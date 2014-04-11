@@ -15,6 +15,14 @@ Prerequisites:
 
 1 - git clone --recursive https://github.com/lerwys/bpm-software.git
 
+	-> Install the Majordomo application from this repository (autotools-based)
+
+3 - cd majordomo/libmdp
+
+	-> Execute the traditional sequence of autotools commands:
+
+4 - ./autogen.sh && make && sudo make install
+
 ==============================================================================
 
 PCIe Installation Instructions:
