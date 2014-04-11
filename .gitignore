@@ -1,0 +1,9 @@
+*~
+*.swp
+*.orig
+*.bak
+*.o
+*.d
+dev_mngr
+dev_io
+valgrind_report.txt
