@@ -1,91 +1,86 @@
-==============================================================================
+# Beam Position Monitor Software
 
-Repository containing the Beam Position Monitor Software
+Software for controlling the AFC BPM boards
 
-==============================================================================
+## Prerequisites:
 
-Prerequisites:
+Make sure you have the following libraries installed: 
 
-	-> Make sure you have the following libraries installed: 
+* zeromq-4.0.4 (http://zeromq.org/area:download)
+* czmq-2.1.0 (http://czmq.zeromq.org/page:get-the-software)
 
-	* zeromq-4.0.4 (http://zeromq.org/area:download)
-	* czmq-2.1.0 (http://czmq.zeromq.org/page:get-the-software)
+Cloning this repository
 
-	-> Cloning this repository
+	git clone --recursive https://github.com/lerwys/bpm-software.git
 
-1 - git clone --recursive https://github.com/lerwys/bpm-software.git
+Install the Majordomo application from this repository (autotools-based)
 
-	-> Install the Majordomo application from this repository (autotools-based)
+	cd majordomo/libmdp
 
-3 - cd majordomo/libmdp
+Execute the traditional sequence of autotools commands:
 
-	-> Execute the traditional sequence of autotools commands:
+	./autogen.sh && make && sudo make install
 
-4 - ./autogen.sh && make && sudo make install
+## PCIe Installation Instructions
 
-==============================================================================
+Install linux header files
 
-PCIe Installation Instructions:
+	sudo apt-get install linux-headers-generic
 
-1 - sudo apt-get install linux-headers-generic
+Install the GIT package
 
-	-> Install the GIT package
+	sudo apt-get install binutils gcc
 
-2 - sudo apt-get install binutils gcc
+Change folder to the pcie driver location
 
-	-> Change folder to the pcie driver location
+	cd kernel
 
-4 - cd kernel
+Compile the PCIe driver and its tests
 
-	-> Compile the PCIe driver and its tests
+	make
 
-5 - make
+Install the PCIe drivers and libraries
 
-	-> Install the PCIe drivers and libraries
+	sudo make install
 
-6 - sudo make install
+Load the Driver module
 
-	-> Load the Driver module
+	sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
 
-7 - sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
+After this the kernel should have found the FPGA board 
+and initialized it. Run the following command and check its output
 
-	-> After this the kernel should have found the FPGA board and
-	initialized it. Run the following command and check its output
+	dmesg | tail
 
-8 - dmesg | tail
+You should see something like the excerpt below:
 
-	-> You should see something like the excerpt below:
+	[267002.495109] pciDriver - pcidriver_init : 
+		Major 250 allocated to nodename 'fpga'
+	[267002.495130] pciDriver - pcidriver_probe : 
+		Found ML605 board at 0000:01:00.0
+	[267002.495224] pciDriver - pcidriver_probe : 
+		Device /dev/fpga0 added
+	[267002.495434] pciDriver - pcidriver_probe_irq : 
+		Registered Interrupt Handler at pin 1, line 11, IRQ 16
+	[267002.495450] pciDriver - pcidriver_init : 
+		Module loaded
 
-	"
-		[267002.495109] pciDriver - pcidriver_init : 
-			Major 250 allocated to nodename 'fpga'
-		[267002.495130] pciDriver - pcidriver_probe : 
-			Found ML605 board at 0000:01:00.0
-		[267002.495224] pciDriver - pcidriver_probe : 
-			Device /dev/fpga0 added
-		[267002.495434] pciDriver - pcidriver_probe_irq : 
-			Registered Interrupt Handler at pin 1, line 11, IRQ 16
-		[267002.495450] pciDriver - pcidriver_init : 
-			Module loaded
-	"
-==============================================================================
+## Running the PCIe self-test
 
-Running the PCIe self-test:
+After the installation of the PCIe driver (see above) 
+it is possible to run a self test to check if 
+everything is setup properly. For this run the following:
 
-	-> After the installation of the PCIe driver (see above) it is possible to run
-        a self test to check if everything is setup properly. For this run the following:
+Change to the "compiled tests folder"
 
-	-> Change to the "compiled tests folder"
+	cd tests/pcie/bin
 
-1 - cd tests/pcie/bin
+Run the test entitled "testPciDriverMod"
 
-	-> Run the test entitled "testPciDriverMod"
+	sudo ./testPciDriverMod
 
-2 - sudo ./testPciDriverMod
+You should get an output like the following, if everythig is ok:
 
-	-> You should get an output like the following, if everythig is ok:
-
-	"
         Testing OPEN DEVICE... PASSED!
          Testing PCIDRIVER_IOC_MMAP_MODE... PASSED!
          Testing PCIDRIVER_IOC_MMAP_AREA... PASSED!
@@ -177,40 +172,42 @@ Running the PCIe self-test:
 		-------------------------------------
 		|        All tests PASSED!          |
 		-------------------------------------
-	
-	"
 
-    -> Notice that some tests that try to evaluate the limits of a current
-        Linux Kernel may fail in some cases. In the example above,
-        two tests , due to an attempt to allocate a large buffer in kernel
-        space.
+Notice that some tests that try to evaluate the limits of a current
+Linux Kernel may fail in some cases. In the example above,
+two tests , due to an attempt to allocate a large buffer in kernel
+space.
 
-    -> This is not actually an error or a failure, it is just trying to
-        allocate more memory than the kernel has available.
+This is not actually an error or a failure, it is just trying to
+allocate more memory than the kernel has available.
 
-==============================================================================
+## Installation Instructions
 
-Installation Instructions:
+Comple everything
 
-	-> Comple everything
+	make
 
-1 - make
+Compile the examples
 
-	-> Compile the examples
+	make examples
 
-2 - make examples
+Run the server components with the helper script, like shown below:
 
-	-> Run the server components with a helper script
+	./init.sh <broker_endpoint>
 
-3 - ./init.sh
+Typically, one should choose the IPC transport method
+for its faster than TCP. For instance:
 
-	-> Now we should be good to start making transactions.
-	-> Change to the example applications folder
+	./init.sh ipc:///tmp/bpm/0
 
-4 - cd examples
+Now we should be good to start making transactions.
 
-	-> Run the Example application
+Change to the example applications folder
 
-5 - ./client -v
+	cd examples
 
-	-> Leds should be blinking in the FMC ADC board
+Run the Example application
+
+	./client -v
+
+Leds should be blinking in the FMC ADC board
