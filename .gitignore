@@ -5,6 +5,4 @@
 *.o
 *.d
 *.pyc
-dev_mngr
-dev_io
 valgrind_report.txt
