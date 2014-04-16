@@ -11,14 +11,15 @@ fi
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
+	echo "Error: Broker endpoint not set!"
 	echo "Usage: `basename $0` {broker endpoint}"
 	exit 1;
 fi
 
 broker_endp=$1
 
-# Launch Device Manager 
-./dev_mngr "ipc://"$broker_endp &
+# Launch Device Manager
+./dev_mngr -v -b "ipc://"$broker_endp &
 # Signal dev_mngr of a "new" PCIe device
 killall -SIGUSR1 dev_mngr
 
