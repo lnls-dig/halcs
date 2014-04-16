@@ -183,9 +183,9 @@ allocate more memory than the kernel has available.
 
 ## Installation Instructions
 
-Comple everything
+Compile everything with debug info
 
-	make
+	make DBE_DBG=y
 
 Compile the examples
 
