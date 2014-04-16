@@ -23,5 +23,7 @@ broker_endp=$1
 # Signal dev_mngr of a "new" PCIe device
 killall -SIGUSR1 dev_mngr
 
+# FIXME:Wait until worker has been created
+sleep 1
 # Change IPC permissions
 chmod 777 $broker_endp
