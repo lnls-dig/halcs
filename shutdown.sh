@@ -6,7 +6,7 @@ then
 	exit 1
 fi
 
-killall mdp_broker && 
-killall dev_io && 
+killall mdp_broker
+killall dev_io
 killall dev_mngr
 
