@@ -54,7 +54,7 @@ OUT=client
 all: $(OUT)
 
 client: client.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD
 clean:
