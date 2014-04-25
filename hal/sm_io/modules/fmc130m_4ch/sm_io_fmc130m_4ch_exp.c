@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "sm_io_fmc130m_4ch.h"
+#include "sm_io_fmc130m_4ch_exp.h"
 #include "sm_io.h"
 #include "dev_io.h"
 #include "hal_assert.h"
@@ -17,14 +17,14 @@
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
-    ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io:fmc130m_4ch]",\
+    ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io:fmc130m_4ch_exp]", \
             err_str, err_goto_label)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
 #define ASSERT_ALLOC(ptr, err_goto_label)                   \
-    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:fmc130m_4ch]",     \
+    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:fmc130m_4ch_exp]", \
             smio_err_str(SMIO_ERR_ALLOC),                   \
             err_goto_label)
 
@@ -32,7 +32,7 @@
 #undef CHECK_ERR
 #endif
 #define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch]",        \
+    CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
 /************************************************************/
@@ -63,11 +63,11 @@ static void *_fmc130m_4ch_leds (void *owner, void *args)
     exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
     assert (zmsg_size (*exp_msg->msg) > 0);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling _fmc130m_4ch_leds\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_leds\n");
     uint32_t leds = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     smio_thsafe_client_write_32 (self, BAR4_ADDR | FMC1_ADDR | FMC_MONITOR_REG,
             &leds);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_boot] Led write: 0x%08x\n",
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Led write: 0x%08x\n",
             leds);
 
     /* Don't send any response, for now... */
@@ -151,7 +151,7 @@ const smio_ops_t fmc130m_4ch_ops = {
 
 smio_err_e fmc130m_4ch_init (smio_t * self)
 {
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Initializing fmc130m_4ch\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Initializing fmc130m_4ch\n");
 
     smio_err_e err = SMIO_ERR_ALLOC;
 
@@ -163,8 +163,16 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
     self->ops = &fmc130m_4ch_ops;
     self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
     self->exp_ops = fmc130m_exp_ops;
-    err = SMIO_SUCCESS;
 
+    /* Initialize specific structure */
+    self->smio_handler = smio_fmc130m_4ch_new (0);
+    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc);
+
+    err = SMIO_SUCCESS;
+    return err;
+
+err_smio_handler_alloc:
+    free (self->name);
 err_name_alloc:
     return err;
 }
@@ -172,8 +180,9 @@ err_name_alloc:
 /* Destroy sm_io instance of fmc130m_4ch */
 smio_err_e fmc130m_4ch_shutdown (smio_t *self)
 {
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Shutting down fmc130m_4ch\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Shutting down fmc130m_4ch\n");
 
+    smio_fmc130m_4ch_destroy (self->smio_handler);
     self->exp_ops = NULL;
     self->thsafe_client_ops = NULL;
     self->ops = NULL;
