@@ -198,7 +198,7 @@ Run the server components with the helper script, like shown below:
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./init.sh ipc:///tmp/bpm/0
+	./init.sh /tmp/bpm/0
 
 Now we should be good to start making transactions.
 
