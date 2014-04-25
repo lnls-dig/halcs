@@ -37,6 +37,9 @@ struct _smio_t {
     /* int verbose; */                  /* Print activity to stdout */
     mdp_worker_t *worker;               /* zeroMQ Majordomo worker */
     struct _devio_t *parent;            /* Pointer back to parent dev_io */
+    void *smio_handler;                 /* Generic pointer to a device handler. This
+                                            must be cast to a specific type by the
+                                            devices functions */
     zctx_t *ctx;                        /* Our context */
     void *pipe;                         /* Pipe back to parent to exchange messages */
 

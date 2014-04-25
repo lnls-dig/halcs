@@ -165,6 +165,7 @@ static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx, 
     self->exp_ops_dtable = disp_table_new ();
     ASSERT_ALLOC(self->exp_ops_dtable, err_exp_ops_dtable_alloc);
 
+    self->smio_handler = NULL;      /* This is set by the device functions */
     self->ctx = ctx;
     self->pipe = pipe;
 
