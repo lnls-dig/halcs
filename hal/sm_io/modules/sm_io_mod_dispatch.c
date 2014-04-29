@@ -7,7 +7,7 @@
 
 #include "sm_io_mod_dispatch.h"
 /* Include all available module we can handle */
-#include "sm_io_fmc130m_4ch.h"
+#include "sm_io_fmc130m_4ch_exp.h"
 
 /* Table of all known modules we can handle */
 const smio_mod_dispatch_t smio_mod_dispatch[MOD_DISPATCH_END] = {

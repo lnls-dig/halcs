@@ -11,6 +11,7 @@
 #include "sm_io_bootstrap.h"
 #include "smio_thsafe_zmq_client.h"
 #include "exp_ops_codes.h"
+#include "sm_io_fmc130m_4ch_core.h"
 
 /* Known modules IDs (from SDB records defined in FPGA) */
 #define FMC130M_4CH_SDB_DEVID       0x7085ef15
