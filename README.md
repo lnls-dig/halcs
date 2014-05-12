@@ -183,9 +183,32 @@ allocate more memory than the kernel has available.
 
 ## Installation Instructions
 
-Compile everything with debug info
+### Server
 
-	make DBE_DBG=y
+Compile everything with debug info. The superuser access 
+is necessary because it checks (and installs if needed) 
+the PCIe kernel driver. 
+
+If the PCIe driver is already installed, you could
+run it without superuser.
+
+	sudo make DBE_DBG=y
+
+### Client
+
+Change to the Client API folder
+
+	cd libclient
+
+Compile the library
+
+	make
+
+Install the library
+	
+	sudo make install
+
+## Running the example
 
 Compile the examples
 
@@ -198,7 +221,7 @@ Run the server components with the helper script, like shown below:
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./init.sh /tmp/bpm/0
+	./init.sh /tmp/bpm
 
 Now we should be good to start making transactions.
 
@@ -206,8 +229,9 @@ Change to the example applications folder
 
 	cd examples
 
-Run the Example application
+Run the Example application with verbose flag (-v)
+and specifying a broker endpoint (-b)
 
-	./client -v
+	./client -v -b ipc://<broker_endpoint>
 
 Leds should be blinking in the FMC ADC board
