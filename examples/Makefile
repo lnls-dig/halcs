@@ -34,12 +34,12 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmdp
+LIBS = -lbpmclient -lmdp -lczmq -lzmq
 # General library flags -L<libdir>
 LFLAGS =
 
 # Include directories
-INCLUDE_DIRS = -I. -Iinclude
+INCLUDE_DIRS = -I. -I/usr/local/lib
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
