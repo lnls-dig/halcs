@@ -70,29 +70,28 @@ OUT = $(hal_OUT)
 .SECONDEXPANSION:
 
 # Save a git repository description
-#REVISION = $(shell git describe --dirty --always)
-#REVISION_NAME = revision
-#OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
+REVISION = $(shell git describe --dirty --always)
+REVISION_NAME = revision
+OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 
-.PHONY: all kernel_check clean mrproper install uninstall tests examples
+.PHONY: all kernel_install kernel_check \
+	clean mrproper install uninstall \
+	tests examples
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel_check $(OUT)
+all: kernel_install $(OUT)
 
 # Output Rule
-$(OUT): $$($$@_OBJS)
-	#$(REVISION_NAME).o
+$(OUT): $$($$@_OBJS) $(REVISION_NAME).o
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $(LDFLAGS) $(LIBS)
-#$(SIZE) $@
 
-#$(REVISION_NAME).o: $(REVISION_NAME).c
-#	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION=\"$(REVISION)\" -c $<
-#	$(SIZE) -t $@
+$(REVISION_NAME).o: $(REVISION_NAME).c
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION=\"$(REVISION)\" -c $<
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -125,8 +124,10 @@ $(OUT): $$($$@_OBJS)
 	@rm -f $*.d.tmp
 
 kernel_check:
-# Check for libraries and issue warning!!!
-# $(MAKE) -C $(KERNEL_DIR) all
+	$(MAKE) -C $(KERNEL_DIR) all
+
+kernel_install: kernel_check
+	$(MAKE) -C $(KERNEL_DIR) install
 
 tests:
 	$(MAKE) -C $@ all
