@@ -7,7 +7,7 @@ Software for controlling the AFC BPM boards
 Make sure you have the following libraries installed: 
 
 * zeromq-4.0.4 (http://zeromq.org/area:download)
-* czmq-2.1.0 (http://czmq.zeromq.org/page:get-the-software)
+* czmq-2.2.0 (http://czmq.zeromq.org/page:get-the-software)
 
 Cloning this repository
 
