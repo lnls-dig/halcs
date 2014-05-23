@@ -199,7 +199,6 @@ void *thsafe_zmq_server_read_32 (void *owner, void *args)
     uint32_t data = 0;
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_32 (self->llio, offset, &data);
-    printf ("message read from LLIO is: %u\n", data);
 
     /* Send message back to client */
     _thsafe_zmq_server_send_read (&llio_ret, (uint8_t *) &data, sizeof (data),
