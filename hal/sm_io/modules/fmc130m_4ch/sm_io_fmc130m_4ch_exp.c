@@ -182,7 +182,7 @@ smio_err_e fmc130m_4ch_shutdown (smio_t *self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Shutting down fmc130m_4ch\n");
 
-    smio_fmc130m_4ch_destroy (self->smio_handler);
+    smio_fmc130m_4ch_destroy ((smio_fmc130m_4ch_t **) &self->smio_handler);
     self->exp_ops = NULL;
     self->thsafe_client_ops = NULL;
     self->ops = NULL;
