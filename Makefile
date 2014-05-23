@@ -11,6 +11,9 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
+# Select board in which we will work. Options are: ml605, afc
+BOARD = ml605
+
 INSTALL_DIR ?= /usr/lib
 export INSTALL_DIR
 
@@ -19,7 +22,7 @@ export INSTALL_DIR
 KERNEL_DIR = kernel
 
 # General C flags
-CFLAGS = -std=gnu99 -O2
+CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
