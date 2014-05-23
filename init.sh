@@ -20,6 +20,8 @@ broker_endp=$1
 
 # Launch Device Manager
 ./dev_mngr -v -b "ipc://"$broker_endp &
+# FIXME: Wait dev_mngr has registred the signal handlers
+sleep 1
 # Signal dev_mngr of a "new" PCIe device
 killall -SIGUSR1 dev_mngr
 
