@@ -7,12 +7,12 @@
 
 #include "bpm_client_codes.h"
 
-const BPM_CLI_OPCODE_TYPE cli_opcodes [BPM_CLI_OPCODE_END] = {
-    [0]  = BPM_CLI_OPCODE_LEDS,
+const BPM_CLIENT_OPCODE_TYPE client_opcodes [BPM_CLIENT_OPCODE_END] = {
+    [0]  = BPM_CLIENT_OPCODE_LEDS,
 };
 
-const BPM_CLI_RECODE_TYPE cli_recodes [BPM_CLI_RECODE_END] = {
-    [0] = BPM_CLI_RECODE_OK,
-    [1] = BPM_CLI_RECODE_ERR
+const BPM_CLIENT_RECODE_TYPE client_recodes [BPM_CLIENT_RECODE_END] = {
+    [0] = BPM_CLIENT_RECODE_OK,
+    [1] = BPM_CLIENT_RECODE_ERR
 };
 
