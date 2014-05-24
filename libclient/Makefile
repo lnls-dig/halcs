@@ -48,10 +48,10 @@ LFLAGS =
 # Specific platform objects
 OBJS_PLATFORM =
 # Library objects
-libbpmclient_OBJS_LIB = bpm_client.o bpm_client_codes.o
+libbpmclient_OBJS_LIB = bpm_client.o bpm_client_codes.o bpm_client_err.o
 
 # Include directories
-INCLUDE_DIRS = -I.
+INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -118,7 +118,7 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c -fPIC $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
-	${CC} -MM $(CFLAGS) $*.c > $*.d
+	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
 
 # Workaround to make objects in different folders have
 # the correct target path. e.g., "dir/bar.o: dir/bar.c dir/foo.h"
@@ -154,7 +154,7 @@ uninstall:
 	$(foreach header,$($(LIBCLIENT)_HEADERS),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
 
 clean:
-	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
+	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean
 	rm -f *.a *.so.$(LIB_VER)
