@@ -12,6 +12,7 @@
 #include <mdp.h>
 
 #include "bpm_client_codes.h"
+#include "bpm_client_err.h"
 
 typedef struct _bpm_client_t bpm_client_t;
 
@@ -30,6 +31,6 @@ void bpm_client_destroy (bpm_client_t **self_p);
 /* Blink the FMC Leds. This is only used for debug and for demostration
  * purposes. Return BPM_CLI_RECODE_OK if ok and BPM_CLI_RECODE_ERR if
  * error */
-bpm_cli_recode_t bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
+bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
 
 #endif
