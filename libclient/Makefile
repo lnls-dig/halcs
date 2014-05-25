@@ -48,7 +48,7 @@ LFLAGS =
 # Specific board objects
 OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
-OBJS_PLATFORM =
+OBJS_PLATFORM = ../hal/debug/debug_print.o
 # Library objects
 libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o
 
