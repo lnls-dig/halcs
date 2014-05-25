@@ -14,6 +14,7 @@
 #include "hal_assert.h"
 #include "ddr3_map.h"
 #include "board.h"
+#include "wb_acq_core_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -56,7 +57,8 @@
 /************************************************************/
 static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
 									uint32_t reply_size, uint32_t *data_out,
-									mdp_worker_t *worker, zframe_t *reply_to ){
+									bool with_data_frame, mdp_worker_t *worker,
+                                    zframe_t *reply_to ){
 
 	/* Send reply back to client */
     zmsg_t *report = zmsg_new ();
@@ -69,7 +71,7 @@ static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
     int zerr = zmsg_addmem (report, &reply_code, sizeof(reply_code));
     ASSERT_TEST(zerr==0, "Could not add reply code in message", err_reply_code);
 
-	if (reply_code == ACQ_BLOCK_OK || reply_code == ACQ_BLOCK_ERR) {
+	if (with_data_frame) {
         zerr = zmsg_addmem (report, &reply_size, sizeof(reply_size));
         ASSERT_TEST(zerr==0, "Could not add reply size in message",
                 err_size_code);
@@ -77,6 +79,7 @@ static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
         ASSERT_TEST(zerr==0, "Could not add reply data in message",
                 err_data_code);
     }
+
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:acq] send_client_response: "
 		"Sending message:\n");
 #ifdef LOCAL_MSG_DBG
@@ -120,8 +123,8 @@ static void *_acq_data_acquire (void *owner, void *args)
 
         /* Message is:
          * frame 0: error code      */
-        _send_client_response (ACQ_REQ_ERR, 0, NULL, self->worker,
-								exp_msg->reply_to);
+        _send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
+                self->worker, exp_msg->reply_to);
 		goto err_smp_exceeded;
     }
 
@@ -203,7 +206,8 @@ static void *_acq_data_acquire (void *owner, void *args)
 
     /* Message is:
      * frame 0: error code      */
-	_send_client_response (ACQ_REQ_OK, 0, NULL, self->worker, exp_msg->reply_to);
+	_send_client_response (ACQ_OK, 0, NULL, false, self->worker,
+            exp_msg->reply_to);
 
 err_smp_exceeded:
     zmsg_destroy (exp_msg->msg);
@@ -233,13 +237,14 @@ static void *_acq_check_data_acquire (void *owner, void *args)
                 "Acquisition is not done\n");
         /* Message is:
          * frame 0: error code  */
-        _send_client_response (ACQ_CHECK_ERR, 0, NULL, self->worker,
+        _send_client_response (ACQ_NOT_COMPLETED, 0, NULL, false, self->worker,
 								exp_msg->reply_to);
 		goto err_acq_check;
     }
+
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
                 "Acquisition is done\n");
-    _send_client_response (ACQ_CHECK_OK, 0, NULL, self->worker,
+    _send_client_response (ACQ_OK, 0, NULL, false, self->worker,
 								exp_msg->reply_to);
 err_acq_check:
     zmsg_destroy (exp_msg->msg);
@@ -290,7 +295,7 @@ static void *_acq_get_data_block (void *owner, void *args)
         * frame 0: error code
         * frame 1: size (in bytes)
         * frame 2: data            */
-		_send_client_response (ACQ_BLOCK_ERR, 0, NULL, self->worker,
+		_send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
 								exp_msg->reply_to);
 		goto err_invalid_block;
 	}
@@ -324,7 +329,7 @@ static void *_acq_get_data_block (void *owner, void *args)
         * frame 0: error code
         * frame 1: size (in bytes)
         * frame 2: data            */
-		_send_client_response (ACQ_BLOCK_ERR, 0, NULL, self->worker,
+		_send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
 								exp_msg->reply_to);
 		goto err_invalid_block;
     }	/* Last valid data conditions check done */
@@ -361,21 +366,13 @@ static void *_acq_get_data_block (void *owner, void *args)
      * frame 0: error code
      * frame 1: size (in bytes)
      * frame 2: data            */
-	_send_client_response (ACQ_BLOCK_OK, reply_size, data_out, self->worker,
+	_send_client_response (ACQ_OK, reply_size, data_out, true, self->worker,
                             exp_msg->reply_to);
 
 err_invalid_block:
     zmsg_destroy (exp_msg->msg);
     return NULL;
 }
-
-#define ACQ_OPCODE_DATA_ACQUIRE         0
-#define ACQ_NAME_DATA_ACQUIRE           "data_acquire"
-#define ACQ_OPCODE_GET_DATA_BLOCK       1
-#define ACQ_NAME_GET_DATA_BLOCK         "get_data_block"
-#define ACQ_OPCODE_CHECK_DATA_ACQUIRE    2
-#define ACQ_NAME_CHECK_DATA_ACQUIRE      "check_data_acquire"
-#define ACQ_OPCODE_END                  3
 
 const smio_exp_ops_t acq_exp_ops [] = {
     {.name 			= ACQ_NAME_DATA_ACQUIRE,

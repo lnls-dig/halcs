@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "sm_io_fmc130m_4ch_exp.h"
+#include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io.h"
 #include "dev_io.h"
 #include "hal_assert.h"
@@ -74,11 +75,6 @@ static void *_fmc130m_4ch_leds (void *owner, void *args)
 
     return NULL;
 }
-
-/* #define EXP_FUNC_FMC130M_4CH_SIZE       1 */
-#define FMC130M_4CH_OPCODE_LEDS         0
-#define FMC130M_4CH_NAME_LEDS           "leds"
-#define FMC130M_4CH_OPCODE_END          1
 
 const smio_exp_ops_t fmc130m_exp_ops [] = {
     {.name = FMC130M_4CH_NAME_LEDS, .opcode = FMC130M_4CH_OPCODE_LEDS, .func_fp = _fmc130m_4ch_leds},

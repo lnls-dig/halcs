@@ -10,21 +10,26 @@
 
 #include <inttypes.h>
 
+/* Messaging OPCODES */
+#define ACQ_OPCODE_SIZE                  (sizeof(uint32_t))
+#define ACQ_OPCODE_TYPE                  uint32_t
+
+#define ACQ_OPCODE_DATA_ACQUIRE         0
+#define ACQ_NAME_DATA_ACQUIRE           "data_acquire"
+#define ACQ_OPCODE_GET_DATA_BLOCK       1
+#define ACQ_NAME_GET_DATA_BLOCK         "get_data_block"
+#define ACQ_OPCODE_CHECK_DATA_ACQUIRE   2
+#define ACQ_NAME_CHECK_DATA_ACQUIRE     "check_data_acquire"
+#define ACQ_OPCODE_END                  3
+
 /* Messaging Reply OPCODES */
-#define ACQ_REPLY_SIZE           (sizeof(uint32_t))
-#define ACQ_REPLY_TYPE           uint32_t
+#define ACQ_REPLY_SIZE                  (sizeof(uint32_t))
+#define ACQ_REPLY_TYPE                  uint32_t
 
-#define ACQ_REQ_OK              0
-#define ACQ_REQ_ERR             1
-
-#define ACQ_CHECK_OK            2
-#define ACQ_CHECK_ERR           3
-
-#define ACQ_BLOCK_OK            4
-#define ACQ_BLOCK_ERR           5
-
-#define ACQ_REPLY_END           6
-
-extern const ACQ_REPLY_TYPE acq_reply_ops [ACQ_REPLY_END];
+#define ACQ_OK                          0   /* Operation was successful */
+#define ACQ_NUM_SAMPLES_OOR             1   /* Number of samples out of range */
+#define ACQ_NOT_COMPLETED               2   /* Acquisition not completed */
+#define ACQ_BLOCK_OOR                   3   /* Block number out of range */
+#define ACQ_REPLY_END                   4   /* End marker */
 
 #endif
