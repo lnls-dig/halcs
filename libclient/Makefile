@@ -45,6 +45,8 @@ LIBS = -lzmq -lczmq -lmdp
 # General library flags -L<libdir>
 LFLAGS =
 
+# Specific board objects
+OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
 OBJS_PLATFORM =
 # Library objects
@@ -71,7 +73,8 @@ common_OBJS = $(OBJS_PLATFORM) $(OBJS_BOARD)
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
 $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../hal/sm_io/modules/acq/sm_io_acq_codes.h
+	../hal/sm_io/modules/acq/sm_io_acq_codes.h ../hal/sm_io/modules/sm_io_codes.h \
+	bpm_client_codes.h
 $(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
 
 # Save a git repository description
