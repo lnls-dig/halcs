@@ -13,6 +13,7 @@
 
 #include "bpm_client_codes.h"
 #include "bpm_client_err.h"
+#include "acq_chan.h"           /* SMIO acq channel definition */
 
 typedef struct _bpm_client_t bpm_client_t;
 
