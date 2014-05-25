@@ -1,7 +1,7 @@
 #ifndef DDR3_MAP_H_
 #define DDR3_MAP_H_
 
-#include "wb_acq_core_regs.h"
+#include <inttypes.h>
 
 /*************** Memory Regions *************/
 #define MEM_TOTAL_SIZE (1 << 28) // 256 MB
