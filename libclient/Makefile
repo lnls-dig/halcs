@@ -48,10 +48,11 @@ LFLAGS =
 # Specific platform objects
 OBJS_PLATFORM =
 # Library objects
-libbpmclient_OBJS_LIB = bpm_client.o bpm_client_codes.o bpm_client_err.o
+libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o
 
 # Include directories
-INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug
+INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug -I../hal/sm_io/modules/ \
+	       -I../hal/sm_io/modules/fmc130m_4ch -I../hal/sm_io/modules/acq
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -69,7 +70,9 @@ common_OBJS = $(OBJS_PLATFORM) $(OBJS_BOARD)
 
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
-$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h)
+$(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	../hal/sm_io/modules/acq/sm_io_acq_codes.h
+$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
 
 # Save a git repository description
 REVISION = $(shell git describe --dirty --always)
@@ -151,7 +154,7 @@ uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
-	$(foreach header,$($(LIBCLIENT)_HEADERS),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBCLIENT)_HEADERS)),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
