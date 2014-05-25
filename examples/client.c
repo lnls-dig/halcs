@@ -7,47 +7,11 @@
 #include <czmq.h>
 #include <inttypes.h>
 
+#include <bpm_client.h>
+
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 #define DFLT_BIND_ADDR              "0"
 #define LEDS_OPERATION              0
-
-/* Our tructure */
-typedef struct _bpm_client_t {
-    mdp_client_t *mdp_client;
-} bpm_client_t;
-
-/* Our API */
-bpm_client_t *bpm_client_new (char *broker_endp, int verbose)
-{
-    bpm_client_t *self = zmalloc (sizeof *self);
-    self->mdp_client = mdp_client_new (broker_endp, verbose);
-
-    return self;
-}
-
-void bpm_client_destroy (bpm_client_t **self_p)
-{
-    assert (self_p);
-
-    if (*self_p) {
-        bpm_client_t *self = *self_p;
-
-        mdp_client_destroy (&self->mdp_client);
-        *self_p = NULL;
-    }
-}
-
-int bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
-{
-    uint32_t operation = LEDS_OPERATION;
-
-    zmsg_t *request = zmsg_new ();
-    zmsg_addmem (request, &operation, sizeof (operation));
-    zmsg_addmem (request, &leds, sizeof (leds));
-    mdp_client_send (self->mdp_client, service, &request);
-
-    return 0;
-}
 
 void print_help (char *program_name)
 {
