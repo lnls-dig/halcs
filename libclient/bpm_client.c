@@ -56,10 +56,12 @@ bpm_client_t *bpm_client_new (char *broker_endp, int verbose)
      * acq/ddr3_map.h */
     self->acq_buf = __acq_buf;
 
-err_mdp_client:
-        free (self);
-err_self_alloc:
     return self;
+
+err_mdp_client:
+    free (self);
+err_self_alloc:
+    return NULL;
 }
 
 void bpm_client_destroy (bpm_client_t **self_p)
@@ -69,6 +71,7 @@ void bpm_client_destroy (bpm_client_t **self_p)
     if (*self_p) {
         bpm_client_t *self = *self_p;
 
+        self->acq_buf = NULL;
         mdp_client_destroy (&self->mdp_client);
         *self_p = NULL;
     }
