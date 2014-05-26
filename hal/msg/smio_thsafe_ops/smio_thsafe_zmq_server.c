@@ -37,7 +37,7 @@ static int _thsafe_zmq_server_send_read (int32_t *llio_ret, uint8_t *data,
 static int _thsafe_zmq_server_recv_read (zmsg_t *msg, loff_t *offset);
 static int _thsafe_zmq_server_send_write (int32_t *llio_ret, void *reply_to);
 static int _thsafe_zmq_server_recv_write (zmsg_t *msg, loff_t *offset,
-        uint8_t *data, uint32_t size);
+        zframe_t **data_write_frame);
 
 /**** Open device ****/
 void *thsafe_zmq_server_open (void *owner, void *args)
@@ -252,18 +252,25 @@ void *thsafe_zmq_server_write_16 (void *owner, void *args)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_16\n");
 
-    uint16_t data_write = 0;
+    zframe_t *data_write_frame;
     loff_t offset = 0;
     int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            (uint8_t *) &data_write, THSAFE_WRITE_16_DSIZE);
+            &data_write_frame);
     ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
 
+    if (zframe_size (data_write_frame) != THSAFE_WRITE_16_DSIZE) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_ERR, "[smio_thsafe_server:zmq] Wrong received data size\n");
+        goto err_wrong_data_write_size;
+    }
+
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_16 (self->llio, offset, &data_write);
+    int32_t llio_ret = llio_write_16 (self->llio, offset, (uint16_t *) zframe_data (data_write_frame));
 
     /* Send message back to client */
     _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
 
+err_wrong_data_write_size:
+    zframe_destroy (&data_write_frame);
 err_recv_msg:
     /* Might not be safe to do this if we fail */
     zmsg_destroy (server_args->msg);
@@ -280,18 +287,25 @@ void *thsafe_zmq_server_write_32 (void *owner, void *args)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_32\n");
 
-    uint32_t data_write = 0;
+    zframe_t *data_write_frame;
     loff_t offset = 0;
     int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            (uint8_t *) &data_write, THSAFE_WRITE_32_DSIZE);
+            &data_write_frame);
     ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
 
+    if (zframe_size (data_write_frame) != THSAFE_WRITE_32_DSIZE) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_ERR, "[smio_thsafe_server:zmq] Wrong received data size\n");
+        goto err_wrong_data_write_size;
+    }
+
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_32 (self->llio, offset, &data_write);
+    int32_t llio_ret = llio_write_32 (self->llio, offset, (uint32_t *) zframe_data (data_write_frame));
 
     /* Send message back to client */
     _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
 
+err_wrong_data_write_size:
+    zframe_destroy (&data_write_frame);
 err_recv_msg:
     /* Might not be safe to do this if we fail */
     zmsg_destroy (server_args->msg);
@@ -308,18 +322,25 @@ void *thsafe_zmq_server_write_64 (void *owner, void *args)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_64\n");
 
-    uint64_t data_write = 0;
+    zframe_t *data_write_frame;
     loff_t offset = 0;
     int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            (uint8_t *) &data_write, THSAFE_WRITE_64_DSIZE);
+            &data_write_frame);
     ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
 
+    if (zframe_size (data_write_frame) != THSAFE_WRITE_64_DSIZE) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_ERR, "[smio_thsafe_server:zmq] Wrong received data size\n");
+        goto err_wrong_data_write_size;
+    }
+
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_64 (self->llio, offset, &data_write);
+    int32_t llio_ret = llio_write_64 (self->llio, offset, (uint64_t *) zframe_data (data_write_frame));
 
     /* Send message back to client */
     _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
 
+err_wrong_data_write_size:
+    zframe_destroy (&data_write_frame);
 err_recv_msg:
     /* Might not be safe to do this if we fail */
     zmsg_destroy (server_args->msg);
@@ -477,10 +498,11 @@ err_send_msg_alloc:
 }
 
 static int _thsafe_zmq_server_recv_write (zmsg_t *msg, loff_t *offset,
-        uint8_t *data, uint32_t size)
+        zframe_t **data_write_frame)
 {
     assert (offset);
-    assert (data);
+    assert (data_write_frame);
+    assert (*data_write_frame);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
 #ifdef LOCAL_MSG_DBG
@@ -492,23 +514,13 @@ static int _thsafe_zmq_server_recv_write (zmsg_t *msg, loff_t *offset,
      * frame 1: data to be written */
     zframe_t *offset_frame = zmsg_pop (msg);
     ASSERT_ALLOC(offset, err_offset_alloc);
-    zframe_t *data_write_frame = zmsg_pop (msg);
-    ASSERT_ALLOC(offset, err_data_write_alloc);
-
-    if (zframe_size (data_write_frame) != size) {
-        DBE_DEBUG (DBG_MSG | DBG_LVL_ERR, "[smio_thsafe_server:zmq] Wrong received data size\n");
-        goto err_wrong_data_write_size;
-    }
+    *data_write_frame = zmsg_pop (msg);
+    ASSERT_ALLOC(*data_write_frame, err_data_write_alloc);
 
     *offset = *(loff_t *) zframe_data (offset_frame);
-    memcpy (data, zframe_data (data_write_frame), size);
-
-    zframe_destroy (&data_write_frame);
     zframe_destroy (&offset_frame);
     return 0;
 
-err_wrong_data_write_size:
-    zframe_destroy (&data_write_frame);
 err_data_write_alloc:
     zframe_destroy (&offset_frame);
 err_offset_alloc:
