@@ -18,7 +18,7 @@ export INSTALL_DIR
 LIB_VER = 1.0.0
 
 # General C flags
-CFLAGS = -std=gnu99 -O2
+CFLAGS = -std=gnu99 -O2 -fPIC
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -67,8 +67,8 @@ OUT = $(LIBCLIENT)
 
 .SECONDEXPANSION:
 
-# Objects common for both server and client libraries
-common_OBJS = $(OBJS_PLATFORM) $(OBJS_BOARD)
+# Objects common for both server and client libraries.
+common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
 
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
@@ -118,11 +118,17 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 # corresponding .d file is not found
 -include $(OBJS_all:.o=.d)
 
+# Always recompile common objects as the previous compilation,
+# from another makefile might not have compiled them with the
+# correct flags, as the fPIC for our shared libraries
+$(common_OBJS): FORCE
+FORCE:
+
 # Compile with position-independent objects.
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c -fPIC $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
