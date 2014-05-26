@@ -232,7 +232,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time (NULL);
-    while (time(NULL) - start < timeout) {
+    while ((time(NULL) - start)*1000 < timeout) {
         if (!zctx_interrupted) {
             if ((err = _bpm_check_data_acquire (self, service)) == BPM_CLIENT_SUCCESS) {
                 DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
@@ -240,7 +240,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
                 goto exit;
             }
 
-            usleep (MSECS*timeout);
+            usleep (MSECS*MIN_WAIT_TIME);
         }
     }
 
