@@ -161,12 +161,12 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
     if ( *(ACQ_REPLY_TYPE *) zframe_data(err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
                 "Data acquire was not required correctly\n");
         err = BPM_CLIENT_ERR_AGAIN;
         goto err_data_acquire;
     }
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
             "Data acquire was successfully required\n");
 
 err_data_acquire:
@@ -183,7 +183,7 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     assert (service);
 
     int err = BPM_CLIENT_SUCCESS;
-    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_DATA_ACQUIRE;
+    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_CHECK_DATA_ACQUIRE;
 
     /* Message is:
      * frame 0: operation code      */
@@ -201,12 +201,12 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
     if ( *(ACQ_REPLY_TYPE *) zframe_data(err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
             "Check fail: data acquire was not completed\n");
         err = BPM_CLIENT_ERR_SERVER;
         goto err_check_data_acquire;
     }
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
             "Check ok: data acquire was successfully completed\n");
 
 err_check_data_acquire:
@@ -235,7 +235,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     while (time(NULL) - start < timeout) {
         if (!zctx_interrupted) {
             if ((err = _bpm_check_data_acquire (self, service)) == BPM_CLIENT_SUCCESS) {
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] "
+                DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
                         "bpm_wait_data_acquire_timed: finished waiting\n");
                 goto exit;
             }
@@ -244,7 +244,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
         }
     }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
             "bpm_wait_data_acquire_timed: number of tries was exceeded\n");
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
@@ -262,7 +262,7 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     assert (acq_trans->block.data);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_CHECK_DATA_ACQUIRE;
+    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_GET_DATA_BLOCK;
 
     /* Message is:
      * frame 0: operation code
@@ -292,7 +292,7 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     ASSERT_TEST(data != NULL, "Could not receive data", err_null_data);
 
     if ( *(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
             "Data block was not acquired\n");
         err = BPM_CLIENT_ERR_SERVER;
         goto err_get_data_block;
@@ -302,8 +302,13 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     uint32_t read_size = (acq_trans->block.data_size < data_size) ?
         acq_trans->block.data_size : data_size;
     memcpy (acq_trans->block.data, (uint32_t *) zframe_data (data), read_size);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-        "Data block of %u bytes was successfully acquired\n", read_size);
+
+	/* Print some debug messages */
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "read_size: %u\n", read_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "acq_trans->block.data: %p\n", acq_trans->block.data);
+
     acq_trans->block.bytes_read = read_size;
 
 err_get_data_block:
@@ -339,34 +344,42 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
     /* FIXME: When the last block is full 'block_n_valid exceeds by one */
     uint32_t block_n_valid = acq_trans->req.num_samples /
         (BLOCK_SIZE/self->acq_buf[acq_trans->req.chan].sample_size);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "block_n_valid = %u\n", block_n_valid);
 
-    int bytes_read = 0;
+    uint32_t total_bread = 0;   /* Total bytes read */
+    uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size fopr later */
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
         if (!zctx_interrupted) {
             acq_trans->block.idx = block_n;
-            err = _bpm_get_data_block (self, service, /*chan, block_n,
-                    (uint32_t *)((uint8_t *)data_out+ret), size-ret*/
-                    acq_trans);
+            err = _bpm_get_data_block (self, service, acq_trans);
             if (err != BPM_CLIENT_SUCCESS){
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
                         "_bpm_get_data_block failed. block_n: %u\n", block_n);
                 goto err_bpm_get_data_block;
             }
 
-            bytes_read += acq_trans->block.bytes_read;
-            acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + bytes_read);
-            acq_trans->block.data_size -= bytes_read;
+            total_bread += acq_trans->block.bytes_read;
+            acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
+            acq_trans->block.data_size -= acq_trans->block.bytes_read;
+
+            /* Print some debug messages */
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                    "Total bytes read up to now: %u\n", total_bread);
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                    "Data pointer addr: %p\n", acq_trans->block.data);
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                    "Data buffer size: %u\n", acq_trans->block.data_size);
         }
     }
 
-    /* return to client the total number of bytes read */
-    acq_trans->block.bytes_read = bytes_read;
+    /* Return to client the total number of bytes read */
+    acq_trans->block.bytes_read = total_bread;
+    acq_trans->block.data_size = data_size;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-        "Data curve of %u bytes was successfully acquired\n", bytes_read);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+        "Data curve of %u bytes was successfully acquired\n", total_bread);
 
 err_bpm_get_data_block:
 err_bpm_wait_data_acquire:
