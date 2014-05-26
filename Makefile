@@ -149,8 +149,11 @@ clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 	$(MAKE) -C tests clean
 	$(MAKE) -C examples clean
+	$(MAKE) -C libclient clean
 	$(MAKE) -C $(KERNEL_DIR) clean
 
 mrproper: clean
 	rm -f $(OUT)
+	$(MAKE) -C tests mrproper
 	$(MAKE) -C examples mrproper
+	$(MAKE) -C libclient mrproper
