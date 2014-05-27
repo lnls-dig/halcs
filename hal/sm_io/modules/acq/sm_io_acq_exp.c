@@ -363,7 +363,7 @@ static void *_acq_get_data_block (void *owner, void *args)
      * frame 0: error code
      * frame 1: size (in bytes)
      * frame 2: data            */
-	_send_client_response (ACQ_OK, reply_size, data_out, true, self->worker,
+	_send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
                             exp_msg->reply_to);
 
 err_invalid_block:
