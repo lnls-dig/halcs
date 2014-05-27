@@ -192,7 +192,7 @@ the PCIe kernel driver.
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	sudo make DBE_DBG=y
+	make DBE_DBG=y
 
 ### Client
 
