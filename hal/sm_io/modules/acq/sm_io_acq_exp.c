@@ -353,13 +353,10 @@ static void *_acq_get_data_block (void *owner, void *args)
 
 	/* static max allocation (32-bit words) */
 	uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
-    unsigned long i;
-    for (i = 0; i < reply_size/sizeof(uint32_t); i++, addr_i += sizeof (uint32_t)) {
-        smio_thsafe_client_read_32 (self, BAR2_ADDR | addr_i,
-			&data_out[i]);
-    }
+    ssize_t bytes_read = smio_thsafe_client_read_block (self, BAR2_ADDR | addr_i,
+            reply_size, data_out);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-        "%lu words read\n", i);
+        "%lu bytes read\n", bytes_read);
 
     /* Successul case */
    	/* Message is:
