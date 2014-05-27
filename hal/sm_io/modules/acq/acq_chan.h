@@ -1,7 +1,7 @@
 #ifndef _ACQ_CHAN_H_
 #define _ACQ_CHAN_H_
 
-#define BLOCK_SIZE 32768
+#define BLOCK_SIZE 131072
 
 /* ADC */
 #define ADC_CHAN_ID 0
