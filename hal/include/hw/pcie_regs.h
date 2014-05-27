@@ -17,8 +17,8 @@
 /* Some FPGA PCIe constants */
 /* SDRAM is accesses via 32-bit BAR (32-bit addressing) */
 #define PCIE_SDRAM_PG_SHIFT                 0           /* bits */
-/* #define PCIE_SDRAM_PG_MAX                   19 */          /* bits */
-#define PCIE_SDRAM_PG_MAX                   17          /* bits */
+#define PCIE_SDRAM_PG_MAX                   20          /* bits */
+/* #define PCIE_SDRAM_PG_MAX                   17 */        /* bits */
 /* #define PCIE_SDRAM_PG_SIZE                (1<<16)*/   /* in Words (32-bit) */
 #define PCIE_SDRAM_PG_SIZE                  (1<<PCIE_SDRAM_PG_MAX)  /* in Bytes (8-bit) */
 #define PCIE_SDRAM_PG_MASK                  ((PCIE_SDRAM_PG_SIZE-1) << \
@@ -96,11 +96,73 @@
                                                 PCIE_WB_PG_MAX)
 
 /********** Read or write to BAR **********/
-#define BAR32_RW(barp, addr, datap, rw)                             \
+#define BAR_RW_8(barp, addr, datap, rw)                             \
+    do {                                                            \
+        (rw) ?                                                      \
+        (*(datap) = *(uint32_t *)(((uint8_t *)barp) + (addr))) :    \
+        (*(uint32_t *)(((uint8_t *)barp) + (addr)) = *(datap));     \
+    } while (0)
+
+/* BAR0 is BYTE addressed for the user */
+#define BAR0_RW(barp, addr, datap, rw)                              \
+    BAR_RW_8(barp, addr, datap, rw)
+
+/* BAR2 is BYTE addressed for the user */
+#define BAR2_RW(barp, addr, datap, rw)                              \
+    BAR_RW_8(barp, addr, datap, rw)
+
+/* BAR4 is BYTE addresses for the user */
+/* On PCIe Core FPGA firmware the wishbone address is provided with
+ * only 29 bits, with the LSB zeroed:
+ *
+ *  bit 31        . . .      bit 3   bit 2   bit 1   bit 0
+ *   A31          . . .        A3     '0'     '0'    '0'
+ *
+ * This is done as the BAR4 is 64-bit addressed. But, the output of the
+ * PCIe wrapper are right shifted to avoid dealking with this particularity:
+ *
+ *  bit 31   bit 30   bit 29  bit 28    . . .      bit 3   bit 2   bit 1   bit 0
+ *   '0'      '0'     '0'       A31     . . .        A6     A5      A4      A3
+ *
+ * */
+#define BAR4_RW(barp, addr, datap, rw)                              \
     do {                                                            \
         (rw) ?                                                      \
         (*(datap) = *((barp) + (addr))) :                           \
         (*((barp) + (addr)) = *(datap));                            \
+    } while (0)
+
+/********** Read or write block to BAR **********/
+
+#define BAR_RW_8_BLOCK(barp, addr, size, datap, rw)                 \
+    do {                                                            \
+        if (rw) {                                                   \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((datap) + j) = *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr); \
+            }                                                       \
+        }                                                           \
+        else {                                                      \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr) = *((datap) + j); \
+            };                                                      \
+        }                                                           \
+    } while (0)
+
+#define BAR2_RW_BLOCK(barp, addr, size, datap, rw)                  \
+    BAR_RW_8_BLOCK(barp, addr, size, datap, rw)
+
+#define BAR4_RW_BLOCK(barp, addr, size, datap, rw)                  \
+    do {                                                            \
+        if (rw) {                                                   \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((datap) + j) = *((barp) + j + addr);              \
+            }                                                       \
+        }                                                           \
+        else {                                                      \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((barp) + j + addr) = *((datap) + j);              \
+            }                                                       \
+        }                                                           \
     } while (0)
 
 /* FIXME: Figure it out another convenient way of doing this without hiding code! */

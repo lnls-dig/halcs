@@ -48,12 +48,15 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 #-ffunction-sections -fdata-sections -Wl,--gc-sections
 
-OUT=client
+OUT=leds acq
 
 # Makefile rules
 all: $(OUT)
 
-client: client.c
+leds: leds.c
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
+
+acq: acq.c
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD

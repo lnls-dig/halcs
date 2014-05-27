@@ -1,3 +1,5 @@
-.PHONY: clean
+.PHONY: clean mrproper
 
 clean: ;
+
+mrproper: clean ;

@@ -17,6 +17,6 @@ fi
 
 broker_endp=$1
 
-sudo valgrind --leak-check=yes --trace-children=yes \
+valgrind --leak-check=yes --trace-children=yes \
 	--suppressions=valgrind.supp ./dev_mngr "ipc://"$broker_endp > \
 	valgrind_report.txt 2>&1
