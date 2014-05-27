@@ -56,11 +56,11 @@
 /******************** Local functions ***********************/
 /************************************************************/
 static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
-									uint32_t reply_size, uint32_t *data_out,
-									bool with_data_frame, mdp_worker_t *worker,
-                                    zframe_t *reply_to ){
+        uint32_t reply_size, uint32_t *data_out,
+        bool with_data_frame, mdp_worker_t *worker,
+        zframe_t *reply_to ){
 
-	/* Send reply back to client */
+    /* Send reply back to client */
     zmsg_t *report = zmsg_new ();
     ASSERT_ALLOC(report, err_send_msg_alloc);
 
@@ -71,7 +71,7 @@ static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
     int zerr = zmsg_addmem (report, &reply_code, sizeof(reply_code));
     ASSERT_TEST(zerr==0, "Could not add reply code in message", err_reply_code);
 
-	if (with_data_frame) {
+    if (with_data_frame) {
         zerr = zmsg_addmem (report, &reply_size, sizeof(reply_size));
         ASSERT_TEST(zerr==0, "Could not add reply size in message",
                 err_size_code);
@@ -81,12 +81,12 @@ static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
     }
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:acq] send_client_response: "
-		"Sending message:\n");
+            "Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    	zmsg_print (report);
+    zmsg_print (report);
 #endif
-	mdp_worker_send (worker, &report, reply_to);
-	return;
+    mdp_worker_send (worker, &report, reply_to);
+    return;
 
 err_data_code:
 err_size_code:
@@ -119,13 +119,13 @@ static void *_acq_data_acquire (void *owner, void *args)
     /* number of samples required is out of the maximum limit */
     if (num_samples >= SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
-            "Number of samples required is out of the maximum limit\n");
+                "Number of samples required is out of the maximum limit\n");
 
         /* Message is:
          * frame 0: error code      */
         _send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
                 self->worker, exp_msg->reply_to);
-		goto err_smp_exceeded;
+        goto err_smp_exceeded;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -150,8 +150,8 @@ static void *_acq_data_acquire (void *owner, void *args)
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
     uint32_t num_samples_aligned = num_samples +
-            ( num_samples %
-            ( DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) );
+        ( num_samples %
+          ( DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) );
     /* Pre trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Pre Trigger offset: ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n",
@@ -206,7 +206,7 @@ static void *_acq_data_acquire (void *owner, void *args)
 
     /* Message is:
      * frame 0: error code      */
-	_send_client_response (ACQ_OK, 0, NULL, false, self->worker,
+    _send_client_response (ACQ_OK, 0, NULL, false, self->worker,
             exp_msg->reply_to);
 
 err_smp_exceeded:
@@ -238,14 +238,14 @@ static void *_acq_check_data_acquire (void *owner, void *args)
         /* Message is:
          * frame 0: error code  */
         _send_client_response (ACQ_NOT_COMPLETED, 0, NULL, false, self->worker,
-								exp_msg->reply_to);
-		goto err_acq_check;
+                exp_msg->reply_to);
+        goto err_acq_check;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is done\n");
+            "Acquisition is done\n");
     _send_client_response (ACQ_OK, 0, NULL, false, self->worker,
-								exp_msg->reply_to);
+            exp_msg->reply_to);
 err_acq_check:
     zmsg_destroy (exp_msg->msg);
     return NULL;
@@ -266,13 +266,13 @@ static void *_acq_get_data_block (void *owner, void *args)
     /* Message is:
      * frame 0: channel
      * frame 1: block required      */
-	uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
+    uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     uint32_t block_n     = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "chan = %u\t block_n = %u\n",chan, block_n);
 
-	/* Channel features */
-	DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+    /* Channel features */
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "[channel = %u]\tid = %u\tstart_addr = %u\tend_addr = %u\t"
             "max_samples = %u\tsample_size = %u\n", chan,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].id,
@@ -281,33 +281,33 @@ static void *_acq_get_data_block (void *owner, void *args)
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size);
 
-	uint32_t block_n_max = ( SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr -
-                             SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
-							 SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) /
-						     BLOCK_SIZE;
-	DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-			"block_n_max= %u\n", block_n_max);
-	if (block_n > block_n_max) {	/* block required out of the limits */
+    uint32_t block_n_max = ( SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr -
+            SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
+            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) /
+        BLOCK_SIZE;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+            "block_n_max= %u\n", block_n_max);
+    if (block_n > block_n_max) {	/* block required out of the limits */
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-            "Block required out of the limit\n");
-	    /* Message is:
-        * frame 0: error code
-        * frame 1: size (in bytes)
-        * frame 2: data            */
-		_send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
-								exp_msg->reply_to);
-		goto err_invalid_block;
-	}
+                "Block required out of the limit\n");
+        /* Message is:
+         * frame 0: error code
+         * frame 1: size (in bytes)
+         * frame 2: data            */
+        _send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
+                exp_msg->reply_to);
+        goto err_invalid_block;
+    }
 
-	/* Get number of samples */
-	uint32_t num_samples =
-			 SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples;
-	DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+    /* Get number of samples */
+    uint32_t num_samples =
+        SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "last num_samples = %u\n", num_samples);
 
-	uint32_t n_max_samples = BLOCK_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
-	DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+    uint32_t n_max_samples = BLOCK_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
     uint32_t over_samples = num_samples % n_max_samples;
@@ -324,47 +324,47 @@ static void *_acq_get_data_block (void *owner, void *args)
     if (block_n > block_n_valid) {
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-            "Block required is not valid\n");
-	    /* Message is:
-        * frame 0: error code
-        * frame 1: size (in bytes)
-        * frame 2: data            */
-		_send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
-								exp_msg->reply_to);
-		goto err_invalid_block;
+                "Block required is not valid\n");
+        /* Message is:
+         * frame 0: error code
+         * frame 1: size (in bytes)
+         * frame 2: data            */
+        _send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
+                exp_msg->reply_to);
+        goto err_invalid_block;
     }	/* Last valid data conditions check done */
 
-	uint32_t reply_size;
-	if (block_n == block_n_valid && over_samples > 0){
+    uint32_t reply_size;
+    if (block_n == block_n_valid && over_samples > 0){
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-            "Block required has %u valid samples\n", over_samples);
-		reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+                "Block required has %u valid samples\n", over_samples);
+        reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
     }
     else { /* if block_n < block_n_valid */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-            "Block required is full of valid data\n");
-		reply_size = BLOCK_SIZE;
+                "Block required is full of valid data\n");
+        reply_size = BLOCK_SIZE;
     }
 
-	uint32_t addr_i = SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
-					  block_n * BLOCK_SIZE;
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+    uint32_t addr_i = SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
+        block_n * BLOCK_SIZE;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "addr_i = %u\n", addr_i);
 
-	/* static max allocation (32-bit words) */
-	uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
+    /* static max allocation (32-bit words) */
+    uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
     ssize_t bytes_read = smio_thsafe_client_read_block (self, BAR2_ADDR | addr_i,
             reply_size, data_out);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-        "%lu bytes read\n", bytes_read);
+            "%lu bytes read\n", bytes_read);
 
     /* Successul case */
-   	/* Message is:
+    /* Message is:
      * frame 0: error code
      * frame 1: size (in bytes)
      * frame 2: data            */
-	_send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
-                            exp_msg->reply_to);
+    _send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
+            exp_msg->reply_to);
 
 err_invalid_block:
     zmsg_destroy (exp_msg->msg);
@@ -373,20 +373,20 @@ err_invalid_block:
 
 const smio_exp_ops_t acq_exp_ops [] = {
     {.name 			= ACQ_NAME_DATA_ACQUIRE,
-	 .opcode 		= ACQ_OPCODE_DATA_ACQUIRE,
-	 .func_fp 		= _acq_data_acquire						},
+        .opcode 		= ACQ_OPCODE_DATA_ACQUIRE,
+        .func_fp 		= _acq_data_acquire						},
 
     {.name 			= ACQ_NAME_GET_DATA_BLOCK,
-	 .opcode 		= ACQ_OPCODE_GET_DATA_BLOCK,
-	 .func_fp 		= _acq_get_data_block					},
+        .opcode 		= ACQ_OPCODE_GET_DATA_BLOCK,
+        .func_fp 		= _acq_get_data_block					},
 
     {.name 			= ACQ_NAME_CHECK_DATA_ACQUIRE,
-	 .opcode 		= ACQ_OPCODE_CHECK_DATA_ACQUIRE,
-	 .func_fp 		= _acq_check_data_acquire				},
+        .opcode 		= ACQ_OPCODE_CHECK_DATA_ACQUIRE,
+        .func_fp 		= _acq_check_data_acquire				},
 
     {.name 			= NULL,		/* Must end with this NULL pattern */
-	 .opcode 		= 0,
-	 .func_fp 		= NULL									}
+        .opcode 		= 0,
+        .func_fp 		= NULL									}
 };
 /************************************************************/
 /***************** Export methods functions *****************/
