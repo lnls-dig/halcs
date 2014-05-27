@@ -10,8 +10,6 @@
 #include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
-#define DFLT_BIND_ADDR              "0"
-#define LEDS_OPERATION              0
 
 void print_help (char *program_name)
 {
@@ -57,7 +55,7 @@ int main (int argc, char *argv [])
 
     /* Set default broker address */
     if (broker_endp == NULL) {
-        broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER"/"DFLT_BIND_ADDR);
+        broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose);
