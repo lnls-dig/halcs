@@ -132,6 +132,39 @@
         (*((barp) + (addr)) = *(datap));                            \
     } while (0)
 
+/********** Read or write block to BAR **********/
+
+#define BAR_RW_8_BLOCK(barp, addr, size, datap, rw)                 \
+    do {                                                            \
+        if (rw) {                                                   \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((datap) + j) = *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr); \
+            }                                                       \
+        }                                                           \
+        else {                                                      \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr) = *((datap) + j); \
+            };                                                      \
+        }                                                           \
+    } while (0)
+
+#define BAR2_RW_BLOCK(barp, addr, size, datap, rw)                  \
+    BAR_RW_8_BLOCK(barp, addr, size, datap, rw)
+
+#define BAR4_RW_BLOCK(barp, addr, size, datap, rw)                  \
+    do {                                                            \
+        if (rw) {                                                   \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((datap) + j) = *((barp) + j + addr);              \
+            }                                                       \
+        }                                                           \
+        else {                                                      \
+            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
+                *((barp) + j + addr) = *((datap) + j);              \
+            }                                                       \
+        }                                                           \
+    } while (0)
+
 /* FIXME: Figure it out another convenient way of doing this without hiding code! */
 /* Macros for ease the PCIe BAR pointer verbosity. */
 #define BAR_ACCESS_GEN(bar_addr)        (((llio_dev_pcie_t *)self->dev_handler)->bar_addr)
