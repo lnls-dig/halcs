@@ -11,6 +11,9 @@
 #include "dev_io_core.h"
 #include "sm_io_thsafe_codes.h"
 
+/* Somewhat arbitrary maximum block size for read_block funtions */
+#define MAX_BLOCK_SIZE          131072
+
 /* For use by smio_t general structure */
 extern const smio_thsafe_server_ops_t smio_thsafe_zmq_server_ops;
 
