@@ -59,11 +59,11 @@ typedef ssize_t (*write_64_fp)(struct _llio_t *self, loff_t offs, const uint64_t
 /* Read data block from device function pointer, size in bytes */
 typedef ssize_t (*read_block_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Write data block from device function pointer, size in bytes */
-typedef ssize_t (*write_block_fp)(struct _llio_t *self, loff_t offs, size_t size, const uint32_t *data);
+typedef ssize_t (*write_block_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Read data block via DMA from device function pointer, size in bytes */
 typedef ssize_t (*read_dma_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Write data block via DMA from device function pointer, size in bytes */
-typedef ssize_t (*write_dma_fp)(struct _llio_t *self, loff_t offs, size_t size, const uint32_t *data);
+typedef ssize_t (*write_dma_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Read device information function pointer */
 /* typedef int (*read_info_fp)(struct _llio_t *self, struct _llio_dev_info_t *dev_info); moved to dev_io */
 
@@ -127,11 +127,11 @@ ssize_t llio_write_64 (llio_t *self, loff_t offs, const uint64_t *data);
 /* Read data block from device, size in bytes */
 ssize_t llio_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Write data block from device, size in bytes */
-ssize_t llio_write_block (llio_t *self, loff_t offs, size_t size, const uint32_t *data);
+ssize_t llio_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Read data block via DMA from device, size in bytes */
 ssize_t llio_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Write data block via DMA from device, size in bytes */
-ssize_t llio_write_dma (llio_t *self, loff_t offs, size_t size, const uint32_t *data);
+ssize_t llio_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data);
 /* Read device information */
 /* int llio_read_info (llio_t *self, llio_dev_info_t *dev_info); Moved to dev_io */
 

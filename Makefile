@@ -11,15 +11,20 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
+# Select board in which we will work. Options are: ml605, afc
+BOARD = ml605
+
 INSTALL_DIR ?= /usr/lib
 export INSTALL_DIR
 
 # Kernel stuff (pcie driver and library) relative
 # directory
 KERNEL_DIR = kernel
+KERNEL_VER = $(shell uname -r)
+DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
 
 # General C flags
-CFLAGS = -std=gnu99 -O2
+CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -57,12 +62,10 @@ include hal/hal.mk
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
 	       -I$(KERNEL_DIR)/include/pcie
 
-# Merge all flags. Optimize for size (-Os)
+# Merge all flags.
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-#-Os
 
 LDFLAGS = $(LDFLAGS_PLATFORM)
-#-ffunction-sections -fdata-sections -Wl,--gc-sections
 
 # Output modules
 OUT = $(hal_OUT)
@@ -76,7 +79,7 @@ OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 
-.PHONY: all kernel_install kernel_check \
+.PHONY: all kernel kernel_install kernel_check \
 	clean mrproper install uninstall \
 	tests examples
 
@@ -84,7 +87,7 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel_install $(OUT)
+all: kernel_check $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
@@ -123,10 +126,20 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-kernel_check:
+kernel:
 	$(MAKE) -C $(KERNEL_DIR) all
 
-kernel_install: kernel_check
+#Verify if the driver is in place
+kernel_check:
+ifeq ($(wildcard $(DRIVER_OBJ)),)
+	@echo "PCI driver not found!";
+	@echo "Compilation will continue, but you must install";
+	@echo "and load the driver prior to initializing the software";
+	@sleep 2;
+	$(MAKE) -C $(KERNEL_DIR) all
+endif
+
+kernel_install:
 	$(MAKE) -C $(KERNEL_DIR) install
 
 tests:
@@ -147,8 +160,11 @@ clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 	$(MAKE) -C tests clean
 	$(MAKE) -C examples clean
+	$(MAKE) -C libclient clean
 	$(MAKE) -C $(KERNEL_DIR) clean
 
 mrproper: clean
 	rm -f $(OUT)
+	$(MAKE) -C tests mrproper
 	$(MAKE) -C examples mrproper
+	$(MAKE) -C libclient mrproper

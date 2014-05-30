@@ -35,6 +35,12 @@
 #define WRITE_TO_BAR                          0
 
 static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw);
+static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw);
+static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw);
+static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size,
+        uint32_t *data, int rw);
 
 /************ Our methods implementation **********/
 
@@ -61,8 +67,12 @@ llio_dev_pcie_t * llio_dev_pcie_new (char *dev_entry)
     ASSERT_TEST(self->bar0!=NULL, "Could not allocate bar0", err_bar0_alloc);
     self->bar2 = (uint32_t *) pd_mapBAR (self->dev, BAR2NO);
     ASSERT_TEST(self->bar2!=NULL, "Could not allocate bar2", err_bar2_alloc);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] BAR2 addr = %p\n",
+            self->bar2);
     self->bar4 = (uint64_t *) pd_mapBAR (self->dev, BAR4NO);
     ASSERT_TEST(self->bar4!=NULL, "Could not allocate bar4", err_bar4_alloc);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] BAR4 addr = %p\n",
+            self->bar4);
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] Created instance of llio_dev_pcie\n");
 
@@ -199,21 +209,14 @@ ssize_t pcie_write_64 (llio_t *self, loff_t offs, const uint64_t *data)
 /* Read data block from PCIe device, size in bytes */
 ssize_t pcie_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
-    return -1;
+    return _pcie_rw_block (self, offs, size, data, READ_FROM_BAR);
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t pcie_write_block (llio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t pcie_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
-    return -1;
+    /* _pcie_rw_block with WRITE_TO_BAR does not modify "data" */
+    return _pcie_rw_block (self, offs, size, data, WRITE_TO_BAR);
 }
 
 /* Read data block from PCIe device, size in bytes */
@@ -227,7 +230,7 @@ ssize_t pcie_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t pcie_write_dma (llio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t pcie_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 {
     (void) self;
     (void) offs;
@@ -267,7 +270,7 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_32] bar_no = %d, full_offs = %lX\n",
                     bar_no, full_offs);
-            BAR32_RW(BAR0, full_offs, data, rw);
+            BAR0_RW(BAR0, full_offs, data, rw);
             break;
 
         /* FPGA SDRAM */
@@ -278,9 +281,11 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
             pg_offs = PCIE_ADDR_SDRAM_PG_OFFS (full_offs);
             SET_SDRAM_PG (pg_num);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = %lX, pg_offs = %lX\n",
+                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
                     bar_no, pg_num, full_offs, pg_offs);
-            BAR32_RW(BAR2, pg_offs, data, rw);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_32] full_addr = 0x%p\n", ((llio_dev_pcie_t *) self->dev_handler)->bar2 + pg_offs);
+            BAR2_RW(BAR2, pg_offs, data, rw);
             break;
 
         /* FPGA Wishbone */
@@ -291,9 +296,11 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
             pg_offs = PCIE_ADDR_WB_PG_OFFS (full_offs);
             SET_WB_PG (pg_num);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num = %d,\n\tfull_offs = %lX, pg_offs = %lX\n",
+                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
                     bar_no, pg_num, full_offs, pg_offs);
-            BAR32_RW(BAR4, pg_offs, data, rw);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_32] full_addr = %p\n", ((llio_dev_pcie_t *) self->dev_handler)->bar4 + pg_offs);
+            BAR4_RW(BAR4, pg_offs, data, rw);
             break;
 
         /* Invalid BAR */
@@ -302,6 +309,119 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
     }
 
     return sizeof (*data);
+}
+
+static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw)
+{
+    uint32_t offs = pg_offs;
+    uint32_t num_bytes_rem = size;
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_rw_bar2_block_raw] pg_start = %u, pg_end = %lu...\n",
+            pg_start, pg_start + (pg_offs+size)/PCIE_SDRAM_PG_SIZE + 1);
+    for (unsigned int pg = pg_start;
+            pg < (pg_start + (pg_offs+size)/PCIE_SDRAM_PG_SIZE + 1);
+            ++pg) {
+        SET_SDRAM_PG (pg);
+        uint32_t num_bytes_page = (num_bytes_rem > PCIE_SDRAM_PG_SIZE) ?
+            (PCIE_SDRAM_PG_SIZE-offs) : (num_bytes_rem);
+        num_bytes_rem -= num_bytes_page;
+
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_rw_bar2_block_raw] Reading %u bytes from addr: %p\n",
+                num_bytes_page, BAR2);
+        BAR2_RW_BLOCK(BAR2, offs, num_bytes_page,
+                (uint32_t *)((uint8_t *)data + (pg-pg_start)*PCIE_SDRAM_PG_SIZE), rw);
+
+        /* Always 0 after the first page */
+        offs = 0;
+    }
+
+    return size /*- num_bytes_rem*/;
+}
+
+static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw)
+{
+    uint32_t offs = pg_offs;
+    uint32_t num_bytes_rem = size;
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_rw_bar4_block_raw] pg_start = %u, pg_end = %lu...\n",
+            pg_start, pg_start + (pg_offs+size)/PCIE_WB_PG_SIZE + 1);
+    for (unsigned int pg = pg_start;
+            pg < pg_start + (pg_offs+size)/PCIE_WB_PG_SIZE + 1;
+            ++pg) {
+        SET_WB_PG (pg);
+        uint32_t num_bytes_page = (num_bytes_rem > PCIE_WB_PG_SIZE) ?
+            (PCIE_WB_PG_SIZE-offs) : (num_bytes_rem);
+        num_bytes_rem -= num_bytes_page;
+
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_rw_bar4_block_raw] Reading %u bytes from addr: %p\n",
+                num_bytes_page, BAR4);
+        BAR4_RW_BLOCK(BAR4, offs, num_bytes_page,
+                (uint32_t *)((uint8_t *)data + (pg-pg_start)*PCIE_WB_PG_SIZE), rw);
+
+        /* Always 0 after the first page */
+        offs = 0;
+    }
+
+    return size /*- num_bytes_rem*/;
+}
+
+static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t *data, int rw)
+{
+    if (!self->endpoint->opened) {
+        return -1;
+    }
+
+    /* Determine which bar to operate on */
+    int bar_no = PCIE_ADDR_BAR (offs);
+    loff_t full_offs = PCIE_ADDR_GEN (offs);
+    int pg_start;
+    loff_t pg_offs;
+    ssize_t ret_size = -1;
+
+    switch (bar_no) {
+        /* PCIe config registers */
+        case BAR0NO:
+            /* Not available */
+            break;
+
+        /* FPGA SDRAM */
+        case BAR2NO:
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] Going to read/write in BAR2\n");
+            pg_start = PCIE_ADDR_SDRAM_PG (full_offs);
+            pg_offs = PCIE_ADDR_SDRAM_PG_OFFS (full_offs);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    bar_no, pg_start, full_offs, pg_offs);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] full_addr = 0x%p\n", ((llio_dev_pcie_t *) self->dev_handler)->bar2 + pg_offs);
+            ret_size = _pcie_rw_bar2_block_raw (self, pg_start, pg_offs, data, size, rw);
+            break;
+
+        /* FPGA Wishbone */
+        case BAR4NO:
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] Going to read/write in BAR4\n");
+            pg_start = PCIE_ADDR_WB_PG (full_offs);
+            pg_offs = PCIE_ADDR_WB_PG_OFFS (full_offs);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    bar_no, pg_start, full_offs, pg_offs);
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_block] full_addr = %p\n", ((llio_dev_pcie_t *) self->dev_handler)->bar4 + pg_offs);
+            ret_size =  _pcie_rw_bar4_block_raw (self, pg_start, pg_offs, data, size, rw);
+            break;
+
+        /* Invalid BAR */
+        default:
+            break;
+    }
+
+    return ret_size;
 }
 
 const llio_ops_t llio_ops_pcie = {

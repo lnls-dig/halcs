@@ -35,9 +35,10 @@
 #define DBG_SUBSYS_ON           (\
                                  DBG_DEV_MNGR    | \
                                  DBG_DEV_IO      | \
-                                 DBG_LL_IO       | \
                                  DBG_SM_IO       | \
+                                 DBG_LIB_CLIENT  | \
                                  DBG_HAL_UTILS)
+/*                                 DBG_LL_IO       | \ */
 /*                                 DBG_MSG         | \ */
 
 #endif

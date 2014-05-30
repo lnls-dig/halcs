@@ -202,7 +202,7 @@ ssize_t llio_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
     LLIO_FUNC_WRAPPER (read_block, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t llio_write_block (llio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t llio_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
     LLIO_FUNC_WRAPPER (write_block, offs, size, data)
 
 /**** Read data block via DMA from device, size in bytes ****/
@@ -210,7 +210,7 @@ ssize_t llio_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
     LLIO_FUNC_WRAPPER (read_dma, offs, size, data)
 
 /**** Write data block via DMA from device, size in bytes ****/
-ssize_t llio_write_dma (llio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t llio_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
     LLIO_FUNC_WRAPPER (write_dma, offs, size, data)
 
 /**** Read device information function pointer ****/

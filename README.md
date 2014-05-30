@@ -7,7 +7,7 @@ Software for controlling the AFC BPM boards
 Make sure you have the following libraries installed: 
 
 * zeromq-4.0.4 (http://zeromq.org/area:download)
-* czmq-2.1.0 (http://czmq.zeromq.org/page:get-the-software)
+* czmq-2.2.0 (http://czmq.zeromq.org/page:get-the-software)
 
 Cloning this repository
 
@@ -192,7 +192,7 @@ the PCIe kernel driver.
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	sudo make DBE_DBG=y
+	make DBE_DBG=y
 
 ### Client
 
@@ -216,12 +216,16 @@ Compile the examples
 
 Run the server components with the helper script, like shown below:
 
-	./init.sh <broker_endpoint>
+	./init.sh <tranport type = [ipc|tcp]> <broker_endpoint>
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./init.sh /tmp/bpm
+	./init.sh ipc /tmp/bpm
+
+If one would like to use TCP, it should call, for instance:
+
+	./init.sh tcp 127.0.0.1:8888
 
 Now we should be good to start making transactions.
 
@@ -232,6 +236,15 @@ Change to the example applications folder
 Run the Example application with verbose flag (-v)
 and specifying a broker endpoint (-b)
 
-	./client -v -b ipc://<broker_endpoint>
+	./client -v -b <broker_endpoint>
+
+Typically, one should choose the the IPC transport method
+for its faster than TCP. For instance:
+	
+	./client -v -b ipc:///tmp/bpm
+
+If one would like to use TCP, it should call, for instance:
+
+	./client -v -b tcp://127.0.0.1:8888
 
 Leds should be blinking in the FMC ADC board

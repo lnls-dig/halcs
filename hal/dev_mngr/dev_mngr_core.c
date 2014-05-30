@@ -52,7 +52,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose)
     /* Create Dealer for use with zbeacon */
     self->dealer = zsocket_new (self->ctx, ZMQ_DEALER);
     ASSERT_ALLOC(self->dealer, err_dealer_alloc);
-    zsocket_bind (self->dealer, endpoint);
+    zsocket_bind (self->dealer, "%s", endpoint);
 
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);

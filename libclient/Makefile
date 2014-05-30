@@ -18,7 +18,7 @@ export INSTALL_DIR
 LIB_VER = 1.0.0
 
 # General C flags
-CFLAGS = -std=gnu99 -O2
+CFLAGS = -std=gnu99 -O2 -fPIC
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -45,13 +45,16 @@ LIBS = -lzmq -lczmq -lmdp
 # General library flags -L<libdir>
 LFLAGS =
 
+# Specific board objects
+OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
-OBJS_PLATFORM =
+OBJS_PLATFORM = ../hal/debug/debug_print.o
 # Library objects
-libbpmclient_OBJS_LIB = bpm_client.o bpm_client_codes.o
+libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o
 
 # Include directories
-INCLUDE_DIRS = -I.
+INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug -I../hal/sm_io/modules/ \
+	       -I../hal/sm_io/modules/fmc130m_4ch -I../hal/sm_io/modules/acq
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -64,12 +67,16 @@ OUT = $(LIBCLIENT)
 
 .SECONDEXPANSION:
 
-# Objects common for both server and client libraries
-common_OBJS = $(OBJS_PLATFORM) $(OBJS_BOARD)
+# Objects common for both server and client libraries.
+common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
 
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
-$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h)
+$(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	../hal/sm_io/modules/acq/sm_io_acq_codes.h ../hal/sm_io/modules/acq/acq_chan.h \
+	../hal/sm_io/modules/sm_io_codes.h \
+	bpm_client_codes.h
+$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
 
 # Save a git repository description
 REVISION = $(shell git describe --dirty --always)
@@ -111,14 +118,20 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 # corresponding .d file is not found
 -include $(OBJS_all:.o=.d)
 
+# Always recompile common objects as the previous compilation,
+# from another makefile might not have compiled them with the
+# correct flags, as the fPIC for our shared libraries
+$(common_OBJS): FORCE
+FORCE:
+
 # Compile with position-independent objects.
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c -fPIC $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
-	${CC} -MM $(CFLAGS) $*.c > $*.d
+	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
 
 # Workaround to make objects in different folders have
 # the correct target path. e.g., "dir/bar.o: dir/bar.c dir/foo.h"
@@ -151,10 +164,10 @@ uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
-	$(foreach header,$($(LIBCLIENT)_HEADERS),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBCLIENT)_HEADERS)),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
 
 clean:
-	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
+	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean
 	rm -f *.a *.so.$(LIB_VER)

@@ -117,17 +117,23 @@ int main (int argc, char *argv[])
     free (*str_p);
     broker_endp = NULL;
 
+    uint32_t acq_id = 0x4519a0ad;
     uint32_t fmc130m_4ch_id = 0x7085ef15;
     devio_err_e err;
-    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
 
+    err = devio_register_sm (devio, acq_id, NULL);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_devio;
+    }
+
+    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;
     }
 
     err = devio_init_poller_sm (devio);
-
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_init_poller_sm error!\n");
         goto err_devio;
