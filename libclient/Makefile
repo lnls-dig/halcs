@@ -11,11 +11,14 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
-INSTALL_DIR ?= /usr/local/lib
+INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
 # Config variables suitable for creating shared libraries
-LIB_VER = 1.0.0
+LIB_VER_MAJOR = 1
+LIB_VER_MINOR = 0
+LIB_VER_REVISION = 0
+LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -fPIC
@@ -53,8 +56,11 @@ OBJS_PLATFORM = ../hal/debug/debug_print.o
 libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o
 
 # Include directories
-INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug -I../hal/sm_io/modules/ \
-	       -I../hal/sm_io/modules/fmc130m_4ch -I../hal/sm_io/modules/acq
+INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
+	       -I../hal/sm_io/modules/ \
+	       -I../hal/sm_io/modules/fmc130m_4ch \
+	       -I../hal/sm_io/modules/acq \
+	       -I/usr/local/include
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -155,16 +161,18 @@ FORCE:
 #	$(MAKE) -C $@ all
 
 install:
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(INSTALL_DIR) $(CMDSEP))
-	$(foreach header,$($(LIBCLIENT)_HEADERS),install -m 755 $(header) $(INSTALL_DIR) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
+	$(foreach header,$($(LIBCLIENT)_HEADERS),install -m 755 $(header) $(INSTALL_DIR)/include $(CMDSEP))
 
 uninstall:
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib).$(LIB_VER) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
-	$(foreach header,$(notdir $($(LIBCLIENT)_HEADERS)),rm -f $(INSTALL_DIR)/$(header) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBCLIENT)_HEADERS)),rm -f $(INSTALL_DIR)/include/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o

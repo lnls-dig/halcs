@@ -14,7 +14,7 @@ MAKE =		make
 # Select board in which we will work. Options are: ml605, afc
 BOARD = ml605
 
-INSTALL_DIR ?= /usr/lib
+INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
 # Kernel stuff (pcie driver and library) relative
@@ -22,6 +22,9 @@ export INSTALL_DIR
 KERNEL_DIR = kernel
 KERNEL_VER = $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
+
+# Client library
+LIBCLIENT_DIR=libclient
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
@@ -79,15 +82,18 @@ OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 
-.PHONY: all kernel kernel_install kernel_check \
-	clean mrproper install uninstall \
-	tests examples
+.PHONY: all kernel clean mrproper install uninstall tests examples \
+	kernel_install kernel_uninstall kernel_check \
+	libclient libclient_install libclient_uninstall libclient_mrproper \
+	hal_install hal_uninstall hal_clean hal_mrproper \
+	tests tests_clean tests_mrproper \
+	examples_clean examples_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel_check $(OUT)
+all: kernel $(OUT) libclient
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
@@ -126,7 +132,7 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-kernel:
+kernel: kernel_check
 	$(MAKE) -C $(KERNEL_DIR) all
 
 #Verify if the driver is in place
@@ -136,35 +142,67 @@ ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "Compilation will continue, but you must install";
 	@echo "and load the driver prior to initializing the software";
 	@sleep 2;
-	$(MAKE) -C $(KERNEL_DIR) all
 endif
 
 kernel_install:
 	$(MAKE) -C $(KERNEL_DIR) install
 
-tests:
-	$(MAKE) -C $@ all
+kernel_uninstall:
+	$(MAKE) -C $(KERNEL_DIR) uninstall
 
-examples:
-	$(MAKE) -C $@ all
-
-#install:
-#	@install -m 755 $(TARGET_SHARED_VER) $(INSTALL_DIR)
-#	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/$(lib) $(CMDSEP))
-#
-#uninstall:
-#	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib).$(LIB_VER) $(CMDSEP))
-#	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/$(lib) $(CMDSEP))
-
-clean:
-	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
-	$(MAKE) -C tests clean
-	$(MAKE) -C examples clean
-	$(MAKE) -C libclient clean
+kernel_clean:
 	$(MAKE) -C $(KERNEL_DIR) clean
 
-mrproper: clean
+libclient:
+	$(MAKE) -C $(LIBCLIENT_DIR) all
+
+libclient_install:
+	$(MAKE) -C $(LIBCLIENT_DIR) install
+
+libclient_uninstall:
+	$(MAKE) -C $(LIBCLIENT_DIR) uninstall
+
+libclient_clean:
+	$(MAKE) -C $(LIBCLIENT_DIR) clean
+
+libclient_mrproper:
+	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
+
+hal_install:
+	$(foreach hal_bin,$(OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+
+hal_uninstall:
+	$(foreach hal_bin,$(OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
+
+hal_clean:
+	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
+
+hal_mrproper:
 	rm -f $(OUT)
+
+tests:
+	$(MAKE) -C tests all
+
+tests_clean:
+	$(MAKE) -C tests clean
+
+tests_mrproper:
 	$(MAKE) -C tests mrproper
+
+examples:
+	$(MAKE) -C examples all
+
+examples_clean:
+	$(MAKE) -C examples clean
+
+examples_mrproper:
 	$(MAKE) -C examples mrproper
-	$(MAKE) -C libclient mrproper
+
+install: hal_install kernel_install libclient_install
+
+uninstall: hal_uninstall kernel_uninstall libclient_uninstall
+
+clean: hal_clean kernel_clean libclient_clean examples_clean tests_clean
+
+mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper
+
