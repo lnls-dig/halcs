@@ -48,15 +48,13 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 #-ffunction-sections -fdata-sections -Wl,--gc-sections
 
-OUT=leds acq
+# Every .c file will must be a separate example
+examples_SRC = $(wildcard *.c)
+OUT = $(basename $(examples_SRC))
 
-# Makefile rules
 all: $(OUT)
 
-leds: leds.c
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
-
-acq: acq.c
+%: %.c
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD
