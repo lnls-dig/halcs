@@ -117,9 +117,17 @@ int main (int argc, char *argv[])
     free (*str_p);
     broker_endp = NULL;
 
-    uint32_t acq_id = 0x4519a0ad;
     uint32_t fmc130m_4ch_id = 0x7085ef15;
+    uint32_t acq_id = 0x4519a0ad;
+    uint32_t dsp_id = 0x1bafbf1e;
+    uint32_t swap_id = 0x12897592;
     devio_err_e err;
+
+    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_devio;
+    }
 
     err = devio_register_sm (devio, acq_id, NULL);
     if (err != DEVIO_SUCCESS) {
@@ -127,7 +135,13 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
+    err = devio_register_sm (devio, dsp_id, NULL);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_devio;
+    }
+
+    err = devio_register_sm (devio, swap_id, NULL);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;

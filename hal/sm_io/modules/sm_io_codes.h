@@ -11,5 +11,7 @@
 /* Include all module's codes */
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_acq_codes.h"
+#include "sm_io_dsp_codes.h"
+#include "sm_io_swap_codes.h"
 
 #endif

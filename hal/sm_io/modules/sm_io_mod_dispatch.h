@@ -13,7 +13,7 @@
 /* #include "sm_io_bootstrap.h" */
 
 /* Number of known specific modules that we can handle */
-#define MOD_DISPATCH_END 2
+#define MOD_DISPATCH_END 4
 
 struct _smio_bootstrap_ops_t;
 

@@ -7,9 +7,13 @@
 
 #include "bpm_client.h"
 #include "hal_assert.h"
-#include "ddr3_map.h"
 
 #include "sm_io_acq_codes.h"
+#include "sm_io_dsp_codes.h"
+#include "sm_io_swap_codes.h"
+#include "sm_io_swap_useful_macros.h"
+#include "rw_param_codes.h"
+#include "ddr3_map.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -33,12 +37,6 @@
 #define CHECK_ERR(err, err_type)                            \
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient]",           \
             bpm_client_err_str (err_type))
-
-/* Our structure */
-struct _bpm_client_t {
-    mdp_client_t *mdp_client;           /* Majordomo client instance */
-    const acq_buf_t *acq_buf;           /* Acquisition buffer table */
-};
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -384,5 +382,216 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 err_bpm_get_data_block:
 err_bpm_wait_data_acquire:
 err_bpm_data_acquire:
+    return err;
+}
+
+/**************** DSP SMIO Functions ****************/
+
+/* Kx functions */
+PARAM_FUNC_CLIENT_WRITE(kx)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_KX, kx);
+}
+
+PARAM_FUNC_CLIENT_READ(kx)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_KX, kx);
+}
+
+/* Ky functions */
+PARAM_FUNC_CLIENT_WRITE(ky)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_KY, ky);
+}
+
+PARAM_FUNC_CLIENT_READ(ky)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_KY, ky);
+}
+
+/* Ksum functions */
+PARAM_FUNC_CLIENT_WRITE(ksum)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_KSUM, ksum);
+}
+
+PARAM_FUNC_CLIENT_READ(ksum)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_KSUM, ksum);
+}
+
+/* Delta/Sigma TBT threshold calculation functions */
+PARAM_FUNC_CLIENT_WRITE(ds_tbt_thres)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_DS_TBT_THRES, ds_tbt_thres);
+}
+
+PARAM_FUNC_CLIENT_READ(ds_tbt_thres)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_DS_TBT_THRES, ds_tbt_thres);
+}
+
+/* Delta/Sigma FOFB threshold calculation functions */
+PARAM_FUNC_CLIENT_WRITE(ds_fofb_thres)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_DS_FOFB_THRES, ds_fofb_thres);
+}
+
+PARAM_FUNC_CLIENT_READ(ds_fofb_thres)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_DS_FOFB_THRES, ds_fofb_thres);
+}
+
+/* Delta/Sigma MONIT. threshold calculation functions */
+PARAM_FUNC_CLIENT_WRITE(ds_monit_thres)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_DS_MONIT_THRES, ds_monit_thres);
+}
+
+PARAM_FUNC_CLIENT_READ(ds_monit_thres)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_DS_MONIT_THRES, ds_monit_thres);
+}
+
+/**************** Swap SMIO Functions ****************/
+
+/* Switching functions */
+PARAM_FUNC_CLIENT_WRITE(sw)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_SW, sw);
+}
+
+PARAM_FUNC_CLIENT_READ(sw)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW, sw);
+}
+
+/* Switching enabling functions */
+PARAM_FUNC_CLIENT_WRITE(sw_en)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_en)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
+}
+
+/* Switching Clock division functions */
+PARAM_FUNC_CLIENT_WRITE(div_clk)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_DIV_CLK, div_clk);
+}
+
+PARAM_FUNC_CLIENT_READ(div_clk)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_DIV_CLK, div_clk);
+}
+
+/* Switching delay functions */
+PARAM_FUNC_CLIENT_WRITE(sw_dly)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_SW_DLY, sw_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_dly)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_DLY, sw_dly);
+}
+
+/* Windowing functions */
+PARAM_FUNC_CLIENT_WRITE(wdw)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW, wdw);
+}
+
+PARAM_FUNC_CLIENT_READ(wdw)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW, wdw);
+}
+
+PARAM_FUNC_CLIENT_WRITE(wdw_dly)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(wdw_dly)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
+}
+
+/* Gain functions */
+/* TODO: reduce code repetition by, possibilly, group the OPCODES in
+ * structure and merge all functions in a single
+ * generic one for all channels (A, B, C, D) */
+PARAM_FUNC_CLIENT_WRITE2(gain_a, dir_gain, inv_gain)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_A,
+            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
+}
+
+PARAM_FUNC_CLIENT_READ2(gain_a, dir_gain, inv_gain)
+{
+    uint32_t gain;
+    bpm_client_err_e err = param_client_read (self, service,
+            SWAP_OPCODE_SET_GET_GAIN_A, &gain);
+
+    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
+    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
+
+    return err;
+}
+
+PARAM_FUNC_CLIENT_WRITE2(gain_b, dir_gain, inv_gain)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_B,
+            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
+}
+
+PARAM_FUNC_CLIENT_READ2(gain_b, dir_gain, inv_gain)
+{
+    uint32_t gain;
+    bpm_client_err_e err = param_client_read (self, service,
+            SWAP_OPCODE_SET_GET_GAIN_B, &gain);
+
+    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
+    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
+
+    return err;
+}
+
+PARAM_FUNC_CLIENT_WRITE2(gain_c, dir_gain, inv_gain)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_C,
+            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
+}
+
+PARAM_FUNC_CLIENT_READ2(gain_c, dir_gain, inv_gain)
+{
+    uint32_t gain;
+    bpm_client_err_e err = param_client_read (self, service,
+            SWAP_OPCODE_SET_GET_GAIN_C, &gain);
+
+    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
+    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
+
+    return err;
+}
+
+PARAM_FUNC_CLIENT_WRITE2(gain_d, dir_gain, inv_gain)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_D,
+            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
+}
+
+PARAM_FUNC_CLIENT_READ2(gain_d, dir_gain, inv_gain)
+{
+    uint32_t gain;
+    bpm_client_err_e err = param_client_read (self, service,
+            SWAP_OPCODE_SET_GET_GAIN_D, &gain);
+
+    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
+    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
+
     return err;
 }
