@@ -50,11 +50,13 @@ OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
 OBJS_PLATFORM = ../hal/debug/debug_print.o
 # Library objects
-libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o
+libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
 
 # Include directories
-INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug -I../hal/sm_io/modules/ \
-	       -I../hal/sm_io/modules/fmc130m_4ch -I../hal/sm_io/modules/acq
+INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug -I../hal/sm_io/modules/	\
+			-I../hal/sm_io/modules/fmc130m_4ch -I../hal/sm_io/modules/acq	\
+			-I../hal/sm_io/modules/swap -I../hal/sm_io/modules/dsp \
+			-I../hal/sm_io/rw_param -I../hal/include/hw
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -73,9 +75,9 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
 $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../hal/sm_io/modules/acq/sm_io_acq_codes.h ../hal/sm_io/modules/acq/acq_chan.h \
-	../hal/sm_io/modules/sm_io_codes.h \
-	bpm_client_codes.h
+	../hal/sm_io/modules/acq/sm_io_acq_codes.h ../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
+	../hal/sm_io/modules/swap/sm_io_swap_codes.h ../hal/sm_io/modules/acq/acq_chan.h \
+	../hal/sm_io/modules/sm_io_codes.h bpm_client_codes.h
 $(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
 
 # Save a git repository description
