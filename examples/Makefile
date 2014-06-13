@@ -48,7 +48,7 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 #-ffunction-sections -fdata-sections -Wl,--gc-sections
 
-OUT=leds acq
+OUT=leds acq dsp_swap
 
 # Makefile rules
 all: $(OUT)
@@ -57,6 +57,9 @@ leds: leds.c
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 acq: acq.c
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
+
+dsp_swap: dsp_swap.c
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD
