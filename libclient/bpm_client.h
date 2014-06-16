@@ -195,7 +195,7 @@ bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_sw_dly (bpm_client_t *self, char *service,
         uint32_t sw_dly);
 bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
-		uint32_t *dly);
+		uint32_t *sw_dly);
 
 /* Windowing functions */
 /* These set of functions write (set) or read (get) the windowing state with
