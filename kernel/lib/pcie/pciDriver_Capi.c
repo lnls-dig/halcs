@@ -61,31 +61,31 @@ int pd_getpagemask() {
 
 int pd_open( int dev, pd_device_t *pci_handle, char *dev_entry )
 {
-	int ret;
+    int ret;
 
-	/* check for null pointer */
-	if (pci_handle == NULL)
-		return -1;
+    /* check for null pointer */
+    if (pci_handle == NULL)
+        return -1;
 
     /* unused? */
-	pci_handle->device = dev;
+    pci_handle->device = dev;
 
     if (dev_entry && strlen(dev_entry) < 50) {
-    	sprintf( pci_handle->name, dev_entry );
+        sprintf( pci_handle->name, dev_entry );
     }
     else {
-    	sprintf( pci_handle->name, "/dev/fpga%d", dev );
+        sprintf( pci_handle->name, "/dev/fpga%d", dev );
     }
 
-	ret = open( pci_handle->name, O_RDWR );
-	if (ret < 0)
-		return -1;
+    ret = open( pci_handle->name, O_RDWR );
+    if (ret < 0)
+        return -1;
 
-	pci_handle->handle = ret;
+    pci_handle->handle = ret;
 
-	pthread_mutex_init( &pci_handle->mmap_mutex, NULL );
+    pthread_mutex_init( &pci_handle->mmap_mutex, NULL );
 
-	return 0;
+    return 0;
 }
 
 int pd_close(pd_device_t *pci_handle)
