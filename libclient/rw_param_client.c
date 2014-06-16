@@ -32,7 +32,7 @@
 #endif
 #define CHECK_ERR(err, err_type)                                    \
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient:rw_param_client]",   \
-                bpm_client_err_str (err_type))
+            bpm_client_err_str (err_type))
 
 bpm_client_err_e param_client_send_rw (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t rw, uint32_t param)
@@ -80,7 +80,7 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-	uint32_t rw = WRITE_MODE;
+    uint32_t rw = WRITE_MODE;
     zmsg_t *report;
 
     err = param_client_send_rw (self, service, operation, rw, param);
@@ -121,7 +121,7 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-	uint32_t rw = READ_MODE;
+    uint32_t rw = READ_MODE;
     zmsg_t *report;
 
     err = param_client_send_rw (self, service, operation, rw,
@@ -135,20 +135,20 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
 
     /* Message is:
      * frame 0: error code
-     * frame 1: kx returned      */
+     * frame 1: data read */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
     zframe_t *data_out_frm = zmsg_pop(report);
     ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
-	if (*(RW_REPLY_TYPE *) zframe_data(err_code) != RW_READ_OK) {
+    if (*(RW_REPLY_TYPE *) zframe_data(err_code) != RW_READ_OK) {
         DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] rw_param_client:: "
                 "paramter get error, try again\n");
         err = BPM_CLIENT_ERR_AGAIN;
         goto err_get_param;
     }
 
-	*param_out = *(uint32_t *) zframe_data(data_out_frm);
+    *param_out = *(uint32_t *) zframe_data(data_out_frm);
 
 err_get_param:
     zframe_destroy (&data_out_frm);
