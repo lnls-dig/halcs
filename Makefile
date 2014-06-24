@@ -63,7 +63,8 @@ include hal/hal.mk
 
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
-	       -I$(KERNEL_DIR)/include/pcie
+	       -I$(KERNEL_DIR)/include/pcie \
+	       -I/usr/local/include
 
 # Merge all flags.
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
