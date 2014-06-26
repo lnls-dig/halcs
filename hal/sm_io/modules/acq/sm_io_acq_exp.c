@@ -149,9 +149,10 @@ static void *_acq_data_acquire (void *owner, void *args)
 
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
-    uint32_t num_samples_aligned = num_samples +
-        ( num_samples %
-          ( DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) );
+    uint32_t num_samples_div =
+        DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+    uint32_t num_samples_aligned = num_samples + num_samples_div -
+        (num_samples % num_samples_div);
     /* Pre trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Pre Trigger offset: ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n",
