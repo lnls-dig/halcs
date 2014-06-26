@@ -231,15 +231,18 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time (NULL);
     while ((time(NULL) - start)*1000 < timeout) {
-        if (!zctx_interrupted) {
-            if ((err = _bpm_check_data_acquire (self, service)) == BPM_CLIENT_SUCCESS) {
-                DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
-                        "bpm_wait_data_acquire_timed: finished waiting\n");
-                goto exit;
-            }
-
-            usleep (MSECS*MIN_WAIT_TIME);
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
         }
+
+        if ((err = _bpm_check_data_acquire (self, service)) == BPM_CLIENT_SUCCESS) {
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
+                    "bpm_wait_data_acquire_timed: finished waiting\n");
+            goto exit;
+        }
+
+        usleep (MSECS*MIN_WAIT_TIME);
     }
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
@@ -247,6 +250,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
+bpm_zctx_interrupted:
 exit:
     return err;
 }
@@ -349,27 +353,30 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
     uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size fopr later */
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (!zctx_interrupted) {
-            acq_trans->block.idx = block_n;
-            err = _bpm_get_data_block (self, service, acq_trans);
-            if (err != BPM_CLIENT_SUCCESS){
-                DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                        "_bpm_get_data_block failed. block_n: %u\n", block_n);
-                goto err_bpm_get_data_block;
-            }
-
-            total_bread += acq_trans->block.bytes_read;
-            acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
-            acq_trans->block.data_size -= acq_trans->block.bytes_read;
-
-            /* Print some debug messages */
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                    "Total bytes read up to now: %u\n", total_bread);
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                    "Data pointer addr: %p\n", acq_trans->block.data);
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                    "Data buffer size: %u\n", acq_trans->block.data_size);
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
         }
+
+        acq_trans->block.idx = block_n;
+        err = _bpm_get_data_block (self, service, acq_trans);
+        if (err != BPM_CLIENT_SUCCESS){
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                    "_bpm_get_data_block failed. block_n: %u\n", block_n);
+            goto err_bpm_get_data_block;
+        }
+
+        total_bread += acq_trans->block.bytes_read;
+        acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
+        acq_trans->block.data_size -= acq_trans->block.bytes_read;
+
+        /* Print some debug messages */
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Total bytes read up to now: %u\n", total_bread);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data pointer addr: %p\n", acq_trans->block.data);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data buffer size: %u\n", acq_trans->block.data_size);
     }
 
     /* Return to client the total number of bytes read */
@@ -380,6 +387,7 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         "Data curve of %u bytes was successfully acquired\n", total_bread);
 
 err_bpm_get_data_block:
+bpm_zctx_interrupted:
 err_bpm_wait_data_acquire:
 err_bpm_data_acquire:
     return err;
