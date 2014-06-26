@@ -162,6 +162,30 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:swap]: bpm_set_gain_a = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
+    err = bpm_set_gain_b (bpm_client, "BPM0:DEVIO:SWAP", gain_aa, gain_ac);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: bpm_set_gain_a failed\n");
+        goto err_bpm_set;
+    }
+    fprintf (stdout, "[client:swap]: bpm_set_gain_a = direct %u, inverted %u was successfully executed\n",
+            gain_aa, gain_ac);
+
+    err = bpm_set_gain_c (bpm_client, "BPM0:DEVIO:SWAP", gain_aa, gain_ac);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: bpm_set_gain_a failed\n");
+        goto err_bpm_set;
+    }
+    fprintf (stdout, "[client:swap]: bpm_set_gain_a = direct %u, inverted %u was successfully executed\n",
+            gain_aa, gain_ac);
+
+    err = bpm_set_gain_d (bpm_client, "BPM0:DEVIO:SWAP", gain_aa, gain_ac);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: bpm_set_gain_a failed\n");
+        goto err_bpm_set;
+    }
+    fprintf (stdout, "[client:swap]: bpm_set_gain_a = direct %u, inverted %u was successfully executed\n",
+            gain_aa, gain_ac);
+
 err_bpm_get:
 err_bpm_set:
     str_p = &broker_endp;
