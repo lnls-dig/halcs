@@ -14,6 +14,15 @@
 #include "bpm_client_codes.h"
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
+#include "rw_param_client.h"
+
+struct _acq_buf_t;
+
+/* Our structure */
+struct _bpm_client_t {
+    mdp_client_t *mdp_client;                   /* Majordomo client instance */
+    const struct _acq_buf_t *acq_buf;           /* Acquisition buffer table */
+};
 
 typedef struct _bpm_client_t bpm_client_t;
 
@@ -105,4 +114,130 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
 
+/********************** DSP Functions ********************/
+
+/* K<direction> functions */
+/* These set of functions write (set) or read (get) the Kx, Ky or Ksum values
+ * for the delta over sigma calculation. All of the functions returns
+ * BPM_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see bpm_client_err.h for all possible errors)*/
+
+bpm_client_err_e bpm_set_kx (bpm_client_t *self, char *service, uint32_t kx);
+bpm_client_err_e bpm_get_kx (bpm_client_t *self, char *service,
+		uint32_t *kx_out);
+bpm_client_err_e bpm_set_ky (bpm_client_t *self, char *service, uint32_t ky);
+bpm_client_err_e bpm_get_ky (bpm_client_t *self, char *service,
+		uint32_t *ky_out);
+bpm_client_err_e bpm_set_ksum (bpm_client_t *self, char *service, uint32_t ksum);
+bpm_client_err_e bpm_get_ksum (bpm_client_t *self, char *service,
+		uint32_t *ksum_out);
+
+/* Delta-Sigma Threshold functions */
+/* These set of functions write (set) or read (get) the delta-sigma
+ * sum threslhold calculation. If the selected threshold is, at any time,
+ * bigger than the calculaterd SUM in the FPGA, the position calculation
+ * for the delta over sigma calculation. All of the functions returns
+ * BPM_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see bpm_client_err.h for all possible errors)*/
+
+bpm_client_err_e bpm_set_ds_tbt_thres (bpm_client_t *self, char *service,
+        uint32_t ds_tbt_thres);
+bpm_client_err_e bpm_get_ds_tbt_thres (bpm_client_t *self, char *service,
+		uint32_t *ds_tbt_thres);
+bpm_client_err_e bpm_set_ds_fofb_thres (bpm_client_t *self, char *service,
+        uint32_t ds_fofb_thres);
+bpm_client_err_e bpm_get_ds_fofb_thres (bpm_client_t *self, char *service,
+		uint32_t *ds_fofb_thres);
+bpm_client_err_e bpm_set_ds_monit_thres (bpm_client_t *self, char *service,
+        uint32_t ds_monit_thres);
+bpm_client_err_e bpm_get_ds_monit_thres (bpm_client_t *self, char *service,
+		uint32_t *ds_monit_thres);
+
+/********************** SWAP Functions ********************/
+
+
+/* Switching functions */
+/* These set of functions write (set) or read (get) the (de)switching
+ * scheme. In order to turn the switching on, it is necessary to first
+ * turn the switching on with bpm_set_sw () and then enable the switching
+ * clock with bpm_set_sw_en (). failuere to do so might work, but the initial
+ * state between the FPGA and the RFFE is undetermined. All of the functions
+ * returns BPM_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_sw (bpm_client_t *self, char *service,
+        uint32_t sw);
+bpm_client_err_e bpm_get_sw (bpm_client_t *self, char *service,
+		uint32_t *sw);
+bpm_client_err_e bpm_set_sw_en (bpm_client_t *self, char *service,
+        uint32_t sw_en);
+bpm_client_err_e bpm_get_sw_en (bpm_client_t *self, char *service,
+		uint32_t *sw_en);
+
+/* Switching clock functions */
+/* These set of functions write (set) or read (get) the switching
+ * clock frequency. It is determined by the currenct ADC clock frequency
+ * divided by the desired value. For instance, to use a switching frequency
+ * that is 1000 times slower than the ADC clock, the div_clk parameter
+ * must be set to 1000. All of the functions returns BPM_CLIENT_SUCCESS if
+ * the parameter was correctly set or error (see bpm_client_err.h for
+ * all possible errors)*/
+bpm_client_err_e bpm_set_div_clk (bpm_client_t *self, char *service,
+        uint32_t div_clk);
+bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
+		uint32_t *div_clk);
+
+/* Switching delay functions */
+/* These set of functions write (set) or read (get) the (de)switching
+ * delay to the switching state in the RFFE. Its granularity is measured in
+ * ADC clock cycles. All of the functions returns BPM_CLIENT_SUCCESS if
+ * the parameter was correctly set or error (see bpm_client_err.h for
+ * all possible errors)*/
+bpm_client_err_e bpm_set_sw_dly (bpm_client_t *self, char *service,
+        uint32_t sw_dly);
+bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
+		uint32_t *sw_dly);
+
+/* Windowing functions */
+/* These set of functions write (set) or read (get) the windowing state with
+ * bpm_*_wdw () and the delay between the beggining of the window and the switching
+ * state change. It is a experimental feature that applies a window to the ADC
+ * data, in order to try to reduce the undesired effects of the switching, such
+ * as phase shifts. All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h for all possible
+ * errors) */
+bpm_client_err_e bpm_set_wdw (bpm_client_t *self, char *service,
+        uint32_t wdw);
+bpm_client_err_e bpm_get_wdw (bpm_client_t *self, char *service,
+		uint32_t *wdw);
+bpm_client_err_e bpm_set_wdw_dly (bpm_client_t *self, char *service,
+        uint32_t wdw_dly);
+bpm_client_err_e bpm_get_wdw_dly (bpm_client_t *self, char *service,
+		uint32_t *wdw_dly);
+
+/* Gain functions */
+/* TODO: reduce code repetition by, possibilly, group the OPCODES in
+ * structure and merge all functions in a single
+ * generic one for all channels (A, B, C, D) */
+/* These set of functions write (set) or read (get) the gain in all ADC channels,
+ * for both the direct path and the inverted path. All of the functions returns
+ * BPM_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see bpm_client_err.h for all possible errors) */
+bpm_client_err_e bpm_set_gain_a (bpm_client_t *self, char *service,
+        uint32_t gain_dir, uint32_t gain_inv);
+bpm_client_err_e bpm_get_gain_a (bpm_client_t *self, char *service,
+        uint32_t *gain_dir, uint32_t *gain_inv);
+bpm_client_err_e bpm_set_gain_b (bpm_client_t *self, char *service,
+        uint32_t gain_dir, uint32_t gain_inv);
+bpm_client_err_e bpm_get_gain_b (bpm_client_t *self, char *service,
+        uint32_t *gain_dir, uint32_t *gain_inv);
+bpm_client_err_e bpm_set_gain_c (bpm_client_t *self, char *service,
+        uint32_t gain_dir, uint32_t gain_inv);
+bpm_client_err_e bpm_get_gain_c (bpm_client_t *self, char *service,
+        uint32_t *gain_dir, uint32_t *gain_inv);
+bpm_client_err_e bpm_set_gain_d (bpm_client_t *self, char *service,
+        uint32_t gain_dir, uint32_t gain_inv);
+bpm_client_err_e bpm_get_gain_d (bpm_client_t *self, char *service,
+        uint32_t *gain_dir, uint32_t *gain_inv);
+
 #endif
+

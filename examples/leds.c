@@ -64,11 +64,13 @@ int main (int argc, char *argv [])
         uint32_t leds = (1 << 1);
         unsigned int j;
         for (j = 0; j < 3; ++j) {
-            if (!zctx_interrupted) {
-                bpm_blink_leds (bpm_client, "BPM0:DEVIO:FMC130M_4CH", leds);
-                usleep (80000);
-                leds <<= 1;
+            if (zctx_interrupted) {
+                break;
             }
+
+            bpm_blink_leds (bpm_client, "BPM0:DEVIO:FMC130M_4CH", leds);
+            usleep (80000);
+            leds <<= 1;
         }
     }
 

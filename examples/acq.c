@@ -32,25 +32,29 @@ void print_data (uint32_t chan, uint32_t *data, uint32_t size)
     if (chan == 0) {
         int16_t *raw_data16 = (int16_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
-            if (!zctx_interrupted) {
-                printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
-                        raw_data16[(i*4)],
-                        raw_data16[(i*4)+1],
-                        raw_data16[(i*4)+2],
-                        raw_data16[(i*4)+3]);
+            if (zctx_interrupted) {
+                break;
             }
+
+            printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
+                    raw_data16[(i*4)],
+                    raw_data16[(i*4)+1],
+                    raw_data16[(i*4)+2],
+                    raw_data16[(i*4)+3]);
         }
     }
     else {
         int32_t *raw_data32 = (int32_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 4; i++) {
-            if (!zctx_interrupted) {
-                printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
-                        raw_data32[(i*4)],
-                        raw_data32[(i*4)+1],
-                        raw_data32[(i*4)+2],
-                        raw_data32[(i*4)+3]);
+            if (zctx_interrupted) {
+                break;
             }
+
+            printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
+                    raw_data32[(i*4)],
+                    raw_data32[(i*4)+1],
+                    raw_data32[(i*4)+2],
+                    raw_data32[(i*4)+3]);
         }
     }
 }
