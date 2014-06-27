@@ -57,7 +57,7 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Initialize the sockets structure to talk to nodes */
-    self->pipes = zmalloc (sizeof (void *) * NODES_MAX_LEN);
+    self->pipes = zmalloc (sizeof (*self->pipes) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes, err_pipes_alloc);
     /* 0 nodes for now... */
     self->nnodes = 0;
