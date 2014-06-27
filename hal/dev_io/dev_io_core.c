@@ -66,6 +66,9 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     self->poller = zpoller_new (NULL);
     ASSERT_ALLOC(self->poller, err_poller_alloc);
 
+	/* Setup new poller. It uses the low-level zmq_poll API */
+    self->poller2 = NULL;
+
     /* Initilize mdp_worrker last, as we need to have everything ready
      * when we attemp to register in broker. Actually, we still need
      * to parse the SDB strucutres and register the operations in the
@@ -177,6 +180,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->endpoint_broker);
         free (self->name);
         zpoller_destroy (&self->poller);
+        free (self->poller2);
         free (self->pipes);
         free (self);
         *self_p = NULL;
@@ -322,6 +326,36 @@ err_no_nodes:
     return err;
 }
 
+devio_err_e devio_init_poller2_sm (devio_t *self)
+{
+    devio_err_e err = DEVIO_SUCCESS;
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+            "[dev_io_core:poll_all_sm] Calling init_poller2_sm\n");
+
+    /*  Set-up poller */
+    if (self->nnodes == 0) {
+        err = DEVIO_ERR_NO_NODES;
+        goto err_no_nodes;
+    }
+
+    zmq_pollitem_t *items = zmalloc (sizeof (*items) * self->nnodes);
+    err = (items == NULL) ? DEVIO_ERR_ALLOC : err;
+    ASSERT_ALLOC(items, err_alloc_items);
+
+    unsigned int i;
+    for (i = 0; i < self->nnodes; ++i) {
+        items [i].socket = self->pipes [i];
+        items [i].events = ZMQ_POLLIN;
+    }
+
+    /* This should be freed on dev_io exit */
+    self->poller2 = items;
+
+err_alloc_items:
+err_no_nodes:
+    return err;
+}
+
 devio_err_e devio_poll_all_sm (devio_t *self)
 {
     devio_err_e err = DEVIO_SUCCESS;
@@ -354,6 +388,45 @@ devio_err_e devio_poll_all_sm (devio_t *self)
 
 err_poller_expired:
 err_poller_terminated:
+err_uninitialized_poller:
+    return err;
+}
+
+devio_err_e devio_poll2_all_sm (devio_t *self)
+{
+    devio_err_e err = DEVIO_SUCCESS;
+
+    if (!self->poller2) {
+        err = DEVIO_ERR_UNINIT_POLLER;
+        goto err_uninitialized_poller;
+    }
+
+    /* Wait up to 100 ms */
+    int rc = zmq_poll (self->poller2, self->nnodes, DEVIO_POLLER_TIMEOUT);
+    err = (rc == -1) ? DEVIO_ERR_INTERRUPTED_POLLER : err;  /* FIXME: redundant error checking */
+    ASSERT_TEST(rc != -1, "devio_poll2_all_sm: interrupted", err_poller_interrupted);
+
+    /* Timeout */
+    if (rc == 0) {  /* Exit silently */
+        /*DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:poll_all_sm] poller expired\n");*/
+        goto err_poller_expired;
+    }
+
+    /* Loop once through all the available sockets */
+    unsigned int i;
+    for (i = 0; i < self->nnodes; ++i) {
+        if (self->poller2 [i].revents & ZMQ_POLLIN) {
+            zmsg_t *recv_msg = zmsg_recv (self->poller2 [i].socket);
+            /* Prepare the args structure */
+            zmq_server_args_t server_args = {.msg = &recv_msg,
+                .reply_to = self->poller2 [i].socket};
+            err = _devio_do_smio_op (self, &server_args);
+        }
+    }
+
+err_poller_expired:
+err_poller_interrupted:
 err_uninitialized_poller:
     return err;
 }
