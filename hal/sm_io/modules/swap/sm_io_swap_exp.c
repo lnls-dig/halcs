@@ -282,11 +282,11 @@ smio_err_e swap_init (smio_t * self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:swap_exp] Initializing swap\n");
 
-    smio_err_e err = SMIO_ERR_ALLOC;
+    smio_err_e err = SMIO_SUCCESS;
 
     self->id = SWAP_SDB_DEVID;
     self->name = strdup (SWAP_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc);
+    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
 
     /* Set SMIO ops pointers */
     self->ops = &swap_ops;
@@ -295,11 +295,10 @@ smio_err_e swap_init (smio_t * self)
 
     /* Initialize specific structure */
     self->smio_handler = smio_swap_new (); /* TODO Define swap init parameters */
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc);
+    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
 //	_smio_swap_config_defaults (self);
 
-    err = SMIO_SUCCESS;
     return err;
 
 err_smio_handler_alloc:

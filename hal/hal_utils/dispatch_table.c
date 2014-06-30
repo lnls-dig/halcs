@@ -128,11 +128,12 @@ halutils_err_e disp_table_insert_all (disp_table_t *self, const disp_table_func_
         halutils_err_e err = _disp_table_insert (self, code_table [i],
                 *disp_table_fp [i]);
 
-        if (err != HALUTILS_SUCCESS) {
-            break;
-        }
+        ASSERT_TEST(err == HALUTILS_SUCCESS,
+                "disp_table_insert_all: Could not insert function",
+                err_disp_insert);
     }
 
+err_disp_insert:
     return err;
 }
 

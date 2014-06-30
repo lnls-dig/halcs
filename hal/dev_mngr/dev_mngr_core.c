@@ -133,7 +133,8 @@ dmngr_err_e dmngr_register_sig_handlers (dmngr_t *self)
         int err = sigaction (sig_handler->signal, &act, NULL);
         CHECK_ERR(err, DMNGR_ERR_SIGACTION);
 
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n", sig_handler->signal);
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n",
+                sig_handler->signal);
 
         sig_handler = (dmngr_sig_handler_t *)
             zlist_next (self->ops->sig_ops);

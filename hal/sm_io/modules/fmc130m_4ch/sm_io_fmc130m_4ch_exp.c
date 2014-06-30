@@ -149,11 +149,11 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Initializing fmc130m_4ch\n");
 
-    smio_err_e err = SMIO_ERR_ALLOC;
+    smio_err_e err = SMIO_SUCCESS;
 
     self->id = FMC130M_4CH_SDB_DEVID;
     self->name = strdup (FMC130M_4CH_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc);
+    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
 
     /* Set SMIO ops pointers */
     self->ops = &fmc130m_4ch_ops;
@@ -162,9 +162,8 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
 
     /* Initialize specific structure */
     self->smio_handler = smio_fmc130m_4ch_new (0);
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc);
+    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
-    err = SMIO_SUCCESS;
     return err;
 
 err_smio_handler_alloc:
