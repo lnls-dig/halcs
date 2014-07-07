@@ -41,27 +41,8 @@
             smio_err_str (err_type))
 
 /************************************************************/
-/******************  Specific Operations ********************/
+/*****************  Specific DSP Operations *****************/
 /************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-
-#define BAR4_ADDR (4 << 28)
-
-/************************************************************/
-/************* Specific dsp functions **************/
-/************************************************************/
-
-/*
-int check_ksum_limits (uint32_t param)
-{
-	param < xxx;
-}
-rw_param_check_fp check_ksum_limits_fp = check_ksum_limits;
-MACRO (KSUM, check_ksum_limits_fp)
-*/
 
 #define KX_PARAM_MIN                        1
 #define KX_PARAM_MAX                        ((1<<25)-1)

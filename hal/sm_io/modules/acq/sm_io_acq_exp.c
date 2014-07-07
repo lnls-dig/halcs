@@ -39,17 +39,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
-/************************************************************/
-/******************  Specific Operations ********************/
-/************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-
-#define BAR4_ADDR (4 << 28)
-#define BAR2_ADDR (2 << 28)
-
 #define SMIO_ACQ_HANDLER(self) ((smio_acq_t *) self->smio_handler)
 
 /************************************************************/
@@ -96,8 +85,9 @@ err_send_msg_alloc:
 }
 
 /************************************************************/
-/************* Specific acq functions **************/
+/***************** Specific ACQ Operations ******************/
 /************************************************************/
+
 static void *_acq_data_acquire (void *owner, void *args)
 {
     assert (owner);
@@ -144,7 +134,7 @@ static void *_acq_data_acquire (void *owner, void *args)
             "acq_core_shots = %u = 0x%08x\n", acq_core_shots, acq_core_shots);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n", ACQ_CORE_REG_PRE_SAMPLES);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
     /* FIXME FPGA Firmware requires number of samples to be divisible by
@@ -157,14 +147,14 @@ static void *_acq_data_acquire (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Pre Trigger offset: ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n",
             ACQ_CORE_REG_PRE_SAMPLES);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_PRE_SAMPLES, &num_samples_aligned);
 
     /* Post trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Post Trigger offset: ACQ_CORE_REG_POST_SAMPLES = 0x%08x\n",
             ACQ_CORE_REG_POST_SAMPLES);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_POST_SAMPLES, 0);
 
     /* DDR3 start address */
@@ -175,7 +165,7 @@ static void *_acq_data_acquire (void *owner, void *args)
             ACQ_CORE_REG_DDR3_START_ADDR);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "DDR3 Start value: 0x%08x\n", start_addr);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_DDR3_START_ADDR, &start_addr8 );
 
     /* Prepare core_ctl register */
@@ -183,7 +173,7 @@ static void *_acq_data_acquire (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Skip Trigger address: ACQ_CORE_REG_CTL = 0x%08x\n",
             ACQ_CORE_REG_CTL);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_CTL, &acq_core_ctl_reg );
 
     /* Prepare acquisition channel control */
@@ -191,7 +181,7 @@ static void *_acq_data_acquire (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Channel address: ACQ_CORE_REG_ACQ_CHAN_CTL = 0x%08x\n",
             ACQ_CORE_REG_ACQ_CHAN_CTL);
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_ACQ_CHAN_CTL, &acq_chan_ctl );
 
     /* Starting acquisition... */
@@ -199,7 +189,7 @@ static void *_acq_data_acquire (void *owner, void *args)
             "Start Acquision address: ACQ_CORE_REG_CTL = 0x%08x\n",
             ACQ_CORE_REG_CTL);
     acq_core_ctl_reg |= ACQ_CORE_CTL_FSM_START_ACQ;
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_CTL, &acq_core_ctl_reg );
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -228,7 +218,7 @@ static void *_acq_check_data_acquire (void *owner, void *args)
 
     uint32_t status_done = 0;
     /* Check for completion */
-    smio_thsafe_client_read_32 (self, BAR4_ADDR | WB_ACQ_BASE_ADDR |
+    smio_thsafe_client_read_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_STA, &status_done );
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Status done = 0x%08x\n", status_done);
@@ -354,7 +344,7 @@ static void *_acq_get_data_block (void *owner, void *args)
 
     /* static max allocation (32-bit words) */
     uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
-    ssize_t bytes_read = smio_thsafe_client_read_block (self, BAR2_ADDR | addr_i,
+    ssize_t bytes_read = smio_thsafe_client_read_block (self, LARGE_MEM_ADDR | addr_i,
             reply_size, data_out);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "%lu bytes read\n", bytes_read);

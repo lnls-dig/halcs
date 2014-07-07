@@ -42,17 +42,7 @@
             smio_err_str (err_type))
 
 /************************************************************/
-/******************  Specific Operations ********************/
-/************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-
-#define BAR4_ADDR (4 << 28)
-
-/************************************************************/
-/************* Specific swap functions **************/
+/*************    Specific SWAP operations     **************/
 /************************************************************/
 /* 0: Outputs matched. No signal
  * 1: Outputs in direct path

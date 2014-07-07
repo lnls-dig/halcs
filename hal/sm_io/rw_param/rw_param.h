@@ -75,7 +75,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define GET_PARAM(module, base_addr, prefix, reg, field, single_bit, fmt_funcp) \
     ({                                                                          \
         uint32_t value;                                                         \
-        uint32_t addr = BAR4_ADDR | base_addr | CONCAT_NAME3(prefix, REG, reg); \
+        uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:"#module"] "              \
 				"GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", addr); \
 		smio_thsafe_client_read_32 (self, addr, &value);                        \
@@ -99,7 +99,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define SET_PARAM(module, base_addr, prefix, reg, field, single_bit, value, min, max, chk_funcp, clr_field) \
 	({                                                                          \
         RW_REPLY_TYPE set_param_return;                                         \
-        uint32_t addr = BAR4_ADDR | base_addr | CONCAT_NAME3(prefix, REG, reg); \
+        uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:"#module"] "              \
 				"SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
                 value, addr);                                                   \
