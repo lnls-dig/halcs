@@ -20,17 +20,17 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
     ASSERT_HAL_TEST(test_boolean, DEV_IO, "[dev_io_core]",  \
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, DEV_IO, "[dev_io_core]",          \
             devio_err_str(DEVIO_ERR_ALLOC),                 \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
@@ -57,7 +57,7 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Initialize the sockets structure to talk to nodes */
-    self->pipes = zmalloc (sizeof (void *) * NODES_MAX_LEN);
+    self->pipes = zmalloc (sizeof (*self->pipes) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes, err_pipes_alloc);
     /* 0 nodes for now... */
     self->nnodes = 0;
@@ -65,6 +65,9 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     /* Nullify poller */
     self->poller = zpoller_new (NULL);
     ASSERT_ALLOC(self->poller, err_poller_alloc);
+
+	/* Setup new poller. It uses the low-level zmq_poll API */
+    self->poller2 = NULL;
 
     /* Initilize mdp_worrker last, as we need to have everything ready
      * when we attemp to register in broker. Actually, we still need
@@ -177,6 +180,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->endpoint_broker);
         free (self->name);
         zpoller_destroy (&self->poller);
+        free (self->poller2);
         free (self->pipes);
         free (self);
         *self_p = NULL;
@@ -300,11 +304,9 @@ devio_err_e devio_init_poller_sm (devio_t *self)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:poll_all_sm] Calling init_poller_sm\n");
 
-    /*  Set-up poller */
-    if (self->nnodes == 0) {
-        err = DEVIO_ERR_NO_NODES;
-        goto err_no_nodes;
-    }
+    /* Check minimum number of nodes */
+    ASSERT_TEST(self->nnodes > 0, "There are no SMIOs registered!",
+            err_no_nodes, DEVIO_ERR_NO_NODES);
 
     /* FIXME: From CZMQ sources: If you need a balanced poll, use
      * the low level zmq_poll method directly
@@ -312,12 +314,38 @@ devio_err_e devio_init_poller_sm (devio_t *self)
     unsigned int i;
     for (i = 0; i < self->nnodes; ++i) {
         int zerr = zpoller_add (self->poller, self->pipes[i]);
-        if (zerr < 0) {
-            err = DEVIO_ERR_ALLOC;
-            break;
-        }
+        ASSERT_TEST(zerr >= 0, "zmq: zpoller_add error!",
+            err_zpoller_add, DEVIO_ERR_ALLOC);
     }
 
+err_no_nodes:
+err_zpoller_add:
+    return err;
+}
+
+devio_err_e devio_init_poller2_sm (devio_t *self)
+{
+    devio_err_e err = DEVIO_SUCCESS;
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+            "[dev_io_core:poll_all_sm] Calling init_poller2_sm\n");
+
+    /* Check minimum number of nodes */
+    ASSERT_TEST(self->nnodes > 0, "There are no SMIOs registered!",
+            err_no_nodes, DEVIO_ERR_NO_NODES);
+
+    zmq_pollitem_t *items = zmalloc (sizeof (*items) * self->nnodes);
+    ASSERT_ALLOC(items, err_alloc_items, DEVIO_ERR_ALLOC);
+
+    unsigned int i;
+    for (i = 0; i < self->nnodes; ++i) {
+        items [i].socket = self->pipes [i];
+        items [i].events = ZMQ_POLLIN;
+    }
+
+    /* This should be freed on dev_io exit */
+    self->poller2 = items;
+
+err_alloc_items:
 err_no_nodes:
     return err;
 }
@@ -326,10 +354,8 @@ devio_err_e devio_poll_all_sm (devio_t *self)
 {
     devio_err_e err = DEVIO_SUCCESS;
 
-    if (!self->poller) {
-        err = DEVIO_ERR_UNINIT_POLLER;
-        goto err_uninitialized_poller;
-    }
+    ASSERT_TEST(self->poller, "Unitialized poller!",
+            err_uninitialized_poller, DEVIO_ERR_UNINIT_POLLER);
 
     /* Wait up to 100 ms */
     void *which = zpoller_wait (self->poller, DEVIO_POLLER_TIMEOUT);
@@ -340,12 +366,8 @@ devio_err_e devio_poll_all_sm (devio_t *self)
         goto err_poller_expired;
     }
 
-    if (zpoller_terminated (self->poller)) {
-        /*DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                "[dev_io_core:poll_all_sm] poller terminated\n");*/
-        err = DEVIO_ERR_TERMINATED;
-        goto err_poller_terminated;
-    }
+    ASSERT_TEST(!zpoller_terminated (self->poller), "Poller terminated!",
+            err_poller_terminated, DEVIO_ERR_TERMINATED);
 
     zmsg_t *recv_msg = zmsg_recv (which);
     /* Prepare the args structure */
@@ -358,6 +380,43 @@ err_uninitialized_poller:
     return err;
 }
 
+devio_err_e devio_poll2_all_sm (devio_t *self)
+{
+    devio_err_e err = DEVIO_SUCCESS;
+
+    ASSERT_TEST(self->poller2, "Unitialized poller!",
+            err_uninitialized_poller, DEVIO_ERR_UNINIT_POLLER);
+
+    /* Wait up to 100 ms */
+    int rc = zmq_poll (self->poller2, self->nnodes, DEVIO_POLLER_TIMEOUT);
+    ASSERT_TEST(rc != -1, "devio_poll2_all_sm: poller interrupted", err_poller_interrupted,
+            DEVIO_ERR_INTERRUPTED_POLLER);
+
+    /* Timeout */
+    if (rc == 0) {  /* Exit silently */
+        /*DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:poll_all_sm] poller expired\n");*/
+        goto err_poller_expired;
+    }
+
+    /* Loop once through all the available sockets */
+    unsigned int i;
+    for (i = 0; i < self->nnodes; ++i) {
+        if (self->poller2 [i].revents & ZMQ_POLLIN) {
+            zmsg_t *recv_msg = zmsg_recv (self->poller2 [i].socket);
+            /* Prepare the args structure */
+            zmq_server_args_t server_args = {.msg = &recv_msg,
+                .reply_to = self->poller2 [i].socket};
+            err = _devio_do_smio_op (self, &server_args);
+        }
+    }
+
+err_poller_expired:
+err_poller_interrupted:
+err_uninitialized_poller:
+    return err;
+}
+
 devio_err_e devio_do_smio_op (devio_t *self, void *msg)
 {
     return _devio_do_smio_op (self, msg);
@@ -366,29 +425,25 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
 /**************** Helper Functions ***************/
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
+    devio_err_e err = DEVIO_SUCCESS;
     zmq_server_args_t *server_args = (zmq_server_args_t *) msg;
     /* Message is:
      * frame 0: opcode
      * frame 1: payload */
     /* Extract the first frame and determine the opcode */
     zframe_t *opcode = zmsg_pop (*server_args->msg);
-    devio_err_e err = (opcode == NULL) ? DEVIO_ERR_BAD_MSG : DEVIO_SUCCESS;
-    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode);
+    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
+            DEVIO_ERR_BAD_MSG);
 
-    if (zframe_size (opcode) != THSAFE_OPCODE_SIZE) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR,
-                "[dev_io_core:poll_all_sm] Invalid opcode size received\n");
-        err = DEVIO_ERR_BAD_MSG;
-        goto err_wrong_opcode_size;
-    }
+    /* Sanity checks */
+    ASSERT_TEST(zframe_size (opcode) == THSAFE_OPCODE_SIZE,
+            "poll_all_sm: Invalid opcode size received", err_wrong_opcode_size,
+            DEVIO_ERR_BAD_MSG);
 
     uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
-    if (opcode_data > THSAFE_OPCODE_END-1) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR,
-                "[dev_io_core:poll_all_sm] Invalid opcode received\n");
-        err = DEVIO_ERR_BAD_MSG;
-        goto err_invalid_opcode;
-    }
+    ASSERT_TEST(opcode_data <= THSAFE_OPCODE_END-1,
+            "poll_all_sm: Invalid opcode received", err_invalid_opcode,
+            DEVIO_ERR_BAD_MSG);
 
     /* Do the actual work... */
     disp_table_call (self->disp_table_thsafe_ops, opcode_data, self, server_args);

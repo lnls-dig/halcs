@@ -17,17 +17,17 @@ extern volatile sig_atomic_t __dev_nums;
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
     ASSERT_HAL_TEST(test_boolean, DEV_MNGR, "dev_mngr_core",\
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, DEV_MNGR, "dev_mngr_core",        \
             dmngr_err_str(DMNGR_ERR_ALLOC),                 \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
@@ -133,7 +133,8 @@ dmngr_err_e dmngr_register_sig_handlers (dmngr_t *self)
         int err = sigaction (sig_handler->signal, &act, NULL);
         CHECK_ERR(err, DMNGR_ERR_SIGACTION);
 
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n", sig_handler->signal);
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n",
+                sig_handler->signal);
 
         sig_handler = (dmngr_sig_handler_t *)
             zlist_next (self->ops->sig_ops);

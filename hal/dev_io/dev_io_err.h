@@ -21,6 +21,7 @@ enum _devio_err_e
     DEVIO_ERR_NO_SMIO_ID,           /* No sm_io registered with the id argument */
     DEVIO_ERR_NO_NODES,             /* No thread nodes available */
     DEVIO_ERR_UNINIT_POLLER,        /* Uninitliazed poller */
+    DEVIO_ERR_INTERRUPTED_POLLER,   /* Poller interrupted. zeroMQ context was terminated or received interrupt signal */
     DEVIO_ERR_BAD_MSG,              /* Malformed message received */
     DEVIO_ERR_TERMINATED,           /* Terminated devio instance */
     DEVIO_ERR_END                   /* End of enum marker */

@@ -17,17 +17,17 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io_acq_core]", \
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io_acq_core]", \
             smio_err_str(SMIO_ERR_ALLOC),                   \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR

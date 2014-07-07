@@ -20,22 +20,22 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io:acq_exp]", \
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:acq_exp]", \
-            smio_err_str(SMIO_ERR_ALLOC),                   \
-            err_goto_label)
+            smio_err_str(SMIO_ERR_ALLOC),           \
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
+#define CHECK_ERR(err, err_type)                    \
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
@@ -457,11 +457,11 @@ smio_err_e acq_init (smio_t * self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq_exp] Initializing acq\n");
 
-    smio_err_e err = SMIO_ERR_ALLOC;
+    smio_err_e err = SMIO_SUCCESS;
 
     self->id = ACQ_SDB_DEVID;
     self->name = strdup (ACQ_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc);
+    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
 
     /* Set SMIO ops pointers */
     self->ops = &acq_ops;
@@ -470,9 +470,8 @@ smio_err_e acq_init (smio_t * self)
 
     /* Initialize specific structure */
     self->smio_handler = smio_acq_new (0); /* Default: num_samples = 0 */
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc);
+    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
-    err = SMIO_SUCCESS;
     return err;
 
 err_smio_handler_alloc:

@@ -13,17 +13,17 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io]",         \
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io]",                 \
             smio_err_str(SMIO_ERR_ALLOC),                   \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
@@ -101,10 +101,8 @@ smio_err_e smio_export_ops (smio_t *self, const smio_exp_ops_t* smio_exp_ops)
         halutils_err_e herr = disp_table_insert (self->exp_ops_dtable,
             smio_exp_ops_it->opcode, smio_exp_ops_it->func_fp);
 
-        if (herr != HALUTILS_SUCCESS) {
-            err = SMIO_ERR_EXPORT_OP;
-            goto err_export_op;
-        }
+        ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export SMIO ops",
+                err_export_op, SMIO_ERR_EXPORT_OP);
     }
 
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
@@ -121,10 +119,8 @@ smio_err_e smio_unexport_ops (smio_t *self)
     smio_err_e err = SMIO_SUCCESS;
     halutils_err_e herr = disp_table_remove_all (self->exp_ops_dtable);
 
-    if (herr != HALUTILS_SUCCESS) {
-        err = SMIO_ERR_EXPORT_OP;
-        goto err_unexport_op;
-    }
+    ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
+            err_unexport_op, SMIO_ERR_EXPORT_OP);
 
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
 
@@ -152,23 +148,17 @@ smio_err_e smio_do_op (void *owner, void *msg)
      * frame 0: operation
      * frame n: arguments*/
     zframe_t *opcode = zmsg_pop (*exp_msg->msg);
-    err = (opcode == NULL) ? SMIO_ERR_WRONG_NARGS : SMIO_SUCCESS;
-    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode);
 
-    if (zframe_size (opcode) != EXP_OPS_OPCODE_SIZE) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
-                "[sm_io] Invalid opcode size received\n");
-        err = SMIO_ERR_WRONG_NARGS;
-        goto err_wrong_opcode_size;
-    }
+    /* Sanity checks */
+    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
+            SMIO_ERR_WRONG_NARGS);
+    ASSERT_TEST(zframe_size (opcode) == EXP_OPS_OPCODE_SIZE,
+            "Invalid opcode size received", err_wrong_opcode_size,
+            SMIO_ERR_WRONG_NARGS);
 
     uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
-    if (opcode_data > SMIO_MAX_OPS-1) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
-                "[sm_io] Invalid opcode received\n");
-        err = SMIO_ERR_WRONG_NARGS;
-        goto err_invalid_opcode;
-    }
+    ASSERT_TEST(opcode_data <= SMIO_MAX_OPS-1, "Invalid opcode received",
+            err_invalid_opcode, SMIO_ERR_WRONG_NARGS);
 
     /* Do the actual work... */
     disp_table_call (self->exp_ops_dtable, opcode_data, self, exp_msg);

@@ -22,17 +22,17 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)      \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io:swap_exp]",    \
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                       \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)   \
     ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:swap_exp]",            \
             smio_err_str(SMIO_ERR_ALLOC),                       \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
@@ -282,11 +282,11 @@ smio_err_e swap_init (smio_t * self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:swap_exp] Initializing swap\n");
 
-    smio_err_e err = SMIO_ERR_ALLOC;
+    smio_err_e err = SMIO_SUCCESS;
 
     self->id = SWAP_SDB_DEVID;
     self->name = strdup (SWAP_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc);
+    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
 
     /* Set SMIO ops pointers */
     self->ops = &swap_ops;
@@ -295,11 +295,10 @@ smio_err_e swap_init (smio_t * self)
 
     /* Initialize specific structure */
     self->smio_handler = smio_swap_new (); /* TODO Define swap init parameters */
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc);
+    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
 //	_smio_swap_config_defaults (self);
 
-    err = SMIO_SUCCESS;
     return err;
 
 err_smio_handler_alloc:

@@ -15,17 +15,17 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label)  \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
     ASSERT_HAL_TEST(test_boolean, HAL_UTILS, "[halultis:disp_table]",\
-            err_str, err_goto_label)
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label)                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
     ASSERT_HAL_ALLOC(ptr, HAL_UTILS, "[halutils:disp_table]",\
             halutils_err_str(HALUTILS_ERR_ALLOC),           \
-            err_goto_label)
+            err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
@@ -128,11 +128,12 @@ halutils_err_e disp_table_insert_all (disp_table_t *self, const disp_table_func_
         halutils_err_e err = _disp_table_insert (self, code_table [i],
                 *disp_table_fp [i]);
 
-        if (err != HALUTILS_SUCCESS) {
-            break;
-        }
+        ASSERT_TEST(err == HALUTILS_SUCCESS,
+                "disp_table_insert_all: Could not insert function",
+                err_disp_insert);
     }
 
+err_disp_insert:
     return err;
 }
 
