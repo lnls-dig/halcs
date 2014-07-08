@@ -84,7 +84,8 @@ typedef struct _devio_t devio_t;
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose);
+        llio_type_e type, char *endpoint_broker, int verbose,
+        const char *log_file_name);
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);
 

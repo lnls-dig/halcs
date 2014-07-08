@@ -51,8 +51,20 @@ static void _devio_destroy_smio_all (devio_t *self);
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose)
+        llio_type_e type, char *endpoint_broker, int verbose,
+        const char *log_file_name)
 {
+    assert (name);
+    assert (endpoint_dev);
+    assert (endpoint_broker);
+
+    /* Set logfile available for all dev_mngr and dev_io instances.
+     * We accept NULL as a parameter, meaning to suppress all messages */
+    int log_err = debug_set_log (log_file_name);
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Log registered to %s\n",
+            (log_err == -1) ? "NULL" : log_file_name);
+
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 

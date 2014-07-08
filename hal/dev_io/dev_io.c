@@ -15,6 +15,7 @@ void print_help (char *program_name)
             "\t-v Verbose output\n"
             "\t-t <device_type> Device type\n"
             "\t-e <dev_entry> Device /dev entry\n"
+            "\t-l <log_filename> Log filename\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
@@ -25,7 +26,8 @@ int main (int argc, char *argv[])
     char *dev_type = NULL;
     char *dev_entry = NULL;
     char *broker_endp = NULL;
-    char **str_p = &dev_type; /* default */
+    char *log_file_name = NULL;
+    char **str_p = NULL;
     int i;
 
     if (argc < 4) {
@@ -58,14 +60,20 @@ int main (int argc, char *argv[])
             str_p = &broker_endp;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set broker_endp parameter\n");
         }
+        else if (streq (argv[i], "-l")) {
+            str_p = &log_file_name;
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set log filename\n");
+        }
         else if (streq (argv[i], "-h")) {
             print_help (argv[0]);
             exit (1);
         }
         /* Fallout for options with parameters */
         else {
-            *str_p = strdup (argv[i]);
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Parameter set to \"%s\"\n", *str_p);
+            if (str_p) {
+                *str_p = strdup (argv[i]);
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Parameter set to \"%s\"\n", *str_p);
+            }
         }
     }
 
@@ -100,7 +108,7 @@ int main (int argc, char *argv[])
     /* Initilialize dev_io */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating devio instance ...\n");
     devio_t *devio = devio_new ("BPM0:DEVIO", dev_entry, llio_type,
-            broker_endp, verbose);
+            broker_endp, verbose, log_file_name);
     /* devio_t *devio = devio_new ("BPM0:DEVIO", *str_p, llio_type,
             "tcp://localhost:5555", verbose); */
 
@@ -171,8 +179,13 @@ int main (int argc, char *argv[])
 err_devio:
     devio_destroy (&devio);
 err_exit:
-    free (broker_endp);
-    free (dev_entry);
-    free (dev_type);
+    str_p = &log_file_name;
+    free (*str_p);
+    str_p = &broker_endp;
+    free (*str_p);
+    str_p = &dev_entry;
+    free (*str_p);
+    str_p = &dev_type;
+    free (*str_p);
     return 0;
 }
