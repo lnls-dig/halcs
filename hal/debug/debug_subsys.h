@@ -24,6 +24,7 @@
 #define DBG_SUBSYS_MASK         (DBG_SUBSYS_MASK_RAW << DBG_SUBSYS_SHIFT)
 
 #define DBG_SUBSYS_GEN(val)    ((val & DBG_SUBSYS_MASK_RAW) << DBG_SUBSYS_SHIFT)
+#define DBG_SUBSYS_DEGEN(val)  ((val & DBG_SUBSYS_MASK) >> DBG_SUBSYS_SHIFT)
 
 /* Debug subsys raw */
 #define DBG_DEV_MNGR_RAW        0x1
@@ -58,6 +59,9 @@
 
 /* Up to 2^3 debug levels */
 #define DBG_LVL_GEN(val)       ((val & DBG_LVL_MASK_RAW) << DBG_LVL_SHIFT)
+#define DBG_LVL_DEGEN(val)     ((val & DBG_LVL_MASK) >> DBG_LVL_SHIFT)
+
+#define DBG_LVL_NUM            5
 
 /* Debug levels raw */
 #define DBG_LVL_TRACE_RAW      0x1
@@ -73,6 +77,14 @@
 #define DBG_LVL_ERR            DBG_LVL_GEN(DBG_LVL_ERR_RAW)
 #define DBG_LVL_FATAL          DBG_LVL_GEN(DBG_LVL_FATAL_RAW)
 
+#define DBG_LVL_TRACE_STR      "TRACE"
+#define DBG_LVL_INFO_STR       "INFO"
+#define DBG_LVL_WARN_STR       "WARN"
+#define DBG_LVL_ERR_STR        "ERR"
+#define DBG_LVL_FATAL_STR      "FATAL"
+
+extern char *dbg_lvl_str [DBG_LVL_NUM];
+char *dbg_lvl_to_str (int dbg_lvl);
 
 /****************** Debug halt macros ******************/
 /*
@@ -89,11 +101,13 @@
 
 /* 1 halt signal */
 #define DBG_HALT_GEN(val)      ((val & DBG_HALT_MASK_RAW) << DBG_HALT_SHIFT)
+#define DBG_HALT_DEGEN(val)    ((val & DBG_HALT_MASK) >> DBG_HALT_SHIFT)
 
 /* Debug halt raw */
 #define DBG_LVL_HALT_RAW       0x1
 
 /* Debug halt mask'ed and shift'ed */
 #define DBG_LVL_HALT           DBG_HALT_GEN(DBG_LVL_HALT_RAW)
+
 
 #endif
