@@ -9,6 +9,7 @@
 
 #include "dev_mngr_core.h"
 #include "hal_assert.h"
+#include "debug_print.h"
 
 /* Some global variables for use with signal handlers */
 extern volatile sig_atomic_t __dev_nums;
@@ -37,10 +38,17 @@ extern volatile sig_atomic_t __dev_nums;
             dmngr_err_str (err_type))
 
 /* Creates a new instance of the Device Manager */
-dmngr_t * dmngr_new (char *name, char *endpoint, int verbose)
+dmngr_t * dmngr_new (char *name, char *endpoint, int verbose, const char *log_file_name)
 {
     assert (name);
     assert (endpoint);
+
+    /* Set logfile available for all dev_mngr and dev_io instances.
+     * We accept NULL as a parameter, meaning to suppress all messages */
+    int log_err = debug_set_log (log_file_name);
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Log registered to %s\n",
+            (log_err == -1) ? "NULL" : log_file_name);
 
     dmngr_t *self = (dmngr_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);

@@ -119,6 +119,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"
+            "\t-l <log_filename> Log filename\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
@@ -127,7 +128,8 @@ int main (int argc, char *argv[])
     int verbose = 0;
     int daemonize = 0;
     char *broker_endp = NULL;
-    char **str_p;
+    char *log_file_name = NULL;
+    char **str_p = NULL;
     int i;
 
     if (argc < 2) {
@@ -148,19 +150,25 @@ int main (int argc, char *argv[])
             daemonize = 1;
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Demonize mode set\n");
         }
+        else if (streq (argv[i], "-b")) {
+            str_p = &broker_endp;
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set broker_endp parameter\n");
+        }
+        else if (streq (argv[i], "-l")) {
+            str_p = &log_file_name;
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set log filename\n");
+        }
         else if (streq(argv[i], "-h"))
         {
             print_help (argv [0]);
             exit (1);
         }
-        else if (streq (argv[i], "-b")) {
-            str_p = &broker_endp;
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Going to set broker_endp parameter\n");
-        }
         /* Fallout for options with parameters */
         else {
-            *str_p = strdup (argv[i]);
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Parameter set to \"%s\"\n", *str_p);
+            if (str_p) {
+                *str_p = strdup (argv[i]);
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Parameter set to \"%s\"\n", *str_p);
+            }
         }
     }
 
@@ -180,7 +188,7 @@ int main (int argc, char *argv[])
     }
 
     /* See the fake promiscuous endpoint tcp*:*. To be changed soon! */
-    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose);
+    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose, log_file_name);
     if (dmngr == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Fail to allocate dev_mngr instance\n");
         goto err_dmngr_alloc;
@@ -244,8 +252,9 @@ int main (int argc, char *argv[])
             /* Argument options are "process name", "device type" and
              *"dev entry" */
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Spawing DEVIO worker\n");
+            /* FIXME: change devio.log to devio%d.log as multiple devio might exist! */
             char *argv_exec[] = {"dev_io", "-t", "pcie", "-e", "/dev/fpga0",
-                "-b", broker_endp, NULL};
+                "-b", broker_endp, "-l", "dev_io.log", NULL};
             int spawn_err = dmngr_spawn_chld (dmngr, "./dev_io", argv_exec);
 
             /* Just fail miserably, for now */
@@ -274,6 +283,8 @@ err_exit:
     dmngr_destroy (&dmngr);
 err_dmngr_alloc:
 err_daemonize:
+    str_p = &log_file_name;
+    free (*str_p);
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;

@@ -62,7 +62,7 @@ typedef struct _dmngr_t dmngr_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Device Manager */
-dmngr_t * dmngr_new (char *name, char * endpoint, int verbose);
+dmngr_t * dmngr_new (char *name, char * endpoint, int verbose, const char *log_file_name);
 /* Destroy an instance of the Device Manager */
 dmngr_err_e dmngr_destroy (dmngr_t **self_p);
 
