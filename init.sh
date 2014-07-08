@@ -18,9 +18,10 @@ fi
 
 transport=$1
 broker_endp=$2
+log_filename="dev_mngr.log"
 
 # Launch Device Manager
-./dev_mngr -v -b ${transport}://${broker_endp} &
+./dev_mngr -v -b ${transport}://${broker_endp} -l ${log_filename} &
 # Wait until dev_mngr has registred the signal handlers
 sleep 1
 # Signal dev_mngr of a "new" PCIe device
