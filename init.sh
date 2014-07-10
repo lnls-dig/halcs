@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Broker Endpoint
-EXPECTED_ARGS=2
+REQUIRED_ARGS=2
+BIN_DIR=/usr/local/bin
 
 if [ "$(id -u)" != "0" ]
 then
@@ -9,19 +9,27 @@ then
 	exit 1
 fi
 
-if [ $# -ne $EXPECTED_ARGS ]
+if [ $# -lt $REQUIRED_ARGS ]
 then
 	echo "Error: Wrong arguments!"
-	echo "Usage: `basename $0` {transport type = [ipc|tcp]} {broker endpoint}"
+	echo "Usage: `basename $0` {transport type = [ipc|tcp]} {broker endpoint} [log directory]"
 	exit 1
 fi
 
 transport=$1
 broker_endp=$2
-log_filename="dev_mngr.log"
+log_dir=$3
+log_dir_opt=
+
+if [ -z "$log_dir" ]
+then
+    log_dir_opt=
+else
+    log_dir_opt="-l $log_dir"
+fi
 
 # Launch Device Manager
-./dev_mngr -v -b ${transport}://${broker_endp} -l ${log_filename} &
+${BIN_DIR}/dev_mngr -v -b ${transport}://${broker_endp} ${log_dir_opt} &
 # Wait until dev_mngr has registred the signal handlers
 sleep 1
 # Signal dev_mngr of a "new" PCIe device
