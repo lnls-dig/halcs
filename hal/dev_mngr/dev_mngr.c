@@ -24,6 +24,15 @@
 #define DFLT_BIND_ADDR              "0"
 #define IPC_FILE_PERM               0777
 
+#define DFLT_LOG_DIR                "/var/log"
+
+#define LOG_FILENAME_LEN            50
+/* We don't expect to have more than 11 digits of devios in a single crate...*/
+#define DEVIO_DEV_NAME_LEN          20
+#define DEVIO_DEV_NAME              "/dev/fpga%d"
+#define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
+#define DEVIO_LOG_FILENAME          "dev_io%d.log"
+
 /* Global variable for testing an asynchronous event */
 volatile sig_atomic_t __new_dev = 0;
 volatile sig_atomic_t __dev_nums = 0;
@@ -119,7 +128,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"
-            "\t-l <log_filename> Log filename\n"
+            "\t-l <log_dir> Log directory\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
@@ -128,7 +137,7 @@ int main (int argc, char *argv[])
     int verbose = 0;
     int daemonize = 0;
     char *broker_endp = NULL;
-    char *log_file_name = NULL;
+    char *log_dir = NULL;
     char **str_p = NULL;
     int i;
 
@@ -155,7 +164,7 @@ int main (int argc, char *argv[])
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set broker_endp parameter\n");
         }
         else if (streq (argv[i], "-l")) {
-            str_p = &log_file_name;
+            str_p = &log_dir;
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set log filename\n");
         }
         else if (streq(argv[i], "-h"))
@@ -177,6 +186,13 @@ int main (int argc, char *argv[])
         broker_endp = DFLT_BIND_FOLDER"/"DFLT_BIND_ADDR;
     }
 
+    /* Set default logfile. We accept NULL as stdout */
+    /*
+     *if (log_dir == NULL) {
+     *   log_dir = DFLT_LOG_DIR"/";
+     *}
+     */
+
     /* Daemonize dev_mngr */
     if (daemonize != 0) {
         int rc = daemon(0, 0);
@@ -187,8 +203,14 @@ int main (int argc, char *argv[])
         }
     }
 
+    /* Put together the log filename */
+    char devmngr_log_filename[LOG_FILENAME_LEN] = "stdout";
+    if (log_dir != NULL) {
+        snprintf (devmngr_log_filename, LOG_FILENAME_LEN, "%s/%s", log_dir, DEVMNGR_LOG_FILENAME);
+    }
+
     /* See the fake promiscuous endpoint tcp*:*. To be changed soon! */
-    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose, log_file_name);
+    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose, devmngr_log_filename);
     if (dmngr == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Fail to allocate dev_mngr instance\n");
         goto err_dmngr_alloc;
@@ -249,12 +271,23 @@ int main (int argc, char *argv[])
                 }
             }
 
+            char devio_devname[DEVIO_DEV_NAME_LEN];
+            char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
+
+            /* FIXME: this logic is weak and prone to errors! */
+            snprintf (devio_devname, DEVIO_DEV_NAME_LEN, DEVIO_DEV_NAME,
+                     __dev_nums-1);
+
+            if (log_dir != NULL) {
+                snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_LOG_FILENAME,
+                        log_dir, __dev_nums-1);
+            }
+
             /* Argument options are "process name", "device type" and
              *"dev entry" */
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Spawing DEVIO worker\n");
-            /* FIXME: change devio.log to devio%d.log as multiple devio might exist! */
-            char *argv_exec[] = {"dev_io", "-t", "pcie", "-e", "/dev/fpga0",
-                "-b", broker_endp, "-l", "dev_io.log", NULL};
+            char *argv_exec[] = {"dev_io", "-t", "pcie", "-e", devio_devname,
+                "-b", broker_endp, "-l", devio_log_filename, NULL};
             int spawn_err = dmngr_spawn_chld (dmngr, "./dev_io", argv_exec);
 
             /* Just fail miserably, for now */
@@ -283,7 +316,7 @@ err_exit:
     dmngr_destroy (&dmngr);
 err_dmngr_alloc:
 err_daemonize:
-    str_p = &log_file_name;
+    str_p = &log_dir;
     free (*str_p);
     str_p = &broker_endp;
     free (*str_p);
