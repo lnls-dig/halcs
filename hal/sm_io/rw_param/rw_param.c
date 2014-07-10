@@ -62,7 +62,7 @@ void rw_param_send_client_response ( RW_REPLY_TYPE reply_code,
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:dsp] send_client_response: "
             "Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (report);
+    debug_log_print_zmq_msg (report);
 #endif
     mdp_worker_send (worker, &report, reply_to);
     return;

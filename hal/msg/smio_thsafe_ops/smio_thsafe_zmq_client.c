@@ -114,7 +114,7 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, loff_t offs, size_t size, ui
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (send_msg);
+    debug_log_print_zmq_msg (send_msg);
 #endif
 
     zerr = zmsg_send (&send_msg, self->pipe);
@@ -163,7 +163,7 @@ ssize_t thsafe_zmq_client_write_block (smio_t *self, loff_t offs, size_t size, c
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (send_msg);
+    debug_log_print_zmq_msg (send_msg);
 #endif
 
     zerr = zmsg_send (&send_msg, self->pipe);
@@ -233,7 +233,7 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (send_msg);
+    debug_log_print_zmq_msg (send_msg);
 #endif
     zerr = zmsg_send (&send_msg, self->pipe);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
@@ -323,7 +323,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, loff_t offs, uint8
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (send_msg);
+    debug_log_print_zmq_msg (send_msg);
 #endif
 
     zerr = zmsg_send (&send_msg, self->pipe);
@@ -388,7 +388,7 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, loff_t offs, cons
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (send_msg);
+    debug_log_print_zmq_msg (send_msg);
 #endif
 
     zerr = zmsg_send (&send_msg, self->pipe);
@@ -421,7 +421,7 @@ static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Receiving message:\n");
 #ifdef LOCAL_MSG_DBG
-    zmsg_print (recv_msg);
+    debug_log_print_zmq_msg (recv_msg);
 #endif
 
     /* Message is:
