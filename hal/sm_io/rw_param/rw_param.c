@@ -59,7 +59,7 @@ void rw_param_send_client_response ( RW_REPLY_TYPE reply_code,
                 err_data_code);
     }
 
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:dsp] send_client_response: "
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:rw_param] send_client_response: "
             "Sending message:\n");
 #ifdef LOCAL_MSG_DBG
     debug_log_print_zmq_msg (report);
