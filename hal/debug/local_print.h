@@ -10,5 +10,6 @@
 #define _LOCAL_PRINT_H_
 
 char *local_vprintf (const char *format, va_list argptr);
+void local_print_zmq_msg (zmsg_t *msg, FILE *file);
 
 #endif

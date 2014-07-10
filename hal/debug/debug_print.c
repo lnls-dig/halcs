@@ -61,6 +61,16 @@ void debug_log_print (int dbg_lvl, const char *fmt, ...)
     free (dbg_lvl_str);
 }
 
+void debug_log_print_zmq_msg (zmsg_t *msg)
+{
+    /* Default to stdout */
+    if (!_debug_logfile) {
+        _debug_logfile = stdout;
+    }
+
+    local_print_zmq_msg (msg, _debug_logfile);
+}
+
 void debug_print_vec (const char *fmt, const char *data, int len)
 {
     int i;
@@ -108,3 +118,4 @@ int debug_set_log (const char *log_file_name)
     _debug_set_log_file (log_file);
     return err;
 }
+
