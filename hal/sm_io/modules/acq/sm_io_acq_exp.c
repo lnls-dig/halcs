@@ -119,11 +119,12 @@ static void *_acq_data_acquire (void *owner, void *args)
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "num_samples= %u\tchannel= %u\n", num_samples, chan);
+            "Current acq params: number of samples = %u, channel = %u\n",
+            num_samples, chan);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "acq params: num_samples[ch=%u] = %u\n", chan,
-            SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples);
+            "\tPrevious acq params: number of samples = %u\n, channel = %u\n",
+            chan, SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples);
 
     /* Set the parameters: number of samples of this channel */
     SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples = num_samples;
@@ -131,63 +132,56 @@ static void *_acq_data_acquire (void *owner, void *args)
     /* Default SHOTS value is 1 */
     uint32_t acq_core_shots = ACQ_CORE_SHOTS_NB_W(1);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "acq_core_shots = %u = 0x%08x\n", acq_core_shots, acq_core_shots);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n", ACQ_CORE_REG_PRE_SAMPLES);
+            "Number of shots = %u\n", acq_core_shots);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
-    uint32_t num_samples_div =
+    uint32_t num_samples_div_pre =
         DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
-    uint32_t num_samples_aligned = num_samples + num_samples_div -
-        (num_samples % num_samples_div);
+    uint32_t num_samples_aligned_pre = num_samples + num_samples_div_pre -
+        (num_samples % num_samples_div_pre);
     /* Pre trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Pre Trigger offset: ACQ_CORE_REG_PRE_SAMPLES = 0x%08x\n",
-            ACQ_CORE_REG_PRE_SAMPLES);
+            "Number of pre-trigger samples (aligned to sample size) = %u\n",
+            num_samples_aligned_pre);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
-            ACQ_CORE_REG_PRE_SAMPLES, &num_samples_aligned);
+            ACQ_CORE_REG_PRE_SAMPLES, &num_samples_aligned_pre);
 
     /* Post trigger samples */
+    uint32_t num_samples_post = 0;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Post Trigger offset: ACQ_CORE_REG_POST_SAMPLES = 0x%08x\n",
-            ACQ_CORE_REG_POST_SAMPLES);
+            "Number of post-trigger samples = %u\n",
+            num_samples_post);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
-            ACQ_CORE_REG_POST_SAMPLES, 0);
+            ACQ_CORE_REG_POST_SAMPLES, &num_samples_post);
 
     /* DDR3 start address */
-    uint32_t start_addr= (uint32_t) SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr;
-    uint32_t start_addr8= start_addr/8;
+    uint32_t start_addr = (uint32_t) SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr;
+    uint32_t start_addr8 = start_addr/8;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "DDR3 Start address: ACQ_CORE_REG_DDR3_START_ADDR = 0x%08x\n",
-            ACQ_CORE_REG_DDR3_START_ADDR);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "DDR3 Start value: 0x%08x\n", start_addr);
+            "DDR3 start address: 0x%08x\n", start_addr);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_DDR3_START_ADDR, &start_addr8 );
 
     /* Prepare core_ctl register */
     uint32_t acq_core_ctl_reg = ACQ_CORE_CTL_FSM_ACQ_NOW;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Skip Trigger address: ACQ_CORE_REG_CTL = 0x%08x\n",
-            ACQ_CORE_REG_CTL);
+            "Control register is: 0x%08x\n",
+            acq_core_ctl_reg);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_CTL, &acq_core_ctl_reg );
 
     /* Prepare acquisition channel control */
     uint32_t acq_chan_ctl = ACQ_CORE_ACQ_CHAN_CTL_WHICH_W(chan);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Channel address: ACQ_CORE_REG_ACQ_CHAN_CTL = 0x%08x\n",
-            ACQ_CORE_REG_ACQ_CHAN_CTL);
+            "Channel control register is: 0x%08x\n",
+            acq_chan_ctl);
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_ACQ_CHAN_CTL, &acq_chan_ctl );
 
     /* Starting acquisition... */
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Start Acquision address: ACQ_CORE_REG_CTL = 0x%08x\n",
-            ACQ_CORE_REG_CTL);
     acq_core_ctl_reg |= ACQ_CORE_CTL_FSM_START_ACQ;
     smio_thsafe_client_write_32 (self, WB_ACQ_BASE_ADDR |
             ACQ_CORE_REG_CTL, &acq_core_ctl_reg );
@@ -260,12 +254,13 @@ static void *_acq_get_data_block (void *owner, void *args)
     uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     uint32_t block_n     = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "chan = %u\t block_n = %u\n",chan, block_n);
+            "chan = %u, block_n = %u\n",chan, block_n);
 
     /* Channel features */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "[channel = %u]\tid = %u\tstart_addr = %u\tend_addr = %u\t"
-            "max_samples = %u\tsample_size = %u\n", chan,
+            "\t[channel = %u], id = %u, start addr = 0x%08x\n"
+            "\tend addr = 0x%08x, max samples = %u, sample size = %u\n",
+            chan,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].id,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr,
@@ -274,14 +269,14 @@ static void *_acq_get_data_block (void *owner, void *args)
 
     uint32_t block_n_max = ( SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr -
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) /
-        BLOCK_SIZE;
+            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) / BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "block_n_max= %u\n", block_n_max);
+            "block_n_max = %u\n", block_n_max);
+
     if (block_n > block_n_max) {	/* block required out of the limits */
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-                "Block required out of the limit\n");
+                "Block required is out of the limit\n");
         /* Message is:
          * frame 0: error code
          * frame 1: size (in bytes)
@@ -308,7 +303,7 @@ static void *_acq_get_data_block (void *owner, void *args)
         block_n_valid--;
     }
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "block_n_valid= %u\tover_samples= %u\n",
+            "block_n_valid= %u, over_samples= %u\n",
             block_n_valid, over_samples);
 
     /* check if block required is valid and if it is full or not */
@@ -327,12 +322,12 @@ static void *_acq_get_data_block (void *owner, void *args)
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
                 "Block required has %u valid samples\n", over_samples);
         reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
     }
     else { /* if block_n < block_n_valid */
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
                 "Block required is full of valid data\n");
         reply_size = BLOCK_SIZE;
     }
@@ -340,7 +335,7 @@ static void *_acq_get_data_block (void *owner, void *args)
     uint32_t addr_i = SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
         block_n * BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "addr_i = %u\n", addr_i);
+            "Memory start address = 0x%08x\n", addr_i);
 
     /* static max allocation (32-bit words) */
     uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
