@@ -16,5 +16,6 @@ void local_print_zmq_msg (zmsg_t *msg, FILE *file)
 {
     zmsg_fprint (msg, file);
     fprintf (file, "--------------------------------------\n");
+    fflush (file);
 }
 
