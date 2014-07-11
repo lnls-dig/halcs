@@ -107,13 +107,25 @@ static void *_acq_data_acquire (void *owner, void *args)
     uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
 
     /* number of samples required is out of the maximum limit */
-    if (num_samples >= SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples) {
+    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Number of samples required is out of the maximum limit\n");
 
         /* Message is:
          * frame 0: error code      */
         _send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
+                self->worker, exp_msg->reply_to);
+        goto err_smp_exceeded;
+    }
+
+    /* channel required is out of the limit */
+    if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+                "Channel required is out of the maximum limit\n");
+
+        /* Message is:
+         * frame 0: error code      */
+        _send_client_response (ACQ_NUM_CHAN_OOR, 0, NULL, false,
                 self->worker, exp_msg->reply_to);
         goto err_smp_exceeded;
     }

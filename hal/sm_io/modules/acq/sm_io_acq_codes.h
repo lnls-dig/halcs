@@ -30,6 +30,7 @@
 #define ACQ_NUM_SAMPLES_OOR             1   /* Number of samples out of range */
 #define ACQ_NOT_COMPLETED               2   /* Acquisition not completed */
 #define ACQ_BLOCK_OOR                   3   /* Block number out of range */
-#define ACQ_REPLY_END                   4   /* End marker */
+#define ACQ_NUM_CHAN_OOR                4   /* Channel number out of range */
+#define ACQ_REPLY_END                   5   /* End marker */
 
 #endif
