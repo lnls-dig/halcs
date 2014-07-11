@@ -66,5 +66,14 @@
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
 
+/************************* ML605 Gateware Options *************************/
+
+
+/*********************** SMIO ACQ Gateware Options ***********************/
+/* FIXME: The Gateware does not support yet a way of reading which
+ * ACQ channels are valid. So, we hardcoded it here for now. This issue
+ * should be addressed soon */
+#define SMIO_ACQ_NUM_CHANNELS                       5
+
 #endif
 
