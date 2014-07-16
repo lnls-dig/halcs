@@ -15,6 +15,7 @@
 #include "smio_thsafe_zmq_server.h"
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
+#include "ll_io_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -60,10 +61,14 @@ devio_t * devio_new (char *name, char *endpoint_dev,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    int log_err = debug_set_log (log_file_name);
+    debug_set_log (log_file_name);
 
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Log registered to %s\n",
-            (log_err == -1) ? "NULL" : log_file_name);
+    char *dev_type_c = llio_type_to_str (type);
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
+            " for a %s device \n\tlocated on %s, broker address %s, with logfile on %s"
+            " ...\n", dev_type_c, endpoint_dev, endpoint_broker,
+            (log_file_name == NULL) ? "NULL" : log_file_name);
+    free (dev_type_c);
 
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
