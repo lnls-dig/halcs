@@ -26,33 +26,6 @@
 
 #define DFLT_LOG_DIR                "/var/log"
 
-#define LOG_FILENAME_LEN            50
-/* We don't expect to have more than 11 digits of devios in a single crate...*/
-#define DEVIO_DEV_NAME_LEN          20
-#define DEVIO_DEV_NAME              "/dev/fpga%d"
-#define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
-#define DEVIO_LOG_FILENAME          "dev_io%d.log"
-
-/* Global variable for testing an asynchronous event */
-volatile sig_atomic_t __new_dev = 0;
-volatile sig_atomic_t __dev_nums = 0;
-
-/* This signal handler emulates some device being plugged */
-static void dmngr_sigusr1_h (int sig, siginfo_t *siginfo, void *context)
-{
-    (void) sig;
-    (void) context;
-    (void) siginfo;
-
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Recv'ed signal: %d\n",
-            siginfo->si_signo);
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] New PCIe device detected!\n");
-
-    /* Simplistic, inefficient method of handling a new_dev */
-    __new_dev = 1;
-    __dev_nums++;
-}
-
 int dmngr_wait_chld_f (void)
 {
     int chld_status;
@@ -80,7 +53,6 @@ int dmngr_wait_chld_f (void)
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_WARN, "[dev_mngr] Child exited%s with status %d\n",
                 WCOREDUMP(chld_status) ? " and dumped core" : "",
                 WEXITSTATUS(chld_status));
-        __dev_nums--;
     }
 
     if (WIFSTOPPED (chld_status)) {
@@ -91,7 +63,6 @@ int dmngr_wait_chld_f (void)
     if (WIFSIGNALED (chld_status)) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_WARN, "[dev_mngr] Child signalled by signal %d\n",
                 WTERMSIG(chld_status));
-        __dev_nums--;
     }
 
     return 0;
@@ -203,34 +174,36 @@ int main (int argc, char *argv[])
         }
     }
 
-    /* Put together the log filename */
-    char devmngr_log_filename[LOG_FILENAME_LEN] = "stdout";
-    if (log_dir != NULL) {
-        snprintf (devmngr_log_filename, LOG_FILENAME_LEN, "%s/%s", log_dir, DEVMNGR_LOG_FILENAME);
-    }
-
     /* See the fake promiscuous endpoint tcp*:*. To be changed soon! */
-    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose, devmngr_log_filename);
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Creating DEV_MNGR instance ...\n");
+    dmngr_t *dmngr = dmngr_new ("dev_mngr", "tcp://*:*", verbose, log_dir);
     if (dmngr == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Fail to allocate dev_mngr instance\n");
         goto err_dmngr_alloc;
     }
 
-    dmngr_sig_handler_t dmngr_sigusr1_handler =
-    {.signal = SIGUSR1,
-     .dmngr_sig_h = dmngr_sigusr1_h};
-    /* dmngr_sigusr1_handler_t dmngr_sigkill_handler =
-    {.signal = SIGKILL,
-     .dmngr_sig_h = dmngr_sigusr1_handler};
-    dmngr_sigusr1_handler_t dmngr_sigterm_handler =
-    {.signal = SIGTERM,
-     .dmngr_sig_h = dmngr_sigusr1_handler}; */
+    dmngr_err_e err = DMNGR_SUCCESS;
 
-    dmngr_err_e err = dmngr_set_sig_handler (dmngr, &dmngr_sigusr1_handler);
+#if 0
+    dmngr_sig_handler_t dmngr_sigkill_handler =
+    {   .signal = SIGKILL,
+        .dmngr_sig_h = dmngr_sigkill_handler};
+    dmngr_sig_handler_t dmngr_sigterm_handler =
+    {   .signal = SIGTERM,
+        .dmngr_sig_h = dmngr_sigterm_handler};
+
+    dmngr_err_e err = dmngr_set_sig_handler (dmngr, &dmngr_sigkill_handler);
     if (err != DMNGR_SUCCESS) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] dmngr_set_sig_handler error!\n");
         goto err_exit;
     }
+
+    dmngr_err_e err = dmngr_set_sig_handler (dmngr, &dmngr_sigterm_handler);
+    if (err != DMNGR_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] dmngr_set_sig_handler error!\n");
+        goto err_exit;
+    }
+#endif
 
     dmngr_set_wait_clhd_handler (dmngr, &dmngr_wait_chld_f);
     dmngr_set_spawn_clhd_handler (dmngr, &dmngr_spawn_chld_f);
@@ -246,71 +219,41 @@ int main (int argc, char *argv[])
      * Ethernet ones, by using a discovery protocol based on zeroMQ
      * (zbeacon should provide a sufficient infrastrucutre for that)
      */
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Waiting for new device\n");
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] PID: %d\n", getpid());
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] DEV_MNGR PID: %d\n", getpid());
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Monitoring devices ...\n");
 
     /* Do until a C^c is pressed (daemon mode unset) or SIGTERM signal arrives */
     while (!zctx_interrupted) {
 
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] ., PID: %d\n", getpid()); */
-        if (__new_dev) {
 
-            __new_dev = 0;
+        /* Spawn the broker if not running */
+        err = dmngr_spawn_broker (dmngr, broker_endp);
+        if (err != DMNGR_SUCCESS) {
+            goto err_exit;
+        }
 
-            /* Verify if the Broker is running. If not, spawn it */
-            if (!dmngr_is_broker_running (dmngr)) {
-                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Spawing Broker\n");
-                char *argv_exec[] = {"mdp_broker", broker_endp, NULL};
-                /* char *argv_exec[] = {"mdp_broker", "-v", NULL}; */
-                int spawn_err = dmngr_spawn_chld (dmngr, "mdp_broker", argv_exec);
-
-                /* Just fail miserably, for now */
-                if (spawn_err < 0) {
-                    perror ("spwan");
-                    goto err_exit;
-                }
-            }
-
-            char devio_devname[DEVIO_DEV_NAME_LEN];
-            char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
-
-            /* FIXME: this logic is weak and prone to errors! */
-            snprintf (devio_devname, DEVIO_DEV_NAME_LEN, DEVIO_DEV_NAME,
-                     __dev_nums-1);
-
-            if (log_dir != NULL) {
-                snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_LOG_FILENAME,
-                        log_dir, __dev_nums-1);
-            }
-
-            /* Argument options are "process name", "device type" and
-             *"dev entry" */
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Spawing DEVIO worker\n");
-            char *argv_exec[] = {"dev_io", "-t", "pcie", "-e", devio_devname,
-                "-b", broker_endp, "-l", devio_log_filename, NULL};
-            int spawn_err = dmngr_spawn_chld (dmngr, "./dev_io", argv_exec);
-
-            /* Just fail miserably, for now */
-            if (spawn_err < 0) {
-                perror ("spwan");
-                goto err_exit;
-            }
+        /* Spawn all found Device IOs that are ready to run */
+        bool respawn_killed_devio = false;
+        err = dmngr_spawn_all_devios (dmngr, broker_endp,
+                log_dir, respawn_killed_devio);
+        if (err != DMNGR_SUCCESS) {
+            goto err_exit;
         }
 
         /* Check the status of child processes */
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
          * "[dev_mngr] PID: %d will wait for child. # = %d\n", getpid(),  __dev_nums); */
         err = dmngr_wait_chld (dmngr);
-
         if (err != DMNGR_SUCCESS) {
-            //perror("[dev_mngr] waitpid");
             goto err_exit;
-            exit (1);
         }
 
         /* Do some monitoring activities */
         sleep(1);
     }
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Monitoring loop interrupted!\n");
 
 err_exit:
     dmngr_destroy (&dmngr);
@@ -321,6 +264,8 @@ err_daemonize:
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Exiting ...\n");
 
     return 0;
 }
