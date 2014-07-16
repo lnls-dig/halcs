@@ -16,20 +16,13 @@
 #include "ll_io_endpoint.h"
 #include "ll_io_dev_info.h"
 #include "ll_io_err.h"
-
-/* Device type */
-enum _llio_type_e {
-    GENERIC_DEV = 0,
-    PCIE_DEV = 1,
-    ETH_DEV,
-    INVALID_DEV
-};
+#include "ll_io_utils.h"
 
 struct _llio_ops_t;
 
 /* Main class object */
 struct _llio_t {
-    enum _llio_type_e type;             /* Device type (PCIe, Ethnernet, or other) */
+    llio_type_e type;                   /* Device type (PCIe, Ethnernet, or other) */
     void *dev_handler;                  /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
@@ -87,8 +80,6 @@ struct _llio_ops_t {
     /*read_info_fp read_info; Moved to dev_io */         /* Read device information data */
 };
 
-/* Opaque llio_type_e enum */
-typedef enum _llio_type_e llio_type_e;
 /* Opaque class structure */
 typedef struct _llio_t llio_t;
 /* Opaque llio_ops structure */
