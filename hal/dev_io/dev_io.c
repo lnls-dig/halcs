@@ -6,6 +6,7 @@
 #include "czmq.h"
 #include "dev_io.h"
 #include "debug_print.h"
+#include "ll_io_utils.h"
 
 void print_help (char *program_name)
 {
@@ -87,15 +88,9 @@ int main (int argc, char *argv[])
         }
     }
 
-    llio_type_e llio_type;
+    llio_type_e llio_type = llio_str_to_type (dev_type);
     /* Parse command-line options */
-    if (streq (dev_type, "pcie")) {
-        llio_type = PCIE_DEV;
-    }
-    else if (streq (dev_type, "eth")) {
-        llio_type = ETH_DEV;
-    }
-    else {
+    if (llio_type == INVALID_DEV) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_type parameter is invalid\n");
         goto err_exit;
     }
