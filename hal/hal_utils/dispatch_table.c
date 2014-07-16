@@ -84,7 +84,7 @@ halutils_err_e disp_table_remove (disp_table_t *self, uint32_t key)
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
         "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
         key);
-    /* This will trigger the free fucntion previously registered */
+    /* This will trigger the free function previously registered */
     zhash_delete (self->table_h, key_c);
 
     free (key_c);
