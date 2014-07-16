@@ -6,13 +6,12 @@
  */
 
 #include <string.h>
+#include <glob.h>
 
 #include "dev_mngr_core.h"
 #include "hal_assert.h"
 #include "debug_print.h"
-
-/* Some global variables for use with signal handlers */
-extern volatile sig_atomic_t __dev_nums;
+#include "hal_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,18 +36,39 @@ extern volatile sig_atomic_t __dev_nums;
     CHECK_HAL_ERR(err, DEV_MNGR, "dev_mngr_core",           \
             dmngr_err_str (err_type))
 
+#define LOG_FILENAME_LEN            50
+#define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
+
+#define DEVIO_DEV_NAME_LEN          20
+#define DEVIO_DEV_NAME              "/dev/fpga%d"
+#define DEVIO_LOG_FILENAME          "dev_io%d.log"
+
+static void _devio_hash_free_item (void *data);
+static uint32_t _dmngr_scan_devs (dmngr_t *self);
+
 /* Creates a new instance of the Device Manager */
-dmngr_t * dmngr_new (char *name, char *endpoint, int verbose, const char *log_file_name)
+dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
+        const char *log_prefix)
 {
     assert (name);
     assert (endpoint);
 
+    /* Set up logdir. Defaulting it to stdout */
+    char log_filename [LOG_FILENAME_LEN] = "stdout";
+
+    /* TODO: Check for the validity of the log filename */
+    if (log_prefix != NULL) {
+        snprintf (log_filename, LOG_FILENAME_LEN, "%s/"DEVMNGR_LOG_FILENAME,
+                log_prefix);
+    }
+
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    int log_err = debug_set_log (log_file_name);
+    debug_set_log (log_filename);
 
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Log registered to %s\n",
-            (log_err == -1) ? "NULL" : log_file_name);
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEV_MNGR worker"
+            " with \n\tdiscovery endpoint (ignored for now) %s, with logfile %s"
+            " ...\n", endpoint, (log_filename == NULL) ? "NULL" : log_filename);
 
     dmngr_t *self = (dmngr_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -73,10 +93,23 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose, const char *log_fi
     self->ops->sig_ops = zlist_new ();
     ASSERT_ALLOC(self->ops->sig_ops, err_list_alloc);
 
+    /* Init devio_info hash */
+    self->devio_info_h = zhash_new ();
+    ASSERT_ALLOC(self->devio_info_h, err_devio_info_h_alloc);
+
     self->broker_running = false;
+
+    /* Scan devios for the first time */
+    uint32_t num_devios = _dmngr_scan_devs (self);
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
+            "[dev_mngr_core] Found a total of %u DEVIO(s)\n", num_devios);
+    /* Supress compiler warnings if we are not debugging */
+    (void) num_devios;
 
     return self;
 
+err_devio_info_h_alloc:
+    zlist_destroy (&self->ops->sig_ops);
 err_list_alloc:
     free (self->ops);
 err_ops_alloc:
@@ -102,6 +135,7 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
         dmngr_t *self = *self_p;
 
         /* Starting destructing by the last resource */
+        zhash_destroy (&self->devio_info_h);
         zlist_destroy (&self->ops->sig_ops);
         free (self->ops);
         free (self->endpoint);
@@ -157,7 +191,7 @@ dmngr_err_e dmngr_register_sig_handlers (dmngr_t *self)
     assert (self);                                      \
     CHECK_ERR(((self->ops->func_name == NULL) ? -1 : 0),\
         DMNGR_ERR_FUNC_NOT_IMPL);                       \
-    int err = self->ops->func_name (##__VA_ARGS__);     \
+    int err = self->ops->func_name (__VA_ARGS__);       \
     CHECK_ERR (err, ops_err);                           \
     return DMNGR_SUCCESS;                               \
 }
@@ -170,18 +204,14 @@ dmngr_err_e dmngr_set_wait_clhd_handler (dmngr_t *self, wait_chld_handler_fp fp)
     return DMNGR_SUCCESS;
 }
 
-dmngr_err_e dmngr_wait_chld (dmngr_t *self)
+static dmngr_err_e _dmngr_wait_chld (dmngr_t *self)
     DMNGR_FUNC_WRAPPER(dmngr_wait_chld, DMNGR_ERR_WAITCHLD)
 
-/*{
-    assert (self);
-    int err = self->ops->dmngr_wait_chld ();
-    CHECK_ERR (err, DMNGR_ERR_WAITCHLD);
+dmngr_err_e dmngr_wait_chld (dmngr_t *self)
+{
+    return _dmngr_wait_chld (self);
+}
 
-    return DMNGR_SUCCESS;
-}*/
-
-/* FIXME: Use the above wrapper!!!! */
 dmngr_err_e dmngr_set_spawn_clhd_handler (dmngr_t *self, spawn_chld_handler_fp fp)
 {
     assert (self);
@@ -190,27 +220,14 @@ dmngr_err_e dmngr_set_spawn_clhd_handler (dmngr_t *self, spawn_chld_handler_fp f
     return DMNGR_SUCCESS;
 }
 
-dmngr_err_e dmngr_spawn_chld (dmngr_t *self, const char *program, char *const argv[])
+static dmngr_err_e _dmngr_spawn_chld (dmngr_t *self, const char *program,
+        char *const argv[])
+    DMNGR_FUNC_WRAPPER(dmngr_spawn_chld, DMNGR_ERR_SPAWNCHLD, program, argv)
+
+dmngr_err_e dmngr_spawn_chld (dmngr_t *self, const char *program,
+        char *const argv[])
 {
-    assert (self);
-    int err = self->ops->dmngr_spawn_chld (program, argv);
-    CHECK_ERR (err, DMNGR_ERR_SPAWNCHLD);
-
-    return DMNGR_SUCCESS;
-}
-
-/* Execute function to spawn a broker process */
-dmngr_err_e dmngr_spawn_broker (dmngr_t *self, const char *program, char *const argv[])
-{
-    assert (self);
-    if (self->broker_running) {
-        return DMNGR_ERR_BROK_RUNN;
-    }
-
-    int err = self->ops->dmngr_spawn_chld (program, argv);
-    CHECK_ERR (err, DMNGR_ERR_SPAWNCHLD);
-
-    return DMNGR_SUCCESS;
+    return _dmngr_spawn_chld (self, program, argv);
 }
 
 dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops)
@@ -223,9 +240,188 @@ dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops)
     return DMNGR_SUCCESS;
 }
 
-bool dmngr_is_broker_running (dmngr_t *self)
+static bool _dmngr_is_broker_running (dmngr_t *self)
 {
     assert (self);
     return self->broker_running;
 }
 
+bool dmngr_is_broker_running (dmngr_t *self)
+{
+    return _dmngr_is_broker_running (self);
+}
+
+dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
+{
+    assert (self);
+    assert (broker_endp);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Verify if the Broker is running. If not, spawn it */
+    /* ASSERT_TEST(!_dmngr_is_broker_running (self), "Broker is already running",
+            err_broker_run, DMNGR_ERR_BROK_RUNN);*/
+    /* This is not an error */
+    if (_dmngr_is_broker_running (self)) {
+        goto err_broker_run;
+    }
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawning Broker ...\n");
+
+    /* Specify if broker is to be run in verbose mode or not */
+    char *argv_exec[] = {"mdp_broker", broker_endp, NULL};
+    /* char *argv_exec[] = {"mdp_broker", "-v", NULL}; */
+    int spawn_err = _dmngr_spawn_chld (self, "mdp_broker", argv_exec);
+
+    /* Just fail miserably, for now */
+    ASSERT_TEST(spawn_err >= 0, "Could not spawn broker",
+            err_spawn_broker, DMNGR_ERR_SPAWNCHLD);
+
+    self->broker_running = true;
+
+err_spawn_broker:
+err_broker_run:
+    return err;
+}
+
+uint32_t dmngr_scan_devs (dmngr_t *self)
+{
+    return _dmngr_scan_devs (self);
+}
+
+dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
+        char *devio_log_prefix, bool respawn_killed_devio)
+{
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawing all DEVIO workers\n");*/
+
+    /* Get all hash keys*/
+    zlist_t *devio_info_key_list = zhash_keys (self->devio_info_h);
+    ASSERT_ALLOC (devio_info_key_list, err_hash_keys_alloc, DMNGR_ERR_ALLOC);
+
+    char *devio_info_key = zlist_first (devio_info_key_list);
+
+    /* Iterate over all keys spawning the DEVIOs */
+    for (; devio_info_key != NULL; devio_info_key = zlist_next (devio_info_key_list)) {
+        /* FIXME: Usage of stroul function for reconverting the string
+         * into a uint32_t */
+        devio_info_t *devio_info = zhash_lookup (self->devio_info_h,
+                devio_info_key);
+
+        /* If device is already running or is stopped or inactive, don't do
+         * anything */
+        if (devio_info->state != READY_TO_RUN &&
+                devio_info->state != KILLED) {
+            /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Device located in"
+                    " %s is running, stopped or inactive. Skipping device...\n",
+                    devio_info->dev_pathname); */
+            continue;
+        }
+
+        /* If device was killed but the respawn option of off, don't do
+         * anything */
+        if (devio_info->state == KILLED && !respawn_killed_devio){
+            /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Device located in"
+                    " %s is dead, but the option \n\trespawn_killed_devio is off. Skipping device...\n",
+                    devio_info->dev_pathname); */
+            continue;
+        }
+
+        /* Set up logdir. Defaulting it to stdout */
+        char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
+
+        /* TODO: Check for the validity of the log filename */
+        if (devio_log_prefix != NULL) {
+            snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_LOG_FILENAME,
+                    devio_log_prefix, devio_info->id);
+        }
+
+        char *dev_type_c = llio_type_to_str (devio_info->type);
+
+        /* Argument options are "process name", "device type" and
+         *"dev entry" */
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEVIO worker"
+                " for a %s device \n\tlocated on %s, broker address %s, with logfile on %s"
+                " ...\n", dev_type_c, devio_info->dev_pathname, broker_endp,
+                devio_log_filename);
+        char *argv_exec [] = {"dev_io", "-t", dev_type_c, "-e", devio_info->dev_pathname,
+            "-b", broker_endp, "-l", devio_log_filename, NULL};
+        int spawn_err = _dmngr_spawn_chld (self, "dev_io", argv_exec);
+
+        free (dev_type_c);
+        /* Just fail miserably, for now */
+        ASSERT_TEST(spawn_err == 0, "Could not spawn DEVIO instance",
+                err_spawn, DMNGR_ERR_SPAWNCHLD);
+
+        devio_info->state = RUNNING;
+    }
+
+err_spawn:
+    zlist_destroy (&devio_info_key_list);
+err_hash_keys_alloc:
+    return err;
+}
+
+/************************ Local helper functions ******************/
+/* Hash free function */
+static void _devio_hash_free_item (void *data)
+{
+    devio_info_destroy ((devio_info_t **) &data);
+}
+
+static uint32_t _dmngr_scan_devs (dmngr_t *self)
+{
+    assert (self);
+
+    uint32_t err = 0;   /* No device scanned */
+    glob_t glob_dev;
+
+    /* Scan just the PCIe bus for now. We expect to find devices of
+     * the form: /dev/fpga0 .. /dev/fpga5 */
+    glob ("/dev/fpga*", 0, NULL, &glob_dev);
+
+    /* Ininitalize the devices we found */
+    devio_info_t *devio_info = NULL;
+    uint32_t i;
+    for (i = 0; i < glob_dev.gl_pathc; ++i){
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
+                "[dev_mngr_core:scan_devs] Found device on %s\n",
+                glob_dev.gl_pathv[i]);
+
+        /* Extract ID */
+        uint32_t devio_info_id;
+        sscanf (glob_dev.gl_pathv[i], "/dev/fpga%d", &devio_info_id);
+
+        /* Alloc hash item */
+        devio_info = devio_info_new (glob_dev.gl_pathv[i],
+                devio_info_id, PCIE_DEV, READY_TO_RUN);
+        ASSERT_ALLOC (devio_info, err_devio_info_alloc,
+                /* return number of devices scanned*/ i);
+
+        /* Stringify ID */
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
+                "[dev_mngr_core:scan_devs] Stringify hash ID\n");
+        char *key = halutils_stringify_key (devio_info->id);
+        ASSERT_ALLOC (key, err_key_alloc);
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
+                "[dev_mngr_core:scan_devs] Inserting hash with key: %s\n", key);
+        zhash_insert (self->devio_info_h, key, devio_info);
+        /* We don't need this anymore */
+        free (key);
+
+        /* Setup free function */
+        zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
+    }
+
+    /* Number of devices found */
+    err = i;
+    globfree (&glob_dev);
+    return err;
+
+err_key_alloc:
+    devio_info_destroy (&devio_info);
+err_devio_info_alloc:
+    globfree (&glob_dev);
+    return err;
+}
