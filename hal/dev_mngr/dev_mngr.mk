@@ -5,7 +5,8 @@ dev_mngr_DIR = hal/dev_mngr
 # makefile
 dev_mngr_core_OBJS = $(dev_mngr_DIR)/dev_mngr.o \
 		     $(dev_mngr_DIR)/dev_mngr_core.o \
-		     $(dev_mngr_DIR)/dev_mngr_err.o
+		     $(dev_mngr_DIR)/dev_mngr_err.o \
+		     $(dev_mngr_DIR)/dev_mngr_dev_info.o
 dev_mngr_INCLUDE_DIRS = $(dev_mngr_DIR)
 
 dev_mngr_OUT = dev_mngr
