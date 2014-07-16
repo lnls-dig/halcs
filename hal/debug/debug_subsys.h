@@ -83,7 +83,7 @@
 #define DBG_LVL_ERR_STR        "ERR"
 #define DBG_LVL_FATAL_STR      "FATAL"
 
-extern char *dbg_lvl_str [DBG_LVL_NUM];
+extern const char *dbg_lvl_str [DBG_LVL_NUM];
 char *dbg_lvl_to_str (int dbg_lvl);
 
 /****************** Debug halt macros ******************/

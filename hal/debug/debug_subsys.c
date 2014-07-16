@@ -8,7 +8,7 @@
 #include <czmq.h>
 #include "debug_subsys.h"
 
-char *dbg_lvl_str [DBG_LVL_NUM] = {
+const char *dbg_lvl_str [DBG_LVL_NUM] = {
     [0] = DBG_LVL_TRACE_STR,
     [1] = DBG_LVL_INFO_STR,
     [2] = DBG_LVL_WARN_STR,
