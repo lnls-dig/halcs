@@ -30,12 +30,8 @@ fi
 
 # Launch Device Manager
 ${BIN_DIR}/dev_mngr -v -b ${transport}://${broker_endp} ${log_dir_opt} &
-# Wait until dev_mngr has registred the signal handlers
-sleep 1
-# Signal dev_mngr of a "new" PCIe device
-killall -SIGUSR1 dev_mngr
 
-# Wait until worker has been created
+# Wait until initial workers have been created
 sleep 1
 # Change IPC permissions if transport = ipc
 if [ "$transport" = "ipc" ]
