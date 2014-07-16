@@ -106,7 +106,7 @@ int main (int argc, char *argv[])
     dev_type = NULL;
 
     /* Initilialize dev_io */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating devio instance ...\n");
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating DEVIO instance ...\n");
     devio_t *devio = devio_new ("BPM0:DEVIO", dev_entry, llio_type,
             broker_endp, verbose, log_file_name);
     /* devio_t *devio = devio_new ("BPM0:DEVIO", *str_p, llio_type,
