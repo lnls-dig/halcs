@@ -65,9 +65,9 @@ devio_t * devio_new (char *name, char *endpoint_dev,
 
     char *dev_type_c = llio_type_to_str (type);
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
-            " for a %s device \n\tlocated on %s, broker address %s, with logfile on %s"
-            " ...\n", dev_type_c, endpoint_dev, endpoint_broker,
-            (log_file_name == NULL) ? "NULL" : log_file_name);
+            " with exported service %s, for a %s device \n\tlocated on %s,"
+            " broker address %s, with logfile on %s ...\n", name, dev_type_c,
+            endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
     free (dev_type_c);
 
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
@@ -271,7 +271,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
             /* Stringify ID */
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                     "[dev_io_core:register_sm] Stringify hash ID\n");
-            char *key = halutils_stringify_key (smio_mod_dispatch[i].id);
+            char *key = halutils_stringify_hex_key (smio_mod_dispatch[i].id);
             ASSERT_ALLOC (key, err_key_alloc);
 
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
@@ -508,7 +508,7 @@ static void _devio_destroy_smio (devio_t *self, uint32_t smio_id)
     assert (self);
 
     /* Stringify ID */
-    char *key_c = halutils_stringify_key (smio_id);
+    char *key_c = halutils_stringify_hex_key (smio_id);
     ASSERT_ALLOC (key_c, err_key_alloc);
 
     /* Lookup SMIO reference in hash table */
