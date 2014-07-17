@@ -35,21 +35,32 @@
     CHECK_HAL_ERR(err, HAL_UTILS, "[halutils]",  \
             halutils_err_str (err_type))
 
-uint32_t hex_to_str_len (uint32_t key)
+uint32_t num_to_str_len (uint32_t key, uint32_t base)
 {
     uint32_t i = 0;
+    uint32_t rem = key;
 
     do {
-        key >>= 4;
+        rem /= base;
         ++i;
-    } while (key > 0);
+    } while (rem > 0);
 
     return i;
 }
 
-char *halutils_stringify_key (uint32_t key)
+uint32_t hex_to_str_len (uint32_t key)
 {
-    uint32_t key_len = hex_to_str_len (key) + 1; /* +1 for \0 */
+    return num_to_str_len (key, 16);
+}
+
+uint32_t dec_to_str_len (uint32_t key)
+{
+    return num_to_str_len (key, 10);
+}
+
+char *halutils_stringify_key (uint32_t key, uint32_t base)
+{
+    uint32_t key_len = num_to_str_len (key, base) + 1; /* +1 for \0 */
     char *key_c = zmalloc (key_len * sizeof (char));
     ASSERT_ALLOC (key_c, err_key_c_alloc);
 
@@ -64,4 +75,12 @@ err_key_c_alloc:
     return NULL;
 }
 
+char *halutils_stringify_dec_key (uint32_t key)
+{
+    return halutils_stringify_key (key, 10);
+}
 
+char *halutils_stringify_hex_key (uint32_t key)
+{
+    return halutils_stringify_key (key, 16);
+}
