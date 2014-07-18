@@ -66,21 +66,21 @@ RW_PARAM_FUNC(dsp, ksum) {
             KSUM_PARAM_MIN, KSUM_PARAM_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_TBT_THRES_MIN                    1
+#define DS_TBT_THRES_MIN                    0
 #define DS_TBT_THRES_MAX                    ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_tbt_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_TBT_THRES, VAL, MULT_BIT_PARAM,
             DS_TBT_THRES_MIN, DS_TBT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_FOFB_THRES_MIN                   1
+#define DS_FOFB_THRES_MIN                   0
 #define DS_FOFB_THRES_MAX                   ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_fofb_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_FOFB_THRES, VAL, MULT_BIT_PARAM,
             DS_FOFB_THRES_MIN, DS_FOFB_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_MONIT_THRES_MIN                  1
+#define DS_MONIT_THRES_MIN                  0
 #define DS_MONIT_THRES_MAX                  ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_monit_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_MONIT_THRES, VAL, MULT_BIT_PARAM,
