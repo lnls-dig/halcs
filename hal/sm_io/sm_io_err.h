@@ -21,6 +21,7 @@ enum _smio_err_e
     SMIO_ERR_WRONG_PARAM,           /* Wrong parameter value */
     SMIO_ERR_LLIO,                  /* Low-level I/O could not complete operation */
     SMIO_ERR_EXPORT_OP,             /* Error exporting function */
+    SMIO_ERR_CONFIG_DFLT,           /* Error configuring the default values */
     SMIO_ERR_END                    /* End of enum marker */
 };
 

@@ -10,12 +10,20 @@
 #define _DEBUG_PRINT_H_
 
 #include <stdarg.h>
+#include <stdio.h>
 #include "debug_subsys.h"       /* This must come before "hal_opts.h" */
 #include "hal_opts.h"
+
+struct _zmsg_t;
 
 /************** Debug functions declarations **************/
 void debug_print (const char *fmt, ...) __attribute__((format(printf,1,2)));
 void debug_print_vec (const char *fmt, const char *data, int len);
+void debug_log_print (int dbg_lvl, const char *fmt, ...) __attribute__((format(printf,2,3)));
+/* Set the output logfile Defaults to STDOUT */
+void debug_set_log_file (FILE *log_file);
+int debug_set_log (const char *log_file_name);
+void debug_log_print_zmq_msg (struct _zmsg_t *msg);
 
 /********************** Debug macros  **********************/
 
@@ -29,9 +37,12 @@ void debug_print_vec (const char *fmt, const char *data, int len);
     debug_print(fmt, ## __VA_ARGS__)
 #define dbg_print_vec(fmt, data, len) \
     debug_print_vec(fmt, data, len)
+#define dbg_log_print(dbg_lvl, fmt, ...) \
+    debug_log_print(dbg_lvl, fmt, ## __VA_ARGS__)
 #else
 #define dbg_print(fmt, ...)
 #define dbg_print_vec(fmt, data, len)
+#define dbg_log_print(dbg_lvl, fmt, ...)
 
 #endif /* DBE_DBG */
 
@@ -47,7 +58,8 @@ void debug_print_vec (const char *fmt, const char *data, int len);
         if (((dbg) & DBG_SUBSYS_ON) &&             \
             (((dbg) & DBG_LVL_MASK) >=             \
             DBG_MIN_LEVEL)) {                      \
-            dbg_print(fmt, ## __VA_ARGS__);        \
+            dbg_log_print((dbg) & DBG_LVL_MASK,    \
+                    fmt, ## __VA_ARGS__);          \
                                                    \
             if ((dbg) & DBG_LVL_HALT) {            \
                 while(1);                          \

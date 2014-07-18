@@ -5,7 +5,7 @@ dev_io_DIR = hal/dev_io
 # makefile
 dev_io_core_OBJS = $(dev_io_DIR)/dev_io.o \
 		   $(dev_io_DIR)/dev_io_core.o \
-		   $(dev_io_DIR)/dev_io_err.o
-dev_io_INCLUDE_DIRS = $(dev_io_DIR)
+		   $(dev_io_DIR)/dev_io_err.o 
+dev_io_INCLUDE_DIRS = $(dev_io_DIR) $(LIBCLIENT_DIR)
 
 dev_io_OUT = dev_io

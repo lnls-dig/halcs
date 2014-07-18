@@ -17,6 +17,8 @@ BOARD = ml605
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
+INIT_SCRIPTS = init.sh shutdown.sh
+
 # Kernel stuff (pcie driver and library) relative
 # directory
 KERNEL_DIR = kernel
@@ -94,11 +96,11 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel $(OUT) libclient
+all: kernel libclient $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION=\"$(REVISION)\" -c $<
@@ -171,9 +173,11 @@ libclient_mrproper:
 
 hal_install:
 	$(foreach hal_bin,$(OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
 
 hal_uninstall:
 	$(foreach hal_bin,$(OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
+	$(foreach hal_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(hal_script) $(CMDSEP))
 
 hal_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

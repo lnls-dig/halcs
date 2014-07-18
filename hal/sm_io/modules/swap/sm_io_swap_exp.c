@@ -17,6 +17,7 @@
 #include "rw_param_codes.h"
 #include "sm_io_swap_useful_macros.h"
 #include "wb_bpm_swap_regs.h"
+#include "sm_io_swap_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -42,17 +43,7 @@
             smio_err_str (err_type))
 
 /************************************************************/
-/******************  Specific Operations ********************/
-/************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-
-#define BAR4_ADDR (4 << 28)
-
-/************************************************************/
-/************* Specific swap functions **************/
+/*************    Specific SWAP operations     **************/
 /************************************************************/
 /* 0: Outputs matched. No signal
  * 1: Outputs in direct path
@@ -323,5 +314,6 @@ smio_err_e swap_shutdown (smio_t *self)
 
 const smio_bootstrap_ops_t swap_bootstrap_ops = {
     .init = swap_init,
-    .shutdown = swap_shutdown
+    .shutdown = swap_shutdown,
+    .config_defaults = swap_config_defaults
 };

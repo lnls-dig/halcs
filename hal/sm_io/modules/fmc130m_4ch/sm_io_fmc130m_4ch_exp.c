@@ -11,6 +11,7 @@
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io.h"
 #include "dev_io.h"
+#include "board.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -36,23 +37,10 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
-/************************************************************/
-/******************  Specific Operations ********************/
-/************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-#define BAR4_ADDR (4 << 28)
-#define FMC1_ADDR 0x00310000
-/* #define FMC2_ADDR 0x00310000 + ???? */
-#define FMC_MONITOR_REG (0x010)
-
-#define FMC1 1
-#define FMC2 2
+#define FMC_MONITOR_REG (FMC130M_BASE_ADDR | 0x010)
 
 /************************************************************/
-/************* Specific fmc_130m_4ch functions **************/
+/************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
 
 static void *_fmc130m_4ch_leds (void *owner, void *args)
@@ -66,8 +54,7 @@ static void *_fmc130m_4ch_leds (void *owner, void *args)
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_leds\n");
     uint32_t leds = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
-    smio_thsafe_client_write_32 (self, BAR4_ADDR | FMC1_ADDR | FMC_MONITOR_REG,
-            &leds);
+    smio_thsafe_client_write_32 (self, FMC_MONITOR_REG, &leds);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Led write: 0x%08x\n",
             leds);
 

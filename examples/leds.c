@@ -58,7 +58,7 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose);
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
 
     for (i = 0; i < 32768; ++i) {
         uint32_t leds = (1 << 1);

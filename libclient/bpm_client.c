@@ -42,8 +42,19 @@
 /************************ Our API ***********************/
 /********************************************************/
 
-bpm_client_t *bpm_client_new (char *broker_endp, int verbose)
+bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name)
 {
+    assert (broker_endp);
+
+    /* Set logfile available for all dev_mngr and dev_io instances.
+     * We accept NULL as a parameter, meaning to suppress all messages */
+    debug_set_log (log_file_name);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBCLIENT"
+            " with broker address %s, with logfile on %s ...\n", broker_endp,
+            (log_file_name == NULL) ? "NULL" : log_file_name);
+
     bpm_client_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     self->mdp_client = mdp_client_new (broker_endp, verbose);
@@ -85,8 +96,7 @@ bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t led
     FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_LEDS;
 
     zmsg_t *request = zmsg_new ();
-    err = (request == NULL) ? BPM_CLIENT_ERR_ALLOC : err;
-    ASSERT_ALLOC(request, err_send_msg_alloc);
+    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &leds, sizeof (leds));
     mdp_client_send (self->mdp_client, service, &request);
@@ -158,12 +168,12 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
      * frame 0: error code      */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-    if ( *(ACQ_REPLY_TYPE *) zframe_data(err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
-                "Data acquire was not required correctly\n");
-        err = BPM_CLIENT_ERR_AGAIN;
-        goto err_data_acquire;
-    }
+
+    /* Check for return code from server */
+    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data(err_code) == ACQ_OK,
+            "bpm_data_acquire: Data acquire was not required correctly",
+            err_data_acquire, BPM_CLIENT_ERR_AGAIN);
+    /* If we are here, then the request was successfully acquired*/
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
             "Data acquire was successfully required\n");
 
@@ -196,14 +206,14 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
 
     /* Message is:
      * frame 0: error code          */
-    zframe_t *err_code = zmsg_pop(report);
+    zframe_t *err_code = zmsg_pop (report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-    if ( *(ACQ_REPLY_TYPE *) zframe_data(err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
-            "Check fail: data acquire was not completed\n");
-        err = BPM_CLIENT_ERR_SERVER;
-        goto err_check_data_acquire;
-    }
+
+    /* Check for return code from server */
+    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
+            "bpm_check_data_acquire: Check fail: data acquire was not completed",
+            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+    /* If we are here, then the request was successfully acquired*/
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
             "Check ok: data acquire was successfully completed\n");
 
@@ -236,7 +246,8 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
             goto bpm_zctx_interrupted;
         }
 
-        if ((err = _bpm_check_data_acquire (self, service)) == BPM_CLIENT_SUCCESS) {
+        err = _bpm_check_data_acquire (self, service);
+        if (err == BPM_CLIENT_SUCCESS) {
             DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
                     "bpm_wait_data_acquire_timed: finished waiting\n");
             goto exit;
@@ -293,12 +304,10 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     zframe_t *data = zmsg_pop (report);
     ASSERT_TEST(data != NULL, "Could not receive data", err_null_data);
 
-    if ( *(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-            "Data block was not acquired\n");
-        err = BPM_CLIENT_ERR_SERVER;
-        goto err_get_data_block;
-    }
+    /* Check for return code from server */
+    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
+            "bpm_get_data_block: Data block was not acquired",
+            err_get_data_block, BPM_CLIENT_ERR_SERVER);
 
     /* Data size effectively returned */
     uint32_t read_size = (acq_trans->block.data_size < data_size) ?
@@ -360,11 +369,11 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 
         acq_trans->block.idx = block_n;
         err = _bpm_get_data_block (self, service, acq_trans);
-        if (err != BPM_CLIENT_SUCCESS){
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                    "_bpm_get_data_block failed. block_n: %u\n", block_n);
-            goto err_bpm_get_data_block;
-        }
+
+        /* Check for return code */
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+                "_bpm_get_data_block failed. block_n is probably out of range",
+                err_bpm_get_data_block);
 
         total_bread += acq_trans->block.bytes_read;
         acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);

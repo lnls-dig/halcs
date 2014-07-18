@@ -40,8 +40,7 @@ bpm_client_err_e param_client_send_rw (bpm_client_t *self, char *service,
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
     zmsg_t *request = zmsg_new ();
-    err = (request == NULL) ? BPM_CLIENT_ERR_ALLOC : err;
-    ASSERT_ALLOC(request, err_send_msg_alloc);
+    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
 
@@ -65,8 +64,8 @@ bpm_client_err_e param_client_recv_rw (bpm_client_t *self, char *service,
 
     /* Receive report */
     *report = mdp_client_recv (self->mdp_client, NULL, NULL);
-    err = (*report == NULL) ? BPM_CLIENT_ERR_SERVER : err;
-    ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg);
+    ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg,
+            BPM_CLIENT_ERR_SERVER);
 
 err_null_msg:
     return err;
@@ -94,15 +93,12 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
     /* Message is:
      * frame 0: error code      */
     zframe_t *err_code = zmsg_pop (report);
-    err = (err_code == NULL) ? BPM_CLIENT_ERR_SERVER : err;
-    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-
-    if (*(RW_REPLY_TYPE *) zframe_data(err_code) != RW_WRITE_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] rw_param_client: "
-                "parameter set error, try again\n");
-        err = BPM_CLIENT_ERR_AGAIN;
-        goto err_set_param;
-    }
+    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code,
+            BPM_CLIENT_ERR_SERVER);
+    /* Check for return code from server */
+    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_WRITE_OK,
+            "rw_param_client: parameter SET error, try again",
+            err_set_param, BPM_CLIENT_ERR_AGAIN);
 
 err_set_param:
     zframe_destroy (&err_code);
@@ -141,13 +137,12 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     zframe_t *data_out_frm = zmsg_pop(report);
     ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
-    if (*(RW_REPLY_TYPE *) zframe_data(err_code) != RW_READ_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] rw_param_client:: "
-                "paramter get error, try again\n");
-        err = BPM_CLIENT_ERR_AGAIN;
-        goto err_get_param;
-    }
+    /* Check for return code from server */
+    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_READ_OK,
+            "rw_param_client: parameter GET error, try again",
+            err_get_param, BPM_CLIENT_ERR_AGAIN);
 
+    /* Finally, copy the message contents to the user */
     *param_out = *(uint32_t *) zframe_data(data_out_frm);
 
 err_get_param:

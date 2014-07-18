@@ -10,6 +10,7 @@
 
 #include "czmq.h"
 #include "dev_mngr_err.h"
+#include "dev_mngr_dev_info.h"
 
 /* Signal handler function pointer */
 typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
@@ -50,6 +51,7 @@ struct _dmngr_t {
     bool broker_running;         /* true if broker is already running */
 
     /* Device managment */
+    zhash_t *devio_info_h;
 };
 
 /* Opaque class signal handler structure */
@@ -62,7 +64,8 @@ typedef struct _dmngr_t dmngr_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Device Manager */
-dmngr_t * dmngr_new (char *name, char * endpoint, int verbose);
+dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
+        const char *log_prefix);
 /* Destroy an instance of the Device Manager */
 dmngr_err_e dmngr_destroy (dmngr_t **self_p);
 
@@ -78,12 +81,17 @@ dmngr_err_e dmngr_wait_chld (dmngr_t *self);
 dmngr_err_e dmngr_set_spawn_clhd_handler (dmngr_t *self, spawn_chld_handler_fp fp);
 /* Execute function to spawn a all child process */
 dmngr_err_e dmngr_spawn_chld (dmngr_t *self, const char *program, char *const argv[]);
-/* Execute function to spawn a broker process */
-dmngr_err_e dmngr_spawn_broker (dmngr_t *self, const char *program, char *const argv[]);
 
 /* Setting all operations at once */
 dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops);
 /* Is broker Running? */
 bool dmngr_is_broker_running (dmngr_t *self);
+/* Spawn broker if not running */
+dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp);
+/* Scan for Devices to control */
+uint32_t dmngr_scan_devs (dmngr_t *self);
+/* Spwan all devices previously found by dmngr_scan_devs () */
+dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
+        char *devio_log_filename, bool respawn_killed_devio);
 
 #endif

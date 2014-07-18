@@ -16,9 +16,14 @@ std_hal_INCLUDE_DIRS = hal/include \
 hal_OUT += $(dev_mngr_OUT) $(dev_io_OUT)
 
 # For each target in hal_OUT we add the necessary objects
-dev_mngr_OBJS = $(dev_mngr_core_OBJS) $(debug_OBJS)
+dev_mngr_OBJS = $(dev_mngr_core_OBJS) $(debug_OBJS) \
+		$(hal_utils_OBJS) $(ll_io_utils_OBJS)
 dev_io_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
 	      $(msg_OBJS) $(debug_OBJS) $(hal_utils_OBJS)
+
+dev_mngr_LIBS =
+dev_io_LIBS = 
+dev_io_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
 
 # Merge all hal objects together
 hal_OBJS = $(debug_OBJS) \

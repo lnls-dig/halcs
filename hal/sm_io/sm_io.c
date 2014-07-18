@@ -82,7 +82,7 @@ smio_err_e smio_deattach (smio_t *self)
     self->parent = NULL;
 
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
-    return SMIO_SUCCESS;
+    return err;
 }
 
 /* Export (Register) sm_io to handle specific operations */

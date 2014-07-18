@@ -78,13 +78,13 @@ halutils_err_e disp_table_insert (disp_table_t *self, uint32_t key,
 
 halutils_err_e disp_table_remove (disp_table_t *self, uint32_t key)
 {
-    char *key_c = halutils_stringify_key (key);
+    char *key_c = halutils_stringify_hex_key (key);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
         "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
         key);
-    /* This will trigger the free fucntion previously registered */
+    /* This will trigger the free function previously registered */
     zhash_delete (self->table_h, key_c);
 
     free (key_c);
@@ -96,7 +96,7 @@ err_key_c_alloc:
 
 void *disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args)
 {
-    char *key_c = halutils_stringify_key (key);
+    char *key_c = halutils_stringify_hex_key (key);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
     func_fp_wrapper_t *func_fp_wrapper = zhash_lookup (self->table_h, key_c);
     ASSERT_ALLOC (func_fp_wrapper, err_func_p_wrapper_null);
@@ -171,7 +171,7 @@ static halutils_err_e _disp_table_insert (disp_table_t *self, uint32_t key,
     /* Initialize func_p_wrapper struct */
     func_fp_wrapper->func_fp = func_fp;
 
-    char *key_c = halutils_stringify_key (key);
+    char *key_c = halutils_stringify_hex_key (key);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
     int zerr = zhash_insert (self->table_h, key_c, func_fp_wrapper);
     ASSERT_TEST(zerr == 0, "Could not insert item into dispatch table", err_insert_hash);

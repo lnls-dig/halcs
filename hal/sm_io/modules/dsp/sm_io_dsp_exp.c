@@ -16,6 +16,7 @@
 #include "wb_pos_calc_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
+#include "sm_io_dsp_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -41,27 +42,8 @@
             smio_err_str (err_type))
 
 /************************************************************/
-/******************  Specific Operations ********************/
+/*****************  Specific DSP Operations *****************/
 /************************************************************/
-/* This does not belong to any public interface. It's meant to
- * allow the do_ops() function to route the operations based on
- * the opcode  */
-/* FIXME FIXME! We don't have to know our transport layer! */
-
-#define BAR4_ADDR (4 << 28)
-
-/************************************************************/
-/************* Specific dsp functions **************/
-/************************************************************/
-
-/*
-int check_ksum_limits (uint32_t param)
-{
-	param < xxx;
-}
-rw_param_check_fp check_ksum_limits_fp = check_ksum_limits;
-MACRO (KSUM, check_ksum_limits_fp)
-*/
 
 #define KX_PARAM_MIN                        1
 #define KX_PARAM_MAX                        ((1<<25)-1)
@@ -84,21 +66,21 @@ RW_PARAM_FUNC(dsp, ksum) {
             KSUM_PARAM_MIN, KSUM_PARAM_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_TBT_THRES_MIN                    1
+#define DS_TBT_THRES_MIN                    0
 #define DS_TBT_THRES_MAX                    ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_tbt_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_TBT_THRES, VAL, MULT_BIT_PARAM,
             DS_TBT_THRES_MIN, DS_TBT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_FOFB_THRES_MIN                   1
+#define DS_FOFB_THRES_MIN                   0
 #define DS_FOFB_THRES_MAX                   ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_fofb_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_FOFB_THRES, VAL, MULT_BIT_PARAM,
             DS_FOFB_THRES_MIN, DS_FOFB_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define DS_MONIT_THRES_MIN                  1
+#define DS_MONIT_THRES_MIN                  0
 #define DS_MONIT_THRES_MAX                  ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_monit_thres) {
 	SET_GET_PARAM(dsp, DSP_CTRL_REGS, POS_CALC, DS_MONIT_THRES, VAL, MULT_BIT_PARAM,
@@ -265,5 +247,6 @@ smio_err_e dsp_shutdown (smio_t *self)
 
 const smio_bootstrap_ops_t dsp_bootstrap_ops = {
     .init = dsp_init,
-    .shutdown = dsp_shutdown
+    .shutdown = dsp_shutdown,
+    .config_defaults = dsp_config_defaults
 };

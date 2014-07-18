@@ -13,6 +13,10 @@
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 
 #define DEFAULT_NUM_SAMPLES         4096
+#define DEFAULT_CHAN_NUM            0
+/* Arbitrary hard limits */
+#define MAX_NUM_SAMPLES             (1 << 28)
+#define MAX_NUM_CHANS               (1 << 8)
 
 typedef struct _acq_chan_t {
     uint32_t chan;
@@ -78,7 +82,7 @@ int main (int argc, char *argv [])
     char *chan_str = NULL;
     char **str_p = NULL;
 
-    if (argc < 2) {
+    if (argc < 3) {
         print_help (argv[0]);
         exit (1);
     }
@@ -117,27 +121,40 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose);
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
 
     /* Set default number samples */
     uint32_t num_samples;
     if (num_samples_str == NULL) {
-        fprintf (stderr, "[client:acq]: Set default value to 'num_samples'\n");
+        fprintf (stderr, "[client:acq]: Setting default value to number of samples: %u\n",
+                DEFAULT_NUM_SAMPLES);
         num_samples = DEFAULT_NUM_SAMPLES;
     }
     else {
-        num_samples = (uint32_t) atoi(num_samples_str);
+        num_samples = strtoul (num_samples_str, NULL, 10);
+
+        if (num_samples > MAX_NUM_SAMPLES) {
+            fprintf (stderr, "[client:acq]: Number of samples too big! Defaulting to: %u\n",
+                    MAX_NUM_SAMPLES);
+            num_samples = MAX_NUM_SAMPLES;
+        }
     }
     fprintf (stdout, "[client:acq]: num_samples = %u\n", num_samples);
 
     /* Set default channel */
     uint32_t chan;
     if (chan_str == NULL) {
-        fprintf (stderr, "[client:acq]: Set default value to 'chan'\n");
-        chan = 0;
+        fprintf (stderr, "[client:acq]: Setting default value to 'chan'\n");
+        chan = DEFAULT_CHAN_NUM;
     }
     else {
-        chan = (uint32_t) atoi(chan_str);
+        chan = strtoul (chan_str, NULL, 10);
+
+        if (chan > MAX_NUM_CHANS) {
+            fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
+                    MAX_NUM_CHANS);
+            chan = MAX_NUM_CHANS;
+        }
     }
     fprintf (stdout, "[client:acq]: chan = %u\n", chan);
 
