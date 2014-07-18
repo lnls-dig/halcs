@@ -58,9 +58,6 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
      * for the same thing (see Majordomo protocol) */
     th_boot_args_t *th_args = (th_boot_args_t *) args;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Thread starting ...\n");
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Thread allocating resources ...\n");
-
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
@@ -68,13 +65,14 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
             smio_mod_dispatch[th_args->smio_id].name, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
+            "starting ...\n", smio_service);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
+            "allocating resources ...\n", smio_service);
+
     smio_t *self = _smio_new (th_args->parent, ctx, pipe, th_args->broker,
             smio_service, th_args->verbose);
     ASSERT_ALLOC(self, err_self_alloc);
-
-    /* We don't need this anymore */
-    free (smio_service);
-    smio_service = NULL;
 
     /* Call SMIO init function to finish initializing its internal strucutres */
     SMIO_DISPATCH_FUNC_WRAPPER (init);
@@ -101,9 +99,13 @@ err_smio_export:
     /* Destroy what we did in _smio_new */
     _smio_destroy (&self);
 err_self_alloc:
+    /* We can't output this message at a later time as we depend on the smio_service
+     * variable. This is not so bad, though, as most of the time we will not fail
+     * in halutils_concat_strings () function */
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_bootstrap] SMIO Thread %s exiting ...\n",
+            smio_service);
     free (smio_service);
 err_smio_service_alloc:
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io_bootstrap] Thread exiting\n");
     free (th_args);
     return;
 }
@@ -117,9 +119,6 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
     (void) ctx;
     th_config_args_t *th_args = (th_config_args_t *) args;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Config thread starting ...\n");
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Thread allocating resources ...\n");
-
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
@@ -127,12 +126,18 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
             smio_mod_dispatch[th_args->smio_id].name, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
+            "starting ...\n", smio_service);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
+            "allocating resources ...\n", smio_service);
+
     SMIO_DISPATCH_FUNC_WRAPPER_GEN(config_defaults, th_args->broker,
             smio_service, th_args->log_file);
 
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
+            "exiting\n", smio_service);
     free (smio_service);
 err_smio_service_alloc:
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config thread exiting\n");
     free (th_args);
     return;
 }
