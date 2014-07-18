@@ -47,11 +47,15 @@ typedef smio_err_e (*smio_init_fp)(struct _smio_t *self);
 /* Destroy instance of sm)io functuion pointer. This tells how to destroy
  * such an object */
 typedef smio_err_e (*smio_shutdown_fp)(struct _smio_t *self);
+/* Configure SMIO default values using the libclient */
+typedef smio_err_e (*smio_config_defaults_fp)(char *broker_endp, char *service,
+        const char *log_file_name);
 
 /* Main class object that every sm_io must implement */
 struct _smio_bootstrap_ops_t {
     smio_init_fp init;
     smio_shutdown_fp shutdown;
+    smio_config_defaults_fp config_defaults;
 };
 
 typedef struct _smio_bootstrap_ops_t smio_bootstrap_ops_t;
@@ -69,10 +73,21 @@ struct _th_boot_args_t {
 
 typedef struct _th_boot_args_t th_boot_args_t;
 
+/* Config thread args structure */
+struct _th_config_args_t {
+    uint32_t smio_id;               /* ID of the SMIO instance */
+    char *broker;                   /* Endpoint to connect to broker */
+    char *service;                  /* Full name of the exported service */
+    char *log_file;                 /* Thread log file */
+};
+
+typedef struct _th_config_args_t th_config_args_t;
+
 /************************************************************/
 /************************ Our methods ***********************/
 /************************************************************/
 void smio_startup (void *args, zctx_t *ctx, void *pipe);
+void smio_config_defaults (void *args, zctx_t *ctx, void *pipe);
 struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
         char *broker, char *service, int verbose);
 smio_err_e smio_destroy (struct _smio_t **self_p);
