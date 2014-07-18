@@ -84,3 +84,17 @@ char *halutils_stringify_hex_key (uint32_t key)
 {
     return halutils_stringify_key (key, 16);
 }
+
+#define SEPARATOR_BYTES 1
+char *halutils_concat_strings (const char *str1, const char* str2, char sep)
+{
+    char *str = zmalloc (strlen(str1) + strlen(str2) +
+            SEPARATOR_BYTES /* separator length */+ 1 /* \0 */);
+    ASSERT_ALLOC(str, err_str_alloc);
+    sprintf (str, "%s%c%s", str1, sep, str2);
+
+    return str;
+
+err_str_alloc:
+    return NULL;
+}
