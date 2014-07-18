@@ -16,6 +16,7 @@
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
 #include "ll_io_utils.h"
+#include "hal_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -72,6 +73,11 @@ devio_t * devio_new (char *name, char *endpoint_dev,
 
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
+
+    self->log_file = strdup (log_file_name);
+    ASSERT_TEST((self->log_file == NULL && log_file_name == NULL)
+            || (self->log_file != NULL && log_file_name != NULL),
+            "Error setting log file!", err_log_file);
 
     /* Initialize the sockets structure to talk to nodes */
     self->pipes = zmalloc (sizeof (*self->pipes) * NODES_MAX_LEN);
@@ -168,6 +174,8 @@ err_name_alloc:
 err_poller_alloc:
     free (self->pipes);
 err_pipes_alloc:
+    free (self->log_file);
+err_log_file:
     free (self);
 err_self_alloc:
     return NULL;
@@ -199,6 +207,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         zpoller_destroy (&self->poller);
         free (self->poller2);
         free (self->pipes);
+        free (self->log_file);
         free (self);
         *self_p = NULL;
     }
@@ -223,71 +232,112 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
      * if found, call the correspondent bootstrap code to initilize
      * the sm_io module */
     th_boot_args_t *th_args = NULL;
-
-    /* For now, just do a simple linear search. We can afford this, as
-     * we don't expect to insert new sm_io modules often */
-    unsigned int i;
+    th_config_args_t *th_config_args = NULL;
+    char *smio_service = NULL;
+    void *config_pipe = NULL;
+    char *key = NULL;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] smio_mod_dispatch table size = %ld\n",
             ARRAY_SIZE(smio_mod_dispatch));
 
+    /* For now, just do a simple linear search. We can afford this, as
+     * we don't expect to insert new sm_io modules often */
+    unsigned int i;
     for (i = 0; i < ARRAY_SIZE(smio_mod_dispatch); ++i) {
-        if (smio_mod_dispatch[i].id == smio_id) {
-            /* Found! Call bootstrap code and insert in
-             * hash table */
-            /* FIXME: Why do I need this? smio always gets initilized
-             * after smio_mod_dispatch[i].bootstrap_ops->smio_boot (self); */
-            /* smio_t *smio = NULL; */
-            /* It is expected tha after the boot () call the operations
-             * this sm_io inscate can handle are already registered! */
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                    "[dev_io_core:register_sm] Allocating thread args\n");
-
-            /* Alloacate thread arguments struct and pass it to the
-             * thread. It is the responsability of the calling thread
-             * to clear this structure after using it! */
-            th_boot_args_t *th_args = zmalloc (sizeof *th_args);
-            ASSERT_ALLOC (th_args, err_th_args_alloc);
-            th_args->parent = self;
-            /* FIXME: weak identifier */
-            th_args->smio_id = i;
-            th_args->broker = self->endpoint_broker;
-            th_args->service = self->name;
-            th_args->verbose = self->verbose;
-            th_args->priv = priv;
-
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                    "[dev_io_core:register_sm] Calling boot func\n");
-
-            uint32_t pipe_idx = self->nnodes++;
-            self->pipes [pipe_idx] = zthread_fork (self->ctx, smio_startup,
-                    th_args);
-            /* self->pipes [pipe_idx] = zthread_fork (self->ctx,
-                   smio_mod_dispatch[i].bootstrap_ops->thread_boot, th_args); */
-            /*smio = smio_mod_dispatch[i].bootstrap_ops->boot (self);*/
-            /*ASSERT_ALLOC (smio, err_smio_alloc); */
-
-            /* Stringify ID */
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                    "[dev_io_core:register_sm] Stringify hash ID\n");
-            char *key = halutils_stringify_hex_key (smio_mod_dispatch[i].id);
-            ASSERT_ALLOC (key, err_key_alloc);
-
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                    "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
-            zhash_insert (self->sm_io_h, key, self->pipes [pipe_idx]);
-            free (key);
-
-            /* stop on first match */
-            break;
+        if (smio_mod_dispatch[i].id != smio_id) {
+            continue;
         }
+
+        /* Found! Call bootstrap code and insert in
+         * hash table */
+        /* FIXME: Why do I need this? smio always gets initilized
+         * after smio_mod_dispatch[i].bootstrap_ops->smio_boot (self); */
+        /* smio_t *smio = NULL; */
+        /* It is expected tha after the boot () call the operations
+         * this sm_io inscate can handle are already registered! */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_sm] Allocating thread args\n");
+
+        /* Alloacate thread arguments struct and pass it to the
+         * thread. It is the responsability of the calling thread
+         * to clear this structure after using it! */
+        th_boot_args_t *th_args = zmalloc (sizeof *th_args);
+        ASSERT_ALLOC (th_args, err_th_args_alloc);
+        th_args->parent = self;
+        /* FIXME: weak identifier */
+        th_args->smio_id = i;
+        th_args->broker = self->endpoint_broker;
+        th_args->service = self->name;
+        th_args->verbose = self->verbose;
+        th_args->priv = priv;
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_sm] Calling boot func\n");
+
+        uint32_t pipe_idx = self->nnodes++;
+        self->pipes [pipe_idx] = zthread_fork (self->ctx, smio_startup,
+                th_args);
+        ASSERT_TEST (self->pipes [pipe_idx] != NULL, "Could not spawn SMIO thread",
+                err_spawn_smio_thread);
+        /* self->pipes [pipe_idx] = zthread_fork (self->ctx,
+           smio_mod_dispatch[i].bootstrap_ops->thread_boot, th_args); */
+        /*smio = smio_mod_dispatch[i].bootstrap_ops->boot (self);*/
+        /*ASSERT_ALLOC (smio, err_smio_alloc); */
+
+        /* Stringify ID */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_sm] Stringify hash ID\n");
+        char *key = halutils_stringify_hex_key (smio_mod_dispatch[i].id);
+        ASSERT_ALLOC (key, err_key_alloc);
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
+        zhash_insert (self->sm_io_h, key, self->pipes [pipe_idx]);
+
+        /* Configure default values of the recently created SMIO using the
+         * bootstrap registered function config_defaults () */
+        smio_service = halutils_concat_strings (th_args->service,
+                 smio_mod_dispatch[th_args->smio_id].name, ':');
+        ASSERT_ALLOC(smio_service, err_smio_service_alloc);
+
+        /* Now, we create a short lived thread just to configure our SMIO */
+        /* Alloacate config thread arguments struct and pass it to the
+         * thread. It is the responsability of the calling thread
+         * to clear this structure after using it! */
+        th_config_args = zmalloc (sizeof *th_config_args);
+        ASSERT_ALLOC (th_config_args, err_th_config_args_alloc);
+
+        th_config_args->broker = self->endpoint_broker;
+        /* FIXME: weak identifier */
+        th_config_args->smio_id = i;
+        th_config_args->service = self->name;
+        th_config_args->log_file = self->log_file;
+
+        config_pipe = zthread_fork (self->ctx, smio_config_defaults, th_config_args);
+        ASSERT_TEST (config_pipe != NULL, "Could not spawn config thread",
+                err_spawn_config_thread);
+
+        /* stop on first match */
+        break;
     }
 
-    //free (th_args);
+    free (key);
     return DEVIO_SUCCESS;
 
+err_spawn_config_thread:
+    free (smio_service);
+    free (th_config_args);
+    /* FIXME: Destroy SMIO thread? */
+    _devio_destroy_smio (self, smio_id);
+err_th_config_args_alloc:
+    free (smio_service);
+err_smio_service_alloc:
+    free (key);
 err_key_alloc:
+    /* This is safe to call more than once */
+    _devio_destroy_smio (self, smio_id);
+err_spawn_smio_thread:
     free (th_args);
 err_th_args_alloc:
     return DEVIO_ERR_ALLOC;

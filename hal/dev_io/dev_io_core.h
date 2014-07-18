@@ -35,6 +35,7 @@ struct _devio_t {
     zmq_pollitem_t *poller2;            /* Poller structure to multiplex threads messages. New version */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
+    char *log_file;                     /* Log filename for tracing and debugging */
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
 
