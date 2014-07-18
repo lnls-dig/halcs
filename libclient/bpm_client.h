@@ -61,7 +61,8 @@ typedef struct _acq_trans_t acq_trans_t;
 /* Create an instance of the BPM client. This must be called
  * before any operation involving communicating with the BPM
  * server. Return an instance of the bpm client */
-bpm_client_t *bpm_client_new (char *broker_endp, int verbose);
+bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name);
 
 /* Destroy an instance of the BPM client. This must be called
  * after all operations involving the communication with the BPM
