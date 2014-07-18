@@ -16,6 +16,7 @@
 #include "wb_pos_calc_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
+#include "sm_io_dsp_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -246,5 +247,6 @@ smio_err_e dsp_shutdown (smio_t *self)
 
 const smio_bootstrap_ops_t dsp_bootstrap_ops = {
     .init = dsp_init,
-    .shutdown = dsp_shutdown
+    .shutdown = dsp_shutdown,
+    .config_defaults = dsp_config_defaults
 };
