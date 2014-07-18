@@ -19,7 +19,8 @@ static const char *smio_err [SMIO_ERR_END] =
     [SMIO_ERR_WRONG_NARGS]      = "Wrong number of arguments",
     [SMIO_ERR_WRONG_PARAM]      = "Wrong parameter value",
     [SMIO_ERR_LLIO]             = "Low-level I/O could not complete operation",
-    [SMIO_ERR_EXPORT_OP]        = "Could not export function"
+    [SMIO_ERR_EXPORT_OP]        = "Could not export function",
+    [SMIO_ERR_CONFIG_DFLT]      = "Could not configure the default values"
 };
 
 /* Convert enumeration type to string */

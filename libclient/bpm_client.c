@@ -42,8 +42,19 @@
 /************************ Our API ***********************/
 /********************************************************/
 
-bpm_client_t *bpm_client_new (char *broker_endp, int verbose)
+bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name)
 {
+    assert (broker_endp);
+
+    /* Set logfile available for all dev_mngr and dev_io instances.
+     * We accept NULL as a parameter, meaning to suppress all messages */
+    debug_set_log (log_file_name);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBCLIENT"
+            " with broker address %s, with logfile on %s ...\n", broker_endp,
+            (log_file_name == NULL) ? "NULL" : log_file_name);
+
     bpm_client_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     self->mdp_client = mdp_client_new (broker_endp, verbose);

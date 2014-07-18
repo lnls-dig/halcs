@@ -34,6 +34,7 @@ struct _smio_t {
     uint32_t id;                        /* Unique identifier for this sm_io type. This must be
                                            the same from the SDB ID */
     char *name;                         /* Identification of this sm_io instance */
+    char *service;                      /* Exported service name */
     /* int verbose; */                  /* Print activity to stdout */
     mdp_worker_t *worker;               /* zeroMQ Majordomo worker */
     struct _devio_t *parent;            /* Pointer back to parent dev_io */

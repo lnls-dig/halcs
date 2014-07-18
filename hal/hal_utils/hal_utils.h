@@ -10,7 +10,29 @@
 
 #include <inttypes.h>
 
-uint32_t num_to_str_len (uint32_t key);
-char *halutils_stringify_key (uint32_t key);
+/* Returns the necessary string length including the termianting null character
+ * for a number in a arbitrary base */
+uint32_t num_to_str_len (uint32_t key, uint32_t base);
+
+/* Returns the necessary string length including the termianting null character
+ * for a hexadecimal number */
+uint32_t hex_to_str_len (uint32_t key);
+
+/* Returns the necessary string length including the termianting null character
+ * for a decimal number */
+uint32_t dec_to_str_len (uint32_t key);
+
+/* Allocates a string with the necessary size to fit a number in an arbitrary base */
+char *halutils_stringify_key (uint32_t key, uint32_t base);
+
+/* Allocates a string with the necessary size to fit a decimal key */
+char *halutils_stringify_dec_key (uint32_t key);
+
+/* Allocates a string with the necessary size to fit an hexadecimal key */
+char *halutils_stringify_hex_key (uint32_t key);
+
+/* Concatenates 2 strings togheter with a separator. returns the string if
+ * OK, NULL in case of error */
+char *halutils_concat_strings (const char *str1, const char* str2, char sep);
 
 #endif

@@ -96,11 +96,11 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel $(OUT) libclient
+all: kernel libclient $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION=\"$(REVISION)\" -c $<

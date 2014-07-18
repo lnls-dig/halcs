@@ -293,6 +293,8 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         char *devio_log_prefix, bool respawn_killed_devio)
 {
     dmngr_err_e err = DMNGR_SUCCESS;
+    char *dev_type_c = NULL;
+    char *dev_id_c = NULL;
 
     /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawing all DEVIO workers\n");*/
 
@@ -337,19 +339,26 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
                     devio_log_prefix, devio_info->id);
         }
 
-        char *dev_type_c = llio_type_to_str (devio_info->type);
+        dev_type_c = llio_type_to_str (devio_info->type);
+        ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
+        dev_id_c = halutils_stringify_dec_key (devio_info->id);
+        ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
 
         /* Argument options are "process name", "device type" and
          *"dev entry" */
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEVIO worker"
-                " for a %s device \n\tlocated on %s, broker address %s, with logfile on %s"
-                " ...\n", dev_type_c, devio_info->dev_pathname, broker_endp,
-                devio_log_filename);
-        char *argv_exec [] = {"dev_io", "-t", dev_type_c, "-e", devio_info->dev_pathname,
-            "-b", broker_endp, "-l", devio_log_filename, NULL};
+                " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
+                "logfile on %s ...\n", dev_type_c, devio_info->dev_pathname, devio_info->id,
+                broker_endp, devio_log_filename);
+        char *argv_exec [] = {"dev_io", "-t", dev_type_c, "-i", dev_id_c,
+            "-e", devio_info->dev_pathname, "-b", broker_endp, "-l",
+            devio_log_filename, NULL};
         int spawn_err = _dmngr_spawn_chld (self, "dev_io", argv_exec);
 
         free (dev_type_c);
+        dev_type_c = NULL;
+        free (dev_id_c);
+        dev_id_c = NULL;
         /* Just fail miserably, for now */
         ASSERT_TEST(spawn_err == 0, "Could not spawn DEVIO instance",
                 err_spawn, DMNGR_ERR_SPAWNCHLD);
@@ -358,6 +367,10 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
     }
 
 err_spawn:
+    free (dev_id_c);
+err_dev_id_c_alloc:
+    free (dev_type_c);
+err_dev_type_c_alloc:
     zlist_destroy (&devio_info_key_list);
 err_hash_keys_alloc:
     return err;
@@ -402,7 +415,7 @@ static uint32_t _dmngr_scan_devs (dmngr_t *self)
         /* Stringify ID */
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
                 "[dev_mngr_core:scan_devs] Stringify hash ID\n");
-        char *key = halutils_stringify_key (devio_info->id);
+        char *key = halutils_stringify_dec_key (devio_info->id);
         ASSERT_ALLOC (key, err_key_alloc);
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
                 "[dev_mngr_core:scan_devs] Inserting hash with key: %s\n", key);

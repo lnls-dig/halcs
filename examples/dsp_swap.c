@@ -60,7 +60,7 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose);
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
 
     uint32_t kx_set = 10000000;
     fprintf (stdout, "[client:dsp]: kx = %u\n", kx_set);
