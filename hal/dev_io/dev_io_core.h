@@ -110,6 +110,10 @@ devio_err_e devio_poll2_all_sm (devio_t *self);
 /* devio_err_e devio_do_op (devio_t *self, uint32_t opcode, int nargs, ...); */
 /* Router for all of the low-level operations for this dev_io */
 devio_err_e devio_do_smio_op (devio_t *self, void *msg);
+/* Destroy a SMIO instance */
+void devio_destroy_smio (devio_t *self, uint32_t smio_id);
+/* Destroy all SMIO instances */
+void devio_destroy_smio_all (devio_t *self);
 
 /********* Low-level generic methods API *********/
 

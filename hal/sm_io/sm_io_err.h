@@ -22,6 +22,8 @@ enum _smio_err_e
     SMIO_ERR_LLIO,                  /* Low-level I/O could not complete operation */
     SMIO_ERR_EXPORT_OP,             /* Error exporting function */
     SMIO_ERR_CONFIG_DFLT,           /* Error configuring the default values */
+    SMIO_ERR_INTERRUPTED_POLLER,    /* SMIO Poller interrupted. zeroMQ context was terminated or received interrupt signal */
+    SMIO_ERR_TERMINATED,            /* Terminated SMIO instance */
     SMIO_ERR_END                    /* End of enum marker */
 };
 

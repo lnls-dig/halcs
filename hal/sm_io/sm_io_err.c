@@ -12,15 +12,17 @@
 
 static const char *smio_err [SMIO_ERR_END] =
 {
-    [SMIO_SUCCESS]              = "Success",
-    [SMIO_ERR_ALLOC]            = "Could not allocate memory",
-    [SMIO_ERR_FUNC_NOT_IMPL]    = "Function not implemented",
-    [SMIO_ERR_OPCODE_NOT_SUPP]  = "Opcode not supported",
-    [SMIO_ERR_WRONG_NARGS]      = "Wrong number of arguments",
-    [SMIO_ERR_WRONG_PARAM]      = "Wrong parameter value",
-    [SMIO_ERR_LLIO]             = "Low-level I/O could not complete operation",
-    [SMIO_ERR_EXPORT_OP]        = "Could not export function",
-    [SMIO_ERR_CONFIG_DFLT]      = "Could not configure the default values"
+    [SMIO_SUCCESS]                      = "Success",
+    [SMIO_ERR_ALLOC]                    = "Could not allocate memory",
+    [SMIO_ERR_FUNC_NOT_IMPL]            = "Function not implemented",
+    [SMIO_ERR_OPCODE_NOT_SUPP]          = "Opcode not supported",
+    [SMIO_ERR_WRONG_NARGS]              = "Wrong number of arguments",
+    [SMIO_ERR_WRONG_PARAM]              = "Wrong parameter value",
+    [SMIO_ERR_LLIO]                     = "Low-level I/O could not complete operation",
+    [SMIO_ERR_EXPORT_OP]                = "Could not export function",
+    [SMIO_ERR_CONFIG_DFLT]              = "Could not configure the default values",
+    [SMIO_ERR_INTERRUPTED_POLLER]       = "Poller interrupted. zeroMQ context was terminated or received interrupt signal",
+    [SMIO_ERR_TERMINATED]               = "Terminated SMIO instance"
 };
 
 /* Convert enumeration type to string */

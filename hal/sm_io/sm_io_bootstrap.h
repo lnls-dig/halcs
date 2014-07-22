@@ -92,5 +92,6 @@ struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pi
         char *broker, char *service, int verbose);
 smio_err_e smio_destroy (struct _smio_t **self_p);
 smio_err_e smio_loop (struct _smio_t *self);
+smio_err_e smio_loop2 (struct _smio_t *self);
 
 #endif

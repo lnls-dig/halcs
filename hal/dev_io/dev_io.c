@@ -23,6 +23,15 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
+int flag=0;
+void alarmhand(int signal)
+{
+    (void) signal;
+    flag=1;
+    printf("\n time out");
+    fflush (stdout);
+}
+
 int main (int argc, char *argv[])
 {
     int verbose = 0;
@@ -195,6 +204,9 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
+//    signal (SIGALRM, alarmhand);
+//    alarm (10);
+
     while (!zctx_interrupted) {
         /* Step 1: Loop though all the SDB records and intialize (boot) the
          * smio modules*/
@@ -207,6 +219,9 @@ int main (int argc, char *argv[])
 
         /* devio_poll_all_sm (devio); */
         devio_poll2_all_sm (devio);
+//      if (flag == 1){
+//            devio_destroy_smio (devio, swap_id);
+//        }
     }
 
 err_devio:

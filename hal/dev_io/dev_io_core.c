@@ -489,6 +489,16 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
     return _devio_do_smio_op (self, msg);
 }
 
+void devio_destroy_smio (devio_t *self, uint32_t smio_id)
+{
+    _devio_destroy_smio (self, smio_id);
+}
+
+void devio_destroy_smio_all (devio_t *self)
+{
+    _devio_destroy_smio_all (self);
+}
+
 /**************** Helper Functions ***************/
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
