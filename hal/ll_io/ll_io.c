@@ -96,14 +96,6 @@ llio_err_e llio_destroy (llio_t **self_p)
         llio_t *self = *self_p;
 
         /* Starting destructing by the last resource */
-
-        /* We must release the device structures by calling the
-         * registered function */
-        if (self->ops->release) {
-            /* TODO: remove self->endpoint parameter (unused!)*/
-            self->ops->release (self, self->endpoint);
-        }
-
         /* llio_dev_info_destroy (&self->dev_info); Moved to dev_io */
         llio_endpoint_destroy (&self->endpoint);
         free (self->name);
