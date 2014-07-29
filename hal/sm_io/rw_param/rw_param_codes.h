@@ -17,7 +17,9 @@
 #define RW_OOR							2   /* Parameter is out of range */
 #define RW_USR_ERR						3   /* Parameter unmet user conditions */
 #define RW_INV	    					4   /* Parameter is invalid */
-#define RW_REPLY_END					5   /* End marker */
+#define RW_READ_EAGAIN   				5   /* Read operation was incomplete */
+#define RW_WRITE_EAGAIN 				6   /* Write operation was incomplete */
+#define RW_REPLY_END					7   /* End marker */
 
 #define PARAM_OK					    0
 #define PARAM_ERR			    	    1
