@@ -29,7 +29,8 @@
  *  DBG_LL_IO
  *  DBG_SM_IO
  *  DBG_MSG
- *  DBG_HAL_UTILS
+ *  DBG_LIB_CLIENT
+ *  DBG_SM_PR
  */
 
 #define DBG_SUBSYS_ON           (\
@@ -40,5 +41,6 @@
                                  DBG_HAL_UTILS)
 /*                                 DBG_LL_IO       | \ */
 /*                                 DBG_MSG         | \ */
+/*                                 DBG_SM_PR       | \ */
 
 #endif
