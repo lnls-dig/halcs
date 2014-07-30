@@ -7,7 +7,7 @@
 /*    General Definitions  */
 /****************************/
 /* CPU Clock frequency in hertz */
-#define CPU_CLOCK 100000000ULL
+#define SYS_CLOCK 100000000ULL
 
 /* Baud rate of the builtin UART (does not apply to the VUART) */
 #define UART_BAUDRATE 115200ULL
