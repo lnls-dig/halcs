@@ -78,15 +78,19 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         fmt_funcp)                                                              \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_READ_OK;                                         \
-        uint32_t __value;                                                         \
+        uint32_t __value;                                                       \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
 				"GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", addr); \
-		ssize_t __ret = smio_thsafe_client_read_32 (smio, addr, &__value);        \
-        ASSERT_TEST(__ret == sizeof(uint32_t), "Number of bytes read does not match the request", \
-            __err_read_get_param, RW_READ_EAGAIN);                              \
-     /*FIXME: Hack to continue the operation but to output warning messages */  \
-__err_read_get_param:                                                           \
+		ssize_t __ret = smio_thsafe_client_read_32 (smio, addr, &__value);      \
+                                                                                \
+        if (__ret != sizeof(uint32_t)) {                                        \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] "   \
+                "SET_PARAM_" #reg "_" #field ": Number of bytes read (%ld)\n"   \
+                "does not match the request (%lu)\n", __ret, sizeof(uint32_t));  \
+            err = RW_READ_EAGAIN;                                               \
+        }                                                                       \
+                                                                                \
         __value = WHEN(single_bit)(  										    \
                     (__value & CONCAT_NAME3(prefix, reg, field)) ?              \
                     BIT_SET : BIT_CLR                                           \
@@ -116,8 +120,14 @@ __err_read_get_param:                                                           
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
             uint32_t __write_value;                                             \
             ssize_t __ret = smio_thsafe_client_read_32 (smio, addr, &__write_value);\
-            ASSERT_TEST(__ret == sizeof(uint32_t), "Number of bytes read does not match the request", \
-                __err_set_read_param, RW_READ_EAGAIN);                          \
+                                                                                \
+            if (__ret != sizeof(uint32_t)) {                                    \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
+                    "SET_PARAM_" #reg "_" #field ": Number of bytes read (%ld)\n" \
+                    "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
+                err = RW_WRITE_EAGAIN;                                          \
+            }                                                                   \
+                                                                                \
             __write_value =                                                     \
                     WHEN(single_bit)(                                           \
                         WHENNOT(clr_field)(                                     \
@@ -134,22 +144,25 @@ __err_read_get_param:                                                           
                         )                                                       \
                     )                                                           \
             ;                                                                   \
-            __ret = smio_thsafe_client_write_32 (smio,  addr, &__write_value);  \
-            ASSERT_TEST(__ret == sizeof(uint32_t), "Number of bytes written does not match the request", \
-                __err_set_write_param, RW_WRITE_EAGAIN);                        \
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] " \
-                    "SET_PARAM_" #reg "_" #field ": updated 0x%08x to address 0x%08x\n", \
-                    __write_value, addr);                                       \
-            set_param_return = RW_WRITE_OK;                                     \
+            __ret = smio_thsafe_client_write_32 (smio, addr, &__write_value);   \
+            if (__ret != sizeof(uint32_t)) {                                    \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
+                        "SET_PARAM_" #reg "_" #field ": Number of bytes written (%ld)\n" \
+                        "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
+                err = RW_WRITE_EAGAIN;                                          \
+            }                                                                   \
+            else {                                                              \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] " \
+                        "SET_PARAM_" #reg "_" #field ": updated 0x%08x to address 0x%08x\n", \
+                        __write_value, addr);                                   \
+            }                                                                   \
         }                                                                       \
         else {                                                                  \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] " \
                     "SET_PARAM_" #reg "_" #field ": invalid parameter: 0x%08x\n", \
                     value);                                                     \
-            set_param_return = RW_USR_ERR;                                      \
+            err = RW_USR_ERR;                                                   \
         }                                                                       \
-__err_set_read_param:                                                           \
-__err_set_write_param:                                                          \
         err;                                                                    \
 	})
 
