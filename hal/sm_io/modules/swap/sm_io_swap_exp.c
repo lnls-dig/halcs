@@ -57,21 +57,21 @@
 #define BPM_SWAP_CTRL_MODE_GLOBAL_W(val)        (BPM_SWAP_CTRL_MODE1_W(val) | BPM_SWAP_CTRL_MODE2_W(val))
 #define BPM_SWAP_CTRL_MODE_GLOBAL_R(val)        (BPM_SWAP_CTRL_MODE1_R(val) | BPM_SWAP_CTRL_MODE2_R(val))
 RW_PARAM_FUNC(swap, sw) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_SW_EN_MIN                           0 /* Switching enabled */
 #define BPM_SW_EN_MAX                           1 /* Switching disabled */
 RW_PARAM_FUNC(swap, sw_en) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
             BPM_SW_EN_MIN, BPM_SW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_SWAP_DIV_F_MIN                      1
 #define BPM_SWAP_DIV_F_MAX                      ((1<<16)-1)
 RW_PARAM_FUNC(swap, div_clk) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, SWAP_DIV_F, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, SWAP_DIV_F, MULT_BIT_PARAM,
             BPM_SWAP_DIV_F_MIN, BPM_SWAP_DIV_F_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -83,7 +83,7 @@ RW_PARAM_FUNC(swap, div_clk) {
 #define BPM_SWAP_DLY_GLOBAL_W(val)              (BPM_SWAP_DLY_1_W(val) | BPM_SWAP_DLY_2_W(val))
 #define BPM_SWAP_DLY_GLOBAL_R(val)              (BPM_SWAP_DLY_1_R(val) | BPM_SWAP_DLY_2_R(val))
 RW_PARAM_FUNC(swap, sw_dly) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_SW_DLY_MIN, BPM_SWAP_SW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC,
             SET_FIELD);
 }
@@ -93,14 +93,14 @@ RW_PARAM_FUNC(swap, sw_dly) {
 
 #define BPM_SWAP_WDW_CTL_EN_GLOBAL              (BPM_SWAP_WDW_CTL_USE | BPM_SWAP_WDW_CTL_SWCLK_EXT)
 RW_PARAM_FUNC(swap, wdw) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, WDW_CTL, EN_GLOBAL, SINGLE_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, EN_GLOBAL, SINGLE_BIT_PARAM,
             BPM_SWAP_WDW_EN_MIN, BPM_SWAP_WDW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_SWAP_WDW_DLY_MIN                    1
 #define BPM_SWAP_WDW_DLY_MAX                    ((1<<16)-1)
 RW_PARAM_FUNC(swap, wdw_dly) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
             BPM_SWAP_WDW_DLY_MIN, BPM_SWAP_WDW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -136,7 +136,7 @@ rw_param_check_fp rw_bpm_swap_gain_chk_fp = _rw_bpm_swap_gain_chk;
 #define BPM_SWAP_A_GLOBAL_W(val)                (val)
 #define BPM_SWAP_A_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_a) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, A, GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, A, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -145,7 +145,7 @@ RW_PARAM_FUNC(swap, gain_a) {
 #define BPM_SWAP_B_GLOBAL_W(val)                (val)
 #define BPM_SWAP_B_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_b) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, B, GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, B, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -154,7 +154,7 @@ RW_PARAM_FUNC(swap, gain_b) {
 #define BPM_SWAP_C_GLOBAL_W(val)                (val)
 #define BPM_SWAP_C_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_c) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, C, GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, C, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -163,7 +163,7 @@ RW_PARAM_FUNC(swap, gain_c) {
 #define BPM_SWAP_D_GLOBAL_W(val)                (val)
 #define BPM_SWAP_D_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_d) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, D, GLOBAL, MULT_BIT_PARAM,
+	SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, D, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
