@@ -7,6 +7,7 @@
 #include "dev_io.h"
 #include "debug_print.h"
 #include "ll_io_utils.h"
+#include "board.h"
 
 #define DEVIO_SERVICE_LEN       50
 
@@ -164,25 +165,25 @@ int main (int argc, char *argv[])
     uint32_t swap_id = 0x12897592;
     devio_err_e err;
 
-    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
+    err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;
     }
 
-    err = devio_register_sm (devio, acq_id, NULL);
+    err = devio_register_sm (devio, acq_id, WB_ACQ_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;
     }
 
-    err = devio_register_sm (devio, dsp_id, NULL);
+    err = devio_register_sm (devio, dsp_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;
     }
 
-    err = devio_register_sm (devio, swap_id, NULL);
+    err = devio_register_sm (devio, swap_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_devio;
