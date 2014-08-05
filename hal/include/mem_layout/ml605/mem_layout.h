@@ -4,22 +4,39 @@
 #include "pcie_regs.h"
 
 /*********************** Static ML605 FPGA layout ***********************/
+/* FMC_130M Components */
+#define FMC_130M_CTRL_RAW_REGS_OFFS                 0x0000
+#define FMC_130M_SI571_RAW_I2C_OFFS                 0x0100
+#define FMC_130M_AD9510_RAW_SPI_OFFS                0x0200
+#define FMC_130M_EEPROM_RAW_I2C_OFFS                0x0300
+#define FMC_130M_LM75A_RAW_I2C_OFFS                 0x0400
+
+/* DSP Components */
+#define DSP_CTRL_RAW_REGS_OFFS                      0x0000
+#define DSP_BPM_RAW_SWAP_OFFS                       0x0100
 
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
-#define FMC130M_BASE_RAW_ADDR                       0x00310000
+#define FMC1_130M_BASE_RAW_ADDR                     0x00310000
 
-#define FPGA_CTRL_RAW_REGS                          (FMC130M_BASE_RAW_ADDR + 0x0000)
-#define FPGA_SI571_RAW_I2C                          (FMC130M_BASE_RAW_ADDR + 0x0100)
-#define FPGA_AD9510_RAW_SPI                         (FMC130M_BASE_RAW_ADDR + 0x0200)
-#define FPGA_EEPROM_RAW_I2C                         (FMC130M_BASE_RAW_ADDR + 0x0300)
-#define FPGA_LM75A_RAW_I2C                          (FMC130M_BASE_RAW_ADDR + 0x0400)
+#define FMC1_130M_CTRL_RAW_REGS                     (FMC1_130M_BASE_RAW_ADDR +  \
+                                                        FMC_130M_CTRL_RAW_REGS_OFFS)
+#define FMC1_130M_SI571_RAW_I2C                     (FMC1_130M_BASE_RAW_ADDR +  \
+                                                        FMC_130M_SI571_RAW_I2C_OFFS)
+#define FMC1_130M_AD9510_RAW_SPI                    (FMC1_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_AD9510_RAW_SPI_OFFS)
+#define FMC1_130M_EEPROM_RAW_I2C                    (FMC1_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_EEPROM_RAW_I2C_OFFS)
+#define FMC1_130M_LM75A_RAW_I2C                     (FMC1_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_LM75A_RAW_I2C_OFFS)
 
-#define DSP_BASE_RAW_ADDR                           0x00308000
+#define DSP1_BASE_RAW_ADDR                          0x00308000
 
-#define DSP_CTRL_RAW_REGS                           (DSP_BASE_RAW_ADDR + 0x00000000)
-#define DSP_BPM_RAW_SWAP                            (DSP_BASE_RAW_ADDR + 0x00000100)
+#define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_CTRL_RAW_REGS_OFFS)
+#define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_BPM_RAW_SWAP_OFFS)
 
 #define WB_ACQ_BASE_RAW_ADDR                        0x00330000
 
@@ -47,19 +64,30 @@
  * the correct one to read or write
  */
 
+/* FMC_130M Components */
+#define FMC_130M_CTRL_REGS_OFFS                     (BAR4_ADDR | FMC_130M_CTRL_RAW_REGS_OFFS)
+#define FMC_130M_SI571_I2C_OFFS                     (BAR4_ADDR | FMC_130M_SI571_I2C_RAW_OFFS)
+#define FMC_130M_AD9510_SPI_OFFS                    (BAR4_ADDR | FMC_130M_AD9510_RAW_SPI_OFFS)
+#define FMC_130M_EEPROM_I2C_OFFS                    (BAR4_ADDR | FMC_130M_EEPROM_RAW_I2C_OFFS)
+#define FMC_130M_LM75A_I2C_OFFS                     (BAR4_ADDR | FMC_130M_LM75A_RAW_I2C_OFFS)
+
+/* DSP Components */
+#define DSP_CTRL_REGS_OFFS                          (BAR4_ADDR | DSP_CTRL_RAW_REGS_OFFS)
+#define DSP_BPM_SWAP_OFFS                           (BAR4_ADDR | DSP_BPM_RAW_SWAP_OFFS)
+
 /* Wishbone Addresses */
-#define FMC130M_BASE_ADDR                           (BAR4_ADDR | FMC130M_BASE_RAW_ADDR)
+#define FMC1_130M_BASE_ADDR                         (BAR4_ADDR | FMC1_130M_BASE_RAW_ADDR)
 
-#define FPGA_CTRL_REGS                              (BAR4_ADDR | FPGA_CTRL_RAW_REGS)
-#define FPGA_SI571_I2C                              (BAR4_ADDR | FPGA_SI571_RAW_I2C)
-#define FPGA_AD9510_SPI                             (BAR4_ADDR | FPGA_AD9510_RAW_SPI)
-#define FPGA_EEPROM_I2C                             (BAR4_ADDR | FPGA_EEPROM_RAW_I2C)
-#define FPGA_LM75A_I2C                              (BAR4_ADDR | FPGA_LM75A_RAW_I2C)
+#define FMC1_130M_CTRL_REGS                         (BAR4_ADDR | FMC1_130M_CTRL_RAW_REGS)
+#define FMC1_130M_SI571_I2C                         (BAR4_ADDR | FMC1_130M_SI571_RAW_I2C)
+#define FMC1_130M_AD9510_SPI                        (BAR4_ADDR | FMC1_130M_AD9510_RAW_SPI)
+#define FMC1_130M_EEPROM_I2C                        (BAR4_ADDR | FMC1_130M_EEPROM_RAW_I2C)
+#define FMC1_130M_LM75A_I2C                         (BAR4_ADDR | FMC1_130M_LM75A_RAW_I2C)
 
-#define DSP_BASE_ADDR                               (BAR4_ADDR | DSP_BASE_RAW_ADDR)
+#define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
 
-#define DSP_CTRL_REGS                               (BAR4_ADDR | DSP_CTRL_RAW_REGS)
-#define DSP_BPM_SWAP                                (BAR4_ADDR | DSP_BPM_RAW_SWAP)
+#define DSP1_CTRL_REGS                              (BAR4_ADDR | DSP1_CTRL_RAW_REGS)
+#define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
 
 #define WB_ACQ_BASE_ADDR                            (BAR4_ADDR | WB_ACQ_BASE_RAW_ADDR)
 
