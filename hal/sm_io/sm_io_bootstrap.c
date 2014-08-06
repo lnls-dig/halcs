@@ -42,7 +42,7 @@
 #define EXTRA_SMIO_SERV_BYTES       1
 
 static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
-        void *pipe, char *broker, char *service, int verbose);
+        void *pipe, char *broker, char *service, uint32_t base, int verbose);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
 static smio_err_e _smio_loop (smio_t *self);
 
@@ -61,8 +61,10 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *smio_service = halutils_concat_strings (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, ':');
+    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = halutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
@@ -71,7 +73,7 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
             "allocating resources ...\n", smio_service);
 
     smio_t *self = _smio_new (th_args->parent, ctx, pipe, th_args->broker,
-            smio_service, th_args->verbose);
+            smio_service, th_args->base, th_args->verbose);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
@@ -106,6 +108,8 @@ err_self_alloc:
             smio_service);
     free (smio_service);
 err_smio_service_alloc:
+    free (inst_id_str);
+err_inst_id_str_alloc:
     free (th_args);
     return;
 }
@@ -122,8 +126,10 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *smio_service = halutils_concat_strings (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, ':');
+    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = halutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
@@ -138,6 +144,8 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
             "exiting\n", smio_service);
     free (smio_service);
 err_smio_service_alloc:
+    free (inst_id_str);
+err_inst_id_str_alloc:
     free (th_args);
     return;
 }
@@ -147,9 +155,9 @@ err_smio_service_alloc:
 /************************************************************/
 
 struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
-        char *broker, char *service, int verbose)
+        char *broker, char *service, uint32_t base, int verbose)
 {
-    return _smio_new (parent, ctx, pipe, broker, service, verbose);
+    return _smio_new (parent, ctx, pipe, broker, service, base, verbose);
 }
 
 smio_err_e smio_destroy (struct _smio_t **self_p)
@@ -167,8 +175,8 @@ smio_err_e smio_loop (struct _smio_t *self)
 /************************************************************/
 
 /* Boot new sm_io instance of fmc130m_4ch */
-static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
-        char *broker, char *service, int verbose)
+static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
+        void *pipe, char *broker, char *service, uint32_t base, int verbose)
 {
     (void) parent;
 
@@ -187,6 +195,9 @@ static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx, 
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->ctx = ctx;
     self->pipe = pipe;
+
+    /* Initialize SMIO base address */
+    self->base = base;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",

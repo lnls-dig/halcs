@@ -35,4 +35,9 @@ char *halutils_stringify_hex_key (uint32_t key);
  * OK, NULL in case of error */
 char *halutils_concat_strings (const char *str1, const char* str2, char sep);
 
+/* Concatenates 3 strings togheter with a separator between the first and second
+ * strings. returns the string if OK, NULL in case of error */
+char *halutils_concat_strings3 (const char *str1, const char* str2,
+        const char* str3, char sep);
+
 #endif

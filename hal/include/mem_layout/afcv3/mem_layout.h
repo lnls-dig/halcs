@@ -3,7 +3,7 @@
 
 #include "pcie_regs.h"
 
-/*********************** Static ML605 FPGA layout ***********************/
+/*********************** Static AFCv3 FPGA layout ***********************/
 /* FMC_130M Components */
 #define FMC_130M_CTRL_RAW_REGS_OFFS                 0x0000
 #define FMC_130M_SI571_RAW_I2C_OFFS                 0x0100
@@ -36,6 +36,26 @@
 #define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
                                                         DSP_CTRL_RAW_REGS_OFFS)
 #define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_BPM_RAW_SWAP_OFFS)
+
+#define FMC2_130M_BASE_RAW_ADDR                     0x00350000
+
+#define FMC2_130M_CTRL_RAW_REGS                     (FMC2_130M_BASE_RAW_ADDR +  \
+                                                        FMC_130M_CTRL_RAW_REGS_OFFS)
+#define FMC2_130M_SI571_RAW_I2C                     (FMC2_130M_BASE_RAW_ADDR +  \
+                                                        FMC_130M_SI571_RAW_I2C_OFFS)
+#define FMC2_130M_AD9510_RAW_SPI                    (FMC2_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_AD9510_RAW_SPI_OFFS)
+#define FMC2_130M_EEPROM_RAW_I2C                    (FMC2_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_EEPROM_RAW_I2C_OFFS)
+#define FMC2_130M_LM75A_RAW_I2C                     (FMC2_130M_BASE_RAW_ADDR + \
+                                                        FMC_130M_LM75A_RAW_I2C_OFFS)
+
+#define DSP2_BASE_RAW_ADDR                          0x00340000
+
+#define DSP2_CTRL_RAW_REGS                          (DSP2_BASE_RAW_ADDR +       \
+                                                        DSP_CTRL_RAW_REGS_OFFS)
+#define DSP2_BPM_RAW_SWAP                           (DSP2_BASE_RAW_ADDR +       \
                                                         DSP_BPM_RAW_SWAP_OFFS)
 
 #define WB_ACQ_BASE_RAW_ADDR                        0x00330000
@@ -90,6 +110,19 @@
 #define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
 
 #define WB_ACQ_BASE_ADDR                            (BAR4_ADDR | WB_ACQ_BASE_RAW_ADDR)
+
+#define FMC2_130M_BASE_ADDR                         (BAR4_ADDR | FMC2_130M_BASE_RAW_ADDR)
+
+#define FMC2_130M_CTRL_REGS                         (BAR4_ADDR | FMC2_130M_CTRL_RAW_REGS)
+#define FMC2_130M_SI571_I2C                         (BAR4_ADDR | FMC2_130M_SI571_RAW_I2C)
+#define FMC2_130M_AD9510_SPI                        (BAR4_ADDR | FMC2_130M_AD9510_RAW_SPI)
+#define FMC2_130M_EEPROM_I2C                        (BAR4_ADDR | FMC2_130M_EEPROM_RAW_I2C)
+#define FMC2_130M_LM75A_I2C                         (BAR4_ADDR | FMC2_130M_LM75A_RAW_I2C)
+
+#define DSP2_BASE_ADDR                              (BAR4_ADDR | DSP2_BASE_RAW_ADDR)
+
+#define DSP2_CTRL_REGS                              (BAR4_ADDR | DSP2_CTRL_RAW_REGS)
+#define DSP2_BPM_SWAP                               (BAR4_ADDR | DSP2_BPM_RAW_SWAP)
 
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)

@@ -13,6 +13,7 @@
 #include "dev_io.h"
 #include "board.h"
 #include "hal_assert.h"
+#include "wb_fmc130m_4ch_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,8 +38,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
-#define FMC_MONITOR_REG (FMC130M_BASE_ADDR | 0x010)
-
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
@@ -54,7 +53,8 @@ static void *_fmc130m_4ch_leds (void *owner, void *args)
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_leds\n");
     uint32_t leds = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
-    smio_thsafe_client_write_32 (self, FMC_MONITOR_REG, &leds);
+    smio_thsafe_client_write_32 (self, FMC_130M_CTRL_REGS_OFFS |
+            WB_FMC_130M_4CH_CSR_REG_MONITOR , &leds);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Led write: 0x%08x\n",
             leds);
 

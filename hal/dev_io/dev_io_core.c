@@ -52,9 +52,8 @@ static void _devio_destroy_smio (devio_t *self, uint32_t smio_id);
 static void _devio_destroy_smio_all (devio_t *self);
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose,
-        const char *log_file_name)
+devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
+        char *endpoint_broker, int verbose, const char *log_file_name)
 {
     assert (name);
     assert (endpoint_dev);
@@ -224,7 +223,8 @@ devio_err_e devio_print_info (devio_t *self)
 }
 
 /* Register an specific sm_io modules to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
+devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
+        uint32_t inst_id)
 {
     assert (self);
 
@@ -270,7 +270,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
         th_args->broker = self->endpoint_broker;
         th_args->service = self->name;
         th_args->verbose = self->verbose;
-        th_args->priv = priv;
+        th_args->base = base;
+        th_args->inst_id = inst_id;
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Calling boot func\n");
@@ -313,6 +314,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
         th_config_args->smio_id = i;
         th_config_args->service = self->name;
         th_config_args->log_file = self->log_file;
+        th_config_args->inst_id = inst_id;
 
         config_pipe = zthread_fork (self->ctx, smio_config_defaults, th_config_args);
         ASSERT_TEST (config_pipe != NULL, "Could not spawn config thread",
@@ -351,10 +353,11 @@ devio_err_e devio_register_all_sm (devio_t *self)
     return DEVIO_ERR_FUNC_NOT_IMPL;
 }
 
-devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id)
+devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id, uint32_t inst_id)
 {
     (void) self;
     (void) smio_id;
+    (void) inst_id;
     return DEVIO_ERR_FUNC_NOT_IMPL;
 
 }
