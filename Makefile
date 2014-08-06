@@ -11,8 +11,8 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
-# Select board in which we will work. Options are: ml605, afc
-BOARD = ml605
+# Select board in which we will work. Options are: ml605 or afcv3
+BOARD ?= ml605
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
@@ -30,6 +30,14 @@ LIBCLIENT_DIR=libclient
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
+
+ifeq ($(BOARD),ml605)
+CFLAGS += -D__BOARD_ML605__
+endif
+
+ifeq ($(BOARD),afcv3)
+CFLAGS += -D__BOARD_AFCV3__
+endif
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
