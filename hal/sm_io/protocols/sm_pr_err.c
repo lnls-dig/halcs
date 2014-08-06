@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "sm_pr.h"
+#include "sm_pr_err.h"
 
 static const char *smpr_err [SMPR_ERR_END] =
 {
