@@ -65,7 +65,7 @@ smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
     ASSERT_TEST(err == SMPR_SUCCESS, "Could not register SMPR operation",
             err_register_ops);
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr] Created instance of smpr\n");
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Created instance of smpr\n");
     return self;
 
 err_register_ops:
