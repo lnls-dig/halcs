@@ -11,6 +11,7 @@
 #include "sm_pr.h"
 #include "sm_pr_err.h"
 #include "wb_spi_regs.h"
+#include "smpr_spi_regs.h"
 
 #define SM_PR_SPI_READBACK                  1
 #define SM_PR_SPI_MAX_TRIES                 10
@@ -21,15 +22,6 @@
 #define SMPR_WB_REG_2_BIT                   (SMPR_WB_REG_2_BYTE*SMPR_BYTE_2_BIT)
 
 #define SMPR_PROTO_SPI(self)                ((smpr_proto_spi_t *) self->proto_handler)
-
-/* Our flags are: SPI_PROTO_CHAR_LEN_MASK | SPI_PROTO_SS_MASK */
-#define SMPR_PROTO_SPI_SS_FLAGS_R(reg)      SPI_PROTO_SS_R(reg)
-#define SMPR_PROTO_SPI_CHARLEN_FLAGS_R(reg)    \
-                                            SPI_PROTO_CTRL_CHAR_LEN_R(reg >> SPI_PROTO_SS_SIZE)
-
-#define SMPR_PROTO_SPI_SS_FLAGS_W(value)    SPI_PROTO_SS_W(value)
-#define SMPR_PROTO_SPI_CHARLEN_FLAGS_W(value)    \
-                                            SPI_PROTO_CTRL_CHAR_LEN_W(value << SPI_PROTO_SS_SIZE)
 
 /* SPI open arguments */
 struct _spi_proto_args_t {
