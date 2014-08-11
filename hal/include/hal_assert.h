@@ -24,7 +24,7 @@
     do {                                                    \
         if(!(test_boolean)) {                               \
             DBE_DEBUG (DBG_ ##debug_subsys | DBG_LVL_FATAL, \
-                    "["debug_name"]" " %s\n", err_str);     \
+                    debug_name " %s\n", err_str);           \
             SET_ERR_VAR(/* err_code*/ __VA_ARGS__);         \
             goto err_goto_label;                            \
         }                                                   \
@@ -40,7 +40,7 @@
     do {                                                    \
         if (err < 0) {                                      \
             DBE_DEBUG (DBG_ ##debug_subsys | DBG_LVL_ERR,   \
-                    "["debug_name"]" " %s\n", err_str);     \
+                    debug_name " %s\n", err_str);           \
             return err;                                     \
         }                                                   \
     } while (0)
