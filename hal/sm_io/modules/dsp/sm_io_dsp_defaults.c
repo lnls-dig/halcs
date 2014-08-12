@@ -27,6 +27,8 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:dsp_defaults]",               \
             smio_err_str (err_type))
 
+#define SMIO_DSP_LIBCLIENT_LOG_MODE                "a"
+
 /* We use the actual libclient to send and configure our default values,
  * maintaining internal consistency. So, in fact, we are sending ourselves
  * a message containing the default values. Because of this approach, we
@@ -44,8 +46,8 @@ smio_err_e dsp_config_defaults (char *broker_endp, char *service,
     bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
-    bpm_client_t *config_client = bpm_client_new (broker_endp, 0,
-            log_file_name);
+    bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_DSP_LIBCLIENT_LOG_MODE);
 
     client_err = bpm_set_kx (config_client, service, DSP_DFLT_KX_VAL);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set KX value",
