@@ -124,6 +124,36 @@ err_send_msg_alloc:
     return err;
 }
 
+/* FUNCTION pin functions */
+PARAM_FUNC_CLIENT_WRITE(fmc_pll_function)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_PLL_FUNCTION,
+            fmc_pll_function);
+}
+
+PARAM_FUNC_CLIENT_READ(fmc_pll_function)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_PLL_FUNCTION,
+            fmc_pll_function);
+}
+
+bpm_client_err_e bpm_ad9510_cfg_test (bpm_client_t *self, char *service)
+{
+    assert (self);
+    assert (service);
+
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_AD9510_CFG_TEST;
+
+    zmsg_t *request = zmsg_new ();
+    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
+    zmsg_addmem (request, &operation, sizeof (operation));
+    mdp_client_send (self->mdp_client, service, &request);
+
+err_send_msg_alloc:
+    return err;
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */

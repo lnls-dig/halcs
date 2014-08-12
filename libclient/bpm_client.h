@@ -64,6 +64,13 @@ typedef struct _acq_trans_t acq_trans_t;
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name);
 
+/* Create an instance of the BPM client, with the log filemode specified
+ * by "log_mode" as in fopen () call. This must be called before any operation
+ * involving communicating with the BPM server. Return an instance of the bpm
+ * client */
+bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode);
+
 /* Destroy an instance of the BPM client. This must be called
  * after all operations involving the communication with the BPM
  * server */
@@ -76,6 +83,20 @@ void bpm_client_destroy (bpm_client_t **self_p);
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
+
+/* Simple AD9510 Condig test.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_ad9510_cfg_test (bpm_client_t *self, char *service);
+
+/* FMC PLL FUNCTION pin. Sets or clears the FMC PLL FUNCTION pin. This pin
+ * has a general purpose based on the 0x59 SPI AD9510 register.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_pll_function (bpm_client_t *self, char *service,
+        uint32_t fmc_pll_function);
+bpm_client_err_e bpm_get_fmc_pll_function (bpm_client_t *self, char *service,
+        uint32_t *fmc_pll_function);
 
 /********************** ACQ SMIO Functions ********************/
 
