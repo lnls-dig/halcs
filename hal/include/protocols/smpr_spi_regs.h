@@ -27,14 +27,17 @@
 #endif
 
 /* Our flags are: SPI_PROTO_CHAR_LEN_MASK | SPI_PROTO_SS_MASK */
-#define SMPR_PROTO_SPI_SS_FLAGS_W(value)    SPI_PROTO_SS_W(value)
-#define SMPR_PROTO_SPI_SS_FLAGS_R(reg)      SPI_PROTO_SS_R(reg)
+#define SMPR_PROTO_SPI_SS_FLAGS_W(value)            SPI_PROTO_SS_W(value)
+#define SMPR_PROTO_SPI_SS_FLAGS_R(reg)              SPI_PROTO_SS_R(reg)
 
-#define SMPR_PROTO_SPI_CHARLEN_FLAGS_R(reg)    \
-                                            SPI_PROTO_CTRL_CHAR_LEN_R(reg >> SPI_PROTO_SS_SIZE)
-#define SMPR_PROTO_SPI_CHARLEN_FLAGS_W(value)    \
-                                            SPI_PROTO_CTRL_CHAR_LEN_W(value << SPI_PROTO_SS_SIZE)
-
+#define SMPR_PROTO_SPI_CHARLEN_FLAGS_SIZE           7
+#define SMPR_PROTO_SPI_CHARLEN_FLAGS_SHIFT          SPI_PROTO_SS_SIZE
+#define SMPR_PROTO_SPI_CHARLEN_FLAGS_MASK           WBGEN2_GEN_MASK(SMPR_PROTO_SPI_CHARLEN_FLAGS_SHIFT, \
+                                                                    SMPR_PROTO_SPI_CHARLEN_FLAGS_SIZE)
+#define SMPR_PROTO_SPI_CHARLEN_FLAGS_W(value)       WBGEN2_GEN_WRITE(value, SMPR_PROTO_SPI_CHARLEN_FLAGS_SHIFT, \
+                                                        SMPR_PROTO_SPI_CHARLEN_FLAGS_SIZE)
+#define SMPR_PROTO_SPI_CHARLEN_FLAGS_R(reg)         WBGEN2_GEN_READ(reg, SMPR_PROTO_SPI_CHARLEN_FLAGS_SHIFT, \
+                                                        SMPR_PROTO_SPI_CHARLEN_FLAGS_SIZE)
 
 #endif
 

@@ -45,6 +45,7 @@
 #define SPI_PROTO_REG_CTRL                          0x00000010
 
 /* Definitions for SPI_PROTO_REG_CTRL */
+
 /*#define SPI_PROTO_CTRL_THREE_WIRE                   (1<<16)
 #define SPI_PROTO_CTRL_RES2                         (1<<15)
 #define SPI_PROTO_CTRL_DIR                          (1<<14)*/
@@ -66,6 +67,10 @@
                                                                             SPI_PROTO_CTRL_CHAR_LEN_SIZE)
 
 /* read-write whole register */
+#define SPI_PROTO_CTRL_SIZE                         16
+#define SPI_PROTO_CTRL_SHIFT                        0
+#define SPI_PROTO_CTRL_MASK                         WBGEN2_GEN_MASK(SPI_PROTO_CTRL_SHIFT, \
+                                                                    SPI_PROTO_CTRL_SIZE)
 #define SPI_PROTO_CTRL_W(value)                     (value)
 #define SPI_PROTO_CTRL_R(reg)                       (reg)
 
@@ -94,6 +99,16 @@
                                                                         SPI_PROTO_SS_SIZE)
 
 #define SPI_PROTO_REG_CFG_BIDIR                     0x0000001C
+
+/* Definitions for SPI_PROTO_REG_CFG_BIDIR */
+#define SPI_PROTO_CFG_BIDIR_SIZE                    1
+#define SPI_PROTO_CFG_BIDIR_SHIFT                   0
+#define SPI_PROTO_CFG_BIDIR_MASK                    WBGEN2_GEN_MASK(SPI_PROTO_CFG_BIDIR_SHIFT, \
+                                                                  SPI_PROTO_CFG_BIDIR_SIZE)
+#define SPI_PROTO_CFG_BIDIR_W(value)                WBGEN2_GEN_WRITE(value, SPI_PROTO_CFG_BIDIR_SHIFT, \
+                                                                          SPI_PROTO_CFG_BIDIR_SIZE)
+#define SPI_PROTO_CFG_BIDIR_R(reg)                  WBGEN2_GEN_READ(reg, SPI_PROTO_CFG_BIDIR_SHIFT, \
+                                                                          SPI_PROTO_CFG_BIDIR_SIZE)
 
 /* For RX data from MISO (single line) */
 #define SPI_PROTO_REG_RX0_SINGLE                    0x00000020
