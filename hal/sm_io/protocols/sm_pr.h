@@ -115,10 +115,10 @@ ssize_t smpr_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t
 /* Read data block from protocol, size in bytes */
 ssize_t smpr_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data, uint32_t flags);
 /* Write data block from protocol, size in bytes */
-ssize_t smpr_write_block (smpr_t *self, loff_t offs, size_t size, const uint32_t *data, uint32_t flags);
+ssize_t smpr_write_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data, uint32_t flags);
 /* Read data block via DMA from protocol, size in bytes */
 ssize_t smpr_read_dma (smpr_t *self, loff_t offs, size_t size, uint32_t *data, uint32_t flags);
 /* Write data block via DMA from protocol, size in bytes */
-ssize_t smpr_write_dma (smpr_t *self, loff_t offs, size_t size, const uint32_t *data, uint32_t flags);
+ssize_t smpr_write_dma (smpr_t *self, loff_t offs, size_t size, uint32_t *data, uint32_t flags);
 
 #endif
