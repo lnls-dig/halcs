@@ -49,7 +49,7 @@ void rw_param_send_client_response ( RW_REPLY_TYPE reply_code,
 
     /* Message is:
      * frame 0: error code          -> always sent
-     * frame 2: data out            -> sent only in read modes		*/
+     * frame 1: data out            -> sent only in read modes		*/
     int zerr = zmsg_addmem (report, &reply_code, sizeof(reply_code));
     ASSERT_TEST(zerr==0, "Could not add reply code in message", err_reply_code);
 
@@ -73,3 +73,42 @@ err_send_msg_alloc:
     zmsg_destroy (&report);
 }
 
+void send_client_response (RW_REPLY_TYPE reply_code, uint32_t reply_size,
+        uint32_t *data_out, bool with_data_frame, mdp_worker_t *worker,
+        zframe_t *reply_to)
+{
+
+    /* Send reply back to client */
+    zmsg_t *report = zmsg_new ();
+    ASSERT_ALLOC(report, err_send_msg_alloc);
+
+    /* Message is:
+     * frame 0: error code          -> always sent
+     * frame 1: size (in bytes)     -> sent only get_data_block
+     * frame 2: data                -> sent only get_data_block          */
+    int zerr = zmsg_addmem (report, &reply_code, sizeof(reply_code));
+    ASSERT_TEST(zerr==0, "Could not add reply code in message", err_reply_code);
+
+    if (with_data_frame) {
+        zerr = zmsg_addmem (report, &reply_size, sizeof(reply_size));
+        ASSERT_TEST(zerr==0, "Could not add reply size in message",
+                err_size_code);
+        zerr = zmsg_addmem (report, data_out, reply_size);
+        ASSERT_TEST(zerr==0, "Could not add reply data in message",
+                err_data_code);
+    }
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:acq] send_client_response: "
+            "Sending message:\n");
+#ifdef LOCAL_MSG_DBG
+    debug_log_print_zmq_msg (report);
+#endif
+    mdp_worker_send (worker, &report, reply_to);
+    return;
+
+err_data_code:
+err_size_code:
+err_reply_code:
+err_send_msg_alloc:
+    zmsg_destroy (&report);
+}

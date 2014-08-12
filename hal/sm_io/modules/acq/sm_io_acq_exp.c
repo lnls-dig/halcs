@@ -14,6 +14,7 @@
 #include "hal_assert.h"
 #include "ddr3_map.h"
 #include "board.h"
+#include "rw_param.h"
 #include "wb_acq_core_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -40,49 +41,6 @@
             smio_err_str (err_type))
 
 #define SMIO_ACQ_HANDLER(self) ((smio_acq_t *) self->smio_handler)
-
-/************************************************************/
-/******************** Local functions ***********************/
-/************************************************************/
-static void _send_client_response ( ACQ_REPLY_TYPE reply_code,
-        uint32_t reply_size, uint32_t *data_out,
-        bool with_data_frame, mdp_worker_t *worker,
-        zframe_t *reply_to ){
-
-    /* Send reply back to client */
-    zmsg_t *report = zmsg_new ();
-    ASSERT_ALLOC(report, err_send_msg_alloc);
-
-    /* Message is:
-     * frame 0: error code          -> always sent
-     * frame 1: size (in bytes)     -> sent only get_data_block
-     * frame 2: data                -> sent only get_data_block          */
-    int zerr = zmsg_addmem (report, &reply_code, sizeof(reply_code));
-    ASSERT_TEST(zerr==0, "Could not add reply code in message", err_reply_code);
-
-    if (with_data_frame) {
-        zerr = zmsg_addmem (report, &reply_size, sizeof(reply_size));
-        ASSERT_TEST(zerr==0, "Could not add reply size in message",
-                err_size_code);
-        zerr = zmsg_addmem (report, data_out, reply_size);
-        ASSERT_TEST(zerr==0, "Could not add reply data in message",
-                err_data_code);
-    }
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:acq] send_client_response: "
-            "Sending message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (report);
-#endif
-    mdp_worker_send (worker, &report, reply_to);
-    return;
-
-err_data_code:
-err_size_code:
-err_reply_code:
-err_send_msg_alloc:
-    zmsg_destroy (&report);
-}
 
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
@@ -113,7 +71,7 @@ static void *_acq_data_acquire (void *owner, void *args)
 
         /* Message is:
          * frame 0: error code      */
-        _send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
+        send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
                 self->worker, exp_msg->reply_to);
         goto err_smp_exceeded;
     }
@@ -125,7 +83,7 @@ static void *_acq_data_acquire (void *owner, void *args)
 
         /* Message is:
          * frame 0: error code      */
-        _send_client_response (ACQ_NUM_CHAN_OOR, 0, NULL, false,
+        send_client_response (ACQ_NUM_CHAN_OOR, 0, NULL, false,
                 self->worker, exp_msg->reply_to);
         goto err_smp_exceeded;
     }
@@ -196,7 +154,7 @@ static void *_acq_data_acquire (void *owner, void *args)
 
     /* Message is:
      * frame 0: error code      */
-    _send_client_response (ACQ_OK, 0, NULL, false, self->worker,
+    send_client_response (ACQ_OK, 0, NULL, false, self->worker,
             exp_msg->reply_to);
 
 err_smp_exceeded:
@@ -226,14 +184,14 @@ static void *_acq_check_data_acquire (void *owner, void *args)
                 "Acquisition is not done\n");
         /* Message is:
          * frame 0: error code  */
-        _send_client_response (ACQ_NOT_COMPLETED, 0, NULL, false, self->worker,
+        send_client_response (ACQ_NOT_COMPLETED, 0, NULL, false, self->worker,
                 exp_msg->reply_to);
         goto err_acq_check;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
             "Acquisition is done\n");
-    _send_client_response (ACQ_OK, 0, NULL, false, self->worker,
+    send_client_response (ACQ_OK, 0, NULL, false, self->worker,
             exp_msg->reply_to);
 err_acq_check:
     zmsg_destroy (exp_msg->msg);
@@ -285,7 +243,7 @@ static void *_acq_get_data_block (void *owner, void *args)
          * frame 0: error code
          * frame 1: size (in bytes)
          * frame 2: data            */
-        _send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
+        send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
                 exp_msg->reply_to);
         goto err_invalid_block;
     }
@@ -319,7 +277,7 @@ static void *_acq_get_data_block (void *owner, void *args)
          * frame 0: error code
          * frame 1: size (in bytes)
          * frame 2: data            */
-        _send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
+        send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
                 exp_msg->reply_to);
         goto err_invalid_block;
     }	/* Last valid data conditions check done */
@@ -355,7 +313,7 @@ static void *_acq_get_data_block (void *owner, void *args)
      * frame 0: error code
      * frame 1: size (in bytes)
      * frame 2: data            */
-    _send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
+    send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
             exp_msg->reply_to);
 
 err_invalid_block:

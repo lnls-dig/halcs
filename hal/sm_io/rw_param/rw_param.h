@@ -76,7 +76,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define GET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, var, \
         fmt_funcp, read_32_fp)                                                  \
     ({                                                                          \
-        RW_REPLY_TYPE err = RW_READ_OK;                                         \
+        RW_REPLY_TYPE err = RW_OK;                                         \
         uint32_t __value;                                                       \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
@@ -118,7 +118,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define SET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, value, \
         min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
 	({                                                                          \
-        RW_REPLY_TYPE err = RW_WRITE_OK;                                        \
+        RW_REPLY_TYPE err = RW_OK;                                        \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
 				"SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
@@ -231,9 +231,12 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                     smio_thsafe_client_write_32)
 
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max);
-void rw_param_send_client_response ( RW_REPLY_TYPE reply_code,
-			uint32_t data_out, bool with_data_frame,
-			mdp_worker_t *worker, zframe_t *reply_to);
+void rw_param_send_client_response (RW_REPLY_TYPE reply_code,
+        uint32_t data_out, bool with_data_frame, mdp_worker_t *worker,
+        zframe_t *reply_to);
+void send_client_response (RW_REPLY_TYPE reply_code, uint32_t reply_size,
+        uint32_t *data_out, bool with_data_frame, mdp_worker_t *worker,
+        zframe_t *reply_to);
 
 #endif
 

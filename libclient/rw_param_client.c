@@ -96,7 +96,7 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code,
             BPM_CLIENT_ERR_SERVER);
     /* Check for return code from server */
-    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_WRITE_OK,
+    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_OK,
             "rw_param_client: parameter SET error, try again",
             err_set_param, BPM_CLIENT_ERR_AGAIN);
 
@@ -138,7 +138,7 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
     /* Check for return code from server */
-    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_READ_OK,
+    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_OK,
             "rw_param_client: parameter GET error, try again",
             err_get_param, BPM_CLIENT_ERR_AGAIN);
 
