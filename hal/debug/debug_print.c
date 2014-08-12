@@ -90,7 +90,7 @@ void debug_set_log_file (FILE *log_file)
     _debug_set_log_file (log_file);
 }
 
-int debug_set_log (const char *log_file_name)
+int debug_set_log (const char *log_file_name, const char *mode)
 {
     int err = -1;    /* Error */
     FILE *log_file = NULL;
@@ -105,7 +105,14 @@ int debug_set_log (const char *log_file_name)
             err = 2;
         }
         else {
-            log_file = fopen (log_file_name, "w");
+            if (mode == NULL) {
+                /* Be conservative if no mode is specified */
+                log_file = fopen (log_file_name, "a");
+            }
+            else {
+                log_file = fopen (log_file_name, mode);
+            }
+
             err = 0;
 
             if (log_file == NULL) {
