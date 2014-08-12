@@ -45,6 +45,8 @@
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr:spi]",                    \
             smpr_err_str (err_type))
 
+#define SM_PR_READBACK 1
+
 static smpr_err_e _spi_init (smpr_t *self);
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         size_t size, spi_mode_e mode, uint32_t flags);
@@ -113,8 +115,9 @@ int spi_open (smpr_t *self, uint32_t base, void *args)
             "\tconfig register = 0x%08X\n",
             spi_proto->sys_freq, spi_proto->spi_freq, spi_proto->init_config);
 
-    _spi_init (self);
     self->proto_handler = spi_proto;
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Initializing SPI protocol\n");
+    _spi_init (self);
 
     return 0;
 
@@ -219,11 +222,12 @@ static smpr_err_e _spi_init (smpr_t *self)
 {
     assert (self);
 
-    //RW_REPLY_TYPE rw_err = RW_READ_OK;
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Inside _spi_init\n");
     smpr_err_e err = SMPR_SUCCESS;
     smio_t *parent = SMPR_PARENT(self);
     smpr_proto_spi_t *spi_proto = SMPR_PROTO_SPI(self);
 
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Calculating SPI frequency\n");
     /* Set SPI clock */
 	float f_freq = (float) spi_proto->sys_freq/(2.0 * (float) spi_proto->spi_freq) - 1.0;
 	uint32_t freq = SPI_PROTO_DIVIDER_W((uint16_t) f_freq);
@@ -231,8 +235,11 @@ static smpr_err_e _spi_init (smpr_t *self)
     /* Configure SPI divider register */
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI divider = %u\n", freq);
-    smio_thsafe_client_write_32 (parent, spi_proto->base | SPI_PROTO_REG_DIVIDER,
-            &freq);
+    RW_REPLY_TYPE rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, DIVIDER, /* field = NULL */,
+            MULT_BIT_PARAM, /* value */ freq, /* min */, /* max */,
+            NO_CHK_FUNC, SET_FIELD);
+    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set freq parameter", err_exit,
+            SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
     /* Readback test */
@@ -247,8 +254,11 @@ static smpr_err_e _spi_init (smpr_t *self)
     /* Configure config register */
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI config register = 0x%08X\n", spi_proto->init_config);
-    smio_thsafe_client_write_32 (parent, spi_proto->base | SPI_PROTO_REG_CTRL,
-            &spi_proto->init_config);
+    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, /* field = NULL */,
+            MULT_BIT_PARAM, /* value */ spi_proto->init_config, /* min */, /* max */,
+            NO_CHK_FUNC, SET_FIELD);
+    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set control parameter", err_exit,
+            SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
     /* Readback test */
@@ -264,8 +274,11 @@ static smpr_err_e _spi_init (smpr_t *self)
     /* Configure BIDIR register */
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI bidir register = 0x%08X\n", bidir);
-    smio_thsafe_client_write_32 (parent, spi_proto->base | SPI_PROTO_REG_CFG_BIDIR,
-            &bidir);
+    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CFG_BIDIR, /* field = NULL */,
+            MULT_BIT_PARAM, /* value */ bidir, /* min */, /* max */,
+            NO_CHK_FUNC, SET_FIELD);
+    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set bidir parameter", err_exit,
+            SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
     /* Readback test */
@@ -277,6 +290,7 @@ static smpr_err_e _spi_init (smpr_t *self)
     assert (config_rb == spi_proto->init_config);
 #endif
 
+err_exit:
     return err;
 }
 
@@ -297,23 +311,23 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     smpr_proto_spi_t *spi_proto = SMPR_PROTO_SPI(self);
 
     uint32_t config;
-    rw_err = GET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO,
+    rw_err = GET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO,
             CTRL, /* field = NULL */, MULT_BIT_PARAM, config, NO_FMT_FUNC);
     ASSERT_TEST(rw_err == RW_READ_OK, "Could not get CONFIG parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] _spi_rw_generic: config register = 0x%08X\n", config);
+            "[sm_pr:spi] _spi_rw_generic: Config register = 0x%08X\n", config);
 
     /* Decode flags */
     uint32_t ss = SMPR_PROTO_SPI_SS_FLAGS_R(flags);
     uint32_t charlen = SMPR_PROTO_SPI_CHARLEN_FLAGS_R(flags);
 
     /* Configure SS line */
-    rw_err = SET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
+    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
             MULT_BIT_PARAM, /* value */ ss, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
     ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set SS parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] _spi_rw_generic: ss register = 0x%08X\n", ss);
+            "[sm_pr:spi] _spi_rw_generic: SS register = 0x%08X\n", ss);
 
     /* Configure character length. For the opencores SPI,
      * 0 is 128-bit data word, 1 is 1 bit, 2 is 2-bit and so on */
@@ -321,7 +335,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         charlen = 0;
     }
 
-    rw_err = SET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO, CTRL, CHAR_LEN,
+    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, CHAR_LEN,
             MULT_BIT_PARAM, /* value */ charlen, /* min */ , /* max */,
             NO_CHK_FUNC, SET_FIELD);
     ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set CHAR_LEN parameter", err_exit, -1);
@@ -337,18 +351,18 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 
         uint32_t i;
         /* We write 32-bit at a time */
+
 		for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
             /* As the TXs are just a single register, we write using the SMIO
              * functions directly */
-            num_bytes = smio_thsafe_client_write_32 (parent, (spi_proto->base | SPI_PROTO_REG_TX0)
-                    + i*SMPR_WB_REG_2_BYTE, (uint32_t *) (data_write + SMPR_WB_REG_2_BYTE*i));
+            DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
+                    "[sm_pr:spi] _spi_rw_generic: Writing 0x%08X to TX%u\n",
+                    *((uint32_t *) (data_write + SMPR_WB_REG_2_BYTE*i)), i);
+            num_bytes = smio_thsafe_client_write_32 (parent,
+                    (spi_proto->base | SPI_PROTO_REG_TX0) + i*SMPR_WB_REG_2_BYTE,
+                    (uint32_t *) (data_write + SMPR_WB_REG_2_BYTE*i));
             err += (num_bytes == -1) ? 0 : num_bytes;
             ASSERT_TEST(num_bytes != -1, "Could not set TX register", err_exit);
-#if 0
-                SET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO, TX0,
-                    /* field = NULL */, MULT_BIT_PARAM, /* value */ data[i],
-                    /* min */, /* max */, NO_CHK_FUNC, SET_FIELD);
-#endif
 		}
 
         /* Return error if we could not write everything */
@@ -357,22 +371,22 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     }
 
     /* Start transfer */
-    rw_err = SET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO, CTRL, GO_BSY,
+    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, GO_BSY,
             SINGLE_BIT_PARAM, /* value */ 1, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
     ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] _spi_rw_generic: transfer started\n");
+            "[sm_pr:spi] _spi_rw_generic: Transfer started\n");
 
     /* Check for completion */
-    uint32_t done = 0;
+    uint32_t busy = 0;
     uint32_t tries = 0;
     while (1) {
-        rw_err = GET_PARAM(parent, "sm_pr_spi", spi_proto->base, SPI_PROTO,
-                CTRL, BSY, SINGLE_BIT_PARAM, done, NO_FMT_FUNC);
+        rw_err = GET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO,
+                CTRL, BSY, SINGLE_BIT_PARAM, busy, NO_FMT_FUNC);
         ASSERT_TEST(rw_err == RW_READ_OK, "Could not get BUSY parameter", err_exit, -1);
 
-        if (done == 1) {
+        if (!busy) {
             break;
         }
 
@@ -381,22 +395,34 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         ASSERT_TEST(tries < SM_PR_SPI_MAX_TRIES, "Transfer timeout", err_exit, -1);
     }
 
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
+            "[sm_pr:spi] _spi_rw_generic: Wait completed successfully\n");
+
     /* Reset byte counter */
     err = 0;
 
     /* Read data from RX regsiters */
     uint32_t i;
+    uint8_t data_read[SPI_PROTO_REG_RXTX_NUM * SMPR_WB_REG_2_BYTE] = {0};
     /* We read 32-bit at a time */
-    for (i = 0; i < size; ++i) {
+    for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+        DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
+                "[sm_pr:spi] _spi_rw_generic: Reading from RX%u\n", i);
         /* As the RXs are just a single register, we write using the SMIO
          * functions directly */
-        num_bytes = smio_thsafe_client_write_32 (parent, (spi_proto->base |
-                SPI_PROTO_REG_RX0_SINGLE) + sizeof(uint32_t)*i,
-                (uint32_t *)(data + sizeof(uint32_t)*i));
+        num_bytes = smio_thsafe_client_read_32 (parent,
+                (spi_proto->base | SPI_PROTO_REG_RX0_SINGLE) + SMPR_WB_REG_2_BYTE*i,
+                (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
+        DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
+                "[sm_pr:spi] _spi_rw_generic: Read 0x%08X from RX%u\n",
+                *((uint32_t *) (data_read + SMPR_WB_REG_2_BYTE*i)), i);
         err += (num_bytes == -1) ? 0 : num_bytes;
         /* Return the number of bytes effectively read */
         ASSERT_TEST(num_bytes != -1, "Could not set RX regsiter", err_exit);
     }
+
+    /* TODO: Reduce the ammount of memcpy () throughout this simple code*/
+    memcpy (data, data_read, size);
 
 err_exit:
 err_inv_size:
