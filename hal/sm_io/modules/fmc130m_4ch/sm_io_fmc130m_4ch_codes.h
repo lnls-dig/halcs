@@ -11,12 +11,16 @@
 #include <inttypes.h>
 
 /* Messaging OPCODES */
-#define FMC130M_4CH_OPCODE_SIZE         (sizeof(uint32_t))
-#define FMC130M_4CH_OPCODE_TYPE         uint32_t
+#define FMC130M_4CH_OPCODE_SIZE                 (sizeof(uint32_t))
+#define FMC130M_4CH_OPCODE_TYPE                 uint32_t
 
-#define FMC130M_4CH_OPCODE_LEDS         0
-#define FMC130M_4CH_NAME_LEDS           "leds"
-#define FMC130M_4CH_OPCODE_END          1
+#define FMC130M_4CH_OPCODE_LEDS                 0
+#define FMC130M_4CH_NAME_LEDS                   "leds"
+#define FMC130M_4CH_OPCODE_PLL_FUNCTION         1
+#define FMC130M_4CH_NAME_PLL_FUNCTION           "pll_function"
+#define FMC130M_4CH_OPCODE_AD9510_CFG_TEST      2
+#define FMC130M_4CH_NAME_AD9510_CFG_TEST        "ad9510_cfg_test"
+#define FMC130M_4CH_OPCODE_END                  3
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_SIZE          (sizeof(uint32_t))

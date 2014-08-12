@@ -10,9 +10,10 @@
 
 #include <inttypes.h>
 #include "sm_io_err.h"
+#include "sm_ch_ad9510.h"
 
 struct _smio_fmc130m_4ch_t {
-    uint32_t dummy;                 /* Just a dummy value to illustrate the idea */
+    smch_ad9510_t *smch_ad9510;         /* AD9510 chip handler */
 };
 
 /* Opaque class structure */
@@ -20,9 +21,9 @@ typedef struct _smio_fmc130m_4ch_t smio_fmc130m_4ch_t;
 
 /***************** Our methods *****************/
 
-/* Creates a new instance of the smio realizationn */
-smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (uint32_t dummy);
-/* Destroys the smio realizationn */
+/* Creates a new instance of the smio realization */
+smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent);
+/* Destroys the smio realization */
 smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p);
 
 #endif

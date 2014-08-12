@@ -9,10 +9,12 @@
 
 #include "sm_io_fmc130m_4ch_exp.h"
 #include "sm_io_fmc130m_4ch_codes.h"
+#include "sm_io_fmc130m_4ch_defaults.h"
 #include "sm_io.h"
 #include "dev_io.h"
 #include "board.h"
 #include "hal_assert.h"
+#include "rw_param.h"
 #include "wb_fmc130m_4ch_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -38,6 +40,9 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
+#define SMIO_FMC130_HANDLER(self) ((smio_fmc130m_4ch_t *) self->smio_handler)
+#define SMIO_AD9510_HANDLER(self) ((smch_ad9510_t *) SMIO_FMC130_HANDLER(self)->smch_ad9510)
+
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
@@ -58,13 +63,43 @@ static void *_fmc130m_4ch_leds (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Led write: 0x%08x\n",
             leds);
 
-    /* Don't send any response, for now... */
+    zmsg_destroy (exp_msg->msg);
+    return NULL;
+}
 
+#define BPM_FMC130M_4CH_PLL_FUNC_MIN            0 /* PLL FUNCTION pin 0 */
+#define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
+
+RW_PARAM_FUNC(fmc130m_4ch, pll_func) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            CLK_DISTRIB, PLL_FUNCTION, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_PLL_FUNC_MIN, BPM_FMC130M_4CH_PLL_FUNC_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+static void *_fmc130m_4ch_ad9510_cfg_test (void *owner, void *args)
+{
+    assert (owner);
+    assert (args);
+
+    smio_t *self = (smio_t *) owner;
+    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
+    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
+    assert (zmsg_size (*exp_msg->msg) > 0);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_ad9510_config_test\n");
+    smch_ad9510_config_test (smch_ad9510);
+
+    zmsg_destroy (exp_msg->msg);
     return NULL;
 }
 
 const smio_exp_ops_t fmc130m_exp_ops [] = {
     {.name = FMC130M_4CH_NAME_LEDS, .opcode = FMC130M_4CH_OPCODE_LEDS, .func_fp = _fmc130m_4ch_leds},
+    {.name = FMC130M_4CH_NAME_PLL_FUNCTION, .opcode = FMC130M_4CH_OPCODE_PLL_FUNCTION,
+        .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func)},
+    {.name = FMC130M_4CH_NAME_AD9510_CFG_TEST, .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_TEST,
+        .func_fp = _fmc130m_4ch_ad9510_cfg_test},
     {.name = NULL, .opcode = 0, .func_fp = NULL} /* Must end with this NULL pattern */
 };
 
@@ -148,7 +183,7 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
     self->exp_ops = fmc130m_exp_ops;
 
     /* Initialize specific structure */
-    self->smio_handler = smio_fmc130m_4ch_new (0);
+    self->smio_handler = smio_fmc130m_4ch_new (self);
     ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
     return err;
@@ -175,5 +210,6 @@ smio_err_e fmc130m_4ch_shutdown (smio_t *self)
 
 const smio_bootstrap_ops_t fmc130m_4ch_bootstrap_ops = {
     .init = fmc130m_4ch_init,
-    .shutdown = fmc130m_4ch_shutdown
+    .shutdown = fmc130m_4ch_shutdown,
+    .config_defaults = fmc130m_4ch_config_defaults
 };

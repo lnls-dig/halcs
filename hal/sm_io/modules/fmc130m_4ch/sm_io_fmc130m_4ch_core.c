@@ -12,6 +12,8 @@
 #include "sm_io_fmc130m_4ch_core.h"
 #include "sm_io_err.h"
 #include "hal_assert.h"
+#include "hal_stddef.h"
+#include "board.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,15 +39,20 @@
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (uint32_t dummy)
+smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
 {
+    (void) parent;
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->dummy = dummy;
+    self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS /* Offset
+                to the beggining of the SMIO base */, FMC130M_4CH_AD9510_ADDR, 0);
+    ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
 
     return self;
 
+err_smch_ad9510_alloc:
+    free (self);
 err_self_alloc:
     return NULL;
 }
@@ -58,6 +65,7 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc130m_4ch_t *self = *self_p;
 
+        smch_ad9510_destroy (&self->smch_ad9510);
         free (self);
         *self_p = NULL;
     }
