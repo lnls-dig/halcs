@@ -169,7 +169,7 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    bpm_client_err_e err = bpm_get_curve (bpm_client, "BPM0:DEVIO:ACQ", &acq_trans);
+    bpm_client_err_e err = bpm_get_curve (bpm_client, "BPM0:DEVIO:ACQ0", &acq_trans);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
         goto err_bpm_get_curve;

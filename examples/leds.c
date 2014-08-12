@@ -68,7 +68,7 @@ int main (int argc, char *argv [])
                 break;
             }
 
-            bpm_blink_leds (bpm_client, "BPM0:DEVIO:FMC130M_4CH", leds);
+            bpm_blink_leds (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", leds);
             usleep (80000);
             leds <<= 1;
         }
