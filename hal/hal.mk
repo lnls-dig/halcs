@@ -12,7 +12,8 @@ include hal/boards/boards.mk
 
 std_hal_INCLUDE_DIRS = hal/include \
 		       hal/include/hw \
-		       hal/include/protocols
+		       hal/include/protocols \
+		       hal/include/chips
 
 hal_OUT += $(dev_mngr_OUT) $(dev_io_OUT)
 
