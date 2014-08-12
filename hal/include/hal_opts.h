@@ -31,6 +31,7 @@
  *  DBG_MSG
  *  DBG_LIB_CLIENT
  *  DBG_SM_PR
+ *  DBG_SM_CH
  */
 
 #define DBG_SUBSYS_ON           (\
@@ -38,9 +39,10 @@
                                  DBG_DEV_IO      | \
                                  DBG_SM_IO       | \
                                  DBG_LIB_CLIENT  | \
+                                 DBG_SM_PR       | \
+                                 DBG_SM_CH       | \
+                                 DBG_LL_IO       | \
                                  DBG_HAL_UTILS)
-/*                                 DBG_LL_IO       | \ */
 /*                                 DBG_MSG         | \ */
-/*                                 DBG_SM_PR       | \ */
 
 #endif
