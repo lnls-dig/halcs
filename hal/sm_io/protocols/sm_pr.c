@@ -59,6 +59,8 @@ smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
 
     /* Initilialize SMIO parent */
     self->parent = parent;
+    ASSERT_TEST(self->parent != NULL, "SMIO parent cannot be NULL",
+            err_parent_null);
 
     /* Attach protocol operation to instance of smpr */
     smpr_err_e err = _smpr_register_proto_ops (type, &self->ops);
@@ -69,6 +71,7 @@ smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
     return self;
 
 err_register_ops:
+err_parent_null:
     free (self->name);
 err_name_alloc:
     free (self);
