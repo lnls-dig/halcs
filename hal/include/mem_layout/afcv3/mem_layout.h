@@ -85,56 +85,67 @@
  */
 
 /* FMC_130M Components */
-#define FMC_130M_CTRL_REGS_OFFS                     (BAR4_ADDR | FMC_130M_CTRL_RAW_REGS_OFFS)
-#define FMC_130M_SI571_I2C_OFFS                     (BAR4_ADDR | FMC_130M_SI571_I2C_RAW_OFFS)
-#define FMC_130M_AD9510_SPI_OFFS                    (BAR4_ADDR | FMC_130M_AD9510_RAW_SPI_OFFS)
-#define FMC_130M_EEPROM_I2C_OFFS                    (BAR4_ADDR | FMC_130M_EEPROM_RAW_I2C_OFFS)
-#define FMC_130M_LM75A_I2C_OFFS                     (BAR4_ADDR | FMC_130M_LM75A_RAW_I2C_OFFS)
+#define FMC_130M_CTRL_REGS_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_CTRL_RAW_REGS_OFFS)
+#define FMC_130M_SI571_I2C_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_SI571_I2C_RAW_OFFS)
+#define FMC_130M_AD9510_SPI_OFFS                    (/*BAR4_ADDR |*/ FMC_130M_AD9510_RAW_SPI_OFFS)
+#define FMC_130M_EEPROM_I2C_OFFS                    (/*BAR4_ADDR |*/ FMC_130M_EEPROM_RAW_I2C_OFFS)
+#define FMC_130M_LM75A_I2C_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_LM75A_RAW_I2C_OFFS)
 
 /* DSP Components */
-#define DSP_CTRL_REGS_OFFS                          (BAR4_ADDR | DSP_CTRL_RAW_REGS_OFFS)
-#define DSP_BPM_SWAP_OFFS                           (BAR4_ADDR | DSP_BPM_RAW_SWAP_OFFS)
+#define DSP_CTRL_REGS_OFFS                          (/*BAR4_ADDR |*/ DSP_CTRL_RAW_REGS_OFFS)
+#define DSP_BPM_SWAP_OFFS                           (/*BAR4_ADDR |*/ DSP_BPM_RAW_SWAP_OFFS)
 
 /* Wishbone Addresses */
 #define FMC1_130M_BASE_ADDR                         (BAR4_ADDR | FMC1_130M_BASE_RAW_ADDR)
 
-#define FMC1_130M_CTRL_REGS                         (BAR4_ADDR | FMC1_130M_CTRL_RAW_REGS)
-#define FMC1_130M_SI571_I2C                         (BAR4_ADDR | FMC1_130M_SI571_RAW_I2C)
-#define FMC1_130M_AD9510_SPI                        (BAR4_ADDR | FMC1_130M_AD9510_RAW_SPI)
-#define FMC1_130M_EEPROM_I2C                        (BAR4_ADDR | FMC1_130M_EEPROM_RAW_I2C)
-#define FMC1_130M_LM75A_I2C                         (BAR4_ADDR | FMC1_130M_LM75A_RAW_I2C)
+#define FMC1_130M_CTRL_REGS                         (/*BAR4_ADDR |*/ FMC1_130M_CTRL_RAW_REGS)
+#define FMC1_130M_SI571_I2C                         (/*BAR4_ADDR |*/ FMC1_130M_SI571_RAW_I2C)
+#define FMC1_130M_AD9510_SPI                        (/*BAR4_ADDR |*/ FMC1_130M_AD9510_RAW_SPI)
+#define FMC1_130M_EEPROM_I2C                        (/*BAR4_ADDR |*/ FMC1_130M_EEPROM_RAW_I2C)
+#define FMC1_130M_LM75A_I2C                         (/*BAR4_ADDR |*/ FMC1_130M_LM75A_RAW_I2C)
 
 #define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
 
-#define DSP1_CTRL_REGS                              (BAR4_ADDR | DSP1_CTRL_RAW_REGS)
-#define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
+#define DSP1_CTRL_REGS                              (/*BAR4_ADDR |*/ DSP1_CTRL_RAW_REGS)
+#define DSP1_BPM_SWAP                               (/*BAR4_ADDR |*/ DSP1_BPM_RAW_SWAP)
 
 #define WB_ACQ_BASE_ADDR                            (BAR4_ADDR | WB_ACQ_BASE_RAW_ADDR)
 
 #define FMC2_130M_BASE_ADDR                         (BAR4_ADDR | FMC2_130M_BASE_RAW_ADDR)
 
-#define FMC2_130M_CTRL_REGS                         (BAR4_ADDR | FMC2_130M_CTRL_RAW_REGS)
-#define FMC2_130M_SI571_I2C                         (BAR4_ADDR | FMC2_130M_SI571_RAW_I2C)
-#define FMC2_130M_AD9510_SPI                        (BAR4_ADDR | FMC2_130M_AD9510_RAW_SPI)
-#define FMC2_130M_EEPROM_I2C                        (BAR4_ADDR | FMC2_130M_EEPROM_RAW_I2C)
-#define FMC2_130M_LM75A_I2C                         (BAR4_ADDR | FMC2_130M_LM75A_RAW_I2C)
+#define FMC2_130M_CTRL_REGS                         (/*BAR4_ADDR |*/ FMC2_130M_CTRL_RAW_REGS)
+#define FMC2_130M_SI571_I2C                         (/*BAR4_ADDR |*/ FMC2_130M_SI571_RAW_I2C)
+#define FMC2_130M_AD9510_SPI                        (/*BAR4_ADDR |*/ FMC2_130M_AD9510_RAW_SPI)
+#define FMC2_130M_EEPROM_I2C                        (/*BAR4_ADDR |*/ FMC2_130M_EEPROM_RAW_I2C)
+#define FMC2_130M_LM75A_I2C                         (/*BAR4_ADDR |*/ FMC2_130M_LM75A_RAW_I2C)
 
 #define DSP2_BASE_ADDR                              (BAR4_ADDR | DSP2_BASE_RAW_ADDR)
 
-#define DSP2_CTRL_REGS                              (BAR4_ADDR | DSP2_CTRL_RAW_REGS)
-#define DSP2_BPM_SWAP                               (BAR4_ADDR | DSP2_BPM_RAW_SWAP)
+#define DSP2_CTRL_REGS                              (/*BAR4_ADDR |*/ DSP2_CTRL_RAW_REGS)
+#define DSP2_BPM_SWAP                               (/*BAR4_ADDR |*/ DSP2_BPM_RAW_SWAP)
 
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
 
-/************************* ML605 Gateware Options *************************/
+/************************* AFCv3 Gateware Options *************************/
 
+/********************* FMC130M_4CH SMIO Gateware Options ******************/
+
+/* Chip SPI slave select lines and I2C address */
+#define FMC130M_4CH_SI571_ADDR                      0x49
+#define FMC130M_4CH_AD9510_ADDR                     0x01
+#define FMC130M_4CH_EEPROM_ADDR                     0x50
+#define FMC130M_4CH_LM75A1_ADDR                     0x49
+#define FMC130M_4CH_LM75A2_ADDR                     0x48
 
 /*********************** SMIO ACQ Gateware Options ***********************/
 /* FIXME: The Gateware does not support yet a way of reading which
  * ACQ channels are valid. So, we hardcoded it here for now. This issue
  * should be addressed soon */
-#define SMIO_ACQ_NUM_CHANNELS                       5
+
+/* We define 10 Channels: ADC 1, TBT AMP 1, TBT POS 1, FOFB AMP 1, FOFB POS 1,
+ * ADC 2, TBT AMP 2, TBT POS 2, FOFB AMP 2, FOFB POS 2 */
+#define SMIO_ACQ_NUM_CHANNELS                       10
 
 #endif
 
