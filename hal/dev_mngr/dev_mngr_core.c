@@ -38,6 +38,7 @@
 
 #define LOG_FILENAME_LEN            50
 #define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
+#define DEVMNGR_DFLT_LOG_MODE       "w"
 
 #define DEVIO_DEV_NAME_LEN          20
 #define DEVIO_DEV_NAME              "/dev/fpga%d"
@@ -64,7 +65,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_filename);
+    debug_set_log (log_filename, DEVMNGR_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEV_MNGR worker"
             " with \n\tdiscovery endpoint (ignored for now) %s, with logfile %s"

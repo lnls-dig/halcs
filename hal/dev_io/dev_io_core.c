@@ -41,8 +41,9 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io_core]",             \
             devio_err_str (err_type))
 
-#define LLIO_STR ":LLIO\0"
-#define DEVIO_POLLER_TIMEOUT 100        /* in msec */
+#define LLIO_STR                            ":LLIO\0"
+#define DEVIO_POLLER_TIMEOUT                100        /* in msec */
+#define DEVIO_DFLT_LOG_MODE                 "w"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -61,7 +62,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_file_name);
+    debug_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     char *dev_type_c = llio_type_to_str (type);
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"

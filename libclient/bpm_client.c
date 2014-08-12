@@ -38,18 +38,50 @@
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient]",           \
             bpm_client_err_str (err_type))
 
+#define BPMCLIENT_DFLT_LOG_MODE             "w"
+
+static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode);
+
 /********************************************************/
 /************************ Our API ***********************/
 /********************************************************/
-
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name)
+{
+    return _bpm_client_new (broker_endp, verbose, log_file_name,
+            BPMCLIENT_DFLT_LOG_MODE);
+}
+
+bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode)
+{
+    return _bpm_client_new (broker_endp, verbose, log_file_name,
+            log_mode);
+}
+
+void bpm_client_destroy (bpm_client_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        bpm_client_t *self = *self_p;
+
+        self->acq_buf = NULL;
+        mdp_client_destroy (&self->mdp_client);
+        *self_p = NULL;
+    }
+}
+
+/**************** Static LIB Client Functions ****************/
+static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode)
 {
     assert (broker_endp);
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_file_name);
+    debug_set_log (log_file_name, log_mode);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
@@ -71,19 +103,6 @@ err_mdp_client:
     free (self);
 err_self_alloc:
     return NULL;
-}
-
-void bpm_client_destroy (bpm_client_t **self_p)
-{
-    assert (self_p);
-
-    if (*self_p) {
-        bpm_client_t *self = *self_p;
-
-        self->acq_buf = NULL;
-        mdp_client_destroy (&self->mdp_client);
-        *self_p = NULL;
-    }
 }
 
 /**************** FMC130M SMIO Functions ****************/
