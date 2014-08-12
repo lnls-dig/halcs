@@ -73,21 +73,22 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define RW_PARAM_FUNC(module, reg)                                              \
         static void *RW_PARAM_FUNC_NAME(module, reg) (void *owner, void *args)
 
-/* TODO: add error checking for reading */
-#define GET_PARAM(smio, module, base_addr, prefix, reg, field, single_bit, var, \
-        fmt_funcp)                                                              \
+#define GET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, var, \
+        fmt_funcp, read_32_fp)                                                  \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_READ_OK;                                         \
         uint32_t __value;                                                       \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", addr); \
-		ssize_t __ret = smio_thsafe_client_read_32 (smio, addr, &__value);      \
+				"GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", \
+                smio->base | addr);                                             \
+        ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(smio, addr,     \
+            &__value);                                                          \
                                                                                 \
         if (__ret != sizeof(uint32_t)) {                                        \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] "   \
                 "SET_PARAM_" #reg "_" #field ": Number of bytes read (%ld)\n"   \
-                "does not match the request (%lu)\n", __ret, sizeof(uint32_t));  \
+                "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
             err = RW_READ_EAGAIN;                                               \
         }                                                                       \
                                                                                 \
@@ -102,24 +103,31 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
 				"GET_PARAM_" #reg "_" #field " = 0x%08x\n", __value);           \
         if (fmt_funcp != NULL) {                                                \
+            ((rw_param_format_fp) fmt_funcp) (&__value);                        \
         }                                                                       \
         var = __value;                                                          \
         err;                                                                    \
      })
 
+#define GET_PARAM(smio, module, base_addr, prefix, reg, field, single_bit, var, \
+        fmt_funcp)                                                              \
+            GET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, var, \
+               fmt_funcp, smio_thsafe_client_read_32)
+
 /* SET or CLEAR parameter based on the last macro parameter "clr_field" */
-#define SET_PARAM(smio, module, base_addr, prefix, reg, field, single_bit, value, \
-        min, max, chk_funcp, clr_field)                                         \
+#define SET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, value, \
+        min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
 	({                                                                          \
         RW_REPLY_TYPE err = RW_WRITE_OK;                                        \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
 				"SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
-                value, addr);                                                   \
+                value, smio->base | addr);                                      \
 		if (EXPAND_CHECK_LIM_NE(min, max)                                       \
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
             uint32_t __write_value;                                             \
-            ssize_t __ret = smio_thsafe_client_read_32 (smio, addr, &__write_value);\
+            ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(smio,       \
+                addr, &__write_value);                                          \
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
@@ -144,7 +152,9 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                         )                                                       \
                     )                                                           \
             ;                                                                   \
-            __ret = smio_thsafe_client_write_32 (smio, addr, &__write_value);   \
+            __ret = ((thsafe_client_write_32_fp) write_32_fp)(smio, addr,       \
+                &__write_value);                                                \
+                                                                                \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
                         "SET_PARAM_" #reg "_" #field ": Number of bytes written (%ld)\n" \
@@ -154,7 +164,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
             else {                                                              \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] " \
                         "SET_PARAM_" #reg "_" #field ": updated 0x%08x to address 0x%08x\n", \
-                        __write_value, addr);                                   \
+                        __write_value, smio->base | addr);                      \
             }                                                                   \
         }                                                                       \
         else {                                                                  \
@@ -166,13 +176,19 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         err;                                                                    \
 	})
 
+#define SET_PARAM(smio, module, base_addr, prefix, reg, field, single_bit, value, \
+        min, max, chk_funcp, clr_field)                                         \
+            SET_PARAM_GEN(smio, module, base_addr, prefix, reg, field, single_bit, value, \
+                min, max, chk_funcp, clr_field, smio_thsafe_client_read_32,     \
+                    smio_thsafe_client_write_32)
+
 /* zmq message in SET_GET_PARAM macro is:
  * frame 0: operation code
  * frame 1: rw		R /W	1 = read mode, 0 = write mode
  * frame 2: value to be written (only when rw = 0)
  * */
-#define SET_GET_PARAM(module, base_addr, prefix, reg, field, single_bit, min,   \
-        max, chk_funcp, fmt_funcp, clr_field)                                   \
+#define SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
+        max, chk_funcp, fmt_funcp, clr_field, read_32_fp, write_32_fp)          \
 	do {                                                                        \
 		assert (owner);                                                         \
 		assert (args);                                                          \
@@ -188,8 +204,8 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 				"SET_GET_PARAM_"#reg": rw = %u\n", rw);                         \
 		if (rw)	{                                                               \
             uint32_t value;                                                     \
-            RW_REPLY_TYPE set_param_return = GET_PARAM(smio, module, base_addr, \
-                    prefix, reg, field, single_bit, value, fmt_funcp);          \
+            RW_REPLY_TYPE set_param_return = GET_PARAM_GEN(smio, module, base_addr, \
+                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp); \
             rw_param_send_client_response (set_param_return, value, true,       \
                     smio->worker, exp_msg->reply_to);                           \
         }                                                                       \
@@ -198,14 +214,21 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
             uint32_t value = *(uint32_t *)                                      \
                              zframe_data (value_frame);                         \
             zframe_destroy (&value_frame);                                      \
-            RW_REPLY_TYPE set_param_return = SET_PARAM(smio, module, base_addr, \
-                    prefix, reg, field, single_bit, value, min, max, chk_funcp, clr_field); \
+            RW_REPLY_TYPE set_param_return = SET_PARAM_GEN(smio, module, base_addr, \
+                    prefix, reg, field, single_bit, value, min, max, chk_funcp, \
+                    clr_field, read_32_fp, write_32_fp);                        \
             rw_param_send_client_response (set_param_return, 0, false,          \
                     smio->worker, exp_msg->reply_to);                           \
         }                                                                       \
 		zmsg_destroy (exp_msg->msg);                                            \
 		return NULL;                                                            \
 	} while (0)
+
+#define SET_GET_PARAM(module, base_addr, prefix, reg, field, single_bit, min,   \
+        max, chk_funcp, fmt_funcp, clr_field)                                   \
+            SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
+                max, chk_funcp, fmt_funcp, clr_field, smio_thsafe_client_read_32, \
+                    smio_thsafe_client_write_32)
 
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max);
 void rw_param_send_client_response ( RW_REPLY_TYPE reply_code,
