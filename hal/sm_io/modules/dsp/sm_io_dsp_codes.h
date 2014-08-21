@@ -34,28 +34,6 @@
 #define DSP_NAME_SET_GET_DDS_FREQ			"set_get_dds_freq"
 
 #define DSP_OPCODE_END                  	4
-
-#define DSP_OPCODE_SET_GET_SW_ON			3
-#define DSP_NAME_SET_GET_SW_ON				"set_get_sw_on"
-#define DSP_OPCODE_SET_GET_SW_OFF			4
-#define DSP_NAME_SET_GET_SW_OFF				"set_get_sw_off"
-#define DSP_OPCODE_SET_GET_SW_CLK_EN_ON		5
-#define DSP_NAME_SET_GET_SW_CLK_EN_ON		"set_get_sw_clk_en_on"
-#define DSP_OPCODE_SET_GET_SW_CLK_EN_OFF	6
-#define DSP_NAME_SET_GET_SW_CLK_EN_OFF		"set_get_sw_clk_en_off"
-#define DSP_OPCODE_SET_GET_SW_DIVCLK		7
-#define DSP_NAME_SET_GET_SW_DIVCLK			"set_get_sw_divclk"
-#define DSP_OPCODE_SET_GET_SW_PHASE			8
-#define DSP_NAME_SET_GET_SW_PHASE			"set_get_sw_phase"
-#define DSP_OPCODE_SET_GET_WDW_ON			9
-#define DSP_NAME_SET_GET_WDW_ON				"set_get_wdw_on"
-#define DSP_OPCODE_SET_GET_WDW_OFF			10
-#define DSP_NAME_SET_GET_WDW_OFF			"set_get_wdw_off"
-#define DSP_OPCODE_SET_GET_WDW_DLY			11
-#define DSP_NAME_SET_GET_WDW_DLY			"set_get_wdw_dly"
-#define DSP_OPCODE_SET_GET_ADC_CLK			12
-#define DSP_NAME_SET_GET_ADC_CLK			"set_get_adc_clk"
-#define DSP_OPCODE_END                  	14
 #endif
 
 #endif

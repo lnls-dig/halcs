@@ -14,7 +14,11 @@ static const char *halutils_err [HALUTILS_ERR_END] =
 {
     [HALUTILS_SUCCESS]              = "Success",
     [HALUTILS_ERR_ALLOC]            = "Could not allocate memory",
-    [HALUTILS_ERR_NULL_POINTER]     = "Null pointer received"
+    [HALUTILS_ERR_NULL_POINTER]     = "Null pointer received",
+    [HALUTILS_ERR_NO_FUNC_REG]      = "No function registered",
+    [HALUTILS_ERR_INV_LESS_ARGS]    = "Less arguments than specified passed",
+    [HALUTILS_ERR_INV_MORE_ARGS]    = "More arguments than specified passed",
+    [HALUTILS_ERR_INV_SIZE_ARG]     = "Invalid size of argument size"
 };
 
 /* Convert enumeration type to string */

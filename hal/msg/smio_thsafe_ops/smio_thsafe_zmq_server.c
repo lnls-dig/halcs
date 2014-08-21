@@ -6,6 +6,7 @@
  */
 
 #include "smio_thsafe_zmq_server.h"
+#include "dev_io_exports.h"
 #include "hal_assert.h"
 #include "msg_err.h"
 
@@ -32,577 +33,404 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_server:zmq]",     \
             msg_err_str (err_type))
 
-static int _thsafe_zmq_server_send_read (int32_t *llio_ret, uint8_t *data,
-        uint32_t size, void *reply_to);
-static int _thsafe_zmq_server_recv_read (zmsg_t *msg, loff_t *offset,
-        uint32_t *read_bsize);
-static int _thsafe_zmq_server_send_write (int32_t *llio_ret, void *reply_to);
-static int _thsafe_zmq_server_recv_write (zmsg_t *msg, loff_t *offset,
-        zframe_t **data_write_frame);
-
 /**** Open device ****/
-void *thsafe_zmq_server_open (void *owner, void *args)
+static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_open\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
 #ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (*server_args->msg);
+    debug_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
 #endif
     /* Message is:
      * frame null: OPEN opcode (removed by dev_io)
-     * frame 0: endpopint struct (FIXME?) */
-    zframe_t *endpoint = zmsg_pop (*server_args->msg);
-    ASSERT_ALLOC(endpoint, err_endpoint_alloc);
+     * frame 0: endpoint struct (FIXME?) */
+    llio_endpoint_t *llio_endpoint = (llio_endpoint_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
-    /* Call llio to actually perform the
-     * operation */
-    int32_t ret = llio_open (self->llio,
-            (llio_endpoint_t *) zframe_data (endpoint));
+    /* Call llio to actually perform the operation */
+    int32_t llio_ret = llio_open (self->llio, llio_endpoint);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send reply back to client */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_send_msg_alloc);
-
-    THSAFE_REPLY_TYPE reply_code = THSAFE_OK;
-    if (ret != 0) {
-        reply_code = THSAFE_ERR;
-    }
-
-    int zerr = zmsg_addmem (send_msg, &reply_code, sizeof (reply_code));
-    ASSERT_TEST(zerr == 0, "Could not add reply code in message", err_reply_code);
-    zerr = zmsg_addmem (send_msg, &ret, sizeof (ret));
-    ASSERT_TEST(zerr == 0, "Could not add return code in message", err_ret_code);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Sending message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (send_msg);
-#endif
-    zerr = zmsg_send (&send_msg, server_args->reply_to);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
-
-err_send_msg:
-err_ret_code:
-err_reply_code:
-    zmsg_destroy (&send_msg);
-err_send_msg_alloc:
-    zframe_destroy (&endpoint);
-err_endpoint_alloc:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return (llio_ret < 0) ? llio_ret : (int) sizeof(int32_t);
 }
 
+disp_op_t thsafe_zmq_server_open_exp = {
+    .name = THSAFE_NAME_OPEN,
+    .opcode = THSAFE_OPCODE_OPEN,
+    .func_fp = _thsafe_zmq_server_open,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, llio_endpoint_t),
+        DISP_ARG_END
+    }
+};
+
 /**** Release device ****/
-void *thsafe_zmq_server_release (void *owner, void *args)
+static int _thsafe_zmq_server_release (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_release\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
 #ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (*server_args->msg);
+    debug_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
 #endif
     /* Message is:
      * frame null: OPEN opcode (removed by dev_io)
      * frame 0: endpopint struct (FIXME?) */
-    zframe_t *endpoint = zmsg_pop (*server_args->msg);
-    ASSERT_ALLOC(endpoint, err_endpoint_alloc);
+    llio_endpoint_t *llio_endpoint = (llio_endpoint_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
-    /* Call llio to actually perform the
-     * operation */
-    int32_t ret = llio_release (self->llio,
-            (llio_endpoint_t *) zframe_data (endpoint));
+    /* Call llio to actually perform the operation */
+    int32_t llio_ret = llio_release (self->llio, llio_endpoint);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send reply back to client */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_send_msg_alloc);
-
-    THSAFE_REPLY_TYPE reply_code = THSAFE_OK;
-    if (ret != 0) {
-        reply_code = THSAFE_ERR;
-    }
-
-    int zerr = zmsg_addmem (send_msg, &reply_code, sizeof (reply_code));
-    ASSERT_TEST(zerr == 0, "Could not add reply code in message", err_reply_code);
-    zerr = zmsg_addmem (send_msg, &ret, sizeof (ret));
-    ASSERT_TEST(zerr == 0, "Could not add return code in message", err_ret_code);
-    zerr = zmsg_send (&send_msg, server_args->reply_to);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
-
-err_send_msg:
-err_ret_code:
-err_reply_code:
-    zmsg_destroy (&send_msg);
-err_send_msg_alloc:
-    zframe_destroy (&endpoint);
-err_endpoint_alloc:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return (llio_ret < 0) ? llio_ret : (int) sizeof(int32_t);
 }
+
+disp_op_t thsafe_zmq_server_release_exp = {
+    .name = THSAFE_NAME_RELEASE,
+    .opcode = THSAFE_OPCODE_RELEASE,
+    .func_fp = _thsafe_zmq_server_release,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, llio_endpoint_t),
+        DISP_ARG_END
+    }
+};
 
 /**** Read data from device ****/
 
-void *thsafe_zmq_server_read_16 (void *owner, void *args)
+static int _thsafe_zmq_server_read_16 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_16\n");
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_read (*server_args->msg, &offset, NULL);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
-    /* Alloc space for the data read */
-    uint16_t data = 0;
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_16 (self->llio, offset, &data);
+    int32_t llio_ret = llio_read_16 (self->llio, offset, (uint16_t *) ret);
 
-    /* Send reply back to client */
-    _thsafe_zmq_server_send_read (&llio_ret, (uint8_t *) &data, sizeof (data),
-            server_args->reply_to);
-
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return llio_ret;
 }
+
+disp_op_t thsafe_zmq_server_read_16_exp = {
+    .name = THSAFE_NAME_READ_16,
+    .opcode = THSAFE_OPCODE_READ_16,
+    .func_fp = _thsafe_zmq_server_read_16,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT16, uint16_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_END
+    }
+};
 
 /* TODO: Reduce code repetition */
 /* Changed only the necessary parameters out of laziness */
-void *thsafe_zmq_server_read_32 (void *owner, void *args)
+static int _thsafe_zmq_server_read_32 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_32\n");
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_read (*server_args->msg, &offset, NULL);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
-    /* Alloc space for the data read */
-    uint32_t data = 0;
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_32 (self->llio, offset, &data);
+    int32_t llio_ret = llio_read_32 (self->llio, offset, (uint32_t *) ret);
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_read (&llio_ret, (uint8_t *) &data, sizeof (data),
-            server_args->reply_to);
-
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return llio_ret;
 }
+
+disp_op_t thsafe_zmq_server_read_32_exp = {
+    .name = THSAFE_NAME_READ_32,
+    .opcode = THSAFE_OPCODE_READ_32,
+    .func_fp = _thsafe_zmq_server_read_32,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_END
+    }
+};
 
 /* TODO: Reduce code repetition */
 /* Changed only the necessary parameters out of laziness */
-void *thsafe_zmq_server_read_64 (void *owner, void *args)
+static int _thsafe_zmq_server_read_64 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_64\n");
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_read (*server_args->msg, &offset, NULL);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
-    /* Alloc space for the data read */
-    uint64_t data = 0;
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_64 (self->llio, offset, &data);
+    int32_t llio_ret = llio_read_64 (self->llio, offset, (uint64_t *) ret);
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_read (&llio_ret, (uint8_t *) &data, sizeof (data),
-            server_args->reply_to);
-
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return llio_ret;
 }
+
+disp_op_t thsafe_zmq_server_read_64_exp = {
+    .name = THSAFE_NAME_READ_64,
+    .opcode = THSAFE_OPCODE_READ_64,
+    .func_fp = _thsafe_zmq_server_read_64,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_END
+    }
+};
 
 /**** Write data to device ****/
 
-void *thsafe_zmq_server_write_16 (void *owner, void *args)
+static int _thsafe_zmq_server_write_16 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_16\n");
-
-    zframe_t *data_write_frame;
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            &data_write_frame);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
-    /* Check for received data size */
-    ASSERT_TEST(zframe_size (data_write_frame) == THSAFE_WRITE_16_DSIZE,
-        "Wrong received data size", err_wrong_data_write_size);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint16_t *data_write = (uint16_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_16 (self->llio, offset, (uint16_t *) zframe_data (data_write_frame));
+    int32_t llio_ret = llio_write_16 (self->llio, offset, data_write);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
-
-err_wrong_data_write_size:
-    zframe_destroy (&data_write_frame);
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return sizeof (int32_t);
 }
 
-void *thsafe_zmq_server_write_32 (void *owner, void *args)
+disp_op_t thsafe_zmq_server_write_16_exp = {
+    .name = THSAFE_NAME_WRITE_16,
+    .opcode = THSAFE_OPCODE_WRITE_16,
+    .func_fp = _thsafe_zmq_server_write_16,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT16, uint16_t),
+        DISP_ARG_END
+    }
+};
+
+static int _thsafe_zmq_server_write_32 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_32\n");
-
-    zframe_t *data_write_frame;
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            &data_write_frame);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
-    /* Check for received data size */
-    ASSERT_TEST(zframe_size (data_write_frame) == THSAFE_WRITE_32_DSIZE,
-        "Wrong received data size", err_wrong_data_write_size);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t *data_write = (uint32_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_32 (self->llio, offset, (uint32_t *) zframe_data (data_write_frame));
+    int32_t llio_ret = llio_write_32 (self->llio, offset, data_write);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
-
-err_wrong_data_write_size:
-    zframe_destroy (&data_write_frame);
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return sizeof (int32_t);
 }
 
-void *thsafe_zmq_server_write_64 (void *owner, void *args)
+disp_op_t thsafe_zmq_server_write_32_exp = {
+    .name = THSAFE_NAME_WRITE_32,
+    .opcode = THSAFE_OPCODE_WRITE_32,
+    .func_fp = _thsafe_zmq_server_write_32,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+static int _thsafe_zmq_server_write_64 (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
 
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_64\n");
-
-    zframe_t *data_write_frame;
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            &data_write_frame);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
-    /* Check for received data size */
-    ASSERT_TEST(zframe_size (data_write_frame) == THSAFE_WRITE_64_DSIZE,
-        "Wrong received data size", err_wrong_data_write_size);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t *data_write = (uint64_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_64 (self->llio, offset, (uint64_t *) zframe_data (data_write_frame));
+    int32_t llio_ret = llio_write_64 (self->llio, offset, data_write);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
-
-err_wrong_data_write_size:
-    zframe_destroy (&data_write_frame);
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return sizeof (int32_t);
 }
+
+disp_op_t thsafe_zmq_server_write_64_exp = {
+    .name = THSAFE_NAME_WRITE_64,
+    .opcode = THSAFE_OPCODE_WRITE_64,
+    .func_fp = _thsafe_zmq_server_write_64,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+        DISP_ARG_END
+    }
+};
 
 /**** Read data block from device function pointer, size in bytes ****/
-void *thsafe_zmq_server_read_block (void *owner, void *args)
+static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
-
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
-    loff_t offset = 0;
-    uint32_t read_bsize = 0;
-    int zerr = _thsafe_zmq_server_recv_read (*server_args->msg, &offset, &read_bsize);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t read_bsize = *(uint32_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
-    /* Alloc space for the data read. Maximum size is MAX_BLOCK_SIZE bytes, defined
-     * in smio_thsafe_zmq_server.h */
-    uint32_t data[MAX_BLOCK_SIZE/sizeof (uint32_t)];
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_block (self->llio, offset, read_bsize, data);
+    int32_t llio_ret = llio_read_block (self->llio, offset, read_bsize,
+            (uint32_t *) ret);
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_read (&llio_ret, (uint8_t *) data, llio_ret,
-            server_args->reply_to);
-
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return llio_ret;
 }
 
+disp_op_t thsafe_zmq_server_read_block_exp = {
+    .name = THSAFE_NAME_READ_BLOCK,
+    .opcode = THSAFE_OPCODE_READ_BLOCK,
+    .func_fp = _thsafe_zmq_server_read_block,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /**** Write data block from device function pointer, size in bytes ****/
-void *thsafe_zmq_server_write_block (void *owner, void *args)
+static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 {
     assert (owner);
     assert (args);
-
-    devio_t *self = (devio_t *) owner;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) args;
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
-
-    zframe_t *data_write_frame;
-    loff_t offset = 0;
-    int zerr = _thsafe_zmq_server_recv_write (*server_args->msg, &offset,
-            &data_write_frame);
-    ASSERT_TEST(zerr == 0, "Could receive message", err_recv_msg);
+    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    /* We now own the argument and must clean it after use */
+    THSAFE_MSG_ZMQ_ARG_TYPE data_write_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
+    uint32_t *data_write = (uint32_t *)
+        ((zmq_server_data_block_t *) THSAFE_MSG_ZMQ_ARG_DATA(data_write_arg))->data;
+    uint32_t data_write_size = THSAFE_MSG_ZMQ_ARG_SIZE(data_write_arg);
 
     /* We must accept every block size. So, we just perform the actual LLIO
      * operation */
-    int32_t llio_ret = llio_write_block (self->llio, offset, zframe_size (data_write_frame),
-            (uint32_t *) zframe_data (data_write_frame));
+    int32_t llio_ret = llio_write_block (self->llio, offset, data_write_size,
+            data_write);
+    *(int32_t *) ret = llio_ret;
 
-    /* Send message back to client */
-    _thsafe_zmq_server_send_write (&llio_ret, server_args->reply_to);
+    /* Cleanup arguments that we now own */
+    THSAFE_MSG_CLENUP_ARG(data_write_arg);
 
-/* err_wrong_data_write_size: */
-    zframe_destroy (&data_write_frame);
-err_recv_msg:
-    /* Might not be safe to do this if we fail */
-    zmsg_destroy (server_args->msg);
-    return NULL;
+    return sizeof (int32_t);
 }
+
+disp_op_t thsafe_zmq_server_write_block_exp = {
+    .name = THSAFE_NAME_WRITE_BLOCK,
+    .opcode = THSAFE_OPCODE_WRITE_BLOCK,
+    .func_fp = _thsafe_zmq_server_write_block,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_END
+    }
+};
 
 /**** Read data block via DMA from device, size in bytes ****/
-void *thsafe_zmq_server_read_dma (void *owner, void *args)
+static int _thsafe_zmq_server_read_dma (void *owner, void *args, void *ret)
 {
     (void) owner;
     (void) args;
-    return NULL;
+    (void) ret;
+    return -1;
 }
+
+disp_op_t thsafe_zmq_server_read_dma_exp = {
+    .name = THSAFE_NAME_READ_DMA,
+    .opcode = THSAFE_OPCODE_READ_DMA,
+    .func_fp = _thsafe_zmq_server_read_dma,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_END
+    }
+};
 
 /**** Write data block via DMA from device, size in bytes ****/
-void *thsafe_zmq_server_write_dma (void *owner, void *args)
+static int _thsafe_zmq_server_write_dma (void *owner, void *args, void *ret)
 {
     (void) owner;
     (void) args;
-    return NULL;
+    (void) ret;
+    return -1;
 }
 
+disp_op_t thsafe_zmq_server_write_dma_exp = {
+    .name = THSAFE_NAME_WRITE_DMA,
+    .opcode = THSAFE_OPCODE_WRITE_DMA,
+    .func_fp = _thsafe_zmq_server_write_dma,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_END
+    }
+};
+
 /**** Read device information function pointer ****/
-/* void *thsafe_zmq_server_read_info (void *owner, void *args)
+/* int thsafe_zmq_server_read_info (void *owner, void *args, void *ret)
  *{
  *  (void) owner;
  *  (void) args;
+ *  (void) ret;
  *  return NULL;
  *} */
 
-/*************** Helper functions **************/
-
-static int _thsafe_zmq_server_send_read (int32_t *llio_ret, uint8_t *data, uint32_t size, void *reply_to)
-{
-    assert (llio_ret);
-    int err = -1;    /* error */
-
-    /* Send reply back to client */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_send_msg_alloc, -1 /* error */);
-
-    THSAFE_REPLY_TYPE reply_code = THSAFE_OK;
-    if (*llio_ret < 0) {
-        reply_code = THSAFE_ERR;
-    }
-
-    /* Message is:
-     * frame 0: reply code
-     * frame 1: return code
-     * frame 2: data read */
-    int zerr = zmsg_addmem (send_msg, &reply_code, sizeof (reply_code));
-    ASSERT_TEST(zerr == 0, "Could not add reply code in message", err_reply_code,
-            -1 /* error */);
-    zerr = zmsg_addmem (send_msg, llio_ret, sizeof (*llio_ret));
-    ASSERT_TEST(zerr == 0, "Could not add number of bytes read in message", err_ret_code,
-            -1 /* error */);
-    zerr = zmsg_addmem (send_msg, data, size);
-    ASSERT_TEST(zerr == 0, "Could not add read data in message", err_data_send,
-            -1 /* error */);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Size: %d\n", size);
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Sending message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (send_msg);
-#endif
-    zerr = zmsg_send (&send_msg, reply_to);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg, -1 /* error */);
-
-err_send_msg:
-err_data_send:
-err_ret_code:
-err_reply_code:
-    zmsg_destroy (&send_msg);
-err_send_msg_alloc:
-    return err;
-}
-
-static int _thsafe_zmq_server_recv_read (zmsg_t *msg, loff_t *offset, uint32_t *read_bsize)
-{
-    assert (offset);
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq:read] Received message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (msg);
-#endif
-
-    /* Message is:
-     * frame null: READ opcode
-     * frame 0: offset
-     * frame 1 (optional): number of bytes to read
-                        (only for read_block function)*/
-    zframe_t *offset_frame = zmsg_pop (msg);
-    ASSERT_ALLOC(offset_frame, err_offset_alloc);
-
-    /* Check for wrong offset */
-    ASSERT_TEST(zframe_size (offset_frame) == sizeof (loff_t),
-        "Wrong offset size", err_wrong_offset_size);
-
-    *offset = *(loff_t *) zframe_data (offset_frame);
-    zframe_destroy (&offset_frame);
-
-    /* Try to pop size frame */
-    if (read_bsize != NULL) {
-        zframe_t *size_frame = zmsg_pop (msg);
-        ASSERT_ALLOC(size_frame, err_size_alloc);
-        *read_bsize = *(uint32_t *) zframe_data (size_frame);
-        zframe_destroy (&size_frame);
-    }
-
-    return 0;
-
-err_size_alloc:
-err_wrong_offset_size:
-    zframe_destroy (&offset_frame);
-err_offset_alloc:
-    return -1;
-}
-
-static int _thsafe_zmq_server_send_write (int32_t *llio_ret, void *reply_to)
-{
-    assert (llio_ret);
-    int err = -1;    /* error */
-
-    /* Send reply back to client */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_send_msg_alloc, -1 /* error */);
-
-    THSAFE_REPLY_TYPE reply_code = THSAFE_OK;
-    if (*llio_ret < 0) {
-        reply_code = THSAFE_ERR;
-    }
-
-    /* Message is:
-     * frame 0: reply code
-     * frame 1: return code */
-    int zerr = zmsg_addmem (send_msg, &reply_code, sizeof (reply_code));
-    ASSERT_TEST(zerr == 0, "Could not add reply code in message", err_reply_code,
-            -1 /* error */);
-    zerr = zmsg_addmem (send_msg, llio_ret, sizeof (*llio_ret));
-    ASSERT_TEST(zerr == 0, "Could not add number of bytes read in message", err_ret_code,
-            -1 /* error */);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Sent message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (send_msg);
-#endif
-    zerr = zmsg_send (&send_msg, reply_to);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg, -1 /* error */);
-
-err_send_msg:
-err_ret_code:
-err_reply_code:
-    zmsg_destroy (&send_msg);
-err_send_msg_alloc:
-    return err;
-}
-
-static int _thsafe_zmq_server_recv_write (zmsg_t *msg, loff_t *offset,
-        zframe_t **data_write_frame)
-{
-    assert (offset);
-    assert (data_write_frame);
-    assert (*data_write_frame);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
-#ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (msg);
-#endif
-    /* Message is:
-     * frame null: WRITE opcode
-     * frame 0: offset
-     * frame 1: data to be written */
-    zframe_t *offset_frame = zmsg_pop (msg);
-    ASSERT_ALLOC(offset_frame, err_offset_alloc);
-    *data_write_frame = zmsg_pop (msg);
-    ASSERT_ALLOC(*data_write_frame, err_data_write_alloc);
-
-    *offset = *(loff_t *) zframe_data (offset_frame);
-    zframe_destroy (&offset_frame);
-    return 0;
-
-err_data_write_alloc:
-    zframe_destroy (&offset_frame);
-err_offset_alloc:
-    return -1;
-}
-
 /*************** Our constant structure **************/
-const smio_thsafe_server_ops_t smio_thsafe_zmq_server_ops = {
-    .thsafe_server_open           = thsafe_zmq_server_open,        /* Open device */
-    .thsafe_server_release        = thsafe_zmq_server_release,     /* Release device */
-    .thsafe_server_read_16        = thsafe_zmq_server_read_16,     /* Read 16-bit data */
-    .thsafe_server_read_32        = thsafe_zmq_server_read_32,     /* Read 32-bit data */
-    .thsafe_server_read_64        = thsafe_zmq_server_read_64,     /* Read 64-bit data */
-    .thsafe_server_write_16       = thsafe_zmq_server_write_16,    /* Write 16-bit data */
-    .thsafe_server_write_32       = thsafe_zmq_server_write_32,    /* Write 32-bit data */
-    .thsafe_server_write_64       = thsafe_zmq_server_write_64,    /* Write 64-bit data */
-    .thsafe_server_read_block     = thsafe_zmq_server_read_block,  /* Read arbitrary block size data,
-                                           parameter size in bytes */
-    .thsafe_server_write_block    = thsafe_zmq_server_write_block, /* Write arbitrary block size data,
-                                           parameter size in bytes */
-    .thsafe_server_read_dma       = thsafe_zmq_server_read_dma,    /* Read arbitrary block size data via DMA,
-     _                                       parameter size in bytes */
-    .thsafe_server_write_dma      = thsafe_zmq_server_write_dma    /* Write arbitrary block size data via DMA,
-                                            parameter size in bytes */
-    /*.thsafe_server_read_info      = thsafe_zmq_server_read_info */   /* Read device information data */
+
+const disp_op_t *smio_thsafe_zmq_server_ops [] = {
+    &thsafe_zmq_server_open_exp,
+    &thsafe_zmq_server_release_exp,
+    &thsafe_zmq_server_read_16_exp,
+    &thsafe_zmq_server_read_32_exp,
+    &thsafe_zmq_server_read_64_exp,
+    &thsafe_zmq_server_write_16_exp,
+    &thsafe_zmq_server_write_32_exp,
+    &thsafe_zmq_server_write_64_exp,
+    &thsafe_zmq_server_read_block_exp,
+    &thsafe_zmq_server_write_block_exp,
+    &thsafe_zmq_server_read_dma_exp,
+    &thsafe_zmq_server_write_dma_exp,
+    &disp_op_end
 };
+

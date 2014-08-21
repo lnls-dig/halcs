@@ -384,7 +384,7 @@ err_null_report:
 }
 
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans)
+        acq_trans_t *acq_trans, int timeout)
 {
     assert (self);
     assert (service);
@@ -397,7 +397,7 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
             err_bpm_data_acquire);
 
     /* Client requisition: wait data acquire indefinetly */
-    err = _bpm_wait_data_acquire_timed (self, service, -1);
+    err = _bpm_wait_data_acquire_timed (self, service, timeout);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Request acquisition timed out\n",
             err_bpm_wait_data_acquire);
 
@@ -566,14 +566,16 @@ PARAM_FUNC_CLIENT_READ(sw_dly)
 }
 
 /* Windowing functions */
+/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
 PARAM_FUNC_CLIENT_WRITE(wdw)
 {
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW, wdw);
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
 }
 
+/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
 PARAM_FUNC_CLIENT_READ(wdw)
 {
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW, wdw);
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
 }
 
 PARAM_FUNC_CLIENT_WRITE(wdw_dly)

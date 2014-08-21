@@ -238,7 +238,7 @@ static smpr_err_e _spi_init (smpr_t *self)
     RW_REPLY_TYPE rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, DIVIDER, /* field = NULL */,
             MULT_BIT_PARAM, /* value */ freq, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set freq parameter", err_exit,
+    ASSERT_TEST(rw_err == RW_OK, "Could not set freq parameter", err_exit,
             SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
@@ -257,7 +257,7 @@ static smpr_err_e _spi_init (smpr_t *self)
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, /* field = NULL */,
             MULT_BIT_PARAM, /* value */ spi_proto->init_config, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set control parameter", err_exit,
+    ASSERT_TEST(rw_err == RW_OK, "Could not set control parameter", err_exit,
             SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
@@ -277,7 +277,7 @@ static smpr_err_e _spi_init (smpr_t *self)
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CFG_BIDIR, /* field = NULL */,
             MULT_BIT_PARAM, /* value */ bidir, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set bidir parameter", err_exit,
+    ASSERT_TEST(rw_err == RW_OK, "Could not set bidir parameter", err_exit,
             SMPR_ERR_RW_SMIO);
 
 #ifdef SM_PR_READBACK
@@ -302,7 +302,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 
     ssize_t err = 0;
     ssize_t num_bytes = 0;
-    RW_REPLY_TYPE rw_err = RW_READ_OK;
+    RW_REPLY_TYPE rw_err = RW_OK;
     ASSERT_TEST(size > 0 && size*SMPR_BYTE_2_BIT /* bits */ <
             SPI_PROTO_CTRL_CHAR_LEN_MASK+1+1, "Invalid size for spi transfer",
             err_inv_size, -1);
@@ -313,7 +313,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     uint32_t config;
     rw_err = GET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO,
             CTRL, /* field = NULL */, MULT_BIT_PARAM, config, NO_FMT_FUNC);
-    ASSERT_TEST(rw_err == RW_READ_OK, "Could not get CONFIG parameter", err_exit, -1);
+    ASSERT_TEST(rw_err == RW_OK, "Could not get CONFIG parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: Config register = 0x%08X\n", config);
 
@@ -325,7 +325,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
             MULT_BIT_PARAM, /* value */ ss, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set SS parameter", err_exit, -1);
+    ASSERT_TEST(rw_err == RW_OK, "Could not set SS parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: SS register = 0x%08X\n", ss);
 
@@ -338,7 +338,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, CHAR_LEN,
             MULT_BIT_PARAM, /* value */ charlen, /* min */ , /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set CHAR_LEN parameter", err_exit, -1);
+    ASSERT_TEST(rw_err == RW_OK, "Could not set CHAR_LEN parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: Charecter Length = 0x%08X\n",
             charlen);
@@ -374,7 +374,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, GO_BSY,
             SINGLE_BIT_PARAM, /* value */ 1, /* min */, /* max */,
             NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_WRITE_OK, "Could not set parameter", err_exit, -1);
+    ASSERT_TEST(rw_err == RW_OK, "Could not set parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: Transfer started\n");
 
@@ -384,7 +384,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     while (1) {
         rw_err = GET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO,
                 CTRL, BSY, SINGLE_BIT_PARAM, busy, NO_FMT_FUNC);
-        ASSERT_TEST(rw_err == RW_READ_OK, "Could not get BUSY parameter", err_exit, -1);
+        ASSERT_TEST(rw_err == RW_OK, "Could not get BUSY parameter", err_exit, -1);
 
         if (!busy) {
             break;

@@ -46,26 +46,35 @@
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
-
-static void *_fmc130m_4ch_leds (void *owner, void *args)
+static int _fmc130m_4ch_leds (void *owner, void *args, void *ret)
 {
+    (void) ret;
     assert (owner);
     assert (args);
 
-    smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
-    assert (zmsg_size (*exp_msg->msg) > 0);
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    uint32_t leds = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_leds\n");
-    uint32_t leds = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
     smio_thsafe_client_write_32 (self, FMC_130M_CTRL_REGS_OFFS |
             WB_FMC_130M_4CH_CSR_REG_MONITOR , &leds);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Led write: 0x%08x\n",
             leds);
 
-    zmsg_destroy (exp_msg->msg);
-    return NULL;
+    return -FMC130M_4CH_OK;
 }
+
+disp_op_t fmc130m_4ch_leds_exp = {
+    .name = FMC130M_4CH_NAME_LEDS,
+    .opcode = FMC130M_4CH_OPCODE_LEDS,
+    .func_fp = _fmc130m_4ch_leds,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_FMC130M_4CH_PLL_FUNC_MIN            0 /* PLL FUNCTION pin 0 */
 #define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
@@ -77,30 +86,50 @@ RW_PARAM_FUNC(fmc130m_4ch, pll_func) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-static void *_fmc130m_4ch_ad9510_cfg_test (void *owner, void *args)
+disp_op_t fmc130m_4ch_pll_func_exp = {
+    .name = FMC130M_4CH_NAME_PLL_FUNCTION,
+    .opcode = FMC130M_4CH_OPCODE_PLL_FUNCTION,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+static int _fmc130m_4ch_ad9510_cfg_test (void *owner, void *args, void *ret)
 {
+    (void) ret;
     assert (owner);
     assert (args);
 
-    smio_t *self = (smio_t *) owner;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
-    assert (zmsg_size (*exp_msg->msg) > 0);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling _fmc130m_4ch_ad9510_config_test\n");
     smch_ad9510_config_test (smch_ad9510);
 
-    zmsg_destroy (exp_msg->msg);
-    return NULL;
+    return -FMC130M_4CH_OK;
 }
 
-const smio_exp_ops_t fmc130m_exp_ops [] = {
-    {.name = FMC130M_4CH_NAME_LEDS, .opcode = FMC130M_4CH_OPCODE_LEDS, .func_fp = _fmc130m_4ch_leds},
-    {.name = FMC130M_4CH_NAME_PLL_FUNCTION, .opcode = FMC130M_4CH_OPCODE_PLL_FUNCTION,
-        .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func)},
-    {.name = FMC130M_4CH_NAME_AD9510_CFG_TEST, .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_TEST,
-        .func_fp = _fmc130m_4ch_ad9510_cfg_test},
-    {.name = NULL, .opcode = 0, .func_fp = NULL} /* Must end with this NULL pattern */
+disp_op_t fmc130m_4ch_ad9510_cfg_test_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_CFG_TEST,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_TEST,
+    .func_fp = _fmc130m_4ch_ad9510_cfg_test,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_END
+    }
+};
+
+const disp_op_t *fmc130m_exp_ops [] = {
+    &fmc130m_4ch_leds_exp,
+    &fmc130m_4ch_pll_func_exp,
+    &fmc130m_4ch_ad9510_cfg_test_exp,
+    &disp_op_end
 };
 
 /************************************************************/
@@ -126,7 +155,7 @@ smio_err_e fmc130m_4ch_deattach (smio_t *self)
 
 /* Export (register) sm_io to handle operations function pointer */
 smio_err_e fmc130m_4ch_export_ops (smio_t *self,
-        const smio_exp_ops_t* smio_exp_ops)
+        const disp_op_t** smio_exp_ops)
 {
     (void) self;
     (void) smio_exp_ops;

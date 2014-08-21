@@ -254,10 +254,14 @@ static smio_err_e _smio_loop (smio_t *self)
         zframe_t *reply_to = NULL;
         zmsg_t *request = mdp_worker_recv (self->worker, &reply_to);
 
-        if (request == NULL)
+        if (request == NULL) {
             break;                          /* Worker has been interrupted */
+        }
 
-        exp_msg_zmq_t smio_args = {.msg = &request, .reply_to = reply_to};
+        exp_msg_zmq_t smio_args = {
+            .tag = EXP_MSG_ZMQ_TAG,
+            .msg = &request,
+            .reply_to = reply_to};
         err = smio_do_op (self, &smio_args);
 
         /* What can I do in case of error ?*/

@@ -23,10 +23,10 @@
 #define FMC130M_4CH_OPCODE_END                  3
 
 /* Messaging Reply OPCODES */
-#define FMC130M_4CH_REPLY_SIZE          (sizeof(uint32_t))
-#define FMC130M_4CH_REPLY_TYPE          uint32_t
+#define FMC130M_4CH_REPLY_SIZE                  (sizeof(uint32_t))
+#define FMC130M_4CH_REPLY_TYPE                  uint32_t
 
-#define FMC130M_4CH_OK                  0   /* Operation was successful */
-#define FMC130M_4CH_REPLY_END           1   /* End marker */
+#define FMC130M_4CH_OK                          0   /* Operation was successful */
+#define FMC130M_4CH_REPLY_END                   1   /* End marker */
 
 #endif

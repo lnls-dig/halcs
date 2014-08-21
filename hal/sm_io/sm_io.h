@@ -15,19 +15,20 @@
 /* #include "dev_io_core.h" */
 #include "ll_io.h"
 #include "sm_io_err.h"
-#include "exp_msg_zmq.h"
 #include "sm_io_bootstrap.h"
 #include "sm_io_mod_dispatch.h"
-#include "mdp.h"
+#include "sm_io_exports.h"
+#include "exp_ops.h"
 #include "dispatch_table.h"
+#include "mdp.h"
 
 /* Arbitrary number*/
-#define SMIO_MAX_OPS                    200
+#define SMIO_MAX_OPS                            200
 
 struct _devio_t;
 struct _smio_ops_t;
 struct _smio_thsafe_client_ops_t;
-struct _smio_exp_ops_t;
+struct _disp_op_t;
 
 /* Main class object that every sm_io must implement */
 struct _smio_t {
@@ -48,7 +49,7 @@ struct _smio_t {
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
     /* Specific SMIO instance functions. This will be exported on SMIO startup */
-    const struct _smio_exp_ops_t *exp_ops;
+    const struct _disp_op_t **exp_ops;
     /* Minimum set of methods that every sm_io instance must implement.
          * This is thought as the interface to the world */
     const struct _smio_ops_t *ops;
@@ -65,7 +66,7 @@ typedef enum _smio_err_e (*attach_fp)(struct _smio_t *self, struct _devio_t *par
 typedef enum _smio_err_e (*deattach_fp)(struct _smio_t *self);
 /* Export (register) sm_io to handle operations function pointer */
 typedef enum _smio_err_e (*export_ops_fp)(struct _smio_t *self,
-        const struct _smio_exp_ops_t* smio_exp_ops);
+        const struct _disp_op_t** smio_exp_ops);
 /* Unexport (unregister) sm_io to handle operations function pointer */
 typedef enum _smio_err_e (*unexport_ops_fp)(struct _smio_t *self);
 /* Generic wrapper for receiving opcodes and arguments to specific funtions function pointer */
@@ -122,20 +123,12 @@ struct _smio_thsafe_client_ops_t {
     /*thsafe_client_read_info_fp thsafe_client_read_info; Moved to dev_io */         /* Read device information data */
 };
 
-struct _smio_exp_ops_t {
-    const char *name;
-    uint32_t opcode;
-    disp_table_func_fp func_fp;
-};
-
 /* Opaque class structure */
 typedef struct _smio_t smio_t;
 /* Opaque smio_ops structure */
 typedef struct _smio_ops_t smio_ops_t;
 /* Opaque llio_th_safe_ops structure */
 typedef struct _smio_thsafe_client_ops_t smio_thsafe_client_ops_t;
-/* smio exported interface function strcuture */
-typedef struct _smio_exp_ops_t smio_exp_ops_t;
 
 /***************** Our methods *****************/
 
@@ -153,7 +146,7 @@ smio_err_e smio_attach (smio_t *self, struct _devio_t *parent);
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e smio_deattach (smio_t *self);
 /* Export (Register) sm_io to handle specific operations */
-smio_err_e smio_export_ops (smio_t *self, const smio_exp_ops_t* smio_exp_ops);
+smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops);
 /* Unexport (unregister) sm_io to handle specific operations */
 smio_err_e smio_unexport_ops (smio_t *self);
 /* Handle the operation */

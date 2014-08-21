@@ -31,3 +31,8 @@
     CHECK_HAL_ERR(err, MSG, "[exp_msg:zmq]",                \
             msg_err_str (err_type))
 
+bool exp_msg_zmq_is (void *self)
+{
+    assert (self);
+    return ((exp_msg_zmq_t *) self)->tag == EXP_MSG_ZMQ_TAG;
+}
