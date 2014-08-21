@@ -17,11 +17,12 @@ enum _smio_err_e
     SMIO_ERR_ALLOC,                 /* Could not allocate memory */
     SMIO_ERR_FUNC_NOT_IMPL,         /* Function not implemented */
     SMIO_ERR_OPCODE_NOT_SUPP,       /* Opcode not supported */
-    SMIO_ERR_WRONG_NARGS,           /* Wrong number of arguments */
+    SMIO_ERR_WRONG_ARGS,            /* Wrong arguments received (number or size) */
     SMIO_ERR_WRONG_PARAM,           /* Wrong parameter value */
     SMIO_ERR_LLIO,                  /* Low-level I/O could not complete operation */
     SMIO_ERR_EXPORT_OP,             /* Error exporting function */
     SMIO_ERR_CONFIG_DFLT,           /* Error configuring the default values */
+    SMIO_ERR_MSG_NOT_SUPP,          /* Exported message not supported */
     SMIO_ERR_END                    /* End of enum marker */
 };
 
