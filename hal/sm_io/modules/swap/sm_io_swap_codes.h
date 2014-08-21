@@ -22,9 +22,9 @@
 #define SWAP_NAME_SET_GET_DIV_CLK			"set_get_div_clk"
 #define SWAP_OPCODE_SET_GET_SW_DLY  		4
 #define SWAP_NAME_SET_GET_SW_DLY			"set_get_sw_dly"
-#define SWAP_OPCODE_SET_GET_WDW		    	5
-#define SWAP_NAME_SET_GET_WDW	    		"set_get_wdw"
-#define SWAP_OPCODE_SET_GET_WDW_DLY			6
+#define SWAP_OPCODE_SET_GET_WDW_EN	    	5
+#define SWAP_NAME_SET_GET_WDW_EN     		"set_get_wdw_en"
+#define SWAP_OPCODE_SET_GET_WDW_DLY		    6
 #define SWAP_NAME_SET_GET_WDW_DLY			"set_get_wdw_dly"
 #define SWAP_OPCODE_SET_GET_GAIN_A			7
 #define SWAP_NAME_SET_GET_GAIN_A			"set_get_gain_a"
