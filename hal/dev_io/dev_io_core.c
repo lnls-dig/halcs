@@ -13,6 +13,7 @@
 #include "hal_assert.h"
 #include "sm_io_mod_dispatch.h"
 #include "smio_thsafe_zmq_server.h"
+#include "rw_param.h"
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
 #include "ll_io_utils.h"
@@ -122,7 +123,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
 
     /* Init sm_io_thsafe_server_ops_h. For now, we assume we want zmq
      * for exchanging messages between smio and devio instances */
-    self->thsafe_server_ops = &smio_thsafe_zmq_server_ops;
+    self->thsafe_server_ops = smio_thsafe_zmq_server_ops;
 
     /* Init sm_io_h hash */
     self->sm_io_h = zhash_new ();
@@ -132,10 +133,9 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     self->disp_table_thsafe_ops = disp_table_new ();
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
-    disp_table_func_fp *thsafe_server_fp = (disp_table_func_fp *) (self->thsafe_server_ops);
-    const uint32_t *thsafe_opcodes_p = thsafe_opcodes;
+    /* thsafe_opcodes is define in smio_thsafe_codes.h */
     halutils_err_e halutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
-            thsafe_server_fp, thsafe_opcodes_p, THSAFE_OPCODE_END);
+            thsafe_opcodes, self->thsafe_server_ops);
     ASSERT_TEST(halutils_err==HALUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
@@ -476,7 +476,9 @@ devio_err_e devio_poll2_all_sm (devio_t *self)
         if (self->poller2 [i].revents & ZMQ_POLLIN) {
             zmsg_t *recv_msg = zmsg_recv (self->poller2 [i].socket);
             /* Prepare the args structure */
-            zmq_server_args_t server_args = {.msg = &recv_msg,
+            zmq_server_args_t server_args = {
+                .tag = ZMQ_SERVER_ARGS_TAG,
+                .msg = &recv_msg,
                 .reply_to = self->poller2 [i].socket};
             err = _devio_do_smio_op (self, &server_args);
         }
@@ -516,13 +518,54 @@ static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
             "poll_all_sm: Invalid opcode received", err_invalid_opcode,
             DEVIO_ERR_BAD_MSG);
 
-    /* Do the actual work... */
-    disp_table_call (self->disp_table_thsafe_ops, opcode_data, self, server_args);
+    /* Check registered function arguments */
+    void *ret = NULL;
+    RW_REPLY_TYPE reply_code = PARAM_ERR;
+    bool with_data_frame = false;
 
+    /* We don't check for the arguments for THSAFE operations, as these are just
+     * internal calls and we trust ourselves ...*/
+    halutils_err_e herr = disp_table_set_ret (self->disp_table_thsafe_ops,
+            opcode_data, &ret);
+    ASSERT_TEST(herr == HALUTILS_SUCCESS, "Could not set return value",
+            err_set_ret, DEVIO_ERR_BAD_MSG);
+
+    int disp_table_ret = disp_table_call (self->disp_table_thsafe_ops,
+            opcode_data, self, server_args, ret);
+
+    /* Log message */
+    if (disp_table_ret < 0) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR, "[dev_io_core] disp_table_check_call "
+                "returned status %d\n", disp_table_ret);
+    }
+
+    /* Error returned from registered function */
+    if (disp_table_ret <= 0) {
+        /* Encode error to send to client */
+        reply_code = format_reply_code (disp_table_ret);
+        with_data_frame = false;
+    }
+    else {
+        reply_code = PARAM_OK;
+        with_data_frame = true;
+    }
+
+    /* Send response back to client */
+    send_client_response_sock (reply_code, disp_table_ret, ret, with_data_frame,
+            server_args->reply_to);
+
+    zframe_destroy (&opcode);
+    zmsg_destroy (server_args->msg);
+    return err;
+
+err_set_ret:
 err_invalid_opcode:
 err_wrong_opcode_size:
     zframe_destroy (&opcode);
 err_null_opcode:
+    send_client_response_sock (PARAM_ERR, 0, NULL, false, server_args->reply_to);
+    /* Should reply_to field be zframe_t ** type ?*/
+    zmsg_destroy (server_args->msg);
     return err;
 }
 
@@ -592,66 +635,3 @@ err_key_alloc:
     return;
 }
 
-/********* Low-level generic methods API *********/
-
-#define CHECK_FUNC(func_p)                              \
-    do {                                                \
-        if(func_p == NULL) {                            \
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR,        \
-                    "[sm_io] %s\n",                     \
-                    devio_err_str (DEVIO_ERR_FUNC_NOT_IMPL)); \
-            return NULL;                                \
-        }                                               \
-    } while(0)
-
-/* Declare wrapper for all DEVIO functions API */
-#define DEVIO_FUNC_WRAPPER(func_name, ...)               \
-{                                                        \
-    assert (owner);                                      \
-    CHECK_FUNC (((devio_t *)owner)->thsafe_server_ops->func_name);\
-        return ((devio_t *)owner)->thsafe_server_ops->func_name (owner, ##__VA_ARGS__);  \
-}
-
-/**** Open device ****/
-void *smio_thsafe_server_open (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_open, args)
-
-/**** Release device ****/
-void *smio_thsafe_server_release (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_release, args)
-
-/**** Read data from device ****/
-void *smio_thsafe_server_read_16 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_16, args)
-void *smio_thsafe_server_read_32 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_32, args)
-void *smio_thsafe_server_read_64 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_64, args)
-
-/**** Write data to device ****/
-void *smio_thsafe_server_write_16 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_16, args)
-void *smio_thsafe_server_write_32 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_32, args)
-void *smio_thsafe_server_write_64 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_64, args)
-
-/**** Read data block from device function pointer, size in bytes ****/
-void *smio_thsafe_server_read_block (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_block, args)
-
-/**** Write data block from device function pointer, size in bytes ****/
-void *smio_thsafe_server_write_block (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_block, args)
-
-/**** Read data block via DMA from device, size in bytes ****/
-void *smio_thsafe_server_read_dma (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_dma, args)
-
-/**** Write data block via DMA from device, size in bytes ****/
-void *smio_thsafe_server_write_dma (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_dma, args)
-
-/**** Read device information function pointer ****/
-/* int smio_thsafe_server_read_info (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_info, args) Moved to dev_io */
