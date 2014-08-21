@@ -43,10 +43,7 @@ bpm_client_err_e param_client_send_rw (bpm_client_t *self, char *service,
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
-
-    if (rw == WRITE_MODE) {
-        zmsg_addmem (request, &param, sizeof (param));
-    }
+    zmsg_addmem (request, &param, sizeof (param));
 
     mdp_client_send (self->mdp_client, service, &request);
 
@@ -121,19 +118,22 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     zmsg_t *report;
 
     err = param_client_send_rw (self, service, operation, rw,
-            0 /* in read mode this doesn't matter */);
+            0 /* in read mode this value will be ignored */);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
 
     /* TODO: better handling of malformed messages */
-    assert (zmsg_size (report) == 2);
+    assert (zmsg_size (report) == 3);
 
     /* Message is:
      * frame 0: error code
-     * frame 1: data read */
+     * frame 1: number of bytes read
+     * frame 2: data read */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
+    zframe_t *bytes_read_frm = zmsg_pop(report);
+    ASSERT_TEST(bytes_read_frm != NULL, "Could not receive number of bytes read", err_null_bytes_read);
     zframe_t *data_out_frm = zmsg_pop(report);
     ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
@@ -148,6 +148,8 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
 err_get_param:
     zframe_destroy (&data_out_frm);
 err_null_param:
+    zframe_destroy (&bytes_read_frm);
+err_null_bytes_read:
     zframe_destroy (&err_code);
 err_null_code:
     zmsg_destroy (&report);
