@@ -134,7 +134,7 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans);
+        acq_trans_t *acq_trans, int timeout);
 
 /********************** DSP Functions ********************/
 
