@@ -7,6 +7,7 @@
 
 #include "sm_io.h"
 #include "exp_ops_codes.h"
+#include "rw_param.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -65,6 +66,8 @@
         }                                               \
     } while (0)
 
+static smio_err_e _smio_do_zmq_msg_op (void *owner, exp_msg_zmq_t *msg);
+
 /************************************************************/
 /**************** SMIO Ops wrapper functions ****************/
 /************************************************************/
@@ -91,20 +94,19 @@ smio_err_e smio_deattach (smio_t *self)
 }
 
 /* Export (Register) sm_io to handle specific operations */
-smio_err_e smio_export_ops (smio_t *self, const smio_exp_ops_t* smio_exp_ops)
+smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
 {
     assert (self);
     assert (smio_exp_ops);
 
     /* FIXME: Dispatch table disp_table_insert_all implements almost the
      * same code! Try to reuse it! */
-    const smio_exp_ops_t* smio_exp_ops_it = smio_exp_ops;
+    const disp_op_t **smio_exp_ops_it = smio_exp_ops;
     smio_err_e err = SMIO_SUCCESS;
     /* FIXME: Iterator is not very good as it has to check an specific field */
-    for (smio_exp_ops_it = smio_exp_ops; smio_exp_ops_it->func_fp != NULL;
-            smio_exp_ops_it++) {
+    for ( ; (*smio_exp_ops_it)->func_fp != NULL; smio_exp_ops_it++) {
         halutils_err_e herr = disp_table_insert (self->exp_ops_dtable,
-            smio_exp_ops_it->opcode, smio_exp_ops_it->func_fp);
+            (*smio_exp_ops_it)->opcode, *smio_exp_ops_it);
 
         ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export SMIO ops",
                 err_export_op, SMIO_ERR_EXPORT_OP);
@@ -136,14 +138,32 @@ err_unexport_op:
 smio_err_e smio_do_op (void *owner, void *msg)
 {
     assert (owner);
+    smio_err_e err = SMIO_ERR_MSG_NOT_SUPP;
+
+    /* Try to guess which type of message we are dealing with */
+    switch (exp_msg_guess_type (msg)) {
+        case EXP_MSG_ZMQ:
+            err = _smio_do_zmq_msg_op (owner, msg);
+            break;
+        default:
+            break;
+    }
+
+    return err;
+}
+
+/*************************** Static Functions *****************************/
+
+static smio_err_e _smio_do_zmq_msg_op (void *owner, exp_msg_zmq_t *msg)
+{
+    assert (owner);
     assert (msg);
 
     smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) msg;
     smio_err_e err = SMIO_SUCCESS;
 
     /* TODO: The SMIO do_op must not modify the packet! We could pass a copy of the
-     * message to it, but we this is in the critical path! Evaluate the imapct
+     * message to it, but we this is in the critical path! Evaluate the impact
      * of doing this */
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, do_op, msg);
     ASSERT_TEST (err==SMIO_SUCCESS, "Error executing SMIO do_op ()",
@@ -152,30 +172,64 @@ smio_err_e smio_do_op (void *owner, void *msg)
     /* Our simple packet is composed of:
      * frame 0: operation
      * frame n: arguments*/
-    zframe_t *opcode = zmsg_pop (*exp_msg->msg);
+    zframe_t *opcode = zmsg_pop (*msg->msg);
 
+    /* FIXME. Improve error codes */
     /* Sanity checks */
     ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
-            SMIO_ERR_WRONG_NARGS);
+            SMIO_ERR_WRONG_ARGS);
     ASSERT_TEST(zframe_size (opcode) == EXP_OPS_OPCODE_SIZE,
             "Invalid opcode size received", err_wrong_opcode_size,
-            SMIO_ERR_WRONG_NARGS);
+            SMIO_ERR_WRONG_ARGS);
 
     uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
     ASSERT_TEST(opcode_data <= SMIO_MAX_OPS-1, "Invalid opcode received",
-            err_invalid_opcode, SMIO_ERR_WRONG_NARGS);
+            err_invalid_opcode, SMIO_ERR_WRONG_ARGS);
 
-    /* Do the actual work... */
-    disp_table_call (self->exp_ops_dtable, opcode_data, self, exp_msg);
+    /* Check registered function arguments */
+    void *ret = NULL;
+    RW_REPLY_TYPE reply_code = PARAM_ERR;
+    bool with_data_frame = false;
+
+    int disp_table_ret = disp_table_check_call (self->exp_ops_dtable,
+            opcode_data, self, msg, &ret);
+
+    /* Log only error message */
+    if (disp_table_ret < 0) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io] disp_table_check_call returned "
+                "status %d\n", disp_table_ret);
+    }
+
+    /* Error returned from registered function */
+    if (disp_table_ret <= 0) {
+        /* Encode error to send to client */
+        reply_code = format_reply_code (disp_table_ret);
+        with_data_frame = false;
+    }
+    else {
+        reply_code = PARAM_OK;
+        with_data_frame = true;
+    }
+
+    /* Send response back to client */
+    send_client_response_mdp (reply_code, disp_table_ret, ret, with_data_frame,
+           self->worker, msg->reply_to);
+
+    zframe_destroy (&opcode);
+    zframe_destroy (&msg->reply_to);
+    zmsg_destroy (msg->msg);
+    return err;
 
 err_invalid_opcode:
 err_wrong_opcode_size:
     zframe_destroy (&opcode);
 err_null_opcode:
 err_do_op:
+    send_client_response_mdp (PARAM_ERR, 0, NULL, false, self->worker,
+            msg->reply_to);
     /* Should reply_to field be zframe_t ** type ?*/
-    zframe_destroy (&exp_msg->reply_to);
-    zmsg_destroy (exp_msg->msg);
+    zframe_destroy (&msg->reply_to);
+    zmsg_destroy (msg->msg);
     return err;
 }
 
