@@ -10,6 +10,7 @@
 #include "sm_io_acq_exp.h"
 #include "sm_io_acq_codes.h"
 #include "sm_io.h"
+#include "sm_io_exports.h"
 #include "dev_io.h"
 #include "hal_assert.h"
 #include "ddr3_map.h"
@@ -46,34 +47,28 @@
 /***************** Specific ACQ Operations ******************/
 /************************************************************/
 
-static void *_acq_data_acquire (void *owner, void *args)
+static int _acq_data_acquire (void *owner, void *args, void *ret)
 {
+    (void) ret;
     assert (owner);
     assert (args);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_data_acquire\n");
-    smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
-    assert (zmsg_size (*exp_msg->msg) == 2);
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
     /* Message is:
      * frame 0: operation code
      * frame 1: number of samples
      * frame 2: channel                 */
-    uint32_t num_samples = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
-    uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
+    uint32_t num_samples = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     /* number of samples required is out of the maximum limit */
     if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Number of samples required is out of the maximum limit\n");
-
-        /* Message is:
-         * frame 0: error code      */
-        send_client_response (ACQ_NUM_SAMPLES_OOR, 0, NULL, false,
-                self->worker, exp_msg->reply_to);
-        goto err_smp_exceeded;
+        return -ACQ_NUM_SAMPLES_OOR;
     }
 
     /* channel required is out of the limit */
@@ -81,11 +76,7 @@ static void *_acq_data_acquire (void *owner, void *args)
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
 
-        /* Message is:
-         * frame 0: error code      */
-        send_client_response (ACQ_NUM_CHAN_OOR, 0, NULL, false,
-                self->worker, exp_msg->reply_to);
-        goto err_smp_exceeded;
+        return -ACQ_NUM_SAMPLES_OOR;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -152,26 +143,32 @@ static void *_acq_data_acquire (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Acquisition Started!\n");
 
-    /* Message is:
-     * frame 0: error code      */
-    send_client_response (ACQ_OK, 0, NULL, false, self->worker,
-            exp_msg->reply_to);
-
-err_smp_exceeded:
-    zmsg_destroy (exp_msg->msg);
-    return NULL;
+    return -ACQ_OK;
 }
 
-static void *_acq_check_data_acquire (void *owner, void *args)
+disp_op_t acq_data_acquire_exp = {
+    .name = ACQ_NAME_DATA_ACQUIRE,
+    .opcode = ACQ_OPCODE_DATA_ACQUIRE,
+    .func_fp = _acq_data_acquire,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+static int _acq_check_data_acquire (void *owner, void *args, void *ret)
 {
+    (void) ret;
     assert (owner);
     assert (args);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_check_data_acquire\n");
 
-    smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
     uint32_t status_done = 0;
     /* Check for completion */
@@ -182,39 +179,41 @@ static void *_acq_check_data_acquire (void *owner, void *args)
     if (!(status_done & ACQ_CORE_STA_DDR3_TRANS_DONE)) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
                 "Acquisition is not done\n");
-        /* Message is:
-         * frame 0: error code  */
-        send_client_response (ACQ_NOT_COMPLETED, 0, NULL, false, self->worker,
-                exp_msg->reply_to);
-        goto err_acq_check;
+        return -ACQ_NOT_COMPLETED;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
             "Acquisition is done\n");
-    send_client_response (ACQ_OK, 0, NULL, false, self->worker,
-            exp_msg->reply_to);
-err_acq_check:
-    zmsg_destroy (exp_msg->msg);
-    return NULL;
+    return -ACQ_OK;
 }
 
-static void *_acq_get_data_block (void *owner, void *args)
+disp_op_t acq_check_data_acquire_exp = {
+    .name = ACQ_NAME_CHECK_DATA_ACQUIRE,
+    .opcode = ACQ_OPCODE_CHECK_DATA_ACQUIRE,
+    .func_fp = _acq_check_data_acquire,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_END
+    }
+};
+
+static int _acq_get_data_block (void *owner, void *args, void *ret)
 {
+    (void) ret;
     assert (owner);
     assert (args);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_get_data_block\n");
 
-    smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) args;
-    assert (zmsg_size (*exp_msg->msg) == 2);
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
     /* Message is:
      * frame 0: channel
      * frame 1: block required      */
-    uint32_t chan = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
-    uint32_t block_n     = *(uint32_t *) zframe_data (zmsg_pop (*exp_msg->msg));
+    uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t block_n = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "chan = %u, block_n = %u\n",chan, block_n);
 
@@ -239,13 +238,7 @@ static void *_acq_get_data_block (void *owner, void *args)
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
                 "Block required is out of the limit\n");
-        /* Message is:
-         * frame 0: error code
-         * frame 1: size (in bytes)
-         * frame 2: data            */
-        send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
-                exp_msg->reply_to);
-        goto err_invalid_block;
+        return -ACQ_BLOCK_OOR;
     }
 
     /* Get number of samples */
@@ -273,13 +266,7 @@ static void *_acq_get_data_block (void *owner, void *args)
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
                 "Block required is not valid\n");
-        /* Message is:
-         * frame 0: error code
-         * frame 1: size (in bytes)
-         * frame 2: data            */
-        send_client_response (ACQ_BLOCK_OOR, 0, NULL, true, self->worker,
-                exp_msg->reply_to);
-        goto err_invalid_block;
+        return -ACQ_BLOCK_OOR;
     }	/* Last valid data conditions check done */
 
     uint32_t reply_size;
@@ -299,45 +286,36 @@ static void *_acq_get_data_block (void *owner, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Memory start address = 0x%08x\n", addr_i);
 
-    /* static max allocation (32-bit words) */
-    uint32_t data_out[BLOCK_SIZE/sizeof(uint32_t)];
     /* Here we must use the "raw" version, as we can't have
      * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
     ssize_t bytes_read = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
-            reply_size, data_out);
+            reply_size, ret);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "%lu bytes read\n", bytes_read);
 
-    /* Successul case */
-    /* Message is:
-     * frame 0: error code
-     * frame 1: size (in bytes)
-     * frame 2: data            */
-    send_client_response (ACQ_OK, bytes_read, data_out, true, self->worker,
-            exp_msg->reply_to);
-
-err_invalid_block:
-    zmsg_destroy (exp_msg->msg);
-    return NULL;
+    return bytes_read;
 }
 
-const smio_exp_ops_t acq_exp_ops [] = {
-    {.name 			= ACQ_NAME_DATA_ACQUIRE,
-        .opcode 		= ACQ_OPCODE_DATA_ACQUIRE,
-        .func_fp 		= _acq_data_acquire						},
-
-    {.name 			= ACQ_NAME_GET_DATA_BLOCK,
-        .opcode 		= ACQ_OPCODE_GET_DATA_BLOCK,
-        .func_fp 		= _acq_get_data_block					},
-
-    {.name 			= ACQ_NAME_CHECK_DATA_ACQUIRE,
-        .opcode 		= ACQ_OPCODE_CHECK_DATA_ACQUIRE,
-        .func_fp 		= _acq_check_data_acquire				},
-
-    {.name 			= NULL,		/* Must end with this NULL pattern */
-        .opcode 		= 0,
-        .func_fp 		= NULL									}
+disp_op_t acq_get_data_block_exp = {
+    .name = ACQ_NAME_GET_DATA_BLOCK,
+    .opcode = ACQ_OPCODE_GET_DATA_BLOCK,
+    .func_fp = _acq_get_data_block,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, smio_acq_data_block_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
 };
+
+const disp_op_t *acq_exp_ops [] = {
+    &acq_data_acquire_exp,
+    &acq_check_data_acquire_exp,
+    &acq_get_data_block_exp,
+    &disp_op_end
+};
+
 /************************************************************/
 /***************** Export methods functions *****************/
 /************************************************************/
@@ -361,7 +339,7 @@ smio_err_e acq_deattach (smio_t *self)
 
 /* Export (register) sm_io to handle operations function pointer */
 smio_err_e acq_export_ops (smio_t *self,
-        const smio_exp_ops_t* smio_exp_ops)
+        const disp_op_t** smio_exp_ops)
 {
     (void) self;
     (void) smio_exp_ops;
