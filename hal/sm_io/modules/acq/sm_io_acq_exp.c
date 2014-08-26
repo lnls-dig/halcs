@@ -291,7 +291,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t bytes_read = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
             reply_size, ret);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%lu bytes read\n", bytes_read);
+            "%ld bytes read\n", bytes_read);
 
     return bytes_read;
 }
