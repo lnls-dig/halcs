@@ -9,8 +9,7 @@
 
 #include "hal_utils.h"
 #include "dispatch_table.h"
-#include "exp_msg_zmq.h"
-#include "exp_ops.h"
+#include "msg.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -54,8 +53,12 @@ static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
 static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void *msg);
 static halutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
+static halutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
+            zmsg_t *zmq_msg);
 static halutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
         exp_msg_zmq_t *args);
+static halutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_op,
+        zmq_server_args_t *args);
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
 static halutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret);
@@ -344,9 +347,12 @@ static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void 
     halutils_err_e err = HALUTILS_ERR_INV_LESS_ARGS;
 
     /* Try to guess which type of message we are dealing with */
-    switch (exp_msg_guess_type (msg)) {
-        case EXP_MSG_ZMQ:
+    switch (msg_guess_type (msg)) {
+        case MSG_EXP_ZMQ:
             err = _disp_table_check_exp_zmq_args (disp_op, (exp_msg_zmq_t *) msg);
+            break;
+        case MSG_THSAFE_ZMQ:
+            err = _disp_table_check_thsafe_zmq_args (disp_op, (zmq_server_args_t *) msg);
             break;
         default:
             break;
@@ -376,11 +382,11 @@ err_disp_op_null:
     return err;
 }
 
-static halutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
-        exp_msg_zmq_t *args)
+static halutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
+        zmsg_t *zmq_msg)
 {
     halutils_err_e err = HALUTILS_SUCCESS;
-    EXP_MSG_ZMQ_ARG_TYPE zmq_arg = EXP_MSG_ZMQ_PEEK_FIRST(args);
+    GEN_MSG_ZMQ_ARG_TYPE zmq_arg = GEN_MSG_ZMQ_PEEK_FIRST(zmq_msg);
 
     /* Iterate over all arguments and check if they match in size with the
      * specified disp_op parameters */
@@ -388,27 +394,28 @@ static halutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
     unsigned i;
     for (i = 0 ; *args_it != DISP_ARG_END; ++args_it, ++i) {
         DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-                "[halutils:disp_table] Checking argument #%u\n", i);
+                "[halutils:disp_table] Checking argument #%u for function \"%s\"\n",
+                i, disp_op->name);
         /* We have argument to check according to disp_op->args */
         if (zmq_arg == NULL) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
                     "[halutils:disp_table] Missing arguments in message"
-                    " received for function: %s\n", disp_op->name);
+                    " received for function \"%s\"\n", disp_op->name);
             err = HALUTILS_ERR_INV_LESS_ARGS;
             goto err_inv_less_args;
         }
 
         /* We have received something and will check for (byte) size
          * correctness */
-        if (EXP_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it)) {
+        if (GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it)) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
                     "[halutils:disp_table] Invalid size of argument"
-                    " received for function: %s\n", disp_op->name);
+                    " received for function \"%s\"\n", disp_op->name);
             err = HALUTILS_ERR_INV_SIZE_ARG;
             goto err_inv_size_args;
         }
 
-        zmq_arg = EXP_MSG_ZMQ_PEEK_NEXT_ARG(args);
+        zmq_arg = GEN_MSG_ZMQ_PEEK_NEXT_ARG(zmq_msg);
     }
 
     /* According to disp_op->args we are done. So, check if the message received
@@ -416,19 +423,32 @@ static halutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
     if (zmq_arg != NULL) {
         DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
                 "[halutils:disp_table] Extra arguments in message"
-                " received for function: %s\n", disp_op->name);
+                " received for function \"%s\"\n", disp_op->name);
         err = HALUTILS_ERR_INV_MORE_ARGS;
         goto err_inv_more_args;
     }
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[halutils:disp_table] No errors detected on the received arguments\n");
+            "[halutils:disp_table] No errors detected on the received arguments "
+            "for function \"%s\"\n", disp_op->name);
 
 err_inv_more_args:
 err_inv_size_args:
 err_inv_less_args:
-    EXP_MSG_ZMQ_PEEK_EXIT(args);
+    GEN_MSG_ZMQ_PEEK_EXIT(zmq_msg);
     return err;
+}
+
+static halutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
+        exp_msg_zmq_t *args)
+{
+    return _disp_table_check_gen_zmq_args (disp_op, EXP_MSG_ZMQ(args));
+}
+
+static halutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_op,
+        zmq_server_args_t *args)
+{
+    return _disp_table_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
 }
 
 static halutils_err_e _disp_table_cleanup_args_op (const disp_op_t *disp_op)
