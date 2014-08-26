@@ -5,11 +5,11 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "exp_msg_zmq.h"
+#include "thsafe_msg_zmq.h"
 
-bool exp_msg_zmq_is (void *self)
+bool thsafe_msg_zmq_is (void *self)
 {
     assert (self);
-    return ((exp_msg_zmq_t *) self)->tag == EXP_MSG_ZMQ_TAG;
+    return ((zmq_server_args_t *) self)->tag == ZMQ_SERVER_ARGS_TAG;
 }
 

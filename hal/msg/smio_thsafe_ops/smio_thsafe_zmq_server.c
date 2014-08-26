@@ -318,7 +318,7 @@ disp_op_t thsafe_zmq_server_read_block_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
         DISP_ARG_END
     }
 };
@@ -345,7 +345,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
     *(int32_t *) ret = llio_ret;
 
     /* Cleanup arguments that we now own */
-    THSAFE_MSG_CLENUP_ARG(data_write_arg);
+    THSAFE_MSG_CLENUP_ARG(&data_write_arg);
 
     return sizeof (int32_t);
 }

@@ -9,7 +9,7 @@
 #include <mdp.h>
 #include "hal_varg.h"
 #include "rw_param_codes.h"
-#include "exp_msg_zmq.h"
+#include "msg.h"
 
 #ifndef _RW_PARAM_H_
 #define _RW_PARAM_H_
@@ -228,12 +228,6 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                     smio_thsafe_client_write_32)
 
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max);
-RW_REPLY_TYPE format_reply_code (int reply_code);
-void send_client_response_mdp (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, mdp_worker_t *worker,
-        zframe_t *reply_to);
-void send_client_response_sock (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, zframe_t *reply_to);
 
 #endif
 

@@ -270,6 +270,10 @@ static smio_err_e _smio_loop (smio_t *self)
                     "[sm_io_bootstrap] smio_do_op: %s\n",
                     smio_err_str (err));
         }
+
+        /* Cleanup */
+        zframe_destroy (&reply_to);
+        zmsg_destroy (&request);
     }
 
     return err;
