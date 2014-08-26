@@ -14,9 +14,11 @@
 enum _msg_err_e
 {
     MSG_SUCCESS = 0,               /* No error */
-    MSG_ERR,                       /* Generic messaging error */
     MSG_ERR_ALLOC,                 /* Could not allocate message */
     MSG_FUNC_NOT_IMPL,             /* Function not implemented */
+    MSG_ERR_INV,                   /* Invalid message structure */
+    MSG_ERR_WRONG_ARGS,            /* Wrong arguments received (number or size) */
+    MSG_ERR_UNEX_MSG,              /* Unexpected message type */
     MSG_ERR_END
 };
 
