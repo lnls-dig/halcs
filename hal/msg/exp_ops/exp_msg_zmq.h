@@ -9,6 +9,7 @@
 #define _EXP_MSG_ZMQ_H_
 
 #include <czmq.h>
+#include "msg_macros.h"
 
 /* Same TAG as defined in https://github.com/zeromq/czmq/blob/master/src/zmsg.c */
 #define EXP_MSG_ZMQ_TAG                             0x0003cafe
@@ -23,23 +24,25 @@ struct _exp_msg_zmq_t {
 
 typedef struct _exp_msg_zmq_t exp_msg_zmq_t;
 
-/* ZMQ exported function arguments macros */
-#define __EXP_MSG_ZMQ_ARGS_2_MSG(args)              ((exp_msg_zmq_t *) args)
-#define EXP_MSG_ZMQ(args)                           (*__EXP_MSG_ZMQ_ARGS_2_MSG(args)->msg)
-#define EXP_MSG_ZMQ_POP_NEXT_ARG(args)              zmsg_pop (EXP_MSG_ZMQ(args))
-#define EXP_MSG_ZMQ_PEEK_NEXT_ARG(args)             zmsg_next (EXP_MSG_ZMQ(args))
-#define EXP_MSG_ZMQ_PEEK_FIRST(args)                zmsg_first (EXP_MSG_ZMQ(args))
-#define EXP_MSG_ZMQ_PEEK_RESTART(args)              EXP_MSG_ZMQ_PEEK_FIRST(args)
-#define EXP_MSG_ZMQ_PEEK_EXIT(args)                 EXP_MSG_ZMQ_PEEK_FIRST(args)
+/* SMIO THSAFE ZMQ server function arguments macros */
+#define __EXP_MSG_ZMQ_ARGS_2_MSG(args)                 ((exp_msg_zmq_t *) args)
+#define EXP_MSG_ZMQ(args)                              (*__EXP_MSG_ZMQ_ARGS_2_MSG(args)->msg)
 
-#define EXP_MSG_ZMQ_ARG_TYPE                        zframe_t *
+#define EXP_MSG_ZMQ_POP_NEXT_ARG(args)                  GEN_MSG_ZMQ_POP_NEXT_ARG(EXP_MSG_ZMQ(args))
+#define EXP_MSG_CLENUP_ARG(arg_p)                       GEN_MSG_ZMQ_CLENUP_ARG(arg_p)
+#define EXP_MSG_ZMQ_PEEK_NEXT_ARG(args)                 GEN_MSG_ZMQ_PEEK_NEXT_ARG(EXP_MSG_ZMQ(args))
+#define EXP_MSG_ZMQ_PEEK_FIRST(args)                    GEN_MSG_ZMQ_PEEK_FIRST(EXP_MSG_ZMQ(args))
+#define EXP_MSG_ZMQ_PEEK_EXIT(args)                     GEN_MSG_ZMQ_PEEK_EXIT(EXP_MSG_ZMQ(args))
+#define EXP_MSG_ZMQ_PEEK_RESTART(args)                  GEN_MSG_ZMQ_PEEK_RESTART(EXP_MSG_ZMQ(args))
 
-#define EXP_MSG_ZMQ_ARG_SIZE(frame)                 zframe_size (frame)
-#define EXP_MSG_ZMQ_ARG_DATA(frame)                 zframe_data (frame)
+#define EXP_MSG_ZMQ_ARG_TYPE                            GEN_MSG_ZMQ_ARG_TYPE
+
+#define EXP_MSG_ZMQ_ARG_SIZE(arg)                       GEN_MSG_ZMQ_ARG_SIZE(arg)
+#define EXP_MSG_ZMQ_ARG_DATA(arg)                       GEN_MSG_ZMQ_ARG_DATA(arg)
 
 /* For use in SMIOs exported functions */
-#define EXP_MSG_ZMQ_FIRST_ARG(args)                 zframe_data (EXP_MSG_ZMQ_PEEK_FIRST(args))
-#define EXP_MSG_ZMQ_NEXT_ARG(args)                  zframe_data (EXP_MSG_ZMQ_PEEK_NEXT_ARG(args))
+#define EXP_MSG_ZMQ_FIRST_ARG(args)                     GEN_MSG_ZMQ_FIRST_ARG(EXP_MSG_ZMQ(args))
+#define EXP_MSG_ZMQ_NEXT_ARG(args)                      GEN_MSG_ZMQ_NEXT_ARG(EXP_MSG_ZMQ(args))
 
 /* Try to guess if the message is of exp_msg_zmq type */
 bool exp_msg_zmq_is (void *self);
