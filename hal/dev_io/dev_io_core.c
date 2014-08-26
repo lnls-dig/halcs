@@ -12,7 +12,7 @@
 #include "dev_io_err.h"
 #include "hal_assert.h"
 #include "sm_io_mod_dispatch.h"
-#include "smio_thsafe_zmq_server.h"
+#include "msg.h"
 #include "rw_param.h"
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
@@ -445,6 +445,9 @@ devio_err_e devio_poll_all_sm (devio_t *self)
     zmq_server_args_t server_args = {.msg = &recv_msg, .reply_to = which};
     err = _devio_do_smio_op (self, &server_args);
 
+    /* Cleanup */
+    zmsg_destroy (&recv_msg);
+
 err_poller_expired:
 err_poller_terminated:
 err_uninitialized_poller:
@@ -481,6 +484,9 @@ devio_err_e devio_poll2_all_sm (devio_t *self)
                 .msg = &recv_msg,
                 .reply_to = self->poller2 [i].socket};
             err = _devio_do_smio_op (self, &server_args);
+
+            /* Cleanup */
+            zmsg_destroy (&recv_msg);
         }
     }
 
@@ -498,74 +504,17 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
 /**************** Helper Functions ***************/
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
+    assert (self);
+    assert (msg);
+
     devio_err_e err = DEVIO_SUCCESS;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) msg;
-    /* Message is:
-     * frame 0: opcode
-     * frame 1: payload */
-    /* Extract the first frame and determine the opcode */
-    zframe_t *opcode = zmsg_pop (*server_args->msg);
-    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
-            DEVIO_ERR_BAD_MSG);
 
-    /* Sanity checks */
-    ASSERT_TEST(zframe_size (opcode) == THSAFE_OPCODE_SIZE,
-            "poll_all_sm: Invalid opcode size received", err_wrong_opcode_size,
-            DEVIO_ERR_BAD_MSG);
+    disp_table_t *disp_table = self->disp_table_thsafe_ops;
+    msg_err_e merr = msg_handle_sock_request (self, msg, disp_table);
+    ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
+           SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
-    uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
-    ASSERT_TEST(opcode_data <= THSAFE_OPCODE_END-1,
-            "poll_all_sm: Invalid opcode received", err_invalid_opcode,
-            DEVIO_ERR_BAD_MSG);
-
-    /* Check registered function arguments */
-    void *ret = NULL;
-    RW_REPLY_TYPE reply_code = PARAM_ERR;
-    bool with_data_frame = false;
-
-    /* We don't check for the arguments for THSAFE operations, as these are just
-     * internal calls and we trust ourselves ...*/
-    halutils_err_e herr = disp_table_set_ret (self->disp_table_thsafe_ops,
-            opcode_data, &ret);
-    ASSERT_TEST(herr == HALUTILS_SUCCESS, "Could not set return value",
-            err_set_ret, DEVIO_ERR_BAD_MSG);
-
-    int disp_table_ret = disp_table_call (self->disp_table_thsafe_ops,
-            opcode_data, self, server_args, ret);
-
-    /* Log message */
-    if (disp_table_ret < 0) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR, "[dev_io_core] disp_table_check_call "
-                "returned status %d\n", disp_table_ret);
-    }
-
-    /* Error returned from registered function */
-    if (disp_table_ret <= 0) {
-        /* Encode error to send to client */
-        reply_code = format_reply_code (disp_table_ret);
-        with_data_frame = false;
-    }
-    else {
-        reply_code = PARAM_OK;
-        with_data_frame = true;
-    }
-
-    /* Send response back to client */
-    send_client_response_sock (reply_code, disp_table_ret, ret, with_data_frame,
-            server_args->reply_to);
-
-    zframe_destroy (&opcode);
-    zmsg_destroy (server_args->msg);
-    return err;
-
-err_set_ret:
-err_invalid_opcode:
-err_wrong_opcode_size:
-    zframe_destroy (&opcode);
-err_null_opcode:
-    send_client_response_sock (PARAM_ERR, 0, NULL, false, server_args->reply_to);
-    /* Should reply_to field be zframe_t ** type ?*/
-    zmsg_destroy (server_args->msg);
+err_hand_req:
     return err;
 }
 
