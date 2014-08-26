@@ -18,12 +18,9 @@
 #include "sm_io_bootstrap.h"
 #include "sm_io_mod_dispatch.h"
 #include "sm_io_exports.h"
-#include "exp_ops.h"
+#include "msg.h"
 #include "dispatch_table.h"
 #include "mdp.h"
-
-/* Arbitrary number*/
-#define SMIO_MAX_OPS                            200
 
 struct _devio_t;
 struct _smio_ops_t;
