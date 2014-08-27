@@ -165,6 +165,190 @@ disp_op_t dsp_set_get_ds_monit_thres_exp = {
     }
 };
 
+#define POS_CALC_DSP_MONIT_AMP_CH0_R(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH0_W(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH0_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_amp_ch0) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH0, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_amp_ch0_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_AMP_CH0,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_AMP_CH0,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_amp_ch0),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_AMP_CH1_R(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH1_W(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH1_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_amp_ch1) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH1, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_amp_ch1_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_AMP_CH1,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_AMP_CH1,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_amp_ch1),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_AMP_CH2_R(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH2_W(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH2_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_amp_ch2) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH2, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_amp_ch2_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_AMP_CH2,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_AMP_CH2,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_amp_ch2),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_AMP_CH3_R(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH3_W(val)       (val)
+#define POS_CALC_DSP_MONIT_AMP_CH3_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_amp_ch3) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH3, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_amp_ch3_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_AMP_CH3,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_AMP_CH3,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_amp_ch3),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_POS_X_R(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_X_W(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_X_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_pos_x) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_X, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_pos_x_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_POS_X,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_POS_X,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_pos_x),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_POS_Y_R(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_Y_W(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_Y_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_pos_y) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_Y, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_pos_y_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_POS_Y,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_POS_Y,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_pos_y),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_POS_Q_R(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_Q_W(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_Q_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_pos_q) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_Q, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_pos_q_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_POS_Q,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_POS_Q,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_pos_q),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define POS_CALC_DSP_MONIT_POS_SUM_R(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_SUM_W(val)       (val)
+#define POS_CALC_DSP_MONIT_POS_SUM_MASK         ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_pos_sum) {
+	SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_SUM, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t dsp_set_get_monit_pos_sum_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_POS_SUM,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_POS_SUM,
+    .func_fp = RW_PARAM_FUNC_NAME(dsp, monit_pos_sum),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
     &dsp_set_get_ky_exp,
@@ -172,6 +356,14 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_ds_tbt_thres_exp,
     &dsp_set_get_ds_fofb_thres_exp,
     &dsp_set_get_ds_monit_thres_exp,
+    &dsp_set_get_monit_amp_ch0_exp,
+    &dsp_set_get_monit_amp_ch1_exp,
+    &dsp_set_get_monit_amp_ch2_exp,
+    &dsp_set_get_monit_amp_ch3_exp,
+    &dsp_set_get_monit_pos_x_exp,
+    &dsp_set_get_monit_pos_y_exp,
+    &dsp_set_get_monit_pos_q_exp,
+    &dsp_set_get_monit_pos_sum_exp,
     &disp_op_end
 };
 
