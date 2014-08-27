@@ -124,10 +124,14 @@ int main (int argc, char *argv[])
                     "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
             goto err_exit;
         }
-
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
-                dev_id);
     }
+    /* Use the passed ID */
+    else {
+        dev_id = strtoul (dev_id_str, NULL, 10);
+    }
+
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
+            dev_id);
 
     /* We don't need it anymore */
     str_p = &dev_type;
