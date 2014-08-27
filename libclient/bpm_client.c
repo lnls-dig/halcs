@@ -154,6 +154,50 @@ err_send_msg_alloc:
     return err;
 }
 
+/* RAW ADC data 0 value */
+PARAM_FUNC_CLIENT_WRITE(adc_data0)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA0, adc_data0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_data0)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA0, adc_data0);
+}
+
+/* RAW ADC data 1 value */
+PARAM_FUNC_CLIENT_WRITE(adc_data1)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA1, adc_data1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_data1)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA1, adc_data1);
+}
+
+/* RAW ADC data 0 value */
+PARAM_FUNC_CLIENT_WRITE(adc_data2)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA2, adc_data2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_data2)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA2, adc_data2);
+}
+
+/* RAW ADC data 0 value */
+PARAM_FUNC_CLIENT_WRITE(adc_data3)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA3, adc_data3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_data3)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA3, adc_data3);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */

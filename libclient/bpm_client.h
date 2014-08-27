@@ -98,6 +98,28 @@ bpm_client_err_e bpm_set_fmc_pll_function (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_fmc_pll_function (bpm_client_t *self, char *service,
         uint32_t *fmc_pll_function);
 
+/* RAW ADC data functions */
+/* These set of functions read (get) the RAW ADC values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_data0 (bpm_client_t *self, char *service,
+        uint32_t adc_data0);
+bpm_client_err_e bpm_get_adc_data0 (bpm_client_t *self, char *service,
+        uint32_t *adc_data0);
+bpm_client_err_e bpm_set_adc_data1 (bpm_client_t *self, char *service,
+        uint32_t adc_data1);
+bpm_client_err_e bpm_get_adc_data1 (bpm_client_t *self, char *service,
+        uint32_t *adc_data1);
+bpm_client_err_e bpm_set_adc_data2 (bpm_client_t *self, char *service,
+        uint32_t adc_data2);
+bpm_client_err_e bpm_get_adc_data2 (bpm_client_t *self, char *service,
+        uint32_t *adc_data2);
+bpm_client_err_e bpm_set_adc_data3 (bpm_client_t *self, char *service,
+        uint32_t adc_data3);
+bpm_client_err_e bpm_get_adc_data3 (bpm_client_t *self, char *service,
+        uint32_t *adc_data3);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
