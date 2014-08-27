@@ -176,7 +176,7 @@ PARAM_FUNC_CLIENT_READ(adc_data1)
      return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA1, adc_data1);
 }
 
-/* RAW ADC data 0 value */
+/* RAW ADC data 2 value */
 PARAM_FUNC_CLIENT_WRITE(adc_data2)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA2, adc_data2);
@@ -187,7 +187,7 @@ PARAM_FUNC_CLIENT_READ(adc_data2)
      return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DATA2, adc_data2);
 }
 
-/* RAW ADC data 0 value */
+/* RAW ADC data 3 value */
 PARAM_FUNC_CLIENT_WRITE(adc_data3)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DATA3, adc_data3);
