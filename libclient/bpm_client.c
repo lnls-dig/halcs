@@ -563,6 +563,94 @@ PARAM_FUNC_CLIENT_READ(ds_monit_thres)
      return param_client_read (self, service, DSP_OPCODE_SET_GET_DS_MONIT_THRES, ds_monit_thres);
 }
 
+/* Monitoring Amplitude channel 0 value */
+PARAM_FUNC_CLIENT_WRITE(monit_amp_ch0)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH0, monit_amp_ch0);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_amp_ch0)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH0, monit_amp_ch0);
+}
+
+/* Monitoring Amplitude channel 1 value */
+PARAM_FUNC_CLIENT_WRITE(monit_amp_ch1)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH1, monit_amp_ch1);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_amp_ch1)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH1, monit_amp_ch1);
+}
+
+/* Monitoring Amplitude channel 2 value */
+PARAM_FUNC_CLIENT_WRITE(monit_amp_ch2)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH2, monit_amp_ch2);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_amp_ch2)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH2, monit_amp_ch2);
+}
+
+/* Monitoring Amplitude channel 3 value */
+PARAM_FUNC_CLIENT_WRITE(monit_amp_ch3)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH3, monit_amp_ch3);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_amp_ch3)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_AMP_CH3, monit_amp_ch3);
+}
+
+/* Monitoring Position X value */
+PARAM_FUNC_CLIENT_WRITE(monit_pos_x)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POS_X, monit_pos_x);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_pos_x)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POS_X, monit_pos_x);
+}
+
+/* Monitoring Position Y value */
+PARAM_FUNC_CLIENT_WRITE(monit_pos_y)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POS_Y, monit_pos_y);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_pos_y)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POS_Y, monit_pos_y);
+}
+
+/* Monitoring Position Q value */
+PARAM_FUNC_CLIENT_WRITE(monit_pos_q)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POS_Q, monit_pos_q);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_pos_q)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POS_Q, monit_pos_q);
+}
+
+/* Monitoring Position Sum value */
+PARAM_FUNC_CLIENT_WRITE(monit_pos_sum)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POS_SUM, monit_pos_sum);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_pos_sum)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POS_SUM, monit_pos_sum);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */

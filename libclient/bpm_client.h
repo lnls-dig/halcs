@@ -197,6 +197,50 @@ bpm_client_err_e bpm_set_ds_monit_thres (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_ds_monit_thres (bpm_client_t *self, char *service,
 		uint32_t *ds_monit_thres);
 
+/* Monitoring Position values */
+/* These set of functions read (get) the Monitoring position values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_pos_x (bpm_client_t *self, char *service,
+        uint32_t monit_pos_x);
+bpm_client_err_e bpm_get_monit_pos_x (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_x);
+bpm_client_err_e bpm_set_monit_pos_y (bpm_client_t *self, char *service,
+        uint32_t monit_pos_y);
+bpm_client_err_e bpm_get_monit_pos_y (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_y);
+bpm_client_err_e bpm_set_monit_pos_q (bpm_client_t *self, char *service,
+        uint32_t monit_pos_q);
+bpm_client_err_e bpm_get_monit_pos_q (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_q);
+bpm_client_err_e bpm_set_monit_pos_sum (bpm_client_t *self, char *service,
+        uint32_t monit_pos_sum);
+bpm_client_err_e bpm_get_monit_pos_sum (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_sum);
+
+/* Monitoring Amplitude values */
+/* These set of functions read (get) the Monitoring amplitude values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_amp_ch0 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch0);
+bpm_client_err_e bpm_get_monit_amp_ch0 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch0);
+bpm_client_err_e bpm_set_monit_amp_ch1 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch1);
+bpm_client_err_e bpm_get_monit_amp_ch1 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch1);
+bpm_client_err_e bpm_set_monit_amp_ch2 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch2);
+bpm_client_err_e bpm_get_monit_amp_ch2 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch2);
+bpm_client_err_e bpm_set_monit_amp_ch3 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch3);
+bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch3);
+
 /********************** SWAP Functions ********************/
 
 
