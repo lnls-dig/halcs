@@ -20,7 +20,15 @@
 #define FMC130M_4CH_NAME_PLL_FUNCTION           "pll_function"
 #define FMC130M_4CH_OPCODE_AD9510_CFG_TEST      2
 #define FMC130M_4CH_NAME_AD9510_CFG_TEST        "ad9510_cfg_test"
-#define FMC130M_4CH_OPCODE_END                  3
+#define FMC130M_4CH_OPCODE_ADC_DATA0            3
+#define FMC130M_4CH_NAME_ADC_DATA0              "adc_data0"
+#define FMC130M_4CH_OPCODE_ADC_DATA1            4
+#define FMC130M_4CH_NAME_ADC_DATA1              "adc_data1"
+#define FMC130M_4CH_OPCODE_ADC_DATA2            5
+#define FMC130M_4CH_NAME_ADC_DATA2              "adc_data2"
+#define FMC130M_4CH_OPCODE_ADC_DATA3            6
+#define FMC130M_4CH_NAME_ADC_DATA3              "adc_data3"
+#define FMC130M_4CH_OPCODE_END                  7
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_SIZE                  (sizeof(uint32_t))

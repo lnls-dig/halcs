@@ -125,10 +125,126 @@ disp_op_t fmc130m_4ch_ad9510_cfg_test_exp = {
     }
 };
 
+/* FIXME: Override DATA<channel_number>_VAL macros with the DATA_GLOBAL ones.
+ * As the macros are defined with 32-bits and there is a shift involved, the
+ * compiler complains about the size of the macro being bigger the the type
+ * (uint32_t). So, we define our own macros here and don't use the generated
+ * ones*/
+#define WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK     ((1ULL<<32)-1)
+#define WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)   (val)
+#define WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)   (val)
+
+/* We receive data as 32-bit, but the 16 MSB are zeroed. It is conveninent
+ * to sign extend the bits */
+static int _rw_bpm_fmc130m_4ch_data_fmt (uint32_t *data)
+{
+    *data = WBGEN2_SIGN_EXTEND(*data, 15);
+
+    return PARAM_OK;
+}
+
+rw_param_format_fp rw_bpm_fmc130m_4ch_data_fmt_fp = _rw_bpm_fmc130m_4ch_data_fmt;
+
+#define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
+#define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
+#define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
+RW_PARAM_FUNC(fmc130m_4ch, adc_data0) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            DATA0, GLOBAL, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_adc_data0 = {
+    .name = FMC130M_4CH_NAME_ADC_DATA0,
+    .opcode = FMC130M_4CH_OPCODE_ADC_DATA0,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data0),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
+#define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
+#define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
+RW_PARAM_FUNC(fmc130m_4ch, adc_data1) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            DATA1, GLOBAL, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_adc_data1 = {
+    .name = FMC130M_4CH_NAME_ADC_DATA1,
+    .opcode = FMC130M_4CH_OPCODE_ADC_DATA1,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data1),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_MASK       WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
+#define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
+#define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
+RW_PARAM_FUNC(fmc130m_4ch, adc_data2) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            DATA2, GLOBAL, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_adc_data2 = {
+    .name = FMC130M_4CH_NAME_ADC_DATA2,
+    .opcode = FMC130M_4CH_OPCODE_ADC_DATA2,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data2),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+#define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
+#define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
+#define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
+RW_PARAM_FUNC(fmc130m_4ch, adc_data3) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            DATA3, GLOBAL, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_adc_data3 = {
+    .name = FMC130M_4CH_NAME_ADC_DATA3,
+    .opcode = FMC130M_4CH_OPCODE_ADC_DATA3,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data3),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
     &fmc130m_4ch_ad9510_cfg_test_exp,
+    &fmc130m_4ch_adc_data0,
+    &fmc130m_4ch_adc_data1,
+    &fmc130m_4ch_adc_data2,
+    &fmc130m_4ch_adc_data3,
     &disp_op_end
 };
 
