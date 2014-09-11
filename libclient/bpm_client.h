@@ -120,6 +120,105 @@ bpm_client_err_e bpm_set_adc_data3 (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_adc_data3 (bpm_client_t *self, char *service,
         uint32_t *adc_data3);
 
+/* ADC delay value functions */
+
+/* The three set of group functions provide a low-lovel interface to the FPGA
+ * firmware. The correct usage to set the ADC clock and data paths delay are:
+ *
+ * 1) Set the delay value with bpm_set_adc_dly_val<*> for the desired channel.
+ *      Accepted values are from 0 to 31.
+ * 2) Set the delay line which will be updated with bpm_set_adc_dly_line<*> for the desired channel
+ *      Accepted values are the bitmask of the desired lines with bit 16 corresponding
+ *      to the clock line and bits 15-0 to ADC bits 15 to 0
+ * 3) call the update functions bpm_set_adc_dly_updt<*> for the desired channel.
+ */
+
+/* These set of functions read/write (set/get) the ADC delay values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_val0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val0);
+bpm_client_err_e bpm_get_adc_dly_val0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val0);
+bpm_client_err_e bpm_set_adc_dly_val1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val1);
+bpm_client_err_e bpm_get_adc_dly_val1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val1);
+bpm_client_err_e bpm_set_adc_dly_val2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val2);
+bpm_client_err_e bpm_get_adc_dly_val2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val2);
+bpm_client_err_e bpm_set_adc_dly_val3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val3);
+bpm_client_err_e bpm_get_adc_dly_val3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val3);
+
+/* ADC delay line functions */
+/* These set of functions read/write (set/get) the ADC delay line values,
+ * meaning which lines (16 = clock, 15-0 = data bits) are to be updated
+ * on bpm_set_adc_dly_updt<*> functions.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_line0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line0);
+bpm_client_err_e bpm_get_adc_dly_line0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line0);
+bpm_client_err_e bpm_set_adc_dly_line1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line1);
+bpm_client_err_e bpm_get_adc_dly_line1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line1);
+bpm_client_err_e bpm_set_adc_dly_line2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line2);
+bpm_client_err_e bpm_get_adc_dly_line2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line2);
+bpm_client_err_e bpm_set_adc_dly_line3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line3);
+bpm_client_err_e bpm_get_adc_dly_line3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line3);
+
+/* ADC update functions */
+/* These set of functions read/write (set/get) the ADC delay update values
+ * for each channel. This will effectively update the FPGA delay primitives to
+ * the previous delay values set by the corresponding bpm_get_adc_dly_updt<*>
+ * functions.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_updt0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt0);
+bpm_client_err_e bpm_get_adc_dly_updt0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt0);
+bpm_client_err_e bpm_set_adc_dly_updt1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt1);
+bpm_client_err_e bpm_get_adc_dly_updt1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt1);
+bpm_client_err_e bpm_set_adc_dly_updt2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt2);
+bpm_client_err_e bpm_get_adc_dly_updt2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt2);
+bpm_client_err_e bpm_set_adc_dly_updt3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt3);
+bpm_client_err_e bpm_get_adc_dly_updt3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt3);
+
+/* Higher-level ADC delay functions */
+/* These set of functions write (set) the ADC delays for each channel.
+ * This functions wrap all of the functionality present by the 3 groups above
+ * in a conveninent way to the user.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly0 (bpm_client_t *self, char *service,
+        uint32_t dly_type0, uint32_t dly_val0);
+bpm_client_err_e bpm_set_adc_dly1 (bpm_client_t *self, char *service,
+        uint32_t dly_type1, uint32_t dly_val1);
+bpm_client_err_e bpm_set_adc_dly2 (bpm_client_t *self, char *service,
+        uint32_t dly_type2, uint32_t dly_val2);
+bpm_client_err_e bpm_set_adc_dly3 (bpm_client_t *self, char *service,
+        uint32_t dly_type3, uint32_t dly_val3);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
