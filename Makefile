@@ -29,7 +29,7 @@ DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
 LIBCLIENT_DIR=libclient
 
 # General C flags
-CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
+CFLAGS = -std=gnu99 -O2
 
 ifeq ($(BOARD),ml605)
 CFLAGS += -D__BOARD_ML605__

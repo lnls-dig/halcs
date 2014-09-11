@@ -163,27 +163,27 @@
 #define ACQ_CORE_ACQ_CHAN_CTL_WHICH_R(reg)    WBGEN2_GEN_READ(reg, 0, 5)
 /* FIXME: The FPGA firmware is WORD addressed for now */
 /* [0x0]: REG Control register */
-#define ACQ_CORE_REG_CTL (0x00000000 >> WR_SHIFT)
+#define ACQ_CORE_REG_CTL 0x00000000
 /* [0x4]: REG Status register */
-#define ACQ_CORE_REG_STA (0x00000004 >> WR_SHIFT)
+#define ACQ_CORE_REG_STA 0x00000004
 /* [0x8]: REG Trigger configuration */
-#define ACQ_CORE_REG_TRIG_CFG (0x00000008 >> WR_SHIFT)
+#define ACQ_CORE_REG_TRIG_CFG 0x00000008
 /* [0xc]: REG Trigger delay */
-#define ACQ_CORE_REG_TRIG_DLY (0x0000000c >> WR_SHIFT)
+#define ACQ_CORE_REG_TRIG_DLY 0x0000000c
 /* [0x10]: REG Software trigger */
-#define ACQ_CORE_REG_SW_TRIG (0x00000010 >> WR_SHIFT)
+#define ACQ_CORE_REG_SW_TRIG 0x00000010
 /* [0x14]: REG Number of shots */
-#define ACQ_CORE_REG_SHOTS (0x00000014 >> WR_SHIFT)
+#define ACQ_CORE_REG_SHOTS 0x00000014
 /* [0x18]: REG Trigger address register */
-#define ACQ_CORE_REG_TRIG_POS (0x00000018 >> WR_SHIFT)
+#define ACQ_CORE_REG_TRIG_POS 0x00000018
 /* [0x1c]: REG Pre-trigger samples */
-#define ACQ_CORE_REG_PRE_SAMPLES (0x0000001c >> WR_SHIFT)
+#define ACQ_CORE_REG_PRE_SAMPLES 0x0000001c
 /* [0x20]: REG Post-trigger samples */
-#define ACQ_CORE_REG_POST_SAMPLES (0x00000020 >> WR_SHIFT)
+#define ACQ_CORE_REG_POST_SAMPLES 0x00000020
 /* [0x24]: REG Samples counter */
-#define ACQ_CORE_REG_SAMPLES_CNT (0x00000024 >> WR_SHIFT)
+#define ACQ_CORE_REG_SAMPLES_CNT 0x00000024
 /* [0x28]: REG DDR3 Start Address */
-#define ACQ_CORE_REG_DDR3_START_ADDR (0x00000028 >> WR_SHIFT)
+#define ACQ_CORE_REG_DDR3_START_ADDR 0x00000028
 /* [0x2c]: REG Acquisition channel control */
-#define ACQ_CORE_REG_ACQ_CHAN_CTL (0x0000002c >> WR_SHIFT)
+#define ACQ_CORE_REG_ACQ_CHAN_CTL 0x0000002c
 #endif
