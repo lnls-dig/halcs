@@ -51,6 +51,8 @@ bpm_client_err_e param_client_recv_rw (struct _bpm_client_t *self, char *service
     zmsg_t **report);
 bpm_client_err_e param_client_write (struct _bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param);
+bpm_client_err_e param_client_write_gen (struct _bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2);
 bpm_client_err_e param_client_read (struct _bpm_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out);
 

@@ -69,17 +69,16 @@ err_null_msg:
 }
 
 /* TODO: improve error handling */
-bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t param)
+bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2)
 {
     assert (self);
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    uint32_t rw = WRITE_MODE;
     zmsg_t *report;
 
-    err = param_client_send_rw (self, service, operation, rw, param);
+    err = param_client_send_rw (self, service, operation, param1, param2);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -106,6 +105,13 @@ err_send_msg:
     return err;
 }
 
+bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service,operation, rw, param);
+}
+
 /* TODO: improve error handling */
 bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out)
@@ -114,10 +120,10 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    uint32_t rw = READ_MODE;
+    uint32_t param1 = READ_MODE;
     zmsg_t *report;
 
-    err = param_client_send_rw (self, service, operation, rw,
+    err = param_client_send_rw (self, service, operation, param1,
             0 /* in read mode this value will be ignored */);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
