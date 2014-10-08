@@ -15,9 +15,10 @@
 /* Default value definitions */
 #define DEFAULT_ADC_DLY_VALUE       10
 #define MAX_ADC_DLY_VALUE           31
-
 #define DEFAULT_CHAN_NUM            0
 #define MAX_CHAN_NUM                3 /* 0-3 */
+#define DEFAULT_LINES_NUM           1 /* DATA */
+#define MAX_LINES_NUM               3 /* DATA + CLOCK */
 
 void print_help (char *program_name)
 {
@@ -26,6 +27,7 @@ void print_help (char *program_name)
             "\t-v Verbose output\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-ch <channel> ADC channel\n"
+            "\t-lines <delay_lines> ADC delay lines (1 = data, 2 = clock, 3 = both)\n"
             "\t-val <delay_value> ADC delay value (0-31)\n"
             , program_name);
 }
@@ -34,8 +36,9 @@ int main (int argc, char *argv [])
 {
     int verbose = 0;
     char *broker_endp = NULL;
-    char *dly_val_str = NULL;
     char *chan_str = NULL;
+    char *lines_str = NULL;
+    char *dly_val_str = NULL;
     char **str_p = NULL;
 
     if (argc < 3) {
@@ -60,11 +63,14 @@ int main (int argc, char *argv [])
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
         }
-        else if (streq (argv[i], "-val")) { /* val: delay value */
-            str_p = &dly_val_str;
-        }
         else if (streq (argv[i], "-ch")) { /* ch: channel */
             str_p = &chan_str;
+        }
+        else if (streq (argv[i], "-lines")) { /* lines: delay lines */
+            str_p = &lines_str;
+        }
+        else if (streq (argv[i], "-val")) { /* val: delay value */
+            str_p = &dly_val_str;
         }
         /* Fallout for options with parameters */
         else {
@@ -78,24 +84,6 @@ int main (int argc, char *argv [])
     }
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-
-    /* Set default ADC Delay values */
-    uint32_t dly_val = 0;
-    if (dly_val_str == NULL) {
-        fprintf (stderr, "[client:adc_dly]: Setting default ADC delay value to: %u\n",
-                DEFAULT_ADC_DLY_VALUE);
-        dly_val = DEFAULT_ADC_DLY_VALUE;
-    }
-    else {
-        dly_val = strtoul (dly_val_str, NULL, 10);
-
-        if (dly_val > MAX_ADC_DLY_VALUE) {
-            fprintf (stderr, "[client:adc_dly]: ADC delay value too big! Defaulting to: %u\n",
-                    MAX_ADC_DLY_VALUE);
-            dly_val = MAX_ADC_DLY_VALUE;
-        }
-    }
-    fprintf (stdout, "[client:adc_dly]: ADC delay value = %u\n", dly_val);
 
     /* Set default channel */
     uint32_t chan;
@@ -115,23 +103,59 @@ int main (int argc, char *argv [])
     }
     fprintf (stdout, "[client:adc_dly]: chan = %u\n", chan);
 
+    /* Set ADC default line values */
+    uint32_t lines = 0;
+    if (dly_val_str == NULL) {
+        fprintf (stderr, "[client:adc_dly]: Setting default ADC lines to: %u\n",
+                DEFAULT_LINES_NUM);
+        lines = DEFAULT_LINES_NUM;
+    }
+    else {
+        lines = strtoul (lines_str, NULL, 10);
+
+        if (lines > MAX_LINES_NUM) {
+            fprintf (stderr, "[client:adc_dly]: ADC delay value too big! Defaulting to: %u\n",
+                    MAX_LINES_NUM);
+            lines = MAX_LINES_NUM;
+        }
+    }
+    fprintf (stdout, "[client:adc_dly]: ADC lines value = %u\n", lines);
+
+    /* Set default ADC Delay values */
+    uint32_t dly_val = 0;
+    if (dly_val_str == NULL) {
+        fprintf (stderr, "[client:adc_dly]: Setting default ADC delay value to: %u\n",
+                DEFAULT_ADC_DLY_VALUE);
+        dly_val = DEFAULT_ADC_DLY_VALUE;
+    }
+    else {
+        dly_val = strtoul (dly_val_str, NULL, 10);
+
+        if (dly_val > MAX_ADC_DLY_VALUE) {
+            fprintf (stderr, "[client:adc_dly]: ADC delay value too big! Defaulting to: %u\n",
+                    MAX_ADC_DLY_VALUE);
+            dly_val = MAX_ADC_DLY_VALUE;
+        }
+    }
+    fprintf (stdout, "[client:adc_dly]: ADC delay value = %u\n", dly_val);
+
     /* Call the appropriate delay fucntion. FIXME: the case construct is
      * not generic nor expansible */
     switch(chan) {
         case 0:
-            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", chan, dly_val);
+            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
             break;
         case 1:
-            bpm_set_adc_dly1 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", chan, dly_val);
+            bpm_set_adc_dly1 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
             break;
         case 2:
-            bpm_set_adc_dly2 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", chan, dly_val);
+            bpm_set_adc_dly2 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
             break;
         case 3:
-            bpm_set_adc_dly3 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", chan, dly_val);
+            bpm_set_adc_dly3 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
             break;
         default:
-            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", chan, dly_val);
+            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
             break;
     }
 
