@@ -105,7 +105,7 @@ int main (int argc, char *argv [])
 
     /* Set ADC default line values */
     uint32_t lines = 0;
-    if (dly_val_str == NULL) {
+    if (lines_str == NULL) {
         fprintf (stderr, "[client:adc_dly]: Setting default ADC lines to: %u\n",
                 DEFAULT_LINES_NUM);
         lines = DEFAULT_LINES_NUM;
