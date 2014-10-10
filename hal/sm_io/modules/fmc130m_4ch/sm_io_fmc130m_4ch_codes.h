@@ -60,7 +60,9 @@
 #define FMC130M_4CH_NAME_ADC_DLY2               "adc_dly2"
 #define FMC130M_4CH_OPCODE_ADC_DLY3             22
 #define FMC130M_4CH_NAME_ADC_DLY3               "adc_dly3"
-#define FMC130M_4CH_OPCODE_END                  23
+#define FMC130M_4CH_OPCODE_TEST_DATA_EN         23
+#define FMC130M_4CH_NAME_TEST_DATA_EN           "adc_test_data_en"
+#define FMC130M_4CH_OPCODE_END                  24
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_SIZE                  (sizeof(uint32_t))

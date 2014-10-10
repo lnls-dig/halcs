@@ -642,6 +642,32 @@ disp_op_t fmc130m_4ch_adc_dly3_exp = {
         DISP_ARG_END
     }
 };
+
+/***************************** FPGA Control ***************************/
+
+#define BPM_FMC130M_4CH_TEST_DATA_EN_MIN            0 /* TEST data enable off */
+#define BPM_FMC130M_4CH_TEST_DATA_EN_MAX            1 /* TEST data enable on */
+
+RW_PARAM_FUNC(fmc130m_4ch, test_data_en) {
+	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            FPGA_CTRL, TEST_DATA_EN, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_TEST_DATA_EN_MIN, BPM_FMC130M_4CH_TEST_DATA_EN_MIN,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_test_data_en_exp = {
+    .name = FMC130M_4CH_NAME_TEST_DATA_EN,
+    .opcode = FMC130M_4CH_OPCODE_TEST_DATA_EN,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, test_data_en),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
@@ -666,6 +692,7 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_adc_dly1_exp,
     &fmc130m_4ch_adc_dly2_exp,
     &fmc130m_4ch_adc_dly3_exp,
+    &fmc130m_4ch_test_data_en_exp,
     &disp_op_end
 };
 
