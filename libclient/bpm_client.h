@@ -219,6 +219,15 @@ bpm_client_err_e bpm_set_adc_dly2 (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_adc_dly3 (bpm_client_t *self, char *service,
         uint32_t dly_type3, uint32_t dly_val3);
 
+/* FMC TEST data enable. Sets or clears the ADC test data switch. This
+ * enables or disables the ADC test RAMP output.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_adc_test_data_en (bpm_client_t *self, char *service,
+        uint32_t adc_test_data_en);
+bpm_client_err_e bpm_get_adc_test_data_en (bpm_client_t *self, char *service,
+        uint32_t *adc_test_data_en);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
