@@ -485,8 +485,8 @@ disp_op_t fmc130m_4ch_adc_dly_updt3_exp = {
 
 /***************************** Convenient ADC Delay ***************************/
 
-#define FMC130M_4CH_IDELAY_CLK_LINE                 (0x01 << 17)
-#define FMC130M_4CH_IDELAY_DATA_LINES               (0x00FFFF << 1)
+#define FMC130M_4CH_IDELAY_CLK_LINE                 (0x01 << 16)    /* Bit 16 is clock */
+#define FMC130M_4CH_IDELAY_DATA_LINES               0x00FFFF        /* Bits 0 to 15 are data */
 #define FMC130M_4CH_IDELAY_ALL_LINES                (FMC130M_4CH_IDELAY_CLK_LINE | \
                                                         FMC130M_4CH_IDELAY_DATA_LINES)
 
@@ -496,32 +496,35 @@ disp_op_t fmc130m_4ch_adc_dly_updt3_exp = {
 #define FMC_130M_4CH_IDELAY_LINE_R(reg)             WB_FMC_130M_4CH_CSR_IDELAY0_CAL_LINE_R(reg)
 #define FMC_130M_4CH_IDELAY_LINE_UPDT               WB_FMC_130M_4CH_CSR_IDELAY0_CAL_UPDATE
 
+#define FMC_130M_4CH_IDELAY_CAL_VAL_W(value)        WB_FMC_130M_4CH_CSR_IDELAY0_CAL_VAL_W(value)
+#define FMC_130M_4CH_IDELAY_CAL_VAL_R(reg)          WB_FMC_130M_4CH_CSR_IDELAY0_CAL_VAL_R(reg)
+
 /* Low-level ADC delay function. Must be called with the correct arguments, so
- * only internal fucntions shall use this */
+ * only internal functions shall use this */
 static int _fmc130m_4ch_set_adc_dly_ll (smio_t* owner, uint32_t addr, uint32_t dly_val,
         uint32_t dly_type)
 {
     uint32_t val = 0;
 
-    if (dly_type == DLY_TYPE_DATA) {
-        val = FMC130M_4CH_IDELAY_DATA_LINES;
+    if (dly_type & DLY_TYPE_DATA) {
+        val = FMC_130M_4CH_IDELAY_LINE_W(FMC130M_4CH_IDELAY_DATA_LINES);
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
                 "[sm_io:fmc130m_4ch] Setting ADC data line delays...\n");
     }
 
-    if (dly_type == DLY_TYPE_CLK) {
-        val |= FMC130M_4CH_IDELAY_CLK_LINE;
+    if (dly_type & DLY_TYPE_CLK) {
+        val |= FMC_130M_4CH_IDELAY_LINE_W(FMC130M_4CH_IDELAY_CLK_LINE);
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
                 "[sm_io:fmc130m_4ch] Setting ADC clock line delay...\n");
     }
 
-    val |= FMC_130M_4CH_IDELAY_LINE_W(dly_val);
+    val |= FMC_130M_4CH_IDELAY_CAL_VAL_W(dly_val);
     smio_thsafe_client_write_32 (owner, addr, &val);
     val |= FMC_130M_4CH_IDELAY_LINE_UPDT;
     smio_thsafe_client_write_32 (owner, addr, &val);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-            "[sm_io:fmc130m_4ch] ADC delay value set to %u\n", FMC_130M_4CH_IDELAY_LINE_W(dly_val));
+            "[sm_io:fmc130m_4ch] ADC delay value set to %u\n", dly_val);
 
     /* Do a readback test to guarantee the delay is set correctly */
     val = 0;
@@ -530,8 +533,8 @@ static int _fmc130m_4ch_set_adc_dly_ll (smio_t* owner, uint32_t addr, uint32_t d
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
             "[sm_io:fmc130m_4ch] ADC delay read value is %u\n",
-            FMC_130M_4CH_IDELAY_LINE_R(val));
-    ASSERT_TEST(FMC_130M_4CH_IDELAY_LINE_R(val) == dly_val,
+            FMC_130M_4CH_IDELAY_CAL_VAL_R(val));
+    ASSERT_TEST(FMC_130M_4CH_IDELAY_CAL_VAL_R(val) == dly_val,
             "Could not set ADC delay correctly. Readback test failed", err_adc_dly);
 
     return -FMC130M_4CH_OK;
@@ -651,7 +654,7 @@ disp_op_t fmc130m_4ch_adc_dly3_exp = {
 RW_PARAM_FUNC(fmc130m_4ch, test_data_en) {
 	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             FPGA_CTRL, TEST_DATA_EN, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_TEST_DATA_EN_MIN, BPM_FMC130M_4CH_TEST_DATA_EN_MIN,
+            BPM_FMC130M_4CH_TEST_DATA_EN_MIN, BPM_FMC130M_4CH_TEST_DATA_EN_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
