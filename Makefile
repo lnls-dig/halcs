@@ -13,6 +13,8 @@ MAKE =		make
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
+# Select the FMC ADC board type. Options are: passive or active
+FMC130M_4CH_TYPE ?= passive
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
@@ -31,12 +33,22 @@ LIBCLIENT_DIR=libclient
 # General C flags
 CFLAGS = -std=gnu99 -O2
 
+# Board selection
 ifeq ($(BOARD),ml605)
 CFLAGS += -D__BOARD_ML605__
 endif
 
 ifeq ($(BOARD),afcv3)
 CFLAGS += -D__BOARD_AFCV3__
+endif
+
+# FMC130M board type selection
+ifeq ($(FMC130M_4CH_TYPE),passive)
+CFLAGS += -D__FMC130M_4CH_TYPE_PASSIVE__
+endif
+
+ifeq ($(FMC130M_4CH_TYPE),active)
+CFLAGS += D__FMC130M_4CH_TYPE_ACTIVE__
 endif
 
 LOCAL_MSG_DBG ?= n
