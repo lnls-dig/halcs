@@ -11,6 +11,11 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
+PWD = 		$(shell pwd)
+
+# Select board in which we will work. Options are: ml605 or afcv3
+BOARD ?= ml605
+
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
@@ -22,6 +27,14 @@ LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -fPIC
+
+ifeq ($(BOARD),ml605)
+CFLAGS += -D__BOARD_ML605__
+endif
+
+ifeq ($(BOARD),afcv3)
+CFLAGS += -D__BOARD_AFCV3__
+endif
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -58,13 +71,14 @@ libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
 
 # Include directories
 INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
-	       -I../hal/sm_io/modules/ \
+	       -I../hal/sm_io/modules \
 	       -I../hal/sm_io/modules/fmc130m_4ch \
 	       -I../hal/sm_io/modules/acq \
 	       -I../hal/sm_io/modules/swap \
 	       -I../hal/sm_io/modules/dsp \
 	       -I../hal/sm_io/rw_param \
 	       -I../hal/include/hw \
+	       -I../hal/boards/$(BOARD) \
 	       -I/usr/local/include
 
 # Merge all flags. Optimize for size (-Os)
@@ -84,10 +98,24 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
 $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../hal/sm_io/modules/acq/sm_io_acq_codes.h ../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
-	../hal/sm_io/modules/swap/sm_io_swap_codes.h ../hal/sm_io/modules/acq/acq_chan.h \
-	../hal/sm_io/modules/sm_io_codes.h bpm_client_codes.h
+	../hal/sm_io/modules/acq/sm_io_acq_codes.h \
+	../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
+	../hal/sm_io/modules/swap/sm_io_swap_codes.h \
+	../hal/sm_io/modules/sm_io_codes.h \
+	bpm_client_codes.h
+
+# Install only specific acq_chan.h defintions according to the BOARD MACRO
+#	../hal/include/mem_layout/ml605/acq_chan_ml605.h \
+#	../hal/include/mem_layout/afcv3/acq_chan_afcv3.h
+
+$(LIBCLIENT)_ACQ_HEADER_BASENAME = acq_chan
+$(LIBCLIENT)_ACQ_HEADERS += \
+	../hal/include/board/$(BOARD)/$($(LIBCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
+
 $(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
+
+# Installation headers
+$(LIBCLIENT)_INST_HEADERS = $($(LIBCLIENT)_HEADERS) $($(LIBCLIENT)_ACQ_HEADER_BASENAME).h
 
 # Save a git repository description
 REVISION = $(shell git describe --dirty --always)
@@ -112,7 +140,7 @@ TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 
 # Compile static library
 %.a: $$($$*_OBJS) $(OBJ_REVISION)
@@ -164,22 +192,33 @@ FORCE:
 
 #tests:
 #	$(MAKE) -C $@ all
+#
+
+# Prepare the environment for install rule
+pre_inst:
+	$(foreach header,$($(LIBCLIENT)_ACQ_HEADERS),cp -p $(header) \
+		$(PWD)/$($(LIBCLIENT)_ACQ_HEADER_BASENAME).h $(CMDSEP))
+
+pre_clean:
+	$(foreach header,$(PWD)/$($(LIBCLIENT)_ACQ_HEADER_BASENAME).h, \
+		rm -f $(header) $(CMDSEP))
 
 install:
 	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach header,$($(LIBCLIENT)_HEADERS),install -m 755 $(header) $(INSTALL_DIR)/include $(CMDSEP))
+	$(foreach header,$($(LIBCLIENT)_INST_HEADERS),install -m 755 $(header) $(INSTALL_DIR)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
-	$(foreach header,$(notdir $($(LIBCLIENT)_HEADERS)),rm -f $(INSTALL_DIR)/include/$(header) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBCLIENT)_INST_HEADERS)),rm -f \
+		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
 
-clean:
+clean: pre_clean
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean
