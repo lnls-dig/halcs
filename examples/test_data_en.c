@@ -1,0 +1,98 @@
+/*
+ * Simple example demonstrating the communication between
+ * a client and the FPGA device
+ */
+
+#include <mdp.h>
+#include <czmq.h>
+#include <inttypes.h>
+
+#include <bpm_client.h>
+
+#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DEFAULT_TEST_DATA_EN        0
+#define MAX_TEST_DATA_EN            1
+
+void print_help (char *program_name)
+{
+    printf( "Usage: %s [options]\n"
+            "\t-h This help message\n"
+            "\t-v Verbose output\n"
+            "\t-e <[0|1]> Enable or disable TEST data\n"
+            "\t-b <broker_endpoint> Broker endpoint\n", program_name);
+}
+
+int main (int argc, char *argv [])
+{
+    int verbose = 0;
+    char *broker_endp = NULL;
+    char *test_data_en_str = NULL;
+    char **str_p = NULL;
+
+    if (argc < 3) {
+        print_help (argv[0]);
+        exit (1);
+    }
+
+    /* FIXME: This is rather buggy! */
+    /* Simple handling of command-line options. This should be done
+     * with getopt, for instance*/
+    int i;
+    for (i = 1; i < argc; i++)
+    {
+        if (streq(argv[i], "-v")) {
+            verbose = 1;
+        }
+        else if (streq(argv[i], "-h"))
+        {
+            print_help (argv [0]);
+            exit (1);
+        }
+        else if (streq (argv[i], "-e")) {
+            str_p = &test_data_en_str;
+        }
+        else if (streq (argv[i], "-b")) {
+            str_p = &broker_endp;
+        }
+        /* Fallout for options with parameters */
+        else {
+            *str_p = strdup (argv[i]);
+        }
+    }
+
+    /* Set default broker address */
+    if (broker_endp == NULL) {
+        broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
+    }
+
+    /* Set test data enable default */
+    uint32_t test_data_en;
+    if (test_data_en_str == NULL) {
+        fprintf (stderr, "[client:test_data_en]: Setting test DATA enable to 0\n");
+        test_data_en = DEFAULT_TEST_DATA_EN;
+    }
+    else {
+        test_data_en = strtoul (test_data_en_str, NULL, 10);
+
+        if (test_data_en > MAX_TEST_DATA_EN) {
+            fprintf (stderr, "[client:test_data_en]: Test data enable value too big! Defaulting to: %u\n",
+                    MAX_TEST_DATA_EN);
+            test_data_en = MAX_TEST_DATA_EN;
+        }
+    }
+    fprintf (stdout, "[client:test_data_en]: test_data_en = %u\n", test_data_en);
+
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+
+    /* Test data enable */
+    bpm_set_adc_test_data_en (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", test_data_en);
+
+    bpm_client_destroy (&bpm_client);
+    str_p = &test_data_en_str;
+    free (*str_p);
+    test_data_en_str = NULL;
+    str_p = &broker_endp;
+    free (*str_p);
+    broker_endp = NULL;
+    return 0;
+}
