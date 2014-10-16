@@ -26,34 +26,6 @@ struct _bpm_client_t {
 
 typedef struct _bpm_client_t bpm_client_t;
 
-/******************** ACQ SMIO Structures ******************/
-/* Acquistion request */
-struct _acq_req_t {
-    uint32_t num_samples;                       /* Number of samples */
-    uint32_t chan;                              /* Acquisition channel number */
-};
-
-typedef struct _acq_req_t acq_req_t;
-
-/* Acquistion data block */
-struct _acq_block_t {
-    uint32_t idx;                               /* Block index */
-
-    uint32_t *data;                             /* Block or complete curve read */
-    uint32_t data_size;                         /* data_out buffer size */
-    uint32_t bytes_read;                        /* Number of bytes effectively read */
-};
-
-typedef struct _acq_block_t acq_block_t;
-
-/* Acquistion transaction */
-struct _acq_trans_t {
-    acq_req_t req;                              /* Request */
-    acq_block_t block;                          /* Block or whole curve read */
-};
-
-typedef struct _acq_trans_t acq_trans_t;
-
 /********************************************************/
 /************************ Our API ***********************/
 /********************************************************/
@@ -229,6 +201,44 @@ bpm_client_err_e bpm_get_adc_test_data_en (bpm_client_t *self, char *service,
         uint32_t *adc_test_data_en);
 
 /********************** ACQ SMIO Functions ********************/
+
+/* Acquistion request */
+struct _acq_req_t {
+    uint32_t num_samples;                       /* Number of samples */
+    uint32_t chan;                              /* Acquisition channel number */
+};
+
+typedef struct _acq_req_t acq_req_t;
+
+/* Acquistion data block */
+struct _acq_block_t {
+    uint32_t idx;                               /* Block index */
+
+    uint32_t *data;                             /* Block or complete curve read */
+    uint32_t data_size;                         /* data_out buffer size */
+    uint32_t bytes_read;                        /* Number of bytes effectively read */
+};
+
+typedef struct _acq_block_t acq_block_t;
+
+/* Acquistion transaction */
+struct _acq_trans_t {
+    acq_req_t req;                              /* Request */
+    acq_block_t block;                          /* Block or whole curve read */
+};
+
+typedef struct _acq_trans_t acq_trans_t;
+
+/* Acquisition channel definitions */
+struct _acq_chan_t {
+    uint32_t chan;
+    uint32_t sample_size;
+};
+
+typedef struct _acq_chan_t acq_chan_t;
+
+/* Acquisition channel definitions */
+extern acq_chan_t acq_chan[END_CHAN_ID];
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
  * through the use of acq_req_t structure.

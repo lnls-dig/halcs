@@ -381,6 +381,31 @@ PARAM_FUNC_CLIENT_READ(adc_test_data_en)
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
 
+/* Acquisition channel definitions for user's application */
+#if defined(__BOARD_ML605__)
+/* Global structure merging all of the channel's sample sizes */
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
+                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
+                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
+                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
+                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE}
+                                    };
+#elif defined(__BOARD_AFCV3__)
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
+                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
+                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
+                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
+                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
+                                        [5] = {.chan = ADC1_CHAN_ID, .sample_size = ADC1_SAMPLE_SIZE},
+                                        [6] = {.chan = TBTAMP1_CHAN_ID, .sample_size = TBTAMP1_SAMPLE_SIZE},
+                                        [7] = {.chan = TBTPOS1_CHAN_ID, .sample_size = TBTPOS1_SAMPLE_SIZE},
+                                        [8] = {.chan = FOFBAMP1_CHAN_ID, .sample_size = FOFBAMP1_SAMPLE_SIZE},
+                                        [9] = {.chan = FOFBPOS1_CHAN_ID, .sample_size = FOFBPOS1_SAMPLE_SIZE}
+                                    };
+#else
+#error "Unsupported board!"
+#endif
+
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
         acq_req_t *acq_req);
 static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *service);
