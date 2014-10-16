@@ -1,10 +1,10 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include <mem_layout/ml605/mem_layout.h>
+#include <board/ml605/defs.h>
 
 /****************************/
-/*    General Definitions  */
+/*    General Definitions   */
 /****************************/
 /* CPU Clock frequency in hertz */
 #define SYS_CLOCK 100000000ULL

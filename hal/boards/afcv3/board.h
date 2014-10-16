@@ -1,7 +1,7 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include <mem_layout/afcv3/mem_layout.h>
+#include "board/afcv3/defs.h"
 
 /****************************/
 /*    General Definitions  */
