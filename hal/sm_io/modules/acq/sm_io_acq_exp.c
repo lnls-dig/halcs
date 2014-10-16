@@ -64,18 +64,18 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t num_samples = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
     uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
-    /* number of samples required is out of the maximum limit */
-    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples-1) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
-                "Number of samples required is out of the maximum limit\n");
-        return -ACQ_NUM_SAMPLES_OOR;
-    }
-
     /* channel required is out of the limit */
     if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
 
+        return -ACQ_NUM_SAMPLES_OOR;
+    }
+
+    /* number of samples required is out of the maximum limit */
+    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples-1) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+                "Number of samples required is out of the maximum limit\n");
         return -ACQ_NUM_SAMPLES_OOR;
     }
 
