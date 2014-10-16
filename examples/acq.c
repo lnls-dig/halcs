@@ -14,21 +14,10 @@
 
 #define DEFAULT_NUM_SAMPLES         4096
 #define DEFAULT_CHAN_NUM            0
+
 /* Arbitrary hard limits */
 #define MAX_NUM_SAMPLES             (1 << 28)
 #define MAX_NUM_CHANS               (1 << 8)
-
-typedef struct _acq_chan_t {
-    uint32_t chan;
-    uint32_t sample_size;
-} acq_chan_t;
-
-/* Global structure merging all of the channel's sample sizes */
-acq_chan_t __acq_chan[END_CHAN_ID] = { [0] = {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                     [1] = {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                     [2] = {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                     [3] = {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                     [4] = {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE} };
 
 void print_data (uint32_t chan, uint32_t *data, uint32_t size)
 {
@@ -158,7 +147,7 @@ int main (int argc, char *argv [])
     }
     fprintf (stdout, "[client:acq]: chan = %u\n", chan);
 
-    uint32_t data_size = num_samples*__acq_chan[chan].sample_size;
+    uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples = num_samples,
