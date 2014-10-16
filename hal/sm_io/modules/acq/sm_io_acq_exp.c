@@ -115,12 +115,13 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             num_samples_post);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_POST_SAMPLES, &num_samples_post);
 
-    /* DDR3 start address */
-    uint32_t start_addr = (uint32_t) SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr;
-    uint32_t start_addr8 = start_addr/8;
+    /* DDR3 start address. Convert Byte address to Word address, as we specify only
+     * the start address */
+    uint32_t start_addr = (uint32_t)
+        SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr/DDR3_ADDR_WORD_2_BYTE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "DDR3 start address: 0x%08x\n", start_addr);
-    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_START_ADDR, &start_addr8 );
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_START_ADDR, &start_addr );
 
     /* Prepare core_ctl register */
     uint32_t acq_core_ctl_reg = ACQ_CORE_CTL_FSM_ACQ_NOW;
