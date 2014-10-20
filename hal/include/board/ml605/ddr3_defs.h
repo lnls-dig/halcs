@@ -1,8 +1,8 @@
 #ifndef _DDR3_DEFS_H_
 #define _DDR3_DEFS_H_
 
-#define MEM_TOTAL_SIZE (1 << 28) // 256 MB
-#define MEM_REGION_SIZE (MEM_TOTAL_SIZE / 8)
+#define MEM_TOTAL_SIZE                  (1UL << 28)             /* 256 MB */
+#define MEM_REGION_SIZE                 (MEM_TOTAL_SIZE / 8)
 
 /* FPGA Specific */
 #define DDR3_PAYLOAD_SIZE               32                      /* In Bytes: Virtex6 (ML605) */
