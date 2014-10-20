@@ -507,9 +507,13 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
 
     /* Check for return code from server */
-    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
-            "bpm_check_data_acquire: Check fail: data acquire was not completed",
-            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+    if (*(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
+                "Check fail: data acquire was not completed");
+        err = BPM_CLIENT_ERR_AGAIN;
+        goto err_check_data_acquire;
+    }
+
     /* If we are here, then the request was successfully acquired*/
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
             "Check ok: data acquire was successfully completed\n");
