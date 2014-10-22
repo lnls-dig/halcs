@@ -45,7 +45,7 @@
 #define DEVIO_LOG_FILENAME          "dev_io%d.log"
 
 static void _devio_hash_free_item (void *data);
-static uint32_t _dmngr_scan_devs (dmngr_t *self);
+static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
 
 /* Creates a new instance of the Device Manager */
 dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
@@ -101,14 +101,18 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     self->broker_running = false;
 
     /* Scan devios for the first time */
-    uint32_t num_devios = _dmngr_scan_devs (self);
+    uint32_t num_devs_found = 0;
+    dmngr_err_e err = _dmngr_scan_devs (self, &num_devs_found);
+    ASSERT_TEST(err == DMNGR_SUCCESS, "Could not scan devices", err_scan_devs);
+
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
-            "[dev_mngr_core] Found a total of %u DEVIO(s)\n", num_devios);
+            "[dev_mngr_core] Found a total of %u device(s)\n", num_devs_found);
     /* Supress compiler warnings if we are not debugging */
-    (void) num_devios;
+    (void) num_devs_found;
 
     return self;
 
+err_scan_devs:
 err_devio_info_h_alloc:
     zlist_destroy (&self->ops->sig_ops);
 err_list_alloc:
@@ -285,9 +289,9 @@ err_broker_run:
     return err;
 }
 
-uint32_t dmngr_scan_devs (dmngr_t *self)
+dmngr_err_e dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 {
-    return _dmngr_scan_devs (self);
+    return _dmngr_scan_devs (self, num_devs_found);
 }
 
 dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
@@ -384,11 +388,11 @@ static void _devio_hash_free_item (void *data)
     devio_info_destroy ((devio_info_t **) &data);
 }
 
-static uint32_t _dmngr_scan_devs (dmngr_t *self)
+static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 {
     assert (self);
 
-    uint32_t err = 0;   /* No device scanned */
+    dmngr_err_e err = DMNGR_SUCCESS;
     glob_t glob_dev;
 
     /* Scan just the PCIe bus for now. We expect to find devices of
@@ -397,45 +401,66 @@ static uint32_t _dmngr_scan_devs (dmngr_t *self)
 
     /* Ininitalize the devices we found */
     devio_info_t *devio_info = NULL;
-    uint32_t i;
-    for (i = 0; i < glob_dev.gl_pathc; ++i){
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
-                "[dev_mngr_core:scan_devs] Found device on %s\n",
-                glob_dev.gl_pathv[i]);
+    char *key = NULL;
+    uint32_t i = 0;
+    for (; i < glob_dev.gl_pathc; ++i) {
+        /* Check if the found device is already on the hash list */
 
         /* Extract ID */
         uint32_t devio_info_id;
         sscanf (glob_dev.gl_pathv[i], "/dev/fpga%d", &devio_info_id);
 
+        /* Stringify ID */
+        /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
+                "[dev_mngr_core:scan_devs] Stringify hash ID\n"); */
+        key = halutils_stringify_dec_key (devio_info_id);
+        ASSERT_ALLOC (key, err_key_alloc, DMNGR_ERR_ALLOC);
+
+        const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h, key);
+
+        /* If device is already registered, do nothing */
+        if (devio_info_lookup != NULL) {
+            /* We don't need this anymore */
+            free (key);
+            key = NULL;
+            continue;
+        }
+
+        /* Found new device */
+
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+                "[dev_mngr_core:scan_devs] Found new device on %s\n",
+                glob_dev.gl_pathv[i]);
+
         /* Alloc hash item */
         devio_info = devio_info_new (glob_dev.gl_pathv[i],
                 devio_info_id, PCIE_DEV, READY_TO_RUN);
-        ASSERT_ALLOC (devio_info, err_devio_info_alloc,
-                /* return number of devices scanned*/ i);
+        ASSERT_ALLOC (devio_info, err_devio_info_alloc, DMNGR_ERR_ALLOC);
 
-        /* Stringify ID */
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
-                "[dev_mngr_core:scan_devs] Stringify hash ID\n");
-        char *key = halutils_stringify_dec_key (devio_info->id);
-        ASSERT_ALLOC (key, err_key_alloc);
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
-                "[dev_mngr_core:scan_devs] Inserting hash with key: %s\n", key);
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+                "[dev_mngr_core:scan_devs] Inserting device with key: %s\n", key);
         zhash_insert (self->devio_info_h, key, devio_info);
-        /* We don't need this anymore */
-        free (key);
 
         /* Setup free function */
         zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
+
+        /* We don't need this anymore */
+        free (key);
+        key = NULL;
     }
 
-    /* Number of devices found */
-    err = i;
-    globfree (&glob_dev);
-    return err;
-
-err_key_alloc:
-    devio_info_destroy (&devio_info);
+    /* devio_info_destroy (&devio_info); */
 err_devio_info_alloc:
+    free (key);
+    key = NULL;
+err_key_alloc:
     globfree (&glob_dev);
+
+    /* Number of new devices found */
+    if (num_devs_found != NULL) {
+        *num_devs_found = i;
+    }
+
     return err;
 }
+

@@ -89,7 +89,7 @@ bool dmngr_is_broker_running (dmngr_t *self);
 /* Spawn broker if not running */
 dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp);
 /* Scan for Devices to control */
-uint32_t dmngr_scan_devs (dmngr_t *self);
+dmngr_err_e dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
 /* Spwan all devices previously found by dmngr_scan_devs () */
 dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         char *devio_log_filename, bool respawn_killed_devio);
