@@ -73,7 +73,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     }
 
     /* number of samples required is out of the maximum limit */
-    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples-1) {
+    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Number of samples required is out of the maximum limit\n");
         return -ACQ_NUM_SAMPLES_OOR;
