@@ -230,6 +230,14 @@ int main (int argc, char *argv[])
         /* Spawn the broker if not running */
         err = dmngr_spawn_broker (dmngr, broker_endp);
         if (err != DMNGR_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not spwan broker!\n");
+            goto err_exit;
+        }
+
+        /* Search for new devices */
+        err = dmngr_scan_devs (dmngr, NULL);
+        if (err != DMNGR_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not scan devices!\n");
             goto err_exit;
         }
 
@@ -238,6 +246,7 @@ int main (int argc, char *argv[])
         err = dmngr_spawn_all_devios (dmngr, broker_endp,
                 log_dir, respawn_killed_devio);
         if (err != DMNGR_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not spawn DEVIOs!\n");
             goto err_exit;
         }
 
@@ -246,6 +255,7 @@ int main (int argc, char *argv[])
          * "[dev_mngr] PID: %d will wait for child. # = %d\n", getpid(),  __dev_nums); */
         err = dmngr_wait_chld (dmngr);
         if (err != DMNGR_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not wait for children!\n");
             goto err_exit;
         }
 
