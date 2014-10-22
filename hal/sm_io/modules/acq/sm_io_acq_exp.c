@@ -80,11 +80,11 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Current acq params: number of samples = %u, channel = %u\n",
-            num_samples, chan);
+            "\n\tCurrent acq params for channel #%u: number of samples = %u\n",
+            chan, num_samples);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "\tPrevious acq params: number of samples = %u\n, channel = %u\n",
+            "\n\tPrevious acq params for channel #%u: number of samples = %u\n",
             chan, SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples);
 
     /* Set the parameters: number of samples of this channel */
