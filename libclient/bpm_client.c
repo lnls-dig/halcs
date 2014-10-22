@@ -470,10 +470,15 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
     /* Receive report */
     zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-    assert (zmsg_size (report) == 1);
 
     /* Message is:
      * frame 0: error code      */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
+
+    /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
 
@@ -488,6 +493,7 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
 err_data_acquire:
     zframe_destroy (&err_code);
 err_null_code:
+err_msg:
     zmsg_destroy (&report);
 err_null_report:
     return err;
@@ -510,10 +516,15 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     /* Receive report */
     zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-    assert (zmsg_size (report) == 1);
 
     /* Message is:
-     * frame 0: error code          */
+     * frame 0: error code      */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
+
+    /* Get message contents */
     zframe_t *err_code = zmsg_pop (report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
 
@@ -532,6 +543,7 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
 err_check_data_acquire:
     zframe_destroy (&err_code);
 err_null_code:
+err_msg:
     zmsg_destroy (&report);
 err_null_report:
     return err;
@@ -602,45 +614,68 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     /* Receive report */
     zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-    assert (zmsg_size (report) == 3);
 
     /* Message is:
      * frame 0: error code
-     * frame 1: data size
-     * frame 2: data block              */
+     * frame 1: number of bytes read (optional)
+     * frame 2: data read (optional) */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
+            "Unexpected message received", err_msg);
+
+    /* Get message contents */
     zframe_t *err_code = zmsg_pop (report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-    zframe_t *data_size_frm = zmsg_pop (report);
-    ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
-    uint32_t data_size = *(uint32_t *) zframe_data(data_size_frm);
-    zframe_t *data = zmsg_pop (report);
-    ASSERT_TEST(data != NULL, "Could not receive data", err_null_data);
 
     /* Check for return code from server */
-    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
+    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
             "bpm_get_data_block: Data block was not acquired",
-            err_get_data_block, BPM_CLIENT_ERR_SERVER);
+            err_error_code, BPM_CLIENT_ERR_SERVER);
 
-    /* Data size effectively returned */
-    uint32_t read_size = (acq_trans->block.data_size < data_size) ?
-        acq_trans->block.data_size : data_size;
-    memcpy (acq_trans->block.data, (uint32_t *) zframe_data (data), read_size);
+    zframe_t *data_size_frm = NULL;
+    zframe_t *data_frm = NULL;
+    if (msg_size == MSG_FULL_SIZE) {
+        data_size_frm = zmsg_pop (report);
+        ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
+        data_frm = zmsg_pop (report);
+        ASSERT_TEST(data_frm != NULL, "Could not receive data", err_null_data);
 
-	/* Print some debug messages */
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-            "read_size: %u\n", read_size);
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-            "acq_trans->block.data: %p\n", acq_trans->block.data);
+        ASSERT_TEST(zframe_size (data_size_frm) == RW_REPLY_SIZE,
+                "Wrong <number of payload bytes> parameter size", err_msg_fmt);
 
-    acq_trans->block.bytes_read = read_size;
+        /* Size in the second frame must match the frame size of the third */
+        RW_REPLY_TYPE data_size = *(RW_REPLY_TYPE *) zframe_data(data_size_frm);
+        ASSERT_TEST(data_size == zframe_size (data_frm),
+                "<payload> parameter size does not match size in <number of payload bytes> parameter",
+                err_msg_fmt);
 
-err_get_data_block:
-    zframe_destroy (&data);
+        /* Data size effectively returned */
+        uint32_t read_size = (acq_trans->block.data_size < data_size) ?
+            acq_trans->block.data_size : data_size;
+
+        /* Copy message contents to user */
+        memcpy (acq_trans->block.data, zframe_data (data_frm), read_size);
+        /* Inform user about the number of bytes effectively copied*/
+        acq_trans->block.bytes_read = read_size;
+
+        /* Print some debug messages */
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+                "read_size: %u\n", read_size);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+                "acq_trans->block.data: %p\n", acq_trans->block.data);
+    }
+
+err_msg_fmt:
+    zframe_destroy (&data_frm);
 err_null_data:
     zframe_destroy (&data_size_frm);
 err_null_data_size:
+err_error_code:
     zframe_destroy (&err_code);
 err_null_code:
+err_msg:
     zmsg_destroy (&report);
 err_null_report:
     return err;
