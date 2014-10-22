@@ -17,6 +17,9 @@
 #define READ_MODE                   1
 #define WRITE_MODE                  0
 
+#define MSG_FULL_SIZE               3       /* 3 frames */
+#define MSG_ERR_CODE_SIZE           1       /* 1 frame */
+
 /* Write function name */
 #define PARAM_FUNC_CLIENT_NAME_WRITE(reg)                                       \
     bpm_set ## _ ## reg

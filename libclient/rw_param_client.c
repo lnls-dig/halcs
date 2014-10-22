@@ -68,7 +68,6 @@ err_null_msg:
     return err;
 }
 
-/* TODO: improve error handling */
 bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2)
 {
@@ -83,11 +82,14 @@ bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
 
-    /* TODO: better handling of malformed messages */
-    assert (zmsg_size (report) == 1);
-
     /* Message is:
      * frame 0: error code      */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
+
+    /* Get message contents */
     zframe_t *err_code = zmsg_pop (report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code,
             BPM_CLIENT_ERR_SERVER);
@@ -99,6 +101,7 @@ bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
 err_set_param:
     zframe_destroy (&err_code);
 err_null_code:
+err_msg:
     zmsg_destroy (&report);
 err_recv_msg:
 err_send_msg:
@@ -129,35 +132,58 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
 
-    /* TODO: better handling of malformed messages */
-    assert (zmsg_size (report) == 3);
-
     /* Message is:
      * frame 0: error code
-     * frame 1: number of bytes read
-     * frame 2: data read */
+     * frame 1: number of bytes read (optional)
+     * frame 2: data read (optional) */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
+            "Unexpected message received", err_msg);
+
+    /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-    zframe_t *bytes_read_frm = zmsg_pop(report);
-    ASSERT_TEST(bytes_read_frm != NULL, "Could not receive number of bytes read", err_null_bytes_read);
-    zframe_t *data_out_frm = zmsg_pop(report);
-    ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
     /* Check for return code from server */
     ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data(err_code) == RW_OK,
             "rw_param_client: parameter GET error, try again",
-            err_get_param, BPM_CLIENT_ERR_AGAIN);
+            err_error_code, BPM_CLIENT_ERR_AGAIN);
 
-    /* Finally, copy the message contents to the user */
-    *param_out = *(uint32_t *) zframe_data(data_out_frm);
+    zframe_t *bytes_read_frm = NULL;
+    zframe_t *data_out_frm = NULL;
+    if (msg_size == MSG_FULL_SIZE) {
+        bytes_read_frm = zmsg_pop(report);
+        ASSERT_TEST(bytes_read_frm != NULL, "Could not receive number of bytes read", err_null_bytes_read);
+        data_out_frm = zmsg_pop(report);
+        ASSERT_TEST(data_out_frm != NULL, "Could not receive parameter", err_null_param);
 
-err_get_param:
+        ASSERT_TEST(zframe_size (bytes_read_frm) == RW_REPLY_SIZE,
+                "Wrong <number of payload bytes> parameter size", err_msg_fmt);
+
+        /* Size in the second frame must match the frame size of the third */
+        ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data (bytes_read_frm) == zframe_size (data_out_frm),
+                "<payload> parameter size does not match size in <number of payload bytes> parameter",
+                err_msg_fmt);
+
+        /* We only accept one RW_REPLY_SIZE bytes of payload for now */
+        ASSERT_TEST(zframe_size (data_out_frm) == RW_REPLY_SIZE,
+                "Wrong <payload> parameter size", err_msg_fmt);
+
+        /* Copy the message contents to the user */
+        *param_out = *(uint32_t *) zframe_data (data_out_frm);
+    }
+
+err_msg_fmt:
     zframe_destroy (&data_out_frm);
 err_null_param:
     zframe_destroy (&bytes_read_frm);
 err_null_bytes_read:
+err_error_code:
     zframe_destroy (&err_code);
 err_null_code:
+err_msg:
     zmsg_destroy (&report);
 err_recv_msg:
 err_send_msg:
