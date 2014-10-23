@@ -107,7 +107,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:dsp]: bpm_get_ky = %u was successfully executed\n",
 					ky_get);
 
-    uint32_t ksum_set = 0x0FFFFFF;  // 1.0 FIX25_24;
+    uint32_t ksum_set = 0x7FFFFF;  // 1.0 FIX25_24;
     fprintf (stdout, "[client:dsp]: ksum = %u\n", ksum_set);
     err = bpm_set_ksum (bpm_client, "BPM0:DEVIO:DSP0", ksum_set);
     if (err != BPM_CLIENT_SUCCESS){

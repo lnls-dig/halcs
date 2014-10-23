@@ -13,11 +13,20 @@
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 
 /* Default value definitions */
-#define DEFAULT_ADC_DLY_VALUE       10
+
+#define DFLT_BPM_NUMBER             0
+#define MAX_BPM_NUMBER              1
+
+#define DFLT_BOARD_NUMBER           0
+#define MAX_BOARD_NUMBER            5
+
+#define DFLT_ADC_DLY_VALUE          10
 #define MAX_ADC_DLY_VALUE           31
-#define DEFAULT_CHAN_NUM            0
+
+#define DFLT_CHAN_NUM               0
 #define MAX_CHAN_NUM                3 /* 0-3 */
-#define DEFAULT_LINES_NUM           1 /* DATA */
+
+#define DFLT_LINES_NUM              1 /* DATA */
 #define MAX_LINES_NUM               3 /* DATA + CLOCK */
 
 void print_help (char *program_name)
@@ -26,6 +35,8 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
+            "\t-board <AMC board = [0|1|2|3|4|5]>\n"
+            "\t-bpm <BPM number = [0|1]>\n"
             "\t-ch <channel> ADC channel\n"
             "\t-lines <delay_lines> ADC delay lines (1 = data, 2 = clock, 3 = both)\n"
             "\t-val <delay_value> ADC delay value (0-31)\n"
@@ -36,6 +47,8 @@ int main (int argc, char *argv [])
 {
     int verbose = 0;
     char *broker_endp = NULL;
+    char *board_number_str = NULL;
+    char *bpm_number_str = NULL;
     char *chan_str = NULL;
     char *lines_str = NULL;
     char *dly_val_str = NULL;
@@ -63,6 +76,14 @@ int main (int argc, char *argv [])
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
         }
+        else if (streq(argv[i], "-board"))
+        {
+            str_p = &board_number_str;
+        }
+        else if (streq(argv[i], "-bpm"))
+        {
+            str_p = &bpm_number_str;
+        }
         else if (streq (argv[i], "-ch")) { /* ch: channel */
             str_p = &chan_str;
         }
@@ -83,14 +104,46 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    /* Set default board number */
+    uint32_t board_number;
+    if (board_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to BOARD number: %u\n",
+                DFLT_BOARD_NUMBER);
+        board_number = DFLT_BOARD_NUMBER;
+    }
+    else {
+        board_number = strtoul (board_number_str, NULL, 10);
+
+        if (board_number > MAX_BOARD_NUMBER) {
+            fprintf (stderr, "[client:leds]: BOARD number too big! Defaulting to: %u\n",
+                    MAX_BOARD_NUMBER);
+            board_number = MAX_BOARD_NUMBER;
+        }
+    }
+
+    /* Set default bpm number */
+    uint32_t bpm_number;
+    if (bpm_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+                DFLT_BPM_NUMBER);
+        bpm_number = DFLT_BPM_NUMBER;
+    }
+    else {
+        bpm_number = strtoul (bpm_number_str, NULL, 10);
+
+        if (bpm_number > MAX_BPM_NUMBER) {
+            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+                    MAX_BPM_NUMBER);
+            bpm_number = MAX_BPM_NUMBER;
+        }
+    }
 
     /* Set default channel */
     uint32_t chan;
     if (chan_str == NULL) {
         fprintf (stderr, "[client:adc_dly]: Setting default value to: %u\n",
-                DEFAULT_CHAN_NUM);
-        chan = DEFAULT_CHAN_NUM;
+                DFLT_CHAN_NUM);
+        chan = DFLT_CHAN_NUM;
     }
     else {
         chan = strtoul (chan_str, NULL, 10);
@@ -107,8 +160,8 @@ int main (int argc, char *argv [])
     uint32_t lines = 0;
     if (lines_str == NULL) {
         fprintf (stderr, "[client:adc_dly]: Setting default ADC lines to: %u\n",
-                DEFAULT_LINES_NUM);
-        lines = DEFAULT_LINES_NUM;
+                DFLT_LINES_NUM);
+        lines = DFLT_LINES_NUM;
     }
     else {
         lines = strtoul (lines_str, NULL, 10);
@@ -125,8 +178,8 @@ int main (int argc, char *argv [])
     uint32_t dly_val = 0;
     if (dly_val_str == NULL) {
         fprintf (stderr, "[client:adc_dly]: Setting default ADC delay value to: %u\n",
-                DEFAULT_ADC_DLY_VALUE);
-        dly_val = DEFAULT_ADC_DLY_VALUE;
+                DFLT_ADC_DLY_VALUE);
+        dly_val = DFLT_ADC_DLY_VALUE;
     }
     else {
         dly_val = strtoul (dly_val_str, NULL, 10);
@@ -139,26 +192,39 @@ int main (int argc, char *argv [])
     }
     fprintf (stdout, "[client:adc_dly]: ADC delay value = %u\n", dly_val);
 
-    /* Call the appropriate delay fucntion. FIXME: the case construct is
+    char service[50];
+    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+
+    /* Call the appropriate delay function. FIXME: the case construct is
      * not generic nor expansible */
     switch(chan) {
         case 0:
-            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
+            bpm_set_adc_dly0 (bpm_client, service, lines, dly_val);
             break;
         case 1:
-            bpm_set_adc_dly1 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
+            bpm_set_adc_dly1 (bpm_client, service, lines, dly_val);
             break;
         case 2:
-            bpm_set_adc_dly2 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
+            bpm_set_adc_dly2 (bpm_client, service, lines, dly_val);
             break;
         case 3:
-            bpm_set_adc_dly3 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
+            bpm_set_adc_dly3 (bpm_client, service, lines, dly_val);
             break;
         default:
-            bpm_set_adc_dly0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", lines, dly_val);
+            bpm_set_adc_dly0 (bpm_client, service, lines, dly_val);
             break;
     }
 
+    bpm_client_destroy (&bpm_client);
+
+    str_p = &board_number_str;
+    free (*str_p);
+    board_number_str = NULL;
+    str_p = &bpm_number_str;
+    free (*str_p);
+    bpm_number_str = NULL;
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;
@@ -168,7 +234,6 @@ int main (int argc, char *argv [])
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
-    bpm_client_destroy (&bpm_client);
 
     return 0;
 }
