@@ -102,14 +102,14 @@ smch_err_e smch_ad9510_destroy (smch_ad9510_t **self_p)
 smch_err_e smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         const uint8_t *data)
 {
-    return (smch_ad9510_write_8 (self, addr, data) == sizeof(uint8_t))?
+    return (_smch_ad9510_write_8 (self, addr, data) == sizeof(uint8_t))?
         SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
 smch_err_e smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
         uint8_t *data)
 {
-    return (smch_ad9510_read_8 (self, addr, data) == sizeof(uint8_t))?
+    return (_smch_ad9510_read_8 (self, addr, data) == sizeof(uint8_t))?
         SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
