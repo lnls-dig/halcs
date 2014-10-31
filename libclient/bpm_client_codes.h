@@ -9,6 +9,5 @@
 #define _BPM_CLIENT_CODES_H_
 
 #include "sm_io_codes.h"
-#include "rw_param_codes.h"
 
 #endif

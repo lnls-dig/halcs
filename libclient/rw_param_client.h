@@ -12,6 +12,7 @@
 #include <mdp.h>
 
 #include "bpm_client_codes.h"
+#include "rw_param_codes.h"
 #include "bpm_client_err.h"
 
 #define READ_MODE                   1
