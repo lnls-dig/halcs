@@ -90,7 +90,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     self->poller = zpoller_new (NULL);
     ASSERT_ALLOC(self->poller, err_poller_alloc);
 
-	/* Setup new poller. It uses the low-level zmq_poll API */
+    /* Setup new poller. It uses the low-level zmq_poll API */
     self->poller2 = NULL;
 
     /* Initilize mdp_worrker last, as we need to have everything ready

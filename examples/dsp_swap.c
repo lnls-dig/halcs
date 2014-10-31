@@ -87,7 +87,7 @@ int main (int argc, char *argv [])
         goto err_bpm_get;
     }
     fprintf (stdout, "[client:dsp]: bpm_get_kx = %u was successfully executed\n",
-					kx_get);
+                    kx_get);
 
     uint32_t ky_set = 10000000;
     fprintf (stdout, "[client:dsp]: ky = %u\n", ky_set);
@@ -105,7 +105,7 @@ int main (int argc, char *argv [])
         goto err_bpm_get;
     }
     fprintf (stdout, "[client:dsp]: bpm_get_ky = %u was successfully executed\n",
-					ky_get);
+                    ky_get);
 
     uint32_t ksum_set = 0x0FFFFFF;  // 1.0 FIX25_24;
     fprintf (stdout, "[client:dsp]: ksum = %u\n", ksum_set);
@@ -123,7 +123,7 @@ int main (int argc, char *argv [])
         goto err_bpm_get;
     }
     fprintf (stdout, "[client:dsp]: bpm_get_ksum = %u was successfully executed\n",
-					ksum_get);
+                    ksum_get);
 
     uint32_t sw = 1;
     err = bpm_set_sw (bpm_client, "BPM0:DEVIO:SWAP0", sw);
@@ -132,7 +132,7 @@ int main (int argc, char *argv [])
         goto err_bpm_set;
     }
     fprintf (stdout, "[client:swap]: bpm_set_sw = %u was successfully executed\n",
-					sw);
+                    sw);
 
     uint32_t sw_en = 0;
     err = bpm_set_sw_en (bpm_client, "BPM0:DEVIO:SWAP0", sw_en);
@@ -141,7 +141,7 @@ int main (int argc, char *argv [])
         goto err_bpm_set;
     }
     fprintf (stdout, "[client:swap]: bpm_set_sw_en = %u was successfully executed\n",
-					sw_en);
+                    sw_en);
 
     uint32_t div_clk = 250;
     err = bpm_set_div_clk (bpm_client, "BPM0:DEVIO:SWAP0", div_clk);
@@ -150,7 +150,7 @@ int main (int argc, char *argv [])
         goto err_bpm_set;
     }
     fprintf (stdout, "[client:swap]: bpm_set_div_clk = %u was successfully executed\n",
-					div_clk);
+                    div_clk);
 
     uint32_t gain_aa = 32768;
     uint32_t gain_ac = 32768;

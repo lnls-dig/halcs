@@ -80,7 +80,7 @@ disp_op_t fmc130m_4ch_leds_exp = {
 #define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
 
 RW_PARAM_FUNC(fmc130m_4ch, pll_func) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             CLK_DISTRIB, PLL_FUNCTION, SINGLE_BIT_PARAM,
             BPM_FMC130M_4CH_PLL_FUNC_MIN, BPM_FMC130M_4CH_PLL_FUNC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -149,7 +149,7 @@ rw_param_format_fp rw_bpm_fmc130m_4ch_data_fmt_fp = _rw_bpm_fmc130m_4ch_data_fmt
 #define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
 RW_PARAM_FUNC(fmc130m_4ch, adc_data0) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             DATA0, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
@@ -172,7 +172,7 @@ disp_op_t fmc130m_4ch_adc_data0_exp = {
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
 RW_PARAM_FUNC(fmc130m_4ch, adc_data1) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             DATA1, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
@@ -195,7 +195,7 @@ disp_op_t fmc130m_4ch_adc_data1_exp = {
 #define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
 RW_PARAM_FUNC(fmc130m_4ch, adc_data2) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             DATA2, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
@@ -218,7 +218,7 @@ disp_op_t fmc130m_4ch_adc_data2_exp = {
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
 RW_PARAM_FUNC(fmc130m_4ch, adc_data3) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             DATA3, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
@@ -240,7 +240,7 @@ disp_op_t fmc130m_4ch_adc_data3_exp = {
 /******************************** ADC Delay Values ****************************/
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val0) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY0_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -260,7 +260,7 @@ disp_op_t fmc130m_4ch_adc_dly_val0_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val1) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -280,7 +280,7 @@ disp_op_t fmc130m_4ch_adc_dly_val1_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val2) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY2_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -300,7 +300,7 @@ disp_op_t fmc130m_4ch_adc_dly_val2_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val3) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -322,7 +322,7 @@ disp_op_t fmc130m_4ch_adc_dly_val3_exp = {
 /******************************** ADC Delay Lines *****************************/
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line0) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY0_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -342,7 +342,7 @@ disp_op_t fmc130m_4ch_adc_dly_line0_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line1) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -362,7 +362,7 @@ disp_op_t fmc130m_4ch_adc_dly_line1_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line2) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY2_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -382,7 +382,7 @@ disp_op_t fmc130m_4ch_adc_dly_line2_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line3) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -404,7 +404,7 @@ disp_op_t fmc130m_4ch_adc_dly_line3_exp = {
 /******************************** ADC Delay Update ****************************/
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt0) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY0_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -424,7 +424,7 @@ disp_op_t fmc130m_4ch_adc_dly_updt0_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt1) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -444,7 +444,7 @@ disp_op_t fmc130m_4ch_adc_dly_updt1_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt2) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY2_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -464,7 +464,7 @@ disp_op_t fmc130m_4ch_adc_dly_updt2_exp = {
 };
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt3) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -652,7 +652,7 @@ disp_op_t fmc130m_4ch_adc_dly3_exp = {
 #define BPM_FMC130M_4CH_TEST_DATA_EN_MAX            1 /* TEST data enable on */
 
 RW_PARAM_FUNC(fmc130m_4ch, test_data_en) {
-	SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             FPGA_CTRL, TEST_DATA_EN, SINGLE_BIT_PARAM,
             BPM_FMC130M_4CH_TEST_DATA_EN_MIN, BPM_FMC130M_4CH_TEST_DATA_EN_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);

@@ -42,7 +42,7 @@ smio_dsp_t * smio_dsp_new ()
     smio_dsp_t *self = (smio_dsp_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-//	self->example = 0;
+//  self->example = 0;
 
     return self;
 

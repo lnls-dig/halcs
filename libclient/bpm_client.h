@@ -286,13 +286,13 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 
 bpm_client_err_e bpm_set_kx (bpm_client_t *self, char *service, uint32_t kx);
 bpm_client_err_e bpm_get_kx (bpm_client_t *self, char *service,
-		uint32_t *kx_out);
+        uint32_t *kx_out);
 bpm_client_err_e bpm_set_ky (bpm_client_t *self, char *service, uint32_t ky);
 bpm_client_err_e bpm_get_ky (bpm_client_t *self, char *service,
-		uint32_t *ky_out);
+        uint32_t *ky_out);
 bpm_client_err_e bpm_set_ksum (bpm_client_t *self, char *service, uint32_t ksum);
 bpm_client_err_e bpm_get_ksum (bpm_client_t *self, char *service,
-		uint32_t *ksum_out);
+        uint32_t *ksum_out);
 
 /* Delta-Sigma Threshold functions */
 /* These set of functions write (set) or read (get) the delta-sigma
@@ -305,15 +305,15 @@ bpm_client_err_e bpm_get_ksum (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_ds_tbt_thres (bpm_client_t *self, char *service,
         uint32_t ds_tbt_thres);
 bpm_client_err_e bpm_get_ds_tbt_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_tbt_thres);
+        uint32_t *ds_tbt_thres);
 bpm_client_err_e bpm_set_ds_fofb_thres (bpm_client_t *self, char *service,
         uint32_t ds_fofb_thres);
 bpm_client_err_e bpm_get_ds_fofb_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_fofb_thres);
+        uint32_t *ds_fofb_thres);
 bpm_client_err_e bpm_set_ds_monit_thres (bpm_client_t *self, char *service,
         uint32_t ds_monit_thres);
 bpm_client_err_e bpm_get_ds_monit_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_monit_thres);
+        uint32_t *ds_monit_thres);
 
 /* Monitoring Position values */
 /* These set of functions read (get) the Monitoring position values.
@@ -373,11 +373,11 @@ bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_sw (bpm_client_t *self, char *service,
         uint32_t sw);
 bpm_client_err_e bpm_get_sw (bpm_client_t *self, char *service,
-		uint32_t *sw);
+        uint32_t *sw);
 bpm_client_err_e bpm_set_sw_en (bpm_client_t *self, char *service,
         uint32_t sw_en);
 bpm_client_err_e bpm_get_sw_en (bpm_client_t *self, char *service,
-		uint32_t *sw_en);
+        uint32_t *sw_en);
 
 /* Switching clock functions */
 /* These set of functions write (set) or read (get) the switching
@@ -390,7 +390,7 @@ bpm_client_err_e bpm_get_sw_en (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_div_clk (bpm_client_t *self, char *service,
         uint32_t div_clk);
 bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
-		uint32_t *div_clk);
+        uint32_t *div_clk);
 
 /* Switching delay functions */
 /* These set of functions write (set) or read (get) the (de)switching
@@ -401,7 +401,7 @@ bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_sw_dly (bpm_client_t *self, char *service,
         uint32_t sw_dly);
 bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
-		uint32_t *sw_dly);
+        uint32_t *sw_dly);
 
 /* Windowing functions */
 /* These set of functions write (set) or read (get) the windowing state with
@@ -414,11 +414,11 @@ bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_wdw (bpm_client_t *self, char *service,
         uint32_t wdw);
 bpm_client_err_e bpm_get_wdw (bpm_client_t *self, char *service,
-		uint32_t *wdw);
+        uint32_t *wdw);
 bpm_client_err_e bpm_set_wdw_dly (bpm_client_t *self, char *service,
         uint32_t wdw_dly);
 bpm_client_err_e bpm_get_wdw_dly (bpm_client_t *self, char *service,
-		uint32_t *wdw_dly);
+        uint32_t *wdw_dly);
 
 /* Gain functions */
 /* TODO: reduce code repetition by, possibilly, group the OPCODES in

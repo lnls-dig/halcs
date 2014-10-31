@@ -22,7 +22,7 @@
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)   	\
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
     ASSERT_HAL_ALLOC(ptr, LIB_CLIENT, "[libclient:rw_param_client]", \
             bpm_client_err_str(BPM_CLIENT_ERR_ALLOC),               \
             err_goto_label, /* err_core */ __VA_ARGS__)

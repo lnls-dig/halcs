@@ -25,14 +25,14 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 #define SINGLE_BIT_PARAM            1
 #define MULT_BIT_PARAM              0
 
-#define BIT_SET 					1
-#define BIT_CLR	  	     			0
+#define BIT_SET                     1
+#define BIT_CLR                     0
 
 #define NO_CHK_FUNC                 NULL
 #define NO_FMT_FUNC                 NULL
 
-#define CLR_FIELD 					1
-#define SET_FIELD  	     			0
+#define CLR_FIELD                   1
+#define SET_FIELD                   0
 
 #define EXPAND_FIELD_NE(field) WHENNOT(ISEMPTY(field))(_ ## field)
 #define EXPAND_CHECK_LIM_NE(min, max) WHENNOT(ISEMPTY(min))                     \
@@ -82,7 +82,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         uint32_t __value;                                                       \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", \
+                "GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", \
                 self->base | addr);                                             \
         ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(self, addr,     \
             &__value);                                                          \
@@ -94,7 +94,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
             err = RW_READ_EAGAIN;                                               \
         }                                                                       \
                                                                                 \
-        __value = WHEN(single_bit)(  										    \
+        __value = WHEN(single_bit)(                                             \
                     (__value & CONCAT_NAME3(prefix, reg, field)) ?              \
                     BIT_SET : BIT_CLR                                           \
                 )                                                               \
@@ -103,7 +103,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                 )                                                               \
         ;                                                                       \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"GET_PARAM_" #reg "_" #field " = 0x%08x\n", __value);           \
+                "GET_PARAM_" #reg "_" #field " = 0x%08x\n", __value);           \
         if (fmt_funcp != NULL) {                                                \
             ((rw_param_format_fp) fmt_funcp) (&__value);                        \
         }                                                                       \
@@ -119,13 +119,13 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 /* SET or CLEAR parameter based on the last macro parameter "clr_field" */
 #define SET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, value, \
         min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
-	({                                                                          \
+    ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
         uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
+                "SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
                 value, self->base | addr);                                      \
-		if (EXPAND_CHECK_LIM_NE(min, max)                                       \
+        if (EXPAND_CHECK_LIM_NE(min, max)                                       \
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
             uint32_t __write_value;                                             \
             ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(self,       \
@@ -176,7 +176,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
             err = RW_USR_ERR;                                                   \
         }                                                                       \
         err;                                                                    \
-	})
+    })
 
 #define SET_PARAM(self, module, base_addr, prefix, reg, field, single_bit, value, \
         min, max, chk_funcp, clr_field)                                         \
@@ -186,23 +186,23 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
 
 /* zmq message in SET_GET_PARAM macro is:
  * frame 0: operation code
- * frame 1: rw		R /W	1 = read mode, 0 = write mode
+ * frame 1: rw      R /W    1 = read mode, 0 = write mode
  * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
  * */
 #define SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
         max, chk_funcp, fmt_funcp, clr_field, read_32_fp, write_32_fp)          \
-	do {                                                                        \
-		assert (owner);                                                         \
-		assert (args);                                                          \
-		DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"Calling SET_GET_PARAM_"#reg"\n");                              \
+    do {                                                                        \
+        assert (owner);                                                         \
+        assert (args);                                                          \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
+                "Calling SET_GET_PARAM_"#reg"\n");                              \
         SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
-		uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
+        uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
         uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
-		DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-				"SET_GET_PARAM_"#reg": rw = %u\n", rw);                         \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
+                "SET_GET_PARAM_"#reg": rw = %u\n", rw);                         \
         RW_REPLY_TYPE set_param_return;                                         \
-		if (rw)	{                                                               \
+        if (rw) {                                                               \
             set_param_return = GET_PARAM_GEN(self, module, base_addr,           \
                     prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp); \
             if (set_param_return != RW_OK) {                                    \
@@ -219,7 +219,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                     clr_field, read_32_fp, write_32_fp);                        \
             return -set_param_return;                                           \
         }                                                                       \
-	} while (0)
+    } while (0)
 
 #define SET_GET_PARAM(module, base_addr, prefix, reg, field, single_bit, min,   \
         max, chk_funcp, fmt_funcp, clr_field)                                   \

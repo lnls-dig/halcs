@@ -21,7 +21,7 @@
 #undef ASSERT_ALLOC
 #endif
 #define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:rw_param]", 		\
+    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:rw_param]",        \
             smio_err_str(SMIO_ERR_ALLOC),                   \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
@@ -29,13 +29,13 @@
 #undef CHECK_ERR
 #endif
 #define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, SM_IO, "[sm_io:rw_param]",    		\
+    CHECK_HAL_ERR(err, SM_IO, "[sm_io:rw_param]",           \
             smio_err_str (err_type))
 
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max) {
-	if (value < min || value > max) {
-		return PARAM_ERR;
-	}
-	return PARAM_OK;
+    if (value < min || value > max) {
+        return PARAM_ERR;
+    }
+    return PARAM_OK;
 }
 

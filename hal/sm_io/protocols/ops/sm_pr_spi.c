@@ -229,8 +229,8 @@ static smpr_err_e _spi_init (smpr_t *self)
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Calculating SPI frequency\n");
     /* Set SPI clock */
-	float f_freq = (float) spi_proto->sys_freq/(2.0 * (float) spi_proto->spi_freq) - 1.0;
-	uint32_t freq = SPI_PROTO_DIVIDER_W((uint16_t) f_freq);
+    float f_freq = (float) spi_proto->sys_freq/(2.0 * (float) spi_proto->spi_freq) - 1.0;
+    uint32_t freq = SPI_PROTO_DIVIDER_W((uint16_t) f_freq);
 
     /* Configure SPI divider register */
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
@@ -352,7 +352,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         uint32_t i;
         /* We write 32-bit at a time */
 
-		for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+        for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
             /* As the TXs are just a single register, we write using the SMIO
              * functions directly */
             DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
@@ -363,7 +363,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
                     (uint32_t *) (data_write + SMPR_WB_REG_2_BYTE*i));
             err += (num_bytes == -1) ? 0 : num_bytes;
             ASSERT_TEST(num_bytes != -1, "Could not set TX register", err_exit);
-		}
+        }
 
         /* Return error if we could not write everything */
         ASSERT_TEST(err == (ssize_t) size, "Could not write everything to TX registers",

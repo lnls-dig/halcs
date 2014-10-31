@@ -235,7 +235,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
-    if (block_n > block_n_max) {	/* block required out of the limits */
+    if (block_n > block_n_max) {    /* block required out of the limits */
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
                 "Block required is out of the limit\n");
@@ -268,7 +268,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
                 "Block required is not valid\n");
         return -ACQ_BLOCK_OOR;
-    }	/* Last valid data conditions check done */
+    }   /* Last valid data conditions check done */
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
