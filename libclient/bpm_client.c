@@ -13,6 +13,7 @@
 #include "sm_io_swap_codes.h"
 #include "sm_io_swap_useful_macros.h"
 #include "rw_param_codes.h"
+#include "rw_param_client.h"
 #include "ddr3_map.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -651,12 +652,17 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
                 "<payload> parameter size does not match size in <number of payload bytes> parameter",
                 err_msg_fmt);
 
+        /* frame 2: data read (optional)
+         *          data read = data block
+         *                      valid bytes */
+        smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) zframe_data (data_frm);
+
         /* Data size effectively returned */
-        uint32_t read_size = (acq_trans->block.data_size < data_size) ?
-            acq_trans->block.data_size : data_size;
+        uint32_t read_size = (acq_trans->block.data_size < data_block->valid_bytes) ?
+            acq_trans->block.data_size : data_block->valid_bytes;
 
         /* Copy message contents to user */
-        memcpy (acq_trans->block.data, zframe_data (data_frm), read_size);
+        memcpy (acq_trans->block.data, data_block->data, read_size);
         /* Inform user about the number of bytes effectively copied*/
         acq_trans->block.bytes_read = read_size;
 

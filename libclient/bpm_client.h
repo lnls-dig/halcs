@@ -14,7 +14,6 @@
 #include "bpm_client_codes.h"
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
-#include "rw_param_client.h"
 
 struct _acq_buf_t;
 
