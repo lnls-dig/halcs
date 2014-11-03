@@ -19,6 +19,8 @@ BOARD ?= ml605
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
+LIBCLIENT = libbpmclient
+
 # Config variables suitable for creating shared libraries
 LIB_VER_MAJOR = 1
 LIB_VER_MINOR = 0
@@ -66,8 +68,6 @@ OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
 OBJS_PLATFORM = ../hal/debug/debug_print.o ../hal/debug/local_print.o \
 		../hal/debug/debug_subsys.o
-# Library objects
-libbpmclient_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
 
 # Include directories
 INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
@@ -87,10 +87,12 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 
 # Output library names
-LIBCLIENT = libbpmclient
 OUT = $(LIBCLIENT)
 
 .SECONDEXPANSION:
+
+# Library objects
+$(LIBCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
 
 # Objects common for both server and client libraries.
 common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
@@ -102,6 +104,7 @@ $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_c
 	../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
 	../hal/sm_io/modules/swap/sm_io_swap_codes.h \
 	../hal/sm_io/modules/sm_io_codes.h \
+	../hal/include/acq_chan_gen_defs.h \
 	bpm_client_codes.h
 
 # Install only specific acq_chan.h defintions according to the BOARD MACRO
@@ -122,7 +125,7 @@ REVISION = $(shell git describe --dirty --always)
 REVISION_NAME = revision
 OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
-OBJS_all = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB) \
+OBJS_all = $(common_OBJS) $($(LIBCLIENT)_OBJS) \
 	   $(OBJ_REVISION)
 
 # Libraries suffixes
