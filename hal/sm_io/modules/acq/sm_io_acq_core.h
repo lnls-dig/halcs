@@ -24,12 +24,6 @@ struct _smio_acq_t {
 /* Opaque class structure */
 typedef struct _smio_acq_t smio_acq_t;
 
-struct _smio_acq_data_block_t {
-    uint8_t data[BLOCK_SIZE];
-};
-
-typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
-
 /***************** Our methods *****************/
 
 /* Creates a new instance of the smio realizationn */

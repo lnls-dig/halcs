@@ -9,6 +9,14 @@
 #define _SM_IO_ACQ_CODES_H_
 
 #include <inttypes.h>
+#include <acq_chan_gen_defs.h>
+
+struct _smio_acq_data_block_t {
+    uint32_t valid_bytes;           /* how much of the BLOCK_SIZE bytes are valid */
+    uint8_t data[BLOCK_SIZE];       /* data buffer */
+};
+
+typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 
 /* Messaging OPCODES */
 #define ACQ_OPCODE_SIZE                  (sizeof(uint32_t))
