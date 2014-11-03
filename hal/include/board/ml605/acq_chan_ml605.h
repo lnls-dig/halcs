@@ -1,7 +1,7 @@
 #ifndef _ACQ_CHAN_ML605_H_
 #define _ACQ_CHAN_ML605_H_
 
-#define BLOCK_SIZE 131072
+#include <acq_chan_gen_defs.h>
 
 /************************ Acquistion 0 Channel Parameters **************/
 
