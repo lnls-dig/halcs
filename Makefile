@@ -35,11 +35,11 @@ CFLAGS = -std=gnu99 -O2
 
 # Board selection
 ifeq ($(BOARD),ml605)
-CFLAGS += -D__BOARD_ML605__
+CFLAGS += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
 ifeq ($(BOARD),afcv3)
-CFLAGS += -D__BOARD_AFCV3__
+CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
 # FMC130M board type selection
