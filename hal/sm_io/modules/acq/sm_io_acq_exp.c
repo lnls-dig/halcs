@@ -201,7 +201,6 @@ disp_op_t acq_check_data_acquire_exp = {
 
 static int _acq_get_data_block (void *owner, void *args, void *ret)
 {
-    (void) ret;
     assert (owner);
     assert (args);
 
@@ -287,14 +286,16 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Memory start address = 0x%08x\n", addr_i);
 
+    smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) ret;
+
     /* Here we must use the "raw" version, as we can't have
      * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
-    ssize_t bytes_read = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
-            reply_size, ret);
+    data_block->valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
+            reply_size, (uint32_t *) data_block->data);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%ld bytes read\n", bytes_read);
+            "%u bytes read\n", data_block->valid_bytes);
 
-    return bytes_read;
+    return sizeof (*data_block);
 }
 
 disp_op_t acq_get_data_block_exp = {
