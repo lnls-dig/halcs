@@ -14,7 +14,6 @@
 #include "sm_io_swap_useful_macros.h"
 #include "rw_param_codes.h"
 #include "rw_param_client.h"
-#include "ddr3_map.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -44,6 +43,34 @@
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode);
 
+/* Acquisition channel definitions for user's application */
+#if defined(__BOARD_ML605__)
+/* Global structure merging all of the channel's sample sizes */
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
+                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
+                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
+                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
+                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
+                                        [5] = {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
+                                        [6] = {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
+                                        [7] = {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
+                                    };
+#elif defined(__BOARD_AFCV3__)
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]  =  {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
+                                        [1]  =  {.chan = MIX0_CHAN_ID, .sample_size = MIX0_SAMPLE_SIZE},
+                                        [2]  =  {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
+                                        [3]  =  {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
+                                        [4]  =  {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
+                                        [5]  =  {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
+                                        [6]  =  {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
+                                        [7]  =  {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
+                                        [8]  =  {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
+                                    };
+#else
+#error "Unsupported board!"
+#endif
+
+
 /********************************************************/
 /************************ Our API ***********************/
 /********************************************************/
@@ -68,7 +95,7 @@ void bpm_client_destroy (bpm_client_t **self_p)
     if (*self_p) {
         bpm_client_t *self = *self_p;
 
-        self->acq_buf = NULL;
+        self->acq_chan = NULL;
         mdp_client_destroy (&self->mdp_client);
         *self_p = NULL;
     }
@@ -94,9 +121,8 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
     ASSERT_TEST(self->mdp_client!=NULL, "Could not create MDP client",
             err_mdp_client);
 
-    /* Initialize acquisition table. Defined in hal/smio/modules/
-     * acq/ddr3_map.h */
-    self->acq_buf = __acq_buf;
+    /* Initialize acquisition table */
+    self->acq_chan = acq_chan;
 
     return self;
 
@@ -381,42 +407,6 @@ PARAM_FUNC_CLIENT_READ(adc_test_data_en)
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
-
-/* Acquisition channel definitions for user's application */
-#if defined(__BOARD_ML605__)
-/* Global structure merging all of the channel's sample sizes */
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [5] = {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [6] = {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [7] = {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
-                                    };
-#elif defined(__BOARD_AFCV3__)
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]  =  {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1]  =  {.chan = MIX0_CHAN_ID, .sample_size = MIX0_SAMPLE_SIZE},
-                                        [2]  =  {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [3]  =  {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [4]  =  {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [5]  =  {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [6]  =  {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [7]  =  {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [8]  =  {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE},
-                                        [9]  =  {.chan = ADC1_CHAN_ID, .sample_size = ADC1_SAMPLE_SIZE},
-                                        [10] =  {.chan = MIX1_CHAN_ID, .sample_size = MIX1_SAMPLE_SIZE},
-                                        [11]  = {.chan = TBTAMP1_CHAN_ID, .sample_size = TBTAMP1_SAMPLE_SIZE},
-                                        [12]  = {.chan = TBTPOS1_CHAN_ID, .sample_size = TBTPOS1_SAMPLE_SIZE},
-                                        [13]  = {.chan = FOFBAMP1_CHAN_ID, .sample_size = FOFBAMP1_SAMPLE_SIZE},
-                                        [14]  = {.chan = FOFBPOS1_CHAN_ID, .sample_size = FOFBPOS1_SAMPLE_SIZE},
-                                        [15]  = {.chan = MONITAMP1_CHAN_ID, .sample_size = MONITAMP1_SAMPLE_SIZE},
-                                        [16]  = {.chan = MONITPOS1_CHAN_ID, .sample_size = MONITPOS1_SAMPLE_SIZE},
-                                        [17]  = {.chan = MONIT1POS1_CHAN_ID, .sample_size = MONIT1POS1_SAMPLE_SIZE}
-                                    };
-#else
-#error "Unsupported board!"
-#endif
 
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
         acq_req_t *acq_req);
@@ -707,7 +697,7 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 
     /* FIXME: When the last block is full 'block_n_valid exceeds by one */
     uint32_t block_n_valid = acq_trans->req.num_samples /
-        (BLOCK_SIZE/self->acq_buf[acq_trans->req.chan].sample_size);
+        (BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size);
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "block_n_valid = %u\n", block_n_valid);
 

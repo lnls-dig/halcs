@@ -15,12 +15,12 @@
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
 
-struct _acq_buf_t;
+struct _acq_chan_t;
 
 /* Our structure */
 struct _bpm_client_t {
     mdp_client_t *mdp_client;                   /* Majordomo client instance */
-    const struct _acq_buf_t *acq_buf;           /* Acquisition buffer table */
+    const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
 };
 
 typedef struct _bpm_client_t bpm_client_t;
