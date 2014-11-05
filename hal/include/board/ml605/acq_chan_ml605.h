@@ -3,6 +3,8 @@
 
 #include <acq_chan_gen_defs.h>
 
+#define NUM_ACQ_CORE_SMIOS              1
+
 /************************ Acquistion 0 Channel Parameters **************/
 
 /* ADC */
