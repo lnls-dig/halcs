@@ -89,8 +89,8 @@ typedef struct _th_config_args_t th_config_args_t;
 /************************************************************/
 void smio_startup (void *args, zctx_t *ctx, void *pipe);
 void smio_config_defaults (void *args, zctx_t *ctx, void *pipe);
-struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
-        void *pipe, char *broker, char *service, uint32_t base, int verbose);
+struct _smio_t *smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
+        void *pipe, char *service);
 smio_err_e smio_destroy (struct _smio_t **self_p);
 smio_err_e smio_loop (struct _smio_t *self);
 

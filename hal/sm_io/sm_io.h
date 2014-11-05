@@ -31,6 +31,8 @@ struct _disp_op_t;
 struct _smio_t {
     uint32_t id;                        /* Unique identifier for this sm_io type. This must be
                                            the same from the SDB ID */
+    uint32_t inst_id;                   /* Instance ID. This differentiate SMIOs
+                                           of the same type */
     uint32_t base;                      /* Base SMIO address */
     char *name;                         /* Identification of this sm_io instance */
     char *service;                      /* Exported service name */

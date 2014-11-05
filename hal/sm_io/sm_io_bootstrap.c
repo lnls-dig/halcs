@@ -41,8 +41,8 @@
  * more byte allocated */
 #define EXTRA_SMIO_SERV_BYTES       1
 
-static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
-        void *pipe, char *broker, char *service, uint32_t base, int verbose);
+static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
+        void *pipe, char *service);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
 static smio_err_e _smio_loop (smio_t *self);
 
@@ -72,8 +72,7 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
             "allocating resources ...\n", smio_service);
 
-    smio_t *self = _smio_new (th_args->parent, ctx, pipe, th_args->broker,
-            smio_service, th_args->base, th_args->verbose);
+    smio_t *self = _smio_new (th_args, ctx, pipe, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
@@ -154,10 +153,10 @@ err_inst_id_str_alloc:
 /************ SMIO Bootstrap wrapper functions **************/
 /************************************************************/
 
-struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
-        char *broker, char *service, uint32_t base, int verbose)
+struct _smio_t *smio_new (th_boot_args_t* args, struct _zctx_t *ctx, void *pipe,
+        char *service)
 {
-    return _smio_new (parent, ctx, pipe, broker, service, base, verbose);
+    return _smio_new (args, ctx, pipe, service);
 }
 
 smio_err_e smio_destroy (struct _smio_t **self_p)
@@ -175,11 +174,9 @@ smio_err_e smio_loop (struct _smio_t *self)
 /************************************************************/
 
 /* Boot new sm_io instance of fmc130m_4ch */
-static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
-        void *pipe, char *broker, char *service, uint32_t base, int verbose)
+static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
+        void *pipe, char *service)
 {
-    (void) parent;
-
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -195,14 +192,15 @@ static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->ctx = ctx;
     self->pipe = pipe;
+    self->inst_id = args->inst_id;
 
     /* Initialize SMIO base address */
-    self->base = base;
+    self->base = args->base;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
-            broker, service, verbose);
-    self->worker = mdp_worker_new (self->ctx, broker, service, verbose);
+            args->broker, service, args->verbose);
+    self->worker = mdp_worker_new (self->ctx, args->broker, service, args->verbose);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
     ASSERT_ALLOC(self->worker, err_worker_alloc);
 
