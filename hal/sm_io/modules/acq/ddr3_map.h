@@ -14,7 +14,7 @@ struct _acq_buf_t {
 
 typedef struct _acq_buf_t acq_buf_t;
 
-extern const acq_buf_t __acq_buf[END_CHAN_ID];
+extern const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID];
 
 #endif
 
