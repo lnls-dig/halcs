@@ -227,7 +227,7 @@ static devio_err_e spwan_platform_smios (devio_t *devio)
         goto err_register_sm;
     }
 
-    err = devio_register_sm (devio, acq_id, WB_ACQ_BASE_ADDR, 0);
+    err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_register_sm;
@@ -249,6 +249,12 @@ static devio_err_e spwan_platform_smios (devio_t *devio)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning AFCv3 specific SMIOs ...\n");
 
     err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_register_sm;
