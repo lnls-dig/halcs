@@ -27,7 +27,7 @@ typedef struct _smio_acq_t smio_acq_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the smio realizationn */
-smio_acq_t * smio_acq_new (uint32_t num_samples);
+smio_acq_t * smio_acq_new (uint32_t num_samples, uint32_t inst_id);
 /* Destroys the smio realizationn */
 smio_err_e smio_acq_destroy (smio_acq_t **self_p);
 
