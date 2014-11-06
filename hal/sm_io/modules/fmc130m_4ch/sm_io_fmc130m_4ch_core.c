@@ -45,18 +45,14 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-#ifdef __FMC130M_4CH_TYPE_ACTIVE__
     self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS /* Offset
                 to the beggining of the SMIO base */, FMC130M_4CH_AD9510_ADDR, 0);
     ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
-#endif
 
     return self;
 
-#ifdef __FMC130M_4CH_TYPE_ACTIVE__
 err_smch_ad9510_alloc:
     free (self);
-#endif
 err_self_alloc:
     return NULL;
 }
@@ -69,9 +65,7 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc130m_4ch_t *self = *self_p;
 
-#ifdef __FMC130M_4CH_TYPE_ACTIVE__
         smch_ad9510_destroy (&self->smch_ad9510);
-#endif
         free (self);
         *self_p = NULL;
     }
