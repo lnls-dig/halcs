@@ -248,7 +248,8 @@ static smpr_err_e _spi_init (smpr_t *self)
             &freq_rb);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI divider readback value = %u\n", SPI_PROTO_DIVIDER_R(freq_rb));
-    assert (SPI_PROTO_DIVIDER_R(freq_rb) == freq);
+    ASSERT_TEST(SPI_PROTO_DIVIDER_R(freq_rb) == freq, "[sm_pr:spi] SPI frequency readback failed",
+            err_exit, SMPR_ERR_RW_SMIO);
 #endif
 
     /* Configure config register */
@@ -267,7 +268,8 @@ static smpr_err_e _spi_init (smpr_t *self)
             &config_rb);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI config readback value = 0x%08X\n", config_rb);
-    assert (config_rb == spi_proto->init_config);
+    ASSERT_TEST(config_rb == spi_proto->init_config, "[sm_pr:spi] SPI initial config readback failed",
+            err_exit, SMPR_ERR_RW_SMIO);
 #endif
 
     uint32_t bidir = SM_PR_SPI_DFLT_BIDIR;
@@ -287,7 +289,8 @@ static smpr_err_e _spi_init (smpr_t *self)
             &bidir_rb);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI bidir readback value = 0x%08X\n", bidir_rb);
-    assert (config_rb == spi_proto->init_config);
+    ASSERT_TEST(bidir_rb == bidir, "[sm_pr:spi] SPI Bidirectional readback failed",
+            err_exit, SMPR_ERR_RW_SMIO);
 #endif
 
 err_exit:
