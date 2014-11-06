@@ -138,6 +138,106 @@
 #define AD9510_LVDS_CMOS_INV_CMOS                   WBGEN2_GEN_MASK(AD9510_LVDS_CMOS_INV_CMOS_SHIFT, \
                                                                          AD9510_LVDS_CMOS_INV_CMOS_SIZE)
 
+#define AD9510_REG_CLK_OPT                          0x45
+
+/* Definition for register AD9510_REG_CLK_OPT */
+#define AD9510_CLK_OPT_SEL_CLK1_SHIFT               0
+#define AD9510_CLK_OPT_SEL_CLK1_SIZE                1
+#define AD9510_CLK_OPT_SEL_CLK1                     WBGEN2_GEN_MASK(AD9510_CLK_OPT_SEL_CLK1_SHIFT,\
+                                                                        AD9510_CLK_OPT_SEL_CLK1_SIZE)
+
+#define AD9510_CLK_OPT_CLK1_PD_SHIFT                1
+#define AD9510_CLK_OPT_CLK1_PD_SIZE                 1
+#define AD9510_CLK_OPT_CLK1_PD                      WBGEN2_GEN_MASK(AD9510_CLK_OPT_CLK1_PD_SHIFT,\
+                                                                        AD9510_CLK_OPT_CLK1_PD_SIZE)
+
+#define AD9510_CLK_OPT_CLK2_PD_SHIFT                2
+#define AD9510_CLK_OPT_CLK2_PD_SIZE                 1
+#define AD9510_CLK_OPT_CLK2_PD                      WBGEN2_GEN_MASK(AD9510_CLK_OPT_CLK2_PD_SHIFT,\
+                                                                        AD9510_CLK_OPT_CLK2_PD_SIZE)
+
+#define AD9510_CLK_OPT_PS_PD_SHIFT                  3
+#define AD9510_CLK_OPT_PS_PD_SIZE                   1
+#define AD9510_CLK_OPT_PS_PD                        WBGEN2_GEN_MASK(AD9510_CLK_OPT_PS_PD_SHIFT,\
+                                                                        AD9510_CLK_OPT_PS_PD_SIZE)
+
+#define AD9510_CLK_OPT_REFIN_PD_SHIFT               4
+#define AD9510_CLK_OPT_REFIN_PD_SIZE                1
+#define AD9510_CLK_OPT_REFIN_PD                     WBGEN2_GEN_MASK(AD9510_CLK_OPT_REFIN_PD_SHIFT,\
+                                                                        AD9510_CLK_OPT_REFIN_PD_SIZE)
+
+#define AD9510_CLK_OPT_ALLCLKS_PD_SHIFT             5
+#define AD9510_CLK_OPT_ALLCLKS_PD_SIZE              1
+#define AD9510_CLK_OPT_ALLCLKS_PD                   WBGEN2_GEN_MASK(AD9510_CLK_OPT_ALLCLKS_PD_SHIFT,\
+                                                                        AD9510_CLK_OPT_ALLCLKS_PD_SIZE)
+
+#define AD9510_REG_DIV0_DCYCLE                      0x48
+#define AD9510_REG_DIV1_DCYCLE                      0x4A
+#define AD9510_REG_DIV2_DCYCLE                      0x4C
+#define AD9510_REG_DIV3_DCYCLE                      0x4E
+#define AD9510_REG_DIV4_DCYCLE                      0x50
+#define AD9510_REG_DIV5_DCYCLE                      0x52
+#define AD9510_REG_DIV6_DCYCLE                      0x54
+#define AD9510_REG_DIV7_DCYCLE                      0x56
+
+/* Definition for register AD9510_REG_DIVX_DCYCLE */
+#define AD9510_DIV_DCYCLE_HIGH_SIZE                 4
+#define AD9510_DIV_DCYCLE_HIGH_SHIFT                0
+#define AD9510_DIV_DCYCLE_HIGH_MASK                 WBGEN2_GEN_MASK(AD9510_DIV_DCYCLE_HIGH_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_HIGH_SIZE)
+#define AD9510_DIV_DCYCLE_HIGH_W(value)             WBGEN2_GEN_WRITE(value, AD9510_DIV_DCYCLE_HIGH_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_HIGH_SIZE)
+#define AD9510_DIV_DCYCLE_HIGH_R(reg)               WBGEN2_GEN_READ(reg, AD9510_DIV_DCYCLE_HIGH_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_HIGH_SIZE)
+
+#define AD9510_DIV_DCYCLE_LOW_SIZE                  4
+#define AD9510_DIV_DCYCLE_LOW_SHIFT                 4
+#define AD9510_DIV_DCYCLE_LOW_MASK                  WBGEN2_GEN_MASK(AD9510_DIV_DCYCLE_LOW_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_LOW_SIZE)
+#define AD9510_DIV_DCYCLE_LOW_W(value)              WBGEN2_GEN_WRITE(value, AD9510_DIV_DCYCLE_LOW_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_LOW_SIZE)
+#define AD9510_DIV_DCYCLE_LOW_R(reg)                WBGEN2_GEN_READ(reg, AD9510_DIV_DCYCLE_LOW_SHIFT, \
+                                                                        AD9510_DIV_DCYCLE_LOW_SIZE)
+
+#define AD9510_REG_DIV0_OPT                         0x49
+#define AD9510_REG_DIV1_OPT                         0x4B
+#define AD9510_REG_DIV2_OPT                         0x4D
+#define AD9510_REG_DIV3_OPT                         0x4F
+#define AD9510_REG_DIV4_OPT                         0x51
+#define AD9510_REG_DIV5_OPT                         0x53
+#define AD9510_REG_DIV6_OPT                         0x55
+#define AD9510_REG_DIV7_OPT                         0x57
+
+/* Definition for register AD9510_REG_DIVX_OPT */
+#define AD9510_DIV_OPT_PHASE_SIZE                   4
+#define AD9510_DIV_OPT_PHASE_SHIFT                  0
+#define AD9510_DIV_OPT_PHASE_MASK                   WBGEN2_GEN_MASK(AD9510_DIV_OPT_PHASE_SHIFT, \
+                                                                        AD9510_DIV_OPT_PHASE_SIZE)
+#define AD9510_DIV_OPT_PHASE_W(value)               WBGEN2_GEN_WRITE(value, AD9510_DIV_OPT_PHASE_SHIFT, \
+                                                                        AD9510_DIV_OPT_PHASE_SIZE)
+#define AD9510_DIV_OPT_PHASE_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_DIV_OPT_PHASE_SHIFT, \
+                                                                        AD9510_DIV_OPT_PHASE_SIZE)
+
+#define AD9510_DIV_START_HIGH_SHIFT                 4
+#define AD9510_DIV_START_HIGH_SIZE                  1
+#define AD9510_DIV_START_HIGH                       WBGEN2_GEN_MASK(AD9510_DIV_START_HIGH_SHIFT,\
+                                                                        AD9510_DIV_START_HIGH_SIZE)
+
+#define AD9510_DIV_FORCE_SHIFT                      5
+#define AD9510_DIV_FORCE_SIZE                       1
+#define AD9510_DIV_FORCE                            WBGEN2_GEN_MASK(AD9510_DIV_FORCE_SHIFT,\
+                                                                        AD9510_DIV_FORCE_SIZE)
+
+#define AD9510_DIV_IGN_CHIP_SYNC_SHIFT              6
+#define AD9510_DIV_IGN_CHIP_SYNC_SIZE               1
+#define AD9510_DIV_IGN_CHIP_SYNC                    WBGEN2_GEN_MASK(AD9510_DIV_IGN_CHIP_SYNC_SHIFT,\
+                                                                        AD9510_DIV_IGN_CHIP_SYNC_SIZE)
+
+#define AD9510_DIV_BYPASS_SHIFT                     7
+#define AD9510_DIV_BYPASS_SIZE                      1
+#define AD9510_DIV_BYPASS                           WBGEN2_GEN_MASK(AD9510_DIV_BYPASS_SHIFT,\
+                                                                        AD9510_DIV_BYPASS_SIZE)
+
 #define AD9510_REG_UPDATE_REGS                      0x5A
 
 /* Definition for register AD9510_REG_UPDATE_REGS */
@@ -145,6 +245,43 @@
 #define AD9510_UPDATE_REGS_VAL_SIZE                 1
 #define AD9510_UPDATE_REGS_VAL                      WBGEN2_GEN_MASK(AD9510_UPDATE_REGS_VAL_SHIFT,\
                                                                     AD9510_UPDATE_REGS_VAL_SIZE)
+
+#define AD9510_REG_FUNCTION                         0x58
+
+/* Definition for register AD9510_REG_FUNCTION */
+#define AD9510_FUNCTION_SYNC_EN_SHIFT               0
+#define AD9510_FUNCTION_SYNC_EN_SIZE                1
+#define AD9510_FUNCTION_SYNC_EN                     WBGEN2_GEN_MASK(AD9510_FUNCTION_SYNC_EN_SHIFT,\
+                                                               AD9510_FUNCTION_SYNC_EN_SIZE)
+
+#define AD9510_FUNCTION_SYNC_SEL_SHIFT              1
+#define AD9510_FUNCTION_SYNC_SEL_SIZE               1
+#define AD9510_FUNCTION_SYNC_SEL                    WBGEN2_GEN_MASK(AD9510_FUNCTION_SYNC_SEL_SHIFT,\
+                                                               AD9510_FUNCTION_SYNC_SEL_SIZE)
+
+#define AD9510_FUNCTION_SYNC_REG_SHIFT              2
+#define AD9510_FUNCTION_SYNC_REG_SIZE               1
+#define AD9510_FUNCTION_SYNC_REG                    WBGEN2_GEN_MASK(AD9510_FUNCTION_SYNC_REG_SHIFT,\
+                                                               AD9510_FUNCTION_SYNC_REG_SIZE)
+
+#define AD9510_FUNCTION_REF_PD_SHIFT                3
+#define AD9510_FUNCTION_REF_PD_SIZE                 1
+#define AD9510_FUNCTION_REF_PD                      WBGEN2_GEN_MASK(AD9510_FUNCTION_REF_PD_SHIFT,\
+                                                               AD9510_FUNCTION_REF_PD_SIZE)
+
+#define AD9510_FUNCTION_SYNC_PD_SHIFT               4
+#define AD9510_FUNCTION_SYNC_PD_SIZE                1
+#define AD9510_FUNCTION_SYNC_PD                     WBGEN2_GEN_MASK(AD9510_FUNCTION_SYNC_PD_SHIFT,\
+                                                               AD9510_FUNCTION_SYNC_PD_SIZE)
+
+#define AD9510_FUNCTION_FUNC_SEL_SIZE               2
+#define AD9510_FUNCTION_FUNC_SEL_SHIFT              5
+#define AD9510_FUNCTION_FUNC_SEL_MASK               WBGEN2_GEN_MASK(AD9510_FUNCTION_FUNC_SEL_SHIFT, \
+                                                                    AD9510_FUNCTION_FUNC_SEL_SIZE)
+#define AD9510_FUNCTION_FUNC_SEL_W(value)           WBGEN2_GEN_WRITE(value, AD9510_FUNCTION_FUNC_SEL_SHIFT, \
+                                                                    AD9510_FUNCTION_FUNC_SEL_SIZE)
+#define AD9510_FUNCTION_FUNC_SEL_R(reg)             WBGEN2_GEN_READ(reg, AD9510_FUNCTION_FUNC_SEL_SHIFT, \
+                                                                    AD9510_FUNCTION_FUNC_SEL_SIZE)
 
 #endif
 
