@@ -53,6 +53,10 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC PLL function",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    client_err = bpm_ad9510_cfg_test (config_client, service);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not configure AD9510",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     bpm_client_destroy (&config_client);
     return err;
