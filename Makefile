@@ -42,15 +42,6 @@ ifeq ($(BOARD),afcv3)
 CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
-# FMC130M board type selection
-ifeq ($(FMC130M_4CH_TYPE),passive)
-CFLAGS += -D__FMC130M_4CH_TYPE_PASSIVE__
-endif
-
-ifeq ($(FMC130M_4CH_TYPE),active)
-CFLAGS += D__FMC130M_4CH_TYPE_ACTIVE__
-endif
-
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
 CFLAGS_DEBUG =
