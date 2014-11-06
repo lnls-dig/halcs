@@ -49,6 +49,7 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         const uint8_t *data);
 static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
         uint8_t *data);
+static smch_err_e _smch_ad9510_init (smch_ad9510_t *self);
 static bool _smch_ad9510_wait_completion (smch_ad9510_t *self, unsigned int tries);
 static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 
@@ -121,47 +122,31 @@ smch_err_e smch_ad9510_reg_update (smch_ad9510_t *self)
 smch_err_e smch_ad9510_config_test (smch_ad9510_t *self)
 {
     smch_err_e err = SMCH_SUCCESS;
-    ssize_t rw_err = -1;
 
-    /* Reset registers,
-     * Turn on Long Instruction bit */
-    uint8_t data = AD9510_CFG_SERIAL_SOFT_RST | AD9510_CFG_SERIAL_LONG_INST;
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
-            "[sm_ch:ad9510] Writing 0x%02X to addr 0x%02X\n", data, AD9510_REG_CFG_SERIAL);
-    rw_err = _smch_ad9510_write_8 (self, AD9510_REG_CFG_SERIAL, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
+    err = _smch_ad9510_init (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not initialize AD9510",
             err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    _smch_ad9510_reg_update (self);
-    /* Wait for reset to complete */
-    SMCH_AD9510_WAIT_DFLT;
-
-    /* Clear reset */
-    data &= ~AD9510_CFG_SERIAL_SOFT_RST;
-    rw_err = _smch_ad9510_write_8 (self, AD9510_REG_CFG_SERIAL, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-    _smch_ad9510_reg_update (self);
-
-    /* Wait for reset to complete */
-    SMCH_AD9510_WAIT_DFLT;
 
     /* Power-up LVPECL outputs */
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
-            "[sm_ch:ad9510] Powering up LVPECL outputs\n");
-    data = AD9510_LVPECL_OUT_LVL_W(0x02) /* 810 mV output */ |
+            "[sm_ch:ad9510] Powering up LVPECL outputs 0-3\n");
+    uint8_t data = AD9510_LVPECL_OUT_LVL_W(0x02) /* 810 mV output */ |
         AD9510_LVPECL_OUT_PDOWN_W(0x0) /* Do not power down */;
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT0, &data);
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT1, &data);
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT2, &data);
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT3, &data);
 
-    /* Power-up LVCMOS/LVDS outputs */
+    /* Power-up LVCMOS/LVDS output 4 (DEBUG) */
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:ad9510] Powering up LVDS/CMOS output 4\n");
     data = AD9510_LVDS_CMOS_CURR_W(0x1) /* 3.5 mA, 100 Ohm */ & (
         ~AD9510_LVDS_CMOS_PDOWN /* Do not power down */);
     _smch_ad9510_write_8 (self, AD9510_REG_LVDS_CMOS_OUT4, &data);
+
+    /* Power-down LVCMOS/LVDS outputs 5-7*/
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            "[sm_ch:ad9510] Powering down LVDS/CMOS outputs 5-7\n");
     data = AD9510_LVDS_CMOS_CURR_W(0x1) /* 3.5 mA, 100 Ohm */ | (
         AD9510_LVDS_CMOS_PDOWN /* Power down */);
     _smch_ad9510_write_8 (self, AD9510_REG_LVDS_CMOS_OUT5, &data);
@@ -169,15 +154,69 @@ smch_err_e smch_ad9510_config_test (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_LVDS_CMOS_OUT7, &data);
 
     /* Set-up clock selection (distribution mode)
-       CLK1 - power on
-       CLK2 - power down
-       Clock select = CLK1
-       Prescaler Clock -  Power-Down
-       REFIN - Power-Down */
-    data = 0x01;
-    _smch_ad9510_write_8 (self, 0x45, &data);
+     * CLK1 - power off
+     * CLK2 - power on
+     * Clock select = CLK2
+     * Prescaler Clock -  Power-Down
+     * REFIN - Power-Down
+     */
+    data = (AD9510_CLK_OPT_REFIN_PD | AD9510_CLK_OPT_PS_PD |
+            AD9510_CLK_OPT_CLK1_PD) & (
+                ~AD9510_CLK_OPT_SEL_CLK1 /* Select CLK2*/);
+    _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
 
-    rw_err = _smch_ad9510_reg_update (self);
+    /* Clock dividers OUT0 - OUT7
+     * divide = off (bypassed, ratio 1)
+     * duty cycle 50%
+     * lo-hi 0x00
+     */
+    data = AD9510_DIV_DCYCLE_LOW_W(0x0) | AD9510_DIV_DCYCLE_HIGH_W(0x0);
+
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV0_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV1_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV2_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV3_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV4_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV5_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV6_DCYCLE, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV7_DCYCLE, &data);
+
+    /* Clock dividers OUT0 - OUT7
+     * phase offset = 0
+     * start high
+     * bypass
+     */
+    data = AD9510_DIV_BYPASS | AD9510_DIV_START_HIGH | AD9510_DIV_OPT_PHASE_W(0x0);
+
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV0_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV1_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV2_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV3_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV4_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV5_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV6_OPT, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_DIV7_OPT, &data);
+
+    /* Function pin is SYNCB */
+    data = AD9510_FUNCTION_FUNC_SEL_W(0x1);
+    _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
+
+    /* Update registers */
+    _smch_ad9510_reg_update (self);
+    SMCH_AD9510_WAIT_DFLT;
+
+    /* Software sync */
+    data |= AD9510_FUNCTION_SYNC_REG;
+    _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
+
+    /* Update registers */
+    _smch_ad9510_reg_update (self);
+    SMCH_AD9510_WAIT_DFLT;
+
+    data &= ~AD9510_FUNCTION_SYNC_REG;
+    _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
+
+    _smch_ad9510_reg_update (self);
 
 err_smpr_write:
     return err;
@@ -205,7 +244,44 @@ smch_err_e smch_ad9510_div_out0 (smch_ad9510_t *self, uint32_t div)
 err_smpr_write:
     return err;
 }
+
 /***************** Static functions *****************/
+
+static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    /* Reset registers,
+     * Turn on Long Instruction bit */
+    uint8_t data = AD9510_CFG_SERIAL_SOFT_RST | AD9510_CFG_SERIAL_LONG_INST;
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            "[sm_ch:ad9510] Writing 0x%02X to addr 0x%02X\n", data, AD9510_REG_CFG_SERIAL);
+    rw_err = _smch_ad9510_write_8 (self, AD9510_REG_CFG_SERIAL, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+    /* Clear reset */
+    data &= ~AD9510_CFG_SERIAL_SOFT_RST;
+    rw_err = _smch_ad9510_write_8 (self, AD9510_REG_CFG_SERIAL, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+    _smch_ad9510_reg_update (self);
+
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+
+/***************** Static functions *****************/
+
 static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         const uint8_t *data)
 {
