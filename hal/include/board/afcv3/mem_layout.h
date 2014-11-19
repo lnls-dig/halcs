@@ -4,6 +4,8 @@
 #include "pcie_regs.h"
 #include "acq_chan_afcv3.h"
 
+#define NUM_FMC130M_4CH_SMIOS                       2
+
 /*********************** Static AFCv3 FPGA layout ***********************/
 /* FMC_130M Components */
 #define FMC_130M_CTRL_RAW_REGS_OFFS                 0x0000
@@ -141,11 +143,14 @@
 /********************* FMC130M_4CH SMIO Gateware Options ******************/
 
 /* Chip SPI slave select lines and I2C address */
-#define FMC130M_4CH_SI571_ADDR                      0x49
-#define FMC130M_4CH_AD9510_ADDR                     0x01
-#define FMC130M_4CH_EEPROM_ADDR                     0x50
-#define FMC130M_4CH_LM75A1_ADDR                     0x49
-#define FMC130M_4CH_LM75A2_ADDR                     0x48
+
+#define NUM_FMC130M_4CH_LM75A                        2
+
+extern const uint32_t fmc130m_4ch_si571_addr[NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_ad9510_addr[NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_24aa64_addr[NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_lm75a_addr[NUM_FMC130M_4CH_SMIOS][NUM_FMC130M_4CH_LM75A];
+extern const uint32_t fmc130m_4ch_pca9547_addr[NUM_FMC130M_4CH_SMIOS];
 
 /*********************** SMIO ACQ Gateware Options ***********************/
 /* FIXME: The Gateware does not support yet a way of reading which
