@@ -13,13 +13,8 @@
 #include "wb_spi_regs.h"
 #include "smpr_spi_regs.h"
 
-#define SM_PR_SPI_READBACK                  1
 #define SM_PR_SPI_MAX_TRIES                 10
 #define SM_PR_SPI_USLEEP                    1000
-
-#define SMPR_BYTE_2_BIT                     8
-#define SMPR_WB_REG_2_BYTE                  4       /* 32-bit word */
-#define SMPR_WB_REG_2_BIT                   (SMPR_WB_REG_2_BYTE*SMPR_BYTE_2_BIT)
 
 #define SMPR_PROTO_SPI(self)                ((smpr_proto_spi_t *) self->proto_handler)
 

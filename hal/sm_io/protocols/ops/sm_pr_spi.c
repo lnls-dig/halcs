@@ -45,8 +45,6 @@
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr:spi]",                    \
             smpr_err_str (err_type))
 
-#define SM_PR_READBACK 1
-
 static smpr_err_e _spi_init (smpr_t *self);
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         size_t size, spi_mode_e mode, uint32_t flags);
@@ -153,7 +151,7 @@ ssize_t spi_read_16 (smpr_t *self, loff_t offs, uint16_t *data, uint32_t flags)
             SPI_MODE_WRITE_READ, flags);
 }
 
-/* Write 16-bit data to PCIe device */
+/* Write 16-bit data to SPI device */
 ssize_t spi_write_16 (smpr_t *self, loff_t offs, const uint16_t *data, uint32_t flags)
 {
     (void) offs;
@@ -171,7 +169,7 @@ ssize_t spi_read_32 (smpr_t *self, loff_t offs, uint32_t *data, uint32_t flags)
             SPI_MODE_WRITE_READ, flags);
 }
 
-/* Write 32-bit data to PCIe device */
+/* Write 32-bit data to SPI device */
 ssize_t spi_write_32 (smpr_t *self, loff_t offs, const uint32_t *data, uint32_t flags)
 {
     (void) offs;
@@ -189,7 +187,7 @@ ssize_t spi_read_64 (smpr_t *self, loff_t offs, uint64_t *data, uint32_t flags)
             SPI_MODE_WRITE_READ, flags);
 }
 
-/* Write 64-bit data to PCIe device */
+/* Write 64-bit data to SPI device */
 ssize_t spi_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t flags)
 {
     (void) offs;
@@ -197,7 +195,7 @@ ssize_t spi_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t 
             SPI_MODE_WRITE, flags);
 }
 
-/* Read data block from PCIe device, size in bytes */
+/* Read data block from SPI device, size in bytes */
 ssize_t spi_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
         uint32_t flags)
 {
@@ -208,7 +206,7 @@ ssize_t spi_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
             SPI_MODE_WRITE_READ, flags);
 }
 
-/* Write data block from PCIe device, size in bytes */
+/* Write data block from SPI device, size in bytes */
 ssize_t spi_write_block (smpr_t *self, loff_t offs, size_t size, const uint32_t *data,
         uint32_t flags)
 {
