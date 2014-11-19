@@ -446,10 +446,8 @@ smio_err_e dsp_init (smio_t * self)
     self->exp_ops = dsp_exp_ops;
 
     /* Initialize specific structure */
-    self->smio_handler = smio_dsp_new (); /* TODO Define dsp init parameters */
+    self->smio_handler = smio_dsp_new (self);
     ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_SUCCESS);
-
-//  _smio_dsp_config_defaults (self);
 
     return err;
 
