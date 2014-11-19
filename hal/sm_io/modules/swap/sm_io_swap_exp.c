@@ -391,10 +391,8 @@ smio_err_e swap_init (smio_t * self)
     self->exp_ops = swap_exp_ops;
 
     /* Initialize specific structure */
-    self->smio_handler = smio_swap_new (); /* TODO Define swap init parameters */
+    self->smio_handler = smio_swap_new (self);
     ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
-
-//  _smio_swap_config_defaults (self);
 
     return err;
 

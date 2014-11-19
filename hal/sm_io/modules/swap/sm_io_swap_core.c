@@ -37,12 +37,12 @@
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_swap_t * smio_swap_new ()
+smio_swap_t * smio_swap_new (smio_t *parent)
 {
+    (void) parent;
+
     smio_swap_t *self = (smio_swap_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
-
-//  self->example = 0;
 
     return self;
 
