@@ -57,15 +57,6 @@
     return self->thsafe_client_ops->func_name (self, ##__VA_ARGS__);  \
 }
 
-#define SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, func_name, ...)   \
-    do {                                                \
-        if (self->ops && self->ops->func_name) {        \
-            smio_err_e local_err = self->ops->func_name (self, ##__VA_ARGS__);  \
-            err = (local_err != SMIO_ERR_FUNC_NOT_IMPL) ? \
-                local_err : err;                        \
-        }                                               \
-    } while (0)
-
 static smio_err_e _smio_do_op (void *owner, void *msg);
 
 /************************************************************/
@@ -78,7 +69,11 @@ smio_err_e smio_attach (smio_t *self, struct _devio_t *parent)
     smio_err_e err = SMIO_SUCCESS;
     self->parent = parent;
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error", 
+        err_func);
+
+err_func:
     return err;
 }
 
@@ -89,7 +84,11 @@ smio_err_e smio_deattach (smio_t *self)
     smio_err_e err = SMIO_SUCCESS;
     self->parent = NULL;
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error", 
+        err_func);
+
+err_func:
     return err;
 }
 
@@ -112,8 +111,11 @@ smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
                 err_export_op, SMIO_ERR_EXPORT_OP);
     }
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"export_ops\" function error", 
+        err_func);
 
+err_func:
 err_export_op:
     return err;
 }
@@ -129,8 +131,11 @@ smio_err_e smio_unexport_ops (smio_t *self)
     ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
             err_unexport_op, SMIO_ERR_EXPORT_OP);
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"unexport_ops\" function error", 
+        err_func);
 
+err_func:
 err_unexport_op:
     return err;
 }
@@ -154,7 +159,7 @@ static smio_err_e _smio_do_op (void *owner, void *msg)
      * message to it, but we this is in the critical path! Evaluate the impact
      * of doing this */
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, do_op, msg);
-    ASSERT_TEST (err == SMIO_SUCCESS, "Error executing SMIO do_op ()",
+    ASSERT_TEST (err == SMIO_SUCCESS, "Registered SMIO \"do_op\" function error",
             err_do_op);
 
     disp_table_t *disp_table = self->exp_ops_dtable;

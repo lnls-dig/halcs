@@ -76,27 +76,32 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
-    SMIO_DISPATCH_FUNC_WRAPPER (init);
+    smio_err_e err = SMIO_DISPATCH_FUNC_WRAPPER (init);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
     /* Atach this SMIO instance to its parent */
-    smio_attach (self, th_args->parent);
+    err = smio_attach (self, th_args->parent);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
 
     /* Export SMIO specific operations */
-    smio_err_e err = smio_export_ops (self, self->exp_ops);
+    err = smio_export_ops (self, self->exp_ops);
     ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
             err_smio_export);
 
     /* Main loop request-action */
-    _smio_loop (self);
+    err = _smio_loop (self);
+    ASSERT_TEST (err == SMIO_SUCCESS, "Could not loop the SMIO messages",
+            err_smio_loop);
 
+err_smio_loop:
     /* Unexport SMIO specific operations */
     smio_unexport_ops (self);
+err_smio_export:
     /* Deattach this SMIO instance to its parent */
     smio_deattach (self);
+err_call_attach:
     /* FIXME: Poll PIPE sockets and on receiving any message calls shutdown () */
     SMIO_DISPATCH_FUNC_WRAPPER (shutdown);
-
-err_smio_export:
-    /* FIXME: check for return error */
+err_call_init:
     /* Destroy what we did in _smio_new */
     _smio_destroy (&self);
 err_self_alloc:
