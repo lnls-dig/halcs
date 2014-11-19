@@ -14,8 +14,18 @@
 #include "sm_io.h"
 #include "sm_pr_err.h"
 
+/* Generally useful macro */
+#define ARRAY_SIZE(x)                       (sizeof(x) / sizeof((x)[0]))
+
+#define SM_PR_READBACK                      1
+
+/* Conversion MACROS */
+#define SMPR_BYTE_2_BIT                     8
+#define SMPR_WB_REG_2_BYTE                  4       /* 32-bit word */
+#define SMPR_WB_REG_2_BIT                   (SMPR_WB_REG_2_BYTE*SMPR_BYTE_2_BIT)
+
 /* This is used by the protocols to perform the device IO */
-#define SMPR_PARENT(self) (self->parent)
+#define SMPR_PARENT(self)                   (self->parent)
 
 enum _smpr_type_e {
     SMPR_SPI = 0,
