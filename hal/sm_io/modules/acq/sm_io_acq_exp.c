@@ -398,7 +398,7 @@ smio_err_e acq_init (smio_t * self)
     self->exp_ops = acq_exp_ops;
 
     /* Initialize specific structure */
-    self->smio_handler = smio_acq_new (0, self->inst_id); /* Default: num_samples = 0 */
+    self->smio_handler = smio_acq_new (self, 0); /* Default: num_samples = 0 */
     ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
 
     return err;

@@ -37,7 +37,7 @@
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_acq_t * smio_acq_new (uint32_t num_samples, uint32_t inst_id)
+smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
 {
     smio_acq_t *self = (smio_acq_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -48,12 +48,12 @@ smio_acq_t * smio_acq_new (uint32_t num_samples, uint32_t inst_id)
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */
-    if (inst_id > NUM_ACQ_CORE_SMIOS-1) {
+    if (parent->inst_id > NUM_ACQ_CORE_SMIOS-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq_core] Instance ID invalid\n");
         return NULL;
     }
 
-    self->acq_buf = __acq_buf[inst_id];
+    self->acq_buf = __acq_buf[parent->inst_id];
 
     return self;
 
