@@ -11,6 +11,7 @@
 #include "sm_io_err.h"
 
 #define FMC130M_4CH_DFLT_PLL_FUNC           0x1
+#define FMC130M_4CH_DFLT_PCA9547_CFG        0x4         /* Connect I2C switch master to output 4 */
 
 smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);

@@ -11,9 +11,36 @@
 #include <inttypes.h>
 #include "sm_io_err.h"
 #include "sm_ch_ad9510.h"
+#include "sm_ch_24aa64.h"
+#include "sm_ch_pca9547.h"
+#include "sm_io.h"
+
+/* The follosing codes were generated via the following command:
+ * > echo FMC130M_4CH_ACTIVE | md5sum | cut -c 1-8
+ * > cb04db4d
+ * > echo FMC130M_4CH_ACTIVE | md5sum | cut -c 1-8
+ * > 59da56ae
+ */
+#define FMC130M_4CH_ACTIVE_MD5              0xcb04db4d
+#define FMC130M_4CH_PASSIVE_MD5             0x59da56ae
+
+/* Start writing on EEPROM address 0x0 */
+#define FMC130M_4CH_EEPROM_START_ADDR       0x0
+
+enum _fmc130m_4ch_type_e
+{
+    TYPE_FMC130M_4CH_UNDEF=0xFF,
+    TYPE_FMC130M_4CH_ACTIVE=1,
+    TYPE_FMC130M_4CH_PASSIVE
+};
+
+typedef enum _fmc130m_4ch_type_e fmc130M_4ch_type_e;
 
 struct _smio_fmc130m_4ch_t {
+    fmc130M_4ch_type_e type;                /* FMC130M_4CH type */
     smch_ad9510_t *smch_ad9510;             /* AD9510 chip handler */
+    smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */
+    smch_pca9547_t *smch_pca9547;           /* FPGA I2C Switch */
 };
 
 /* Opaque class structure */
