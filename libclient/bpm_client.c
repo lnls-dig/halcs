@@ -404,6 +404,16 @@ PARAM_FUNC_CLIENT_READ(adc_test_data_en)
      return param_client_read (self, service, FMC130M_4CH_OPCODE_TEST_DATA_EN, adc_test_data_en);
 }
 
+PARAM_FUNC_CLIENT_WRITE(si571_oe)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
+}
+
+PARAM_FUNC_CLIENT_READ(si571_oe)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */

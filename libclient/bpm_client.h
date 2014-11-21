@@ -199,6 +199,14 @@ bpm_client_err_e bpm_set_adc_test_data_en (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_adc_test_data_en (bpm_client_t *self, char *service,
         uint32_t *adc_test_data_en);
 
+/* FMC SI571 Output Control. Enables or disables the Si571 output.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_si571_oe (bpm_client_t *self, char *service,
+        uint32_t si571_oe);
+bpm_client_err_e bpm_get_si571_oe (bpm_client_t *self, char *service,
+        uint32_t *si571_oe);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquistion request */
