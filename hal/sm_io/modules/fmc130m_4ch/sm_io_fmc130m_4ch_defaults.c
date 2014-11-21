@@ -57,6 +57,11 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not configure AD9510",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_defaults] AD9510 func...\n");
+    client_err = bpm_set_si571_oe (config_client, service, FMC130M_4CH_DFLT_SI571_OE);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not enable SI571 Output",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     bpm_client_destroy (&config_client);
     return err;
