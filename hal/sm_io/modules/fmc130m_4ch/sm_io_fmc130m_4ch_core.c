@@ -39,7 +39,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io_fmc130m_4ch_core]",       \
             smio_err_str (err_type))
 
-static smio_err_e _smio_fmc130m_4ch_set_type (smio_fmc130m_4ch_t *self, 
+static smio_err_e _smio_fmc130m_4ch_set_type (smio_fmc130m_4ch_t *self,
     uint32_t type_code);
 
 /* Creates a new instance of Device Information */
@@ -50,25 +50,11 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Check if Instance ID is within our expected limits */
-    ASSERT_TEST(parent->inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceded",
+    ASSERT_TEST(parent->inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
             err_num_fmc130m_4ch_smios);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] AD9510 initializing, "
-            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_ad9510_addr[parent->inst_id],
-            parent->inst_id);
-    self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS,
-            fmc130m_4ch_ad9510_addr[parent->inst_id], 0);
-    ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
-
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] 24AA64 initializing, "
-            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_24aa64_addr[parent->inst_id],
-            parent->inst_id);
-    /* EEPROM  is on the same I2C bus as the LM75A */
-    self->smch_24aa64 = smch_24aa64_new (parent, FMC_130M_LM75A_I2C_OFFS,
-            fmc130m_4ch_24aa64_addr[parent->inst_id], 0);
-    ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
-
     /* FMC130M_4CH isntance 0 is the one controlling this CI */
+    /* FIXME: This breaks generality for this class */
     if (parent->inst_id == 0) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] PCA9547 initializing, "
                 " addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_pca9547_addr[parent->inst_id],
@@ -84,6 +70,14 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     else {
         self->smch_pca9547 = NULL;
     }
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] 24AA64 initializing, "
+            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_24aa64_addr[parent->inst_id],
+            parent->inst_id);
+    /* EEPROM  is on the same I2C bus as the LM75A */
+    self->smch_24aa64 = smch_24aa64_new (parent, FMC_130M_LM75A_I2C_OFFS,
+            fmc130m_4ch_24aa64_addr[parent->inst_id], 0);
+    ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
 
     uint32_t data_24aa64;
 #ifdef __FMC130M_4CH_EEPROM_PROGRAM__
@@ -106,7 +100,7 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
             "[sm_io:fmc130m_4ch_core] 24AA64 readback: 0x%08X\n", data_24aa64_rb);
     ASSERT_TEST(data_24aa64_rb == data_24aa64, "[sm_io:fmc130m_4ch_core] EEPROM 24AA64 readback failed",
-            err_smch_pca9547_alloc);
+            err_smch_ad9510_alloc);
 #endif
 
     /* Read EEPROM */
@@ -119,13 +113,35 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     /* Determine the type of the FMC130M_4CH board */
     _smio_fmc130m_4ch_set_type (self, data_24aa64);
 
+    /* Now, initialize the FMC130M_4CH with the appropriate structures*/
+    if (self->type == TYPE_FMC130M_4CH_ACTIVE) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] AD9510 initializing, "
+                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_ad9510_addr[parent->inst_id],
+                parent->inst_id);
+        self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS,
+                fmc130m_4ch_ad9510_addr[parent->inst_id], 0);
+        ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
+
+    }
+    else if (self->type == TYPE_FMC130M_4CH_PASSIVE) {
+        self->smch_ad9510 = NULL;
+    }
+    else {/* Undefined board found */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
+            "[sm_io:fmc130m_4ch_core] Unsupported FMC card. Exiting...\n");
+        goto err_unsup_fmc_board;
+    }
+
     return self;
 
-err_smch_pca9547_alloc:
+err_unsup_fmc_board:
+err_smch_ad9510_alloc:
     smch_24aa64_destroy (&self->smch_24aa64);
 err_smch_24aa64_alloc:
-    smch_ad9510_destroy (&self->smch_ad9510);
-err_smch_ad9510_alloc:
+    if (self->smch_pca9547 != NULL) {
+        smch_pca9547_destroy (&self->smch_pca9547);
+    }
+err_smch_pca9547_alloc:
     free (self);
 err_num_fmc130m_4ch_smios:
 err_self_alloc:
@@ -140,12 +156,13 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc130m_4ch_t *self = *self_p;
 
+        smch_ad9510_destroy (&self->smch_ad9510);
+        smch_24aa64_destroy (&self->smch_24aa64);
+
         if (self->smch_pca9547 != NULL) {
             smch_pca9547_destroy (&self->smch_pca9547);
         }
 
-        smch_24aa64_destroy (&self->smch_24aa64);
-        smch_ad9510_destroy (&self->smch_ad9510);
         free (self);
         *self_p = NULL;
     }
@@ -153,7 +170,7 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     return SMIO_SUCCESS;
 }
 
-static smio_err_e _smio_fmc130m_4ch_set_type (smio_fmc130m_4ch_t *self, 
+static smio_err_e _smio_fmc130m_4ch_set_type (smio_fmc130m_4ch_t *self,
     uint32_t type_code)
 {
     assert (self);
