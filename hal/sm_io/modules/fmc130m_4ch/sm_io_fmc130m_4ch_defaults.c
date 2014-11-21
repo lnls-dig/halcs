@@ -15,16 +15,16 @@
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
-    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:fmc130m_4ch_defaults]",           \
-            smio_err_str(SMIO_ERR_ALLOC),                           \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)               \
+    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io:fmc130m_4ch_defaults]",            \
+            smio_err_str(SMIO_ERR_ALLOC),                                   \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                                    \
-    CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_defaults]",              \
+#define CHECK_ERR(err, err_type)                                            \
+    CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_defaults]",               \
             smio_err_str (err_type))
 
 #define SMIO_FMC130M_4CH_LIBCLIENT_LOG_MODE                "a"
@@ -54,10 +54,10 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     client_err = bpm_ad9510_cfg_test (config_client, service);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not configure AD9510",
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS ||
+            client_err == BPM_CLIENT_ERR_AGAIN, "Could not configure AD9510",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_defaults] AD9510 func...\n");
     client_err = bpm_set_si571_oe (config_client, service, FMC130M_4CH_DFLT_SI571_OE);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not enable SI571 Output",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
