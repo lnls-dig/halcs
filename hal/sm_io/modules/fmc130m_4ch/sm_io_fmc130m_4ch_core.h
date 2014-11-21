@@ -68,8 +68,6 @@ struct _delay_lines_t {
     uint32_t value;
 };
 
-typedef enum _fmc130m_4ch_delay_init_e fmc130m_4ch_delay_init_e;
-
 /***************** Our methods *****************/
 
 /* Creates a new instance of the smio realization */
