@@ -70,6 +70,7 @@
 
 #define FMC130M_4CH_OK                          0   /* Operation was successful */
 #define FMC130M_4CH_ERR                         1   /* Could not set/get value */
-#define FMC130M_4CH_REPLY_END                   2   /* End marker */
+#define FMC130M_4CH_UNINPL                      2   /* Uninplemented function or operation */
+#define FMC130M_4CH_REPLY_END                   3   /* End marker */
 
 #endif

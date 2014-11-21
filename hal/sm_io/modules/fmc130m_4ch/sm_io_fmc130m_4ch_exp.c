@@ -105,13 +105,20 @@ static int _fmc130m_4ch_ad9510_cfg_test (void *owner, void *args, void *ret)
     assert (owner);
     assert (args);
 
+    int err = -FMC130M_4CH_OK;
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling _fmc130m_4ch_ad9510_config_test\n");
-    smch_ad9510_config_test (smch_ad9510);
+    if (smch_ad9510 != NULL) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling _fmc130m_4ch_ad9510_config_test\n");
+        smch_ad9510_config_test (smch_ad9510);
+    }
+    else {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Uninplemented _fmc130m_4ch_ad9510_config_test for this FMC board\n");
+        err = -FMC130M_4CH_UNINPL;
+    }
 
-    return -FMC130M_4CH_OK;
+    return err;
 }
 
 disp_op_t fmc130m_4ch_ad9510_cfg_test_exp = {
