@@ -29,7 +29,7 @@
                 smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name) { \
             local_err = smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name (__VA_ARGS__);  \
         }                                                  \
-        local_err; 					   \
+        local_err;                                      \
     })
 
 #define SMIO_DISPATCH_FUNC_WRAPPER(func_name, ...)          \
