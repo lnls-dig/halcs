@@ -123,18 +123,19 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
         ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
 
     }
-    else if (self->type == TYPE_FMC130M_4CH_PASSIVE) {
+    else { /* PASSIVE or Unsupported*/
+
+        if (self->type != TYPE_FMC130M_4CH_PASSIVE) {
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
+            "[sm_io:fmc130m_4ch_core] Unsupported FMC130M_4CH card (maybe EEPROM not configured?).\n"
+            "\t Defaulting to PASSIVE board\n");
+        }
+
         self->smch_ad9510 = NULL;
-    }
-    else {/* Undefined board found */
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
-            "[sm_io:fmc130m_4ch_core] Unsupported FMC card. Exiting...\n");
-        goto err_unsup_fmc_board;
     }
 
     return self;
 
-err_unsup_fmc_board:
 err_smch_ad9510_alloc:
     smch_24aa64_destroy (&self->smch_24aa64);
 err_smch_24aa64_alloc:
