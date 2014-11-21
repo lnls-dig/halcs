@@ -678,6 +678,29 @@ disp_op_t fmc130m_4ch_test_data_en_exp = {
     }
 };
 
+#define BPM_FMC130M_4CH_SI571_OE_MIN            0 /* SI571 Output disable */
+#define BPM_FMC130M_4CH_SI571_OE_MAX            1 /* SI571 Output enable */
+
+RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            CLK_DISTRIB, SI571_OE, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_SI571_OE_MIN, BPM_FMC130M_4CH_SI571_OE_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+disp_op_t fmc130m_4ch_si571_oe_exp = {
+    .name = FMC130M_4CH_NAME_SI571_OE,
+    .opcode = FMC130M_4CH_OPCODE_SI571_OE,
+    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
@@ -703,6 +726,7 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_adc_dly2_exp,
     &fmc130m_4ch_adc_dly3_exp,
     &fmc130m_4ch_test_data_en_exp,
+    &fmc130m_4ch_si571_oe_exp,
     &disp_op_end
 };
 

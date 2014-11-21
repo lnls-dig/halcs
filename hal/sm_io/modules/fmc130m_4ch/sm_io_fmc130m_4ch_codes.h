@@ -62,7 +62,9 @@
 #define FMC130M_4CH_NAME_ADC_DLY3               "adc_dly3"
 #define FMC130M_4CH_OPCODE_TEST_DATA_EN         23
 #define FMC130M_4CH_NAME_TEST_DATA_EN           "adc_test_data_en"
-#define FMC130M_4CH_OPCODE_END                  24
+#define FMC130M_4CH_OPCODE_SI571_OE             24
+#define FMC130M_4CH_NAME_SI571_OE               "si571_oe"
+#define FMC130M_4CH_OPCODE_END                  25
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_SIZE                  (sizeof(uint32_t))
@@ -70,7 +72,7 @@
 
 #define FMC130M_4CH_OK                          0   /* Operation was successful */
 #define FMC130M_4CH_ERR                         1   /* Could not set/get value */
-#define FMC130M_4CH_UNINPL                      2   /* Uninplemented function or operation */
+#define FMC130M_4CH_UNINPL                      2   /* Unimplemented function or operation */
 #define FMC130M_4CH_REPLY_END                   3   /* End marker */
 
 #endif
