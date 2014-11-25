@@ -64,8 +64,8 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
                 fmc130m_4ch_pca9547_addr[parent->inst_id], 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
 
-        uint8_t data = FMC130M_4CH_DFLT_PCA9547_CFG;
-        smch_pca9547_write_8 (self->smch_pca9547, &data);
+        /* Enable default I2C channel */
+        smch_pca9547_en_chan (self->smch_pca9547, FMC130M_4CH_DFLT_PCA9547_CFG);
     }
     else {
         self->smch_pca9547 = NULL;
@@ -122,6 +122,12 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
                 fmc130m_4ch_ad9510_addr[parent->inst_id], 0);
         ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
 
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] SI571 initializing, "
+                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_si571_addr[parent->inst_id],
+                parent->inst_id);
+        self->smch_si571 = smch_si57x_new (parent, FMC_130M_SI571_I2C_OFFS,
+                fmc130m_4ch_si571_addr[parent->inst_id], 0);
+        ASSERT_ALLOC(self->smch_si571, err_smch_si571_alloc);
     }
     else { /* PASSIVE or Unsupported*/
 
@@ -132,10 +138,15 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
         }
 
         self->smch_ad9510 = NULL;
+        self->smch_si571 = NULL;
     }
 
     return self;
 
+err_smch_si571_alloc:
+    if (self->smch_ad9510 != NULL) {
+        smch_ad9510_destroy (&self->smch_ad9510);
+    }
 err_smch_ad9510_alloc:
     smch_24aa64_destroy (&self->smch_24aa64);
 err_smch_24aa64_alloc:

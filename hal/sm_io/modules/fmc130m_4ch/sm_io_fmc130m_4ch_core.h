@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include "sm_io_err.h"
 #include "sm_ch_ad9510.h"
+#include "sm_ch_si57x.h"
 #include "sm_ch_24aa64.h"
 #include "sm_ch_pca9547.h"
 #include "sm_io.h"
@@ -39,6 +40,7 @@ typedef enum _fmc130m_4ch_type_e fmc130M_4ch_type_e;
 struct _smio_fmc130m_4ch_t {
     fmc130M_4ch_type_e type;                /* FMC130M_4CH type */
     smch_ad9510_t *smch_ad9510;             /* AD9510 chip handler */
+    smch_si57x_t *smch_si571;               /* SI571 chip handler */
     smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */
     smch_pca9547_t *smch_pca9547;           /* FPGA I2C Switch */
 };
