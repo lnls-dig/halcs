@@ -27,5 +27,14 @@
 #define PCA9547_DATA_TRANS_SIZE                             8                       /* in bits */
 #define PCA9547_BYTE_TRANS_SIZE                             PCA9547_DATA_TRANS_SIZE /* in bits */
 
+#define PCA9547_MAX_NUM_CHANNEL                             8                       /* Max number of channels */
+
+#define PCA9547_CHANNEL_SEL_EN_SHIFT                        3
+#define PCA9547_CHANNEL_SEL_EN_SIZE                         1
+#define PCA9547_CHANNEL_SEL_EN                              WBGEN2_GEN_MASK(PCA9547_CHANNEL_SEL_EN_SHIFT, \
+                                                                     PCA9547_CHANNEL_SEL_EN_SIZE)
+
+#define PCA9547_CHANNEL_SEL_EN_OFF                          0                    /* No Channel selected */
+
 #endif
 
