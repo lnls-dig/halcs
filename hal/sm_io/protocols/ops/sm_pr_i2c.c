@@ -45,6 +45,7 @@
 
 static smpr_err_e _i2c_init (smpr_t *self);
 static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check);
+static smpr_err_e _i2c_set_mode (smpr_t *self, uint32_t flags);
 static ssize_t _i2c_read_write_header (smpr_t *self, uint32_t flags, bool rw);
 static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
         size_t size, uint32_t flags);
@@ -349,6 +350,23 @@ err_exit:
     return err;
 }
 
+static smpr_err_e _i2c_set_mode (smpr_t *self, uint32_t flags)
+{
+    assert (self);
+
+    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+
+    /* Check if we must send a stop after the last byte */
+    if ((flags & SMPR_PROTO_I2C_REP_START) != 0) {
+        i2c_proto->mode = I2C_MODE_REP_START;
+    }
+    else {
+        i2c_proto->mode = I2C_MODE_NORMAL;
+    }
+
+    return SMPR_SUCCESS;
+}
+
 static ssize_t _i2c_read_write_header (smpr_t *self, uint32_t flags, bool rw)
 {
     assert (self);
@@ -425,6 +443,9 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
     err = _i2c_read_write_header (self, flags, false /* write mode*/);
     ASSERT_TEST(err > 0, "Could not write I2C header", err_exit, -1);
 
+    /* Set I2C mode: NORMAL, REP_START */
+    _i2c_set_mode (self, flags);
+
     uint32_t trans_size = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_R(flags)/SMPR_BYTE_2_BIT; /* in bytes */
     ASSERT_TEST(trans_size*SMPR_BYTE_2_BIT /* bits */ <
             SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MAX+1, "Invalid transfer size for I2C",
@@ -439,7 +460,7 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
     /* Choose the smallest one */
     trans_size = (trans_size > size) ? size : trans_size;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-		    "[sm_pr:i2c] _i2c_write_generic: Transmission size = %u bytes\n", trans_size);
+            "[sm_pr:i2c] _i2c_write_generic: Transmission size = %u bytes\n", trans_size);
 
     /* Send actual data, byte by byte*/
     uint32_t i;
@@ -504,6 +525,9 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
     err = _i2c_read_write_header (self, flags, true /* read mode*/);
     ASSERT_TEST(err > 0, "Could not write I2C header", err_exit, -1);
 
+    /* Set I2C mode: NORMAL, REP_START */
+    _i2c_set_mode (self, flags);
+
     uint32_t trans_size = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_R(flags)/SMPR_BYTE_2_BIT; /* in bytes */
     ASSERT_TEST(trans_size*SMPR_BYTE_2_BIT /* bits */ <
             SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MAX+1, "Invalid transfer size for I2C",
@@ -518,7 +542,7 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
     /* Choose the smallest one */
     trans_size = (trans_size > size) ? size : trans_size;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-		    "[sm_pr:i2c] _i2c_read_generic: Transmission size = %u bytes\n", trans_size);
+            "[sm_pr:i2c] _i2c_read_generic: Transmission size = %u bytes\n", trans_size);
 
     /* Receive data, byte by byte*/
     uint32_t i;

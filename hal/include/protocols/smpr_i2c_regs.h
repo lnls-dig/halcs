@@ -26,7 +26,7 @@
 #define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
 #endif
 
-/* Our flags are: I2C_PROTO_ADDR */
+/* Our flags are: I2C_PROTO_REP_START | I2C_PROTO_TRANS_SIZE | I2C_PROTO_ADDR */
 
 #define SMPR_PROTO_I2C_ADDR_FLAGS_SIZE                  7          /* I2C Address are 7 bits (no 10-bit support) */
 #define SMPR_PROTO_I2C_ADDR_FLAGS_SHIFT                 0
@@ -46,6 +46,12 @@
 #define SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_R(reg)          WBGEN2_GEN_READ(reg, SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_SHIFT, \
                                                                         SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_SIZE)
 #define SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MAX             (SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MASK >> SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_SHIFT)
+
+#define SMPR_PROTO_I2C_REP_START_SHIFT                  (SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_SIZE + \
+                                                            SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_SHIFT)
+#define SMPR_PROTO_I2C_REP_START_SIZE                   1
+#define SMPR_PROTO_I2C_REP_START                        WBGEN2_GEN_MASK(SMPR_PROTO_I2C_REP_START_SHIFT,\
+                                                                    SMPR_PROTO_I2C_REP_START_SIZE)
 
 #endif
 
