@@ -13,6 +13,7 @@
 
 #include "sm_pr_i2c.h"
 #include "sm_ch_err.h"
+#include "hal_stddef.h"
 
 struct _smch_24aa64_t {
     smpr_t *i2c;                    /* I2C protocol object */
