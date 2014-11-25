@@ -37,6 +37,10 @@
 
 #define SMCH_PCA9547_NAME                    "I2C_PCA9547"
 
+
+static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data);
+static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data);
+
 /* Creates a new instance of the SMCH PCA9547 */
 smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint32_t base, uint32_t addr,
         int verbose)
@@ -86,6 +90,18 @@ smch_err_e smch_pca9547_destroy (smch_pca9547_t **self_p)
 
 smch_err_e smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data)
 {
+    return _smch_pca9547_write_8 (self, data);
+}
+
+smch_err_e smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
+{
+    return _smch_pca9547_read_8 (self, data);
+}
+
+/******************************* Static Functions *****************************/
+
+static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data)
+{
     smpr_err_e err = SMPR_SUCCESS;
     uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
     uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
@@ -107,7 +123,7 @@ err_exit:
     return err;
 }
 
-smch_err_e smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
+static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 {
     smpr_err_e err = SMPR_SUCCESS;
     uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
@@ -126,6 +142,30 @@ smch_err_e smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:pca9547_read_8] data =  0x%02X\n",
             *data);
+
+err_exit:
+    return err;
+}
+
+smch_err_e smch_pca9547_en_chan (smch_pca9547_t *self, uint8_t chan)
+{
+    assert (self);
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(chan < PCA9547_MAX_NUM_CHANNEL || chan == SMCH_PCA9547_NO_CHANNEL,
+            "Invalid channel selected", err_exit, SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = 0;
+
+    if (chan == SMCH_PCA9547_NO_CHANNEL) {
+        data = PCA9547_CHANNEL_SEL_EN_OFF;
+    }
+    else {
+        data = PCA9547_CHANNEL_SEL_EN | chan;
+    }
+
+    err =  _smch_pca9547_write_8 (self, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not enable channel", err_exit);
 
 err_exit:
     return err;
