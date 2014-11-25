@@ -160,14 +160,14 @@ static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
     memcpy ((uint8_t *) &__data, &__addr, E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT);
     memcpy ((uint8_t *) &__data + E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT, data, size);
 
-    ssize_t smpr_err = smpr_write_block (self->i2c, 0, ARRAY_SIZE(__data), (uint32_t *) &__data,
-            flags);
+    ssize_t smpr_err = smpr_write_block (self->i2c, 0, ARRAY_SIZE(__data),
+            (uint32_t *) &__data, flags);
 
     /* Check if we have written everything */
     ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not write to SMPR", err_smpr_write, -1);
 
-    /* Return just the nubmer of data bytes written */
+    /* Return just the number of data bytes written */
     err = smpr_err - E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT;
 
     /* 24AA64 takes up to 2 ms to write the page */
