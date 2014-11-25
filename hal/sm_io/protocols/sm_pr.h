@@ -14,9 +14,6 @@
 #include "sm_io.h"
 #include "sm_pr_err.h"
 
-/* Generally useful macro */
-#define ARRAY_SIZE(x)                       (sizeof(x) / sizeof((x)[0]))
-
 #define SM_PR_READBACK                      1
 
 /* Conversion MACROS */
