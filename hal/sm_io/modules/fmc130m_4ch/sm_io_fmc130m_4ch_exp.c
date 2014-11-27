@@ -40,9 +40,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
-#define SMIO_FMC130_HANDLER(self) ((smio_fmc130m_4ch_t *) self->smio_handler)
-#define SMIO_AD9510_HANDLER(self) ((smch_ad9510_t *) SMIO_FMC130_HANDLER(self)->smch_ad9510)
-
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
@@ -109,14 +106,11 @@ static int _fmc130m_4ch_ad9510_cfg_test (void *owner, void *args, void *ret)
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
 
-    if (smch_ad9510 != NULL) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling _fmc130m_4ch_ad9510_config_test\n");
-        smch_ad9510_config_test (smch_ad9510);
-    }
-    else {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Uninplemented _fmc130m_4ch_ad9510_config_test for this FMC board\n");
-        err = -FMC130M_4CH_UNINPL;
-    }
+    FMC130M_4CH_CHECK_ACTIVE(self);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
+            "_fmc130m_4ch_ad9510_config_test\n");
+    smch_ad9510_config_test (smch_ad9510);
 
     return err;
 }
