@@ -33,6 +33,16 @@
 #define SI57X_TRANS_SIZE_MAX                                (SI57X_ADDR_TRANS_SIZE + \
                                                                SI57X_DATA_BYTES_MAX*SI57X_DATA_TRANS_SIZE)
 
+/* FIXME: This is valid for our part number. For different part number, it is different */
+#define SI57X_FOUT_FACTORY_DFLT                             155490000.0 /* in Hertz */
+
+#define SI57X_MIN_FREQ                                      10000000L
+#define SI57X_MAX_FREQ                                      1417500000L
+
+#define SI57X_FDCO_MIN                                      4850000000LL
+#define SI57X_FDCO_MAX                                      5670000000LL
+#define SI57X_FDCO_CENTER                                   ((FDCO_MIN + FDCO_MAX) / 2)
+
 #define SI57X_REG_HS_N1                                     7
 
 /* Definition for register SI57X_REG_HS_N1 */
@@ -135,6 +145,10 @@
                                                                               SI57X_RFREQ4_RFREQ_7_0_SIZE)
 #define SI57X_RFREQ4_RFREQ_7_0_R(reg)                       WBGEN2_GEN_READ(reg, SI57X_RFREQ4_RFREQ_7_0_SHIFT, \
                                                                               SI57X_RFREQ4_RFREQ_7_0_SIZE)
+
+/* RFREQ general definitions */
+#define SI57X_RFREQ_FRAC_SIZE                               28
+#define SI57X_RFREQ_INTEGER_SIZE                            10
 
 #define SI57X_REG_CONTROL                                   135
 
