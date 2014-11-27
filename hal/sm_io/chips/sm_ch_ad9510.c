@@ -15,6 +15,7 @@
 #include "sm_pr.h"
 #include "hal_assert.h"
 #include "ad9510_regs.h"
+#include "sm_ch_ad9510_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -127,10 +128,41 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not initialize AD9510",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
+    /* Setup A and B PLL divider */
+    uint8_t data = AD9510_PLL_A_COUNTER_W(0);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_A_COUNTER, &data);
+
+    /* Extract MSB part of the divider */
+    data = AD9510_PLL_B_MSB_COUNTER_W(SMCH_AD9510_DFLT_PLL_B_COUNTER >>
+            AD9510_PLL_B_LSB_COUNTER_SIZE);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
+
+        /* Extract LSB part of the divider */
+    data = AD9510_PLL_B_LSB_COUNTER_W(SMCH_AD9510_DFLT_PLL_B_COUNTER);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+
+    /* Setup MUX status pin */
+    data = AD9510_PLL_2_CP_MODE_W(0x03 /* CP normal operation*/) |
+        AD9510_PLL_2_MUX_SEL_W(0x01 /* Digital Lock Detect */) |
+        AD9510_PLL_2_PFD_POL_POS; /* PFD positive polarity */
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_2, &data);
+
+    /* Setup Prescaler and Power PLL Up*/
+    data = AD9510_PLL_4_PRESCALER_P_W(0 /* Divide by 1 */) |
+        AD9510_PLL_4_PLL_PDOWN_W(0x0);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+
+    /* Setup R divider */
+    data = AD9510_PLL_R_MSB_COUNTER_W(SMCH_AD9510_DFLT_PLL_R_COUNTER >>
+            AD9510_PLL_R_LSB_COUNTER_SIZE);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_MSB_COUNTER, &data);
+    data = AD9510_PLL_R_LSB_COUNTER_W(SMCH_AD9510_DFLT_PLL_R_COUNTER);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_LSB_COUNTER, &data);
+
     /* Power-up LVPECL outputs */
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:ad9510] Powering up LVPECL outputs 0-3\n");
-    uint8_t data = AD9510_LVPECL_OUT_LVL_W(0x02) /* 810 mV output */ |
+    data = AD9510_LVPECL_OUT_LVL_W(0x02) /* 810 mV output */ |
         AD9510_LVPECL_OUT_PDOWN_W(0x0) /* Do not power down */;
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT0, &data);
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT1, &data);
@@ -157,13 +189,18 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
      * CLK1 - power off
      * CLK2 - power on
      * Clock select = CLK2
-     * Prescaler Clock -  Power-Down
-     * REFIN - Power-Down
+     * Prescaler Clock -  Power-Up
+     * REFIN - Power-Up
      */
-    data = (AD9510_CLK_OPT_REFIN_PD | AD9510_CLK_OPT_PS_PD |
-            AD9510_CLK_OPT_CLK1_PD) & (
+    data = AD9510_CLK_OPT_CLK1_PD /* Power CLK1 down */ & (
+                ~AD9510_CLK_OPT_REFIN_PD /* Power Reference In Up*/ &
+                ~AD9510_CLK_OPT_PS_PD /* Power Prescaler Up*/ &
                 ~AD9510_CLK_OPT_SEL_CLK1 /* Select CLK2*/);
     _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
+
+    /* Update registers */
+    _smch_ad9510_reg_update (self);
+    SMCH_AD9510_WAIT_DFLT;
 
     /* Clock dividers OUT0 - OUT7
      * divide = off (bypassed, ratio 1)
