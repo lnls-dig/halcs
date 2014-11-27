@@ -84,6 +84,184 @@
 #define AD9510_CFG_SERIAL_LSB_FIRST                 WBGEN2_GEN_MASK(AD9510_CFG_SERIAL_LSB_FIRST_SHIFT, \
                                                                     AD9510_CFG_SERIAL_LSB_FIRST_SIZE)
 
+#define AD9510_REG_PLL_A_COUNTER                    0x04
+
+/* Definition for register AD9510_REG_PLL_A_COUNTER */
+#define AD9510_PLL_A_COUNTER_SIZE                   6
+#define AD9510_PLL_A_COUNTER_SHIFT                  0
+#define AD9510_PLL_A_COUNTER_MASK                   WBGEN2_GEN_MASK(AD9510_PLL_A_COUNTER_SHIFT, \
+                                                           AD9510_PLL_A_COUNTER_SIZE)
+#define AD9510_PLL_A_COUNTER_W(value)               WBGEN2_GEN_WRITE(value, AD9510_PLL_A_COUNTER_SHIFT, \
+                                                           AD9510_PLL_A_COUNTER_SIZE)
+#define AD9510_PLL_A_COUNTER_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_A_COUNTER_SHIFT, \
+                                                                       AD9510_PLL_A_COUNTER_SIZE)
+
+#define AD9510_REG_PLL_B_MSB_COUNTER                0x05
+
+/* Definition for register AD9510_REG_PLL_B_MSB_COUNTER */
+#define AD9510_PLL_B_MSB_COUNTER_SIZE               5
+#define AD9510_PLL_B_MSB_COUNTER_SHIFT              0
+#define AD9510_PLL_B_MSB_COUNTER_MASK               WBGEN2_GEN_MASK(AD9510_PLL_B_MSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_B_MSB_COUNTER_SIZE)
+#define AD9510_PLL_B_MSB_COUNTER_W(value)           WBGEN2_GEN_WRITE(value, AD9510_PLL_B_MSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_B_MSB_COUNTER_SIZE)
+#define AD9510_PLL_B_MSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_B_MSB_COUNTER_SHIFT, \
+                                                                   AD9510_PLL_B_MSB_COUNTER_SIZE)
+
+#define AD9510_REG_PLL_B_LSB_COUNTER                0x06
+
+/* Definition for register AD9510_REG_PLL_B_LSB_COUNTER */
+#define AD9510_PLL_B_LSB_COUNTER_SIZE               8
+#define AD9510_PLL_B_LSB_COUNTER_SHIFT              0
+#define AD9510_PLL_B_LSB_COUNTER_MASK               WBGEN2_GEN_MASK(AD9510_PLL_B_LSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_B_LSB_COUNTER_SIZE)
+#define AD9510_PLL_B_LSB_COUNTER_W(value)           WBGEN2_GEN_WRITE(value, AD9510_PLL_B_LSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_B_LSB_COUNTER_SIZE)
+#define AD9510_PLL_B_LSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_B_LSB_COUNTER_SHIFT, \
+                                                                   AD9510_PLL_B_LSB_COUNTER_SIZE)
+
+#define AD9510_REG_PLL_1                            0x07
+
+/* Definition for register AD9510_REG_PLL_1_LOR */
+#define AD9510_PLL_1_LOR_EN_SHIFT                   2
+#define AD9510_PLL_1_LOR_EN_SIZE                    1
+#define AD9510_PLL_1_LOR_EN                         WBGEN2_GEN_MASK(AD9510_PLL_1_LOR_EN_SHIFT, \
+                                                                            AD9510_PLL_1_LOR_EN_SIZE)
+
+#define AD9510_PLL_1_LOR_LOCK_DEL_SIZE              2
+#define AD9510_PLL_1_LOR_LOCK_DEL_SHIFT             5
+#define AD9510_PLL_1_LOR_LOCK_DEL_MASK              WBGEN2_GEN_MASK(AD9510_PLL_1_LOR_LOCK_DEL_SHIFT, \
+                                                      AD9510_PLL_1_LOR_LOCK_DEL_SIZE)
+#define AD9510_PLL_1_LOR_LOCK_DEL_W(value)          WBGEN2_GEN_WRITE(value, AD9510_PLL_1_LOR_LOCK_DEL_SHIFT, \
+                                                      AD9510_PLL_1_LOR_LOCK_DEL_SIZE)
+#define AD9510_PLL_1_LOR_LOCK_DEL_R(reg)            WBGEN2_GEN_READ(reg, AD9510_PLL_1_LOR_LOCK_DEL_SHIFT, \
+                                                                  AD9510_PLL_1_LOR_LOCK_DEL_SIZE)
+
+#define AD9510_REG_PLL_2                            0x08
+
+/* Definition for register AD9510_REG_PLL_2 */
+#define AD9510_PLL_2_CP_MODE_SIZE                   2
+#define AD9510_PLL_2_CP_MODE_SHIFT                  0
+#define AD9510_PLL_2_CP_MODE_MASK                   WBGEN2_GEN_MASK(AD9510_PLL_2_CP_MODE_SHIFT, \
+                                                           AD9510_PLL_2_CP_MODE_SIZE)
+#define AD9510_PLL_2_CP_MODE_W(value)               WBGEN2_GEN_WRITE(value, AD9510_PLL_2_CP_MODE_SHIFT, \
+                                                           AD9510_PLL_2_CP_MODE_SIZE)
+#define AD9510_PLL_2_CP_MODE_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_2_CP_MODE_SHIFT, \
+                                                                       AD9510_PLL_2_CP_MODE_SIZE)
+
+#define AD9510_PLL_2_MUX_SEL_SIZE                   4
+#define AD9510_PLL_2_MUX_SEL_SHIFT                  2
+#define AD9510_PLL_2_MUX_SEL_MASK                   WBGEN2_GEN_MASK(AD9510_PLL_2_MUX_SEL_SHIFT, \
+                                                           AD9510_PLL_2_MUX_SEL_SIZE)
+#define AD9510_PLL_2_MUX_SEL_W(value)               WBGEN2_GEN_WRITE(value, AD9510_PLL_2_MUX_SEL_SHIFT, \
+                                                           AD9510_PLL_2_MUX_SEL_SIZE)
+#define AD9510_PLL_2_MUX_SEL_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_2_MUX_SEL_SHIFT, \
+                                                                       AD9510_PLL_2_MUX_SEL_SIZE)
+
+#define AD9510_PLL_2_PFD_POL_POS_SHIFT              6
+#define AD9510_PLL_2_PFD_POL_POS_SIZE               1
+#define AD9510_PLL_2_PFD_POL_POS                    WBGEN2_GEN_MASK(AD9510_PLL_2_PFD_POL_POS_SHIFT, \
+                                                                       AD9510_PLL_2_PFD_POL_POS_SIZE)
+
+#define AD9510_REG_PLL_3                            0x09
+
+/* Definition for register AD9510_REG_PLL_3 */
+#define AD9510_PLL_3_RST_ALL_CNT_SHIFT              0
+#define AD9510_PLL_3_RST_ALL_CNT_SIZE               1
+#define AD9510_PLL_3_RST_ALL_CNT                    WBGEN2_GEN_MASK(AD9510_PLL_3_RST_ALL_CNT_SHIFT, \
+                                                                       AD9510_PLL_3_RST_ALL_CNT_SIZE)
+
+#define AD9510_PLL_3_RST_N_CNT_SHIFT                1
+#define AD9510_PLL_3_RST_N_CNT_SIZE                 1
+#define AD9510_PLL_3_RST_N_CNT                      WBGEN2_GEN_MASK(AD9510_PLL_3_RST_N_CNT_SHIFT, \
+                                                                         AD9510_PLL_3_RST_N_CNT_SIZE)
+
+#define AD9510_PLL_3_RST_R_CNT_SHIFT                2
+#define AD9510_PLL_3_RST_R_CNT_SIZE                 1
+#define AD9510_PLL_3_RST_R_CNT                      WBGEN2_GEN_MASK(AD9510_PLL_3_RST_R_CNT_SHIFT, \
+                                                                         AD9510_PLL_3_RST_R_CNT_SIZE)
+
+#define AD9510_PLL_3_CP_CURRENT_SIZE                3
+#define AD9510_PLL_3_CP_CURRENT_SHIFT               4
+#define AD9510_PLL_3_CP_CURRENT_MASK                WBGEN2_GEN_MASK(AD9510_PLL_3_CP_CURRENT_SHIFT, \
+                                                        AD9510_PLL_3_CP_CURRENT_SIZE)
+#define AD9510_PLL_3_CP_CURRENT_W(value)            WBGEN2_GEN_WRITE(value, AD9510_PLL_3_CP_CURRENT_SHIFT, \
+                                                        AD9510_PLL_3_CP_CURRENT_SIZE)
+#define AD9510_PLL_3_CP_CURRENT_R(reg)              WBGEN2_GEN_READ(reg, AD9510_PLL_3_CP_CURRENT_SHIFT, \
+                                                                    AD9510_PLL_3_CP_CURRENT_SIZE)
+
+#define AD9510_REG_PLL_4                            0x0A
+
+/* Definition for register AD9510_REG_PLL_4 */
+#define AD9510_PLL_4_PLL_PDOWN_SIZE                 2
+#define AD9510_PLL_4_PLL_PDOWN_SHIFT                0
+#define AD9510_PLL_4_PLL_PDOWN_MASK                 WBGEN2_GEN_MASK(AD9510_PLL_4_PLL_PDOWN_SHIFT, \
+                                                         AD9510_PLL_4_PLL_PDOWN_SIZE)
+#define AD9510_PLL_4_PLL_PDOWN_W(value)             WBGEN2_GEN_WRITE(value, AD9510_PLL_4_PLL_PDOWN_SHIFT, \
+                                                         AD9510_PLL_4_PLL_PDOWN_SIZE)
+#define AD9510_PLL_4_PLL_PDOWN_R(reg)               WBGEN2_GEN_READ(reg, AD9510_PLL_4_PLL_PDOWN_SHIFT, \
+                                                                     AD9510_PLL_4_PLL_PDOWN_SIZE)
+
+#define AD9510_PLL_4_PRESCALER_P_SIZE               3
+#define AD9510_PLL_4_PRESCALER_P_SHIFT              2
+#define AD9510_PLL_4_PRESCALER_P_MASK               WBGEN2_GEN_MASK(AD9510_PLL_4_PRESCALER_P_SHIFT, \
+                                                       AD9510_PLL_4_PRESCALER_P_SIZE)
+#define AD9510_PLL_4_PRESCALER_P_W(value)           WBGEN2_GEN_WRITE(value, AD9510_PLL_4_PRESCALER_P_SHIFT, \
+                                                       AD9510_PLL_4_PRESCALER_P_SIZE)
+#define AD9510_PLL_4_PRESCALER_P_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_4_PRESCALER_P_SHIFT, \
+                                                                   AD9510_PLL_4_PRESCALER_P_SIZE)
+
+#define AD9510_PLL_4_B_BYPASS_SHIFT                 6
+#define AD9510_PLL_4_B_BYPASS_SIZE                  1
+#define AD9510_PLL_4_B_BYPASS                       WBGEN2_GEN_MASK(AD9510_PLL_4_B_BYPASS_SHIFT, \
+                                                                          AD9510_PLL_4_B_BYPASS_SIZE)
+
+#define AD9510_REG_PLL_R_MSB_COUNTER                0x0B
+
+/* Definition for register AD9510_REG_PLL_R_MSB_COUNTER */
+#define AD9510_PLL_R_MSB_COUNTER_SIZE               6
+#define AD9510_PLL_R_MSB_COUNTER_SHIFT              0
+#define AD9510_PLL_R_MSB_COUNTER_MASK               WBGEN2_GEN_MASK(AD9510_PLL_R_MSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_R_MSB_COUNTER_SIZE)
+#define AD9510_PLL_R_MSB_COUNTER_W(value)           WBGEN2_GEN_WRITE(value, AD9510_PLL_R_MSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_R_MSB_COUNTER_SIZE)
+#define AD9510_PLL_R_MSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_R_MSB_COUNTER_SHIFT, \
+                                                                   AD9510_PLL_R_MSB_COUNTER_SIZE)
+
+#define AD9510_REG_PLL_R_LSB_COUNTER                0x0C
+
+/* Definition for register AD9510_REG_PLL_R_LSB_COUNTER */
+#define AD9510_PLL_R_LSB_COUNTER_SIZE               8
+#define AD9510_PLL_R_LSB_COUNTER_SHIFT              0
+#define AD9510_PLL_R_LSB_COUNTER_MASK               WBGEN2_GEN_MASK(AD9510_PLL_R_LSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_R_LSB_COUNTER_SIZE)
+#define AD9510_PLL_R_LSB_COUNTER_W(value)           WBGEN2_GEN_WRITE(value, AD9510_PLL_R_LSB_COUNTER_SHIFT, \
+                                                       AD9510_PLL_R_LSB_COUNTER_SIZE)
+#define AD9510_PLL_R_LSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_R_LSB_COUNTER_SHIFT, \
+                                                                   AD9510_PLL_R_LSB_COUNTER_SIZE)
+
+#define AD9510_REG_PLL_5                            0x0A
+
+/* Definition for register AD9510_REG_PLL_5 */
+#define AD9510_PLL_5_ANTI_BL_PW_SIZE                2
+#define AD9510_PLL_5_ANTI_BL_PW_SHIFT               0
+#define AD9510_PLL_5_ANTI_BL_PW_MASK                WBGEN2_GEN_MASK(AD9510_PLL_5_ANTI_BL_PW_SHIFT, \
+                                                        AD9510_PLL_5_ANTI_BL_PW_SIZE)
+#define AD9510_PLL_5_ANTI_BL_PW_W(value)            WBGEN2_GEN_WRITE(value, AD9510_PLL_5_ANTI_BL_PW_SHIFT, \
+                                                        AD9510_PLL_5_ANTI_BL_PW_SIZE)
+#define AD9510_PLL_5_ANTI_BL_PW_R(reg)              WBGEN2_GEN_READ(reg, AD9510_PLL_5_ANTI_BL_PW_SHIFT, \
+                                                                    AD9510_PLL_5_ANTI_BL_PW_SIZE)
+
+#define AD9510_PLL_5_DIG_LOCK_DET_WDW_SHIFT         5
+#define AD9510_PLL_5_DIG_LOCK_DET_WDW_SIZE          1
+#define AD9510_PLL_5_DIG_LOCK_DET_WDW               WBGEN2_GEN_MASK(AD9510_PLL_5_DIG_LOCK_DET_WDW_SHIFT, \
+                                                                  AD9510_PLL_5_DIG_LOCK_DET_WDW_SIZE)
+
+#define AD9510_PLL_5_DIG_LOCK_DET_EN_SHIFT          6
+#define AD9510_PLL_5_DIG_LOCK_DET_EN_SIZE           1
+#define AD9510_PLL_5_DIG_LOCK_DET_EN                WBGEN2_GEN_MASK(AD9510_PLL_5_DIG_LOCK_DET_EN_SHIFT, \
+                                                                   AD9510_PLL_5_DIG_LOCK_DET_EN_SIZE)
+
 #define AD9510_REG_LVPECL_OUT0                      0x3C
 #define AD9510_REG_LVPECL_OUT1                      0x3D
 #define AD9510_REG_LVPECL_OUT2                      0x3E
