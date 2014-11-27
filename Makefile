@@ -71,7 +71,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmdp -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 # General library flags -L<libdir>
 LFLAGS =
 
