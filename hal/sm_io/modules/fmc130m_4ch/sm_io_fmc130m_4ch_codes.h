@@ -18,8 +18,8 @@
 #define FMC130M_4CH_NAME_LEDS                   "leds"
 #define FMC130M_4CH_OPCODE_PLL_FUNCTION         1
 #define FMC130M_4CH_NAME_PLL_FUNCTION           "pll_function"
-#define FMC130M_4CH_OPCODE_AD9510_CFG_TEST      2
-#define FMC130M_4CH_NAME_AD9510_CFG_TEST        "ad9510_cfg_test"
+#define FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS  2
+#define FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS    "ad9510_cfg_defaults"
 #define FMC130M_4CH_OPCODE_ADC_DATA0            3
 #define FMC130M_4CH_NAME_ADC_DATA0              "adc_data0"
 #define FMC130M_4CH_OPCODE_ADC_DATA1            4

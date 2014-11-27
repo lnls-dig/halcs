@@ -55,10 +55,10 @@ void bpm_client_destroy (bpm_client_t **self_p);
  * if server could not complete the request */
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
 
-/* Simple AD9510 Condig test.
+/* Simple AD9510 Config test.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_ad9510_cfg_test (bpm_client_t *self, char *service);
+bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service);
 
 /* FMC PLL FUNCTION pin. Sets or clears the FMC PLL FUNCTION pin. This pin
  * has a general purpose based on the 0x59 SPI AD9510 register.

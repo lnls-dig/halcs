@@ -119,7 +119,7 @@ smch_err_e smch_ad9510_reg_update (smch_ad9510_t *self)
     return _smch_ad9510_reg_update (self);
 }
 
-smch_err_e smch_ad9510_config_test (smch_ad9510_t *self)
+smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
 {
     smch_err_e err = SMCH_SUCCESS;
 

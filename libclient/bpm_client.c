@@ -164,13 +164,13 @@ PARAM_FUNC_CLIENT_READ(fmc_pll_function)
             fmc_pll_function);
 }
 
-bpm_client_err_e bpm_ad9510_cfg_test (bpm_client_t *self, char *service)
+bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service)
 {
     assert (self);
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_AD9510_CFG_TEST;
+    FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS;
 
     zmsg_t *request = zmsg_new ();
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);

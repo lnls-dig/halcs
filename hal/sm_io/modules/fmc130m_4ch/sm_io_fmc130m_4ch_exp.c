@@ -96,7 +96,7 @@ disp_op_t fmc130m_4ch_pll_func_exp = {
     }
 };
 
-static int _fmc130m_4ch_ad9510_cfg_test (void *owner, void *args, void *ret)
+static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
 {
     (void) ret;
     assert (owner);
@@ -109,16 +109,16 @@ static int _fmc130m_4ch_ad9510_cfg_test (void *owner, void *args, void *ret)
     FMC130M_4CH_CHECK_ACTIVE(self);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
-            "_fmc130m_4ch_ad9510_config_test\n");
-    smch_ad9510_config_test (smch_ad9510);
+            "_fmc130m_4ch_ad9510_cgf_defaults\n");
+    smch_ad9510_cfg_defaults (smch_ad9510);
 
     return err;
 }
 
-disp_op_t fmc130m_4ch_ad9510_cfg_test_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_CFG_TEST,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_TEST,
-    .func_fp = _fmc130m_4ch_ad9510_cfg_test,
+disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+    .func_fp = _fmc130m_4ch_ad9510_cfg_defaults,
     .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -698,7 +698,7 @@ disp_op_t fmc130m_4ch_si571_oe_exp = {
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
-    &fmc130m_4ch_ad9510_cfg_test_exp,
+    &fmc130m_4ch_ad9510_cfg_defaults_exp,
     &fmc130m_4ch_adc_data0_exp,
     &fmc130m_4ch_adc_data1_exp,
     &fmc130m_4ch_adc_data2_exp,
