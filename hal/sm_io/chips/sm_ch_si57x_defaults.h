@@ -8,13 +8,13 @@
 #ifndef _SMCH_SI57X_DEFAULTS_H_
 #define _SMCH_SI57X_DEFAULTS_H_
 
-#include "sm_ch_si57x.h"
+#include "si57x_regs.h"
 
-#define SMCH_SI57X_DFLT_FXTAL                   0ULL
+#define SMCH_SI57X_DFLT_FXTAL                   0.0
 #define SMCH_SI57X_DFLT_N1                      0
 #define SMCH_SI57X_DFLT_HSDIV                   0
 #define SMCH_SI57X_DFLT_RFREQ                   0ULL
-#define SMCH_SI57X_DFLT_FREQUENCY               SMCH_SI57X_FOUT_FACTORY_DFLT
+#define SMCH_SI57X_DFLT_FREQUENCY               SI57X_FOUT_FACTORY_DFLT
 
 #endif
 

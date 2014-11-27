@@ -47,12 +47,6 @@
 #define SMCH_SI57X_WAIT(usecs)              usleep(usecs)
 #define SMCH_SI57X_WAIT_DFLT                SMCH_SI57X_WAIT(SMCH_SI57X_USECS_WAIT)
 
-static inline uint64_t _div_u64_rem (uint64_t dividend, uint32_t divisor,
-        uint32_t *remainder);
-static inline uint64_t _div_u64 (uint64_t dividend, uint32_t divisor);
-static inline uint64_t _div64_u64 (uint64_t dividend, uint64_t divisor);
-static inline int64_t _div64_s64 (int64_t dividend, int64_t divisor);
-
 static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
         const uint8_t *data);
 static smch_err_e _smch_si57x_write_block (smch_si57x_t *self, uint8_t addr,
@@ -69,10 +63,10 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr,
 
 static smch_err_e _smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
         unsigned int *n1, unsigned int *hs_div);
-static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, uint64_t fout);
+static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout);
 static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
         size_t size);
-static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, unsigned long frequency,
+static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
         uint64_t *out_rfreq, unsigned int *out_n1, unsigned int *out_hs_div);
 static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
 
@@ -160,18 +154,18 @@ smch_err_e smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
     return _smch_si57x_get_divs (self, rfreq, n1, hs_div);
 }
 
-smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, uint64_t fout)
+smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout)
 {
     return _smch_si57x_get_defaults (self, fout);
 }
 
-smch_err_e smch_si57x_set_freq (smch_si57x_t *self, unsigned long frequency)
+smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency)
 {
     assert (self);
     smch_err_e err = SMCH_SUCCESS;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
-            "frequency to %lu Hz\n", frequency);
+            "frequency to %f Hz\n", frequency);
 
     /* Get optimal divider values */
     err = _smch_si57x_calc_divs (self, frequency, &self->rfreq, &self->n1,
@@ -281,7 +275,7 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
     assert (self);
     assert (data);
 
-    ssize_t err = sizeof(uint8_t);
+    ssize_t err = -1;
     uint32_t trans_size = SI57X_ADDR_TRANS_SIZE;
     /* Si571 needs a repeated start between the write and read commands */
     uint32_t flags = SMPR_PROTO_I2C_REP_START  |
@@ -308,7 +302,8 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
     flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
         SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
 
-    smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data, flags);
+    smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data,
+        flags);
     /* Check if we have written everything */
     ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not read data from I2C", err_exit, -1);
@@ -359,7 +354,7 @@ err_exit:
     return err;
 }
 
-static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, uint64_t fout)
+static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout)
 {
     assert (self);
     smch_err_e err = SMCH_SUCCESS;
@@ -378,17 +373,11 @@ static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, uint64_t fout)
     err = _smch_si57x_get_divs (self, &self->rfreq, &self->n1, &self->hs_div);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not get divider values", err_exit);
 
-    /*
-     * Accept optional precision loss to avoid arithmetic overflows.
-     * Acceptable per Silicon Labs Application Note AN334.
-     */
-    uint64_t fdco = SMCH_SI57X_FOUT_FACTORY_DFLT * self->n1 * self->hs_div;
-    if (fdco >= (1LL << 36)) {
-        self->fxtal = _div64_u64 (fdco << 24, self->rfreq >> 4);
-    }
-    else {
-        self->fxtal = _div64_u64 (fdco << 28, self->rfreq);
-    }
+    uint64_t fdco = SI57X_FOUT_FACTORY_DFLT * self->n1 * self->hs_div;
+    self->fxtal = (double) (fdco << SI57X_RFREQ_FRAC_SIZE) / (double) (self->rfreq);
+
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_defaults] fxtal: %f, "
+            "fdco: %" PRIu64 ", rfreq: %f\n", self->fxtal, fdco, self->rfreq / POW_2_28);
 
     self->frequency = fout;
 
@@ -497,12 +486,15 @@ err_exit:
 }
 
 /* Cut from linux sources */
-static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, unsigned long frequency,
+static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
         uint64_t *out_rfreq, unsigned int *out_n1, unsigned int *out_hs_div)
 {
     smch_err_e err = SMCH_SUCCESS;
     unsigned int n1, hs_div;
-    uint64_t fdco, best_fdco = ULLONG_MAX;
+    double fdco, best_fdco = DBL_MAX;
+    double rfreq_tmp;
+    uint16_t rfreq_integer = 0;
+    uint32_t rfreq_frac = 0;
     static const uint8_t si57x_hs_div_values [] = { 11, 9, 7, 6, 5, 4 };
 
     uint32_t i;
@@ -510,22 +502,34 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, unsigned long frequ
         hs_div = si57x_hs_div_values[i];
 
         /* Calculate lowest possible value for n1 */
-        n1 = _div_u64 (_div_u64 (SMCH_SI57X_FDCO_MIN, hs_div), frequency);
+        n1 = div_u64 (div_u64 (SI57X_FDCO_MIN, hs_div), (uint64_t) FLOOR(frequency));
 
         if (!n1 || (n1 & 1)) {
             n1++;
         }
 
         while (n1 <= 128) {
-            fdco = (uint64_t) frequency * (uint64_t) hs_div * (uint64_t) n1;
-            if (fdco > SMCH_SI57X_FDCO_MAX) {
+            fdco = (double) frequency * (double) hs_div * (double) n1;
+            if (fdco > SI57X_FDCO_MAX) {
                 break;
             }
 
-            if (fdco >= SMCH_SI57X_FDCO_MIN && fdco < best_fdco) {
+            if (fdco >= SI57X_FDCO_MIN && fdco < best_fdco) {
                 *out_n1 = n1;
                 *out_hs_div = hs_div;
-                *out_rfreq = _div64_u64(fdco << 28, self->fxtal);
+
+                rfreq_tmp = fdco / self->fxtal;
+
+                /* convert new RFREQ to the binary representation
+                 * separate the integer part */
+
+                /* Integer part is a 10-bit number */
+                rfreq_integer = FLOOR(rfreq_tmp);
+                /* Fractional part is a 28-bit number */
+                rfreq_frac = FLOOR((rfreq_tmp - rfreq_integer) * POW_2_28);
+
+                /* Concatenate the integer and fractional parts */
+                *out_rfreq = (rfreq_integer << SI57X_RFREQ_FRAC_SIZE) | rfreq_frac;
                 best_fdco = fdco;
             }
 
@@ -533,38 +537,15 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, unsigned long frequ
         }
     }
 
-    if (best_fdco == ULLONG_MAX) {
+    if (best_fdco == DBL_MAX) {
         err = SMCH_ERR_INV_FUNC_PARAM;
     }
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_calc_divs] Divider values:\n"
-            "\tfrequency: %lu, rfreq: %" PRIu64 ", n1: %u, hs_div: %u\n",
-            frequency, *out_rfreq, *out_n1, *out_hs_div);
+            "\tfrequency: %f, rfreq: %" PRIu64 ", rfreq_integer: %u, rfreq_frac: %u, "
+           "n1: %u, hs_div: %u\n", frequency, *out_rfreq, rfreq_integer,
+                rfreq_frac, *out_n1, *out_hs_div);
 
     return err;
-}
-
-/* Cut from Linux kernel */
-static inline uint64_t _div_u64_rem(uint64_t dividend, uint32_t divisor,
-        uint32_t *remainder)
-{
-    *remainder = dividend % divisor;
-    return dividend / divisor;
-}
-
-static inline uint64_t _div_u64(uint64_t dividend, uint32_t divisor)
-{
-    uint32_t remainder;
-    return _div_u64_rem(dividend, divisor, &remainder);
-}
-
-static inline uint64_t _div64_u64(uint64_t dividend, uint64_t divisor)
-{
-    return dividend / divisor;
-}
-
-static inline int64_t _div64_s64(int64_t dividend, int64_t divisor)
-{
-    return dividend / divisor;
 }
 

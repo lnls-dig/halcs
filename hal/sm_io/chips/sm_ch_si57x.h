@@ -13,26 +13,16 @@
 
 #include "sm_pr_i2c.h"
 #include "sm_ch_err.h"
-
-/* FIXME: This is valid for our part number. For different part number, it is different */
-#define SMCH_SI57X_FOUT_FACTORY_DFLT                155490000LL
-
-#define SMCH_SI57X_MIN_FREQ                         10000000L
-#define SMCH_SI57X_MAX_FREQ                         1417500000L
-
-#define SMCH_SI57X_FDCO_MIN                         4850000000LL
-#define SMCH_SI57X_FDCO_MAX                         5670000000LL
-#define SMCH_SI57X_FDCO_CENTER                      ((FDCO_MIN + FDCO_MAX) / 2)
+#include "hal_math.h"
 
 struct _smch_si57x_t {
     smpr_t *i2c;                    /* I2C protocol object */
     uint32_t addr;                  /* I2C address for this SI57X chip */
-
-    uint64_t fxtal;                 /* Internal crystal frequency */
+    double fxtal;                   /* Internal crystal frequency */
     unsigned int n1;                /* N1 divider value */
     unsigned int hs_div;            /* High Speed divider value */
-    uint64_t rfreq;                 /* RF Freq value */
-    uint64_t frequency;             /* Output crystal frequency */
+    uint64_t rfreq;                 /* RFreq value */
+    double frequency;               /* Output crystal frequency */
 };
 
 /* Opaque sm_ch_si57x structure */
@@ -63,9 +53,9 @@ ssize_t smch_si57x_probe_bus (smch_si57x_t *self);
 smch_err_e smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
         unsigned int *n1, unsigned int *hs_div);
 /* Reset Si57X to its default factory values */
-smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, uint64_t fout);
+smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout);
 
 /* Setup new frequency */
-smch_err_e smch_si57x_set_freq (smch_si57x_t *self, unsigned long frequency);
+smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency);
 
 #endif
