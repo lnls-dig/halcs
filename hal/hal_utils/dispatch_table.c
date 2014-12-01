@@ -5,6 +5,12 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
+/* This is roughly based on the work of Alessandro Rubini and others
+ * "mini-rpc", located on "https://github.com/a-rubini/mini-rpc"
+ *
+ * In the end, I changed much of the original code and only the main
+ * idea with a couple of the original structures remain */
+
 #include <inttypes.h>
 
 #include "hal_utils.h"
