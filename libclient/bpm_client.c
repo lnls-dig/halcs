@@ -368,27 +368,27 @@ PARAM_FUNC_CLIENT_READ(adc_dly_updt3)
 /* ADC set delay channel 0 */
 PARAM_FUNC_CLIENT_WRITE2(adc_dly0, type, val)
 {
-    return param_client_write_gen (self, service, FMC130M_4CH_OPCODE_ADC_DLY0,
+    return param_client_write_raw (self, service, FMC130M_4CH_OPCODE_ADC_DLY0,
             type, val);
 }
 
 /* ADC set delay channel 1 */
 PARAM_FUNC_CLIENT_WRITE2(adc_dly1, type, val)
 {
-    return param_client_write_gen (self, service, FMC130M_4CH_OPCODE_ADC_DLY1,
+    return param_client_write_raw (self, service, FMC130M_4CH_OPCODE_ADC_DLY1,
             type, val);
 }
 
 /* ADC set delay channel 2 */
 PARAM_FUNC_CLIENT_WRITE2(adc_dly2, type, val)
 {
-    return param_client_write_gen (self, service, FMC130M_4CH_OPCODE_ADC_DLY2,
+    return param_client_write_raw (self, service, FMC130M_4CH_OPCODE_ADC_DLY2,
             type, val);
 }
 /* ADC set delay channel 3 */
 PARAM_FUNC_CLIENT_WRITE2(adc_dly3, type, val)
 {
-    return param_client_write_gen (self, service, FMC130M_4CH_OPCODE_ADC_DLY3,
+    return param_client_write_raw (self, service, FMC130M_4CH_OPCODE_ADC_DLY3,
             type, val);
 }
 
@@ -412,6 +412,78 @@ PARAM_FUNC_CLIENT_WRITE(si571_oe)
 PARAM_FUNC_CLIENT_READ(si571_oe)
 {
      return param_client_read (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
+}
+
+/*************************** FMC130M Chips Functions *************************/
+
+/* AD9510 PLL A divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_a_div)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
+            ad9510_pll_a_div);
+}
+
+/* AD9510 PLL B divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_b_div)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
+            ad9510_pll_b_div);
+}
+
+/* AD9510 PLL Prescaler */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_prescaler)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
+            ad9510_pll_prescaler);
+}
+
+/* AD9510 R divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_r_div)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_R_DIV,
+            ad9510_r_div);
+}
+
+/* AD9510 PLL Power Down */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_pdown)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
+            ad9510_pll_pdown);
+}
+
+/* AD9510 Mux Status */
+PARAM_FUNC_CLIENT_WRITE(ad9510_mux_status)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
+            ad9510_mux_status);
+}
+
+/* AD9510 CP current */
+PARAM_FUNC_CLIENT_WRITE(ad9510_cp_current)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
+            ad9510_cp_current);
+}
+
+/* AD9510 Outputs */
+PARAM_FUNC_CLIENT_WRITE(ad9510_outputs)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
+            ad9510_outputs);
+}
+
+/* AD9510 PLL CLK Selection */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_clk_sel)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
+            ad9510_pll_clk_sel);
+}
+
+/* SI571 Set frequency */
+PARAM_FUNC_CLIENT_WRITE(si571_set_freq)
+{
+    return param_client_write_double (self, service, FMC130M_4CH_OPCODE_SI571_SET_FREQ,
+            si571_set_freq);
 }
 
 /****************** ACQ SMIO Functions ****************/

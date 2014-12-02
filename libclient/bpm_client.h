@@ -207,6 +207,34 @@ bpm_client_err_e bpm_set_si571_oe (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_si571_oe (bpm_client_t *self, char *service,
         uint32_t *si571_oe);
 
+/* FMC AD9510 Control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_ad9510_pll_a_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_a_div);
+bpm_client_err_e bpm_set_ad9510_pll_b_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_b_div);
+bpm_client_err_e bpm_set_ad9510_pll_prescaler (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_prescaler);
+bpm_client_err_e bpm_set_ad9510_r_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_r_div);
+bpm_client_err_e bpm_set_ad9510_pll_pdown (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_pdown);
+bpm_client_err_e bpm_set_ad9510_mux_status (bpm_client_t *self, char *service,
+        uint32_t ad9510_mux_status);
+bpm_client_err_e bpm_set_ad9510_cp_current (bpm_client_t *self, char *service,
+        uint32_t ad9510_cp_current);
+bpm_client_err_e bpm_set_ad9510_outputs (bpm_client_t *self, char *service,
+        uint32_t ad9510_outputs);
+bpm_client_err_e bpm_set_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_clk_sel);
+
+/* FMC SI571 Control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_si571_set_freq (bpm_client_t *self, char *service,
+        uint32_t si571_set_freq);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquistion request */
