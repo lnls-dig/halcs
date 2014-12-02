@@ -18,6 +18,7 @@
 
 #define SMIO_FMC130_HANDLER(self) ((smio_fmc130m_4ch_t *) self->smio_handler)
 #define SMIO_AD9510_HANDLER(self) ((smch_ad9510_t *) SMIO_FMC130_HANDLER(self)->smch_ad9510)
+#define SMIO_SI57X_HANDLER(self) ((smch_si57x_t *) SMIO_FMC130_HANDLER(self)->smch_si571)
 
 /* The follosing codes were generated via the following command:
  * > echo FMC130M_4CH_ACTIVE | md5sum | cut -c 1-8
