@@ -958,6 +958,25 @@ disp_op_t fmc130m_4ch_si571_set_freq_exp = {
     }
 };
 
+FMC130M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
+{
+    FMC130M_4CH_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_defaults,
+            "Could not restart SI571 to its defaults");
+}
+
+disp_op_t fmc130m_4ch_si571_get_defaults_exp = {
+    .name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS,
+    .opcode = FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS,
+    .func_fp = FMC130M_4CH_SI571_FUNC_NAME(get_defaults),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
@@ -994,6 +1013,7 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_ad9510_outputs_exp,
     &fmc130m_4ch_ad9510_pll_clk_sel_exp,
     &fmc130m_4ch_si571_set_freq_exp,
+    &fmc130m_4ch_si571_get_defaults_exp,
     &disp_op_end
 };
 
