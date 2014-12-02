@@ -49,7 +49,7 @@ bpm_client_err_e param_client_send_32_rw (bpm_client_t *self, char *service,
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
-    zmsg_addmem (request, &param, sizeof (param_32));
+    zmsg_addmem (request, &param_32, sizeof (param_32));
 
     mdp_client_send (self->mdp_client, service, &request);
 
@@ -72,7 +72,7 @@ bpm_client_err_e param_client_send_double_rw (bpm_client_t *self, char *service,
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
-    zmsg_addmem (request, &param, sizeof (param_double));
+    zmsg_addmem (request, &param_double, sizeof (param_double));
 
     mdp_client_send (self->mdp_client, service, &request);
 
