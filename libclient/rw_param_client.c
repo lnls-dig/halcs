@@ -34,16 +34,45 @@
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient:rw_param_client]",   \
             bpm_client_err_str (err_type))
 
-bpm_client_err_e param_client_send_rw (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t rw, uint32_t param)
+bpm_client_err_e param_client_send_32_rw (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t rw, void *param)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+
+    uint32_t param_32 = 0;
+
+    if (param != NULL) {
+        param_32 = *(uint32_t *) param;
+    }
 
     zmsg_t *request = zmsg_new ();
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
-    zmsg_addmem (request, &param, sizeof (param));
+    zmsg_addmem (request, &param, sizeof (param_32));
+
+    mdp_client_send (self->mdp_client, service, &request);
+
+err_send_msg_alloc:
+    return err;
+}
+
+bpm_client_err_e param_client_send_double_rw (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t rw, void *param)
+{
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+
+    double param_double = 0;
+
+    if (param != NULL) {
+        param_double = *(double *) param;
+    }
+
+    zmsg_t *request = zmsg_new ();
+    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
+    zmsg_addmem (request, &operation, sizeof (operation));
+    zmsg_addmem (request, &rw, sizeof (rw));
+    zmsg_addmem (request, &param, sizeof (param_double));
 
     mdp_client_send (self->mdp_client, service, &request);
 
@@ -69,7 +98,7 @@ err_null_msg:
 }
 
 bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t param1, uint32_t param2)
+        uint32_t operation, uint32_t param1, void *param2, send_client_fp send_client)
 {
     assert (self);
     assert (service);
@@ -77,7 +106,7 @@ bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     zmsg_t *report;
 
-    err = param_client_send_rw (self, service, operation, param1, param2);
+    err = (*send_client) (self, service, operation, param1, param2);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -108,11 +137,27 @@ err_send_msg:
     return err;
 }
 
+bpm_client_err_e param_client_write_raw (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2)
+{
+    return param_client_write_gen (self, service, operation, param1, &param2,
+            param_client_send_32_rw);
+}
+
 bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param)
 {
     uint32_t rw = WRITE_MODE;
-    return param_client_write_gen (self, service,operation, rw, param);
+    return param_client_write_gen (self, service, operation, rw, &param,
+            param_client_send_32_rw);
+}
+
+bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
+        uint32_t operation, double param)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service, operation, rw, &param,
+            param_client_send_double_rw);
 }
 
 /* TODO: improve error handling */
@@ -126,7 +171,7 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
     uint32_t param1 = READ_MODE;
     zmsg_t *report;
 
-    err = param_client_send_rw (self, service, operation, param1,
+    err = param_client_send_32_rw (self, service, operation, param1,
             0 /* in read mode this value will be ignored */);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
