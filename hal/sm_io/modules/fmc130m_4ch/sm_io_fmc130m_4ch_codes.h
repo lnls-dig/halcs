@@ -84,9 +84,9 @@
 #define FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL             "ad9510_pll_clk_sel"
 #define FMC130M_4CH_OPCODE_SI571_SET_FREQ               34
 #define FMC130M_4CH_NAME_SI571_SET_FREQ                 "si571_set_freq"
-#define FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS           34
+#define FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS           35
 #define FMC130M_4CH_NAME_SI571_GET_DEFAULTS             "si571_get_defaults"
-#define FMC130M_4CH_OPCODE_END                          35
+#define FMC130M_4CH_OPCODE_END                          36
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_SIZE                          (sizeof(uint32_t))
