@@ -120,6 +120,19 @@
 #define AD9510_PLL_B_LSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_B_LSB_COUNTER_SHIFT, \
                                                                    AD9510_PLL_B_LSB_COUNTER_SIZE)
 
+/* For software only */
+#define AD9510_PLL_B_COUNTER_SIZE                   13
+#define AD9510_PLL_B_COUNTER_SHIFT                  0
+#define AD9510_PLL_B_COUNTER_MASK                   WBGEN2_GEN_MASK(AD9510_PLL_B_COUNTER_SHIFT, \
+                                                           AD9510_PLL_B_COUNTER_SIZE)
+#define AD9510_PLL_B_COUNTER_W(value)               WBGEN2_GEN_WRITE(value, AD9510_PLL_B_COUNTER_SHIFT, \
+                                                           AD9510_PLL_B_COUNTER_SIZE)
+#define AD9510_PLL_B_COUNTER_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_B_COUNTER_SHIFT, \
+                                                                       AD9510_PLL_B_COUNTER_SIZE)
+
+/* Fictitious register, for software only */
+#define AD9510_PLL_B_MIN_VALUE                      3
+
 #define AD9510_REG_PLL_1                            0x07
 
 /* Definition for register AD9510_REG_PLL_1_LOR */
@@ -190,6 +203,19 @@
 #define AD9510_PLL_3_CP_CURRENT_R(reg)              WBGEN2_GEN_READ(reg, AD9510_PLL_3_CP_CURRENT_SHIFT, \
                                                                     AD9510_PLL_3_CP_CURRENT_SIZE)
 
+/* For software only */
+#define AD9510_PLL3_CP_CURRENT_600                  600 /* uA */
+#define AD9510_PLL3_CP_CURRENT_1200                 1200 /* uA */
+#define AD9510_PLL3_CP_CURRENT_1800                 1800 /* uA */
+#define AD9510_PLL3_CP_CURRENT_2400                 2400 /* uA */
+#define AD9510_PLL3_CP_CURRENT_3000                 3000 /* uA */
+#define AD9510_PLL3_CP_CURRENT_3600                 3600 /* uA */
+#define AD9510_PLL3_CP_CURRENT_4200                 4200 /* uA */
+#define AD9510_PLL3_CP_CURRENT_4800                 4800 /* uA */
+#define AD9510_PLL3_CP_CURRENT_NUM                  8
+#define AD9510_PLL3_CP_CURRENT_MIN                  AD9510_PLL3_CP_CURRENT_600
+#define AD9510_PLL3_CP_CURRENT_MAX                  AD9510_PLL3_CP_CURRENT_4800
+
 #define AD9510_REG_PLL_4                            0x0A
 
 /* Definition for register AD9510_REG_PLL_4 */
@@ -201,6 +227,13 @@
                                                          AD9510_PLL_4_PLL_PDOWN_SIZE)
 #define AD9510_PLL_4_PLL_PDOWN_R(reg)               WBGEN2_GEN_READ(reg, AD9510_PLL_4_PLL_PDOWN_SHIFT, \
                                                                      AD9510_PLL_4_PLL_PDOWN_SIZE)
+
+/* For software only */
+#define AD9510_PLL_PDOWN_NORMAL_OP1                 0
+#define AD9510_PLL_PDOWN_ASYNC                      1
+#define AD9510_PLL_PDOWN_NORMAL_OP2                 2
+#define AD9510_PLL_PDOWN_SYNC                       3
+#define AD9510_PLL_PDOWN_MAX_VAL                    AD9510_PLL_PDOWN_SYNC
 
 #define AD9510_PLL_4_PRESCALER_P_SIZE               3
 #define AD9510_PLL_4_PRESCALER_P_SHIFT              2
@@ -239,6 +272,16 @@
                                                        AD9510_PLL_R_LSB_COUNTER_SIZE)
 #define AD9510_PLL_R_LSB_COUNTER_R(reg)             WBGEN2_GEN_READ(reg, AD9510_PLL_R_LSB_COUNTER_SHIFT, \
                                                                    AD9510_PLL_R_LSB_COUNTER_SIZE)
+
+/* For software only */
+#define AD9510_PLL_R_COUNTER_SIZE                   14
+#define AD9510_PLL_R_COUNTER_SHIFT                  0
+#define AD9510_PLL_R_COUNTER_MASK                   WBGEN2_GEN_MASK(AD9510_PLL_R_COUNTER_SHIFT, \
+                                                           AD9510_PLL_R_COUNTER_SIZE)
+#define AD9510_PLL_R_COUNTER_W(value)               WBGEN2_GEN_WRITE(value, AD9510_PLL_R_COUNTER_SHIFT, \
+                                                           AD9510_PLL_R_COUNTER_SIZE)
+#define AD9510_PLL_R_COUNTER_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_R_COUNTER_SHIFT, \
+                                                                       AD9510_PLL_R_COUNTER_SIZE)
 
 #define AD9510_REG_PLL_5                            0x0A
 
@@ -316,6 +359,28 @@
 #define AD9510_LVDS_CMOS_INV_CMOS                   WBGEN2_GEN_MASK(AD9510_LVDS_CMOS_INV_CMOS_SHIFT, \
                                                                          AD9510_LVDS_CMOS_INV_CMOS_SIZE)
 
+/* For software only */
+#define AD9510_REG_OUTPUT_START                     AD9510_REG_LVPECL_OUT0
+
+#define AD9510_NUM_LVPECL_OUTPUTS                   4
+#define AD9510_NUM_LVDS_LVCMOS_OUTPUTS              4
+#define AD9510_NUM_OUTPUTS                          (AD9510_NUM_LVPECL_OUTPUTS + \
+                                                                AD9510_NUM_LVDS_LVCMOS_OUTPUTS)
+
+#define AD9510_OUTPUT_EN_SIZE                       8
+#define AD9510_OUTPUT_EN_SHIFT                      0
+#define AD9510_OUTPUT_EN_MASK                       WBGEN2_GEN_MASK(AD9510_OUTPUT_EN_SHIFT, \
+                                                                AD9510_OUTPUT_EN_SIZE)
+#define AD9510_OUTPUT_EN_W(value)                   WBGEN2_GEN_WRITE(value, AD9510_OUTPUT_EN_SHIFT, \
+                                                                AD9510_OUTPUT_EN_SIZE)
+#define AD9510_OUTPUT_EN_R(reg)                     WBGEN2_GEN_READ(reg, AD9510_OUTPUT_EN_SHIFT, \
+                                                                AD9510_OUTPUT_EN_SIZE)
+
+#define AD9510_OUTPUT_EN_LSB_SIZE                   1
+#define AD9510_OUTPUT_EN_LSB_SHIFT                  0
+#define AD9510_OUTPUT_EN_LSB_MASK                   WBGEN2_GEN_MASK(AD9510_OUTPUT_EN_LSB_SHIFT, \
+                                                            AD9510_OUTPUT_EN_LSB_SIZE)
+
 #define AD9510_REG_CLK_OPT                          0x45
 
 /* Definition for register AD9510_REG_CLK_OPT */
@@ -348,6 +413,13 @@
 #define AD9510_CLK_OPT_ALLCLKS_PD_SIZE              1
 #define AD9510_CLK_OPT_ALLCLKS_PD                   WBGEN2_GEN_MASK(AD9510_CLK_OPT_ALLCLKS_PD_SHIFT,\
                                                                         AD9510_CLK_OPT_ALLCLKS_PD_SIZE)
+
+/* For software only */
+#define AD9510_PLL_NUM_PLL_CLKS                     2
+#define AD9510_PLL_CLK1_SEL                         1
+#define AD9510_PLL_CLK2_SEL                         2
+#define AD9510_PLL_CLK_MIN_SEL                      AD9510_PLL_CLK1_SEL
+#define AD9510_PLL_CLK_MAX_SEL                      AD9510_PLL_CLK2_SEL
 
 #define AD9510_REG_DIV0_DCYCLE                      0x48
 #define AD9510_REG_DIV1_DCYCLE                      0x4A
