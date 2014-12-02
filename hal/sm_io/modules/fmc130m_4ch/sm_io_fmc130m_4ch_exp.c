@@ -908,13 +908,13 @@ disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp = {
 /* Macros to avoid repetition of the function body Si57X */
 typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
 
-#define FMC130M_4CH_SI57X_FUNC_NAME(func_name)                                  \
-    _fmc130m_4ch_si57x_ ## func_name
+#define FMC130M_4CH_SI571_FUNC_NAME(func_name)                                  \
+    _fmc130m_4ch_si571_ ## func_name
 
-#define FMC130M_4CH_SI57X_FUNC_NAME_HEADER(func_name)                           \
-    static int FMC130M_4CH_SI57X_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
+#define FMC130M_4CH_SI571_FUNC_NAME_HEADER(func_name)                           \
+    static int FMC130M_4CH_SI571_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-#define FMC130M_4CH_SI57X_FUNC_BODY(owner, args, ret, func, error_msg)          \
+#define FMC130M_4CH_SI571_FUNC_BODY(owner, args, ret, func, error_msg)          \
     do {                                                                        \
         (void) ret;                                                             \
         assert (owner);                                                         \
@@ -939,9 +939,9 @@ err_smpr_write:                                                                 
                                                                                 \
     } while(0)
 
-FMC130M_4CH_SI57X_FUNC_NAME_HEADER(set_freq)
+FMC130M_4CH_SI571_FUNC_NAME_HEADER(set_freq)
 {
-    FMC130M_4CH_SI57X_FUNC_BODY(owner, args, ret, smch_si57x_set_freq,
+    FMC130M_4CH_SI571_FUNC_BODY(owner, args, ret, smch_si57x_set_freq,
             "Could not set SI571 frequency");
 }
 
@@ -993,7 +993,7 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_ad9510_cp_current_exp,
     &fmc130m_4ch_ad9510_outputs_exp,
     &fmc130m_4ch_ad9510_pll_clk_sel_exp,
-    &fmc130m_4ch_si57x_set_freq_exp,
+    &fmc130m_4ch_si571_set_freq_exp,
     &disp_op_end
 };
 
