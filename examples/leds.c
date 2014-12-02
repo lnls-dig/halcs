@@ -15,7 +15,7 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            10
+#define MAX_BOARD_NUMBER            5
 
 void print_help (char *program_name)
 {
