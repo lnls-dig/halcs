@@ -108,11 +108,37 @@ smch_err_e smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
+smch_err_e smch_ad9510_write_8_update (smch_ad9510_t *self, uint8_t addr,
+        const uint8_t *data)
+{
+    smch_err_e err = (_smch_ad9510_write_8 (self, addr, data) == sizeof(uint8_t))?
+        SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+
+    if (err != SMCH_SUCCESS) {
+        return err;
+    }
+
+    return _smch_ad9510_reg_update (self);
+}
+
 smch_err_e smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
         uint8_t *data)
 {
     return (_smch_ad9510_read_8 (self, addr, data) == sizeof(uint8_t))?
         SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+}
+
+smch_err_e smch_ad9510_read_8_update (smch_ad9510_t *self, uint8_t addr,
+        uint8_t *data)
+{
+    smch_err_e err = (_smch_ad9510_read_8 (self, addr, data) == sizeof(uint8_t))?
+        SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+
+    if (err != SMCH_SUCCESS) {
+        return err;
+    }
+
+    return _smch_ad9510_reg_update (self);
 }
 
 smch_err_e smch_ad9510_reg_update (smch_ad9510_t *self)
@@ -259,20 +285,263 @@ err_smpr_write:
     return err;
 }
 
-smch_err_e smch_ad9510_div_out0 (smch_ad9510_t *self, uint32_t div)
+smch_err_e smch_ad9510_pll_a_div (smch_ad9510_t *self, uint32_t div)
 {
-    (void) div;
     smch_err_e err = SMCH_SUCCESS;
-    ssize_t rw_err = -1;
 
-    /* Reset registers,
-     * Turn on Long Instruction bit */
-    uint8_t data = 0x11;
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
-            "[sm_ch:ad9510] Writing 0x%02X to addr 0x%02X\n", data, 0x50);
-    rw_err = _smch_ad9510_write_8 (self, 0x50, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to 0x50",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
+    ASSERT_TEST(div < AD9510_PLL_A_COUNTER_MASK+1 ,
+            "PLL A divider is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = AD9510_PLL_A_COUNTER_W(div);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_A_COUNTER, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_ad9510_pll_b_div (smch_ad9510_t *self, uint32_t div)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    /* Divider can by 0 (bypass mode) or between the specified limits */
+    ASSERT_TEST(div == 0 || (div > AD9510_PLL_B_MIN_VALUE-1 &&
+            div < AD9510_PLL_B_COUNTER_MASK+1),
+            "PLL B divider is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = 0;
+    if (div == 0) {
+        _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
+
+        data |= AD9510_PLL_4_B_BYPASS;
+        _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+    }
+    else {
+        /* Extract MSB part of the divider */
+        data = AD9510_PLL_B_MSB_COUNTER_W(div >>
+                AD9510_PLL_B_LSB_COUNTER_SIZE);
+        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
+
+        /* Extract LSB part of the divider */
+        data = AD9510_PLL_B_LSB_COUNTER_W(div);
+        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+    }
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_ad9510_pll_prescaler (smch_ad9510_t *self, uint32_t pre)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
+
+    data = (data & ~AD9510_PLL_4_PRESCALER_P_MASK) |
+        AD9510_PLL_4_PRESCALER_P_W(pre);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+    return err;
+}
+
+/* PLL power-down:
+ * ctl = 0 -> Normal operation
+ * ctl = 1 -> Asynchronous power-down
+ * ctl = 2 -> Normal operation
+ * ctl = 3 -> Synchronous power-down
+ * */
+smch_err_e smch_ad9510_pll_pdown (smch_ad9510_t *self, uint32_t pdown)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(pdown < AD9510_PLL_PDOWN_SYNC+1,
+            "PLL Power Down command is invalid", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
+
+    data = (data & ~AD9510_PLL_4_PLL_PDOWN_MASK) |
+        AD9510_PLL_4_PLL_PDOWN_W(pdown);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_ad9510_mux_status (smch_ad9510_t *self, uint32_t mux)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_2, &data);
+
+    data = (data & ~AD9510_PLL_2_MUX_SEL_MASK) |
+        AD9510_PLL_2_MUX_SEL_W(mux);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_2, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+    return err;
+}
+
+smch_err_e smch_ad9510_r_div (smch_ad9510_t *self, uint32_t div)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(div < AD9510_PLL_R_COUNTER_MASK+1 ,
+            "PLL R divider is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = AD9510_PLL_R_MSB_COUNTER_W(div >>
+            AD9510_PLL_R_LSB_COUNTER_SIZE);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_MSB_COUNTER, &data);
+    data = AD9510_PLL_R_LSB_COUNTER_W(div);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_LSB_COUNTER, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+/* Charge Pump Current.
+ * cp_current between 600 uA and 4800 uA*/
+smch_err_e smch_ad9510_cp_current (smch_ad9510_t *self, uint32_t cp_current)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(cp_current > AD9510_PLL3_CP_CURRENT_MIN-1 &&
+            cp_current < AD9510_PLL3_CP_CURRENT_MAX+1 &&
+            cp_current % AD9510_PLL3_CP_CURRENT_MIN == 0,
+            "PLL Charge Pump current is invalid or out of range",
+            err_smpr_write, SMCH_ERR_INV_FUNC_PARAM);
+
+    /* If we are here, cp_current has one of the possible CP current
+     * values. Just read the register and write the new CP value */
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_3, &data);
+
+    data = (data & ~AD9510_PLL_3_CP_CURRENT_MASK) |
+        /* Get the respective code to be written in the register */
+        AD9510_PLL_3_CP_CURRENT_W(
+            cp_current/AD9510_PLL3_CP_CURRENT_MIN - 1);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_2, &data);
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+/* Enable or disable an AD9510 output.
+ * out_en parameter is a bitmask with the following meaning:
+ * bit 1 = output enable
+ * bit 0 = output disabled*/
+smch_err_e smch_ad9510_outputs (smch_ad9510_t *self, uint32_t out_en)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(out_en < AD9510_OUTPUT_EN_MASK+1 ,
+            "Output enable selection is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint32_t __out_en = AD9510_OUTPUT_EN_R(out_en);
+    uint8_t data = 0;
+
+    uint32_t i;
+    /* LVPECL outputs */
+    for (i = 0; i < AD9510_NUM_LVPECL_OUTPUTS; ++i, __out_en >>=
+            AD9510_OUTPUT_EN_LSB_SIZE) {
+
+        _smch_ad9510_read_8 (self, AD9510_REG_OUTPUT_START+i, &data);
+
+        /* Output disabled */
+        if ((__out_en & AD9510_OUTPUT_EN_LSB_MASK) == 0) {
+            data = (data & ~AD9510_LVPECL_OUT_PDOWN_MASK) |
+                AD9510_LVPECL_OUT_PDOWN_W(0x02); /* Safe power down */
+        }
+        /* Output enabled */
+        else {
+            data = (data & ~AD9510_LVPECL_OUT_PDOWN_MASK) |
+                AD9510_LVPECL_OUT_PDOWN_W(0x00); /* Power up */
+        }
+        _smch_ad9510_write_8 (self, AD9510_REG_OUTPUT_START+i, &data);
+    }
+
+    /* LVDS/CMOS Outputs */
+    for ( ; i < AD9510_NUM_OUTPUTS; ++i, __out_en >>=
+            AD9510_OUTPUT_EN_LSB_SIZE) {
+        data = 0;
+        _smch_ad9510_read_8 (self, AD9510_REG_OUTPUT_START+i, &data);
+
+        /* Output disabled */
+        if ((__out_en & AD9510_OUTPUT_EN_LSB_MASK) == 0) {
+            data &= AD9510_LVDS_CMOS_PDOWN;
+        }
+        /* Output enabled */
+        else {
+            data |= AD9510_LVDS_CMOS_PDOWN;
+        }
+        _smch_ad9510_write_8 (self, AD9510_REG_OUTPUT_START+i, &data);
+    }
+
+    _smch_ad9510_reg_update (self);
+    /* Wait for reset to complete */
+    SMCH_AD9510_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_ad9510_pll_clk_sel (smch_ad9510_t *self, uint32_t clk_num)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    ASSERT_TEST(clk_num > AD9510_PLL_CLK_MIN_SEL-1 &&
+            clk_num < AD9510_PLL_CLK_MAX_SEL+1,
+            "Clock number is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_CLK_OPT, &data);
+
+    switch (clk_num) {
+        case AD9510_PLL_CLK1_SEL:
+            data |= AD9510_CLK_OPT_SEL_CLK1;
+            break;
+        case AD9510_PLL_CLK2_SEL:
+            data &= ~AD9510_CLK_OPT_SEL_CLK1;
+            break;
+        default:
+            data |= AD9510_CLK_OPT_SEL_CLK1;
+    }
+
+    _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
 
     _smch_ad9510_reg_update (self);
     /* Wait for reset to complete */
@@ -315,9 +584,6 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
 err_smpr_write:
     return err;
 }
-
-
-/***************** Static functions *****************/
 
 static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         const uint8_t *data)
