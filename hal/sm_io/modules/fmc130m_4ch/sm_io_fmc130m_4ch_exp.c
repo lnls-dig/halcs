@@ -109,9 +109,12 @@ static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
     FMC130M_4CH_CHECK_ACTIVE(self);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
-            "_fmc130m_4ch_ad9510_cgf_defaults\n");
-    smch_ad9510_cfg_defaults (smch_ad9510);
+            "_fmc130m_4ch_ad9510_cfg_defaults\n");
+    smch_err_e serr = smch_ad9510_cfg_defaults (smch_ad9510);
+    ASSERT_TEST(serr == SMCH_SUCCESS, "Could not config AD9510 defaults",
+            err_smpr_write, -FMC130M_4CH_ERR);
 
+err_smpr_write:
     return err;
 }
 
@@ -695,6 +698,266 @@ disp_op_t fmc130m_4ch_si571_oe_exp = {
     }
 };
 
+/******************************** Chips Export functions *************************/
+
+/* Macros to avoid repetition of the function body AD9510 */
+typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t param);
+
+#define FMC130M_4CH_AD9510_FUNC_NAME(func_name)                                 \
+    _fmc130m_4ch_ad9510_ ## func_name
+
+#define FMC130M_4CH_AD9510_FUNC_NAME_HEADER(func_name)                          \
+    static int FMC130M_4CH_AD9510_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
+
+#define FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, func, error_msg)         \
+    do {                                                                        \
+        (void) ret;                                                             \
+        assert (owner);                                                         \
+        assert (args);                                                          \
+                                                                                \
+        int err = -FMC130M_4CH_OK;                                              \
+        SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
+        smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);                 \
+        uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
+        (void) rw;  /* Ignored for now */                                       \
+        uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+                                                                                \
+        FMC130M_4CH_CHECK_ACTIVE(self);                                         \
+                                                                                \
+        /* Call specific function */                                            \
+        smch_err_e serr = ((smch_ad9510_func_fp) func) (smch_ad9510, param);    \
+        ASSERT_TEST(serr == SMCH_SUCCESS, error_msg,                            \
+                err_smpr_write, -FMC130M_4CH_ERR);                              \
+                                                                                \
+err_smpr_write:                                                                 \
+        return err;                                                             \
+                                                                                \
+    } while(0)
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_a_div)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_a_div,
+            "Could not set AD9510 PLL A divider");
+}
+
+disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_b_div)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_b_div,
+            "Could not set AD9510 PLL B divider");
+}
+
+disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_prescaler)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_prescaler,
+            "Could not set AD9510 PLL Prescaler");
+}
+
+disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(r_div)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_r_div,
+            "Could not set AD9510 R Divider");
+}
+
+disp_op_t fmc130m_4ch_ad9510_r_div_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_R_DIV,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_R_DIV,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(r_div),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_pdown)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_pdown,
+            "Could not power down AD9510 PLL");
+}
+
+disp_op_t fmc130m_4ch_ad9510_pll_pdown_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_pdown),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(mux_status)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_mux_status,
+            "Could not set AD9510 MUX status");
+}
+
+disp_op_t fmc130m_4ch_ad9510_mux_status_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_MUX_STATUS,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(mux_status),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(cp_current)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_cp_current,
+            "Could not set AD9510 CP current");
+}
+
+disp_op_t fmc130m_4ch_ad9510_cp_current_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_CP_CURRENT,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(outputs)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_outputs,
+            "Could not set AD9510 Outputs");
+}
+
+disp_op_t fmc130m_4ch_ad9510_outputs_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_OUTPUTS,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(outputs),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_clk_sel)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_clk_sel,
+            "Could not set AD9510 PLL CLK selection");
+}
+
+disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
+    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_clk_sel),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+/* Macros to avoid repetition of the function body Si57X */
+typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
+
+#define FMC130M_4CH_SI57X_FUNC_NAME(func_name)                                  \
+    _fmc130m_4ch_si57x_ ## func_name
+
+#define FMC130M_4CH_SI57X_FUNC_NAME_HEADER(func_name)                           \
+    static int FMC130M_4CH_SI57X_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
+
+#define FMC130M_4CH_SI57X_FUNC_BODY(owner, args, ret, func, error_msg)          \
+    do {                                                                        \
+        (void) ret;                                                             \
+        assert (owner);                                                         \
+        assert (args);                                                          \
+                                                                                \
+        int err = -FMC130M_4CH_OK;                                              \
+        SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
+        smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(self);                    \
+        uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
+        (void) rw;  /* Ignored for now */                                       \
+        uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+                                                                                \
+        FMC130M_4CH_CHECK_ACTIVE(self);                                         \
+                                                                                \
+        /* Call specific function */                                            \
+        smch_err_e serr = ((smch_si57x_func_fp) func) (smch_si57x, param);      \
+        ASSERT_TEST(serr == SMCH_SUCCESS, error_msg,                            \
+                err_smpr_write, -FMC130M_4CH_ERR);                              \
+                                                                                \
+err_smpr_write:                                                                 \
+        return err;                                                             \
+                                                                                \
+    } while(0)
+
+FMC130M_4CH_SI57X_FUNC_NAME_HEADER(set_freq)
+{
+    FMC130M_4CH_SI57X_FUNC_BODY(owner, args, ret, smch_si57x_set_freq,
+            "Could not set SI571 frequency");
+}
+
+disp_op_t fmc130m_4ch_si571_set_freq_exp = {
+    .name = FMC130M_4CH_NAME_SI571_SET_FREQ,
+    .opcode = FMC130M_4CH_OPCODE_SI571_SET_FREQ,
+    .func_fp = FMC130M_4CH_SI571_FUNC_NAME(set_freq),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
 const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
@@ -721,6 +984,16 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_adc_dly3_exp,
     &fmc130m_4ch_test_data_en_exp,
     &fmc130m_4ch_si571_oe_exp,
+    &fmc130m_4ch_ad9510_pll_a_div_exp,
+    &fmc130m_4ch_ad9510_pll_b_div_exp,
+    &fmc130m_4ch_ad9510_pll_prescaler_exp,
+    &fmc130m_4ch_ad9510_r_div_exp,
+    &fmc130m_4ch_ad9510_pll_pdown_exp,
+    &fmc130m_4ch_ad9510_mux_status_exp,
+    &fmc130m_4ch_ad9510_cp_current_exp,
+    &fmc130m_4ch_ad9510_outputs_exp,
+    &fmc130m_4ch_ad9510_pll_clk_sel_exp,
+    &fmc130m_4ch_si57x_set_freq_exp,
     &disp_op_end
 };
 
