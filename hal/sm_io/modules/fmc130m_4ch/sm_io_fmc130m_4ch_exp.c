@@ -936,7 +936,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
         smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(self);                    \
         uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
         (void) rw;  /* Ignored for now */                                       \
-        uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+        double param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);                \
                                                                                 \
         FMC130M_4CH_CHECK_ACTIVE(self);                                         \
                                                                                 \
