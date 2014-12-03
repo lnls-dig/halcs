@@ -40,6 +40,17 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
+#define FMC130M_4CH_CHECK_ACTIVE(self)                          \
+    ({                                                          \
+        if (SMIO_FMC130_HANDLER(self)->type !=                  \
+                TYPE_FMC130M_4CH_ACTIVE) {                      \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
+                "Board is not of ACTIVE type. Unimplemented "   \
+                "function for this type of FMC130M_4CH board"); \
+                return -FMC130M_4CH_UNINPL;                     \
+        }                                                       \
+    })
+
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
