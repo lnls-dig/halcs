@@ -493,8 +493,8 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
     unsigned int n1, hs_div;
     double fdco, best_fdco = DBL_MAX;
     double rfreq_tmp;
-    uint16_t rfreq_integer = 0;
-    uint32_t rfreq_frac = 0;
+    uint64_t rfreq_integer = 0;
+    uint64_t rfreq_frac = 0;
     static const uint8_t si57x_hs_div_values [] = { 11, 9, 7, 6, 5, 4 };
 
     uint32_t i;
@@ -542,9 +542,9 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
     }
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_calc_divs] Divider values:\n"
-            "\tfrequency: %f, rfreq: %" PRIu64 ", rfreq_integer: %u, rfreq_frac: %u, "
-           "n1: %u, hs_div: %u\n", frequency, *out_rfreq, rfreq_integer,
-                rfreq_frac, *out_n1, *out_hs_div);
+            "\tfrequency: %f, rfreq: %" PRIu64 ", rfreq_integer: %" PRIu64 ", "
+            "rfreq_frac: %" PRIu64 ", n1: %u, hs_div: %u\n", frequency, *out_rfreq,
+            rfreq_integer, rfreq_frac, *out_n1, *out_hs_div);
 
     return err;
 }
