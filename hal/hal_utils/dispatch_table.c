@@ -52,8 +52,7 @@ const disp_op_t disp_op_end = {
     }
 };
 
-static halutils_err_e _disp_table_insert (disp_table_t *self, uint32_t key,
-        const disp_op_t* disp_op);
+static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
 static void _disp_table_free_item (void *data);
 static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
 static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void *msg);
@@ -104,30 +103,23 @@ halutils_err_e disp_table_destroy (disp_table_t **self_p)
     return HALUTILS_SUCCESS;
 }
 
-halutils_err_e disp_table_insert (disp_table_t *self, uint32_t key,
-        const disp_op_t* disp_op)
+halutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t* disp_op)
 {
-    return _disp_table_insert (self, key, disp_op);
+    return _disp_table_insert (self, disp_op);
 }
 
-/* FIXME: unsafe iteration */
-halutils_err_e disp_table_insert_all (disp_table_t *self, const uint32_t *code_table,
-        const disp_op_t **disp_ops)
+halutils_err_e disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
 {
     assert (self);
     assert (disp_ops);
-    assert (code_table);
 
-    unsigned int i;
     halutils_err_e err = HALUTILS_SUCCESS;
     const disp_op_t** disp_op_it = disp_ops;
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
         "[halutils:disp_table] Preparing to insert function in dispatch table\n");
-    for (i = 0; (*disp_op_it)->func_fp != NULL; ++i, ++disp_op_it) {
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-                "[halutils:disp_table] Inserting function Iteration %u\n", i);
-        halutils_err_e err = _disp_table_insert (self, code_table [i],
-                *disp_op_it);
+
+    for ( ; (*disp_op_it)->func_fp != NULL; ++disp_op_it) {
+        halutils_err_e err = _disp_table_insert (self, *disp_op_it);
         ASSERT_TEST(err == HALUTILS_SUCCESS,
                 "disp_table_insert_all: Could not insert function",
                 err_disp_insert);
@@ -240,22 +232,21 @@ halutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 
 /**** Local helper functions ****/
 
-static halutils_err_e _disp_table_insert (disp_table_t *self, uint32_t key,
-        const disp_op_t *disp_op)
+static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *disp_op)
 {
     assert (self);
     assert (disp_op);
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
             "[halutils:disp_table] Registering function \"%s\" (%p) opcode (%u) "
-            "into dispatch table\n", disp_op->name, disp_op->func_fp, key);
+            "into dispatch table\n", disp_op->name, disp_op->func_fp, disp_op->opcode);
 
     /* FIXME: We want disp_op to be const, but we need to allocate the return value */
     halutils_err_e herr = _disp_table_alloc_ret (disp_op, (void **) &disp_op->ret);
     ASSERT_TEST (herr == HALUTILS_SUCCESS, "Return value could not be allocated",
             err_alloc_ret);
 
-    char *key_c = halutils_stringify_hex_key (key);
+    char *key_c = halutils_stringify_hex_key (disp_op->opcode);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
     int zerr = zhash_insert (self->table_h, key_c, (void *) disp_op);
     ASSERT_TEST(zerr == 0, "Could not insert item into dispatch table",
