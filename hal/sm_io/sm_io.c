@@ -70,7 +70,7 @@ smio_err_e smio_attach (smio_t *self, struct _devio_t *parent)
     self->parent = parent;
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
-    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error", 
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error",
         err_func);
 
 err_func:
@@ -85,7 +85,7 @@ smio_err_e smio_deattach (smio_t *self)
     self->parent = NULL;
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
-    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error", 
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error",
         err_func);
 
 err_func:
@@ -98,21 +98,14 @@ smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
     assert (self);
     assert (smio_exp_ops);
 
-    /* FIXME: Dispatch table disp_table_insert_all implements almost the
-     * same code! Try to reuse it! */
-    const disp_op_t **smio_exp_ops_it = smio_exp_ops;
     smio_err_e err = SMIO_SUCCESS;
-    /* FIXME: Iterator is not very good as it has to check an specific field */
-    for ( ; (*smio_exp_ops_it)->func_fp != NULL; smio_exp_ops_it++) {
-        halutils_err_e herr = disp_table_insert (self->exp_ops_dtable,
-            (*smio_exp_ops_it)->opcode, *smio_exp_ops_it);
 
-        ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export SMIO ops",
-                err_export_op, SMIO_ERR_EXPORT_OP);
-    }
+    halutils_err_e herr = disp_table_insert_all (self->exp_ops_dtable, smio_exp_ops);
+    ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export"
+            " SMIO ops", err_export_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
-    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"export_ops\" function error", 
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"export_ops\" function error",
         err_func);
 
 err_func:
@@ -132,7 +125,7 @@ smio_err_e smio_unexport_ops (smio_t *self)
             err_unexport_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
-    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"unexport_ops\" function error", 
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"unexport_ops\" function error",
         err_func);
 
 err_func:
