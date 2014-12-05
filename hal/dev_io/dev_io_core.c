@@ -133,9 +133,8 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     self->disp_table_thsafe_ops = disp_table_new ();
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
-    /* thsafe_opcodes is define in smio_thsafe_codes.h */
     halutils_err_e halutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
-            thsafe_opcodes, self->thsafe_server_ops);
+            self->thsafe_server_ops);
     ASSERT_TEST(halutils_err==HALUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
