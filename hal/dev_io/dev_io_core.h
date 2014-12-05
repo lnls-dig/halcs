@@ -24,8 +24,6 @@
 #define SMIO_HKEY_LEN                   8
 #define NODES_MAX_LEN                   20
 
-struct _smio_thsafe_server_ops_t;
-
 struct _devio_t {
     /* General information */
     /*mdp_worker_t *worker;*/           /* zeroMQ Majordomo Worker */
@@ -44,7 +42,7 @@ struct _devio_t {
     /* Server part of the llio operations. This is the bridge between the
      * smio client part of the llio operations and the de-facto
      * llio operations */
-    const struct _smio_thsafe_server_ops_t *thsafe_server_ops;
+    const disp_op_t **thsafe_server_ops;
     /* Hash containg all the sm_io objects that
      * this dev_io can handle. It is composed
      * of key (10-char ID) / value (sm_io instance) */
@@ -94,11 +92,12 @@ devio_err_e devio_destroy (devio_t **self_p);
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self);
 /* Register an specific sm_io module to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv);
+devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
+        uint32_t inst_id);
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
 devio_err_e devio_register_all_sm (devio_t *self);
-devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id);
+devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id, uint32_t inst_id);
 devio_err_e devio_unregister_all_sm (devio_t *self);
 /* Initilize poller with all of the initialized PIPE sockets */
 devio_err_e devio_init_poller_sm (devio_t *self);
@@ -114,26 +113,26 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg);
 /********* Low-level generic methods API *********/
 
 /* Open device */
-void *smio_thsafe_server_open (void *owner, void *args);
+int smio_thsafe_server_open (void *owner, void *args, void *ret);
 /* Release device */
-void *smio_thsafe_server_release (void *owner, void *args);
+int smio_thsafe_server_release (void *owner, void *args, void *ret);
 /* Read data from device */
-void *smio_thsafe_server_read_16 (void *owner, void *args);
-void *smio_thsafe_server_read_32 (void *owner, void *args);
-void *smio_thsafe_server_read_64 (void *owner, void *args);
+int smio_thsafe_server_read_16 (void *owner, void *args, void *ret);
+int smio_thsafe_server_read_32 (void *owner, void *args, void *ret);
+int smio_thsafe_server_read_64 (void *owner, void *args, void *ret);
 /* Write data to device */
-void *smio_thsafe_server_write_16 (void *owner, void *args);
-void *smio_thsafe_server_write_32 (void *owner, void *args);
-void *smio_thsafe_server_write_64 (void *owner, void *args);
+int smio_thsafe_server_write_16 (void *owner, void *args, void *ret);
+int smio_thsafe_server_write_32 (void *owner, void *args, void *ret);
+int smio_thsafe_server_write_64 (void *owner, void *args, void *ret);
 /* Read data block from device, size in bytes */
-void *smio_thsafe_server_read_block (void *owner, void *args);
+int smio_thsafe_server_read_block (void *owner, void *args, void *ret);
 /* Write data block from device, size in bytes */
-void *smio_thsafe_server_write_block (void *owner, void *args);
+int smio_thsafe_server_write_block (void *owner, void *args, void *ret);
 /* Read data block via DMA from device, size in bytes */
-void *smio_thsafe_server_read_dma (void *owner, void *args);
+int smio_thsafe_server_read_dma (void *owner, void *args, void *ret);
 /* Write data block via DMA from device, size in bytes */
-void *smio_thsafe_server_write_dma (void *owner, void *args);
+int smio_thsafe_server_write_dma (void *owner, void *args, void *ret);
 /* Read device information */
-/* void *smio_thsafe_server_read_info (void *owner, void *args); */
+/* int smio_thsafe_server_read_info (void *owner, void *args, void *ret); */
 
 #endif

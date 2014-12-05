@@ -7,8 +7,11 @@
 #include "dev_io.h"
 #include "debug_print.h"
 #include "ll_io_utils.h"
+#include "board.h"
 
 #define DEVIO_SERVICE_LEN       50
+
+static devio_err_e spwan_platform_smios (devio_t *devio);
 
 void print_help (char *program_name)
 {
@@ -121,10 +124,14 @@ int main (int argc, char *argv[])
                     "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
             goto err_exit;
         }
-
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
-                dev_id);
     }
+    /* Use the passed ID */
+    else {
+        dev_id = strtoul (dev_id_str, NULL, 10);
+    }
+
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
+            dev_id);
 
     /* We don't need it anymore */
     str_p = &dev_type;
@@ -158,33 +165,9 @@ int main (int argc, char *argv[])
     free (*str_p);
     broker_endp = NULL;
 
-    uint32_t fmc130m_4ch_id = 0x7085ef15;
-    uint32_t acq_id = 0x4519a0ad;
-    uint32_t dsp_id = 0x1bafbf1e;
-    uint32_t swap_id = 0x12897592;
-    devio_err_e err;
-
-    err = devio_register_sm (devio, fmc130m_4ch_id, NULL);
+    devio_err_e err = spwan_platform_smios (devio);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
-        goto err_devio;
-    }
-
-    err = devio_register_sm (devio, acq_id, NULL);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
-        goto err_devio;
-    }
-
-    err = devio_register_sm (devio, dsp_id, NULL);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
-        goto err_devio;
-    }
-
-    err = devio_register_sm (devio, swap_id, NULL);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] spwan_platform_smios error!\n");
         goto err_devio;
     }
 
@@ -224,3 +207,76 @@ err_exit:
     free (*str_p);
     return 0;
 }
+
+static devio_err_e spwan_platform_smios (devio_t *devio)
+{
+    assert (devio);
+
+    uint32_t fmc130m_4ch_id = 0x7085ef15;
+    uint32_t acq_id = 0x4519a0ad;
+    uint32_t dsp_id = 0x1bafbf1e;
+    uint32_t swap_id = 0x12897592;
+    devio_err_e err;
+
+    /* ML605 or AFCv3 */
+#if defined (__BOARD_ML605__) || defined (__BOARD_AFCV3__)
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning default SMIOs ...\n");
+    err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, dsp_id, DSP1_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, swap_id, DSP1_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+    /* AFCv3 spefific */
+#if defined (__BOARD_AFCV3__)
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning AFCv3 specific SMIOs ...\n");
+
+    err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, dsp_id, DSP2_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, swap_id, DSP2_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+#endif
+#else
+#error "Board not supported!"
+#endif
+
+err_register_sm:
+    return err;
+}
+

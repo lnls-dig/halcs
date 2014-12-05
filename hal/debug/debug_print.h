@@ -22,7 +22,7 @@ void debug_print_vec (const char *fmt, const char *data, int len);
 void debug_log_print (int dbg_lvl, const char *fmt, ...) __attribute__((format(printf,2,3)));
 /* Set the output logfile Defaults to STDOUT */
 void debug_set_log_file (FILE *log_file);
-int debug_set_log (const char *log_file_name);
+int debug_set_log (const char *log_file_name, const char *mode);
 void debug_log_print_zmq_msg (struct _zmsg_t *msg);
 
 /********************** Debug macros  **********************/

@@ -41,8 +41,8 @@
  * more byte allocated */
 #define EXTRA_SMIO_SERV_BYTES       1
 
-static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx,
-        void *pipe, char *broker, char *service, int verbose);
+static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
+        void *pipe, char *service);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
 static smio_err_e _smio_loop (smio_t *self);
 
@@ -61,8 +61,10 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *smio_service = halutils_concat_strings (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, ':');
+    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = halutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
@@ -70,32 +72,36 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
             "allocating resources ...\n", smio_service);
 
-    smio_t *self = _smio_new (th_args->parent, ctx, pipe, th_args->broker,
-            smio_service, th_args->verbose);
+    smio_t *self = _smio_new (th_args, ctx, pipe, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
-    SMIO_DISPATCH_FUNC_WRAPPER (init);
+    smio_err_e err = SMIO_DISPATCH_FUNC_WRAPPER (init);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
     /* Atach this SMIO instance to its parent */
-    smio_attach (self, th_args->parent);
+    err = smio_attach (self, th_args->parent);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
 
     /* Export SMIO specific operations */
-    smio_err_e err = smio_export_ops (self, self->exp_ops);
+    err = smio_export_ops (self, self->exp_ops);
     ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
             err_smio_export);
 
     /* Main loop request-action */
-    _smio_loop (self);
+    err = _smio_loop (self);
+    ASSERT_TEST (err == SMIO_SUCCESS, "Could not loop the SMIO messages",
+            err_smio_loop);
 
+err_smio_loop:
     /* Unexport SMIO specific operations */
     smio_unexport_ops (self);
+err_smio_export:
     /* Deattach this SMIO instance to its parent */
     smio_deattach (self);
+err_call_attach:
     /* FIXME: Poll PIPE sockets and on receiving any message calls shutdown () */
     SMIO_DISPATCH_FUNC_WRAPPER (shutdown);
-
-err_smio_export:
-    /* FIXME: check for return error */
+err_call_init:
     /* Destroy what we did in _smio_new */
     _smio_destroy (&self);
 err_self_alloc:
@@ -106,6 +112,8 @@ err_self_alloc:
             smio_service);
     free (smio_service);
 err_smio_service_alloc:
+    free (inst_id_str);
+err_inst_id_str_alloc:
     free (th_args);
     return;
 }
@@ -122,8 +130,10 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *smio_service = halutils_concat_strings (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, ':');
+    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = halutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
@@ -138,6 +148,8 @@ void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
             "exiting\n", smio_service);
     free (smio_service);
 err_smio_service_alloc:
+    free (inst_id_str);
+err_inst_id_str_alloc:
     free (th_args);
     return;
 }
@@ -146,10 +158,10 @@ err_smio_service_alloc:
 /************ SMIO Bootstrap wrapper functions **************/
 /************************************************************/
 
-struct _smio_t *smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
-        char *broker, char *service, int verbose)
+struct _smio_t *smio_new (th_boot_args_t* args, struct _zctx_t *ctx, void *pipe,
+        char *service)
 {
-    return _smio_new (parent, ctx, pipe, broker, service, verbose);
+    return _smio_new (args, ctx, pipe, service);
 }
 
 smio_err_e smio_destroy (struct _smio_t **self_p)
@@ -167,11 +179,9 @@ smio_err_e smio_loop (struct _smio_t *self)
 /************************************************************/
 
 /* Boot new sm_io instance of fmc130m_4ch */
-static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx, void *pipe,
-        char *broker, char *service, int verbose)
+static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
+        void *pipe, char *service)
 {
-    (void) parent;
-
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -187,11 +197,15 @@ static struct _smio_t *_smio_new (struct _devio_t *parent, struct _zctx_t *ctx, 
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->ctx = ctx;
     self->pipe = pipe;
+    self->inst_id = args->inst_id;
+
+    /* Initialize SMIO base address */
+    self->base = args->base;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
-            broker, service, verbose);
-    self->worker = mdp_worker_new (self->ctx, broker, service, verbose);
+            args->broker, service, args->verbose);
+    self->worker = mdp_worker_new (self->ctx, args->broker, service, args->verbose);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
     ASSERT_ALLOC(self->worker, err_worker_alloc);
 
@@ -243,10 +257,14 @@ static smio_err_e _smio_loop (smio_t *self)
         zframe_t *reply_to = NULL;
         zmsg_t *request = mdp_worker_recv (self->worker, &reply_to);
 
-        if (request == NULL)
+        if (request == NULL) {
             break;                          /* Worker has been interrupted */
+        }
 
-        exp_msg_zmq_t smio_args = {.msg = &request, .reply_to = reply_to};
+        exp_msg_zmq_t smio_args = {
+            .tag = EXP_MSG_ZMQ_TAG,
+            .msg = &request,
+            .reply_to = reply_to};
         err = smio_do_op (self, &smio_args);
 
         /* What can I do in case of error ?*/
@@ -255,6 +273,10 @@ static smio_err_e _smio_loop (smio_t *self)
                     "[sm_io_bootstrap] smio_do_op: %s\n",
                     smio_err_str (err));
         }
+
+        /* Cleanup */
+        zframe_destroy (&reply_to);
+        zmsg_destroy (&request);
     }
 
     return err;

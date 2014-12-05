@@ -39,6 +39,8 @@
 
 /* Register Low-level operations to llio instance. Helpper function */
 static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **llio_ops);
+/* Unregister Low-level operations to llio instance. Helpper function */
+static llio_err_e _llio_unregister_ops (const llio_ops_t **ops);
 
 /* Creates a new instance of the Low-level I/O */
 llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
@@ -96,14 +98,7 @@ llio_err_e llio_destroy (llio_t **self_p)
         llio_t *self = *self_p;
 
         /* Starting destructing by the last resource */
-
-        /* We must release the device structures by calling the
-         * registered function */
-        if (self->ops->release) {
-            /* TODO: remove self->endpoint parameter (unused!)*/
-            self->ops->release (self, self->endpoint);
-        }
-
+        _llio_unregister_ops (&self->ops);
         /* llio_dev_info_destroy (&self->dev_info); Moved to dev_io */
         llio_endpoint_destroy (&self->endpoint);
         free (self->name);
@@ -149,6 +144,13 @@ static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **ops)
     }
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io] Ops set\n");
+    return LLIO_SUCCESS;
+}
+
+static llio_err_e _llio_unregister_ops (const llio_ops_t **ops)
+{
+    *ops = NULL;
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io] Ops unset\n");
     return LLIO_SUCCESS;
 }
 

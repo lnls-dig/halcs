@@ -10,18 +10,18 @@
 
 #include "dev_io_core.h"
 #include "sm_io_thsafe_codes.h"
+#include "thsafe_msg_zmq.h"
 
 /* Somewhat arbitrary maximum block size for read_block funtions */
-#define MAX_BLOCK_SIZE          131072
+#define ZMQ_SERVER_BLOCK_SIZE       131072
 
-/* For use by smio_t general structure */
-extern const smio_thsafe_server_ops_t smio_thsafe_zmq_server_ops;
-
-struct _zmq_server_args_t {
-    zmsg_t **msg;
-    void *reply_to;
+struct _zmq_server_data_block_t {
+    uint8_t data[ZMQ_SERVER_BLOCK_SIZE];
 };
 
-typedef struct _zmq_server_args_t zmq_server_args_t;
+typedef struct _zmq_server_data_block_t zmq_server_data_block_t;
+
+/* For use by smio_t general structure */
+extern const disp_op_t *smio_thsafe_zmq_server_ops [];
 
 #endif

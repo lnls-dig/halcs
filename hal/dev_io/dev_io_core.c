@@ -12,7 +12,8 @@
 #include "dev_io_err.h"
 #include "hal_assert.h"
 #include "sm_io_mod_dispatch.h"
-#include "smio_thsafe_zmq_server.h"
+#include "msg.h"
+#include "rw_param.h"
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
 #include "ll_io_utils.h"
@@ -41,8 +42,9 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io_core]",             \
             devio_err_str (err_type))
 
-#define LLIO_STR ":LLIO\0"
-#define DEVIO_POLLER_TIMEOUT 100        /* in msec */
+#define LLIO_STR                            ":LLIO\0"
+#define DEVIO_POLLER_TIMEOUT                100        /* in msec */
+#define DEVIO_DFLT_LOG_MODE                 "w"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -52,9 +54,8 @@ static void _devio_destroy_smio (devio_t *self, uint32_t smio_id);
 static void _devio_destroy_smio_all (devio_t *self);
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose,
-        const char *log_file_name)
+devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
+        char *endpoint_broker, int verbose, const char *log_file_name)
 {
     assert (name);
     assert (endpoint_dev);
@@ -62,7 +63,7 @@ devio_t * devio_new (char *name, char *endpoint_dev,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_file_name);
+    debug_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     char *dev_type_c = llio_type_to_str (type);
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
@@ -89,7 +90,7 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     self->poller = zpoller_new (NULL);
     ASSERT_ALLOC(self->poller, err_poller_alloc);
 
-	/* Setup new poller. It uses the low-level zmq_poll API */
+    /* Setup new poller. It uses the low-level zmq_poll API */
     self->poller2 = NULL;
 
     /* Initilize mdp_worrker last, as we need to have everything ready
@@ -122,7 +123,7 @@ devio_t * devio_new (char *name, char *endpoint_dev,
 
     /* Init sm_io_thsafe_server_ops_h. For now, we assume we want zmq
      * for exchanging messages between smio and devio instances */
-    self->thsafe_server_ops = &smio_thsafe_zmq_server_ops;
+    self->thsafe_server_ops = smio_thsafe_zmq_server_ops;
 
     /* Init sm_io_h hash */
     self->sm_io_h = zhash_new ();
@@ -132,10 +133,9 @@ devio_t * devio_new (char *name, char *endpoint_dev,
     self->disp_table_thsafe_ops = disp_table_new ();
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
-    disp_table_func_fp *thsafe_server_fp = (disp_table_func_fp *) (self->thsafe_server_ops);
-    const uint32_t *thsafe_opcodes_p = thsafe_opcodes;
+    /* thsafe_opcodes is define in smio_thsafe_codes.h */
     halutils_err_e halutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
-            thsafe_server_fp, thsafe_opcodes_p, THSAFE_OPCODE_END);
+            thsafe_opcodes, self->thsafe_server_ops);
     ASSERT_TEST(halutils_err==HALUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
@@ -224,7 +224,8 @@ devio_err_e devio_print_info (devio_t *self)
 }
 
 /* Register an specific sm_io modules to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
+devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
+        uint32_t inst_id)
 {
     assert (self);
 
@@ -270,7 +271,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
         th_args->broker = self->endpoint_broker;
         th_args->service = self->name;
         th_args->verbose = self->verbose;
-        th_args->priv = priv;
+        th_args->base = base;
+        th_args->inst_id = inst_id;
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Calling boot func\n");
@@ -313,6 +315,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, void *priv)
         th_config_args->smio_id = i;
         th_config_args->service = self->name;
         th_config_args->log_file = self->log_file;
+        th_config_args->inst_id = inst_id;
 
         config_pipe = zthread_fork (self->ctx, smio_config_defaults, th_config_args);
         ASSERT_TEST (config_pipe != NULL, "Could not spawn config thread",
@@ -351,10 +354,11 @@ devio_err_e devio_register_all_sm (devio_t *self)
     return DEVIO_ERR_FUNC_NOT_IMPL;
 }
 
-devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id)
+devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id, uint32_t inst_id)
 {
     (void) self;
     (void) smio_id;
+    (void) inst_id;
     return DEVIO_ERR_FUNC_NOT_IMPL;
 
 }
@@ -441,6 +445,9 @@ devio_err_e devio_poll_all_sm (devio_t *self)
     zmq_server_args_t server_args = {.msg = &recv_msg, .reply_to = which};
     err = _devio_do_smio_op (self, &server_args);
 
+    /* Cleanup */
+    zmsg_destroy (&recv_msg);
+
 err_poller_expired:
 err_poller_terminated:
 err_uninitialized_poller:
@@ -472,9 +479,14 @@ devio_err_e devio_poll2_all_sm (devio_t *self)
         if (self->poller2 [i].revents & ZMQ_POLLIN) {
             zmsg_t *recv_msg = zmsg_recv (self->poller2 [i].socket);
             /* Prepare the args structure */
-            zmq_server_args_t server_args = {.msg = &recv_msg,
+            zmq_server_args_t server_args = {
+                .tag = ZMQ_SERVER_ARGS_TAG,
+                .msg = &recv_msg,
                 .reply_to = self->poller2 [i].socket};
             err = _devio_do_smio_op (self, &server_args);
+
+            /* Cleanup */
+            zmsg_destroy (&recv_msg);
         }
     }
 
@@ -492,33 +504,17 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
 /**************** Helper Functions ***************/
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
+    assert (self);
+    assert (msg);
+
     devio_err_e err = DEVIO_SUCCESS;
-    zmq_server_args_t *server_args = (zmq_server_args_t *) msg;
-    /* Message is:
-     * frame 0: opcode
-     * frame 1: payload */
-    /* Extract the first frame and determine the opcode */
-    zframe_t *opcode = zmsg_pop (*server_args->msg);
-    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
-            DEVIO_ERR_BAD_MSG);
 
-    /* Sanity checks */
-    ASSERT_TEST(zframe_size (opcode) == THSAFE_OPCODE_SIZE,
-            "poll_all_sm: Invalid opcode size received", err_wrong_opcode_size,
-            DEVIO_ERR_BAD_MSG);
+    disp_table_t *disp_table = self->disp_table_thsafe_ops;
+    msg_err_e merr = msg_handle_sock_request (self, msg, disp_table);
+    ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
+           SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
-    uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
-    ASSERT_TEST(opcode_data <= THSAFE_OPCODE_END-1,
-            "poll_all_sm: Invalid opcode received", err_invalid_opcode,
-            DEVIO_ERR_BAD_MSG);
-
-    /* Do the actual work... */
-    disp_table_call (self->disp_table_thsafe_ops, opcode_data, self, server_args);
-
-err_invalid_opcode:
-err_wrong_opcode_size:
-    zframe_destroy (&opcode);
-err_null_opcode:
+err_hand_req:
     return err;
 }
 
@@ -588,66 +584,3 @@ err_key_alloc:
     return;
 }
 
-/********* Low-level generic methods API *********/
-
-#define CHECK_FUNC(func_p)                              \
-    do {                                                \
-        if(func_p == NULL) {                            \
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_ERR,        \
-                    "[sm_io] %s\n",                     \
-                    devio_err_str (DEVIO_ERR_FUNC_NOT_IMPL)); \
-            return NULL;                                \
-        }                                               \
-    } while(0)
-
-/* Declare wrapper for all DEVIO functions API */
-#define DEVIO_FUNC_WRAPPER(func_name, ...)               \
-{                                                        \
-    assert (owner);                                      \
-    CHECK_FUNC (((devio_t *)owner)->thsafe_server_ops->func_name);\
-        return ((devio_t *)owner)->thsafe_server_ops->func_name (owner, ##__VA_ARGS__);  \
-}
-
-/**** Open device ****/
-void *smio_thsafe_server_open (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_open, args)
-
-/**** Release device ****/
-void *smio_thsafe_server_release (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_release, args)
-
-/**** Read data from device ****/
-void *smio_thsafe_server_read_16 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_16, args)
-void *smio_thsafe_server_read_32 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_32, args)
-void *smio_thsafe_server_read_64 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_64, args)
-
-/**** Write data to device ****/
-void *smio_thsafe_server_write_16 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_16, args)
-void *smio_thsafe_server_write_32 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_32, args)
-void *smio_thsafe_server_write_64 (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_64, args)
-
-/**** Read data block from device function pointer, size in bytes ****/
-void *smio_thsafe_server_read_block (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_block, args)
-
-/**** Write data block from device function pointer, size in bytes ****/
-void *smio_thsafe_server_write_block (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_block, args)
-
-/**** Read data block via DMA from device, size in bytes ****/
-void *smio_thsafe_server_read_dma (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_dma, args)
-
-/**** Write data block via DMA from device, size in bytes ****/
-void *smio_thsafe_server_write_dma (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_write_dma, args)
-
-/**** Read device information function pointer ****/
-/* int smio_thsafe_server_read_info (void *owner, void *args)
-    DEVIO_FUNC_WRAPPER (thsafe_server_read_info, args) Moved to dev_io */

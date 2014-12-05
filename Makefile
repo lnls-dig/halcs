@@ -11,8 +11,10 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
-# Select board in which we will work. Options are: ml605, afc
-BOARD = ml605
+# Select board in which we will work. Options are: ml605 or afcv3
+BOARD ?= ml605
+# Select the FMC ADC board type. Options are: passive or active
+FMC130M_4CH_TYPE ?= passive
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
@@ -30,6 +32,24 @@ LIBCLIENT_DIR=libclient
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
+
+# Board selection
+ifeq ($(BOARD),ml605)
+CFLAGS += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
+endif
+
+ifeq ($(BOARD),afcv3)
+CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
+endif
+
+# Program FMC130M_4CH EEPROM
+ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),active)
+CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
+endif
+
+ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
+CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
+endif
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -51,7 +71,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmdp -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 # General library flags -L<libdir>
 LFLAGS =
 

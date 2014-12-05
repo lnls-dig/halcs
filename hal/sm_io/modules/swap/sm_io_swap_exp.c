@@ -57,23 +57,62 @@
 #define BPM_SWAP_CTRL_MODE_GLOBAL_W(val)        (BPM_SWAP_CTRL_MODE1_W(val) | BPM_SWAP_CTRL_MODE2_W(val))
 #define BPM_SWAP_CTRL_MODE_GLOBAL_R(val)        (BPM_SWAP_CTRL_MODE1_R(val) | BPM_SWAP_CTRL_MODE2_R(val))
 RW_PARAM_FUNC(swap, sw) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_sw_exp = {
+    .name = SWAP_NAME_SET_GET_SW,
+    .opcode = SWAP_OPCODE_SET_GET_SW,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, sw),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SW_EN_MIN                           0 /* Switching enabled */
 #define BPM_SW_EN_MAX                           1 /* Switching disabled */
 RW_PARAM_FUNC(swap, sw_en) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
             BPM_SW_EN_MIN, BPM_SW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_sw_en_exp = {
+    .name = SWAP_NAME_SET_GET_SW_EN,
+    .opcode = SWAP_OPCODE_SET_GET_SW_EN,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, sw_en),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_DIV_F_MIN                      1
 #define BPM_SWAP_DIV_F_MAX                      ((1<<16)-1)
 RW_PARAM_FUNC(swap, div_clk) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, CTRL, SWAP_DIV_F, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, SWAP_DIV_F, MULT_BIT_PARAM,
             BPM_SWAP_DIV_F_MIN, BPM_SWAP_DIV_F_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_div_clk_exp = {
+    .name = SWAP_NAME_SET_GET_DIV_CLK,
+    .opcode = SWAP_OPCODE_SET_GET_DIV_CLK,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, div_clk),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 /* Number of clock cycles between the switching and deswitching */
 #define BPM_SWAP_SW_DLY_MIN                     0
@@ -83,26 +122,65 @@ RW_PARAM_FUNC(swap, div_clk) {
 #define BPM_SWAP_DLY_GLOBAL_W(val)              (BPM_SWAP_DLY_1_W(val) | BPM_SWAP_DLY_2_W(val))
 #define BPM_SWAP_DLY_GLOBAL_R(val)              (BPM_SWAP_DLY_1_R(val) | BPM_SWAP_DLY_2_R(val))
 RW_PARAM_FUNC(swap, sw_dly) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_SW_DLY_MIN, BPM_SWAP_SW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC,
             SET_FIELD);
 }
+
+disp_op_t swap_set_get_sw_dly_exp = {
+    .name = SWAP_NAME_SET_GET_SW_DLY,
+    .opcode = SWAP_OPCODE_SET_GET_SW_DLY,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, sw_dly),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_WDW_EN_MIN                     0 /* Windowing enabled */
 #define BPM_SWAP_WDW_EN_MAX                     1 /* Windowing disabled */
 
 #define BPM_SWAP_WDW_CTL_EN_GLOBAL              (BPM_SWAP_WDW_CTL_USE | BPM_SWAP_WDW_CTL_SWCLK_EXT)
-RW_PARAM_FUNC(swap, wdw) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, WDW_CTL, EN_GLOBAL, SINGLE_BIT_PARAM,
+RW_PARAM_FUNC(swap, wdw_en) {
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, EN_GLOBAL, SINGLE_BIT_PARAM,
             BPM_SWAP_WDW_EN_MIN, BPM_SWAP_WDW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_wdw_en_exp = {
+    .name = SWAP_NAME_SET_GET_WDW_EN,
+    .opcode = SWAP_OPCODE_SET_GET_WDW_EN,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, wdw_en),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_WDW_DLY_MIN                    1
 #define BPM_SWAP_WDW_DLY_MAX                    ((1<<16)-1)
 RW_PARAM_FUNC(swap, wdw_dly) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
             BPM_SWAP_WDW_DLY_MIN, BPM_SWAP_WDW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_wdw_dly_exp = {
+    .name = SWAP_NAME_SET_GET_WDW_DLY,
+    .opcode = SWAP_OPCODE_SET_GET_WDW_DLY,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, wdw_dly),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 /* SWAP gain functions.
  * These are a bit different from the others, in that the parameter passed to
@@ -136,76 +214,104 @@ rw_param_check_fp rw_bpm_swap_gain_chk_fp = _rw_bpm_swap_gain_chk;
 #define BPM_SWAP_A_GLOBAL_W(val)                (val)
 #define BPM_SWAP_A_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_a) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, A, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, A, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_gain_a_exp = {
+    .name = SWAP_NAME_SET_GET_GAIN_A,
+    .opcode = SWAP_OPCODE_SET_GET_GAIN_A,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_a),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_B_GLOBAL_MASK                  (BPM_SWAP_B_B_MASK      | BPM_SWAP_B_D_MASK)
 #define BPM_SWAP_B_GLOBAL_W(val)                (val)
 #define BPM_SWAP_B_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_b) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, B, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, B, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_gain_b_exp = {
+    .name = SWAP_NAME_SET_GET_GAIN_B,
+    .opcode = SWAP_OPCODE_SET_GET_GAIN_B,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_b),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_C_GLOBAL_MASK                  (BPM_SWAP_C_C_MASK      | BPM_SWAP_C_A_MASK)
 #define BPM_SWAP_C_GLOBAL_W(val)                (val)
 #define BPM_SWAP_C_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_c) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, C, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, C, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
+
+disp_op_t swap_set_get_gain_c_exp = {
+    .name = SWAP_NAME_SET_GET_GAIN_C,
+    .opcode = SWAP_OPCODE_SET_GET_GAIN_C,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_c),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 #define BPM_SWAP_D_GLOBAL_MASK                  (BPM_SWAP_D_D_MASK      | BPM_SWAP_D_B_MASK)
 #define BPM_SWAP_D_GLOBAL_W(val)                (val)
 #define BPM_SWAP_D_GLOBAL_R(val)                (val)
 RW_PARAM_FUNC(swap, gain_d) {
-	SET_GET_PARAM(swap, DSP_BPM_SWAP, BPM_SWAP, D, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, D, GLOBAL, MULT_BIT_PARAM,
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-const smio_exp_ops_t swap_exp_ops [] = {
-    {.name 			= SWAP_NAME_SET_GET_SW,
-	 .opcode 		= SWAP_OPCODE_SET_GET_SW,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, sw)	    		},
-    {.name 			= SWAP_NAME_SET_GET_SW_EN,
-	 .opcode 		= SWAP_OPCODE_SET_GET_SW_EN,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, sw_en)	    	},
-    {.name 			= SWAP_NAME_SET_GET_DIV_CLK,
-	 .opcode 		= SWAP_OPCODE_SET_GET_DIV_CLK,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, div_clk)		    },
-    {.name 			= SWAP_NAME_SET_GET_SW_DLY,
-	 .opcode 		= SWAP_OPCODE_SET_GET_SW_DLY,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, sw_dly)		    },
-    {.name 			= SWAP_NAME_SET_GET_WDW,
-	 .opcode 		= SWAP_OPCODE_SET_GET_WDW,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, wdw)		        },
-    {.name 			= SWAP_NAME_SET_GET_WDW_DLY,
-	 .opcode 		= SWAP_OPCODE_SET_GET_WDW_DLY,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, wdw_dly)		    },
-    {.name 			= SWAP_NAME_SET_GET_GAIN_A,
-	 .opcode 		= SWAP_OPCODE_SET_GET_GAIN_A,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, gain_a)		    },
-    {.name 			= SWAP_NAME_SET_GET_GAIN_B,
-	 .opcode 		= SWAP_OPCODE_SET_GET_GAIN_B,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, gain_b)		    },
-    {.name 			= SWAP_NAME_SET_GET_GAIN_C,
-	 .opcode 		= SWAP_OPCODE_SET_GET_GAIN_C,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, gain_c)		    },
-    {.name 			= SWAP_NAME_SET_GET_GAIN_D,
-	 .opcode 		= SWAP_OPCODE_SET_GET_GAIN_D,
-	 .func_fp 		= RW_PARAM_FUNC_NAME(swap, gain_d)		    },
-/*
-    { ...   }
-*/
-    {.name 			= NULL,		/* Must end with this NULL pattern */
-	 .opcode 		= 0,
-	 .func_fp 		= NULL										}
+disp_op_t swap_set_get_gain_d_exp = {
+    .name = SWAP_NAME_SET_GET_GAIN_D,
+    .opcode = SWAP_OPCODE_SET_GET_GAIN_D,
+    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_d),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
 };
+
+const disp_op_t *swap_exp_ops [] = {
+    &swap_set_get_sw_exp,
+    &swap_set_get_sw_en_exp,
+    &swap_set_get_div_clk_exp,
+    &swap_set_get_sw_dly_exp,
+    &swap_set_get_wdw_en_exp,
+    &swap_set_get_wdw_dly_exp,
+    &swap_set_get_gain_a_exp,
+    &swap_set_get_gain_b_exp,
+    &swap_set_get_gain_c_exp,
+    &swap_set_get_gain_d_exp,
+    &disp_op_end
+};
+
 /************************************************************/
 /***************** Export methods functions *****************/
 /************************************************************/
@@ -229,7 +335,7 @@ smio_err_e swap_deattach (smio_t *self)
 
 /* Export (register) sm_io to handle operations function pointer */
 smio_err_e swap_export_ops (smio_t *self,
-        const smio_exp_ops_t* smio_exp_ops)
+        const disp_op_t **smio_exp_ops)
 {
     (void) self;
     (void) smio_exp_ops;
@@ -285,10 +391,8 @@ smio_err_e swap_init (smio_t * self)
     self->exp_ops = swap_exp_ops;
 
     /* Initialize specific structure */
-    self->smio_handler = smio_swap_new (); /* TODO Define swap init parameters */
+    self->smio_handler = smio_swap_new (self);
     ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
-
-//	_smio_swap_config_defaults (self);
 
     return err;
 

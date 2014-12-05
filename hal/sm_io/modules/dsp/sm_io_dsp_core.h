@@ -10,6 +10,7 @@
 
 #include <inttypes.h>
 #include "sm_io_err.h"
+#include "sm_io.h"
 
 struct _smio_dsp_t {
     const uint32_t example;
@@ -20,8 +21,8 @@ typedef struct _smio_dsp_t smio_dsp_t;
 
 /***************** Our methods *****************/
 
-/* Creates a new instance of the smio realizationn */
-smio_dsp_t * smio_dsp_new ();
+/* Creates a new instance of the smio realization */
+smio_dsp_t * smio_dsp_new (smio_t *parent);
 /* Destroys the smio realizationn */
 smio_err_e smio_dsp_destroy (smio_dsp_t **self_p);
 

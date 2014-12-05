@@ -7,6 +7,7 @@
 
 #include "sm_io.h"
 #include "exp_ops_codes.h"
+#include "rw_param.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -42,23 +43,21 @@
         }                                               \
     } while(0)
 
+#define ASSERT_FUNC(func_name)                          \
+    do {                                                \
+        assert (self);                                  \
+        assert (self->thsafe_client_ops);               \
+        CHECK_FUNC (self->thsafe_client_ops->func_name); \
+    } while(0)
+
 /* Declare wrapper for all SMIO functions API */
 #define SMIO_FUNC_WRAPPER(func_name, ...)               \
 {                                                       \
-    assert (self);                                      \
-    assert (self->thsafe_client_ops);                   \
-    CHECK_FUNC (self->thsafe_client_ops->func_name);    \
+    ASSERT_FUNC(func_name);                             \
     return self->thsafe_client_ops->func_name (self, ##__VA_ARGS__);  \
 }
 
-#define SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, func_name, ...)   \
-    do {                                                \
-        if (self->ops && self->ops->func_name) {        \
-            smio_err_e local_err = self->ops->func_name (self, ##__VA_ARGS__);  \
-            err = (local_err != SMIO_ERR_FUNC_NOT_IMPL) ? \
-                local_err : err;                        \
-        }                                               \
-    } while (0)
+static smio_err_e _smio_do_op (void *owner, void *msg);
 
 /************************************************************/
 /**************** SMIO Ops wrapper functions ****************/
@@ -70,7 +69,11 @@ smio_err_e smio_attach (smio_t *self, struct _devio_t *parent)
     smio_err_e err = SMIO_SUCCESS;
     self->parent = parent;
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error", 
+        err_func);
+
+err_func:
     return err;
 }
 
@@ -81,32 +84,38 @@ smio_err_e smio_deattach (smio_t *self)
     smio_err_e err = SMIO_SUCCESS;
     self->parent = NULL;
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error", 
+        err_func);
+
+err_func:
     return err;
 }
 
 /* Export (Register) sm_io to handle specific operations */
-smio_err_e smio_export_ops (smio_t *self, const smio_exp_ops_t* smio_exp_ops)
+smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
 {
     assert (self);
     assert (smio_exp_ops);
 
     /* FIXME: Dispatch table disp_table_insert_all implements almost the
      * same code! Try to reuse it! */
-    const smio_exp_ops_t* smio_exp_ops_it = smio_exp_ops;
+    const disp_op_t **smio_exp_ops_it = smio_exp_ops;
     smio_err_e err = SMIO_SUCCESS;
     /* FIXME: Iterator is not very good as it has to check an specific field */
-    for (smio_exp_ops_it = smio_exp_ops; smio_exp_ops_it->func_fp != NULL;
-            smio_exp_ops_it++) {
+    for ( ; (*smio_exp_ops_it)->func_fp != NULL; smio_exp_ops_it++) {
         halutils_err_e herr = disp_table_insert (self->exp_ops_dtable,
-            smio_exp_ops_it->opcode, smio_exp_ops_it->func_fp);
+            (*smio_exp_ops_it)->opcode, *smio_exp_ops_it);
 
         ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export SMIO ops",
                 err_export_op, SMIO_ERR_EXPORT_OP);
     }
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"export_ops\" function error", 
+        err_func);
 
+err_func:
 err_export_op:
     return err;
 }
@@ -122,55 +131,44 @@ smio_err_e smio_unexport_ops (smio_t *self)
     ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
             err_unexport_op, SMIO_ERR_EXPORT_OP);
 
-    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"unexport_ops\" function error", 
+        err_func);
 
+err_func:
 err_unexport_op:
     return err;
 }
 
 smio_err_e smio_do_op (void *owner, void *msg)
 {
+    return _smio_do_op (owner, msg);
+}
+
+/**************** Static Functions ***************/
+
+static smio_err_e _smio_do_op (void *owner, void *msg)
+{
     assert (owner);
     assert (msg);
 
-    smio_t *self = (smio_t *) owner;
-    exp_msg_zmq_t *exp_msg = (exp_msg_zmq_t *) msg;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_err_e err = SMIO_SUCCESS;
 
     /* TODO: The SMIO do_op must not modify the packet! We could pass a copy of the
-     * message to it, but we this is in the critical path! Evaluate the imapct
+     * message to it, but we this is in the critical path! Evaluate the impact
      * of doing this */
     SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, do_op, msg);
-    ASSERT_TEST (err==SMIO_SUCCESS, "Error executing SMIO do_op ()",
+    ASSERT_TEST (err == SMIO_SUCCESS, "Registered SMIO \"do_op\" function error",
             err_do_op);
 
-    /* Our simple packet is composed of:
-     * frame 0: operation
-     * frame n: arguments*/
-    zframe_t *opcode = zmsg_pop (*exp_msg->msg);
+    disp_table_t *disp_table = self->exp_ops_dtable;
+    msg_err_e merr = msg_handle_mdp_request (owner, msg, disp_table);
+    ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
+           SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
-    /* Sanity checks */
-    ASSERT_TEST(opcode != NULL, "Could not receive opcode", err_null_opcode,
-            SMIO_ERR_WRONG_NARGS);
-    ASSERT_TEST(zframe_size (opcode) == EXP_OPS_OPCODE_SIZE,
-            "Invalid opcode size received", err_wrong_opcode_size,
-            SMIO_ERR_WRONG_NARGS);
-
-    uint32_t opcode_data = *(uint32_t *) zframe_data (opcode);
-    ASSERT_TEST(opcode_data <= SMIO_MAX_OPS-1, "Invalid opcode received",
-            err_invalid_opcode, SMIO_ERR_WRONG_NARGS);
-
-    /* Do the actual work... */
-    disp_table_call (self->exp_ops_dtable, opcode_data, self, exp_msg);
-
-err_invalid_opcode:
-err_wrong_opcode_size:
-    zframe_destroy (&opcode);
-err_null_opcode:
+err_hand_req:
 err_do_op:
-    /* Should reply_to field be zframe_t ** type ?*/
-    zframe_destroy (&exp_msg->reply_to);
-    zmsg_destroy (exp_msg->msg);
     return err;
 }
 
@@ -188,37 +186,105 @@ int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint)
 
 /**** Read data from device ****/
 ssize_t smio_thsafe_client_read_16 (smio_t *self, loff_t offs, uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_16, offs, data)
+{
+    ASSERT_FUNC(thsafe_client_read_16);
+    return self->thsafe_client_ops->thsafe_client_read_16 (self, self->base | offs, data);
+}
+
 ssize_t smio_thsafe_client_read_32 (smio_t *self, loff_t offs, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_32, offs, data)
+{
+    ASSERT_FUNC(thsafe_client_read_32);
+    return self->thsafe_client_ops->thsafe_client_read_32 (self, self->base | offs, data);
+}
+
 ssize_t smio_thsafe_client_read_64 (smio_t *self, loff_t offs, uint64_t *data)
+{
+    ASSERT_FUNC(thsafe_client_read_64);
+    return self->thsafe_client_ops->thsafe_client_read_64 (self, self->base | offs, data);
+}
+
+ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, loff_t offs, uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, offs, data)
+ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, loff_t offs, uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, offs, data)
+ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, loff_t offs, uint64_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_64, offs, data)
 
 /**** Write data to device ****/
 ssize_t smio_thsafe_client_write_16 (smio_t *self, loff_t offs, const uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_16, offs, data)
+{
+    ASSERT_FUNC(thsafe_client_write_16);
+    return self->thsafe_client_ops->thsafe_client_write_16 (self, self->base | offs, data);
+}
+
 ssize_t smio_thsafe_client_write_32 (smio_t *self, loff_t offs, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_32, offs, data)
+{
+    ASSERT_FUNC(thsafe_client_write_32);
+    return self->thsafe_client_ops->thsafe_client_write_32 (self, self->base | offs, data);
+}
+
 ssize_t smio_thsafe_client_write_64 (smio_t *self, loff_t offs, const uint64_t *data)
+{
+    ASSERT_FUNC(thsafe_client_write_64);
+    return self->thsafe_client_ops->thsafe_client_write_64 (self, self->base | offs, data);
+}
+
+ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, loff_t offs, const uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, offs, data)
+ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, loff_t offs, const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, offs, data)
+ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, loff_t offs, const uint64_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_64, offs, data)
 
 /**** Read data block from device function pointer, size in bytes ****/
-ssize_t smio_thsafe_client_read_block (smio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t smio_thsafe_client_read_block (smio_t *self, loff_t offs, size_t size,
+        uint32_t *data)
+{
+    ASSERT_FUNC(thsafe_client_read_block);
+    return self->thsafe_client_ops->thsafe_client_read_block (self, self->base | offs,
+            size, data);
+}
+
+ssize_t smio_thsafe_raw_client_read_block (smio_t *self, loff_t offs, size_t size, uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_block, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t smio_thsafe_client_write_block (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t smio_thsafe_client_write_block (smio_t *self, loff_t offs, size_t size,
+        const uint32_t *data)
+{
+    ASSERT_FUNC(thsafe_client_write_block);
+    return self->thsafe_client_ops->thsafe_client_write_block (self, self->base | offs,
+            size, data);
+}
+
+ssize_t smio_thsafe_raw_client_write_block (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_block, offs, size, data)
 
 /**** Read data block via DMA from device, size in bytes ****/
-ssize_t smio_thsafe_client_read_dma (smio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t smio_thsafe_client_read_dma (smio_t *self, loff_t offs, size_t size,
+        uint32_t *data)
+{
+    ASSERT_FUNC(thsafe_client_read_dma);
+    return self->thsafe_client_ops->thsafe_client_read_dma (self, self->base | offs,
+            size, data);
+}
+
+ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, loff_t offs, size_t size, uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_dma, offs, size, data)
 
 /**** Write data block via DMA from device, size in bytes ****/
-ssize_t smio_thsafe_client_write_dma (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t smio_thsafe_client_write_dma (smio_t *self, loff_t offs, size_t size,
+        const uint32_t *data)
+{
+    ASSERT_FUNC(thsafe_client_write_dma);
+    return self->thsafe_client_ops->thsafe_client_write_dma (self, self->base | offs,
+            size, data);
+}
+
+ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_dma, offs, size, data)
 
 /**** Read device information function pointer ****/
-/* int smio_thsafe_client_read_info (smio_t *self, llio_dev_info_t *dev_info)
+/* int smio_thsafe_raw_client_read_info (smio_t *self, llio_dev_info_t *dev_info)
     SMIO_FUNC_WRAPPER (thsafe_client_read_info, dev_info) Moved to dev_io */
 

@@ -14,19 +14,231 @@
 #include "bpm_client_codes.h"
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
-#include "rw_param_client.h"
 
-struct _acq_buf_t;
+struct _acq_chan_t;
 
 /* Our structure */
 struct _bpm_client_t {
     mdp_client_t *mdp_client;                   /* Majordomo client instance */
-    const struct _acq_buf_t *acq_buf;           /* Acquisition buffer table */
+    const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
 };
 
 typedef struct _bpm_client_t bpm_client_t;
 
-/******************** ACQ SMIO Structures ******************/
+/********************************************************/
+/************************ Our API ***********************/
+/********************************************************/
+
+/* Create an instance of the BPM client. This must be called
+ * before any operation involving communicating with the BPM
+ * server. Return an instance of the bpm client */
+bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name);
+
+/* Create an instance of the BPM client, with the log filemode specified
+ * by "log_mode" as in fopen () call. This must be called before any operation
+ * involving communicating with the BPM server. Return an instance of the bpm
+ * client */
+bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode);
+
+/* Destroy an instance of the BPM client. This must be called
+ * after all operations involving the communication with the BPM
+ * server */
+void bpm_client_destroy (bpm_client_t **self_p);
+
+/******************** FMC130M SMIO Functions ******************/
+
+/* Blink the FMC Leds. This is only used for debug and for demostration
+ * purposes.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
+
+/* Simple AD9510 Config test.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service);
+
+/* FMC PLL FUNCTION pin. Sets or clears the FMC PLL FUNCTION pin. This pin
+ * has a general purpose based on the 0x59 SPI AD9510 register.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_pll_function (bpm_client_t *self, char *service,
+        uint32_t fmc_pll_function);
+bpm_client_err_e bpm_get_fmc_pll_function (bpm_client_t *self, char *service,
+        uint32_t *fmc_pll_function);
+
+/* RAW ADC data functions */
+/* These set of functions read (get) the RAW ADC values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_data0 (bpm_client_t *self, char *service,
+        uint32_t adc_data0);
+bpm_client_err_e bpm_get_adc_data0 (bpm_client_t *self, char *service,
+        uint32_t *adc_data0);
+bpm_client_err_e bpm_set_adc_data1 (bpm_client_t *self, char *service,
+        uint32_t adc_data1);
+bpm_client_err_e bpm_get_adc_data1 (bpm_client_t *self, char *service,
+        uint32_t *adc_data1);
+bpm_client_err_e bpm_set_adc_data2 (bpm_client_t *self, char *service,
+        uint32_t adc_data2);
+bpm_client_err_e bpm_get_adc_data2 (bpm_client_t *self, char *service,
+        uint32_t *adc_data2);
+bpm_client_err_e bpm_set_adc_data3 (bpm_client_t *self, char *service,
+        uint32_t adc_data3);
+bpm_client_err_e bpm_get_adc_data3 (bpm_client_t *self, char *service,
+        uint32_t *adc_data3);
+
+/* ADC delay value functions */
+
+/* The three set of group functions provide a low-lovel interface to the FPGA
+ * firmware. The correct usage to set the ADC clock and data paths delay are:
+ *
+ * 1) Set the delay value with bpm_set_adc_dly_val<*> for the desired channel.
+ *      Accepted values are from 0 to 31.
+ * 2) Set the delay line which will be updated with bpm_set_adc_dly_line<*> for the desired channel
+ *      Accepted values are the bitmask of the desired lines with bit 16 corresponding
+ *      to the clock line and bits 15-0 to ADC bits 15 to 0
+ * 3) call the update functions bpm_set_adc_dly_updt<*> for the desired channel.
+ */
+
+/* These set of functions read/write (set/get) the ADC delay values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_val0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val0);
+bpm_client_err_e bpm_get_adc_dly_val0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val0);
+bpm_client_err_e bpm_set_adc_dly_val1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val1);
+bpm_client_err_e bpm_get_adc_dly_val1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val1);
+bpm_client_err_e bpm_set_adc_dly_val2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val2);
+bpm_client_err_e bpm_get_adc_dly_val2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val2);
+bpm_client_err_e bpm_set_adc_dly_val3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_val3);
+bpm_client_err_e bpm_get_adc_dly_val3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_val3);
+
+/* ADC delay line functions */
+/* These set of functions read/write (set/get) the ADC delay line values,
+ * meaning which lines (16 = clock, 15-0 = data bits) are to be updated
+ * on bpm_set_adc_dly_updt<*> functions.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_line0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line0);
+bpm_client_err_e bpm_get_adc_dly_line0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line0);
+bpm_client_err_e bpm_set_adc_dly_line1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line1);
+bpm_client_err_e bpm_get_adc_dly_line1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line1);
+bpm_client_err_e bpm_set_adc_dly_line2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line2);
+bpm_client_err_e bpm_get_adc_dly_line2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line2);
+bpm_client_err_e bpm_set_adc_dly_line3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_line3);
+bpm_client_err_e bpm_get_adc_dly_line3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_line3);
+
+/* ADC update functions */
+/* These set of functions read/write (set/get) the ADC delay update values
+ * for each channel. This will effectively update the FPGA delay primitives to
+ * the previous delay values set by the corresponding bpm_get_adc_dly_updt<*>
+ * functions.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly_updt0 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt0);
+bpm_client_err_e bpm_get_adc_dly_updt0 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt0);
+bpm_client_err_e bpm_set_adc_dly_updt1 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt1);
+bpm_client_err_e bpm_get_adc_dly_updt1 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt1);
+bpm_client_err_e bpm_set_adc_dly_updt2 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt2);
+bpm_client_err_e bpm_get_adc_dly_updt2 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt2);
+bpm_client_err_e bpm_set_adc_dly_updt3 (bpm_client_t *self, char *service,
+        uint32_t adc_dly_updt3);
+bpm_client_err_e bpm_get_adc_dly_updt3 (bpm_client_t *self, char *service,
+        uint32_t *adc_dly_updt3);
+
+/* Higher-level ADC delay functions */
+/* These set of functions write (set) the ADC delays for each channel.
+ * This functions wrap all of the functionality present by the 3 groups above
+ * in a conveninent way to the user.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_dly0 (bpm_client_t *self, char *service,
+        uint32_t dly_type0, uint32_t dly_val0);
+bpm_client_err_e bpm_set_adc_dly1 (bpm_client_t *self, char *service,
+        uint32_t dly_type1, uint32_t dly_val1);
+bpm_client_err_e bpm_set_adc_dly2 (bpm_client_t *self, char *service,
+        uint32_t dly_type2, uint32_t dly_val2);
+bpm_client_err_e bpm_set_adc_dly3 (bpm_client_t *self, char *service,
+        uint32_t dly_type3, uint32_t dly_val3);
+
+/* FMC TEST data enable. Sets or clears the ADC test data switch. This
+ * enables or disables the ADC test RAMP output.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_adc_test_data_en (bpm_client_t *self, char *service,
+        uint32_t adc_test_data_en);
+bpm_client_err_e bpm_get_adc_test_data_en (bpm_client_t *self, char *service,
+        uint32_t *adc_test_data_en);
+
+/* FMC SI571 Output Control. Enables or disables the Si571 output.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_si571_oe (bpm_client_t *self, char *service,
+        uint32_t si571_oe);
+bpm_client_err_e bpm_get_si571_oe (bpm_client_t *self, char *service,
+        uint32_t *si571_oe);
+
+/* FMC AD9510 Control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_ad9510_pll_a_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_a_div);
+bpm_client_err_e bpm_set_ad9510_pll_b_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_b_div);
+bpm_client_err_e bpm_set_ad9510_pll_prescaler (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_prescaler);
+bpm_client_err_e bpm_set_ad9510_r_div (bpm_client_t *self, char *service,
+        uint32_t ad9510_r_div);
+bpm_client_err_e bpm_set_ad9510_pll_pdown (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_pdown);
+bpm_client_err_e bpm_set_ad9510_mux_status (bpm_client_t *self, char *service,
+        uint32_t ad9510_mux_status);
+bpm_client_err_e bpm_set_ad9510_cp_current (bpm_client_t *self, char *service,
+        uint32_t ad9510_cp_current);
+bpm_client_err_e bpm_set_ad9510_outputs (bpm_client_t *self, char *service,
+        uint32_t ad9510_outputs);
+bpm_client_err_e bpm_set_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
+        uint32_t ad9510_pll_clk_sel);
+
+/* FMC SI571 Control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_si571_set_freq (bpm_client_t *self, char *service,
+        double si571_set_freq);
+bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
+        double si571_defaults);
+
+/********************** ACQ SMIO Functions ********************/
+
 /* Acquistion request */
 struct _acq_req_t {
     uint32_t num_samples;                       /* Number of samples */
@@ -54,30 +266,16 @@ struct _acq_trans_t {
 
 typedef struct _acq_trans_t acq_trans_t;
 
-/********************************************************/
-/************************ Our API ***********************/
-/********************************************************/
+/* Acquisition channel definitions */
+struct _acq_chan_t {
+    uint32_t chan;
+    uint32_t sample_size;
+};
 
-/* Create an instance of the BPM client. This must be called
- * before any operation involving communicating with the BPM
- * server. Return an instance of the bpm client */
-bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name);
+typedef struct _acq_chan_t acq_chan_t;
 
-/* Destroy an instance of the BPM client. This must be called
- * after all operations involving the communication with the BPM
- * server */
-void bpm_client_destroy (bpm_client_t **self_p);
-
-/******************** FMC130M SMIO Functions ******************/
-
-/* Blink the FMC Leds. This is only used for debug and for demostration
- * purposes.
- * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
- * if server could not complete the request */
-bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
-
-/********************** ACQ SMIO Functions ********************/
+/* Acquisition channel definitions */
+extern acq_chan_t acq_chan[END_CHAN_ID];
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
  * through the use of acq_req_t structure.
@@ -113,7 +311,7 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans);
+        acq_trans_t *acq_trans, int timeout);
 
 /********************** DSP Functions ********************/
 
@@ -125,13 +323,13 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 
 bpm_client_err_e bpm_set_kx (bpm_client_t *self, char *service, uint32_t kx);
 bpm_client_err_e bpm_get_kx (bpm_client_t *self, char *service,
-		uint32_t *kx_out);
+        uint32_t *kx_out);
 bpm_client_err_e bpm_set_ky (bpm_client_t *self, char *service, uint32_t ky);
 bpm_client_err_e bpm_get_ky (bpm_client_t *self, char *service,
-		uint32_t *ky_out);
+        uint32_t *ky_out);
 bpm_client_err_e bpm_set_ksum (bpm_client_t *self, char *service, uint32_t ksum);
 bpm_client_err_e bpm_get_ksum (bpm_client_t *self, char *service,
-		uint32_t *ksum_out);
+        uint32_t *ksum_out);
 
 /* Delta-Sigma Threshold functions */
 /* These set of functions write (set) or read (get) the delta-sigma
@@ -144,15 +342,59 @@ bpm_client_err_e bpm_get_ksum (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_ds_tbt_thres (bpm_client_t *self, char *service,
         uint32_t ds_tbt_thres);
 bpm_client_err_e bpm_get_ds_tbt_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_tbt_thres);
+        uint32_t *ds_tbt_thres);
 bpm_client_err_e bpm_set_ds_fofb_thres (bpm_client_t *self, char *service,
         uint32_t ds_fofb_thres);
 bpm_client_err_e bpm_get_ds_fofb_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_fofb_thres);
+        uint32_t *ds_fofb_thres);
 bpm_client_err_e bpm_set_ds_monit_thres (bpm_client_t *self, char *service,
         uint32_t ds_monit_thres);
 bpm_client_err_e bpm_get_ds_monit_thres (bpm_client_t *self, char *service,
-		uint32_t *ds_monit_thres);
+        uint32_t *ds_monit_thres);
+
+/* Monitoring Position values */
+/* These set of functions read (get) the Monitoring position values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_pos_x (bpm_client_t *self, char *service,
+        uint32_t monit_pos_x);
+bpm_client_err_e bpm_get_monit_pos_x (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_x);
+bpm_client_err_e bpm_set_monit_pos_y (bpm_client_t *self, char *service,
+        uint32_t monit_pos_y);
+bpm_client_err_e bpm_get_monit_pos_y (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_y);
+bpm_client_err_e bpm_set_monit_pos_q (bpm_client_t *self, char *service,
+        uint32_t monit_pos_q);
+bpm_client_err_e bpm_get_monit_pos_q (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_q);
+bpm_client_err_e bpm_set_monit_pos_sum (bpm_client_t *self, char *service,
+        uint32_t monit_pos_sum);
+bpm_client_err_e bpm_get_monit_pos_sum (bpm_client_t *self, char *service,
+        uint32_t *monit_pos_sum);
+
+/* Monitoring Amplitude values */
+/* These set of functions read (get) the Monitoring amplitude values.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_amp_ch0 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch0);
+bpm_client_err_e bpm_get_monit_amp_ch0 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch0);
+bpm_client_err_e bpm_set_monit_amp_ch1 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch1);
+bpm_client_err_e bpm_get_monit_amp_ch1 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch1);
+bpm_client_err_e bpm_set_monit_amp_ch2 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch2);
+bpm_client_err_e bpm_get_monit_amp_ch2 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch2);
+bpm_client_err_e bpm_set_monit_amp_ch3 (bpm_client_t *self, char *service,
+        uint32_t monit_amp_ch3);
+bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
+        uint32_t *monit_amp_ch3);
 
 /********************** SWAP Functions ********************/
 
@@ -168,11 +410,11 @@ bpm_client_err_e bpm_get_ds_monit_thres (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_sw (bpm_client_t *self, char *service,
         uint32_t sw);
 bpm_client_err_e bpm_get_sw (bpm_client_t *self, char *service,
-		uint32_t *sw);
+        uint32_t *sw);
 bpm_client_err_e bpm_set_sw_en (bpm_client_t *self, char *service,
         uint32_t sw_en);
 bpm_client_err_e bpm_get_sw_en (bpm_client_t *self, char *service,
-		uint32_t *sw_en);
+        uint32_t *sw_en);
 
 /* Switching clock functions */
 /* These set of functions write (set) or read (get) the switching
@@ -185,7 +427,7 @@ bpm_client_err_e bpm_get_sw_en (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_div_clk (bpm_client_t *self, char *service,
         uint32_t div_clk);
 bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
-		uint32_t *div_clk);
+        uint32_t *div_clk);
 
 /* Switching delay functions */
 /* These set of functions write (set) or read (get) the (de)switching
@@ -196,7 +438,7 @@ bpm_client_err_e bpm_get_div_clk (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_sw_dly (bpm_client_t *self, char *service,
         uint32_t sw_dly);
 bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
-		uint32_t *sw_dly);
+        uint32_t *sw_dly);
 
 /* Windowing functions */
 /* These set of functions write (set) or read (get) the windowing state with
@@ -209,11 +451,11 @@ bpm_client_err_e bpm_get_sw_dly (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_wdw (bpm_client_t *self, char *service,
         uint32_t wdw);
 bpm_client_err_e bpm_get_wdw (bpm_client_t *self, char *service,
-		uint32_t *wdw);
+        uint32_t *wdw);
 bpm_client_err_e bpm_set_wdw_dly (bpm_client_t *self, char *service,
         uint32_t wdw_dly);
 bpm_client_err_e bpm_get_wdw_dly (bpm_client_t *self, char *service,
-		uint32_t *wdw_dly);
+        uint32_t *wdw_dly);
 
 /* Gain functions */
 /* TODO: reduce code repetition by, possibilly, group the OPCODES in

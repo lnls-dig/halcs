@@ -34,6 +34,8 @@
 #define DBG_MSG_RAW             0x10
 #define DBG_HAL_UTILS_RAW       0x20
 #define DBG_LIB_CLIENT_RAW      0x40    /* The client library shares this macros */
+#define DBG_SM_PR_RAW           0x80
+#define DBG_SM_CH_RAW           0x100
 
 #define DBG_DEV_MNGR             DBG_SUBSYS_GEN(DBG_DEV_MNGR_RAW)
 #define DBG_DEV_IO               DBG_SUBSYS_GEN(DBG_DEV_IO_RAW)
@@ -43,6 +45,8 @@
 #define DBG_HAL_UTILS            DBG_SUBSYS_GEN(DBG_HAL_UTILS_RAW)
 /* The client library shares this macros */
 #define DBG_LIB_CLIENT           DBG_SUBSYS_GEN(DBG_LIB_CLIENT_RAW)
+#define DBG_SM_PR                DBG_SUBSYS_GEN(DBG_SM_PR_RAW)
+#define DBG_SM_CH                DBG_SUBSYS_GEN(DBG_SM_CH_RAW)
 
 /****************** Debug levels macros ******************/
 /*

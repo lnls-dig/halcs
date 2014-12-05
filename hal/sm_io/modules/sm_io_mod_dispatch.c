@@ -21,7 +21,7 @@ const smio_mod_dispatch_t smio_mod_dispatch[MOD_DISPATCH_END] = {
     [1] = { .id = ACQ_SDB_DEVID,
             .name = ACQ_SDB_NAME,
             .bootstrap_ops = &acq_bootstrap_ops
-	},
+    },
     [2] = { .id = DSP_SDB_DEVID,
             .name = DSP_SDB_NAME,
             .bootstrap_ops = &dsp_bootstrap_ops
