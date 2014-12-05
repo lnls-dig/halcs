@@ -40,6 +40,17 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc130m_4ch_exp]",    \
             smio_err_str (err_type))
 
+#define FMC130M_4CH_CHECK_ACTIVE(self)                          \
+    ({                                                          \
+        if (SMIO_FMC130_HANDLER(self)->type !=                  \
+                TYPE_FMC130M_4CH_ACTIVE) {                      \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
+                "Board is not of ACTIVE type. Unimplemented "   \
+                "function for this type of FMC130M_4CH board"); \
+                return -FMC130M_4CH_UNINPL;                     \
+        }                                                       \
+    })
+
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
@@ -925,7 +936,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
         smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(self);                    \
         uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
         (void) rw;  /* Ignored for now */                                       \
-        uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+        double param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);                \
                                                                                 \
         FMC130M_4CH_CHECK_ACTIVE(self);                                         \
                                                                                 \
@@ -949,6 +960,25 @@ disp_op_t fmc130m_4ch_si571_set_freq_exp = {
     .name = FMC130M_4CH_NAME_SI571_SET_FREQ,
     .opcode = FMC130M_4CH_OPCODE_SI571_SET_FREQ,
     .func_fp = FMC130M_4CH_SI571_FUNC_NAME(set_freq),
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+FMC130M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
+{
+    FMC130M_4CH_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_defaults,
+            "Could not restart SI571 to its defaults");
+}
+
+disp_op_t fmc130m_4ch_si571_get_defaults_exp = {
+    .name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS,
+    .opcode = FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS,
+    .func_fp = FMC130M_4CH_SI571_FUNC_NAME(get_defaults),
     .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -994,6 +1024,7 @@ const disp_op_t *fmc130m_exp_ops [] = {
     &fmc130m_4ch_ad9510_outputs_exp,
     &fmc130m_4ch_ad9510_pll_clk_sel_exp,
     &fmc130m_4ch_si571_set_freq_exp,
+    &fmc130m_4ch_si571_get_defaults_exp,
     &disp_op_end
 };
 

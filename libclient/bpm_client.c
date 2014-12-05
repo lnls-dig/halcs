@@ -480,10 +480,17 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_pll_clk_sel)
 }
 
 /* SI571 Set frequency */
-PARAM_FUNC_CLIENT_WRITE(si571_set_freq)
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_set_freq)
 {
     return param_client_write_double (self, service, FMC130M_4CH_OPCODE_SI571_SET_FREQ,
             si571_set_freq);
+}
+
+/* SI571 Get defaults */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
+{
+    return param_client_write_double (self, service, FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS,
+            si571_defaults);
 }
 
 /****************** ACQ SMIO Functions ****************/

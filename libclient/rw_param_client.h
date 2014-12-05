@@ -34,6 +34,10 @@
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
             char *service, uint32_t reg)
 
+#define PARAM_FUNC_CLIENT_WRITE_DOUBLE(reg)                                     \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
+            char *service, double reg)
+
 #define PARAM_FUNC_CLIENT_WRITE2(reg, param1, param2)                           \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
             char *service, uint32_t param1, uint32_t param2)

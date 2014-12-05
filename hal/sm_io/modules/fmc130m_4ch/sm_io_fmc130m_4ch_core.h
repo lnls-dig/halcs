@@ -32,18 +32,6 @@
 /* Start writing on EEPROM address 0x0 */
 #define FMC130M_4CH_EEPROM_START_ADDR       0x0
 
-#define FMC130M_4CH_CHECK_ACTIVE(self)                          \
-    ({                                                          \
-    ASSERT_TEST(SMIO_FMC130_HANDLER(self)->type ==              \
-        TYPE_FMC130M_4CH_ACTIVE,                                \
-            "Board is not of ACTIVE type. Unimplemented "       \
-            "function for this type of FMC130M_4CH board",      \
-            err_uninp_func,                                     \
-            -FMC130M_4CH_UNINPL);                               \
-err_uninp_func:                                                 \
-     return err;                                                \
-    })
-
 enum _fmc130m_4ch_type_e
 {
     TYPE_FMC130M_4CH_UNDEF=0xFF,
