@@ -48,8 +48,6 @@
 #define THSAFE_OPCODE_END                   12
 //#define THSAFE_OPCODE_END                 13
 
-extern const THSAFE_OPCODE_TYPE thsafe_opcodes [THSAFE_OPCODE_END];
-
 /* Messaging Reply OPCODES */
 #define THSAFE_REPLY_SIZE                   (sizeof(uint32_t))
 #define THSAFE_REPLY_TYPE                   uint32_t
@@ -57,8 +55,6 @@ extern const THSAFE_OPCODE_TYPE thsafe_opcodes [THSAFE_OPCODE_END];
 #define THSAFE_OK                           0
 #define THSAFE_ERR                          1
 #define THSAFE_REPLY_END                    2
-
-extern const THSAFE_REPLY_TYPE thsafe_reply_opcodes [THSAFE_REPLY_END];
 
 /* Messaging Return Codes */
 #define THSAFE_RETURN_SIZE                  (sizeof(int32_t))
