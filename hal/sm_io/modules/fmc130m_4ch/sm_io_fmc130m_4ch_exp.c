@@ -16,6 +16,8 @@
 #include "hal_assert.h"
 #include "rw_param.h"
 #include "wb_fmc130m_4ch_regs.h"
+#include "sm_io_fmc130m_4ch_exports.h"
+#include "hal_stddef.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -72,18 +74,6 @@ static int _fmc130m_4ch_leds (void *owner, void *args, void *ret)
     return -FMC130M_4CH_OK;
 }
 
-disp_op_t fmc130m_4ch_leds_exp = {
-    .name = FMC130M_4CH_NAME_LEDS,
-    .opcode = FMC130M_4CH_OPCODE_LEDS,
-    .func_fp = _fmc130m_4ch_leds,
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_FMC130M_4CH_PLL_FUNC_MIN            0 /* PLL FUNCTION pin 0 */
 #define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
 
@@ -93,19 +83,6 @@ RW_PARAM_FUNC(fmc130m_4ch, pll_func) {
             BPM_FMC130M_4CH_PLL_FUNC_MIN, BPM_FMC130M_4CH_PLL_FUNC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_pll_func_exp = {
-    .name = FMC130M_4CH_NAME_PLL_FUNCTION,
-    .opcode = FMC130M_4CH_OPCODE_PLL_FUNCTION,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
 {
@@ -128,17 +105,6 @@ static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
 err_smpr_write:
     return err;
 }
-
-disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
-    .func_fp = _fmc130m_4ch_ad9510_cfg_defaults,
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_END
-    }
-};
 
 /* FIXME: Override DATA<channel_number>_VAL macros with the DATA_GLOBAL ones.
  * As the macros are defined with 32-bits and there is a shift involved, the
@@ -170,19 +136,6 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data0) {
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_data0_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DATA0,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DATA0,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data0),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
@@ -192,19 +145,6 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data1) {
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_data1_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DATA1,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DATA1,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data1),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 #define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_MASK       WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
 #define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
@@ -216,19 +156,6 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data2) {
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_data2_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DATA2,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DATA2,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data2),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_R(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_R(val)
@@ -239,19 +166,6 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data3) {
             rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_data3_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DATA3,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DATA3,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data3),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 /******************************** ADC Delay Values ****************************/
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val0) {
@@ -261,38 +175,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val0) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_val0_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_VAL0,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_VAL0,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val0),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val1) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_val1_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_VAL1,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_VAL1,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val1),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val2) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -301,38 +189,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val2) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_val2_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_VAL2,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_VAL2,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val2),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_val3) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_val3_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_VAL3,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_VAL3,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val3),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /******************************** ADC Delay Lines *****************************/
 
@@ -343,38 +205,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line0) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_line0_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_LINE0,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_LINE0,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line0),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line1) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_line1_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_LINE1,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_LINE1,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line1),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line2) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -383,38 +219,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line2) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_line2_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_LINE2,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_LINE2,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line2),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_line3) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_line3_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_LINE3,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_LINE3,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line3),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /******************************** ADC Delay Update ****************************/
 
@@ -425,38 +235,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt0) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_updt0_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_UPDT0,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_UPDT0,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt0),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt1) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY1_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_updt1_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_UPDT1,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_UPDT1,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt1),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt2) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -465,38 +249,12 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt2) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_adc_dly_updt2_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_UPDT2,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_UPDT2,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt2),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt3) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
             IDELAY3_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_adc_dly_updt3_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY_UPDT3,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY_UPDT3,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt3),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /***************************** Convenient ADC Delay ***************************/
 
@@ -594,72 +352,20 @@ FMC130M_4CH_ADC_DLY_FUNC_HEADER(0)
     FMC130M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 0);
 }
 
-disp_op_t fmc130m_4ch_adc_dly0_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY0,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY0,
-    .func_fp = FMC130M_4CH_ADC_DLY_FUNC_NAME(0),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_ADC_DLY_FUNC_HEADER(1)
 {
     FMC130M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 1);
 }
-
-disp_op_t fmc130m_4ch_adc_dly1_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY1,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY1,
-    .func_fp = FMC130M_4CH_ADC_DLY_FUNC_NAME(1),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 FMC130M_4CH_ADC_DLY_FUNC_HEADER(2)
 {
     FMC130M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 2);
 }
 
-disp_op_t fmc130m_4ch_adc_dly2_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY2,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY2,
-    .func_fp = FMC130M_4CH_ADC_DLY_FUNC_NAME(2),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_ADC_DLY_FUNC_HEADER(3)
 {
     FMC130M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 3);
 }
-
-disp_op_t fmc130m_4ch_adc_dly3_exp = {
-    .name = FMC130M_4CH_NAME_ADC_DLY3,
-    .opcode = FMC130M_4CH_OPCODE_ADC_DLY3,
-    .func_fp = FMC130M_4CH_ADC_DLY_FUNC_NAME(3),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /***************************** FPGA Control ***************************/
 
@@ -673,19 +379,6 @@ RW_PARAM_FUNC(fmc130m_4ch, test_data_en) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t fmc130m_4ch_test_data_en_exp = {
-    .name = FMC130M_4CH_NAME_TEST_DATA_EN,
-    .opcode = FMC130M_4CH_OPCODE_TEST_DATA_EN,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, test_data_en),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_FMC130M_4CH_SI571_OE_MIN            0 /* SI571 Output disable */
 #define BPM_FMC130M_4CH_SI571_OE_MAX            1 /* SI571 Output enable */
 
@@ -695,19 +388,6 @@ RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
             BPM_FMC130M_4CH_SI571_OE_MIN, BPM_FMC130M_4CH_SI571_OE_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t fmc130m_4ch_si571_oe_exp = {
-    .name = FMC130M_4CH_NAME_SI571_OE,
-    .opcode = FMC130M_4CH_OPCODE_SI571_OE,
-    .func_fp = RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /******************************** Chips Export functions *************************/
 
@@ -751,37 +431,11 @@ FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_a_div)
             "Could not set AD9510 PLL A divider");
 }
 
-disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_b_div)
 {
     FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_b_div,
             "Could not set AD9510 PLL B divider");
 }
-
-disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_prescaler)
 {
@@ -789,37 +443,11 @@ FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_prescaler)
             "Could not set AD9510 PLL Prescaler");
 }
 
-disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(r_div)
 {
     FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_r_div,
             "Could not set AD9510 R Divider");
 }
-
-disp_op_t fmc130m_4ch_ad9510_r_div_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_R_DIV,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_R_DIV,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(r_div),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_pdown)
 {
@@ -827,37 +455,11 @@ FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_pdown)
             "Could not power down AD9510 PLL");
 }
 
-disp_op_t fmc130m_4ch_ad9510_pll_pdown_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_pdown),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(mux_status)
 {
     FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_mux_status,
             "Could not set AD9510 MUX status");
 }
-
-disp_op_t fmc130m_4ch_ad9510_mux_status_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_MUX_STATUS,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(mux_status),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(cp_current)
 {
@@ -865,56 +467,17 @@ FMC130M_4CH_AD9510_FUNC_NAME_HEADER(cp_current)
             "Could not set AD9510 CP current");
 }
 
-disp_op_t fmc130m_4ch_ad9510_cp_current_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_CP_CURRENT,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(outputs)
 {
     FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_outputs,
             "Could not set AD9510 Outputs");
 }
 
-disp_op_t fmc130m_4ch_ad9510_outputs_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_OUTPUTS,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(outputs),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_clk_sel)
 {
     FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, smch_ad9510_pll_clk_sel,
             "Could not set AD9510 PLL CLK selection");
 }
-
-disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
-    .func_fp = FMC130M_4CH_AD9510_FUNC_NAME(pll_clk_sel),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /* Macros to avoid repetition of the function body Si57X */
 typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
@@ -956,39 +519,56 @@ FMC130M_4CH_SI571_FUNC_NAME_HEADER(set_freq)
             "Could not set SI571 frequency");
 }
 
-disp_op_t fmc130m_4ch_si571_set_freq_exp = {
-    .name = FMC130M_4CH_NAME_SI571_SET_FREQ,
-    .opcode = FMC130M_4CH_OPCODE_SI571_SET_FREQ,
-    .func_fp = FMC130M_4CH_SI571_FUNC_NAME(set_freq),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-        DISP_ARG_END
-    }
-};
-
 FMC130M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
 {
     FMC130M_4CH_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_defaults,
             "Could not restart SI571 to its defaults");
 }
 
-disp_op_t fmc130m_4ch_si571_get_defaults_exp = {
-    .name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS,
-    .opcode = FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS,
-    .func_fp = FMC130M_4CH_SI571_FUNC_NAME(get_defaults),
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-        DISP_ARG_END
-    }
+/* Exported function pointers */
+const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
+    _fmc130m_4ch_leds,
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
+    _fmc130m_4ch_ad9510_cfg_defaults,
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data0),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data1),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data2),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data3),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val0),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val1),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val2),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_val3),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line0),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line1),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line2),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_line3),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt0),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt1),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt2),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dly_updt3),
+    FMC130M_4CH_ADC_DLY_FUNC_NAME(0),
+    FMC130M_4CH_ADC_DLY_FUNC_NAME(1),
+    FMC130M_4CH_ADC_DLY_FUNC_NAME(2),
+    FMC130M_4CH_ADC_DLY_FUNC_NAME(3),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, test_data_en),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
+    FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
+    FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
+    FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),
+    FMC130M_4CH_AD9510_FUNC_NAME(r_div),
+    FMC130M_4CH_AD9510_FUNC_NAME(pll_pdown),
+    FMC130M_4CH_AD9510_FUNC_NAME(mux_status),
+    FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
+    FMC130M_4CH_AD9510_FUNC_NAME(outputs),
+    FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
+    FMC130M_4CH_AD9510_FUNC_NAME(pll_clk_sel),
+    FMC130M_4CH_SI571_FUNC_NAME(set_freq),
+    FMC130M_4CH_SI571_FUNC_NAME(get_defaults),
+    NULL
 };
 
-const disp_op_t *fmc130m_exp_ops [] = {
+/* Exported function description */
+const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
     &fmc130m_4ch_pll_func_exp,
     &fmc130m_4ch_ad9510_cfg_defaults_exp,
@@ -1105,7 +685,20 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
     /* Set SMIO ops pointers */
     self->ops = &fmc130m_4ch_ops;
     self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
-    self->exp_ops = fmc130m_exp_ops;
+
+
+    /* Fill the disp_op_t description structure with the callbacks. */
+
+    /* disp_op_t structure is const and all of the functions performing on it
+     * obviously receives a const argument, but here (and only on the SMIO
+     * initialization) we need to make an exception if we want to keep the
+     * functions' description and the function pointers separate */
+    err = smio_init_exp_ops (self, (disp_op_t **) fmc130m_4ch_exp_ops, fmc130m_4ch_exp_fp,
+            ARRAY_SIZE(fmc130m_4ch_exp_ops));
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
+            "function descriptors with the callbacks", err_fill_desc);
+
+    self->exp_ops = fmc130m_4ch_exp_ops;
 
     /* Initialize specific structure */
     self->smio_handler = smio_fmc130m_4ch_new (self);
@@ -1114,6 +707,7 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
     return err;
 
 err_smio_handler_alloc:
+err_fill_desc:
     free (self->name);
 err_name_alloc:
     return err;
