@@ -175,6 +175,34 @@ halutils_err_e disp_table_remove_all (disp_table_t *self)
     return HALUTILS_SUCCESS;
 }
 
+/* FIXME: unsafe iteration */
+halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
+        const disp_table_func_fp *func_fps, size_t size)
+{
+    assert (self);
+    assert (disp_ops);
+    assert (func_fps);
+
+    halutils_err_e err = HALUTILS_SUCCESS;
+    disp_op_t **disp_ops_it = disp_ops;
+    const disp_table_func_fp *func_fps_it = func_fps;
+
+    uint32_t i;
+    for (i = 0; i < size; ++i, ++disp_ops_it, ++func_fps_it) {
+
+        ASSERT_TEST (*func_fps_it != NULL, "Attempt to initialize a function "
+                "description with NULL pointer", err_func_fp_null,
+                HALUTILS_ERR_NULL_POINTER);
+        /* Initialize funcp_fp field with the function pointer passed to it */
+
+        /* */
+        (*disp_ops_it)->func_fp = *func_fps_it;
+    }
+
+err_func_fp_null:
+    return err;
+}
+
 halutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret)
 {

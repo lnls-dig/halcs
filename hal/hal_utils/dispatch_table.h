@@ -84,11 +84,15 @@ extern const disp_op_t disp_op_end;
 
 disp_table_t *disp_table_new (void);
 halutils_err_e disp_table_destroy (disp_table_t **self_p);
+
 halutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t *disp_op);
 halutils_err_e disp_table_insert_all (disp_table_t *self,
         const disp_op_t **disp_ops);
 halutils_err_e disp_table_remove (disp_table_t *self, uint32_t key);
 halutils_err_e disp_table_remove_all (disp_table_t *self);
+
+halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
+        const disp_table_func_fp *func_fps, size_t size);
 halutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 halutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key);
@@ -98,5 +102,6 @@ int disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
 int disp_table_check_call (disp_table_t *self, uint32_t key, void *owner,
         void *args, void **ret);
 halutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
+
 #endif
 
