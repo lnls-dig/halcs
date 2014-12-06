@@ -18,6 +18,8 @@
 #include "sm_io_swap_useful_macros.h"
 #include "wb_bpm_swap_regs.h"
 #include "sm_io_swap_defaults.h"
+#include "sm_io_swap_exports.h"
+#include "hal_stddef.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -61,19 +63,6 @@ RW_PARAM_FUNC(swap, sw) {
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_sw_exp = {
-    .name = SWAP_NAME_SET_GET_SW,
-    .opcode = SWAP_OPCODE_SET_GET_SW,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, sw),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SW_EN_MIN                           0 /* Switching enabled */
 #define BPM_SW_EN_MAX                           1 /* Switching disabled */
 RW_PARAM_FUNC(swap, sw_en) {
@@ -81,38 +70,12 @@ RW_PARAM_FUNC(swap, sw_en) {
             BPM_SW_EN_MIN, BPM_SW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_sw_en_exp = {
-    .name = SWAP_NAME_SET_GET_SW_EN,
-    .opcode = SWAP_OPCODE_SET_GET_SW_EN,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, sw_en),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SWAP_DIV_F_MIN                      1
 #define BPM_SWAP_DIV_F_MAX                      ((1<<16)-1)
 RW_PARAM_FUNC(swap, div_clk) {
     SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, CTRL, SWAP_DIV_F, MULT_BIT_PARAM,
             BPM_SWAP_DIV_F_MIN, BPM_SWAP_DIV_F_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t swap_set_get_div_clk_exp = {
-    .name = SWAP_NAME_SET_GET_DIV_CLK,
-    .opcode = SWAP_OPCODE_SET_GET_DIV_CLK,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, div_clk),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /* Number of clock cycles between the switching and deswitching */
 #define BPM_SWAP_SW_DLY_MIN                     0
@@ -127,19 +90,6 @@ RW_PARAM_FUNC(swap, sw_dly) {
             SET_FIELD);
 }
 
-disp_op_t swap_set_get_sw_dly_exp = {
-    .name = SWAP_NAME_SET_GET_SW_DLY,
-    .opcode = SWAP_OPCODE_SET_GET_SW_DLY,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, sw_dly),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SWAP_WDW_EN_MIN                     0 /* Windowing enabled */
 #define BPM_SWAP_WDW_EN_MAX                     1 /* Windowing disabled */
 
@@ -149,38 +99,12 @@ RW_PARAM_FUNC(swap, wdw_en) {
             BPM_SWAP_WDW_EN_MIN, BPM_SWAP_WDW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_wdw_en_exp = {
-    .name = SWAP_NAME_SET_GET_WDW_EN,
-    .opcode = SWAP_OPCODE_SET_GET_WDW_EN,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, wdw_en),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SWAP_WDW_DLY_MIN                    1
 #define BPM_SWAP_WDW_DLY_MAX                    ((1<<16)-1)
 RW_PARAM_FUNC(swap, wdw_dly) {
     SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
             BPM_SWAP_WDW_DLY_MIN, BPM_SWAP_WDW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t swap_set_get_wdw_dly_exp = {
-    .name = SWAP_NAME_SET_GET_WDW_DLY,
-    .opcode = SWAP_OPCODE_SET_GET_WDW_DLY,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, wdw_dly),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 /* SWAP gain functions.
  * These are a bit different from the others, in that the parameter passed to
@@ -219,19 +143,6 @@ RW_PARAM_FUNC(swap, gain_a) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_gain_a_exp = {
-    .name = SWAP_NAME_SET_GET_GAIN_A,
-    .opcode = SWAP_OPCODE_SET_GET_GAIN_A,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_a),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SWAP_B_GLOBAL_MASK                  (BPM_SWAP_B_B_MASK      | BPM_SWAP_B_D_MASK)
 #define BPM_SWAP_B_GLOBAL_W(val)                (val)
 #define BPM_SWAP_B_GLOBAL_R(val)                (val)
@@ -240,19 +151,6 @@ RW_PARAM_FUNC(swap, gain_b) {
             BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
             NO_FMT_FUNC, SET_FIELD);
 }
-
-disp_op_t swap_set_get_gain_b_exp = {
-    .name = SWAP_NAME_SET_GET_GAIN_B,
-    .opcode = SWAP_OPCODE_SET_GET_GAIN_B,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_b),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
 
 #define BPM_SWAP_C_GLOBAL_MASK                  (BPM_SWAP_C_C_MASK      | BPM_SWAP_C_A_MASK)
 #define BPM_SWAP_C_GLOBAL_W(val)                (val)
@@ -263,19 +161,6 @@ RW_PARAM_FUNC(swap, gain_c) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_gain_c_exp = {
-    .name = SWAP_NAME_SET_GET_GAIN_C,
-    .opcode = SWAP_OPCODE_SET_GET_GAIN_C,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_c),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 #define BPM_SWAP_D_GLOBAL_MASK                  (BPM_SWAP_D_D_MASK      | BPM_SWAP_D_B_MASK)
 #define BPM_SWAP_D_GLOBAL_W(val)                (val)
 #define BPM_SWAP_D_GLOBAL_R(val)                (val)
@@ -285,19 +170,22 @@ RW_PARAM_FUNC(swap, gain_d) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-disp_op_t swap_set_get_gain_d_exp = {
-    .name = SWAP_NAME_SET_GET_GAIN_D,
-    .opcode = SWAP_OPCODE_SET_GET_GAIN_D,
-    .func_fp = RW_PARAM_FUNC_NAME(swap, gain_d),
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
+/* Exported function pointers */
+const disp_table_func_fp swap_exp_fp [] = {
+    RW_PARAM_FUNC_NAME(swap, sw),
+    RW_PARAM_FUNC_NAME(swap, sw_en),
+    RW_PARAM_FUNC_NAME(swap, div_clk),
+    RW_PARAM_FUNC_NAME(swap, sw_dly),
+    RW_PARAM_FUNC_NAME(swap, wdw_en),
+    RW_PARAM_FUNC_NAME(swap, wdw_dly),
+    RW_PARAM_FUNC_NAME(swap, gain_a),
+    RW_PARAM_FUNC_NAME(swap, gain_b),
+    RW_PARAM_FUNC_NAME(swap, gain_c),
+    RW_PARAM_FUNC_NAME(swap, gain_d),
+    NULL
 };
 
+/* Exported function description */
 const disp_op_t *swap_exp_ops [] = {
     &swap_set_get_sw_exp,
     &swap_set_get_sw_en_exp,
@@ -388,6 +276,18 @@ smio_err_e swap_init (smio_t * self)
     /* Set SMIO ops pointers */
     self->ops = &swap_ops;
     self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
+
+    /* Fill the disp_op_t description structure with the callbacks. */
+
+    /* disp_op_t structure is const and all of the functions performing on it
+     * obviously receives a const argument, but here (and only on the SMIO
+     * initialization) we need to make an exception if we want to keep the
+     * functions' description and the function pointers separate */
+    err = smio_init_exp_ops (self, (disp_op_t **) swap_exp_ops, swap_exp_fp,
+            ARRAY_SIZE(swap_exp_ops));
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
+            "function descriptors with the callbacks", err_fill_desc);
+
     self->exp_ops = swap_exp_ops;
 
     /* Initialize specific structure */
@@ -397,6 +297,7 @@ smio_err_e swap_init (smio_t * self)
     return err;
 
 err_smio_handler_alloc:
+err_fill_desc:
     free (self->name);
 err_name_alloc:
     return err;
