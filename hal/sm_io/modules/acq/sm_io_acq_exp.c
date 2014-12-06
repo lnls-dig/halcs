@@ -17,6 +17,8 @@
 #include "board.h"
 #include "rw_param.h"
 #include "wb_acq_core_regs.h"
+#include "sm_io_acq_exports.h"
+#include "hal_stddef.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -147,19 +149,6 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     return -ACQ_OK;
 }
 
-disp_op_t acq_data_acquire_exp = {
-    .name = ACQ_NAME_DATA_ACQUIRE,
-    .opcode = ACQ_OPCODE_DATA_ACQUIRE,
-    .func_fp = _acq_data_acquire,
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 static int _acq_check_data_acquire (void *owner, void *args, void *ret)
 {
     (void) ret;
@@ -187,17 +176,6 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
             "Acquisition is done\n");
     return -ACQ_OK;
 }
-
-disp_op_t acq_check_data_acquire_exp = {
-    .name = ACQ_NAME_CHECK_DATA_ACQUIRE,
-    .opcode = ACQ_OPCODE_CHECK_DATA_ACQUIRE,
-    .func_fp = _acq_check_data_acquire,
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_END
-    }
-};
 
 static int _acq_get_data_block (void *owner, void *args, void *ret)
 {
@@ -298,19 +276,15 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     return sizeof (*data_block);
 }
 
-disp_op_t acq_get_data_block_exp = {
-    .name = ACQ_NAME_GET_DATA_BLOCK,
-    .opcode = ACQ_OPCODE_GET_DATA_BLOCK,
-    .func_fp = _acq_get_data_block,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, smio_acq_data_block_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
+/* Exported function pointers */
+const disp_table_func_fp acq_exp_fp [] = {
+    _acq_data_acquire,
+    _acq_check_data_acquire,
+    _acq_get_data_block,
+    NULL
 };
 
+/* Exported function description */
 const disp_op_t *acq_exp_ops [] = {
     &acq_data_acquire_exp,
     &acq_check_data_acquire_exp,
@@ -395,6 +369,18 @@ smio_err_e acq_init (smio_t * self)
     /* Set SMIO ops pointers */
     self->ops = &acq_ops;
     self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
+
+    /* Fill the disp_op_t description structure with the callbacks. */
+
+    /* disp_op_t structure is const and all of the functions performing on it
+     * obviously receives a const argument, but here (and only on the SMIO
+     * initialization) we need to make an exception if we want to keep the
+     * functions' description and the function pointers separate */
+    err = smio_init_exp_ops (self, (disp_op_t **) acq_exp_ops, acq_exp_fp,
+            ARRAY_SIZE(acq_exp_ops));
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
+            "function descriptors with the callbacks", err_fill_desc);
+
     self->exp_ops = acq_exp_ops;
 
     /* Initialize specific structure */
@@ -404,6 +390,7 @@ smio_err_e acq_init (smio_t * self)
     return err;
 
 err_smio_handler_alloc:
+err_fill_desc:
     free (self->name);
 err_name_alloc:
     return err;
