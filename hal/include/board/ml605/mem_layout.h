@@ -41,7 +41,7 @@
 #define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
                                                         DSP_BPM_RAW_SWAP_OFFS)
 
-#define WB_ACQ_BASE_RAW_ADDR                        0x00330000
+#define WB_ACQ1_BASE_RAW_ADDR                       0x00330000
 
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
@@ -92,7 +92,7 @@
 #define DSP1_CTRL_REGS                              (/*BAR4_ADDR |*/ DSP1_CTRL_RAW_REGS)
 #define DSP1_BPM_SWAP                               (/*BAR4_ADDR |*/ DSP1_BPM_RAW_SWAP)
 
-#define WB_ACQ_BASE_ADDR                            (BAR4_ADDR | WB_ACQ_BASE_RAW_ADDR)
+#define WB_ACQ1_BASE_ADDR                           (BAR4_ADDR | WB_ACQ1_BASE_RAW_ADDR)
 
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
