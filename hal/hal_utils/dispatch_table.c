@@ -189,13 +189,14 @@ halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
 
     uint32_t i;
     for (i = 0; i < size; ++i, ++disp_ops_it, ++func_fps_it) {
-
+        /* FIXME: This actually does not protect us against vector bounds
+         * differences between disp_ops and func_ops parameters */
+        ASSERT_TEST (*disp_ops_it != NULL, "Attempt to access NULL function descriptor",
+                err_func_fp_null, HALUTILS_ERR_NULL_POINTER);
         ASSERT_TEST (*func_fps_it != NULL, "Attempt to initialize a function "
                 "description with NULL pointer", err_func_fp_null,
                 HALUTILS_ERR_NULL_POINTER);
         /* Initialize funcp_fp field with the function pointer passed to it */
-
-        /* */
         (*disp_ops_it)->func_fp = *func_fps_it;
     }
 
