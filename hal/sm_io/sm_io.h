@@ -137,7 +137,8 @@ typedef struct _smio_thsafe_client_ops_t smio_thsafe_client_ops_t;
 /* smio_err_e smio_destroy (smio_t **self_p); */
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
-        const disp_table_func_fp *func_fps, size_t size);
+        size_t disp_ops_size, const disp_table_func_fp *func_fps,
+        size_t func_fps_size);
 
 /************************************************************/
 /**************** Smio OPS generic methods API **************/

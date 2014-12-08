@@ -139,14 +139,15 @@ smio_err_e smio_do_op (void *owner, void *msg)
 }
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
-        const disp_table_func_fp *func_fps, size_t size)
+        size_t disp_ops_size, const disp_table_func_fp *func_fps,
+        size_t func_fps_size)
 {
     assert(self);
 
     halutils_err_e herr = HALUTILS_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
-    herr = disp_table_fill_desc (self->exp_ops_dtable, smio_exp_ops, func_fps,
-            size);
+    herr = disp_table_fill_desc (self->exp_ops_dtable, smio_exp_ops, disp_ops_size,
+            func_fps, func_fps_size);
     ASSERT_TEST(herr == HALUTILS_SUCCESS, "smio_export_ops: Could not export"
             " fill SMIO ops description", err_fill_desc_ops, SMIO_ERR_EXPORT_OP);
 
