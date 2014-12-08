@@ -288,8 +288,8 @@ smio_err_e dsp_init (smio_t * self)
      * obviously receives a const argument, but here (and only on the SMIO
      * initialization) we need to make an exception if we want to keep the
      * functions' description and the function pointers separate */
-    err = smio_init_exp_ops (self, (disp_op_t **) dsp_exp_ops, dsp_exp_fp,
-            ARRAY_SIZE(dsp_exp_ops));
+    err = smio_init_exp_ops (self, (disp_op_t **) dsp_exp_ops,
+            ARRAY_SIZE(dsp_exp_ops), dsp_exp_fp, ARRAY_SIZE(dsp_exp_fp));
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 

@@ -283,8 +283,8 @@ smio_err_e swap_init (smio_t * self)
      * obviously receives a const argument, but here (and only on the SMIO
      * initialization) we need to make an exception if we want to keep the
      * functions' description and the function pointers separate */
-    err = smio_init_exp_ops (self, (disp_op_t **) swap_exp_ops, swap_exp_fp,
-            ARRAY_SIZE(swap_exp_ops));
+    err = smio_init_exp_ops (self, (disp_op_t **) swap_exp_ops,
+            ARRAY_SIZE(swap_exp_ops), swap_exp_fp, ARRAY_SIZE(swap_exp_fp));
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 

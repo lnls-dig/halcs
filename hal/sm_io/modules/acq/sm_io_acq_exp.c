@@ -376,8 +376,8 @@ smio_err_e acq_init (smio_t * self)
      * obviously receives a const argument, but here (and only on the SMIO
      * initialization) we need to make an exception if we want to keep the
      * functions' description and the function pointers separate */
-    err = smio_init_exp_ops (self, (disp_op_t **) acq_exp_ops, acq_exp_fp,
-            ARRAY_SIZE(acq_exp_ops));
+    err = smio_init_exp_ops (self, (disp_op_t **) acq_exp_ops,
+            ARRAY_SIZE(acq_exp_ops), acq_exp_fp, ARRAY_SIZE(acq_exp_fp));
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 
