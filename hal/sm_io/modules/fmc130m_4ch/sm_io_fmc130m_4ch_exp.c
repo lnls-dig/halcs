@@ -11,7 +11,7 @@
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_fmc130m_4ch_defaults.h"
 #include "sm_io.h"
-#include "dev_io.h"
+#include "dev_io_core.h"
 #include "board.h"
 #include "hal_assert.h"
 #include "rw_param.h"

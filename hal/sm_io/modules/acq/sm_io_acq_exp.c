@@ -11,7 +11,7 @@
 #include "sm_io_acq_codes.h"
 #include "sm_io.h"
 #include "sm_io_exports.h"
-#include "dev_io.h"
+#include "dev_io_core.h"
 #include "hal_assert.h"
 #include "ddr3_map.h"
 #include "board.h"

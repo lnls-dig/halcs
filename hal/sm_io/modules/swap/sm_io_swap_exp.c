@@ -10,7 +10,7 @@
 #include "sm_io_swap_exp.h"
 #include "sm_io_swap_codes.h"
 #include "sm_io.h"
-#include "dev_io.h"
+#include "dev_io_core.h"
 #include "hal_assert.h"
 #include "board.h"
 #include "rw_param.h"
