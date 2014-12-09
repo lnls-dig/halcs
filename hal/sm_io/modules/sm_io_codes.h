@@ -14,4 +14,13 @@
 #include "sm_io_dsp_codes.h"
 #include "sm_io_swap_codes.h"
 
+/* Include all function descriptors */
+#include "sm_io_fmc130m_4ch_exports.h"
+#include "sm_io_acq_exports.h"
+#include "sm_io_dsp_exports.h"
+#include "sm_io_swap_exports.h"
+
+/* Merge all function descriptors in a single structure */
+extern const disp_op_t **smio_exp_ops [];
+
 #endif
