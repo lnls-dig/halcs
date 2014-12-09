@@ -68,6 +68,9 @@ OBJS_BOARD = ../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
 OBJS_PLATFORM = ../hal/debug/debug_print.o ../hal/debug/local_print.o \
 		../hal/debug/debug_subsys.o
+# Objects that are not specificaly related to the bpm_client, but composes
+# our library, as it eases some tasks for us
+OBJS_EXTERNAL = ../hal/sm_io/modules/sm_io_codes.o
 
 # Include directories
 INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
@@ -77,6 +80,7 @@ INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
 	       -I../hal/sm_io/modules/swap \
 	       -I../hal/sm_io/modules/dsp \
 	       -I../hal/sm_io/rw_param \
+	       -I../hal/hal_utils \
 	       -I../hal/include/hw \
 	       -I../hal/boards/$(BOARD) \
 	       -I/usr/local/include
@@ -95,7 +99,7 @@ OUT = $(LIBCLIENT)
 $(LIBCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
 
 # Objects common for both server and client libraries.
-common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM)
+common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 
 # Objects for each version of library
 $(LIBCLIENT)_OBJS = $(common_OBJS) $($(LIBCLIENT)_OBJS_LIB)
@@ -107,6 +111,11 @@ $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_c
 	../hal/include/acq_chan_gen_defs.h \
 	bpm_client_codes.h
 
+$(LIBCLIENT)_FUNC_EXPORTS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+	../hal/sm_io/modules/acq/sm_io_acq_exports.h \
+	../hal/sm_io/modules/dsp/sm_io_dsp_exports.h \
+	../hal/sm_io/modules/swap/sm_io_swap_exports.h
+
 # Install only specific acq_chan.h defintions according to the BOARD MACRO
 #	../hal/include/mem_layout/ml605/acq_chan_ml605.h \
 #	../hal/include/mem_layout/afcv3/acq_chan_afcv3.h
@@ -115,7 +124,8 @@ $(LIBCLIENT)_ACQ_HEADER_BASENAME = acq_chan
 $(LIBCLIENT)_ACQ_HEADERS += \
 	../hal/include/board/$(BOARD)/$($(LIBCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
 
-$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS)
+$(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADERS) \
+    $($(LIBCLIENT)_FUNC_EXPORTS)
 
 # Installation headers
 $(LIBCLIENT)_INST_HEADERS = $($(LIBCLIENT)_HEADERS) $($(LIBCLIENT)_ACQ_HEADER_BASENAME).h
