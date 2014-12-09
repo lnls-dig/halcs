@@ -130,3 +130,17 @@ disp_op_t swap_set_get_gain_d_exp = {
     }
 };
 
+/* Exported function description */
+const disp_op_t *swap_exp_ops [] = {
+    &swap_set_get_sw_exp,
+    &swap_set_get_sw_en_exp,
+    &swap_set_get_div_clk_exp,
+    &swap_set_get_sw_dly_exp,
+    &swap_set_get_wdw_en_exp,
+    &swap_set_get_wdw_dly_exp,
+    &swap_set_get_gain_a_exp,
+    &swap_set_get_gain_b_exp,
+    &swap_set_get_gain_c_exp,
+    &swap_set_get_gain_d_exp,
+    NULL
+};

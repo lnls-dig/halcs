@@ -21,5 +21,7 @@ extern disp_op_t swap_set_get_gain_b_exp;
 extern disp_op_t swap_set_get_gain_c_exp;
 extern disp_op_t swap_set_get_gain_d_exp;
 
+extern const disp_op_t *swap_exp_ops [];
+
 #endif
 

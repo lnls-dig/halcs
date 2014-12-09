@@ -284,14 +284,6 @@ const disp_table_func_fp acq_exp_fp [] = {
     NULL
 };
 
-/* Exported function description */
-const disp_op_t *acq_exp_ops [] = {
-    &acq_data_acquire_exp,
-    &acq_check_data_acquire_exp,
-    &acq_get_data_block_exp,
-    NULL
-};
-
 /************************************************************/
 /***************** Export methods functions *****************/
 /************************************************************/

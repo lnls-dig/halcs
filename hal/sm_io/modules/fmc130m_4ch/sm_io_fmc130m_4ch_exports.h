@@ -47,5 +47,7 @@ extern disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp;
 extern disp_op_t fmc130m_4ch_si571_set_freq_exp;
 extern disp_op_t fmc130m_4ch_si571_get_defaults_exp;
 
+extern const disp_op_t *fmc130m_4ch_exp_ops [];
+
 #endif
 

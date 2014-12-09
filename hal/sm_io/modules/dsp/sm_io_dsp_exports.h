@@ -25,5 +25,7 @@ extern disp_op_t dsp_set_get_monit_pos_y_exp;
 extern disp_op_t dsp_set_get_monit_pos_q_exp;
 extern disp_op_t dsp_set_get_monit_pos_sum_exp;
 
+extern const disp_op_t *dsp_exp_ops [];
+
 #endif
 

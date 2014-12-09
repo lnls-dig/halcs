@@ -441,3 +441,44 @@ disp_op_t fmc130m_4ch_si571_get_defaults_exp = {
     }
 };
 
+/* Exported function description */
+const disp_op_t *fmc130m_4ch_exp_ops [] = {
+    &fmc130m_4ch_leds_exp,
+    &fmc130m_4ch_pll_func_exp,
+    &fmc130m_4ch_ad9510_cfg_defaults_exp,
+    &fmc130m_4ch_adc_data0_exp,
+    &fmc130m_4ch_adc_data1_exp,
+    &fmc130m_4ch_adc_data2_exp,
+    &fmc130m_4ch_adc_data3_exp,
+    &fmc130m_4ch_adc_dly_val0_exp,
+    &fmc130m_4ch_adc_dly_val1_exp,
+    &fmc130m_4ch_adc_dly_val2_exp,
+    &fmc130m_4ch_adc_dly_val3_exp,
+    &fmc130m_4ch_adc_dly_line0_exp,
+    &fmc130m_4ch_adc_dly_line1_exp,
+    &fmc130m_4ch_adc_dly_line2_exp,
+    &fmc130m_4ch_adc_dly_line3_exp,
+    &fmc130m_4ch_adc_dly_updt0_exp,
+    &fmc130m_4ch_adc_dly_updt1_exp,
+    &fmc130m_4ch_adc_dly_updt2_exp,
+    &fmc130m_4ch_adc_dly_updt3_exp,
+    &fmc130m_4ch_adc_dly0_exp,
+    &fmc130m_4ch_adc_dly1_exp,
+    &fmc130m_4ch_adc_dly2_exp,
+    &fmc130m_4ch_adc_dly3_exp,
+    &fmc130m_4ch_test_data_en_exp,
+    &fmc130m_4ch_si571_oe_exp,
+    &fmc130m_4ch_ad9510_pll_a_div_exp,
+    &fmc130m_4ch_ad9510_pll_b_div_exp,
+    &fmc130m_4ch_ad9510_pll_prescaler_exp,
+    &fmc130m_4ch_ad9510_r_div_exp,
+    &fmc130m_4ch_ad9510_pll_pdown_exp,
+    &fmc130m_4ch_ad9510_mux_status_exp,
+    &fmc130m_4ch_ad9510_cp_current_exp,
+    &fmc130m_4ch_ad9510_outputs_exp,
+    &fmc130m_4ch_ad9510_pll_clk_sel_exp,
+    &fmc130m_4ch_si571_set_freq_exp,
+    &fmc130m_4ch_si571_get_defaults_exp,
+    NULL
+};
+

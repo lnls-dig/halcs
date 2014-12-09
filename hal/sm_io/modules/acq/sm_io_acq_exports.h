@@ -14,5 +14,7 @@ extern disp_op_t acq_data_acquire_exp;
 extern disp_op_t acq_check_data_acquire_exp;
 extern disp_op_t acq_get_data_block_exp;
 
+extern const disp_op_t *acq_exp_ops [];
+
 #endif
 

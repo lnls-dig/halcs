@@ -188,25 +188,6 @@ const disp_table_func_fp dsp_exp_fp [] = {
     NULL
 };
 
-/* Exported function description */
-const disp_op_t *dsp_exp_ops [] = {
-    &dsp_set_get_kx_exp,
-    &dsp_set_get_ky_exp,
-    &dsp_set_get_ksum_exp,
-    &dsp_set_get_ds_tbt_thres_exp,
-    &dsp_set_get_ds_fofb_thres_exp,
-    &dsp_set_get_ds_monit_thres_exp,
-    &dsp_set_get_monit_amp_ch0_exp,
-    &dsp_set_get_monit_amp_ch1_exp,
-    &dsp_set_get_monit_amp_ch2_exp,
-    &dsp_set_get_monit_amp_ch3_exp,
-    &dsp_set_get_monit_pos_x_exp,
-    &dsp_set_get_monit_pos_y_exp,
-    &dsp_set_get_monit_pos_q_exp,
-    &dsp_set_get_monit_pos_sum_exp,
-    NULL
-};
-
 /************************************************************/
 /***************** Export methods functions *****************/
 /************************************************************/
