@@ -77,9 +77,6 @@ struct _disp_op_t {
 /* Dispatch exported interface function structure */
 typedef struct _disp_op_t disp_op_t;
 
-/* Dummy disp_op structure */
-extern const disp_op_t disp_op_end;
-
 /***************** Our methods *****************/
 
 disp_table_t *disp_table_new (void);
@@ -92,8 +89,8 @@ halutils_err_e disp_table_remove (disp_table_t *self, uint32_t key);
 halutils_err_e disp_table_remove_all (disp_table_t *self);
 
 halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
-        size_t disp_ops_size, const disp_table_func_fp *func_fps,
-        size_t func_fps_size);
+        const disp_table_func_fp *func_fps);
+
 halutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 halutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key);

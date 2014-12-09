@@ -41,17 +41,6 @@
     CHECK_HAL_ERR(err, HAL_UTILS, "[halutils:disp_table]",                      \
             halutils_err_str (err_type))
 
-const disp_op_t disp_op_end = {
-    .name = NULL,
-    .opcode = 0,
-    .func_fp = NULL,
-    .retval = DISP_ARG_END,
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_END
-    }
-};
-
 static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
 static void _disp_table_free_item (void *data);
 static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
@@ -118,7 +107,7 @@ halutils_err_e disp_table_insert_all (disp_table_t *self, const disp_op_t **disp
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
         "[halutils:disp_table] Preparing to insert function in dispatch table\n");
 
-    for ( ; (*disp_op_it)->func_fp != NULL; ++disp_op_it) {
+    for ( ; *disp_op_it != NULL; ++disp_op_it) {
         halutils_err_e err = _disp_table_insert (self, *disp_op_it);
         ASSERT_TEST(err == HALUTILS_SUCCESS,
                 "disp_table_insert_all: Could not insert function",
@@ -176,34 +165,29 @@ halutils_err_e disp_table_remove_all (disp_table_t *self)
 }
 
 halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
-        size_t disp_ops_size,  const disp_table_func_fp *func_fps,
-        size_t func_fps_size)
+        const disp_table_func_fp *func_fps)
 {
     assert (self);
     assert (disp_ops);
     assert (func_fps);
 
     halutils_err_e err = HALUTILS_SUCCESS;
-    ASSERT_TEST (disp_ops_size == func_fps_size,
-            "Attempt to initialize the function descriptor vector with an uneven"
-            " number of function pointers", err_func_fp_null,
-            HALUTILS_ERR_NULL_POINTER);
 
     disp_op_t **disp_ops_it = disp_ops;
     const disp_table_func_fp *func_fps_it = func_fps;
 
-    uint32_t i;
-    for (i = 0; i < disp_ops_size; ++i, ++disp_ops_it, ++func_fps_it) {
-        ASSERT_TEST (*disp_ops_it != NULL, "Attempt to access NULL function descriptor",
-                err_func_fp_null, HALUTILS_ERR_NULL_POINTER);
-        ASSERT_TEST (*func_fps_it != NULL, "Attempt to initialize a function "
-                "description with NULL pointer", err_func_fp_null,
-                HALUTILS_ERR_NULL_POINTER);
+    for ( ; *disp_ops_it != NULL && *func_fps_it != NULL; ++disp_ops_it,
+            ++func_fps_it) {
         /* Initialize funcp_fp field with the function pointer passed to it */
         (*disp_ops_it)->func_fp = *func_fps_it;
     }
 
-err_func_fp_null:
+    ASSERT_TEST ((*disp_ops_it == NULL && *func_fps_it == NULL) ,
+            "Attempt to initialize the function descriptor vector with an "
+            "uneven number of function pointers", err_desc_null,
+            HALUTILS_ERR_NULL_POINTER);
+
+err_desc_null:
     return err;
 }
 
