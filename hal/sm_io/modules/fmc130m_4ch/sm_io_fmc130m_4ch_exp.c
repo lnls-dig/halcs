@@ -560,7 +560,6 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     FMC130M_4CH_AD9510_FUNC_NAME(mux_status),
     FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
     FMC130M_4CH_AD9510_FUNC_NAME(outputs),
-    FMC130M_4CH_AD9510_FUNC_NAME(cp_current),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_clk_sel),
     FMC130M_4CH_SI571_FUNC_NAME(set_freq),
     FMC130M_4CH_SI571_FUNC_NAME(get_defaults),
