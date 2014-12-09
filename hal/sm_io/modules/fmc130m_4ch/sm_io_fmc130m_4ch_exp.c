@@ -605,7 +605,7 @@ const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_ad9510_pll_clk_sel_exp,
     &fmc130m_4ch_si571_set_freq_exp,
     &fmc130m_4ch_si571_get_defaults_exp,
-    &disp_op_end
+    NULL
 };
 
 /************************************************************/
@@ -694,8 +694,7 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
      * initialization) we need to make an exception if we want to keep the
      * functions' description and the function pointers separate */
     err = smio_init_exp_ops (self, (disp_op_t **) fmc130m_4ch_exp_ops,
-            ARRAY_SIZE(fmc130m_4ch_exp_ops), fmc130m_4ch_exp_fp,
-            ARRAY_SIZE(fmc130m_4ch_exp_fp));
+            fmc130m_4ch_exp_fp);
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 

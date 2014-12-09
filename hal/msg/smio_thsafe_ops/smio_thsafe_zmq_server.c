@@ -431,6 +431,6 @@ const disp_op_t *smio_thsafe_zmq_server_ops [] = {
     &thsafe_zmq_server_write_block_exp,
     &thsafe_zmq_server_read_dma_exp,
     &thsafe_zmq_server_write_dma_exp,
-    &disp_op_end
+    NULL
 };
 
