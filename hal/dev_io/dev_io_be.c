@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "czmq.h"
-#include "dev_io.h"
+#include "dev_io_be.h"
 #include "debug_print.h"
 #include "ll_io_utils.h"
 #include "board.h"
@@ -15,7 +15,8 @@ static devio_err_e spwan_platform_smios (devio_t *devio);
 
 void print_help (char *program_name)
 {
-    printf( "Usage: %s [options]\n"
+    printf( "DBE BPM Device I/O\n"
+            "Usage: %s [options]\n"
             "\t-h This help message\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"

@@ -24,12 +24,14 @@ dev_mngr_OBJS = $(dev_mngr_core_OBJS) $(debug_OBJS) \
 		$(thsafe_msg_zmq_OBJS) $(ll_io_utils_OBJS)
 # msg_OBJS already contains exp_ops_OBJS. So, there is no need to include
 # it here twice
-dev_io_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
+dev_io_be_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
 	      $(msg_OBJS) $(debug_OBJS) $(hal_utils_OBJS)
 
 dev_mngr_LIBS =
-dev_io_LIBS = 
-dev_io_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
+dev_mngr_STATIC_LIBS =
+
+dev_io_be_LIBS =
+dev_io_be_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
 
 # Merge all hal objects together
 hal_OBJS = $(debug_OBJS) \
