@@ -70,7 +70,11 @@ OBJS_PLATFORM = ../hal/debug/debug_print.o ../hal/debug/local_print.o \
 		../hal/debug/debug_subsys.o
 # Objects that are not specificaly related to the bpm_client, but composes
 # our library, as it eases some tasks for us
-OBJS_EXTERNAL = ../hal/sm_io/modules/sm_io_codes.o
+OBJS_EXTERNAL = ../hal/sm_io/modules/sm_io_codes.o \
+                ../hal/sm_io/modules/acq/sm_io_acq_exports.o \
+                ../hal/sm_io/modules/dsp/sm_io_dsp_exports.o \
+                ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
+                ../hal/sm_io/modules/swap/sm_io_swap_exports.o
 
 # Include directories
 INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
