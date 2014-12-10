@@ -13,8 +13,23 @@ MAKE =		make
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
+#Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
+LOCAL_MSG_DBG ?= n
+#Select if we want to compile with debug mode on. Options are: y(es) or n(o)
+DBE_DBG ?= y
 # Select the FMC ADC board type. Options are: passive or active
 FMC130M_4CH_TYPE ?= passive
+# Select if we should program FMC EEPROM with some code or not. Option are:
+# active, passive or nothing (dont' program EEPROM)
+FMC130M_4CH_EEPROM_PROGRAM ?=
+# Selects if we want to compile DEV_MNGR. Options are: y(es) or n(o)
+WITH_DEV_MNGR ?= y
+# Selects if we want to compile DEVIO's for the Back-End (FPGA board). Options are: y(es) or n(o)
+WITH_DBE_DEVIO ?= y
+# Selects if we want to compile DEVIO's for the Front-End (RFFE). Options are: y(es) or n(o)
+WITH_AFE_DEVIO ?= n
+# Selects the AFE RFFE version. Options are: 2
+AFE_RFFE_TYPE ?= 2
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
@@ -51,8 +66,30 @@ ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
 CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
 endif
 
-LOCAL_MSG_DBG ?= n
-DBE_DBG ?= n
+# Compile DEV MNGR or not
+ifeq ($(WITH_DEV_MNGR),y)
+CFLAGS += -D__WITH_DEV_MNGR__
+endif
+
+# Compile DBE DEVIO or not
+ifeq ($(WITH_DBE_DEVIO),y)
+CFLAGS += -D__WITH_DBE_DEVIO__
+endif
+
+# Compile AFE RFFE DEVIO or not
+ifeq ($(WITH_AFE_DEVIO),y)
+CFLAGS += -D__WITH_AFE_DEVIO__
+endif
+
+ifeq ($(AFE_RFFE_TYPE),1)
+CFLAGS += -D__AFE_RFFE_V1__
+endif
+
+ifeq ($(AFE_RFFE_TYPE),2)
+CFLAGS += -D__AFE_RFFE_V2__
+endif
+
+# Debug conditional flags
 CFLAGS_DEBUG =
 
 ifeq ($(LOCAL_MSG_DBG),y)
@@ -95,6 +132,9 @@ LDFLAGS = $(LDFLAGS_PLATFORM)
 
 # Output modules
 OUT = $(hal_OUT)
+
+# All possible output modules
+ALL_OUT = $(hal_all_OUT)
 
 .SECONDEXPANSION:
 
@@ -203,7 +243,7 @@ hal_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 hal_mrproper:
-	rm -f $(OUT)
+	rm -f $(ALL_OUT)
 
 tests:
 	$(MAKE) -C tests all
