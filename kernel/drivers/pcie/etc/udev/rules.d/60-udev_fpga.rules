@@ -1,3 +1,0 @@
-# Permissions for the fpga devices
-
-KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660"
