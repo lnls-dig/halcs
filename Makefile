@@ -38,7 +38,7 @@ INIT_SCRIPTS = init.sh shutdown.sh
 
 # Kernel stuff (pcie driver and library) relative
 # directory
-KERNEL_DIR = kernel
+KERNEL_DIR = kernel/pcie-driver/
 KERNEL_VER = $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
 
