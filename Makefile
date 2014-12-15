@@ -36,11 +36,18 @@ export INSTALL_DIR
 
 INIT_SCRIPTS = init.sh shutdown.sh
 
-# Kernel stuff (pcie driver and library) relative
+# Subdmoules and third-party codes
+FOREIGN_DIR = foreign
+
+# Our submodules and third-party codes
+LIBMDP_DIR = $(FOREIGN_DIR)/libmdp/libmdp
+LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
+PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
+
+# PCIe driver stuff (pcie driver and library) relative
 # directory
-KERNEL_DIR = kernel/pcie-driver/
-KERNEL_VER = $(shell uname -r)
-DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
+PCIE_DRIVER_VER = $(shell uname -r)
+DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 
 # Client library
 LIBCLIENT_DIR=libclient
@@ -122,7 +129,7 @@ include hal/hal.mk
 
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
-	       -I$(KERNEL_DIR)/include/pcie \
+	       -I$(PCIE_DRIVER_DIR)/include/pcie \
 	       -I/usr/local/include
 
 # Merge all flags.
@@ -145,18 +152,20 @@ OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 
-.PHONY: all kernel clean mrproper install uninstall tests examples \
-	kernel_install kernel_uninstall kernel_check \
-	libclient libclient_install libclient_uninstall libclient_mrproper \
+.PHONY: all install uninstall clean mrproper \
+	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
+	libclient libclient_install libclient_uninstall libclient_clean libclient_mrproper \
+	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
+	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
 	tests tests_clean tests_mrproper \
-	examples_clean examples_mrproper
+	examples examples_clean examples_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel libclient $(OUT)
+all: pcie_driver libmdp libbsmp libclient $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
@@ -195,11 +204,11 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-kernel: kernel_check
-	$(MAKE) -C $(KERNEL_DIR) all
+pcie_driver: pcie_driver_check
+	$(MAKE) -C $(PCIE_DRIVER_DIR) all
 
 #Verify if the driver is in place
-kernel_check:
+pcie_driver_check:
 ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
 	@echo "Compilation will continue, but you must install";
@@ -207,14 +216,57 @@ ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@sleep 2;
 endif
 
-kernel_install:
-	$(MAKE) -C $(KERNEL_DIR) install
+pcie_driver_install:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) install
 
-kernel_uninstall:
-	$(MAKE) -C $(KERNEL_DIR) uninstall
+pcie_driver_uninstall:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) uninstall
 
-kernel_clean:
-	$(MAKE) -C $(KERNEL_DIR) clean
+pcie_driver_clean:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
+
+libmdp_pre:
+	cd $(LIBMDP_DIR) && \
+	    ./autogen.sh && \
+	    ./configure
+
+libmdp_check: libmdp_pre
+	cd $(LIBMDP_DIR) && \
+	    $(MAKE) check
+
+libmdp: libmdp_check
+
+libmdp_install: libmdp_pre
+	cd $(LIBMDP_DIR) && \
+	    $(MAKE) install && \
+	    ldconfig
+
+libmdp_uninstall: libmdp_pre
+	cd $(LIBMDP_DIR) && \
+	    $(MAKE) uninstall
+
+libmdp_clean: libmdp_pre
+	cd $(LIBMDP_DIR) && \
+	    $(MAKE) clean
+
+libmdp_mrproper: libmdp_pre
+	cd $(LIBMDP_DIR) && \
+	    $(MAKE) distclean
+
+libbsmp:
+	$(MAKE) -C $(LIBBSMP_DIR) all
+
+libbsmp_install:
+	$(MAKE) -C $(LIBBSMP_DIR) install
+
+libbsmp_uninstall:
+	$(MAKE) -C $(LIBBSMP_DIR) uninstall
+
+libbsmp_clean:
+	$(MAKE) -C $(LIBBSMP_DIR) clean
+
+libbsmp_mrproper:
+	$(MAKE) -C $(LIBBSMP_DIR) distclean
 
 libclient:
 	$(MAKE) -C $(LIBCLIENT_DIR) all
@@ -232,11 +284,11 @@ libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
 hal_install:
-	$(foreach hal_bin,$(OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+	$(foreach hal_bin,$(ALL_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
 
 hal_uninstall:
-	$(foreach hal_bin,$(OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
+	$(foreach hal_bin,$(ALL_OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(hal_script) $(CMDSEP))
 
 hal_clean:
@@ -263,11 +315,11 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-install: hal_install kernel_install libclient_install
+install: hal_install pcie_driver_install libclient_install libmdp_install libbsmp_install
 
-uninstall: hal_uninstall kernel_uninstall libclient_uninstall
+uninstall: hal_uninstall pcie_driver_uninstall libclient_uninstall libmdp_uninstall libbsmp_uninstall
 
-clean: hal_clean kernel_clean libclient_clean examples_clean tests_clean
+clean: hal_clean pcie_driver_clean libclient_clean examples_clean tests_clean libmdp_clean libbsmp_clean
 
-mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper
+mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper libmdp_mrproper libbsmp_mrproper
 
