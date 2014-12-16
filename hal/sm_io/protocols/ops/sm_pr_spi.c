@@ -113,12 +113,18 @@ int spi_open (smpr_t *self, uint32_t base, void *args)
             "\tconfig register = 0x%08X\n",
             spi_proto->sys_freq, spi_proto->spi_freq, spi_proto->init_config);
 
-    self->proto_handler = spi_proto;
+    /* Attach specific protocol handler to generic one */
+    SMPR_PROTO_SPI(self) = spi_proto;
+
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Initializing SPI protocol\n");
-    _spi_init (self);
+    smpr_err_e err = _spi_init (self);
+    ASSERT_TEST(err == SMPR_SUCCESS, "Could not initialize SPI protocol handler",
+            err_proto_handler_init);
 
     return 0;
 
+err_proto_handler_init:
+    smpr_proto_spi_destroy (&SMPR_PROTO_SPI(self));
 err_proto_handler_alloc:
     return -1;
 }
@@ -129,10 +135,8 @@ int spi_release (smpr_t *self)
     assert (self);
 
     /* Deattach specific protocol handler to generic one */
-    smpr_err_e err = smpr_proto_spi_destroy ((smpr_proto_spi_t **) &self->proto_handler);
+    smpr_err_e err = smpr_proto_spi_destroy (&SMPR_PROTO_SPI(self));
     ASSERT_TEST (err==SMPR_SUCCESS, "Could not close device appropriately", err_dealloc);
-
-    self->proto_handler = NULL;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[smpr:spi] Closed SPI protocol handler\n");
 
     return 0;
