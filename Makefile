@@ -226,32 +226,28 @@ pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
 
 libmdp_pre:
-	cd $(LIBMDP_DIR) && \
+ifeq ($(wildcard $(LIBMDP_DIR)/Makefile),)
+	@echo "LIBMDP is not configured. Configuring ..."
+	@cd $(LIBMDP_DIR) && \
 	    ./autogen.sh && \
 	    ./configure
+endif
 
-libmdp_check: libmdp_pre
-	cd $(LIBMDP_DIR) && \
-	    $(MAKE) check
-
-libmdp: libmdp_check
+libmdp: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR)
 
 libmdp_install: libmdp_pre
-	cd $(LIBMDP_DIR) && \
-	    $(MAKE) install && \
-	    ldconfig
+	$(MAKE) -C $(LIBMDP_DIR) install
+	ldconfig
 
 libmdp_uninstall: libmdp_pre
-	cd $(LIBMDP_DIR) && \
-	    $(MAKE) uninstall
+	$(MAKE) -C $(LIBMDP_DIR) install
 
 libmdp_clean: libmdp_pre
-	cd $(LIBMDP_DIR) && \
-	    $(MAKE) clean
+	$(MAKE) -C $(LIBMDP_DIR) clean
 
 libmdp_mrproper: libmdp_pre
-	cd $(LIBMDP_DIR) && \
-	    $(MAKE) distclean
+	$(MAKE) -C $(LIBMDP_DIR) distclean
 
 libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
