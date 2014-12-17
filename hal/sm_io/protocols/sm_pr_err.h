@@ -15,9 +15,10 @@ enum _smpr_err_e
 {
     SMPR_SUCCESS = 0,               /* No error */
     SMPR_ERR_ALLOC,                 /* Could not allocate memory */
-    SMPR_ERR_INV_FUNC_PARAM,        /* Invalid function paramter */
-    SMPR_ERR_FUNC_NOT_IMPL,         /* Fucntions not implemented */
+    SMPR_ERR_INV_FUNC_PARAM,        /* Invalid function parameter */
+    SMPR_ERR_FUNC_NOT_IMPL,         /* Functions not implemented */
     SMPR_ERR_RW_SMIO,               /* Invalid function parameter */
+    SMPR_ERR_DUP_HANDLER,           /* Protocol handler already set */
     SMPR_ERR_END                    /* End of enum marker */
 };
 

@@ -16,7 +16,8 @@ static const char *smpr_err [SMPR_ERR_END] =
     [SMPR_ERR_ALLOC]            = "Could not allocate memory",
     [SMPR_ERR_INV_FUNC_PARAM]   = "Invalid function parameter",
     [SMPR_ERR_RW_SMIO]          = "Could not Read/Write to/from SMIO",
-    [SMPR_ERR_FUNC_NOT_IMPL]    = "Function not implemented"
+    [SMPR_ERR_FUNC_NOT_IMPL]    = "Function not implemented",
+    [SMPR_ERR_DUP_HANDLER]      = "Protocol handler already set"
 };
 
 /* Convert enumeration type to string */

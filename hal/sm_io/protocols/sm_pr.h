@@ -102,6 +102,10 @@ typedef enum _smpr_type_e smpr_type_e;
 smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose);
 /* Destroy an instance of the Low-level I/O */
 smpr_err_e smpr_destroy (smpr_t **self_p);
+/* Register Specific Protocol operations to smpr instance */
+smpr_err_e smpr_set_handler (smpr_t *self, void *handler);
+/* Unregister Specific Protocol operations to smpr instance */
+void *smpr_unset_handler (smpr_t *self);
 
 /************************************************************/
 /***************** Thsafe generic methods API ***************/

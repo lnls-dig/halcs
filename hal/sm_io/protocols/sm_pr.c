@@ -97,6 +97,37 @@ smpr_err_e smpr_destroy (smpr_t **self_p)
     return SMPR_SUCCESS;
 }
 
+/* Register Specific Protocol operations to smpr instance */
+smpr_err_e smpr_set_handler (smpr_t *self, void *handler)
+{
+    assert (self);
+    assert (handler);
+
+    smpr_err_e err = SMPR_SUCCESS;
+
+    ASSERT_TEST(self->proto_handler == NULL, "Trying to set another handler to "
+            "SMPR instance", err_dup_handler, SMPR_ERR_DUP_HANDLER);
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Setting protocol handler: %s\n",
+            self->name);
+    self->proto_handler = handler;
+
+err_dup_handler:
+    return err;
+}
+
+/* Unregister Specific Protocol operations to smpr instance */
+void *smpr_unset_handler (smpr_t *self)
+{
+    assert (self);
+
+    void *proto_handler = self->proto_handler;
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Unsetting protocol handler: %s\n",
+            self->name);
+    self->proto_handler = NULL;
+
+    return proto_handler;
+}
+
 /**************** Helper Functions ***************/
 
 /* Register Specific Protocol operations to smpr instance. Helper function */
