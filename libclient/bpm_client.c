@@ -97,6 +97,7 @@ void bpm_client_destroy (bpm_client_t **self_p)
 
         self->acq_chan = NULL;
         mdp_client_destroy (&self->mdp_client);
+        free (self);
         *self_p = NULL;
     }
 }
