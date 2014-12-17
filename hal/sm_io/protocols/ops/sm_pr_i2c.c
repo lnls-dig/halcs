@@ -117,17 +117,21 @@ int i2c_open (smpr_t *self, uint32_t base, void *args)
             i2c_proto->sys_freq, i2c_proto->i2c_freq, i2c_proto->init_config);
 
     /* Attach specific protocol handler to generic one */
-    SMPR_PROTO_I2C(self) = i2c_proto;
+    smpr_err_e err = smpr_set_handler (self, i2c_proto);
+    ASSERT_TEST(err == SMPR_SUCCESS, "Could not set protocol handler",
+            err_proto_handler_set);
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:i2c] Initializing I2C protocol\n");
-    smpr_err_e err = _i2c_init (self);
+    err = _i2c_init (self);
     ASSERT_TEST(err == SMPR_SUCCESS, "Could not initialize I2C protocol handler",
             err_proto_handler_init);
 
     return 0;
 
 err_proto_handler_init:
-    smpr_proto_i2c_destroy (&SMPR_PROTO_I2C(self));
+    smpr_unset_handler (self);
+err_proto_handler_set:
+    smpr_proto_i2c_destroy (&i2c_proto);
 err_proto_handler_alloc:
     return -1;
 }
@@ -138,13 +142,17 @@ int i2c_release (smpr_t *self)
     assert (self);
 
     /* Deattach specific protocol handler to generic one */
-    smpr_err_e err = smpr_proto_i2c_destroy (&SMPR_PROTO_I2C(self));
+    smpr_proto_i2c_t *i2c_proto = (smpr_proto_i2c_t *) smpr_unset_handler (self);
+    ASSERT_TEST (i2c_proto != NULL, "Could not unset protocol handler",
+            err_proto_handler_unset);
+    smpr_err_e err = smpr_proto_i2c_destroy (&i2c_proto);
     ASSERT_TEST (err==SMPR_SUCCESS, "Could not close device appropriately", err_dealloc);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[smpr:i2c] Closed I2C protocol handler\n");
 
     return 0;
 
 err_dealloc:
+err_proto_handler_unset:
     return -1;
 }
 

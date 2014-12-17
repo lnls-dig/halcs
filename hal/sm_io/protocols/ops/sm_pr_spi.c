@@ -114,17 +114,21 @@ int spi_open (smpr_t *self, uint32_t base, void *args)
             spi_proto->sys_freq, spi_proto->spi_freq, spi_proto->init_config);
 
     /* Attach specific protocol handler to generic one */
-    SMPR_PROTO_SPI(self) = spi_proto;
+    smpr_err_e err = smpr_set_handler (self, spi_proto);
+    ASSERT_TEST(err == SMPR_SUCCESS, "Could not set protocol handler",
+            err_proto_handler_set);
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Initializing SPI protocol\n");
-    smpr_err_e err = _spi_init (self);
+    err = _spi_init (self);
     ASSERT_TEST(err == SMPR_SUCCESS, "Could not initialize SPI protocol handler",
             err_proto_handler_init);
 
     return 0;
 
 err_proto_handler_init:
-    smpr_proto_spi_destroy (&SMPR_PROTO_SPI(self));
+    smpr_unset_handler (self);
+err_proto_handler_set:
+    smpr_proto_spi_destroy (&spi_proto);
 err_proto_handler_alloc:
     return -1;
 }
@@ -135,13 +139,18 @@ int spi_release (smpr_t *self)
     assert (self);
 
     /* Deattach specific protocol handler to generic one */
-    smpr_err_e err = smpr_proto_spi_destroy (&SMPR_PROTO_SPI(self));
+    smpr_proto_spi_t *spi_proto = (smpr_proto_spi_t *) smpr_unset_handler (self);
+    ASSERT_TEST (spi_proto != NULL, "Could not unset protocol handler",
+            err_proto_handler_unset);
+    /* Destroy protocol handler instance */
+    smpr_err_e err = smpr_proto_spi_destroy (&spi_proto);
     ASSERT_TEST (err==SMPR_SUCCESS, "Could not close device appropriately", err_dealloc);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[smpr:spi] Closed SPI protocol handler\n");
 
     return 0;
 
 err_dealloc:
+err_proto_handler_unset:
     return -1;
 }
 
