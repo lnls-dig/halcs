@@ -253,10 +253,10 @@ libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
 
 libbsmp_install:
-	$(MAKE) -C $(LIBBSMP_DIR) install
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) install
 
 libbsmp_uninstall:
-	$(MAKE) -C $(LIBBSMP_DIR) uninstall
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) uninstall
 
 libbsmp_clean:
 	$(MAKE) -C $(LIBBSMP_DIR) clean
