@@ -114,15 +114,16 @@ smch_err_e smch_24aa64_read_8 (smch_24aa64_t *self, uint16_t addr,
 smch_err_e smch_24aa64_write_block (smch_24aa64_t *self, uint16_t addr,
         const uint32_t *data, size_t size)
 {
-    return (_smch_24aa64_write_generic (self, addr, (const uint8_t *) data, size) ==
-            (ssize_t) size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+    ssize_t ret = _smch_24aa64_write_generic (self, addr,
+            (const uint8_t *) data, size);
+    return (ret >= 0 && (size_t) ret == size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
 smch_err_e smch_24aa64_read_block (smch_24aa64_t *self, uint16_t addr,
         uint32_t *data, size_t size)
 {
-    return (_smch_24aa64_read_generic (self, addr, (uint8_t *) data, size) ==
-            (ssize_t) size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+    ssize_t ret = _smch_24aa64_read_generic (self, addr, (uint8_t *) data, size);
+    return (ret >= 0 && (size_t) ret == size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
 /***************** Static functions *****************/

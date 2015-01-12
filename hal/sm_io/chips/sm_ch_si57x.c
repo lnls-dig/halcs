@@ -205,8 +205,8 @@ static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
 static smch_err_e _smch_si57x_write_block (smch_si57x_t *self, uint8_t addr,
         const uint8_t *data, size_t size)
 {
-    return (_smch_si57x_write_generic (self, addr, data, size) ==
-            (ssize_t) size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+    ssize_t ret = _smch_si57x_write_generic (self, addr, data, size);
+    return (ret >= 0 && (size_t) ret == size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
 static ssize_t _smch_si57x_write_generic (smch_si57x_t *self, uint8_t addr,
@@ -265,8 +265,8 @@ static smch_err_e _smch_si57x_read_8 (smch_si57x_t *self, uint8_t addr,
 static smch_err_e _smch_si57x_read_block (smch_si57x_t *self, uint8_t addr,
         uint8_t *data, size_t size)
 {
-    return (_smch_si57x_read_generic (self, addr, data, size) ==
-            (ssize_t) size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
+    ssize_t ret = _smch_si57x_read_generic (self, addr, data, size);
+    return (ret >= 0 && (size_t) ret == size)? SMCH_SUCCESS : SMCH_ERR_RW_SMPR;
 }
 
 static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8_t *data,

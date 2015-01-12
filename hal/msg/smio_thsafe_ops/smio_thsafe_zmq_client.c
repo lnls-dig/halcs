@@ -496,9 +496,12 @@ static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
         /* Check if the frame has the number of bytes requested.
          * For now, we consider a success only when the number of
          * bytes requested is the same as the actually read*/
-        ssize_t data_frame_size = (ssize_t) zframe_size (data_frame);
-        ASSERT_TEST(data_frame_size ==
-                *(THSAFE_RETURN_TYPE *) zframe_data (return_frame),
+        size_t data_frame_size = zframe_size (data_frame);
+        THSAFE_RETURN_TYPE ret_frame_size =
+            *(THSAFE_RETURN_TYPE *) zframe_data (return_frame);
+
+        ASSERT_TEST(ret_frame_size >= 0 &&
+                (THSAFE_RETURN_UTYPE) ret_frame_size == data_frame_size,
                 "Received data frame size is wrong", err_data_frame_size);
         ASSERT_TEST(data_frame_size >= size,
                 "Specified buffer size is bigger than the available data",

@@ -59,5 +59,7 @@
 /* Messaging Return Codes */
 #define THSAFE_RETURN_TYPE                  int32_t
 #define THSAFE_RETURN_SIZE                  (sizeof (THSAFE_RETURN_TYPE))
+#define THSAFE_RETURN_UTYPE                 uint32_t
+#define THSAFE_RETURN_USIZE                 (sizeof (THSAFE_RETURN_TYPE))
 
 #endif

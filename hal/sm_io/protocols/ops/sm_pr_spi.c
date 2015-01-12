@@ -380,8 +380,8 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         }
 
         /* Return error if we could not write everything */
-        ASSERT_TEST(err == (ssize_t) size, "Could not write everything to TX registers",
-                err_exit, -1);
+        ASSERT_TEST(err >= 0 && (size_t) err == size,
+                "Could not write everything to TX registers", err_exit, -1);
     }
 
     /* Start transfer */
