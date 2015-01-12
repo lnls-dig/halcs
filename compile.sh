@@ -15,23 +15,39 @@ FMC130M_4CH_TYPE=passive
 FMC130M_4CH_EEPROM_PROGRAM=
 # Selects if we want to compile DEV_MNGR. Options are: y(es) or n(o)
 WITH_DEV_MNGR=y
-# Selects if we want to compile DEVIO's for the Back-End (FPGA board). Options are: y(es) or n(o)
-WITH_DBE_DEVIO=y
-# Selects if we want to compile DEVIO's for the Front-End (RFFE). Options are: y(es) or n(o)
-WITH_AFE_DEVIO=n
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE=2
+# Selects the base IP address of all AFE RFFE. The AFE RFFE must be located
+# starting to the specified IP address up to the number of the AFE RFFE.
+#
+# Example:
+#
+# if AFE_BASE_IP_ADDR = 192.168.0.%u and AFE_BASE_IP_OFFSET = 100, the AFE
+# RFFE would have the following IP addresses:
+#
+# AFE RFFE #1 (DBE #1): 192.168.0.100
+# AFE RFFE #2 (DBE #1): 192.168.0.101
+# AFE RFFE #3 (DBE #2): 192.168.0.102
+# AFE RFFE #4 (DBE #2): 192.168.0.103
+# AFE RFFE #3 (DBE #3): 192.168.0.104
+# AFE RFFE #4 (DBE #3): 192.168.0.105
+# ...
+AFE_TRANSPORT="tcp"
+AFE_BASE_IP_PORT="6791"
+AFE_BASE_IP_PATTERN="10.0.18.%u"
+AFE_BASE_IP_OFFSET=100
 
-COMMAND="make mrproper && \
+COMMAND="\
     make BOARD=${BOARD} \
     LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
     DBE_DBG=${DBE_DBG} \
     FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
-    WITH_DBE_DEVIO=${WITH_DBE_DEVIO} \
-    WITH_AFE_DEVIO=${WITH_AFE_DEVIO} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+    AFE_TRANSPORT=${AFE_TRANSPORT} \
+    AFE_BASE_IP_PATTERN=${AFE_BASE_IP_PATTERN} \
+    AFE_BASE_IP_OFFSET=${AFE_BASE_IP_OFFSET} \
     && sudo make install"
 
 echo "Executing: " ${COMMAND}
