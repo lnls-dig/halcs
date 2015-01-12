@@ -42,27 +42,36 @@
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
             char *service, uint32_t param1, uint32_t param2)
 
+#define PARAM_FUNC_CLIENT_WRITE_GEN(param)                                      \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(param) (bpm_client_t *self,     \
+            char *service, void *param, size_t size)
+
 /* Read function declaration */
 #define PARAM_FUNC_CLIENT_READ(reg)                                             \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
             char *service, uint32_t *reg)
 
+#define PARAM_FUNC_CLIENT_READ_DOUBLE(reg)                                      \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
+            char *service, double *reg)
+
 #define PARAM_FUNC_CLIENT_READ2(reg, param1, param2)                            \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
             char *service, uint32_t *param1, uint32_t *param2)
 
-
-typedef bpm_client_err_e (*send_client_fp) (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t param1, void *param2);
+#define PARAM_FUNC_CLIENT_READ_GEN(param)                                       \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(param) (bpm_client_t *self,    \
+            char *service, void *param, size_t size)
 
 struct _bpm_client_t;
 
-bpm_client_err_e param_client_send_32_rw (struct _bpm_client_t *self, char *service,
-    uint32_t operation, uint32_t rw, void *param);
-bpm_client_err_e param_client_send_double_rw (struct _bpm_client_t *self, char *service,
-    uint32_t operation, uint32_t rw, void *param);
+/* Low-level protocol functions */
+bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t rw, void *param, size_t size);
 bpm_client_err_e param_client_recv_rw (struct _bpm_client_t *self, char *service,
     zmsg_t **report);
+
+/* Write functions */
 bpm_client_err_e param_client_write_raw (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2);
 bpm_client_err_e param_client_write (struct _bpm_client_t *self, char *service,
@@ -70,9 +79,15 @@ bpm_client_err_e param_client_write (struct _bpm_client_t *self, char *service,
 bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
         uint32_t operation, double param);
 bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t param1, void *param2, send_client_fp send_client);
+        uint32_t operation, uint32_t param1, void *param2, size_t size);
+
+/* Read functions */
 bpm_client_err_e param_client_read (struct _bpm_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out);
+bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, void *param_out, size_t size);
+bpm_client_err_e param_client_read_double (struct _bpm_client_t *self, char *service,
+        uint32_t operation, double *param_out);
 
 #endif
 
