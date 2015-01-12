@@ -19,6 +19,7 @@ enum _smpr_err_e
     SMPR_ERR_FUNC_NOT_IMPL,         /* Functions not implemented */
     SMPR_ERR_RW_SMIO,               /* Invalid function parameter */
     SMPR_ERR_DUP_HANDLER,           /* Protocol handler already set */
+    SMPR_ERR_PROTO_INFO,            /* Could not retrieve protocol information */
     SMPR_ERR_END                    /* End of enum marker */
 };
 
