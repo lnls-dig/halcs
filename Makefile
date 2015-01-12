@@ -24,12 +24,27 @@ FMC130M_4CH_TYPE ?= passive
 FMC130M_4CH_EEPROM_PROGRAM ?=
 # Selects if we want to compile DEV_MNGR. Options are: y(es) or n(o)
 WITH_DEV_MNGR ?= y
-# Selects if we want to compile DEVIO's for the Back-End (FPGA board). Options are: y(es) or n(o)
-WITH_DBE_DEVIO ?= y
-# Selects if we want to compile DEVIO's for the Front-End (RFFE). Options are: y(es) or n(o)
-WITH_AFE_DEVIO ?= n
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE ?= 2
+# Selects the base IP address of all AFE RFFE. The AFE RFFE must be located
+# starting to the specified IP address up to the number of the AFE RFFE.
+#
+# Example:
+#
+# if AFE_BASE_IP_ADDR = 192.168.0.%u and AFE_BASE_IP_OFFSET = 100, the AFE
+# RFFE would have the following IP addresses:
+#
+# AFE RFFE #1 (DBE #1): 192.168.0.100
+# AFE RFFE #2 (DBE #1): 192.168.0.101
+# AFE RFFE #3 (DBE #2): 192.168.0.102
+# AFE RFFE #4 (DBE #2): 192.168.0.103
+# AFE RFFE #3 (DBE #3): 192.168.0.104
+# AFE RFFE #4 (DBE #3): 192.168.0.105
+# ...
+AFE_TRANSPORT ?= "tcp"
+AFE_BASE_IP_PORT="6791"
+AFE_BASE_IP_PATTERN ?= "192.168.0.%u"
+AFE_BASE_IP_OFFSET ?= 100
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
@@ -78,22 +93,28 @@ ifeq ($(WITH_DEV_MNGR),y)
 CFLAGS += -D__WITH_DEV_MNGR__
 endif
 
-# Compile DBE DEVIO or not
-ifeq ($(WITH_DBE_DEVIO),y)
-CFLAGS += -D__WITH_DBE_DEVIO__
-endif
-
-# Compile AFE RFFE DEVIO or not
-ifeq ($(WITH_AFE_DEVIO),y)
-CFLAGS += -D__WITH_AFE_DEVIO__
-endif
-
 ifeq ($(AFE_RFFE_TYPE),1)
 CFLAGS += -D__AFE_RFFE_V1__
 endif
 
 ifeq ($(AFE_RFFE_TYPE),2)
 CFLAGS += -D__AFE_RFFE_V2__
+endif
+
+ifneq ($(AFE_TRANSPORT),)
+CFLAGS += -D__AFE_TRANSPORT__=$(AFE_TRANSPORT)
+endif
+
+ifneq ($(AFE_BASE_IP_PORT),)
+CFLAGS += -D__AFE_BASE_IP_PORT__=$(AFE_BASE_IP_PORT)
+endif
+
+ifneq ($(AFE_BASE_IP_PATTERN),)
+CFLAGS += -D__AFE_BASE_IP_PATTERN__=$(AFE_BASE_IP_PATTERN)
+endif
+
+ifneq ($(AFE_BASE_IP_OFFSET),)
+CFLAGS += -D__AFE_BASE_IP_OFFSET__=$(AFE_BASE_IP_OFFSET)
 endif
 
 # Debug conditional flags
