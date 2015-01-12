@@ -37,7 +37,7 @@
 
 /************** Utility functions ****************/
 
-const llio_types_t llio_dev_types_map [] ={
+static const llio_types_t llio_dev_types_map [] ={
     {.name = GENERIC_DEV_STR,    .type = GENERIC_DEV},
     {.name = PCIE_DEV_STR,       .type = PCIE_DEV},
     {.name = ETH_DEV_STR,        .type = ETH_DEV},
