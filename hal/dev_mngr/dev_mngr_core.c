@@ -36,16 +36,87 @@
     CHECK_HAL_ERR(err, DEV_MNGR, "dev_mngr_core",           \
             dmngr_err_str (err_type))
 
+#define STRINGIFY(s)                __STRINGIFY(s)
+#define __STRINGIFY(s)              #s
+
 #define LOG_FILENAME_LEN            50
 #define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
 #define DEVMNGR_DFLT_LOG_MODE       "w"
 
-#define DEVIO_DEV_NAME_LEN          20
-#define DEVIO_DEV_NAME              "/dev/fpga%d"
-#define DEVIO_LOG_FILENAME          "dev_io%d.log"
+#define DEVIO_DEV_NAME_LEN          40
+
+#define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
+#define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
+
+#ifndef __AFE_TRANSPORT__
+#error "FE RFFE transport is not defined!"
+#else
+#define AFE_TRANSPORT               STRINGIFY(__AFE_TRANSPORT__)
+#endif
+
+#ifndef __AFE_BASE_IP_PORT__
+#error "FE RFFE base IP port is not defined!"
+#else
+#define AFE_BASE_IP_PORT            STRINGIFY(__AFE_BASE_IP_PORT__)
+#endif
+
+#ifndef __AFE_BASE_IP_PATTERN__
+#error "FE RFFE base IP address is not defined!"
+#else
+#define AFE_BASE_IP_PATTERN         STRINGIFY(__AFE_BASE_IP_PATTERN__)
+#endif
+
+#ifndef __AFE_BASE_IP_OFFSET__
+#error "FE RFFE base IP offset is not defined!"
+#else
+#define AFE_BASE_IP_OFFSET         __AFE_BASE_IP_OFFSET__
+#endif
+
+#define AFE_MAX_HOSTNAME            40
+
+/* This must be greater than the maximum number of DEVIO_BEs (typically 12
+ * on a mTCA crate) */
+#define DEVIO_FE_HASH_SALT_1        8192        /* 2^13 */
+#define DEVIO_FE_HASH_SALT_2        16384       /* 2^14 */
+
+/* Must be linear IDs starting from 0 */
+#define DEVIO_FE_INST_ID_1          0
+#define DEVIO_FE_INST_ID_2          1
+#define DEVIO_FE_INST_ID_END        2
+#define DEVIO_FE_INST_MAX           DEVIO_FE_INST_ID_END
+
+static const uint32_t devio_fe_hash_salt [DEVIO_FE_INST_MAX] = {
+    DEVIO_FE_HASH_SALT_1,
+    DEVIO_FE_HASH_SALT_2
+};
+
+static const uint32_t devio_fe_inst_id [DEVIO_FE_INST_MAX] = {
+    DEVIO_FE_INST_ID_1,
+    DEVIO_FE_INST_ID_2
+};
+
+#if 0
+#define DEVIO_FE_DEV_PATTERN        ""
+#define DEVIO_FE_DEV_GLOB           "^(tcp|udp)://(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$"
+#endif
+
+#define DEVIO_NAME                  "dev_io"
+
+/* FPGA DEVIO */
+#define DEVIO_BE_TYPE               BE_DEVIO
+#define DEVIO_BE_NAME               "dev_io_be"
+#define DEVIO_BE_LOG_FILENAME       CAT(DEVIO_BE_NAME, "%d.log")
+
+/* RFFE DEVIO */
+#define DEVIO_FE_TYPE               FE_DEVIO
+#define DEVIO_FE_NAME               "dev_io_fe"
+#define DEVIO_FE_LOG_FILENAME       CAT(DEVIO_FE_NAME, "%d.log")
 
 static void _devio_hash_free_item (void *data);
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
+static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
+        char *dev_pathname, uint32_t id, llio_type_e type,
+        devio_type_e devio_type, uint32_t smio_inst_id, devio_state_e state);
 
 /* Creates a new instance of the Device Manager */
 dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
@@ -299,7 +370,9 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
 {
     dmngr_err_e err = DMNGR_SUCCESS;
     char *dev_type_c = NULL;
+    char *devio_type_c = NULL;
     char *dev_id_c = NULL;
+    char *smio_inst_id_c = NULL;
 
     /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawing all DEVIO workers\n");*/
 
@@ -340,14 +413,19 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
 
         /* TODO: Check for the validity of the log filename */
         if (devio_log_prefix != NULL) {
-            snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_LOG_FILENAME,
+            snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_BE_LOG_FILENAME,
                     devio_log_prefix, devio_info->id);
         }
 
+        /* Alloc and convert types */
         dev_type_c = llio_type_to_str (devio_info->type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
+        devio_type_c = devio_type_to_str (devio_info->devio_type);
+        ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
         dev_id_c = halutils_stringify_dec_key (devio_info->id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
+        smio_inst_id_c = halutils_stringify_dec_key (devio_info->smio_inst_id);
+        ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DMNGR_ERR_ALLOC);
 
         /* Argument options are "process name", "device type" and
          *"dev entry" */
@@ -355,15 +433,19 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
                 " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
                 "logfile on %s ...\n", dev_type_c, devio_info->dev_pathname, devio_info->id,
                 broker_endp, devio_log_filename);
-        char *argv_exec [] = {"dev_io", "-t", dev_type_c, "-i", dev_id_c,
-            "-e", devio_info->dev_pathname, "-b", broker_endp, "-l",
-            devio_log_filename, NULL};
-        int spawn_err = _dmngr_spawn_chld (self, "dev_io", argv_exec);
+        char *argv_exec [] = {DEVIO_NAME, "-n", devio_type_c,"-t", dev_type_c,
+            "-i", dev_id_c, "-e", devio_info->dev_pathname, "-s", smio_inst_id_c,
+            "-b", broker_endp, "-l", devio_log_filename, NULL};
+        int spawn_err = _dmngr_spawn_chld (self, DEVIO_NAME, argv_exec);
 
         free (dev_type_c);
         dev_type_c = NULL;
+        free (devio_type_c);
+        devio_type_c = NULL;
         free (dev_id_c);
         dev_id_c = NULL;
+        free (smio_inst_id_c);
+        smio_inst_id_c = NULL;
         /* Just fail miserably, for now */
         ASSERT_TEST(spawn_err == 0, "Could not spawn DEVIO instance",
                 err_spawn, DMNGR_ERR_SPAWNCHLD);
@@ -372,8 +454,12 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
     }
 
 err_spawn:
+    free (smio_inst_id_c);
+err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
+    free (devio_type_c);
+err_devio_type_c_alloc:
     free (dev_type_c);
 err_dev_type_c_alloc:
     zlist_destroy (&devio_info_key_list);
@@ -397,18 +483,18 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 
     /* Scan just the PCIe bus for now. We expect to find devices of
      * the form: /dev/fpga0 .. /dev/fpga5 */
-    glob ("/dev/fpga*", 0, NULL, &glob_dev);
+    glob (DEVIO_BE_DEV_GLOB, 0, NULL, &glob_dev);
 
-    /* Ininitalize the devices we found */
-    devio_info_t *devio_info = NULL;
+    /* Initialize the devices we found */
     char *key = NULL;
+    char *key_fe = NULL;
     uint32_t i = 0;
     for (; i < glob_dev.gl_pathc; ++i) {
         /* Check if the found device is already on the hash list */
 
         /* Extract ID */
         uint32_t devio_info_id;
-        sscanf (glob_dev.gl_pathv[i], "/dev/fpga%d", &devio_info_id);
+        sscanf (glob_dev.gl_pathv[i], DEVIO_BE_DEV_PATTERN, &devio_info_id);
 
         /* Stringify ID */
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
@@ -416,7 +502,8 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
         key = halutils_stringify_dec_key (devio_info_id);
         ASSERT_ALLOC (key, err_key_alloc, DMNGR_ERR_ALLOC);
 
-        const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h, key);
+        const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h,
+                key);
 
         /* If device is already registered, do nothing */
         if (devio_info_lookup != NULL) {
@@ -432,25 +519,58 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
                 "[dev_mngr_core:scan_devs] Found new device on %s\n",
                 glob_dev.gl_pathv[i]);
 
-        /* Alloc hash item */
-        devio_info = devio_info_new (glob_dev.gl_pathv[i],
-                devio_info_id, PCIE_DEV, READY_TO_RUN);
-        ASSERT_ALLOC (devio_info, err_devio_info_alloc, DMNGR_ERR_ALLOC);
-
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
-                "[dev_mngr_core:scan_devs] Inserting device with key: %s\n", key);
-        zhash_insert (self->devio_info_h, key, devio_info);
-
-        /* Setup free function */
-        zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
+        /* Insert found device */
+        err = _dmngr_prepare_devio (self, key, glob_dev.gl_pathv[i],
+                devio_info_id, PCIE_DEV, DEVIO_BE_TYPE, 0, READY_TO_RUN);
+        ASSERT_TEST (err == DMNGR_SUCCESS, "Could not insert DEVIO",
+                err_devio_insert_alloc);
 
         /* We don't need this anymore */
         free (key);
         key = NULL;
+
+        /* For each PCIE device find, register two Ethernet devices to control
+         * our RFFEs */
+
+        /* hostname pattern is of type tcp://192.168.0.%u. The host part is
+         * generated by a fixed offset determined at compile time + linear counter
+         * starting from 0 up to the number of RFFEs */
+        uint32_t j;
+        for (j = 0; j < DEVIO_FE_INST_MAX; ++j) {
+            char hostname_fe [AFE_MAX_HOSTNAME];
+            int errs = snprintf (hostname_fe, sizeof (hostname_fe), AFE_TRANSPORT
+                    "://" AFE_BASE_IP_PATTERN ":" AFE_BASE_IP_PORT,
+                    AFE_BASE_IP_OFFSET + DEVIO_FE_INST_MAX*devio_info_id +
+                    devio_fe_inst_id [j]);
+            /* Only when the number of characters written is less than the whole buffer,
+             * it is guaranteed that the string was written successfully */
+            ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hostname_fe),
+                    "Could not generate AFE IP address. Too big AFE_BASE_IP_OFFSET?",
+                    err_hostname_fe_conv, DMNGR_ERR_ALLOC);
+            key_fe = halutils_stringify_dec_key (devio_info_id +
+                    devio_fe_hash_salt [j]);
+            ASSERT_ALLOC (key_fe, err_key_fe_alloc, DMNGR_ERR_ALLOC);
+
+            /* Prepare respective DEVIO structure */
+            err = _dmngr_prepare_devio (self, key_fe, hostname_fe,
+                    devio_info_id, ETH_DEV, DEVIO_FE_TYPE, devio_fe_inst_id [j],
+                    READY_TO_RUN);
+            ASSERT_TEST (err == DMNGR_SUCCESS, "Could not prepare associated FE DEVIO",
+                    err_devio_fe_insert_alloc);
+
+            /* We don't need this anymore */
+            free (key_fe);
+            key_fe = NULL;
+        }
     }
 
     /* devio_info_destroy (&devio_info); */
-err_devio_info_alloc:
+err_devio_fe_insert_alloc:
+    free (key_fe);
+    key_fe = NULL;
+err_key_fe_alloc:
+err_hostname_fe_conv:
+err_devio_insert_alloc:
     free (key);
     key = NULL;
 err_key_alloc:
@@ -461,6 +581,31 @@ err_key_alloc:
         *num_devs_found = i;
     }
 
+    return err;
+}
+
+static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
+        char *dev_pathname, uint32_t id, llio_type_e type,
+        devio_type_e devio_type, uint32_t smio_inst_id, devio_state_e state)
+{
+    assert (self);
+    assert (dev_pathname);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Alloc DBE hash item */
+    devio_info_t *devio_info = devio_info_new (dev_pathname,
+            id, type, devio_type, smio_inst_id, state);
+    ASSERT_ALLOC (devio_info, err_devio_info_alloc, DMNGR_ERR_ALLOC);
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+            "[dev_mngr_core:prepare_devio] Inserting device with key: %s\n", key);
+    zhash_insert (self->devio_info_h, key, devio_info);
+
+    /* Setup free function */
+    zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
+
+err_devio_info_alloc:
     return err;
 }
 
