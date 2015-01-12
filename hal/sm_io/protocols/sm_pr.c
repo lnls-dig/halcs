@@ -13,6 +13,7 @@
 #include "sm_pr_err.h"
 #include "sm_pr_spi.h"
 #include "sm_pr_i2c.h"
+#include "sm_pr_bsmp.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -140,6 +141,10 @@ static smpr_err_e _smpr_register_proto_ops (smpr_type_e type, const smpr_proto_o
 
         case SMPR_I2C:
             *ops = &smpr_proto_ops_i2c;
+            break;
+
+        case SMPR_BSMP:
+            *ops = &smpr_proto_ops_bsmp;
             break;
 
         /*case SMPR_1WIRE:

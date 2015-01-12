@@ -27,6 +27,7 @@
 enum _smpr_type_e {
     SMPR_SPI = 0,
     SMPR_I2C,
+    SMPR_BSMP,
     SMPR_1WIRE,
     SMPR_GPIO,
     SMPR_BYPASS
