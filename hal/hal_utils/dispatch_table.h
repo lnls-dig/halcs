@@ -42,7 +42,10 @@ enum _disp_at_e {
     DISP_ATYPE_UINT64,
     DISP_ATYPE_DOUBLE,              /* float is promoted to double */
     DISP_ATYPE_STRING,              /* size of strings is strlen() each time */
-    DISP_ATYPE_STRUCT
+    DISP_ATYPE_STRUCT,
+    DISP_ATYPE_VAR                  /* variable argument size. Allowed to be
+                                       up to the size of the encoded argument.
+                                       Typically a structure */
 };
 
 typedef enum _disp_at_e disp_at_e;
