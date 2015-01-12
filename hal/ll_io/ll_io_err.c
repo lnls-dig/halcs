@@ -17,7 +17,8 @@ static const char *llio_err [LLIO_ERR_END] =
     [LLIO_ERR_FUNC_NOT_IMPL]    = "Function not implemented",
     [LLIO_ERR_INV_FUNC_PARAM]   = "Invalid function parameter",
     [LLIO_ERR_SET_ENDP]         = "Could not change enpoint (device opened)",
-    [LLIO_ERR_DEV_CLOSE]        = "Could not close device appropriately"
+    [LLIO_ERR_DEV_CLOSE]        = "Could not close device appropriately",
+    [LLIO_ERR_CONN]             = "Could establish connection to endpoint"
 };
 
 /* Convert enumeration type to string */
