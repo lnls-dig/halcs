@@ -11,14 +11,14 @@
 #include <inttypes.h>
 
 /* Messaging OPCODES */
-#define THSAFE_OPCODE_SIZE                  (sizeof (uint32_t))
+#define THSAFE_OPCODE_TYPE                  uint32_t
+#define THSAFE_OPCODE_SIZE                  (sizeof (THSAFE_OPCODE_TYPE))
 #define THSAFE_READ_16_DSIZE                (sizeof (uint16_t))
 #define THSAFE_READ_32_DSIZE                (sizeof (uint32_t))
 #define THSAFE_READ_64_DSIZE                (sizeof (uint64_t))
 #define THSAFE_WRITE_16_DSIZE               THSAFE_READ_16_DSIZE
 #define THSAFE_WRITE_32_DSIZE               THSAFE_READ_32_DSIZE
 #define THSAFE_WRITE_64_DSIZE               THSAFE_READ_64_DSIZE
-#define THSAFE_OPCODE_TYPE                  uint32_t
 
 #define THSAFE_OPCODE_OPEN                  0
 #define THSAFE_NAME_OPEN                    "open"
@@ -49,15 +49,15 @@
 //#define THSAFE_OPCODE_END                 13
 
 /* Messaging Reply OPCODES */
-#define THSAFE_REPLY_SIZE                   (sizeof(uint32_t))
 #define THSAFE_REPLY_TYPE                   uint32_t
+#define THSAFE_REPLY_SIZE                   (sizeof (THSAFE_REPLY_TYPE))
 
 #define THSAFE_OK                           0
 #define THSAFE_ERR                          1
 #define THSAFE_REPLY_END                    2
 
 /* Messaging Return Codes */
-#define THSAFE_RETURN_SIZE                  (sizeof(int32_t))
 #define THSAFE_RETURN_TYPE                  int32_t
+#define THSAFE_RETURN_SIZE                  (sizeof (THSAFE_RETURN_TYPE))
 
 #endif
