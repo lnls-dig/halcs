@@ -34,7 +34,7 @@
 
 /************** Utility functions ****************/
 
-const llio_types_t devio_types_map [] = {
+static const llio_types_t devio_types_map [] = {
     {.name = BE_DEVIO_STR,          .type = BE_DEVIO},
     {.name = FE_DEVIO_STR,          .type = FE_DEVIO},
     {.name = INVALID_DEVIO_STR,     .type = INVALID_DEVIO},
