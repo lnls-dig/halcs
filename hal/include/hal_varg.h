@@ -54,6 +54,10 @@ _ISEMPTY(                                                               \
 #define CAT8(a, b, c, d, e, f, g, ...) PRIMITIVE_CAT8(a, b, c, d, e, f, g, __VA_ARGS__)
 #define PRIMITIVE_CAT8(a, b, c, d, e, f, g, ...) a ## b ## c ## d ## e ## f ## g ## __VA_ARGS__
 
+/* Stringify MACRO */
+#define STRINGIFY(s) PRIMITIVE_STRINGIFY(s)
+#define PRIMITIVE_STRINGIFY(s) #s
+
 /* Simple IF macro that returns the parameter passed itself, when expanded
  * to IFF_1 and the other parameters if it's expanded to IFF_0.
  * This is the basis for a generalized IF MACRO */
