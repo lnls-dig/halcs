@@ -627,5 +627,15 @@ bpm_client_err_e bpm_set_rffe_sw_lvl (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_rffe_sw_lvl (bpm_client_t *self, char *service,
         uint32_t *rffe_sw_lvl);
 
+/* Helper Function */
+
+/* This function execute the given function *func in a disp_op_t 
+ * for a specific amount of time (timeout).
+ * Returns BPM_CLIENT_SUCCESS if the functions has been successfully 
+ * executed or error otherwise. 
+ * (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e func_polling (bpm_client_t *self, char *name, 
+        char *service, uint8_t *input, uint8_t *output, int timeout);
+        
 #endif
 

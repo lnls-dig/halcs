@@ -1634,3 +1634,43 @@ PARAM_FUNC_CLIENT_READ(rffe_sw_lvl)
             rffe_sw_lvl);
 }
 
+/**************** Helper Function ****************/
+
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout);
+
+bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout)
+{
+    return _func_polling (self, name, service, input, output, timeout);
+}
+
+/* Polling Function */
+
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout)
+{
+    if (timeout < 0) {
+        timeout = INT_MAX;
+    }
+
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    time_t start = time(NULL);
+    while ((time(NULL) - start)*1000 < timeout) {
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
+        }
+        const disp_op_t* func = bpm_func_translate(name);
+        err = bpm_func_exec(self, func, service, input, output);
+        if (err == BPM_CLIENT_SUCCESS)
+        {
+            goto exit;
+        }
+        usleep (1000);
+    }
+
+    /* timeout occured */
+    err = BPM_CLIENT_ERR_TIMEOUT;
+
+bpm_zctx_interrupted:
+exit:
+    return err;
+}
