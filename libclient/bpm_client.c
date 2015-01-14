@@ -171,7 +171,7 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
     ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
 
     /* Message is:
-     * frame 0: Error code      
+     * frame 0: Error code
      * frame 1: Number of bytes received
      * frame 2+: Data received      */
 
@@ -186,7 +186,7 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
 
     zframe_t *data_size_frm = NULL;
     zframe_t *data_frm = NULL;
-    if (msg_size == MSG_FULL_SIZE) 
+    if (msg_size == MSG_FULL_SIZE)
     {
         data_size_frm = zmsg_pop (report);
         ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
@@ -224,7 +224,7 @@ err_inv_param:
 
 const disp_op_t *bpm_func_translate (char *name)
 {
-    if (name != NULL) 
+    if (name != NULL)
     {
         /* Search the function table for a match in the 'name' field */
         for (int i=0; smio_exp_ops[i] != NULL; i++)
@@ -1000,7 +1000,7 @@ static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
     bpm_client_err_e err = bpm_func_exec(self, func, service, NULL, NULL);
 
     /* Check if any error ocurred */
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, 
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
             "bpm_check_data_acquire: Check fail: data acquire was not completed",
             err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
 
@@ -1024,7 +1024,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
     *write_val = acq_trans->req.chan;
     *(write_val+4) = acq_trans->block.idx;
 
-    smio_acq_data_block_t *read_val = zmalloc (sizeof (smio_acq_data_block_t)); 
+    smio_acq_data_block_t *read_val = zmalloc (sizeof (smio_acq_data_block_t));
 
     /* Sent Message is:
      * frame 0: operation code
@@ -1040,7 +1040,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
      * frame 2: data block */
 
     /* Check if any error ocurred */
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, 
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
             "bpm_get_data_block: Data block was not acquired",
             err_get_data_block, BPM_CLIENT_ERR_SERVER);
 
@@ -1049,10 +1049,10 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
         acq_trans->block.data_size : read_val->valid_bytes;
 
     /* Copy message contents to user */
-    memcpy (acq_trans->block.data, read_val->data, read_size);  
+    memcpy (acq_trans->block.data, read_val->data, read_size);
 
     /* Inform user about the number of bytes effectively copied */
-    acq_trans->block.bytes_read = read_size;    
+    acq_trans->block.bytes_read = read_size;
 
     /* Print some debug messages */
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
@@ -1079,7 +1079,7 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_tr
     /* Wait until the acquisition is finished */
     bpm_client_err_e err = func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE, service, NULL, NULL, timeout);
 
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, 
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
             "bpm_check_data_acquire: Check fail: data acquire was not completed",
             err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
 
