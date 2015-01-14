@@ -619,6 +619,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
         int timeout);
 static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
 
 bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
@@ -640,6 +641,11 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans)
 {
     return _bpm_get_data_block (self, service, acq_trans);
+}
+
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
+{
+    return _bpm_acq_start (self, service, acq_req);
 }
 
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
@@ -949,6 +955,26 @@ err_bpm_data_acquire:
     return err;
 }
 
+static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
+{
+    uint8_t write_val[sizeof(uint32_t)*2] = {0};  // 2 32-bits variables
+    *write_val = acq_req->num_samples;
+    *(write_val+4) = acq_req->chan;
+
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_DATA_ACQUIRE);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, NULL);
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "bpm_data_acquire: Data acquire was not required correctly",
+            err_data_acquire, BPM_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully acquired*/
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
+            "Data acquire was successfully required\n");
+
+err_data_acquire:
+    return err;
+}
 /**************** DSP SMIO Functions ****************/
 
 /* Kx functions */

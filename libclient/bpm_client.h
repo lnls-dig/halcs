@@ -324,6 +324,9 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout);
 
+/* New version of bpm_data_acquire that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */
