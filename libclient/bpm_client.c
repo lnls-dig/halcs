@@ -134,6 +134,94 @@ err_self_alloc:
     return NULL;
 }
 
+/**************** General Function to call the others *********/
+
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint8_t *input, uint8_t *output)
+{
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    /* Check input arguments */
+    ASSERT_TEST(self != NULL, "Bpm_client is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
+    ASSERT_TEST(func != NULL, "Function structure is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
+
+    ASSERT_TEST(!(func->args[0] != DISP_ARG_END && input == NULL), "Invalid input arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
+    ASSERT_TEST(!(func->retval != DISP_ARG_END && output == NULL), "Invalid output arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
+
+    /* Create the message */
+    zmsg_t *msg = zmsg_new ();
+    ASSERT_ALLOC(msg, err_msg_alloc, BPM_CLIENT_ERR_ALLOC);
+
+    /* Add the frame containing the opcode for the function desired (always first) */
+    zmsg_addmem (msg, &func->opcode, sizeof (func->opcode));
+
+
+    /* Add the arguments in their respective frames in the message */
+    for (int i = 0; func->args[i] != DISP_ARG_END; ++i) {
+        /* Get the size of the message being sent */
+        uint32_t in_size = DISP_GET_ASIZE(func->args[i]);
+        /* Create a frame to compose the message */
+        zmsg_addmem (msg, input, in_size);
+        /* Moves along the pointer */
+        input += in_size;
+    }
+
+    mdp_client_send (self->mdp_client, service, &msg);
+
+    /* Receive report */
+    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
+
+    /* Message is:
+     * frame 0: Error code      
+     * frame 1: Number of bytes received
+     * frame 2+: Data received      */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
+            "Unexpected message received", err_msg);
+
+    /* Get message contents */
+    zframe_t *err_code = zmsg_pop(report);
+    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg);
+
+    zframe_t *data_size_frm = NULL;
+    zframe_t *data_frm = NULL;
+    if (msg_size == MSG_FULL_SIZE) 
+    {
+        data_size_frm = zmsg_pop (report);
+        ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
+        data_frm = zmsg_pop (report);
+        ASSERT_TEST(data_frm != NULL, "Could not receive data", err_null_data);
+
+        ASSERT_TEST(zframe_size (data_size_frm) == RW_REPLY_SIZE,
+                "Wrong <number of payload bytes> parameter size", err_msg_fmt);
+
+        /* Size in the second frame must match the frame size of the third */
+        RW_REPLY_TYPE data_size = *(RW_REPLY_TYPE *) zframe_data(data_size_frm);
+        ASSERT_TEST(data_size == zframe_size (data_frm),
+                "<payload> parameter size does not match size in <number of payload bytes> parameter",
+                err_msg_fmt);
+
+        uint32_t *data_out = (uint32_t *)zframe_data(data_frm);
+        /* Copy message contents to user */
+        memcpy (output, data_out, data_size);
+    }
+
+err_msg_fmt:
+    zframe_destroy (&data_frm);
+err_null_data:
+    zframe_destroy (&data_size_frm);
+err_null_data_size:
+    zframe_destroy (&err_code);
+err_msg:
+    zmsg_destroy (&report);
+err_msg_alloc:
+    zmsg_destroy (&msg);
+err_null_exp:
+err_inv_param:
+    return err;
+}
+
 /**************** FMC130M SMIO Functions ****************/
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
 {

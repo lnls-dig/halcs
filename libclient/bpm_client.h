@@ -47,6 +47,10 @@ bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
  * server */
 void bpm_client_destroy (bpm_client_t **self_p);
 
+/* General function to execute all the other modules functions */
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, 
+        char *service, uint8_t *input, uint8_t *output);
+        
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
