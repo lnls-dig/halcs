@@ -17,25 +17,10 @@ FMC130M_4CH_EEPROM_PROGRAM=
 WITH_DEV_MNGR=y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE=2
-# Selects the base IP address of all AFE RFFE. The AFE RFFE must be located
-# starting to the specified IP address up to the number of the AFE RFFE.
-#
-# Example:
-#
-# if AFE_BASE_IP_ADDR = 192.168.0.%u and AFE_BASE_IP_OFFSET = 100, the AFE
-# RFFE would have the following IP addresses:
-#
-# AFE RFFE #1 (DBE #1): 192.168.0.100
-# AFE RFFE #2 (DBE #1): 192.168.0.101
-# AFE RFFE #3 (DBE #2): 192.168.0.102
-# AFE RFFE #4 (DBE #2): 192.168.0.103
-# AFE RFFE #3 (DBE #3): 192.168.0.104
-# AFE RFFE #4 (DBE #3): 192.168.0.105
-# ...
-AFE_TRANSPORT="tcp"
-AFE_BASE_IP_PORT="6791"
-AFE_BASE_IP_PATTERN="10.0.18.%u"
-AFE_BASE_IP_OFFSET=100
+# Selects the install location of the config file
+CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
+# Selects the install location of the config file
+CFG_DIR=/etc/bpm_sw
 
 COMMAND="\
     make BOARD=${BOARD} \
@@ -45,9 +30,7 @@ COMMAND="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-    AFE_TRANSPORT=${AFE_TRANSPORT} \
-    AFE_BASE_IP_PATTERN=${AFE_BASE_IP_PATTERN} \
-    AFE_BASE_IP_OFFSET=${AFE_BASE_IP_OFFSET} \
+    CFG_DIR=${CFG_DIR} \
     && sudo make install"
 
 echo "Executing: " ${COMMAND}
