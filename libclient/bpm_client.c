@@ -241,6 +241,12 @@ const disp_op_t *bpm_func_translate (char *name)
     return 0;
 }
 
+bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output)
+{
+    const disp_op_t *func = bpm_func_translate(name);
+    bpm_client_err_e err = bpm_func_exec (self, func, service, input, output);
+    return err;
+}
 /**************** FMC130M SMIO Functions ****************/
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
 {

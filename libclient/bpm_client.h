@@ -54,6 +54,10 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
 /* Translate function's name and returns its structure */
 const disp_op_t* bpm_func_translate (char *name);
 
+/* Wrapper to bpm_func_exec which translates the function name to
+ * its exp_ops structure */
+ bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, 
+        char *service, uint8_t *input, uint8_t *output);
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
