@@ -45,6 +45,8 @@
 #define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
 #define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
 
+/******************* Configuration file property names ************************/
+
 #define DMNGR_FE_CFG_ENDP_MAX_PATH  256
 #define DMNGR_FE_CFG_ENDP_PATH_PATTERN   \
                                     "/dev_io/board%u/bpm%u/afe/bind"
@@ -79,12 +81,22 @@
 /* FPGA DEVIO */
 #define DEVIO_BE_TYPE               BE_DEVIO
 #define DEVIO_BE_NAME               "dev_io_be"
-#define DEVIO_BE_LOG_FILENAME       CAT(DEVIO_BE_NAME, "%d.log")
 
 /* RFFE DEVIO */
 #define DEVIO_FE_TYPE               FE_DEVIO
 #define DEVIO_FE_NAME               "dev_io_fe"
-#define DEVIO_FE_LOG_FILENAME       CAT(DEVIO_FE_NAME, "%d.log")
+
+/* This composes the log filename as "dev_io%u_fe%u.log" or
+ * "dev_io%u_be%u.log" */
+#define DEVIO_LOG_RADICAL_PATTERN   "dev_io%u"
+#define DEVIO_LOG_DEVIO_MODEL_TYPE  "%s"
+#define DEVIO_LOG_INST_TYPE         "%u"
+#define DEVIO_LOG_SUFFIX            "log"
+#define DEVIO_LOG_FILENAME_PATTERN \
+                                    DEVIO_LOG_RADICAL_PATTERN "_" \
+                                    DEVIO_LOG_DEVIO_MODEL_TYPE \
+                                    DEVIO_LOG_INST_TYPE "." \
+                                    DEVIO_LOG_SUFFIX
 
 /* Configuration variables. To be filled by dev_mngr */
 const char *dmngr_log_filename = NULL;
@@ -397,20 +409,23 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
             continue;
         }
 
+        /* Get DEVIO type to set-up correct log filename */
+        devio_type_c = devio_type_to_str (devio_info->devio_type);
+        ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
+
         /* Set up logdir. Defaulting it to stdout */
         char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
 
         /* TODO: Check for the validity of the log filename */
         if (devio_log_prefix != NULL) {
-            snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_BE_LOG_FILENAME,
-                    devio_log_prefix, devio_info->id);
+            snprintf (devio_log_filename, LOG_FILENAME_LEN,
+                    "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
+                    devio_info->id, devio_type_c, devio_info->smio_inst_id);
         }
 
         /* Alloc and convert types */
         dev_type_c = llio_type_to_str (devio_info->type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
-        devio_type_c = devio_type_to_str (devio_info->devio_type);
-        ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
         dev_id_c = halutils_stringify_dec_key (devio_info->id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
         smio_inst_id_c = halutils_stringify_dec_key (devio_info->smio_inst_id);
@@ -447,10 +462,10 @@ err_spawn:
 err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
-    free (devio_type_c);
-err_devio_type_c_alloc:
     free (dev_type_c);
 err_dev_type_c_alloc:
+    free (devio_type_c);
+err_devio_type_c_alloc:
     zlist_destroy (&devio_info_key_list);
 err_hash_keys_alloc:
     return err;
