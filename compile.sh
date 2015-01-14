@@ -53,5 +53,11 @@ for i in "${COMMAND_ARRAY[@]}"
 do
     echo "Executing: " $i
     eval $i
+
+    # Check return value
+    rc=$?
+    if [[ $rc != 0 ]]; then
+        exit $rc
+    fi
 done
 
