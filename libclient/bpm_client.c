@@ -12,6 +12,7 @@
 #include "sm_io_dsp_codes.h"
 #include "sm_io_swap_codes.h"
 #include "sm_io_swap_useful_macros.h"
+#include "sm_io_codes.h"
 #include "rw_param_codes.h"
 #include "rw_param_client.h"
 
