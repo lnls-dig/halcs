@@ -166,7 +166,7 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: pcie_driver libmdp libbsmp libclient cfg $(OUT)
+all: libclient cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
