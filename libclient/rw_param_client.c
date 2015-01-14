@@ -34,49 +34,24 @@
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient:rw_param_client]",   \
             bpm_client_err_str (err_type))
 
-bpm_client_err_e param_client_send_32_rw (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t rw, void *param)
+bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t rw, void *param, size_t size)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
-    uint32_t param_32 = 0;
-
-    if (param != NULL) {
-        param_32 = *(uint32_t *) param;
-    }
+    ASSERT_TEST(param != NULL, "param_client_send_gen_rw (): parameter cannot be NULL",
+            err_param_null, BPM_CLIENT_ERR_INV_PARAM);
 
     zmsg_t *request = zmsg_new ();
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
-    zmsg_addmem (request, &param_32, sizeof (param_32));
+    zmsg_addmem (request, param, size);
 
     mdp_client_send (self->mdp_client, service, &request);
 
 err_send_msg_alloc:
-    return err;
-}
-
-bpm_client_err_e param_client_send_double_rw (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t rw, void *param)
-{
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-
-    double param_double = 0;
-
-    if (param != NULL) {
-        param_double = *(double *) param;
-    }
-
-    zmsg_t *request = zmsg_new ();
-    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
-    zmsg_addmem (request, &operation, sizeof (operation));
-    zmsg_addmem (request, &rw, sizeof (rw));
-    zmsg_addmem (request, &param_double, sizeof (param_double));
-
-    mdp_client_send (self->mdp_client, service, &request);
-
-err_send_msg_alloc:
+err_param_null:
     return err;
 }
 
@@ -98,7 +73,7 @@ err_null_msg:
 }
 
 bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t param1, void *param2, send_client_fp send_client)
+        uint32_t operation, uint32_t param1, void *param2, size_t size)
 {
     assert (self);
     assert (service);
@@ -106,7 +81,8 @@ bpm_client_err_e param_client_write_gen (bpm_client_t *self, char *service,
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     zmsg_t *report;
 
-    err = (*send_client) (self, service, operation, param1, param2);
+    err = param_client_send_gen_rw (self, service, operation, param1, param2,
+            size);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -141,7 +117,7 @@ bpm_client_err_e param_client_write_raw (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2)
 {
     return param_client_write_gen (self, service, operation, param1, &param2,
-            param_client_send_32_rw);
+            sizeof (param2));
 }
 
 bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
@@ -149,7 +125,7 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param,
-            param_client_send_32_rw);
+            sizeof (param));
 }
 
 bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
@@ -157,22 +133,21 @@ bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param,
-            param_client_send_double_rw);
+            sizeof (param));
 }
 
-/* TODO: improve error handling */
-bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
-        uint32_t operation, uint32_t *param_out)
+bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, void *param_out, size_t size)
 {
     assert (self);
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    uint32_t param1 = READ_MODE;
+    uint32_t param2 = 0;
     zmsg_t *report;
 
-    err = param_client_send_32_rw (self, service, operation, param1,
-            0 /* in read mode this value will be ignored */);
+    err = param_client_send_gen_rw (self, service, operation, param1,
+            &param2 /* in read mode this value will be ignored */, sizeof (param2));
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -213,11 +188,11 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
                 err_msg_fmt);
 
         /* We only accept one RW_REPLY_SIZE bytes of payload for now */
-        ASSERT_TEST(zframe_size (data_out_frm) == RW_REPLY_SIZE,
+        ASSERT_TEST(zframe_size (data_out_frm) == size,
                 "Wrong <payload> parameter size", err_msg_fmt);
 
         /* Copy the message contents to the user */
-        *param_out = *(uint32_t *) zframe_data (data_out_frm);
+        memcpy (param_out, zframe_data (data_out_frm), size);
     }
 
 err_msg_fmt:
@@ -233,5 +208,21 @@ err_msg:
 err_recv_msg:
 err_send_msg:
     return err;
+}
+
+bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
+        uint32_t operation, uint32_t *param_out)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, operation, rw, param_out,
+            sizeof (*param_out));
+}
+
+bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
+        uint32_t operation, double *param_out)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, operation, rw, param_out,
+            sizeof (*param_out));
 }
 

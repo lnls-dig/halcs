@@ -18,7 +18,8 @@ static const char *dmngr_err [DMNGR_ERR_END] =
     [DMNGR_ERR_SIGACTION]           = "Signal registration error",
     [DMNGR_ERR_WAITCHLD]            = "Could not complete wait child routine",
     [DMNGR_ERR_SPAWNCHLD]           = "Could not complete spawn child routine",
-    [DMNGR_ERR_BROK_RUNN]           = "Broker already running"
+    [DMNGR_ERR_BROK_RUNN]           = "Broker already running",
+    [DMNGR_ERR_CFG]                 = "Could not get property from config file"
 };
 
 /* Convert enumeration type to string */

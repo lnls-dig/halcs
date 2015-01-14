@@ -6,22 +6,27 @@
 #include "czmq.h"
 #include "dev_io.h"
 #include "debug_print.h"
-#include "ll_io_utils.h"
 #include "board.h"
 
 #define DEVIO_SERVICE_LEN       50
 
-static devio_err_e spwan_platform_smios (devio_t *devio);
+static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+        uint32_t smio_inst_id);
+static devio_err_e _spawn_be_platform_smios (devio_t *devio);
+static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_id);
 
 void print_help (char *program_name)
 {
-    printf( "Usage: %s [options]\n"
+    printf( "BPM Device I/O\n"
+            "Usage: %s [options]\n"
             "\t-h This help message\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"
-            "\t-t <device_type> Device type\n"
-            "\t-e <dev_entry> Device /dev entry\n"
+            "\t-n <devio_type = [be|fe]> Devio type\n"
+            "\t-t <device_type = [eth|pcie]> Device type\n"
+            "\t-e <dev_entry = [ip_addr|/dev entry]> Device entry\n"
             "\t-i <dev_id> Device ID\n"
+            "\t-s <fe_smio_id> FE SMIO ID (only valid for devio_type = fe)\n"
             "\t-l <log_filename> Log filename\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
@@ -30,10 +35,11 @@ int main (int argc, char *argv[])
 {
     int verbose = 0;
     int daemonize = 0;
+    char *devio_type_str = NULL;
     char *dev_type = NULL;
     char *dev_entry = NULL;
     char *dev_id_str = NULL;
-    uint32_t dev_id = 0;
+    char *fe_smio_id_str = NULL;
     char *broker_endp = NULL;
     char *log_file_name = NULL;
     char **str_p = NULL;
@@ -57,6 +63,10 @@ int main (int argc, char *argv[])
             daemonize = 1;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Demonize mode set\n");
         }
+        else if (streq (argv[i], "-n")) {
+            str_p = &devio_type_str;
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set devio_type parameter\n");
+        }
         else if (streq (argv[i], "-t")) {
             str_p = &dev_type;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set dev_type parameter\n");
@@ -68,6 +78,10 @@ int main (int argc, char *argv[])
         else if (streq (argv[i], "-i")) {
             str_p = &dev_id_str;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set dev_id_str parameter\n");
+        }
+        else if (streq (argv[i], "-s")) {
+            str_p = &fe_smio_id_str;
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set fe_smio_id_str parameter\n");
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
@@ -107,27 +121,57 @@ int main (int argc, char *argv[])
         goto err_exit;
     }
 
+    devio_type_e devio_type = devio_str_to_type (devio_type_str);
+    /* Parse command-line options */
+    if (devio_type == INVALID_DEVIO) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Devio_type parameter is invalid\n");
+        goto err_exit;
+    }
+
     /* Check for device entry */
     if (dev_entry == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_entry parameter was not set. Exiting ...\n");
         goto err_exit;
     }
 
+    uint32_t dev_id = 0;
     /* Check for device ID */
     if (dev_id_str == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
-                "\tDefaulting it to the /dev file number ...\n");
+        switch (llio_type) {
+            case ETH_DEV:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
+                goto err_exit;
+            break;
 
-        int matches = sscanf (dev_entry, "/dev/fpga%u", &dev_id);
-        if (matches == 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
-                    "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
-            goto err_exit;
+            case PCIE_DEV:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
+                    "\tDefaulting it to the /dev file number ...\n");
+
+                int matches = sscanf (dev_entry, "/dev/fpga%u", &dev_id);
+                if (matches == 0) {
+                    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
+                            "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
+                    goto err_exit;
+                }
+
+            default:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
+                goto err_exit;
         }
     }
     /* Use the passed ID */
     else {
         dev_id = strtoul (dev_id_str, NULL, 10);
+    }
+
+    uint32_t fe_smio_id = 0;
+    /* Check for FE SMIO ID */
+    if (devio_type == FE_DEVIO && fe_smio_id_str == NULL) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Fe_smio_id parameter was not set. Exiting ...\n");
+        goto err_exit;
+    }
+    else {
+        fe_smio_id = strtoul (fe_smio_id_str, NULL, 10);
     }
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
@@ -165,9 +209,9 @@ int main (int argc, char *argv[])
     free (*str_p);
     broker_endp = NULL;
 
-    devio_err_e err = spwan_platform_smios (devio);
+    devio_err_e err = _spawn_platform_smios (devio, devio_type, fe_smio_id);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] spwan_platform_smios error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] _spawn_platform_smios error!\n");
         goto err_devio;
     }
 
@@ -205,20 +249,50 @@ err_exit:
     free (*str_p);
     str_p = &dev_type;
     free (*str_p);
+    str_p = &devio_type_str;
+    free (*str_p);
     return 0;
 }
 
-static devio_err_e spwan_platform_smios (devio_t *devio)
+static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+        uint32_t smio_inst_id)
 {
     assert (devio);
 
+    devio_err_e err = DEVIO_SUCCESS;
+
+    switch (devio_type) {
+        case BE_DEVIO:
+            err = _spawn_be_platform_smios (devio);
+            break;
+
+        case FE_DEVIO:
+            err = _spawn_fe_platform_smios (devio, smio_inst_id);
+            break;
+
+        default:
+            /* FIXME: increase the error clarity? */
+            err = DEVIO_ERR_NO_SMIO_ID;
+    }
+
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+err_register_sm:
+    return err;
+}
+
+static devio_err_e _spawn_be_platform_smios (devio_t *devio)
+{
     uint32_t fmc130m_4ch_id = 0x7085ef15;
     uint32_t acq_id = 0x4519a0ad;
     uint32_t dsp_id = 0x1bafbf1e;
     uint32_t swap_id = 0x12897592;
-    devio_err_e err;
+    devio_err_e err = DEVIO_SUCCESS;
 
-    /* ML605 or AFCv3 */
+/* ML605 or AFCv3 */
 #if defined (__BOARD_ML605__) || defined (__BOARD_AFCV3__)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning default SMIOs ...\n");
     err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
@@ -273,10 +347,31 @@ static devio_err_e spwan_platform_smios (devio_t *devio)
     }
 #endif
 #else
-#error "Board not supported!"
+#error "BE FPGA Board not supported!"
 #endif
 
 err_register_sm:
     return err;
 }
 
+static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_id)
+{
+    uint32_t rffe_id = 0x7af21909;
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* RFFE V2 only */
+/* #if defined (__AFE_RFFE_V1__) */
+#if defined (__AFE_RFFE_V2__)
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_fe] Spawning default SMIOs ...\n");
+    err = devio_register_sm (devio, rffe_id, 0, smio_inst_id);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io_fe] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+#else
+#error "FE RFFE Board not supported!"
+#endif
+
+err_register_sm:
+    return err;
+}

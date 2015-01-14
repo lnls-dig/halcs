@@ -113,12 +113,22 @@ int spi_open (smpr_t *self, uint32_t base, void *args)
             "\tconfig register = 0x%08X\n",
             spi_proto->sys_freq, spi_proto->spi_freq, spi_proto->init_config);
 
-    self->proto_handler = spi_proto;
+    /* Attach specific protocol handler to generic one */
+    smpr_err_e err = smpr_set_handler (self, spi_proto);
+    ASSERT_TEST(err == SMPR_SUCCESS, "Could not set protocol handler",
+            err_proto_handler_set);
+
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Initializing SPI protocol\n");
-    _spi_init (self);
+    err = _spi_init (self);
+    ASSERT_TEST(err == SMPR_SUCCESS, "Could not initialize SPI protocol handler",
+            err_proto_handler_init);
 
     return 0;
 
+err_proto_handler_init:
+    smpr_unset_handler (self);
+err_proto_handler_set:
+    smpr_proto_spi_destroy (&spi_proto);
 err_proto_handler_alloc:
     return -1;
 }
@@ -129,15 +139,18 @@ int spi_release (smpr_t *self)
     assert (self);
 
     /* Deattach specific protocol handler to generic one */
-    smpr_err_e err = smpr_proto_spi_destroy ((smpr_proto_spi_t **) &self->proto_handler);
+    smpr_proto_spi_t *spi_proto = (smpr_proto_spi_t *) smpr_unset_handler (self);
+    ASSERT_TEST (spi_proto != NULL, "Could not unset protocol handler",
+            err_proto_handler_unset);
+    /* Destroy protocol handler instance */
+    smpr_err_e err = smpr_proto_spi_destroy (&spi_proto);
     ASSERT_TEST (err==SMPR_SUCCESS, "Could not close device appropriately", err_dealloc);
-
-    self->proto_handler = NULL;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[smpr:spi] Closed SPI protocol handler\n");
 
     return 0;
 
 err_dealloc:
+err_proto_handler_unset:
     return -1;
 }
 
@@ -367,8 +380,8 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         }
 
         /* Return error if we could not write everything */
-        ASSERT_TEST(err == (ssize_t) size, "Could not write everything to TX registers",
-                err_exit, -1);
+        ASSERT_TEST(err >= 0 && (size_t) err == size,
+                "Could not write everything to TX registers", err_exit, -1);
     }
 
     /* Start transfer */

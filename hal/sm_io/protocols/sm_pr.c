@@ -13,6 +13,7 @@
 #include "sm_pr_err.h"
 #include "sm_pr_spi.h"
 #include "sm_pr_i2c.h"
+#include "sm_pr_bsmp.h"
 #include "hal_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -97,6 +98,37 @@ smpr_err_e smpr_destroy (smpr_t **self_p)
     return SMPR_SUCCESS;
 }
 
+/* Register Specific Protocol operations to smpr instance */
+smpr_err_e smpr_set_handler (smpr_t *self, void *handler)
+{
+    assert (self);
+    assert (handler);
+
+    smpr_err_e err = SMPR_SUCCESS;
+
+    ASSERT_TEST(self->proto_handler == NULL, "Trying to set another handler to "
+            "SMPR instance", err_dup_handler, SMPR_ERR_DUP_HANDLER);
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Setting protocol handler: %s\n",
+            self->name);
+    self->proto_handler = handler;
+
+err_dup_handler:
+    return err;
+}
+
+/* Unregister Specific Protocol operations to smpr instance */
+void *smpr_unset_handler (smpr_t *self)
+{
+    assert (self);
+
+    void *proto_handler = self->proto_handler;
+    DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Unsetting protocol handler: %s\n",
+            self->name);
+    self->proto_handler = NULL;
+
+    return proto_handler;
+}
+
 /**************** Helper Functions ***************/
 
 /* Register Specific Protocol operations to smpr instance. Helper function */
@@ -109,6 +141,10 @@ static smpr_err_e _smpr_register_proto_ops (smpr_type_e type, const smpr_proto_o
 
         case SMPR_I2C:
             *ops = &smpr_proto_ops_i2c;
+            break;
+
+        case SMPR_BSMP:
+            *ops = &smpr_proto_ops_bsmp;
             break;
 
         /*case SMPR_1WIRE:

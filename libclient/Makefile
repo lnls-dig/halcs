@@ -74,7 +74,8 @@ OBJS_EXTERNAL = ../hal/sm_io/modules/sm_io_codes.o \
                 ../hal/sm_io/modules/acq/sm_io_acq_exports.o \
                 ../hal/sm_io/modules/dsp/sm_io_dsp_exports.o \
                 ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
-                ../hal/sm_io/modules/swap/sm_io_swap_exports.o
+                ../hal/sm_io/modules/swap/sm_io_swap_exports.o \
+                ../hal/sm_io/modules/rffe/sm_io_rffe_exports.o
 
 # Include directories
 INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
@@ -83,6 +84,7 @@ INCLUDE_DIRS = -I. -I../hal/include -I../hal/debug \
 	       -I../hal/sm_io/modules/acq \
 	       -I../hal/sm_io/modules/swap \
 	       -I../hal/sm_io/modules/dsp \
+	       -I../hal/sm_io/modules/rffe \
 	       -I../hal/sm_io/rw_param \
 	       -I../hal/hal_utils \
 	       -I../hal/include/hw \
@@ -111,14 +113,18 @@ $(LIBCLIENT)_CODE_HEADERS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_c
 	../hal/sm_io/modules/acq/sm_io_acq_codes.h \
 	../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
 	../hal/sm_io/modules/swap/sm_io_swap_codes.h \
+	../hal/sm_io/modules/rffe/sm_io_rffe_codes.h \
 	../hal/sm_io/modules/sm_io_codes.h \
 	../hal/include/acq_chan_gen_defs.h \
+	../hal/hal_utils/dispatch_table.h \
+	../hal/hal_utils/hal_utils_err.h \
 	bpm_client_codes.h
 
 $(LIBCLIENT)_FUNC_EXPORTS = ../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
 	../hal/sm_io/modules/acq/sm_io_acq_exports.h \
 	../hal/sm_io/modules/dsp/sm_io_dsp_exports.h \
-	../hal/sm_io/modules/swap/sm_io_swap_exports.h
+	../hal/sm_io/modules/swap/sm_io_swap_exports.h \
+	../hal/sm_io/modules/rffe/sm_io_rffe_exports.h
 
 # Install only specific acq_chan.h defintions according to the BOARD MACRO
 #	../hal/include/mem_layout/ml605/acq_chan_ml605.h \

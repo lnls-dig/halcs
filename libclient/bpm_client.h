@@ -398,7 +398,6 @@ bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
 
 /********************** SWAP Functions ********************/
 
-
 /* Switching functions */
 /* These set of functions write (set) or read (get) the (de)switching
  * scheme. In order to turn the switching on, it is necessary to first
@@ -481,6 +480,122 @@ bpm_client_err_e bpm_set_gain_d (bpm_client_t *self, char *service,
         uint32_t gain_dir, uint32_t gain_inv);
 bpm_client_err_e bpm_get_gain_d (bpm_client_t *self, char *service,
         uint32_t *gain_dir, uint32_t *gain_inv);
+
+/********************** RFFE Functions ********************/
+
+/* Switching functions */
+/* These set of functions write (set) or read (get) the RFFE switching
+ * scheme. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_sw (bpm_client_t *self, char *service,
+        uint32_t rffe_sw);
+bpm_client_err_e bpm_get_rffe_sw (bpm_client_t *self, char *service,
+        uint32_t *rffe_sw);
+
+/* Attenuator functions */
+/* These set of functions write (set) or read (get) the RFFE attenuator
+ * values. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_att1 (bpm_client_t *self, char *service,
+        double rffe_att1);
+bpm_client_err_e bpm_get_rffe_att1 (bpm_client_t *self, char *service,
+        double *rffe_att1);
+bpm_client_err_e bpm_set_rffe_att2 (bpm_client_t *self, char *service,
+        double rffe_att2);
+bpm_client_err_e bpm_get_rffe_att2 (bpm_client_t *self, char *service,
+        double *rffe_att2);
+
+/* Temperature functions */
+/* These set of functions read (get) the RFFE temperature
+ * values. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_get_rffe_temp1 (bpm_client_t *self, char *service,
+        double *rffe_temp1);
+bpm_client_err_e bpm_get_rffe_temp2 (bpm_client_t *self, char *service,
+        double *rffe_temp2);
+bpm_client_err_e bpm_get_rffe_temp3 (bpm_client_t *self, char *service,
+        double *rffe_temp3);
+bpm_client_err_e bpm_get_rffe_temp4 (bpm_client_t *self, char *service,
+        double *rffe_temp4);
+
+/* Temperature control set point unctions */
+/* These set of functions write (set) or read (get) the RFFE set point
+ * values. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_set_point1 (bpm_client_t *self, char *service,
+        double rffe_set_point1);
+bpm_client_err_e bpm_get_rffe_set_point1 (bpm_client_t *self, char *service,
+        double *rffe_set_point1);
+bpm_client_err_e bpm_set_rffe_set_point2 (bpm_client_t *self, char *service,
+        double rffe_set_point2);
+bpm_client_err_e bpm_get_rffe_set_point2 (bpm_client_t *self, char *service,
+        double *rffe_set_point2);
+
+/* Temperature control enable functions */
+/* These set of functions write (set) or read (get) the RFFE temperatue control
+ * scheme. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_temp_control (bpm_client_t *self, char *service,
+        uint32_t rffe_temp_control);
+bpm_client_err_e bpm_get_rffe_temp_control (bpm_client_t *self, char *service,
+        uint32_t *rffe_temp_control);
+
+/* RFFE output functions */
+/* These set of functions write (set) or read (get) the RFFE output
+ * values. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_output1 (bpm_client_t *self, char *service,
+        double rffe_output1);
+bpm_client_err_e bpm_get_rffe_output1 (bpm_client_t *self, char *service,
+        double *rffe_output1);
+bpm_client_err_e bpm_set_rffe_output2 (bpm_client_t *self, char *service,
+        double rffe_output2);
+bpm_client_err_e bpm_get_rffe_output2 (bpm_client_t *self, char *service,
+        double *rffe_output2);
+
+/* Reset functions */
+/* These set of functions write (set) or read (get) the RFFE reset state
+ * scheme. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_reset (bpm_client_t *self, char *service,
+        uint32_t rffe_reset);
+bpm_client_err_e bpm_get_rffe_reset (bpm_client_t *self, char *service,
+        uint32_t *rffe_reset);
+
+/* Reprogramming functions */
+/* These set of functions write (set) or read (get) the RFFE reprogramming
+ * scheme. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
+ * was correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_reprog (bpm_client_t *self, char *service,
+        uint32_t rffe_reprog);
+bpm_client_err_e bpm_get_rffe_reprog (bpm_client_t *self, char *service,
+        uint32_t *rffe_reprog);
+
+/* Data functions */
+/* These set of functions write (set) or read (get) the RFFE new firmware data
+ * for the reprogramming scheme. All of the functions returns BPM_CLIENT_SUCCESS
+ * if the parameter was correctly set or error (see bpm_client_err.h for all
+ * possible errors)*/
+bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
+        smio_rffe_data_block_t *rffe_data_block);
+bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
+        smio_rffe_data_block_t *rffe_data_block);
+
+/* Version functions */
+/* These set of functions read (get) the RFFE version.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_get_rffe_version (bpm_client_t *self, char *service,
+        smio_rffe_version_t *rffe_version);
+
+/* Switching level functions */
+/* These set of functions write (set) read (get) the RFFE switching level.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_rffe_sw_lvl (bpm_client_t *self, char *service,
+        uint32_t rffe_sw_lvl);
+bpm_client_err_e bpm_get_rffe_sw_lvl (bpm_client_t *self, char *service,
+        uint32_t *rffe_sw_lvl);
 
 #endif
 

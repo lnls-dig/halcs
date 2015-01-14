@@ -420,10 +420,12 @@ static halutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
 
         /* We have received something and will check for (byte) size
          * correctness */
-        if (GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it)) {
+        if ((GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) > DISP_GET_ASIZE(*args_it)) ||
+                (DISP_GET_ATYPE(*args_it) != DISP_ATYPE_VAR &&
+                 GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it))) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
-                    "[halutils:disp_table] Invalid size of argument"
-                    " received for function \"%s\"\n", disp_op->name);
+                    "[halutils:disp_table] Invalid size of argument #%u"
+                    " received for function \"%s\"\n", i, disp_op->name);
             err = HALUTILS_ERR_INV_SIZE_ARG;
             goto err_inv_size_args;
         }

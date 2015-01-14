@@ -135,8 +135,8 @@ static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **ops)
             break;
 
         case ETH_DEV:
-            *ops = NULL;
-            return LLIO_ERR_INV_FUNC_PARAM;
+            *ops = &llio_ops_eth;
+            break;
 
         default:
             *ops = NULL;

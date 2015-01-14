@@ -301,8 +301,10 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
     loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
-    uint32_t read_bsize = *(uint32_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
+    size_t read_bsize = *(size_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %lu, "
+            "size = %ld\n", offset, read_bsize);
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_block (self->llio, offset, read_bsize,
             (uint32_t *) ret);
@@ -314,7 +316,7 @@ disp_op_t thsafe_zmq_server_read_block_exp = {
     .name = THSAFE_NAME_READ_BLOCK,
     .opcode = THSAFE_OPCODE_READ_BLOCK,
     .func_fp = _thsafe_zmq_server_read_block,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
@@ -331,12 +333,15 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    THSAFE_MSG_ZMQ_ARG_TYPE offset_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
+    loff_t offset = *(loff_t *) GEN_MSG_ZMQ_ARG_DATA(offset_arg);
     /* We now own the argument and must clean it after use */
     THSAFE_MSG_ZMQ_ARG_TYPE data_write_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
     uint32_t *data_write = (uint32_t *)
         ((zmq_server_data_block_t *) THSAFE_MSG_ZMQ_ARG_DATA(data_write_arg))->data;
     uint32_t data_write_size = THSAFE_MSG_ZMQ_ARG_SIZE(data_write_arg);
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Arg is %u bytes\n",
+            data_write_size);
 
     /* We must accept every block size. So, we just perform the actual LLIO
      * operation */
@@ -345,6 +350,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
     *(int32_t *) ret = llio_ret;
 
     /* Cleanup arguments that we now own */
+    THSAFE_MSG_CLENUP_ARG(&offset_arg);
     THSAFE_MSG_CLENUP_ARG(&data_write_arg);
 
     return sizeof (int32_t);
@@ -358,7 +364,7 @@ disp_op_t thsafe_zmq_server_write_block_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
         DISP_ARG_END
     }
 };
@@ -376,11 +382,11 @@ disp_op_t thsafe_zmq_server_read_dma_exp = {
     .name = THSAFE_NAME_READ_DMA,
     .opcode = THSAFE_OPCODE_READ_DMA,
     .func_fp = _thsafe_zmq_server_read_dma,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
         DISP_ARG_END
     }
 };
@@ -402,7 +408,7 @@ disp_op_t thsafe_zmq_server_write_dma_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, zmq_server_data_block_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
         DISP_ARG_END
     }
 };

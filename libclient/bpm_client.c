@@ -97,6 +97,7 @@ void bpm_client_destroy (bpm_client_t **self_p)
 
         self->acq_chan = NULL;
         mdp_client_destroy (&self->mdp_client);
+        free (self);
         *self_p = NULL;
     }
 }
@@ -1134,3 +1135,197 @@ PARAM_FUNC_CLIENT_READ2(gain_d, dir_gain, inv_gain)
 
     return err;
 }
+
+/**************** RFFE SMIO Functions ****************/
+
+/* RFFE get/set switching state */
+PARAM_FUNC_CLIENT_WRITE(rffe_sw)
+{
+    return param_client_write (self, service, RFFE_OPCODE_SET_GET_SW,
+            rffe_sw);
+}
+
+PARAM_FUNC_CLIENT_READ(rffe_sw)
+{
+    return param_client_read (self, service, RFFE_OPCODE_SET_GET_SW,
+            rffe_sw);
+}
+
+/* RFFE get/set attenuator */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_att1)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_ATT1,
+            rffe_att1);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_att1)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_ATT1,
+            rffe_att1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_att2)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_ATT2,
+            rffe_att2);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_att2)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_ATT2,
+            rffe_att2);
+}
+
+/* RFFE get temperatures */
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_temp1)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_TEMP1,
+            rffe_temp1);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_temp2)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_TEMP2,
+            rffe_temp2);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_temp3)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_TEMP3,
+            rffe_temp3);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_temp4)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_TEMP4,
+            rffe_temp4);
+}
+
+/* RFFE get/set set points */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_set_point1)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_SET_POINT1,
+            rffe_set_point1);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_set_point1)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_SET_POINT1,
+            rffe_set_point1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_set_point2)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_SET_POINT2,
+            rffe_set_point2);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_set_point2)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_SET_POINT2,
+            rffe_set_point2);
+}
+
+/* RFFE get/set temperature control */
+PARAM_FUNC_CLIENT_WRITE(rffe_temp_control)
+{
+    return param_client_write (self, service, RFFE_OPCODE_SET_GET_TEMP_CONTROL,
+            rffe_temp_control);
+}
+
+PARAM_FUNC_CLIENT_READ(rffe_temp_control)
+{
+    return param_client_read (self, service, RFFE_OPCODE_SET_GET_TEMP_CONTROL,
+            rffe_temp_control);
+}
+
+/* RFFE outputs */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_output1)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_OUTPUT1,
+            rffe_output1);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_output1)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_OUTPUT1,
+            rffe_output1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(rffe_output2)
+{
+    return param_client_write_double (self, service, RFFE_OPCODE_SET_GET_OUTPUT2,
+            rffe_output2);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(rffe_output2)
+{
+    return param_client_read_double (self, service, RFFE_OPCODE_SET_GET_OUTPUT2,
+            rffe_output2);
+}
+
+/* RFFE get/set reset */
+PARAM_FUNC_CLIENT_WRITE(rffe_reset)
+{
+    return param_client_write (self, service, RFFE_OPCODE_SET_GET_RESET,
+            rffe_reset);
+}
+
+PARAM_FUNC_CLIENT_READ(rffe_reset)
+{
+    return param_client_read (self, service, RFFE_OPCODE_SET_GET_RESET,
+            rffe_reset);
+}
+
+/* RFFE get/set reprogram */
+PARAM_FUNC_CLIENT_WRITE(rffe_reprog)
+{
+    return param_client_write (self, service, RFFE_OPCODE_SET_GET_REPROG,
+            rffe_reprog);
+}
+
+PARAM_FUNC_CLIENT_READ(rffe_reprog)
+{
+    return param_client_read (self, service, RFFE_OPCODE_SET_GET_REPROG,
+            rffe_reprog);
+}
+
+/* RFFE set/get data */
+bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
+        smio_rffe_data_block_t *rffe_data_block)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
+            rw, rffe_data_block, sizeof (*rffe_data_block));
+}
+
+bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
+        smio_rffe_data_block_t *rffe_data_block)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
+            rw, rffe_data_block, sizeof (*rffe_data_block));
+}
+
+/* RFFE get version */
+bpm_client_err_e bpm_get_rffe_version (bpm_client_t *self, char *service,
+        smio_rffe_version_t *rffe_version)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_VERSION,
+            rw, rffe_version, sizeof (*rffe_version));
+}
+
+/* RFFE get/set switching level */
+PARAM_FUNC_CLIENT_WRITE(rffe_sw_lvl)
+{
+    return param_client_write (self, service, RFFE_OPCODE_SET_GET_SW_LVL,
+            rffe_sw_lvl);
+}
+
+PARAM_FUNC_CLIENT_READ(rffe_sw_lvl)
+{
+    return param_client_read (self, service, RFFE_OPCODE_SET_GET_SW_LVL,
+            rffe_sw_lvl);
+}
+
