@@ -21,6 +21,7 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_MSG,                   /* Unexpected message */
     BPM_CLIENT_INT,                       /* Interrupt occured */
     BPM_CLIENT_ERR_INV_PARAM,             /* Invalid function parameters */
+    BPM_CLIENT_ERR_INV_FUNC,              /* Invalid function */
     BPM_CLIENT_ERR_END                    /* End of enum marker */
 };
 
