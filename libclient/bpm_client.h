@@ -327,6 +327,11 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
 /* New version of bpm_data_acquire that uses the general function caller
  * bpm_func_exec */
 bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
+
+/* New version of bpm_check_data_acquire that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */

@@ -620,6 +620,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
 static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
+static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service);
 
 bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
@@ -646,6 +647,11 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
     return _bpm_acq_start (self, service, acq_req);
+}
+
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service)
+{
+    return _bpm_acq_check (self, service);
 }
 
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
@@ -975,6 +981,25 @@ static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_r
 err_data_acquire:
     return err;
 }
+
+static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
+{
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_CHECK_DATA_ACQUIRE);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, NULL, NULL);
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, 
+            "bpm_check_data_acquire: Check fail: data acquire was not completed",
+            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+
+    /* If we are here, then the request was successfully acquired*/
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_acq_check: "
+            "Check ok: data acquire was successfully completed\n");
+
+err_check_data_acquire:
+    return err;
+}
+
 /**************** DSP SMIO Functions ****************/
 
 /* Kx functions */
