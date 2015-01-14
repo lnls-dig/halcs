@@ -653,7 +653,7 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
                     "configuration file\n", err_cfg_exit, DMNGR_ERR_CFG);
 
             DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] AFE hint endpoint "
-                    "hash key: \"%s\", value: \"%s\n\"", hints_key, hints_value);
+                    "hash key: \"%s\", value: \"%s\"\n", hints_key, hints_value);
 
             /* Insert this value in the hash table */
             errs = zhash_insert (hints_h, hints_key, hints_value);
