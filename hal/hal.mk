@@ -34,8 +34,8 @@ dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
 dev_mngr_LIBS =
 dev_mngr_STATIC_LIBS =
 
-dev_io_LIBS =
-dev_io_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a $(LIBBSMP_DIR)/libbsmp.a
+dev_io_LIBS = -lbsmp
+dev_io_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
 
 # Merge all hal objects together
 hal_OBJS = $(debug_OBJS) \
