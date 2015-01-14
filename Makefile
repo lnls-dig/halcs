@@ -205,16 +205,13 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-pcie_driver: pcie_driver_check
+pcie_driver:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) all
 
 #Verify if the driver is in place
 pcie_driver_check:
 ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
-	@echo "Compilation will continue, but you must install";
-	@echo "and load the driver prior to initializing the software";
-	@sleep 2;
 endif
 
 pcie_driver_install:
@@ -280,6 +277,16 @@ libclient_clean:
 libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
+deps: pcie_driver libmdp libbsmp
+
+deps_install: pcie_driver_install libmdp_install libbsmp_install
+
+deps_uninstall: pcie_driver_uninstall libmdp_uninstall libbsmp_uninstall
+
+deps_clean: pcie_driver_clean libmdp_clean libbsmp_clean
+
+deps_mrproper: libmdp_mrproper libbsmp_mrproper
+
 hal_install:
 	$(foreach hal_bin,$(ALL_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
@@ -325,13 +332,13 @@ cfg_clean:
 	$(MAKE) -C cfg clean
 
 cfg_mrproper:
-	$(MAKE) -C cfg all
+	$(MAKE) -C cfg mrproper
 
-install: hal_install pcie_driver_install libclient_install libmdp_install libbsmp_install cfg_install
+install: hal_install deps_install libclient_install cfg_install
 
-uninstall: hal_uninstall pcie_driver_uninstall libclient_uninstall libmdp_uninstall libbsmp_uninstall cfg_uninstall
+uninstall: hal_uninstall deps_uninstall libclient_uninstall cfg_uninstall
 
-clean: hal_clean pcie_driver_clean libclient_clean examples_clean tests_clean libmdp_clean libbsmp_clean cfg_clean
+clean: hal_clean deps_clean libclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper libmdp_mrproper libbsmp_mrproper cfg_mrproper
+mrproper: clean hal_mrproper deps_mrproper libclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 
