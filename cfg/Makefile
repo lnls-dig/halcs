@@ -27,9 +27,9 @@ install:
 
 uninstall:
 	$(foreach cfg,$(CFG_FILES),rm -f $(CFG_DIR)/$(cfg) $(CMDSEP))
-	@rmdir $(CFG_DIR)
+	@rm -rf $(CFG_DIR)
 
 clean:
 
-mrproper:
+mrproper: clean
 
