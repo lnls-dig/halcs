@@ -50,7 +50,10 @@ void bpm_client_destroy (bpm_client_t **self_p);
 /* General function to execute all the other modules functions */
 bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, 
         char *service, uint8_t *input, uint8_t *output);
-        
+
+/* Translate function's name and returns its structure */
+const disp_op_t* bpm_func_translate (char *name);
+
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration

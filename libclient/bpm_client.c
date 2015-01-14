@@ -222,6 +222,25 @@ err_inv_param:
     return err;
 }
 
+const disp_op_t *bpm_func_translate (char *name)
+{
+    if (name != NULL) 
+    {
+        /* Search the function table for a match in the 'name' field */
+        for (int i=0; smio_exp_ops[i] != NULL; i++)
+        {
+            for (int j=0; smio_exp_ops[i][j] != NULL; j++)
+            {
+                if (streq(name, smio_exp_ops[i][j]->name))
+                {
+                    return smio_exp_ops[i][j];
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 /**************** FMC130M SMIO Functions ****************/
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
 {
