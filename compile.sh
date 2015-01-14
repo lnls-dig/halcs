@@ -22,7 +22,11 @@ CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
 CFG_DIR=/etc/bpm_sw
 
-COMMAND="\
+COMMAND_DEPS="\
+    make deps && \
+    sudo make deps_install"
+
+COMMAND_HAL="\
     make BOARD=${BOARD} \
     LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
     DBE_DBG=${DBE_DBG} \
@@ -30,8 +34,24 @@ COMMAND="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-    CFG_DIR=${CFG_DIR} \
-    && sudo make install"
+    CFG_DIR=${CFG_DIR} && \
+    sudo make install"
 
-echo "Executing: " ${COMMAND}
-eval ${COMMAND}
+COMMAND_LIBCLIENT="\
+    make BOARD=${BOARD} \
+    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+    DBE_DBG=${DBE_DBG} libclient && \
+    sudo make libclient_install"
+
+COMMAND_ARRAY=(
+    "${COMMAND_DEPS}"
+    "${COMMAND_HAL}"
+    "${COMMAND_LIBCLIENT}"
+)
+
+for i in "${COMMAND_ARRAY[@]}"
+do
+    echo "Executing: " $i
+    eval $i
+done
+
