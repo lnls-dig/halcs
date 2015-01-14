@@ -621,6 +621,7 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
 static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service);
+static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
 
 bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
@@ -652,6 +653,11 @@ bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *ac
 bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service)
 {
     return _bpm_acq_check (self, service);
+}
+
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    return _bpm_acq_get_data_block (self, service, acq_trans);
 }
 
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
@@ -997,6 +1003,59 @@ static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
             "Check ok: data acquire was successfully completed\n");
 
 err_check_data_acquire:
+    return err;
+}
+
+static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    /* TODO: Use a error check like ASSERT_TEST instead assert() */
+    assert (self);
+    assert (service);
+    assert (acq_trans);
+    assert (acq_trans->block.data);
+
+    uint8_t write_val[sizeof(uint32_t)*2] = {0};  // 2 32-bits variables
+    *write_val = acq_trans->req.chan;
+    *(write_val+4) = acq_trans->block.idx;
+
+    smio_acq_data_block_t *read_val = zmalloc (sizeof (smio_acq_data_block_t)); 
+
+    /* Sent Message is:
+     * frame 0: operation code
+     * frame 1: channel
+     * frame 2: block required */
+
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_GET_DATA_BLOCK);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, (uint8_t *)read_val);
+
+    /* Received Message is:
+     * frame 0: error code
+     * frame 1: data size
+     * frame 2: data block */
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, 
+            "bpm_get_data_block: Data block was not acquired",
+            err_get_data_block, BPM_CLIENT_ERR_SERVER);
+
+    /* Data size effectively returned */
+    uint32_t read_size = (acq_trans->block.data_size < read_val->valid_bytes) ?
+        acq_trans->block.data_size : read_val->valid_bytes;
+
+    /* Copy message contents to user */
+    memcpy (acq_trans->block.data, read_val->data, read_size);  
+
+    /* Inform user about the number of bytes effectively copied */
+    acq_trans->block.bytes_read = read_size;    
+
+    /* Print some debug messages */
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "read_size: %u\n", read_val->data_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "acq_trans->block.data: %p\n", acq_trans->block.data);
+
+err_get_data_block:
+    free(read_val);
     return err;
 }
 

@@ -332,6 +332,10 @@ bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *ac
  * bpm_func_exec */
 bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
 
+/* New version of bpm_get_data_block that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */
