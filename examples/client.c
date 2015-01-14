@@ -25,6 +25,7 @@
 #define DSP_MODULE_NAME             "DSP"
 #define SWAP_MODULE_NAME            "SWAP"
 #define ACQ_MODULE_NAME             "ACQ"
+#define RFFE_MODULE_NAME            "RFFE"
 #define MAX_VARIABLES_NUMBER        sizeof(uint32_t)*8
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -332,6 +333,36 @@ int main (int argc, char *argv [])
         getwdwen,
         setwdwdly,
         getwdwdly,
+        rffesetsw,
+        rffegetsw,
+        rffesetatt1,
+        rffegetatt1,
+        rffesetatt2,
+        rffegetatt2,
+        rffesettmp1,
+        rffegettmp1,
+        rffesettmp2,
+        rffegettmp2,
+        rffesettmp3,
+        rffegettmp3,
+        rffesettmp4,
+        rffegettmp4,
+        rffesetpnt1,
+        rffegetpnt1,
+        rffesetpnt2,
+        rffegetpnt2,
+        rffesettmpctr,
+        rffegettmpctr,
+        rffesetout1,
+        rffegetout1,
+        rffesetout2,
+        rffegetout2,
+        rffesetrst,
+        rffegetrst,
+        rffesetrpg,
+        rffegetrpg,
+        rffesetswlvl,
+        rffegetswlvl,
         acqcheckpoll,
         getcurve,
         fullacq,
@@ -427,7 +458,7 @@ int main (int argc, char *argv [])
     {
         char *corr_name = zmalloc(50);
         call_func_t *item = zmalloc (sizeof(call_func_t));
-
+        double db_arg = 0;
         //Get the specified options
         switch (ch)
         {
@@ -678,7 +709,7 @@ int main (int argc, char *argv [])
                 item->service = FMC130M_4CH_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                double db_arg = strtod(optarg, NULL);
+                db_arg = strtod(optarg, NULL);
                 memcpy(item->write_val+4, &db_arg, sizeof(double));
                 append_item (call_list, item);
                 break;
@@ -1152,6 +1183,305 @@ int main (int argc, char *argv [])
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
                 free(item->name);
+                break;
+
+                /******** RFFE Module Functions *******/
+
+                //Set RFFE Switching
+            case rffesetsw:
+                item->name = RFFE_NAME_SET_GET_SW;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Switching
+            case rffegetsw:
+                item->name = RFFE_NAME_SET_GET_SW;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+
+                //Set RFFE Attenuator 1
+            case rffesetatt1:
+                item->name = RFFE_NAME_SET_GET_ATT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Attenuator 1
+            case rffegetatt1:
+                item->name = RFFE_NAME_SET_GET_ATT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Attenuator 2
+            case rffesetatt2:
+                item->name = RFFE_NAME_SET_GET_ATT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Attenuator 2
+            case rffegetatt2:
+                item->name = RFFE_NAME_SET_GET_ATT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                /* FIXME: Fix parse_subopt so it can be used here, allowing it to write double args */
+                
+                //Set RFFE Channel 1 Temperature 
+            case rffesettmp1:
+                item->name = RFFE_NAME_SET_GET_TEMP1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Channel 1 Temperature 
+            case rffegettmp1:
+                item->name = RFFE_NAME_SET_GET_TEMP1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Channel 2 Temperature 
+            case rffesettmp2:
+                item->name = RFFE_NAME_SET_GET_TEMP2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Channel 2 Temperature 
+            case rffegettmp2:
+                item->name = RFFE_NAME_SET_GET_TEMP2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Channel 3 Temperature 
+            case rffesettmp3:
+                item->name = RFFE_NAME_SET_GET_TEMP3;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Channel 3 Temperature 
+            case rffegettmp3:
+                item->name = RFFE_NAME_SET_GET_TEMP3;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Channel 4 Temperature 
+            case rffesettmp4:
+                item->name = RFFE_NAME_SET_GET_TEMP4;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Channel 4 Temperature 
+            case rffegettmp4:
+                item->name = RFFE_NAME_SET_GET_TEMP4;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Point 1
+            case rffesetpnt1:
+                item->name = RFFE_NAME_SET_GET_SET_POINT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Point 1
+            case rffegetpnt1:
+                item->name = RFFE_NAME_SET_GET_SET_POINT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Point 2 
+            case rffesetpnt2:
+                item->name = RFFE_NAME_SET_GET_SET_POINT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Point 2
+            case rffegetpnt2:
+                item->name = RFFE_NAME_SET_GET_SET_POINT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Temperature Control
+            case rffesettmpctr:
+                item->name = RFFE_NAME_SET_GET_TEMP_CONTROL;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Temperature Control
+            case rffegettmpctr:
+                item->name = RFFE_NAME_SET_GET_TEMP_CONTROL;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+                
+                //Set RFFE Output 1
+            case rffesetout1:
+                item->name = RFFE_NAME_SET_GET_OUTPUT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Output 1
+            case rffegetout1:
+                item->name = RFFE_NAME_SET_GET_OUTPUT1;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+
+                //Set RFFE Output 2
+            case rffesetout2:
+                item->name = RFFE_NAME_SET_GET_OUTPUT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                db_arg = strtod(optarg, NULL);
+                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Output 2
+            case rffegetout2:
+                item->name = RFFE_NAME_SET_GET_OUTPUT2;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+
+                //Set RFFE Reset
+            case rffesetrst:
+                item->name = RFFE_NAME_SET_GET_RESET;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Reset
+            case rffegetrst:
+                item->name = RFFE_NAME_SET_GET_RESET;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+
+                //Set RFFE Reprog
+            case rffesetrpg:
+                item->name = RFFE_NAME_SET_GET_REPROG;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Reprog
+            case rffegetrpg:
+                item->name = RFFE_NAME_SET_GET_REPROG;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
+                break;
+
+                //Set RFFE Switch Level
+            case rffesetswlvl:
+                item->name = RFFE_NAME_SET_GET_SW_LVL;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 0;
+                *(item->write_val) = item->rw;
+                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get RFFE Switch Level
+            case rffegetswlvl:
+                item->name = RFFE_NAME_SET_GET_SW_LVL;
+                item->service = RFFE_MODULE_NAME;
+                item->rw = 1;
+                *(item->write_val) = item->rw;
+                append_item (call_list, item);
                 break;
 
                 /******** ACQ Module Functions ********/
