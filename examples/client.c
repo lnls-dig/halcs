@@ -1490,14 +1490,14 @@ int main (int argc, char *argv [])
 
     //Check if the board number is within range and set to default if necessary
     if (board_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BOARD number: %u\n",
+        fprintf (stderr, "[client]: Setting default value to BOARD number: %u\n",
                 DFLT_BOARD_NUMBER);
         board_number = DFLT_BOARD_NUMBER;
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
         if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:leds]: BOARD number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client]: BOARD number too big! Defaulting to: %u\n",
                     MAX_BOARD_NUMBER);
             board_number = MAX_BOARD_NUMBER;
         }
@@ -1505,7 +1505,7 @@ int main (int argc, char *argv [])
 
     //Check if the bpm number is within range and set to default if necessary
     if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+        fprintf (stderr, "[client]: Setting default value to BPM number: %u\n",
                 DFLT_BPM_NUMBER);
         bpm_number = DFLT_BPM_NUMBER;
     }
@@ -1513,7 +1513,7 @@ int main (int argc, char *argv [])
         bpm_number = strtoul (bpm_number_str, NULL, 10);
 
         if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client]: BPM number too big! Defaulting to: %u\n",
                     MAX_BPM_NUMBER);
             bpm_number = MAX_BPM_NUMBER;
         }
