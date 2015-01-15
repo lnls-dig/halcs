@@ -48,7 +48,7 @@
                 TYPE_FMC130M_4CH_ACTIVE) {                      \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
                 "Board is not of ACTIVE type. Unimplemented "   \
-                "function for this type of FMC130M_4CH board"); \
+                "function for this type of FMC130M_4CH board\n"); \
                 return -FMC130M_4CH_UNINPL;                     \
         }                                                       \
     })
