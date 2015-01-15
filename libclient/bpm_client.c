@@ -415,6 +415,36 @@ PARAM_FUNC_CLIENT_READ(si571_oe)
      return param_client_read (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
 }
 
+PARAM_FUNC_CLIENT_WRITE(trig_dir)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_dir)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_term)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_term)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_val)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_val)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
+}
+
 /*************************** FMC130M Chips Functions *************************/
 
 /* AD9510 PLL A divider */
