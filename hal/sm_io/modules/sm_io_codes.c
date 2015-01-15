@@ -13,5 +13,6 @@ const disp_op_t **smio_exp_ops [] = {
     fmc130m_4ch_exp_ops,
     swap_exp_ops,
     rffe_exp_ops,
+    NULL
 };
 
