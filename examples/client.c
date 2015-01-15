@@ -179,7 +179,7 @@ int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name
             case VALUE:;
                     if (dbl_input_flag == 1)
                     {   
-                        double db_arg = strtod(optarg, NULL);
+                        double db_arg = strtod(value, NULL);
                         memcpy(input+4, &db_arg, sizeof(double));
                     }
                     else
@@ -1365,7 +1365,7 @@ int main (int argc, char *argv [])
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
                 break;
-                
+
                 //Set RFFE Point 1
             case rffesetpnt1:
                 item->name = RFFE_NAME_SET_GET_SET_POINT1;
