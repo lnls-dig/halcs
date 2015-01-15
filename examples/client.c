@@ -345,28 +345,16 @@ int main (int argc, char *argv [])
         getwdwdly,
         rffesetsw,
         rffegetsw,
-        rffesetatt1,
-        rffegetatt1,
-        rffesetatt2,
-        rffegetatt2,
-        rffesettmp1,
-        rffegettmp1,
-        rffesettmp2,
-        rffegettmp2,
-        rffesettmp3,
-        rffegettmp3,
-        rffesettmp4,
-        rffegettmp4,
-        rffesetpnt1,
-        rffegetpnt1,
-        rffesetpnt2,
-        rffegetpnt2,
+        rffesetatt,
+        rffegetatt,
+        rffesettmp,
+        rffegettmp,
+        rffesetpnt,
+        rffegetpnt,
         rffesettmpctr,
         rffegettmpctr,
-        rffesetout1,
-        rffegetout1,
-        rffesetout2,
-        rffegetout2,
+        rffesetout,
+        rffegetout,
         rffesetrst,
         rffegetrst,
         rffesetrpg,
@@ -452,28 +440,16 @@ int main (int argc, char *argv [])
         {"setgain",             required_argument,   NULL, 'G'},
         {"rffesetsw",           required_argument,   NULL, rffesetsw},
         {"rffegetsw",           no_argument,         NULL, rffegetsw},
-        {"rffesetatt1",         required_argument,   NULL, rffesetatt1},
-        {"rffegetatt1",         no_argument,         NULL, rffegetatt1},
-        {"rffesetatt2",         required_argument,   NULL, rffesetatt2},
-        {"rffegetatt2",         no_argument,         NULL, rffegetatt2},
-        {"rffesettmp1",         required_argument,   NULL, rffesettmp1},
-        {"rffegettmp1",         no_argument,         NULL, rffegettmp1},
-        {"rffesettmp2",         required_argument,   NULL, rffesettmp2},
-        {"rffegettmp2",         no_argument,         NULL, rffegettmp2},
-        {"rffesettmp3",         required_argument,   NULL, rffesettmp3},
-        {"rffegettmp3",         no_argument,         NULL, rffegettmp3},
-        {"rffesettmp4",         required_argument,   NULL, rffesettmp4},
-        {"rffegettmp4",         no_argument,         NULL, rffegettmp4},
-        {"rffesetpnt1",         required_argument,   NULL, rffesetpnt1},
-        {"rffegetpnt1",         no_argument,         NULL, rffegetpnt1},
-        {"rffesetpnt2",         required_argument,   NULL, rffesetpnt2},
-        {"rffegetpnt2",         no_argument,         NULL, rffegetpnt2},
+        {"rffesetatt",          required_argument,   NULL, rffesetatt},
+        {"rffegetatt",          no_argument,         NULL, rffegetatt},
+        {"rffesettmp",          required_argument,   NULL, rffesettmp},
+        {"rffegettmp",          no_argument,         NULL, rffegettmp},
+        {"rffesetpnt",          required_argument,   NULL, rffesetpnt},
+        {"rffegetpnt",          no_argument,         NULL, rffegetpnt},
         {"rffesettmpctr",       required_argument,   NULL, rffesettmpctr},
         {"rffegettmpctr",       no_argument,         NULL, rffegettmpctr},
-        {"rffesetout1",         required_argument,   NULL, rffesetout1},
-        {"rffegetout1",         no_argument,         NULL, rffegetout1},
-        {"rffesetout2",         required_argument,   NULL, rffesetout2},
-        {"rffegetout2",         no_argument,         NULL, rffegetout2},
+        {"rffesetout",          required_argument,   NULL, rffesetout},
+        {"rffegetout",          no_argument,         NULL, rffegetout},
         {"rffesetrst",          required_argument,   NULL, rffesetrst},
         {"rffegetrst",          no_argument,         NULL, rffegetrst},
         {"rffesetrpg",          required_argument,   NULL, rffesetrpg},
@@ -1246,166 +1222,102 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set RFFE Attenuator 1
-            case rffesetatt1:
-                item->name = RFFE_NAME_SET_GET_ATT1;
+                //Set RFFE Attenuators
+            case rffesetatt:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
                 append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Get RFFE Attenuator 1
-            case rffegetatt1:
-                item->name = RFFE_NAME_SET_GET_ATT1;
+                //Get RFFE Attenuators
+            case rffegetatt:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 1;
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
+                free(item->name);
                 break;
                 
-                //Set RFFE Attenuator 2
-            case rffesetatt2:
-                item->name = RFFE_NAME_SET_GET_ATT2;
+                //Set RFFE Temperature
+            case rffesettmp:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
                 append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Get RFFE Attenuator 2
-            case rffegetatt2:
-                item->name = RFFE_NAME_SET_GET_ATT2;
+                //Read RFFE Temperature
+            case rffegettmp:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 1;
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Set RFFE Channel 1 Temperature 
-            case rffesettmp1:
-                item->name = RFFE_NAME_SET_GET_TEMP1;
+                //Set RFFE Point
+            case rffesetpnt:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
                 append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Get RFFE Channel 1 Temperature 
-            case rffegettmp1:
-                item->name = RFFE_NAME_SET_GET_TEMP1;
+                //Get RFFE Point
+            case rffegetpnt:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 1;
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
-                break;
-                
-                //Set RFFE Channel 2 Temperature 
-            case rffesettmp2:
-                item->name = RFFE_NAME_SET_GET_TEMP2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Get RFFE Channel 2 Temperature 
-            case rffegettmp2:
-                item->name = RFFE_NAME_SET_GET_TEMP2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
-                break;
-                
-                //Set RFFE Channel 3 Temperature 
-            case rffesettmp3:
-                item->name = RFFE_NAME_SET_GET_TEMP3;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
-                break;
-
-                //Get RFFE Channel 3 Temperature 
-            case rffegettmp3:
-                item->name = RFFE_NAME_SET_GET_TEMP3;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
-                break;
-                
-                //Set RFFE Channel 4 Temperature 
-            case rffesettmp4:
-                item->name = RFFE_NAME_SET_GET_TEMP4;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
-                break;
-
-                //Get RFFE Channel 4 Temperature 
-            case rffegettmp4:
-                item->name = RFFE_NAME_SET_GET_TEMP4;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
-                break;
-
-                //Set RFFE Point 1
-            case rffesetpnt1:
-                item->name = RFFE_NAME_SET_GET_SET_POINT1;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
-                break;
-
-                //Get RFFE Point 1
-            case rffegetpnt1:
-                item->name = RFFE_NAME_SET_GET_SET_POINT1;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
-                break;
-                
-                //Set RFFE Point 2 
-            case rffesetpnt2:
-                item->name = RFFE_NAME_SET_GET_SET_POINT2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
-                break;
-
-                //Get RFFE Point 2
-            case rffegetpnt2:
-                item->name = RFFE_NAME_SET_GET_SET_POINT2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
-                break;
-                
                 //Set RFFE Temperature Control
             case rffesettmpctr:
                 item->name = RFFE_NAME_SET_GET_TEMP_CONTROL;
@@ -1424,45 +1336,37 @@ int main (int argc, char *argv [])
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
                 break;
-                
-                //Set RFFE Output 1
-            case rffesetout1:
-                item->name = RFFE_NAME_SET_GET_OUTPUT1;
+
+                //Set RFFE Output
+            case rffesetout:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
                 append_item (call_list, item);
+                free(item->name);
                 break;
 
-                //Get RFFE Output 1
-            case rffegetout1:
-                item->name = RFFE_NAME_SET_GET_OUTPUT1;
+                //Get RFFE Output
+            case rffegetout:
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
+                if (bpm_func_translate(corr_name) == NULL)
+                {
+                    fprintf(stderr, "%s: Invalid channel!\n", program_name);
+                    break;
+                }
+                item->name = strdup(corr_name);
                 item->service = RFFE_MODULE_NAME;
                 item->rw = 1;
                 *(item->write_val) = item->rw;
                 append_item (call_list, item);
-                break;
-
-                //Set RFFE Output 2
-            case rffesetout2:
-                item->name = RFFE_NAME_SET_GET_OUTPUT2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
-                append_item (call_list, item);
-                break;
-
-                //Get RFFE Output 2
-            case rffegetout2:
-                item->name = RFFE_NAME_SET_GET_OUTPUT2;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
-                append_item (call_list, item);
+                free(item->name);
                 break;
 
                 //Set RFFE Reset
