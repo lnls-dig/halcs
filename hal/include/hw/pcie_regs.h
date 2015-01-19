@@ -8,12 +8,6 @@
 #ifndef _PCIE_REGS_H_
 #define _PCIE_REGS_H_
 
-/* Some FPGA PCIe registers. These are inside bar0 */
-#define PCIE_CFG_REG_SDRAM_PG               0x1C
-#define PCIE_CFG_REG_GSR                    0x20
-#define PCIE_CFG_GSR_BIT_DDR_RDY            (0x1 << 7)
-#define PCIE_CFG_REG_WB_PG                  0x24
-
 /* Some FPGA PCIe constants */
 /* SDRAM is accesses via 32-bit BAR (32-bit addressing) */
 #define PCIE_SDRAM_PG_SHIFT                 0           /* bits */
@@ -39,6 +33,75 @@
 #define WB_DWORD_ACC                        2           /* 32-bit addressing */
 #define WB_WORD_ACC                         1           /* 16-bit addressing */
 #define WB_BYTE_ACC                         0           /* 8-bit addressing */
+
+/************************************************************/
+/******************* FPGA PCIe Registers ********************/
+/************************************************************/
+/* FPGA PCIe registers. These are inside bar0r These must match
+ * the FPGA firmware */
+
+#define PCIE_CFG_REG_VERSION                (0 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_IRQ_STAT               (2 << WB_DWORD_ACC)
+
+/* IRQ Enable. Write '1' turns on the interrupt, '0' masks. */
+#define PCIE_CFG_REG_IRQ_EN                 (4 << WB_DWORD_ACC)
+
+#define PCIE_CFG_REG_ERROR                  (6 << WB_DWORD_ACC)  /* Unused */
+#define PCIE_CFG_REG_SDRAM_PG               (7 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_STATUS                 (8 << WB_DWORD_ACC)
+
+#define PCIE_CFG_STATUS_DDR_RDY             (0x1 << 7)
+
+#define PCIE_CFG_REG_WB_PG                  (9 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_CONTROL                (10 << WB_DWORD_ACC)
+
+/* Upstream DMA channel Constants */
+#define PCIE_CFG_REG_DMA_US_PAH             (11 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_PAL             (12 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_HAH             (13 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_HAL             (14 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_BDAH            (15 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_BDAL            (16 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_LENG            (17 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_CTRL            (18 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_US_STA             (19 << WB_DWORD_ACC)
+
+/* Downstream DMA channel Constants */
+#define PCIE_CFG_REG_DMA_DS_PAH             (20 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_PAL             (21 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_HAH             (22 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_HAL             (23 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_BDAH            (24 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_BDAL            (25 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_LENG            (26 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_CTRL            (27 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_DS_STA             (28 << WB_DWORD_ACC)
+
+/* Address for MRd channel control */
+#define PCIE_CFG_REG_MRD_CTRL               (29 << WB_DWORD_ACC)
+/* Address for Tx module control */
+#define PCIE_CFG_REG_TX_CTRL                (30 << WB_DWORD_ACC)
+
+#define PCIE_CFG_TX_CTRL_CHANNEL_RST        0x0A
+
+/* Address of Interrupt Generator Control (W) */
+#define PCIE_CFG_REG_IG_CONTROL             (32 << WB_DWORD_ACC)
+/* Address of Interrupt Generator Latency (W+R) */
+#define PCIE_CFG_REG_IG_LATENCY             (33 << WB_DWORD_ACC)
+/* Address of Interrupt Generator Assert Number (R) */
+#define PCIE_CFG_REG_IG_NUM_ASSERT          (34 << WB_DWORD_ACC)
+/* Address of Interrupt Generator Deassert Number (R) */
+#define PCIE_CFG_REG_IG_NUM_DEASSERT        (35 << WB_DWORD_ACC)
+/* Event Buffer FIFO status (R) + control (W) */
+#define PCIE_CFG_REG_EB_STACON              (36 << WB_DWORD_ACC)
+
+/* Upstream DMA transferred byte count (R) */
+#define PCIE_CFG_REG_US_TRANSF_BC           (37 << WB_DWORD_ACC)
+/* Downstream DMA transferred byte count (R) */
+#define PCIE_CFG_REG_DS_TRANSF_BC           (38 << WB_DWORD_ACC)
+
+/* Total number of registers */
+#define PCIE_CFG_REG_NUM_OF_ADDRESSES       39
 
 /************************************************************/
 /********** PCIe Address MSB (BARs) part extractor **********/
