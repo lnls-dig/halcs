@@ -179,8 +179,7 @@ int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name
             case VALUE:;
                     if (dbl_input_flag == 1)
                     {   
-                        double db_arg = strtod(value, NULL);
-                        memcpy(input+4, &db_arg, sizeof(double));
+                        *(double *)(input+4) = strtod(value, NULL);
                     }
                     else
                     {
@@ -725,8 +724,7 @@ int main (int argc, char *argv [])
                 item->service = FMC130M_4CH_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                db_arg = strtod(optarg, NULL);
-                memcpy(item->write_val+4, &db_arg, sizeof(double));
+                *(double *)(input+4) = strtod(value, NULL);
                 append_item (call_list, item);
                 break;
 
@@ -1673,7 +1671,7 @@ int main (int argc, char *argv [])
         free(valid_data);
     }
 
-    //Desallocate memory
+    //Deallocate memory
     free (default_broker_endp);
     free (broker_endp);
     free (acq_service);
