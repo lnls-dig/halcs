@@ -469,7 +469,7 @@ int main (int argc, char *argv [])
     {
         char *corr_name = zmalloc(50);
         call_func_t *item = zmalloc (sizeof(call_func_t));
-        double db_arg = 0;
+
         //Get the specified options
         switch (ch)
         {
@@ -711,7 +711,8 @@ int main (int argc, char *argv [])
                 item->service = FMC130M_4CH_MODULE_NAME;
                 item->rw = 0;
                 *(item->write_val) = item->rw;
-                *(double *)(input+4) = strtod(value, NULL);
+                double *db_ptr = (double *)(item->write_val+4);
+                *db_ptr = strtod(optarg, NULL);
                 append_item (call_list, item);
                 break;
 
