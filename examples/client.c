@@ -57,8 +57,7 @@ void print_data_curve (uint32_t chan, uint32_t *data, uint32_t size)
                     raw_data16[(i*4)+2],
                     raw_data16[(i*4)+3]);
         }
-    }
-    else {
+    } else {
         int32_t *raw_data32 = (int32_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 4; i++) {
             if (zctx_interrupted) {
@@ -177,15 +176,11 @@ int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name
                     memcpy(corr_name+len-1, value, strlen(value));
                     break;
             case VALUE:;
-                    if (dbl_input_flag == 1)
-                    {   
+                    if (dbl_input_flag == 1) {
                         *(double *)(input+4) = strtod(value, NULL);
+                    } else {
+                        *(input+4) = (uint32_t) strtoul(value, NULL, 10);
                     }
-                    else
-                    {
-                        *(input+4) = (uint32_t) strtoul(value, NULL, 10);    
-                    }
-                    break;
             default:
                     /* Unknown suboption. */
                     printf ("Unknown suboption '%s'\n", value);
@@ -486,20 +481,20 @@ int main (int argc, char *argv [])
                 verbose = 1;
                 break;
 
-                // Broker Endpoint
+                //Broker Endpoint
             case 'e':
                 broker_endp = strdup(optarg);
                 break;
 
-                // Board Number
+                //Board Number
             case 'd':
                 board_number_str = strdup(optarg);
                 break;
 
-                // BPM number
+                //BPM number
             case 'm':
                 bpm_number_str = strdup(optarg);
-                break;  
+                break;
 
                 //Blink Leds
             case 'l':
@@ -539,8 +534,7 @@ int main (int argc, char *argv [])
                 //Get ADC Data
             case 'c':
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -555,8 +549,7 @@ int main (int argc, char *argv [])
                 //Set ADC Data
             case 'C':
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -571,8 +564,7 @@ int main (int argc, char *argv [])
                 //Get ADC Dly Value
             case getdlyval:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -587,8 +579,7 @@ int main (int argc, char *argv [])
                 //Set ADC Dly Value
             case setdlyval:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -603,8 +594,7 @@ int main (int argc, char *argv [])
                 //Get ADC Dly Line
             case getdlyline:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -619,8 +609,7 @@ int main (int argc, char *argv [])
                 //Set ADC Dly Line
             case setdlyline:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -635,8 +624,7 @@ int main (int argc, char *argv [])
                 //Get ADC Dly Update
             case getdlyupdt:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -651,8 +639,7 @@ int main (int argc, char *argv [])
                 //Set ADC Dly Update
             case setdlyupdt:
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -667,8 +654,7 @@ int main (int argc, char *argv [])
                 //Set ADC Dly
             case 'V':
                 parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1022,8 +1008,7 @@ int main (int argc, char *argv [])
                 //Get Monit AMP
             case 'J':
                 parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1038,8 +1023,7 @@ int main (int argc, char *argv [])
                 //Set Monit AMP
             case 'j':
                 parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1170,8 +1154,7 @@ int main (int argc, char *argv [])
                 //Get FE Gain
             case 'g':
                 parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1186,8 +1169,7 @@ int main (int argc, char *argv [])
                 //Set FE Gain
             case 'G':
                 parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val, 0);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1223,8 +1205,7 @@ int main (int argc, char *argv [])
                 //Set RFFE Attenuators
             case rffesetatt:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1239,8 +1220,7 @@ int main (int argc, char *argv [])
                 //Get RFFE Attenuators
             case rffegetatt:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1251,12 +1231,11 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 free(item->name);
                 break;
-                
+
                 //Set RFFE Temperature
             case rffesettmp:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1271,8 +1250,7 @@ int main (int argc, char *argv [])
                 //Read RFFE Temperature
             case rffegettmp:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1287,8 +1265,7 @@ int main (int argc, char *argv [])
                 //Set RFFE Point
             case rffesetpnt:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1303,8 +1280,7 @@ int main (int argc, char *argv [])
                 //Get RFFE Point
             case rffegetpnt:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1338,8 +1314,7 @@ int main (int argc, char *argv [])
                 //Set RFFE Output
             case rffesetout:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1354,8 +1329,7 @@ int main (int argc, char *argv [])
                 //Get RFFE Output
             case rffegetout:
                 parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
-                if (bpm_func_translate(corr_name) == NULL)
-                {
+                if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
@@ -1491,8 +1465,7 @@ int main (int argc, char *argv [])
         fprintf (stderr, "[client]: Setting default value to BOARD number: %u\n",
                 DFLT_BOARD_NUMBER);
         board_number = DFLT_BOARD_NUMBER;
-    }
-    else {
+    } else {
         board_number = strtoul (board_number_str, NULL, 10);
         if (board_number > MAX_BOARD_NUMBER) {
             fprintf (stderr, "[client]: BOARD number too big! Defaulting to: %u\n",
@@ -1506,8 +1479,7 @@ int main (int argc, char *argv [])
         fprintf (stderr, "[client]: Setting default value to BPM number: %u\n",
                 DFLT_BPM_NUMBER);
         bpm_number = DFLT_BPM_NUMBER;
-    }
-    else {
+    } else {
         bpm_number = strtoul (bpm_number_str, NULL, 10);
 
         if (bpm_number > MAX_BPM_NUMBER) {
@@ -1524,12 +1496,15 @@ int main (int argc, char *argv [])
     }
 
     if ( (acq_start || acq_get_block || acq_full_call) && (!acq_samples_set || !acq_chan_set)) {
-        if (acq_start){
-            fprintf(stderr, "%s: If --acqstart is requested, --setchan and --setsamples must be set!\n", program_name);}
-        if (acq_get_block){
-            fprintf(stderr, "%s: To receive a data block, --setsamples and --setchan must be set!\n", program_name);}
-        if (acq_full_call){
-            fprintf(stderr, "%s: If --fullacq is requested, --setchan and --setsamples must be set!\n", program_name);}
+        if (acq_start) {
+            fprintf(stderr, "%s: If --acqstart is requested, --setchan and --setsamples must be set!\n", program_name);
+            }
+        if (acq_get_block) {
+            fprintf(stderr, "%s: To receive a data block, --setsamples and --setchan must be set!\n", program_name);
+            }
+        if (acq_full_call) {
+            fprintf(stderr, "%s: If --fullacq is requested, --setchan and --setsamples must be set!\n", program_name);
+            }
         return -1;
     }
 
@@ -1569,14 +1544,12 @@ int main (int argc, char *argv [])
         bpm_client_err_e err = bpm_func_exec (bpm_client, func_structure, func_service, (uint8_t *)function->write_val,
                 (uint8_t *)function->read_val);
 
-        if (err != BPM_CLIENT_SUCCESS)
-        {
+        if (err != BPM_CLIENT_SUCCESS) {
             fprintf (stderr, "[client]: BPM_ERROR: '%s'\n",bpm_client_err_str (err));
             return -1;
         }
 
-        if (func_structure->retval != DISP_ARG_END && function->rw)
-        {
+        if (func_structure->retval != DISP_ARG_END && function->rw) {
             print_func_v(1, function);
         }
         free (func_service);
@@ -1588,54 +1561,47 @@ int main (int argc, char *argv [])
     char *acq_service = zmalloc(50);
     sprintf (acq_service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
     /* Request data acquisition on server */
-    if (acq_start) 
-    {
-        //Wrap the data request parameters
-        acq_req_t acq_req = {   
+    if (acq_start) {
+    //Wrap the data request parameters
+        acq_req_t acq_req = {
             acq_samples_val,        /* Number of samples */
             acq_chan_val            /* Acquisition channel number */
-        };                 
+        };
         bpm_client_err_e err = bpm_acq_start(bpm_client, acq_service, &acq_req);
         fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
     }
 
     /* Check if the previous acquisition has finished */
-    if (acq_check)
-    {
-        if (check_poll){
+    if (acq_check) {
+        if (check_poll) {
             func_polling (bpm_client, ACQ_NAME_CHECK_DATA_ACQUIRE, acq_service, NULL, NULL, poll_timeout);
-        }
-        else {
+        } else {
             bpm_client_err_e err = bpm_acq_check(bpm_client, acq_service);
             fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
         }
-
     }
 
     /* Retrieve specific data block */
-    if (acq_get_block) 
-    {
+    if (acq_get_block) {
         uint32_t data_size = acq_samples_val*acq_chan[acq_chan_val].sample_size;
         uint32_t *valid_data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
-        acq_trans_t acq_trans = {       
-            .req =   {
+        acq_trans_t acq_trans = {
+            .req = {
                 .chan = acq_chan_val,
             },
             .block = {
                 .idx = acq_block_id,
                 .data = valid_data,
                 .data_size = data_size
-            }                           
+            }
         };
 
         bpm_client_err_e err = bpm_acq_get_data_block (bpm_client, acq_service, &acq_trans);
 
-        if (err == BPM_CLIENT_SUCCESS){
+        if (err == BPM_CLIENT_SUCCESS) {
             fprintf (stdout, "[client:acq]: bpm_get_block was successfully executed\n");
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
-        }
-
-        else {
+        } else {
             fprintf (stderr, "[client:acq]: bpm_get_block failed\n");
             fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
         }
@@ -1643,27 +1609,25 @@ int main (int argc, char *argv [])
     }
 
     /* Perform a full acquisition routine and return a data curve */
-    if (acq_full_call)
-    {
+    if (acq_full_call) {
         uint32_t data_size = acq_samples_val*acq_chan[acq_chan_val].sample_size;
         uint32_t *valid_data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
 
-        acq_trans_t acq_trans = {   
-            .req =   {  
+        acq_trans_t acq_trans = {
+            .req = {
                 .chan = acq_chan_val,
                 .num_samples = acq_samples_val },
-            .block = {  
+            .block = {
                 .data = valid_data,
-                .data_size = data_size}
+                .data_size = data_size }
         };
 
         bpm_client_err_e err = bpm_full_acq(bpm_client, acq_service, &acq_trans, poll_timeout);
 
-        if (err == BPM_CLIENT_SUCCESS){
+        if (err == BPM_CLIENT_SUCCESS) {
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
             fprintf (stdout, "[client:acq]: bpm_acq_full_call was successfully executed\n");
-        }
-        else {
+        } else {
             fprintf (stderr, "[client:acq]: bpm_acq_full_call failed\n");
             fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
         }
