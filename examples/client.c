@@ -158,7 +158,7 @@ char *mount_opts[] =
     [SUBOPT_END] = NULL
 };
 
-int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint8_t *input, int dbl_input_flag)
+int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint8_t *input)
 {
     /* FIXME: Check if we use DISP_GET_ATYPE to verify the input arg type
      * is a better solution than dbl_input_flag */
@@ -172,11 +172,12 @@ int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name
     {
         switch (getsubopt (&subopts, mount_opts, &value))
         {
-            case CHANNEL:;
+            case CHANNEL:
                     memcpy(corr_name+len-1, value, strlen(value));
                     break;
             case VALUE:;
-                    if (dbl_input_flag == 1) {
+                    const disp_op_t* temp_func = bpm_func_translate(corr_name);
+                    if (DISP_GET_ATYPE(temp_func->args[1]) == DISP_ATYPE_DOUBLE) {
                         *(double *)(input+4) = strtod(value, NULL);
                     } else {
                         *(input+4) = (uint32_t) strtoul(value, NULL, 10);
@@ -533,7 +534,7 @@ int main (int argc, char *argv [])
 
                 //Get ADC Data
             case 'c':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -548,7 +549,7 @@ int main (int argc, char *argv [])
 
                 //Set ADC Data
             case 'C':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -563,7 +564,7 @@ int main (int argc, char *argv [])
 
                 //Get ADC Dly Value
             case getdlyval:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -578,7 +579,7 @@ int main (int argc, char *argv [])
 
                 //Set ADC Dly Value
             case setdlyval:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -593,7 +594,7 @@ int main (int argc, char *argv [])
 
                 //Get ADC Dly Line
             case getdlyline:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -608,7 +609,7 @@ int main (int argc, char *argv [])
 
                 //Set ADC Dly Line
             case setdlyline:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -623,7 +624,7 @@ int main (int argc, char *argv [])
 
                 //Get ADC Dly Update
             case getdlyupdt:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -638,7 +639,7 @@ int main (int argc, char *argv [])
 
                 //Set ADC Dly Update
             case setdlyupdt:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -653,7 +654,7 @@ int main (int argc, char *argv [])
 
                 //Set ADC Dly
             case 'V':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1007,7 +1008,7 @@ int main (int argc, char *argv [])
 
                 //Get Monit AMP
             case 'J':
-                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1022,7 +1023,7 @@ int main (int argc, char *argv [])
 
                 //Set Monit AMP
             case 'j':
-                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1153,7 +1154,7 @@ int main (int argc, char *argv [])
 
                 //Get FE Gain
             case 'g':
-                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1168,7 +1169,7 @@ int main (int argc, char *argv [])
 
                 //Set FE Gain
             case 'G':
-                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val, 0);
+                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1204,7 +1205,7 @@ int main (int argc, char *argv [])
 
                 //Set RFFE Attenuators
             case rffesetatt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1219,7 +1220,7 @@ int main (int argc, char *argv [])
 
                 //Get RFFE Attenuators
             case rffegetatt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1234,7 +1235,7 @@ int main (int argc, char *argv [])
 
                 //Set RFFE Temperature
             case rffesettmp:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1249,7 +1250,7 @@ int main (int argc, char *argv [])
 
                 //Read RFFE Temperature
             case rffegettmp:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1264,7 +1265,7 @@ int main (int argc, char *argv [])
 
                 //Set RFFE Point
             case rffesetpnt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1279,7 +1280,7 @@ int main (int argc, char *argv [])
 
                 //Get RFFE Point
             case rffegetpnt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1313,7 +1314,7 @@ int main (int argc, char *argv [])
 
                 //Set RFFE Output
             case rffesetout:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
@@ -1328,7 +1329,7 @@ int main (int argc, char *argv [])
 
                 //Get RFFE Output
             case rffegetout:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val, 1);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
