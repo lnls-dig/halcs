@@ -344,6 +344,14 @@ int main (int argc, char *argv [])
         getwdwen,
         setwdwdly,
         getwdwdly,
+        setgaina,
+        getgaina,
+        setgainb,
+        getgainb,
+        setgainc,
+        getgainc,
+        setgaind,
+        getgaind,
         rffesetsw,
         rffegetsw,
         rffesetatt,
@@ -437,9 +445,15 @@ int main (int argc, char *argv [])
         {"getwdwen",            no_argument,         NULL, getwdwen},
         {"setwdwdly",           required_argument,   NULL, setwdwdly},
         {"getwdwdly",           no_argument,         NULL, getwdwdly},
-        {"getgain",             required_argument,   NULL, 'g'},
-        {"setgain",             required_argument,   NULL, 'G'},
-        {"rffesetsw",           required_argument,   NULL, rffesetsw},
+        {"setgaina",            required_argument,   NULL, setgaina},
+        {"getgaina",            no_argument,         NULL, getgaina},
+        {"setgainb",            required_argument,   NULL, setgainb},
+        {"getgainb",            no_argument,         NULL, getgainb},
+        {"setgainc",            required_argument,   NULL, setgainc},
+        {"getgainc",            no_argument,         NULL, getgainc},
+        {"setgaind",            required_argument,   NULL, setgaind},
+        {"getgaind",            no_argument,         NULL, getgaind},
+        {"rffesetsw",           no_argument,         NULL, rffesetsw},
         {"rffegetsw",           no_argument,         NULL, rffegetsw},
         {"rffesetatt",          required_argument,   NULL, rffesetatt},
         {"rffegetatt",          no_argument,         NULL, rffegetatt},
@@ -468,7 +482,7 @@ int main (int argc, char *argv [])
         {NULL, 0, NULL, 0}
     };
 
-    const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:g:G:E:H:IKA:";
+    const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:E:H:IKA:";
     zlist_t *call_list = zlist_new();
 
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
@@ -1138,29 +1152,79 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FE Gain
-            case 'g':
-                if ((err = parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
-                    fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
-                    return -1;
-                }
-                item.name = strdup(corr_name);
-                item.service = DSP_MODULE_NAME;
+                //Get FE Channel A Gain
+            case getgaina:
+                item.name = SWAP_NAME_SET_GET_GAIN_A;
+                item.service = SWAP_MODULE_NAME;
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
-                //Set FE Gain
-            case 'G':
-                if ((err = parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
-                    fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
-                    return -1;
-                }
-                item.name = strdup(corr_name);
-                item.service = DSP_MODULE_NAME;
+                //Set FE Channel A Gain
+            case setgaina:
+                item.name = SWAP_NAME_SET_GET_GAIN_A;
+                item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get FE Channel B Gain
+            case getgainb:
+                item.name = SWAP_NAME_SET_GET_GAIN_B;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set FE Channel B Gain
+            case setgainb:
+                item.name = SWAP_NAME_SET_GET_GAIN_B;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get FE Channel C Gain
+            case getgainc:
+                item.name = SWAP_NAME_SET_GET_GAIN_C;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set FE Channel C Gain
+            case setgainc:
+                item.name = SWAP_NAME_SET_GET_GAIN_C;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get FE Channel D Gain
+            case getgaind:
+                item.name = SWAP_NAME_SET_GET_GAIN_D;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set FE Channel D Gain
+            case setgaind:
+                item.name = SWAP_NAME_SET_GET_GAIN_D;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
