@@ -90,14 +90,10 @@ static void _zlist_free_item (void *data)
     data = NULL;
 }
 
-void append_item (zlist_t* list, call_func_t *func)
+void append_item (zlist_t* list, call_func_t func)
 {
     call_func_t *wrap_func = zmalloc(sizeof(call_func_t));
-    wrap_func->name = strdup(func->name);
-    wrap_func->service = func->service;
-    wrap_func->rw = func->rw;
-    wrap_func->poll = func->poll;
-    memcpy(wrap_func->write_val, func->write_val, sizeof(func->write_val));
+    *wrap_func = func;
     zlist_append (list, wrap_func);
     zlist_freefn (list, wrap_func, _zlist_free_item, false);
 }
@@ -160,9 +156,8 @@ char *mount_opts[] =
 
 int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint8_t *input)
 {
-    /* FIXME: Check if we use DISP_GET_ATYPE to verify the input arg type
-     * is a better solution than dbl_input_flag */
     char* value;
+    char* temp_value = "";
     size_t len = strlen(name);
     char* temp = zmalloc(len);
     memcpy(temp, name, len-1);
@@ -175,19 +170,28 @@ int parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name
             case CHANNEL:
                     memcpy(corr_name+len-1, value, strlen(value));
                     break;
-            case VALUE:;
-                    const disp_op_t* temp_func = bpm_func_translate(corr_name);
-                    if (DISP_GET_ATYPE(temp_func->args[1]) == DISP_ATYPE_DOUBLE) {
-                        *(double *)(input+4) = strtod(value, NULL);
-                    } else {
-                        *(input+4) = (uint32_t) strtoul(value, NULL, 10);
-                    }
+            case VALUE:
+                    temp_value = value;
+                    break;
             default:
                     /* Unknown suboption. */
                     printf ("Unknown suboption '%s'\n", value);
                     break;
         }
     }
+    const disp_op_t* temp_func = bpm_func_translate(corr_name);
+    if (temp_func == NULL) {
+        fprintf(stderr, "[client]: Invalid channel selected");
+        goto inv_channel;
+    }
+    
+    if (DISP_GET_ATYPE(temp_func->args[1]) == DISP_ATYPE_DOUBLE) {
+        *(double *)(input+4) = strtod(temp_value, NULL);
+    } else {
+        *(input+4) = (uint32_t) strtoul(temp_value, NULL, 10);
+    }
+    
+inv_channel:
     free (temp);
     value = NULL;
     temp = NULL;
@@ -464,12 +468,11 @@ int main (int argc, char *argv [])
 
     const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:g:G:E:H:IKA:";
     zlist_t *call_list = zlist_new();
-    assert (call_list);
-    
+
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
         char *corr_name = zmalloc(50);
-        call_func_t *item = zmalloc (sizeof(call_func_t));
+        call_func_t item = {0};
 
         //Get the specified options
         switch (ch)
@@ -500,904 +503,883 @@ int main (int argc, char *argv [])
 
                 //Blink Leds
             case 'l':
-                item->name = FMC130M_4CH_NAME_LEDS;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                *(item->write_val) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_LEDS;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                *(item.write_val) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get PLL Function
             case 'p':
-                item->name = FMC130M_4CH_NAME_PLL_FUNCTION;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = FMC130M_4CH_NAME_PLL_FUNCTION;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set PLL Function
             case 'P':
-                item->name = FMC130M_4CH_NAME_PLL_FUNCTION;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_PLL_FUNCTION;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //AD9510 Defaults
             case 'L':
-                item->name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
+                item.name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
                 append_item (call_list, item);
                 break;
 
                 //Get ADC Data
             case 'c':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set ADC Data
             case 'C':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get ADC Dly Value
             case getdlyval:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set ADC Dly Value
             case setdlyval:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get ADC Dly Line
             case getdlyline:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set ADC Dly Line
             case setdlyline:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get ADC Dly Update
             case getdlyupdt:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set ADC Dly Update
             case setdlyupdt:
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set ADC Dly
             case 'V':
-                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set Test_data_en 
             case 'N':
-                item->name = FMC130M_4CH_NAME_TEST_DATA_EN;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_TEST_DATA_EN;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Test_data_en
             case 'n':
-                item->name = FMC130M_4CH_NAME_TEST_DATA_EN;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = FMC130M_4CH_NAME_TEST_DATA_EN;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set SI571 OE
             case 'O':
-                item->name = FMC130M_4CH_NAME_SI571_OE;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_SI571_OE;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get SI571 OE
             case 'o':
-                item->name = FMC130M_4CH_NAME_SI571_OE;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = FMC130M_4CH_NAME_SI571_OE;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set SI571 Frequency
             case 'i':
-                item->name = FMC130M_4CH_NAME_SI571_SET_FREQ;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                double *db_ptr = (double *)(item->write_val+4);
+                item.name = FMC130M_4CH_NAME_SI571_SET_FREQ;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                double *db_ptr = (double *)(item.write_val+4);
                 *db_ptr = strtod(optarg, NULL);
                 append_item (call_list, item);
                 break;
 
                 //Get SI571 Defaults
             case 'D':
-                item->name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 PLL A Divider 
             case 'a':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 PLL B Divider 
             case 'b':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 PLL Prescaler
             case 'r':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 R Divider
             case 'R':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 PLL PDown
             case 'B':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 MUX Status
             case 'M':
-                item->name = FMC130M_4CH_NAME_AD9510_MUX_STATUS;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_MUX_STATUS;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 CP Current
             case 'u':
-                item->name = FMC130M_4CH_NAME_AD9510_CP_CURRENT;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_CP_CURRENT;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 Outputs
             case 'U':
-                item->name = FMC130M_4CH_NAME_AD9510_OUTPUTS;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_OUTPUTS;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Set AD9510 PLL Clock Select
             case 'k':
-                item->name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL;
-                item->service = FMC130M_4CH_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 /****** DSP Functions ******/
 
-                //Set Kx 
+                //Set Kx
             case setkx:
-                item->name = DSP_NAME_SET_GET_KX;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_KX;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Kx
             case getkx:
-                item->name = DSP_NAME_SET_GET_KX;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_KX;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
-                //Set Kx 
+                //Set Kx
             case setky:
-                item->name = DSP_NAME_SET_GET_KY;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_KY;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Ky
             case getky:
-                item->name = DSP_NAME_SET_GET_KY;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_KY;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Ksum
             case setksum:
-                item->name = DSP_NAME_SET_GET_KSUM;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_KSUM;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Ksum
             case getksum:
-                item->name = DSP_NAME_SET_GET_KSUM;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_KSUM;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set TBT Thres
             case settbtth:
-                item->name = DSP_NAME_SET_GET_DS_TBT_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_DS_TBT_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get TBT Thres
             case gettbtth:
-                item->name = DSP_NAME_SET_GET_DS_TBT_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_DS_TBT_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set FOFB Thres
             case setfofbth:
-                item->name = DSP_NAME_SET_GET_DS_FOFB_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_DS_FOFB_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get FOFB Thres
             case getfofbth:
-                item->name = DSP_NAME_SET_GET_DS_FOFB_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_DS_FOFB_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Monit Thres
             case setmonitth:
-                item->name = DSP_NAME_SET_GET_DS_MONIT_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_DS_MONIT_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Monit Thres
             case getmonitth:
-                item->name = DSP_NAME_SET_GET_DS_MONIT_THRES;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_DS_MONIT_THRES;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Monit Position X
             case 'X':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_X;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_MONIT_POS_X;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Monit Position X
             case 'x':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_X;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_MONIT_POS_X;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Monit Position Y
             case 'Y':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_Y;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_MONIT_POS_Y;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Monit Position Y
             case 'y':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_Y;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_MONIT_POS_Y;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Monit Position Q
             case 'Q':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_Q;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_MONIT_POS_Q;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Monit Position Q
             case 'q':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_Q;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_MONIT_POS_Q;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Monit Position SUM
             case 'S':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_SUM;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = DSP_NAME_SET_GET_MONIT_POS_SUM;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Monit Position SUM
             case 's':
-                item->name = DSP_NAME_SET_GET_MONIT_POS_SUM;
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = DSP_NAME_SET_GET_MONIT_POS_SUM;
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Get Monit AMP
             case 'J':
-                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set Monit AMP
             case 'j':
-                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 /******** SWAP Module Functions ********/
 
                 //Set SW
             case 'W':
-                item->name = SWAP_NAME_SET_GET_SW;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_SW;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get SW
             case 'w':
-                item->name = SWAP_NAME_SET_GET_SW;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_SW;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set SW Enable
             case 'T':
-                item->name = SWAP_NAME_SET_GET_SW_EN;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_SW_EN;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get SW Enable
             case 't':
-                item->name = SWAP_NAME_SET_GET_SW_EN;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_SW_EN;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set SW Delay
             case 'F':
-                item->name = SWAP_NAME_SET_GET_SW_DLY;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_SW_DLY;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get SW Delay
             case 'f':
-                item->name = SWAP_NAME_SET_GET_SW_DLY;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_SW_DLY;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set Div Clock
             case 'Z':
-                item->name = SWAP_NAME_SET_GET_DIV_CLK;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_DIV_CLK;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get Div Clock
             case 'z':
-                item->name = SWAP_NAME_SET_GET_DIV_CLK;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_DIV_CLK;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set WDW Enable
             case setwdwen:
-                item->name = SWAP_NAME_SET_GET_WDW_EN;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_WDW_EN;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get WDW Enable
             case getwdwen:
-                item->name = SWAP_NAME_SET_GET_WDW_EN;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_WDW_EN;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set WDW Delay
             case setwdwdly:
-                item->name = SWAP_NAME_SET_GET_WDW_DLY;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = SWAP_NAME_SET_GET_WDW_DLY;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get WDW Delay
             case getwdwdly:
-                item->name = SWAP_NAME_SET_GET_WDW_DLY;
-                item->service = SWAP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = SWAP_NAME_SET_GET_WDW_DLY;
+                item.service = SWAP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Get FE Gain
             case 'g':
-                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = DSP_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = DSP_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set FE Gain
             case 'G':
-                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, SWAP_NAME_SET_GET_GAIN_A, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = DSP_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = DSP_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 /******** RFFE Module Functions *******/
 
                 //Set RFFE Switching
             case rffesetsw:
-                item->name = RFFE_NAME_SET_GET_SW;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = RFFE_NAME_SET_GET_SW;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get RFFE Switching
             case rffegetsw:
-                item->name = RFFE_NAME_SET_GET_SW;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = RFFE_NAME_SET_GET_SW;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set RFFE Attenuators
             case rffesetatt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get RFFE Attenuators
             case rffegetatt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set RFFE Temperature
             case rffesettmp:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Read RFFE Temperature
             case rffegettmp:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set RFFE Point
             case rffesetpnt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get RFFE Point
             case rffegetpnt:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set RFFE Temperature Control
             case rffesettmpctr:
-                item->name = RFFE_NAME_SET_GET_TEMP_CONTROL;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = RFFE_NAME_SET_GET_TEMP_CONTROL;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get RFFE Temperature Control
             case rffegettmpctr:
-                item->name = RFFE_NAME_SET_GET_TEMP_CONTROL;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = RFFE_NAME_SET_GET_TEMP_CONTROL;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set RFFE Output
             case rffesetout:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Get RFFE Output
             case rffegetout:
-                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item->write_val);
+                parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val);
                 if (bpm_func_translate(corr_name) == NULL) {
                     fprintf(stderr, "%s: Invalid channel!\n", program_name);
                     break;
                 }
-                item->name = strdup(corr_name);
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = strdup(corr_name);
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
-                free(item->name);
                 break;
 
                 //Set RFFE Reset
             case rffesetrst:
-                item->name = RFFE_NAME_SET_GET_RESET;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = RFFE_NAME_SET_GET_RESET;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get RFFE Reset
             case rffegetrst:
-                item->name = RFFE_NAME_SET_GET_RESET;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = RFFE_NAME_SET_GET_RESET;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set RFFE Reprog
             case rffesetrpg:
-                item->name = RFFE_NAME_SET_GET_REPROG;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = RFFE_NAME_SET_GET_REPROG;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get RFFE Reprog
             case rffegetrpg:
-                item->name = RFFE_NAME_SET_GET_REPROG;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = RFFE_NAME_SET_GET_REPROG;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
                 //Set RFFE Switch Level
             case rffesetswlvl:
-                item->name = RFFE_NAME_SET_GET_SW_LVL;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 0;
-                *(item->write_val) = item->rw;
-                *(item->write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                item.name = RFFE_NAME_SET_GET_SW_LVL;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
                 //Get RFFE Switch Level
             case rffegetswlvl:
-                item->name = RFFE_NAME_SET_GET_SW_LVL;
-                item->service = RFFE_MODULE_NAME;
-                item->rw = 1;
-                *(item->write_val) = item->rw;
+                item.name = RFFE_NAME_SET_GET_SW_LVL;
+                item.service = RFFE_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
                 append_item (call_list, item);
                 break;
 
@@ -1452,9 +1434,8 @@ int main (int argc, char *argv [])
                 fprintf(stderr, "%s: bad option\n", program_name);
                 print_usage(stderr, 1);
         }
-        free(corr_name);    
-        free(item);
-    } 
+        free(corr_name);
+    }
 
     /* User input error handling */
 
@@ -1556,7 +1537,6 @@ int main (int argc, char *argv [])
             print_func_v(1, function);
         }
         free (func_service);
-        free (function->name);
     }
     zlist_destroy (&call_list);
 
