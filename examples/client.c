@@ -464,7 +464,8 @@ int main (int argc, char *argv [])
 
     const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:g:G:E:H:IKA:";
     zlist_t *call_list = zlist_new();
-
+    assert (call_list);
+    
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
         char *corr_name = zmalloc(50);
