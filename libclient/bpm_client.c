@@ -642,7 +642,7 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     /* Check for return code from server */
     if (*(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
         DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
-                "Check fail: data acquire was not completed");
+                "Check fail: data acquire was not completed\n");
         err = BPM_CLIENT_ERR_AGAIN;
         goto err_check_data_acquire;
     }
