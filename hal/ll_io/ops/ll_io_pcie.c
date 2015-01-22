@@ -31,8 +31,19 @@
     CHECK_HAL_ERR(err, LL_IO, "[ll_io:pcie]",               \
             llio_err_str (err_type))
 
-#define READ_FROM_BAR                         1
-#define WRITE_TO_BAR                          0
+#define READ_FROM_BAR                           1
+#define WRITE_TO_BAR                            0
+
+#define PCIE_TIMEOUT_MAX_TRIES                  32
+/* Wait between reads/writes, in usecs */
+#define PCIE_TIMEOUT_WAIT                       100000
+
+/* Timeout byte pattern */
+#define PCIE_TIMEOUT_PATT_INIT                  0xFF
+/* Number of timeout pattern bytes in a row to detect a timeout */
+#define PCIE_TIMEOUT_PATT_SIZE                  32
+
+static uint32_t pcie_timeout_patt [PCIE_TIMEOUT_PATT_SIZE];
 
 static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw);
 static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
@@ -41,6 +52,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t 
         uint32_t *data, uint32_t size, int rw);
 static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size,
         uint32_t *data, int rw);
+static ssize_t _pcie_timeout_reset (llio_t *self);
 
 /************ Our methods implementation **********/
 
@@ -73,6 +85,9 @@ llio_dev_pcie_t * llio_dev_pcie_new (char *dev_entry)
     ASSERT_TEST(self->bar4!=NULL, "Could not allocate bar4", err_bar4_alloc);
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] BAR4 addr = %p\n",
             self->bar4);
+
+    /* Initialize PCIE timeout pattern */
+    memset (&pcie_timeout_patt, PCIE_TIMEOUT_PATT_INIT, sizeof (pcie_timeout_patt));
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] Created instance of llio_dev_pcie\n");
 
@@ -324,6 +339,10 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t 
 {
     uint32_t offs = pg_offs;
     uint32_t num_bytes_rem = size;
+    /* Number of bytes read/written, for faster comparison */
+    uint32_t num_bytes_rw = 0;
+    /* PCIe timeout correlation counter */
+    ////uint32_t timeout_count = 0;
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "----------------------------------------------------------\n"
             "[ll_io_pcie:_pcie_rw_bar2_block_raw] pg_start = %u, pg_end = %lu...\n",
@@ -335,6 +354,7 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t 
         uint32_t num_bytes_page = (num_bytes_rem > PCIE_SDRAM_PG_SIZE) ?
             (PCIE_SDRAM_PG_SIZE-offs) : (num_bytes_rem);
         num_bytes_rem -= num_bytes_page;
+        num_bytes_rw += num_bytes_page;
 
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                 "[ll_io_pcie:_pcie_rw_bar2_block_raw] Reading %u bytes from addr: %p\n"
@@ -348,6 +368,43 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t 
     }
 
     return size /*- num_bytes_rem*/;
+}
+
+/* Read/Write BAR2 block with timeout detection */
+static ssize_t _pcie_rw_bar2_block_td (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw)
+{
+    size_t num_bytes_rw = 0;
+
+    uint32_t i;
+    for (i = 0; i < PCIE_TIMEOUT_MAX_TRIES; ++i) {
+        num_bytes_rw = _pcie_rw_bar2_block_raw (self, pg_start, pg_offs, data,
+                size, rw);
+
+        /* If sufficient number of bytes read, try to detect a PCIe core
+         * timeout by reading specified number of words and comparing to
+         * the timeout pattern */
+        if (num_bytes_rw >= PCIE_TIMEOUT_PATT_SIZE && !memcmp (data,
+                    pcie_timeout_patt, PCIE_TIMEOUT_PATT_SIZE)) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_bar2_td] Timeout detected. Retrying\n");
+            /////////////////////
+            _pcie_timeout_reset (self);
+            usleep (PCIE_TIMEOUT_WAIT);
+        }
+        else {
+            break;
+        }
+    }
+
+    if (i >= PCIE_TIMEOUT_MAX_TRIES) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
+                "[ll_io_pcie:_pcie_rw_bar2_td] Unrecoverable timeout detected. Exceeded "
+                "maximum number of tries\n");
+        return -1;
+    }
+
+    return num_bytes_rw;
 }
 
 static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
@@ -379,6 +436,44 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t 
     }
 
     return size /*- num_bytes_rem*/;
+}
+
+/* Read/Write BAR4 block with timeout detection.
+ * FIXME: Reduce code repetition. _pcie_rw_bar2_block_td () is almost the same */
+static ssize_t _pcie_rw_bar4_block_td (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+        uint32_t *data, uint32_t size, int rw)
+{
+    size_t num_bytes_rw = 0;
+
+    uint32_t i;
+    for (i = 0; i < PCIE_TIMEOUT_MAX_TRIES; ++i) {
+        num_bytes_rw = _pcie_rw_bar4_block_raw (self, pg_start, pg_offs, data,
+                size, rw);
+
+        /* If sufficient number of bytes read, try to detect a PCIe core
+         * timeout by reading specified number of words and comparing to
+         * the timeout pattern */
+        if (num_bytes_rw >= PCIE_TIMEOUT_PATT_SIZE && !memcmp (data,
+                    pcie_timeout_patt, PCIE_TIMEOUT_PATT_SIZE)) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_pcie:_pcie_rw_bar4_td] Timeout detected. Retrying\n");
+            //////////////
+            _pcie_timeout_reset (self);
+            usleep (PCIE_TIMEOUT_WAIT);
+        }
+        else {
+            break;
+        }
+    }
+
+    if (i >= PCIE_TIMEOUT_MAX_TRIES) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
+                "[ll_io_pcie:_pcie_rw_bar4_td] Unrecoverable timeout detected. Exceeded "
+                "maximum number of tries\n");
+        return -1;
+    }
+
+    return num_bytes_rw;
 }
 
 static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t *data, int rw)
@@ -414,7 +509,7 @@ static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t 
                     "[ll_io_pcie:_pcie_rw_block] full_addr = 0x%p\n"
                     "-------------------------------------------------------------------------------------\n",
                     ((llio_dev_pcie_t *) self->dev_handler)->bar2 + pg_offs);
-            ret_size = _pcie_rw_bar2_block_raw (self, pg_start, pg_offs, data, size, rw);
+            ret_size = _pcie_rw_bar2_block_td (self, pg_start, pg_offs, data, size, rw);
             break;
 
         /* FPGA Wishbone */
@@ -431,7 +526,7 @@ static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t 
                     "[ll_io_pcie:_pcie_rw_block] full_addr = %p\n"
                     "-------------------------------------------------------------------------------------\n",
                     ((llio_dev_pcie_t *) self->dev_handler)->bar4 + pg_offs);
-            ret_size =  _pcie_rw_bar4_block_raw (self, pg_start, pg_offs, data, size, rw);
+            ret_size =  _pcie_rw_bar4_block_td (self, pg_start, pg_offs, data, size, rw);
             break;
 
         /* Invalid BAR */
@@ -440,6 +535,16 @@ static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t 
     }
 
     return ret_size;
+}
+
+static ssize_t _pcie_timeout_reset (llio_t *self)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_timeout_reset] Reseting timeout\n");
+
+    loff_t offs = BAR0_ADDR | PCIE_CFG_REG_TX_CTRL;
+    uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
+    return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
 }
 
 const llio_ops_t llio_ops_pcie = {
