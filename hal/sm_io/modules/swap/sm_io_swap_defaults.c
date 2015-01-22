@@ -57,11 +57,6 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching enable state",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_gain_b (config_client, service, SWAP_DFLT_GAIN_BB,
-            SWAP_DFLT_GAIN_BD);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set channel B gain",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
     client_err = bpm_set_gain_a (config_client, service, SWAP_DFLT_GAIN_AA,
             SWAP_DFLT_GAIN_AC);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set channel A gain",
