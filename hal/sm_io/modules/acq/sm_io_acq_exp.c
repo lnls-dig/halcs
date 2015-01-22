@@ -268,12 +268,23 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* Here we must use the "raw" version, as we can't have
      * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
-    data_block->valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
+    ssize_t valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
             reply_size, (uint32_t *) data_block->data);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%u bytes read\n", data_block->valid_bytes);
+            "%ld bytes read\n", valid_bytes);
 
-    return sizeof (*data_block);
+    /* Check if we could read successfully */
+    int retf = 0;
+    if (valid_bytes >= 0) {
+        data_block->valid_bytes = (uint32_t) valid_bytes;
+        retf = valid_bytes + (ssize_t) sizeof (data_block->valid_bytes);
+    }
+    else {
+        data_block->valid_bytes = 0;
+        retf = -ACQ_COULD_NOT_READ;
+    }
+
+    return retf;
 }
 
 /* Exported function pointers */
