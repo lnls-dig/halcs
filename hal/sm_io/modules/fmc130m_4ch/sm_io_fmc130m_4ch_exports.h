@@ -36,6 +36,8 @@ extern disp_op_t fmc130m_4ch_adc_dly3_exp;
 extern disp_op_t fmc130m_4ch_test_data_en_exp;
 extern disp_op_t fmc130m_4ch_si571_oe_exp;
 extern disp_op_t fmc130m_4ch_trig_dir_exp;
+extern disp_op_t fmc130m_4ch_trig_term_exp;
+extern disp_op_t fmc130m_4ch_trig_val_exp;
 extern disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp;
 extern disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp;
 extern disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp;
