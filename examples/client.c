@@ -571,6 +571,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set ADC Data
@@ -584,6 +585,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get ADC Dly Value
@@ -597,6 +599,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set ADC Dly Value
@@ -610,6 +613,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get ADC Dly Line
@@ -623,6 +627,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set ADC Dly Line
@@ -636,6 +641,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get ADC Dly Update
@@ -649,6 +655,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set ADC Dly Update
@@ -662,6 +669,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set ADC Dly
@@ -675,9 +683,10 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
-                //Set Test_data_en 
+                //Set Test_data_en
             case 'N':
                 item.name = FMC130M_4CH_NAME_TEST_DATA_EN;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -1028,6 +1037,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set Monit AMP
@@ -1041,6 +1051,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 /******** SWAP Module Functions ********/
@@ -1267,6 +1278,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get RFFE Attenuators
@@ -1280,6 +1292,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set RFFE Temperature
@@ -1293,6 +1306,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Read RFFE Temperature
@@ -1306,6 +1320,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set RFFE Point
@@ -1319,6 +1334,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get RFFE Point
@@ -1332,6 +1348,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set RFFE Temperature Control
@@ -1364,6 +1381,7 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Get RFFE Output
@@ -1377,6 +1395,7 @@ int main (int argc, char *argv [])
                 item.rw = 1;
                 *(item.write_val) = item.rw;
                 append_item (call_list, item);
+                free(item.name);
                 break;
 
                 //Set RFFE Reset
@@ -1487,7 +1506,6 @@ int main (int argc, char *argv [])
                 fprintf(stderr, "%s: bad option\n", program_name);
                 print_usage(stderr, 1);
         }
-        free(item.name);
     }
 
     /* User input error handling */
