@@ -162,9 +162,9 @@ bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, ch
     char* value;
     char* temp_value = "";
     size_t len = strlen(name);
-    char* temp = zmalloc(len);
-    memcpy(temp, name, len-1);
-    memcpy(corr_name, temp, len);
+    char* temp_name = zmalloc(len);
+    memcpy(temp_name, name, len-1);
+    memcpy(corr_name, temp_name, len);
 
     while (*subopts != '\0')
     {
@@ -196,9 +196,9 @@ bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, ch
     }
 
 inv_function:
-    free (temp);
+    free (temp_name);
     value = NULL;
-    temp = NULL;
+    temp_name = NULL;
     return err;
 }
 
