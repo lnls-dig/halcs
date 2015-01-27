@@ -139,10 +139,10 @@ err_self_alloc:
 bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint8_t *input, uint8_t *output)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    
     /* Check input arguments */
     ASSERT_TEST(self != NULL, "Bpm_client is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
     ASSERT_TEST(func != NULL, "Function structure is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
-
     ASSERT_TEST(!(func->args[0] != DISP_ARG_END && input == NULL), "Invalid input arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
     ASSERT_TEST(!(func->retval != DISP_ARG_END && output == NULL), "Invalid output arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
 
@@ -975,7 +975,7 @@ err_bpm_data_acquire:
 
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
-    uint8_t write_val[sizeof(uint32_t)*2] = {0};  // 2 32-bits variables
+    uint8_t write_val[sizeof(uint32_t)*2] = {0};
     *write_val = acq_req->num_samples;
     *(write_val+4) = acq_req->chan;
 
@@ -1014,13 +1014,12 @@ err_check_data_acquire:
 
 static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
 {
-    /* TODO: Use a error check like ASSERT_TEST instead assert() */
     assert (self);
     assert (service);
     assert (acq_trans);
     assert (acq_trans->block.data);
 
-    uint8_t write_val[sizeof(uint32_t)*2] = {0};  // 2 32-bits variables
+    uint8_t write_val[sizeof(uint32_t)*2] = {0};
     *write_val = acq_trans->req.chan;
     *(write_val+4) = acq_trans->block.idx;
 
