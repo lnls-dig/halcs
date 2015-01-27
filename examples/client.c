@@ -225,12 +225,14 @@ int main (int argc, char *argv [])
     int acq_start = 0;
     int acq_check = 0;
     int acq_get_block = 0;
+    int acq_get_curve = 0;
     uint32_t acq_block_id = 0;
     int check_poll = 0;
     uint32_t poll_timeout = 0;
 
     void print_usage (FILE* stream, int exit_code)
     {
+        /* FIXME: Add the RFFE module functions' help information */
         fprintf (stream, "BPM Client program\n");
         fprintf (stream, "Usage:  %s options \n", program_name);
         fprintf (stream,
@@ -316,6 +318,7 @@ int main (int argc, char *argv [])
                 "  --acqcheckpoll                   Keep checking if the acquisition is over for an amount of time\n"
                 "                                    (Must be used with -t <timeout>) \n"
                 "  -A  --getblock <block>           Get specified data block from server \n"
+                "  --getcurve                       Get a whole data curve \n"
                 "  --fullacq                        Perform a full acquisition\n"
                 "  --timeout    <timeout>           Sets the timeout for the polling function\n"
                 );
@@ -479,6 +482,7 @@ int main (int argc, char *argv [])
         {"acqcheck",            no_argument,         NULL, 'K'},
         {"acqcheckpoll",        no_argument,         NULL, acqcheckpoll},
         {"getblock",            required_argument,   NULL, 'A'},
+        {"getcurve",            no_argument,         NULL, getcurve},
         {"fullacq",             no_argument,         NULL, fullacq},
         {"timeout",             required_argument,   NULL, timeout},
         {NULL, 0, NULL, 0}
@@ -1491,6 +1495,11 @@ int main (int argc, char *argv [])
                 acq_get_block = 1;
                 acq_block_id = (uint32_t) strtoul(optarg, NULL, 10);
                 break;
+                
+                // Get a whole data curve
+            case getcurve:
+                acq_get_curve = 1;
+                break;
 
                 // Perform full acq
             case fullacq:
@@ -1550,12 +1559,15 @@ int main (int argc, char *argv [])
         return -1;
     }
 
-    if ( (acq_start || acq_get_block || acq_full_call) && (!acq_samples_set || !acq_chan_set)) {
+    if ( (acq_start || acq_get_block || acq_get_curve || acq_full_call) && (!acq_samples_set || !acq_chan_set)) {
         if (acq_start) {
             fprintf(stderr, "%s: If --acqstart is requested, --setchan and --setsamples must be set!\n", program_name);
             }
         if (acq_get_block) {
             fprintf(stderr, "%s: To receive a data block, --setsamples and --setchan must be set!\n", program_name);
+            }
+        if (acq_get_curve) {
+            fprintf(stderr, "%s: To receive a data curve, --setsamples and --setchan must be set!\n", program_name);
             }
         if (acq_full_call) {
             fprintf(stderr, "%s: If --fullacq is requested, --setchan and --setsamples must be set!\n", program_name);
@@ -1578,11 +1590,12 @@ int main (int argc, char *argv [])
         return -1;
     }
 
-    if (acq_full_call && (acq_start || acq_check || acq_get_block )) {
+    if (acq_full_call && (acq_start || acq_check || acq_get_block || acq_get_curve)) {
         printf("%s: If --fullacq is requested, the other acquisition functions dont need to be called. Executing -fullacq only...\n", program_name);
         acq_start = 0;
         acq_check = 0;
         acq_get_block = 0;
+        acq_get_curve = 0;
     }
 
     /* If we are here, all the parameters are good and the functions can be executed */
@@ -1664,6 +1677,33 @@ int main (int argc, char *argv [])
             fprintf (stderr, "[client:acq]: bpm_get_block failed\n");
             fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
         }
+        free(valid_data);
+    }
+
+    /* Returns a whole data curve */
+    if (acq_get_curve) {
+        uint32_t data_size = acq_samples_val*acq_chan[acq_chan_val].sample_size;
+        uint32_t *valid_data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
+
+        acq_trans_t acq_trans = {
+            .req = {
+                .chan = acq_chan_val,
+                .num_samples = acq_samples_val },
+            .block = {
+                .data = valid_data,
+                .data_size = data_size }
+        };
+
+        bpm_client_err_e err = bpm_acq_get_curve(bpm_client, acq_service, &acq_trans);
+
+        if (err == BPM_CLIENT_SUCCESS) {
+            print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
+            fprintf (stdout, "[client:acq]: bpm_acq_get_curve was successfully executed\n");
+        } else {
+            fprintf (stderr, "[client:acq]: bpm_acq_get_curve failed\n");
+            fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
+        }
+        acq_get_curve = 0;
         free(valid_data);
     }
 

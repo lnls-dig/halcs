@@ -336,7 +336,11 @@ bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
  * bpm_func_exec */
 bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
 
-/* Perform a full acquisition process (Acquisition request, checking if 
+/* New version of bpm_get_curve that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+
+/* Perform a full acquisition process (Acquisition request, checking if
  * its done and receiving the full curve).
  * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with

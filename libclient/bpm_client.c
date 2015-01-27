@@ -622,6 +622,7 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
 static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service);
 static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
 static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
 
 bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
@@ -659,6 +660,11 @@ bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service)
 bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
 {
     return _bpm_acq_get_data_block (self, service, acq_trans);
+}
+
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    return _bpm_acq_get_curve (self, service, acq_trans);
 }
 
 bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout)
@@ -1061,6 +1067,67 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
 
 err_get_data_block:
     free(read_val);
+    return err;
+}
+
+static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    assert (self);
+    assert (service);
+    assert (acq_trans);
+    assert (acq_trans->block.data);
+
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    
+    uint32_t block_n_valid = acq_trans->req.num_samples /
+        (BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_full_acq: "
+            "block_n_valid = %u\n", block_n_valid);
+
+    /* Total bytes read */
+    uint32_t total_bread = 0;
+    uint32_t data_size = acq_trans->block.data_size;
+    /* Save the original buffer size for later */
+    uint32_t *original_data_pt = acq_trans->block.data;
+
+    /* Fill all blocks */
+    for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
+        }
+
+        acq_trans->block.idx = block_n;
+        err = bpm_acq_get_data_block(self, service, acq_trans);
+
+        /* Check for return code */
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+                "_bpm_get_data_block failed. block_n is probably out of range",
+                err_bpm_get_data_block);
+
+        total_bread += acq_trans->block.bytes_read;
+        acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
+        acq_trans->block.data_size -= acq_trans->block.bytes_read;
+
+        /* Print some debug messages */
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Total bytes read up to now: %u\n", total_bread);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data pointer addr: %p\n", acq_trans->block.data);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data buffer size: %u\n", acq_trans->block.data_size);
+    }
+
+    /* Return to client the total number of bytes read */
+    acq_trans->block.bytes_read = total_bread;
+    acq_trans->block.data_size = data_size;
+    acq_trans->block.data = original_data_pt;
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+            "Data curve of %u bytes was successfully acquired\n", total_bread);
+
+bpm_zctx_interrupted:
+err_bpm_get_data_block:
     return err;
 }
 
