@@ -86,6 +86,7 @@ typedef call_var_t call_func_t;
 
 static void _zlist_free_item (void *data)
 {
+    free(((call_func_t *) data)->name);
     free((call_func_t *) data);
     data = NULL;
 }
@@ -94,6 +95,7 @@ void append_item (zlist_t* list, call_func_t func)
 {
     call_func_t *wrap_func = zmalloc(sizeof(call_func_t));
     *wrap_func = func;
+    wrap_func->name = strdup(func.name);
     zlist_append (list, wrap_func);
     zlist_freefn (list, wrap_func, _zlist_free_item, false);
 }
@@ -486,12 +488,13 @@ int main (int argc, char *argv [])
     zlist_t *call_list = zlist_new();
     assert(call_list);
 
+    char *corr_name = zmalloc(50);
+    call_func_t item = {0};
+
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
-        char *corr_name = zmalloc(50);
-        call_func_t item = {0};
         bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-        
+
         //Get the specified options
         switch (ch)
         {
@@ -1481,7 +1484,7 @@ int main (int argc, char *argv [])
                 fprintf(stderr, "%s: bad option\n", program_name);
                 print_usage(stderr, 1);
         }
-        free(corr_name);
+        free(item.name);
     }
 
     /* User input error handling */
@@ -1672,6 +1675,7 @@ int main (int argc, char *argv [])
     free (acq_service);
     free (board_number_str);
     free (bpm_number_str);
+    free (corr_name);
     bpm_client_destroy (&bpm_client);
     return 0;
 }
