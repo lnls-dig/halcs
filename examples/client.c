@@ -1594,9 +1594,10 @@ int main (int argc, char *argv [])
     /* Call all functions from the FMC130M_4CH, SWAP and DSP Module that the user specified */
     call_func_t* function = (call_func_t *)zlist_first (call_list);
 
-    for ( ; function != NULL; function = zlist_next (call_list)) 
+    for ( ; function != NULL; function = zlist_next (call_list))
     {
-        char *func_service = zmalloc (50);
+        int str_length = snprintf(NULL, 0, "BPM%u:DEVIO:%s%u", board_number, function->service, bpm_number);
+        char *func_service = zmalloc (str_length+1);
         sprintf (func_service, "BPM%u:DEVIO:%s%u", board_number, function->service, bpm_number);
         const disp_op_t* func_structure = bpm_func_translate (function->name);
         bpm_client_err_e err = bpm_func_exec (bpm_client, func_structure, func_service, (uint8_t *)function->write_val,
@@ -1615,7 +1616,8 @@ int main (int argc, char *argv [])
     zlist_destroy (&call_list);
 
     /***** Acquisition module routines *****/
-    char *acq_service = zmalloc(50);
+    int str_length = snprintf(NULL, 0, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+    char *acq_service = zmalloc (str_length+1);
     sprintf (acq_service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
     /* Request data acquisition on server */
     if (acq_start) {
