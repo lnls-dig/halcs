@@ -485,8 +485,11 @@ int main (int argc, char *argv [])
     };
 
     const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:E:H:IKA:";
+
     zlist_t *call_list = zlist_new();
-    assert(call_list);
+    if (call_list == NULL) {
+        fprintf(stderr, "[client]: Error in memory allocation for zlist\n");
+    }
 
     char *corr_name = zmalloc(50);
     call_func_t item = {0};
@@ -1566,7 +1569,9 @@ int main (int argc, char *argv [])
 
     /* If we are here, all the parameters are good and the functions can be executed */
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    assert(bpm_client);
+    if (bpm_client == NULL) {
+        fprintf(stderr, "[client]: Error in memory allocation for bpm_client\n");
+    }
 
     /* Call all functions from the FMC130M_4CH, SWAP and DSP Module that the user specified */
     call_func_t* function = (call_func_t *)zlist_first (call_list);
