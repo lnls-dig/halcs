@@ -159,6 +159,7 @@ char *mount_opts[] =
 bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint8_t *input)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    strncpy(corr_name, "", strlen(corr_name));
     char* value;
     char* temp_value = "";
     size_t len = strlen(name);
