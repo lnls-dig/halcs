@@ -218,6 +218,30 @@ bpm_client_err_e bpm_set_si571_oe (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_si571_oe (bpm_client_t *self, char *service,
         uint32_t *si571_oe);
 
+/* FMC trigger direction control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_trig_dir (bpm_client_t *self, char *service,
+        uint32_t trig_dir);
+bpm_client_err_e bpm_get_trig_dir (bpm_client_t *self, char *service,
+        uint32_t *trig_dir);
+
+/* FMC trigger termination control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_trig_term (bpm_client_t *self, char *service,
+        uint32_t trig_term);
+bpm_client_err_e bpm_get_trig_term (bpm_client_t *self, char *service,
+        uint32_t *trig_term);
+
+/* FMC trigger value control.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_trig_val (bpm_client_t *self, char *service,
+        uint32_t trig_val);
+bpm_client_err_e bpm_get_trig_val (bpm_client_t *self, char *service,
+        uint32_t *trig_val);
+
 /* FMC AD9510 Control.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */

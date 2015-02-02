@@ -296,10 +296,45 @@ disp_op_t fmc130m_4ch_test_data_en_exp = {
     }
 };
 
-
 disp_op_t fmc130m_4ch_si571_oe_exp = {
     .name = FMC130M_4CH_NAME_SI571_OE,
     .opcode = FMC130M_4CH_OPCODE_SI571_OE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_trig_dir_exp = {
+    .name = FMC130M_4CH_NAME_TRIG_DIR,
+    .opcode = FMC130M_4CH_OPCODE_TRIG_DIR,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_trig_term_exp = {
+    .name = FMC130M_4CH_NAME_TRIG_TERM,
+    .opcode = FMC130M_4CH_OPCODE_TRIG_TERM,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_trig_val_exp = {
+    .name = FMC130M_4CH_NAME_TRIG_VAL,
+    .opcode = FMC130M_4CH_OPCODE_TRIG_VAL,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -468,6 +503,9 @@ const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_adc_dly3_exp,
     &fmc130m_4ch_test_data_en_exp,
     &fmc130m_4ch_si571_oe_exp,
+    &fmc130m_4ch_trig_dir_exp,
+    &fmc130m_4ch_trig_term_exp,
+    &fmc130m_4ch_trig_val_exp,
     &fmc130m_4ch_ad9510_pll_a_div_exp,
     &fmc130m_4ch_ad9510_pll_b_div_exp,
     &fmc130m_4ch_ad9510_pll_prescaler_exp,

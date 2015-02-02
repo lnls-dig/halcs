@@ -11,7 +11,7 @@
 /******************** Switching Clock Default Values **************************/
 #define SWAP_DFLT_SW                    1               /* 1 is switching in direct state
                                                             No switching */
-#define SWAP_DFLT_SW_EN                 1               /* Switching clock is disable */
+#define SWAP_DFLT_SW_EN                 0               /* Switching clock is disable */
 
 #define _SWAP_DFLT_DIV_CLK              1120            /* in ADC counts */
 

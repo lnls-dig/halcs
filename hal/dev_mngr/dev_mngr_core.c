@@ -36,9 +36,6 @@
     CHECK_HAL_ERR(err, DEV_MNGR, "dev_mngr_core",           \
             dmngr_err_str (err_type))
 
-#define STRINGIFY(s)                __STRINGIFY(s)
-#define __STRINGIFY(s)              #s
-
 #define LOG_FILENAME_LEN            50
 #define DEVMNGR_LOG_FILENAME        "dev_mngr.log"
 #define DEVMNGR_DFLT_LOG_MODE       "w"
@@ -48,69 +45,67 @@
 #define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
 #define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
 
-#ifndef __AFE_TRANSPORT__
-#error "FE RFFE transport is not defined!"
-#else
-#define AFE_TRANSPORT               STRINGIFY(__AFE_TRANSPORT__)
-#endif
+/******************* Configuration file property names ************************/
 
-#ifndef __AFE_BASE_IP_PORT__
-#error "FE RFFE base IP port is not defined!"
-#else
-#define AFE_BASE_IP_PORT            STRINGIFY(__AFE_BASE_IP_PORT__)
-#endif
+#define DMNGR_FE_CFG_ENDP_MAX_PATH  256
+#define DMNGR_FE_CFG_ENDP_PATH_PATTERN   \
+                                    "/dev_io/board%u/bpm%u/afe/bind"
 
-#ifndef __AFE_BASE_IP_PATTERN__
-#error "FE RFFE base IP address is not defined!"
-#else
-#define AFE_BASE_IP_PATTERN         STRINGIFY(__AFE_BASE_IP_PATTERN__)
-#endif
+/* We don't expect our hash key to be bigger than this */
+#define DMNGR_CFG_HASH_KEY_MAX_LEN  64
+/* Our config hash key is composed of this pattern: board%u/bpm%u/afe
+ * or board%u/bpm%u/dbe */
+#define DMNGR_CFG_BOARD_TYPE        "%s"
+#define DMNGR_CFG_BOARD_PATTERN     "board%u"
+#define DMNGR_CFG_BPM_TYPE          "%s"
+#define DMNGR_CFG_BPM_PATTERN       "bpm%u"
+#define DMNGR_CFG_DEVIO_MODEL_TYPE  "%s"
+#define DMNGR_CFG_AFE               "afe"
+#define DMNGR_CFG_DBE               "dbe"
 
-#ifndef __AFE_BASE_IP_OFFSET__
-#error "FE RFFE base IP offset is not defined!"
-#else
-#define AFE_BASE_IP_OFFSET         __AFE_BASE_IP_OFFSET__
-#endif
+//#define DMNGR_CFG_HASH_KEY_PATTERN  "%s/%s/%s"
+#define DMNGR_CFG_HASH_KEY_PATTERN  DMNGR_CFG_BOARD_TYPE \
+                                    "/" DMNGR_CFG_BPM_TYPE "/" \
+                                    DMNGR_CFG_DEVIO_MODEL_TYPE
+#define DMNGR_CFG_HASH_KEY_PATTERN_COMPL \
+                                    DMNGR_CFG_BOARD_PATTERN \
+                                    "/" DMNGR_CFG_BPM_PATTERN "/" \
+                                    DMNGR_CFG_DEVIO_MODEL_TYPE
 
-#define AFE_MAX_HOSTNAME            40
-
-/* This must be greater than the maximum number of DEVIO_BEs (typically 12
- * on a mTCA crate) */
-#define DEVIO_FE_HASH_SALT_1        8192        /* 2^13 */
-#define DEVIO_FE_HASH_SALT_2        16384       /* 2^14 */
-
-/* Must be linear IDs starting from 0 */
-#define DEVIO_FE_INST_ID_1          0
-#define DEVIO_FE_INST_ID_2          1
-#define DEVIO_FE_INST_ID_END        2
-#define DEVIO_FE_INST_MAX           DEVIO_FE_INST_ID_END
-
-static const uint32_t devio_fe_hash_salt [DEVIO_FE_INST_MAX] = {
-    DEVIO_FE_HASH_SALT_1,
-    DEVIO_FE_HASH_SALT_2
-};
-
-static const uint32_t devio_fe_inst_id [DEVIO_FE_INST_MAX] = {
-    DEVIO_FE_INST_ID_1,
-    DEVIO_FE_INST_ID_2
-};
-
-#if 0
-#define DEVIO_FE_DEV_PATTERN        ""
-#define DEVIO_FE_DEV_GLOB           "^(tcp|udp)://(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$"
-#endif
+/* Arbitrary hard limit for the maximum number of AFE DEVIOs
+ * for each DBE DEVIO */
+#define DEVIO_MAX_FE_DEVIOS         16
 
 #define DEVIO_NAME                  "dev_io"
 
 /* FPGA DEVIO */
 #define DEVIO_BE_TYPE               BE_DEVIO
 #define DEVIO_BE_NAME               "dev_io_be"
-#define DEVIO_BE_LOG_FILENAME       CAT(DEVIO_BE_NAME, "%d.log")
 
 /* RFFE DEVIO */
 #define DEVIO_FE_TYPE               FE_DEVIO
 #define DEVIO_FE_NAME               "dev_io_fe"
-#define DEVIO_FE_LOG_FILENAME       CAT(DEVIO_FE_NAME, "%d.log")
+
+/* This composes the log filename as "dev_io%u_fe%u.log" or
+ * "dev_io%u_be%u.log" */
+#define DEVIO_LOG_RADICAL_PATTERN   "dev_io%u"
+#define DEVIO_LOG_DEVIO_MODEL_TYPE  "%s"
+#define DEVIO_LOG_INST_TYPE         "%u"
+#define DEVIO_LOG_SUFFIX            "log"
+#define DEVIO_LOG_FILENAME_PATTERN \
+                                    DEVIO_LOG_RADICAL_PATTERN "_" \
+                                    DEVIO_LOG_DEVIO_MODEL_TYPE \
+                                    DEVIO_LOG_INST_TYPE "." \
+                                    DEVIO_LOG_SUFFIX
+
+/* Configuration variables. To be filled by dev_mngr */
+const char *dmngr_log_filename = NULL;
+char *dmngr_log_dir = NULL;
+char *dmngr_broker_endp = NULL;
+char *dmngr_verbose_str = NULL;
+int dmngr_verbose = 0;
+char *dmngr_daemonize_str = NULL;
+int dmngr_daemonize = 0;
 
 static void _devio_hash_free_item (void *data);
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
@@ -120,7 +115,7 @@ static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
 
 /* Creates a new instance of the Device Manager */
 dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
-        const char *log_prefix)
+        const char *log_prefix, zhash_t *hints_h)
 {
     assert (name);
     assert (endpoint);
@@ -169,6 +164,9 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     self->devio_info_h = zhash_new ();
     ASSERT_ALLOC(self->devio_info_h, err_devio_info_h_alloc);
 
+    self->hints_h = zhash_dup (hints_h);
+    ASSERT_ALLOC(self->hints_h, err_hints_h_alloc);
+
     self->broker_running = false;
 
     /* Scan devios for the first time */
@@ -184,6 +182,8 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     return self;
 
 err_scan_devs:
+err_hints_h_alloc:
+        zhash_destroy (&self->devio_info_h);
 err_devio_info_h_alloc:
     zlist_destroy (&self->ops->sig_ops);
 err_list_alloc:
@@ -211,6 +211,7 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
         dmngr_t *self = *self_p;
 
         /* Starting destructing by the last resource */
+        zhash_destroy (&self->hints_h);
         zhash_destroy (&self->devio_info_h);
         zlist_destroy (&self->ops->sig_ops);
         free (self->ops);
@@ -408,20 +409,23 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
             continue;
         }
 
+        /* Get DEVIO type to set-up correct log filename */
+        devio_type_c = devio_type_to_str (devio_info->devio_type);
+        ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
+
         /* Set up logdir. Defaulting it to stdout */
         char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
 
         /* TODO: Check for the validity of the log filename */
         if (devio_log_prefix != NULL) {
-            snprintf (devio_log_filename, LOG_FILENAME_LEN, "%s/"DEVIO_BE_LOG_FILENAME,
-                    devio_log_prefix, devio_info->id);
+            snprintf (devio_log_filename, LOG_FILENAME_LEN,
+                    "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
+                    devio_info->id, devio_type_c, devio_info->smio_inst_id);
         }
 
         /* Alloc and convert types */
         dev_type_c = llio_type_to_str (devio_info->type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
-        devio_type_c = devio_type_to_str (devio_info->devio_type);
-        ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
         dev_id_c = halutils_stringify_dec_key (devio_info->id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
         smio_inst_id_c = halutils_stringify_dec_key (devio_info->smio_inst_id);
@@ -458,10 +462,10 @@ err_spawn:
 err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
-    free (devio_type_c);
-err_devio_type_c_alloc:
     free (dev_type_c);
 err_dev_type_c_alloc:
+    free (devio_type_c);
+err_devio_type_c_alloc:
     zlist_destroy (&devio_info_key_list);
 err_hash_keys_alloc:
     return err;
@@ -486,8 +490,6 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
     glob (DEVIO_BE_DEV_GLOB, 0, NULL, &glob_dev);
 
     /* Initialize the devices we found */
-    char *key = NULL;
-    char *key_fe = NULL;
     uint32_t i = 0;
     for (; i < glob_dev.gl_pathc; ++i) {
         /* Check if the found device is already on the hash list */
@@ -499,22 +501,28 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
         /* Stringify ID */
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
                 "[dev_mngr_core:scan_devs] Stringify hash ID\n"); */
-        key = halutils_stringify_dec_key (devio_info_id);
-        ASSERT_ALLOC (key, err_key_alloc, DMNGR_ERR_ALLOC);
+        char key [DMNGR_CFG_HASH_KEY_MAX_LEN];
+
+        /* This follows the hierarchy found in the config file */
+        int errs = snprintf (key, sizeof (key), DMNGR_CFG_HASH_KEY_PATTERN_COMPL,
+                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0,
+                DMNGR_CFG_DBE);
+
+        /* Only when the number of characters written is less than the whole buffer,
+         * it is guaranteed that the string was written successfully */
+        ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (key),
+                "[dev_mngr] Could not generate DBE config path\n", err_cfg_key,
+                DMNGR_ERR_CFG);
 
         const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h,
                 key);
 
         /* If device is already registered, do nothing */
         if (devio_info_lookup != NULL) {
-            /* We don't need this anymore */
-            free (key);
-            key = NULL;
             continue;
         }
 
         /* Found new device */
-
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
                 "[dev_mngr_core:scan_devs] Found new device on %s\n",
                 glob_dev.gl_pathv[i]);
@@ -525,55 +533,46 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
         ASSERT_TEST (err == DMNGR_SUCCESS, "Could not insert DEVIO",
                 err_devio_insert_alloc);
 
-        /* We don't need this anymore */
-        free (key);
-        key = NULL;
-
-        /* For each PCIE device find, register two Ethernet devices to control
-         * our RFFEs */
-
-        /* hostname pattern is of type tcp://192.168.0.%u. The host part is
-         * generated by a fixed offset determined at compile time + linear counter
-         * starting from 0 up to the number of RFFEs */
+        /* For each PCIE device find, register Ethernet devices to control
+         * our RFFEs. Do a lookup in our hints_h hash to look for endpoints
+         * to bind to */
         uint32_t j;
-        for (j = 0; j < DEVIO_FE_INST_MAX; ++j) {
-            char hostname_fe [AFE_MAX_HOSTNAME];
-            int errs = snprintf (hostname_fe, sizeof (hostname_fe), AFE_TRANSPORT
-                    "://" AFE_BASE_IP_PATTERN ":" AFE_BASE_IP_PORT,
-                    AFE_BASE_IP_OFFSET + DEVIO_FE_INST_MAX*devio_info_id +
-                    devio_fe_inst_id [j]);
+        for (j = 0; j < DEVIO_MAX_FE_DEVIOS; ++j) {
+            char hints_key [DMNGR_CFG_HASH_KEY_MAX_LEN];
+            int errs = snprintf (hints_key, sizeof (hints_key),
+                    DMNGR_CFG_HASH_KEY_PATTERN_COMPL, devio_info_id, j,
+                    DMNGR_CFG_AFE);
+
             /* Only when the number of characters written is less than the whole buffer,
              * it is guaranteed that the string was written successfully */
-            ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hostname_fe),
-                    "Could not generate AFE IP address. Too big AFE_BASE_IP_OFFSET?",
-                    err_hostname_fe_conv, DMNGR_ERR_ALLOC);
-            key_fe = halutils_stringify_dec_key (devio_info_id +
-                    devio_fe_hash_salt [j]);
-            ASSERT_ALLOC (key_fe, err_key_fe_alloc, DMNGR_ERR_ALLOC);
+            ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
+                    "[dev_mngr] Could not generate AFE bind address from "
+                    "configuration file\n", err_cfg_exit, DMNGR_ERR_CFG);
+
+            char *endpoint_fe = zhash_lookup (self->hints_h, hints_key);
+            /* If key is not found, assume we don't have any more AFE to
+             * prepare */
+            if (endpoint_fe == NULL) {
+                /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+                        "[dev_mngr_core:scan_devs] Could not find any more endpoint
+                        hints for FEs\n"); */
+                break;
+            }
 
             /* Prepare respective DEVIO structure */
-            err = _dmngr_prepare_devio (self, key_fe, hostname_fe,
-                    devio_info_id, ETH_DEV, DEVIO_FE_TYPE, devio_fe_inst_id [j],
+            err = _dmngr_prepare_devio (self, hints_key, endpoint_fe,
+                    devio_info_id, ETH_DEV, DEVIO_FE_TYPE, j,
                     READY_TO_RUN);
             ASSERT_TEST (err == DMNGR_SUCCESS, "Could not prepare associated FE DEVIO",
                     err_devio_fe_insert_alloc);
-
-            /* We don't need this anymore */
-            free (key_fe);
-            key_fe = NULL;
         }
     }
 
     /* devio_info_destroy (&devio_info); */
 err_devio_fe_insert_alloc:
-    free (key_fe);
-    key_fe = NULL;
-err_key_fe_alloc:
-err_hostname_fe_conv:
+err_cfg_exit:
 err_devio_insert_alloc:
-    free (key);
-    key = NULL;
-err_key_alloc:
+err_cfg_key:
     globfree (&glob_dev);
 
     /* Number of new devices found */
@@ -606,6 +605,84 @@ static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
     zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
 
 err_devio_info_alloc:
+    return err;
+}
+
+dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
+{
+    assert (root_cfg);
+    assert (hints_h);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Read DEVIO suggested bind endpoints and fill the hash table with
+     * the corresponding keys */
+
+    /* First find the dev_io property */
+    zconfig_t *devio_cfg = zconfig_locate (root_cfg, "/dev_io");
+    ASSERT_TEST (devio_cfg != NULL, "[dev_mngr] Could not find "
+            "dev_io property in configuration file\n", err_cfg_exit,
+            DMNGR_ERR_CFG);
+
+    /* Now, find all of our child */
+    zconfig_t *board_cfg = zconfig_child (devio_cfg);
+    ASSERT_TEST (board_cfg != NULL, "[dev_mngr] Could not find "
+            "board* property in configuration file\n", err_cfg_exit,
+            DMNGR_ERR_CFG);
+
+    /* Navigate through all of our board siblings */
+    for (; board_cfg != NULL; board_cfg = zconfig_next (board_cfg)) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Config file: "
+                "board_cfg name: %s\n", zconfig_name (board_cfg));
+
+        zconfig_t *bpm_cfg = zconfig_child (board_cfg);
+        ASSERT_TEST (bpm_cfg != NULL, "[dev_mngr] Could not find "
+                "bpm* property in configuration file\n", err_cfg_exit,
+                DMNGR_ERR_CFG);
+
+        /* Navigate through all of our bpm siblings and fill the hash table */
+        for (; bpm_cfg != NULL; bpm_cfg = zconfig_next (bpm_cfg)) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Config file: "
+                    "bpm_cfg name: %s\n", zconfig_name (bpm_cfg));
+
+            /* Now, we expect to find the bind address of this bpm/board instance
+             * in the configuration file */
+            char *hints_value = zconfig_resolve (bpm_cfg, "/afe/bind",
+                    NULL);
+            ASSERT_TEST (hints_value != NULL, "[dev_mngr] Could not find "
+                    "AFE bind address in configuration file\n", err_cfg_exit,
+                    DMNGR_ERR_CFG);
+
+            /* Now, we only need to generate a valid key to insert in the hash.
+             * we choose the combination of the type "board%u/bpm%u/afe" or
+             * board%u/bpm%u/dbe */
+            char hints_key [DMNGR_CFG_HASH_KEY_MAX_LEN];
+            int errs = snprintf (hints_key, sizeof (hints_key),
+                    DMNGR_CFG_HASH_KEY_PATTERN, zconfig_name (board_cfg),
+                    zconfig_name (bpm_cfg), DMNGR_CFG_AFE);
+
+            /* Only when the number of characters written is less than the whole buffer,
+             * it is guaranteed that the string was written successfully */
+            ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
+                    "[dev_mngr] Could not generate AFE bind address from "
+                    "configuration file\n", err_cfg_exit, DMNGR_ERR_CFG);
+
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] AFE hint endpoint "
+                    "hash key: \"%s\", value: \"%s\"\n", hints_key, hints_value);
+
+            /* Insert this value in the hash table */
+            errs = zhash_insert (hints_h, hints_key, hints_value);
+            ASSERT_TEST (errs == 0, "[dev_mngr] Could not find "
+                    "insert AFE endpoint to hash table\n", err_cfg_exit,
+                    DMNGR_ERR_CFG);
+        }
+    }
+
+    /* As we only have strings in our hash, we can use the simple autofree
+     * feature to cleanly destroy the items later. */
+    zhash_autofree (hints_h);
+
+err_cfg_exit:
     return err;
 }
 

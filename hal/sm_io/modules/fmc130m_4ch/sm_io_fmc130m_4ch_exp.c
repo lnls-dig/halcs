@@ -48,7 +48,7 @@
                 TYPE_FMC130M_4CH_ACTIVE) {                      \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
                 "Board is not of ACTIVE type. Unimplemented "   \
-                "function for this type of FMC130M_4CH board"); \
+                "function for this type of FMC130M_4CH board\n"); \
                 return -FMC130M_4CH_UNINPL;                     \
         }                                                       \
     })
@@ -389,6 +389,36 @@ RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+#define BPM_FMC130M_4CH_TRIG_DIR_MIN            0 /* Trigger direction input */
+#define BPM_FMC130M_4CH_TRIG_DIR_MAX            1 /* Trigger direction output */
+
+RW_PARAM_FUNC(fmc130m_4ch, trig_dir) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            TRIGGER, DIR, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_TRIG_DIR_MIN, BPM_FMC130M_4CH_TRIG_DIR_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC130M_4CH_TRIG_TERM_MIN           0 /* Trigger direction input */
+#define BPM_FMC130M_4CH_TRIG_TERM_MAX           1 /* Trigger direction output */
+
+RW_PARAM_FUNC(fmc130m_4ch, trig_term) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            TRIGGER, TERM, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_TRIG_TERM_MIN, BPM_FMC130M_4CH_TRIG_TERM_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC130M_4CH_TRIG_VAL_MIN            0 /* Trigger direction input */
+#define BPM_FMC130M_4CH_TRIG_VAL_MAX            1 /* Trigger direction output */
+
+RW_PARAM_FUNC(fmc130m_4ch, trig_val) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            TRIGGER, TRIG_VAL, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_TRIG_VAL_MIN, BPM_FMC130M_4CH_TRIG_VAL_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /******************************** Chips Export functions *************************/
 
 /* Macros to avoid repetition of the function body AD9510 */
@@ -552,6 +582,9 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     FMC130M_4CH_ADC_DLY_FUNC_NAME(3),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, test_data_en),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_dir),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_term),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_val),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),

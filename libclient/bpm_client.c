@@ -529,6 +529,36 @@ PARAM_FUNC_CLIENT_READ(si571_oe)
      return param_client_read (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
 }
 
+PARAM_FUNC_CLIENT_WRITE(trig_dir)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_dir)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_term)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_term)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_val)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_val)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
+}
+
 /*************************** FMC130M Chips Functions *************************/
 
 /* AD9510 PLL A divider */
@@ -756,7 +786,7 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     /* Check for return code from server */
     if (*(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
         DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
-                "Check fail: data acquire was not completed");
+                "Check fail: data acquire was not completed\n");
         err = BPM_CLIENT_ERR_AGAIN;
         goto err_check_data_acquire;
     }

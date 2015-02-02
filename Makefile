@@ -26,28 +26,15 @@ FMC130M_4CH_EEPROM_PROGRAM ?=
 WITH_DEV_MNGR ?= y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE ?= 2
-# Selects the base IP address of all AFE RFFE. The AFE RFFE must be located
-# starting to the specified IP address up to the number of the AFE RFFE.
-#
-# Example:
-#
-# if AFE_BASE_IP_ADDR = 192.168.0.%u and AFE_BASE_IP_OFFSET = 100, the AFE
-# RFFE would have the following IP addresses:
-#
-# AFE RFFE #1 (DBE #1): 192.168.0.100
-# AFE RFFE #2 (DBE #1): 192.168.0.101
-# AFE RFFE #3 (DBE #2): 192.168.0.102
-# AFE RFFE #4 (DBE #2): 192.168.0.103
-# AFE RFFE #3 (DBE #3): 192.168.0.104
-# AFE RFFE #4 (DBE #3): 192.168.0.105
-# ...
-AFE_TRANSPORT ?= "tcp"
-AFE_BASE_IP_PORT="6791"
-AFE_BASE_IP_PATTERN ?= "192.168.0.%u"
-AFE_BASE_IP_OFFSET ?= 100
+# Selects the install location of the config file
+CFG_DIR ?= /etc/bpm_sw
+export CFG_DIR
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
+
+# Config filename
+CFG_FILENAME = bpm_sw.cfg
 
 INIT_SCRIPTS = init.sh shutdown.sh
 
@@ -101,20 +88,12 @@ ifeq ($(AFE_RFFE_TYPE),2)
 CFLAGS += -D__AFE_RFFE_V2__
 endif
 
-ifneq ($(AFE_TRANSPORT),)
-CFLAGS += -D__AFE_TRANSPORT__=$(AFE_TRANSPORT)
+ifneq ($(CFG_DIR),)
+CFLAGS += -D__CFG_DIR__=$(CFG_DIR)
 endif
 
-ifneq ($(AFE_BASE_IP_PORT),)
-CFLAGS += -D__AFE_BASE_IP_PORT__=$(AFE_BASE_IP_PORT)
-endif
-
-ifneq ($(AFE_BASE_IP_PATTERN),)
-CFLAGS += -D__AFE_BASE_IP_PATTERN__=$(AFE_BASE_IP_PATTERN)
-endif
-
-ifneq ($(AFE_BASE_IP_OFFSET),)
-CFLAGS += -D__AFE_BASE_IP_OFFSET__=$(AFE_BASE_IP_OFFSET)
+ifneq ($(CFG_FILENAME),)
+CFLAGS += -D__CFG_FILENAME__=$(CFG_FILENAME)
 endif
 
 # Debug conditional flags
@@ -180,13 +159,14 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
 	tests tests_clean tests_mrproper \
-	examples examples_clean examples_mrproper
+	examples examples_clean examples_mrproper \
+	cfg cfg_install cfg_uninstall cfg_clean cfg_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: pcie_driver libmdp libbsmp libclient $(OUT)
+all: libclient cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
@@ -225,16 +205,13 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-pcie_driver: pcie_driver_check
+pcie_driver:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) all
 
 #Verify if the driver is in place
 pcie_driver_check:
 ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
-	@echo "Compilation will continue, but you must install";
-	@echo "and load the driver prior to initializing the software";
-	@sleep 2;
 endif
 
 pcie_driver_install:
@@ -300,6 +277,16 @@ libclient_clean:
 libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
+deps: pcie_driver libmdp libbsmp
+
+deps_install: pcie_driver_install libmdp_install libbsmp_install
+
+deps_uninstall: pcie_driver_uninstall libmdp_uninstall libbsmp_uninstall
+
+deps_clean: pcie_driver_clean libmdp_clean libbsmp_clean
+
+deps_mrproper: libmdp_mrproper libbsmp_mrproper
+
 hal_install:
 	$(foreach hal_bin,$(ALL_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
@@ -332,11 +319,26 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-install: hal_install pcie_driver_install libclient_install libmdp_install libbsmp_install
+cfg:
+	$(MAKE) -C cfg all
 
-uninstall: hal_uninstall pcie_driver_uninstall libclient_uninstall libmdp_uninstall libbsmp_uninstall
+cfg_install:
+	$(MAKE) -C cfg install
 
-clean: hal_clean pcie_driver_clean libclient_clean examples_clean tests_clean libmdp_clean libbsmp_clean
+cfg_uninstall:
+	$(MAKE) -C cfg uninstall
 
-mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper libmdp_mrproper libbsmp_mrproper
+cfg_clean:
+	$(MAKE) -C cfg clean
+
+cfg_mrproper:
+	$(MAKE) -C cfg mrproper
+
+install: hal_install deps_install libclient_install cfg_install
+
+uninstall: hal_uninstall deps_uninstall libclient_uninstall cfg_uninstall
+
+clean: hal_clean deps_clean libclient_clean examples_clean tests_clean cfg_clean
+
+mrproper: clean hal_mrproper deps_mrproper libclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 
