@@ -97,6 +97,7 @@ void append_item (zlist_t* list, call_func_t func)
     *wrap_func = func;
     wrap_func->name = strdup(func.name);
     zlist_append (list, wrap_func);
+    *(wrap_func->write_val) = 0;
     zlist_freefn (list, wrap_func, _zlist_free_item, false);
 }
 
@@ -514,6 +515,8 @@ int main (int argc, char *argv [])
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
         bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+        double *db_ptr = (double *)(item.write_val+4);
+        uint32_t *int_ptr = (uint32_t *)(item.write_val+4);
 
         /* Get the user selected options */
         switch (ch)
@@ -747,7 +750,6 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *(item.write_val) = item.rw;
-                double *db_ptr = (double *)(item.write_val+4);
                 *db_ptr = strtod(optarg, NULL);
                 append_item (call_list, item);
                 break;
@@ -758,6 +760,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 1;
                 *(item.write_val) = item.rw;
+                *db_ptr = strtod(optarg, NULL);
                 append_item (call_list, item);
                 break;
 
@@ -916,7 +919,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *(item.write_val) = item.rw;
-                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                *int_ptr = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -935,7 +938,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *(item.write_val) = item.rw;
-                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                *int_ptr = (uint32_t) strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
