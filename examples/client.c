@@ -333,6 +333,12 @@ int main (int argc, char *argv [])
         setdlyline,
         getdlyupdt,
         setdlyupdt,
+        gettrigdir,
+        settrigdir,
+        gettrigterm,
+        settrigterm,
+        gettrigval,
+        settrigval,
         setkx,
         getkx,
         setky,
@@ -407,6 +413,12 @@ int main (int argc, char *argv [])
         {"setsi571oe",          required_argument,   NULL, 'O'},
         {"setsi571freq",        required_argument,   NULL, 'i'},
         {"si571default",        required_argument,   NULL, 'D'},
+        {"gettrigdir",          no_argument,         NULL, gettrigdir},
+        {"settrigdir",          required_argument,   NULL, settrigdir},
+        {"gettrigterm",         no_argument,         NULL, gettrigterm},
+        {"settrigterm",         required_argument,   NULL, settrigterm},
+        {"gettrigval",          no_argument,         NULL, gettrigval},
+        {"settrigval",          required_argument,   NULL, settrigval},
         {"setad9510plladiv",    required_argument,   NULL, 'a'},
         {"setad9510pllbdiv",    required_argument,   NULL, 'b'},
         {"setad9510pllpresc",   required_argument,   NULL, 'r'},
@@ -748,7 +760,64 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL A Divider 
+                //Set Trigger Dir
+            case settrigdir:
+                item.name = FMC130M_4CH_NAME_TRIG_DIR;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get Trigger Dir
+            case gettrigdir:
+                item.name = FMC130M_4CH_NAME_TRIG_DIR;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set Trigger Term
+            case settrigterm:
+                item.name = FMC130M_4CH_NAME_TRIG_TERM;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get Trigger Term
+            case gettrigterm:
+                item.name = FMC130M_4CH_NAME_TRIG_TERM;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set Trigger Value
+            case settrigval:
+                item.name = FMC130M_4CH_NAME_TRIG_VAL;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *(item.write_val) = item.rw;
+                *(item.write_val+4) = (uint32_t) strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                //Get Trigger Value
+            case gettrigval:
+                item.name = FMC130M_4CH_NAME_TRIG_VAL;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *(item.write_val) = item.rw;
+                append_item (call_list, item);
+                break;
+
+                //Set AD9510 PLL A Divider
             case 'a':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV;
                 item.service = FMC130M_4CH_MODULE_NAME;
