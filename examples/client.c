@@ -76,10 +76,10 @@ void print_data_curve (uint32_t chan, uint32_t *data, uint32_t size)
 typedef struct _call_var_t {
     char *name;
     char *service;
-    int rw;                     // 1 -> read, 0 -> write
-    int poll;                   // 1 to keep waiting data in return from server
-    uint8_t write_val[MAX_VARIABLES_NUMBER];    // 2 32-bits variables
-    uint8_t read_val[MAX_VARIABLES_NUMBER];     // 2 32-bits variables
+    int rw;
+    int poll;
+    uint8_t write_val[MAX_VARIABLES_NUMBER];
+    uint8_t read_val[MAX_VARIABLES_NUMBER];
 } call_var_t;
 
 typedef call_var_t call_func_t;
@@ -216,7 +216,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *bpm_number_str = NULL;
 
-    // Acquitision parameters check variables
+    /* Acquitision parameters check variables */
     int acq_samples_set = 0;
     int32_t acq_samples_val = 0;
     int acq_chan_set = 0;
@@ -514,34 +514,34 @@ int main (int argc, char *argv [])
     {
         bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
-        //Get the specified options
+        /* Get the user selected options */
         switch (ch)
         {
-                //Help
+                /* Display Help */
             case 'h':
                 print_usage(stderr, 0);
 
-                //Verbose
+                /* Define Verbosity level */
             case 'v':
                 verbose = 1;
                 break;
 
-                //Broker Endpoint
+                /* Define Broker Endpoint */
             case 'e':
                 broker_endp = strdup(optarg);
                 break;
 
-                //Board Number
+                /* Define Board Number */
             case 'd':
                 board_number_str = strdup(optarg);
                 break;
 
-                //BPM number
+                /* Define BPM number */
             case 'm':
                 bpm_number_str = strdup(optarg);
                 break;
 
-                //Blink Leds
+                /* Blink FMC Leds */
             case 'l':
                 item.name = FMC130M_4CH_NAME_LEDS;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -549,7 +549,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get PLL Function
+                /* Get PLL Function */
             case 'p':
                 item.name = FMC130M_4CH_NAME_PLL_FUNCTION;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -558,7 +558,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set PLL Function
+                /* Set PLL Function */
             case 'P':
                 item.name = FMC130M_4CH_NAME_PLL_FUNCTION;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -568,7 +568,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //AD9510 Defaults
+                /* AD9510 Defaults */
             case 'L':
                 item.name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -576,7 +576,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get ADC Data
+                /* Get ADC Data */
             case 'c':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -590,7 +590,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set ADC Data
+                /* Set ADC Data */
             case 'C':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -604,7 +604,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get ADC Dly Value
+                /* Get ADC Dly Value */
             case getdlyval:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -618,7 +618,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set ADC Dly Value
+                /* Set ADC Dly Value */
             case setdlyval:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -632,7 +632,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get ADC Dly Line
+                /* Get ADC Dly Line */
             case getdlyline:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -646,7 +646,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set ADC Dly Line
+                /* Set ADC Dly Line */
             case setdlyline:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -660,7 +660,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get ADC Dly Update
+                /* Get ADC Dly Update */
             case getdlyupdt:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -674,7 +674,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set ADC Dly Update
+                /* Set ADC Dly Update */
             case setdlyupdt:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -688,7 +688,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set ADC Dly
+                /* Set ADC Dly */
             case 'V':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -702,7 +702,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set Test_data_en
+                /* Set Test_data_en */
             case 'N':
                 item.name = FMC130M_4CH_NAME_TEST_DATA_EN;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -712,7 +712,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Test_data_en
+                /* Get Test_data_en */
             case 'n':
                 item.name = FMC130M_4CH_NAME_TEST_DATA_EN;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -721,7 +721,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set SI571 OE
+                /* Set SI571 OE */
             case 'O':
                 item.name = FMC130M_4CH_NAME_SI571_OE;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -731,7 +731,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get SI571 OE
+                /* Get SI571 OE */
             case 'o':
                 item.name = FMC130M_4CH_NAME_SI571_OE;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -740,7 +740,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set SI571 Frequency
+                /* Set SI571 Frequency */
             case 'i':
                 item.name = FMC130M_4CH_NAME_SI571_SET_FREQ;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -751,7 +751,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get SI571 Defaults
+                /* Get SI571 Defaults */
             case 'D':
                 item.name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -760,7 +760,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Trigger Dir
+                /* Set Trigger Dir */
             case settrigdir:
                 item.name = FMC130M_4CH_NAME_TRIG_DIR;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -770,7 +770,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Trigger Dir
+                /* Get Trigger Dir */
             case gettrigdir:
                 item.name = FMC130M_4CH_NAME_TRIG_DIR;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -779,7 +779,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Trigger Term
+                /* Set Trigger Term */
             case settrigterm:
                 item.name = FMC130M_4CH_NAME_TRIG_TERM;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -789,7 +789,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Trigger Term
+                /* Get Trigger Term */
             case gettrigterm:
                 item.name = FMC130M_4CH_NAME_TRIG_TERM;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -798,7 +798,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Trigger Value
+                /* Set Trigger Value */
             case settrigval:
                 item.name = FMC130M_4CH_NAME_TRIG_VAL;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -808,7 +808,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Trigger Value
+                /* Get Trigger Value */
             case gettrigval:
                 item.name = FMC130M_4CH_NAME_TRIG_VAL;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -817,7 +817,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL A Divider
+                /* Set AD9510 PLL A Divider */
             case 'a':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -827,7 +827,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL B Divider 
+                /* Set AD9510 PLL B Divider */
             case 'b':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -837,7 +837,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL Prescaler
+                /* Set AD9510 PLL Prescaler */
             case 'r':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -847,7 +847,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 R Divider
+                /* Set AD9510 R Divider */
             case 'R':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -857,7 +857,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL PDown
+                /* Set AD9510 PLL PDown */
             case 'B':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -867,7 +867,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 MUX Status
+                /* Set AD9510 MUX Status */
             case 'M':
                 item.name = FMC130M_4CH_NAME_AD9510_MUX_STATUS;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -877,7 +877,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 CP Current
+                /* Set AD9510 CP Current */
             case 'u':
                 item.name = FMC130M_4CH_NAME_AD9510_CP_CURRENT;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -887,7 +887,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 Outputs
+                /* Set AD9510 Outputs */
             case 'U':
                 item.name = FMC130M_4CH_NAME_AD9510_OUTPUTS;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -897,7 +897,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set AD9510 PLL Clock Select
+                /* Set AD9510 PLL Clock Select */
             case 'k':
                 item.name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL;
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -909,7 +909,7 @@ int main (int argc, char *argv [])
 
                 /****** DSP Functions ******/
 
-                //Set Kx
+                /* Set Kx */
             case setkx:
                 item.name = DSP_NAME_SET_GET_KX;
                 item.service = DSP_MODULE_NAME;
@@ -919,7 +919,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Kx
+                /* Get Kx */
             case getkx:
                 item.name = DSP_NAME_SET_GET_KX;
                 item.service = DSP_MODULE_NAME;
@@ -928,7 +928,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Kx
+                /* Set Kx */
             case setky:
                 item.name = DSP_NAME_SET_GET_KY;
                 item.service = DSP_MODULE_NAME;
@@ -938,7 +938,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Ky
+                /* Get Ky */
             case getky:
                 item.name = DSP_NAME_SET_GET_KY;
                 item.service = DSP_MODULE_NAME;
@@ -947,7 +947,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Ksum
+                /* Set Ksum */
             case setksum:
                 item.name = DSP_NAME_SET_GET_KSUM;
                 item.service = DSP_MODULE_NAME;
@@ -957,7 +957,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Ksum
+                /* Get Ksum */
             case getksum:
                 item.name = DSP_NAME_SET_GET_KSUM;
                 item.service = DSP_MODULE_NAME;
@@ -966,7 +966,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set TBT Thres
+                /* Set TBT Thres */
             case settbtth:
                 item.name = DSP_NAME_SET_GET_DS_TBT_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -976,7 +976,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get TBT Thres
+                /* Get TBT Thres */
             case gettbtth:
                 item.name = DSP_NAME_SET_GET_DS_TBT_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -985,7 +985,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set FOFB Thres
+                /* Set FOFB Threshold */
             case setfofbth:
                 item.name = DSP_NAME_SET_GET_DS_FOFB_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -995,7 +995,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FOFB Thres
+                /* Get FOFB Threshold */
             case getfofbth:
                 item.name = DSP_NAME_SET_GET_DS_FOFB_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -1004,7 +1004,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Monit Thres
+                /* Set Monit Threshold */
             case setmonitth:
                 item.name = DSP_NAME_SET_GET_DS_MONIT_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -1014,7 +1014,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit Thres
+                /* Get Monit Threshold */
             case getmonitth:
                 item.name = DSP_NAME_SET_GET_DS_MONIT_THRES;
                 item.service = DSP_MODULE_NAME;
@@ -1023,7 +1023,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Monit Position X
+                /* Set Monit Position X */
             case 'X':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_X;
                 item.service = DSP_MODULE_NAME;
@@ -1033,7 +1033,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit Position X
+                /* Get Monit Position X */
             case 'x':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_X;
                 item.service = DSP_MODULE_NAME;
@@ -1042,7 +1042,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Monit Position Y
+                /* Set Monit Position Y */
             case 'Y':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_Y;
                 item.service = DSP_MODULE_NAME;
@@ -1052,7 +1052,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit Position Y
+                /* Get Monit Position Y */
             case 'y':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_Y;
                 item.service = DSP_MODULE_NAME;
@@ -1061,7 +1061,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Monit Position Q
+                /* Set Monit Position Q */
             case 'Q':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_Q;
                 item.service = DSP_MODULE_NAME;
@@ -1071,7 +1071,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit Position Q
+                /* Get Monit Position Q */
             case 'q':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_Q;
                 item.service = DSP_MODULE_NAME;
@@ -1080,7 +1080,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Monit Position SUM
+                /* Set Monit Position SUM */
             case 'S':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_SUM;
                 item.service = DSP_MODULE_NAME;
@@ -1090,7 +1090,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit Position SUM
+                /* Get Monit Position SUM */
             case 's':
                 item.name = DSP_NAME_SET_GET_MONIT_POS_SUM;
                 item.service = DSP_MODULE_NAME;
@@ -1099,7 +1099,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Monit AMP
+                /* Get Monit AMP */
             case 'J':
                 if ((err = parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1113,7 +1113,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set Monit AMP
+                /* Set Monit AMP */
             case 'j':
                 if ((err = parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1129,7 +1129,7 @@ int main (int argc, char *argv [])
 
                 /******** SWAP Module Functions ********/
 
-                //Set SW
+                /* Set SW */
             case 'W':
                 item.name = SWAP_NAME_SET_GET_SW;
                 item.service = SWAP_MODULE_NAME;
@@ -1139,7 +1139,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get SW
+                /* Get SW */
             case 'w':
                 item.name = SWAP_NAME_SET_GET_SW;
                 item.service = SWAP_MODULE_NAME;
@@ -1148,7 +1148,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set SW Enable
+                /* Set SW Enable */
             case 'T':
                 item.name = SWAP_NAME_SET_GET_SW_EN;
                 item.service = SWAP_MODULE_NAME;
@@ -1158,7 +1158,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get SW Enable
+                /* Get SW Enable */
             case 't':
                 item.name = SWAP_NAME_SET_GET_SW_EN;
                 item.service = SWAP_MODULE_NAME;
@@ -1167,7 +1167,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set SW Delay
+                /* Set SW Delay */
             case 'F':
                 item.name = SWAP_NAME_SET_GET_SW_DLY;
                 item.service = SWAP_MODULE_NAME;
@@ -1177,7 +1177,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get SW Delay
+                /* Get SW Delay */
             case 'f':
                 item.name = SWAP_NAME_SET_GET_SW_DLY;
                 item.service = SWAP_MODULE_NAME;
@@ -1186,7 +1186,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set Div Clock
+                /* Set Div Clock */
             case 'Z':
                 item.name = SWAP_NAME_SET_GET_DIV_CLK;
                 item.service = SWAP_MODULE_NAME;
@@ -1196,7 +1196,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get Div Clock
+                /* Get Div Clock */
             case 'z':
                 item.name = SWAP_NAME_SET_GET_DIV_CLK;
                 item.service = SWAP_MODULE_NAME;
@@ -1205,7 +1205,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set WDW Enable
+                /* Set WDW Enable */
             case setwdwen:
                 item.name = SWAP_NAME_SET_GET_WDW_EN;
                 item.service = SWAP_MODULE_NAME;
@@ -1215,7 +1215,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get WDW Enable
+                /* Get WDW Enable */
             case getwdwen:
                 item.name = SWAP_NAME_SET_GET_WDW_EN;
                 item.service = SWAP_MODULE_NAME;
@@ -1224,7 +1224,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set WDW Delay
+                /* Set WDW Delay */
             case setwdwdly:
                 item.name = SWAP_NAME_SET_GET_WDW_DLY;
                 item.service = SWAP_MODULE_NAME;
@@ -1234,7 +1234,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get WDW Delay
+                /* Get WDW Delay */
             case getwdwdly:
                 item.name = SWAP_NAME_SET_GET_WDW_DLY;
                 item.service = SWAP_MODULE_NAME;
@@ -1243,7 +1243,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FE Channel A Gain
+                /* Get FE Channel A Gain */
             case getgaina:
                 item.name = SWAP_NAME_SET_GET_GAIN_A;
                 item.service = SWAP_MODULE_NAME;
@@ -1252,7 +1252,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set FE Channel A Gain
+                /* Set FE Channel A Gain */
             case setgaina:
                 item.name = SWAP_NAME_SET_GET_GAIN_A;
                 item.service = SWAP_MODULE_NAME;
@@ -1262,7 +1262,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FE Channel B Gain
+                /* Get FE Channel B Gain */
             case getgainb:
                 item.name = SWAP_NAME_SET_GET_GAIN_B;
                 item.service = SWAP_MODULE_NAME;
@@ -1271,7 +1271,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set FE Channel B Gain
+                /* Set FE Channel B Gain */
             case setgainb:
                 item.name = SWAP_NAME_SET_GET_GAIN_B;
                 item.service = SWAP_MODULE_NAME;
@@ -1281,7 +1281,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FE Channel C Gain
+                /* Get FE Channel C Gain */
             case getgainc:
                 item.name = SWAP_NAME_SET_GET_GAIN_C;
                 item.service = SWAP_MODULE_NAME;
@@ -1290,7 +1290,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set FE Channel C Gain
+                /* Set FE Channel C Gain */
             case setgainc:
                 item.name = SWAP_NAME_SET_GET_GAIN_C;
                 item.service = SWAP_MODULE_NAME;
@@ -1300,7 +1300,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get FE Channel D Gain
+                /* Get FE Channel D Gain */
             case getgaind:
                 item.name = SWAP_NAME_SET_GET_GAIN_D;
                 item.service = SWAP_MODULE_NAME;
@@ -1309,7 +1309,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set FE Channel D Gain
+                /* Set FE Channel D Gain */
             case setgaind:
                 item.name = SWAP_NAME_SET_GET_GAIN_D;
                 item.service = SWAP_MODULE_NAME;
@@ -1321,7 +1321,7 @@ int main (int argc, char *argv [])
 
                 /******** RFFE Module Functions *******/
 
-                //Set RFFE Switching
+                /* Set RFFE Switching */
             case rffesetsw:
                 item.name = RFFE_NAME_SET_GET_SW;
                 item.service = RFFE_MODULE_NAME;
@@ -1331,7 +1331,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get RFFE Switching
+                /* Get RFFE Switching */
             case rffegetsw:
                 item.name = RFFE_NAME_SET_GET_SW;
                 item.service = RFFE_MODULE_NAME;
@@ -1340,7 +1340,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set RFFE Attenuators
+                /* Set RFFE Attenuators */
             case rffesetatt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1354,7 +1354,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get RFFE Attenuators
+                /* Get RFFE Attenuators */
             case rffegetatt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1368,7 +1368,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set RFFE Temperature
+                /* Set RFFE Temperature */
             case rffesettmp:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1382,7 +1382,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Read RFFE Temperature
+                /* Read RFFE Temperature */
             case rffegettmp:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1396,7 +1396,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set RFFE Point
+                /* Set RFFE Point */
             case rffesetpnt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1410,7 +1410,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get RFFE Point
+                /* Get RFFE Point */
             case rffegetpnt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1424,7 +1424,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set RFFE Temperature Control
+                /* Set RFFE Temperature Control */
             case rffesettmpctr:
                 item.name = RFFE_NAME_SET_GET_TEMP_CONTROL;
                 item.service = RFFE_MODULE_NAME;
@@ -1434,7 +1434,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get RFFE Temperature Control
+                /* Get RFFE Temperature Control */
             case rffegettmpctr:
                 item.name = RFFE_NAME_SET_GET_TEMP_CONTROL;
                 item.service = RFFE_MODULE_NAME;
@@ -1443,7 +1443,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set RFFE Output
+                /* Set RFFE Output */
             case rffesetout:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1457,7 +1457,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Get RFFE Output
+                /* Get RFFE Output */
             case rffegetout:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s\n", program_name, bpm_client_err_str(err));
@@ -1471,7 +1471,7 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                //Set RFFE Reset
+                /* Set RFFE Reset */
             case rffesetrst:
                 item.name = RFFE_NAME_SET_GET_RESET;
                 item.service = RFFE_MODULE_NAME;
@@ -1481,7 +1481,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get RFFE Reset
+                /* Get RFFE Reset */
             case rffegetrst:
                 item.name = RFFE_NAME_SET_GET_RESET;
                 item.service = RFFE_MODULE_NAME;
@@ -1490,7 +1490,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set RFFE Reprog
+                /* Set RFFE Reprog */
             case rffesetrpg:
                 item.name = RFFE_NAME_SET_GET_REPROG;
                 item.service = RFFE_MODULE_NAME;
@@ -1500,7 +1500,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get RFFE Reprog
+                /* Get RFFE Reprog */
             case rffegetrpg:
                 item.name = RFFE_NAME_SET_GET_REPROG;
                 item.service = RFFE_MODULE_NAME;
@@ -1509,7 +1509,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Set RFFE Switch Level
+                /* Set RFFE Switch Level */
             case rffesetswlvl:
                 item.name = RFFE_NAME_SET_GET_SW_LVL;
                 item.service = RFFE_MODULE_NAME;
@@ -1519,7 +1519,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                //Get RFFE Switch Level
+                /* Get RFFE Switch Level */
             case rffegetswlvl:
                 item.name = RFFE_NAME_SET_GET_SW_LVL;
                 item.service = RFFE_MODULE_NAME;
@@ -1530,52 +1530,52 @@ int main (int argc, char *argv [])
 
                 /******** ACQ Module Functions ********/
 
-                // Set Acq Samples
+                /*  Set Acq Samples */
             case 'E':
                 acq_samples_set = 1;
                 acq_samples_val = (uint32_t) strtoul(optarg, NULL, 10);
                 break;
 
-                // Set Acq Chan
+                /*  Set Acq Chan */
             case 'H':
                 acq_chan_set = 1;
                 acq_chan_val = (uint32_t) strtoul(optarg, NULL, 10);
                 break;
 
-                // Set Acq Start
+                /*  Set Acq Start */
             case 'I':
                 acq_start = 1;
                 break;
 
-                // Check if the acquisition is finished
+                /*  Check if the acquisition is finished */
             case 'K':
                 acq_check = 1;
                 check_poll = 0;
                 break;
 
-                // Check if the acquisition is finished until timeout (-1 for infinite)
+                /*  Check if the acquisition is finished until timeout (-1 for infinite) */
             case acqcheckpoll:
                 acq_check = 1;
                 check_poll = 1;
                 break;
 
-                // Get a single data block from the acquisition
+                /*  Get a single data block from the acquisition */
             case 'A':
                 acq_get_block = 1;
                 acq_block_id = (uint32_t) strtoul(optarg, NULL, 10);
                 break;
-                
-                // Get a whole data curve
+
+                /*  Get a whole data curve */
             case getcurve:
                 acq_get_curve = 1;
                 break;
 
-                // Perform full acq
+                /*  Perform full acq */
             case fullacq:
                 acq_full_call = 1;
                 break;
 
-                // Set Polling timeout
+                /*  Set Polling timeout */
             case timeout:
                 poll_timeout = (int) strtoul(optarg, NULL, 10);
                 break;
@@ -1588,12 +1588,12 @@ int main (int argc, char *argv [])
 
     /* User input error handling */
 
-    //Use default local broker endpoint if none was given
+    /* Use default local broker endpoint if none was given */
     if (broker_endp == NULL){
         broker_endp = strdup(default_broker_endp);
     }
 
-    //Check if the board number is within range and set to default if necessary
+    /* Check if the board number is within range and set to default if necessary */
     if (board_number_str == NULL) {
         fprintf (stderr, "[client]: Setting default value to BOARD number: %u\n",
                 DFLT_BOARD_NUMBER);
@@ -1607,7 +1607,7 @@ int main (int argc, char *argv [])
         }
     }
 
-    //Check if the bpm number is within range and set to default if necessary
+    /* Check if the bpm number is within range and set to default if necessary */
     if (bpm_number_str == NULL) {
         fprintf (stderr, "[client]: Setting default value to BPM number: %u\n",
                 DFLT_BPM_NUMBER);
@@ -1622,7 +1622,7 @@ int main (int argc, char *argv [])
         }
     }
 
-    // Both Acq Chan and Acq Samples must be set or none of them
+    /* Both Acq Chan and Acq Samples must be set or none of them */
     if ((acq_samples_set && !acq_chan_set) || (!acq_samples_set && acq_chan_set)) {
         fprintf(stderr, "%s: If --setsamples or --setchan is set the other must be too!\n", program_name);
         return -1;
@@ -1701,12 +1701,14 @@ int main (int argc, char *argv [])
     int str_length = snprintf(NULL, 0, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
     char *acq_service = zmalloc (str_length+1);
     sprintf (acq_service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+
     /* Request data acquisition on server */
+
     if (acq_start) {
-    //Wrap the data request parameters
+    /* Wrap the data request parameters */
         acq_req_t acq_req = {
-            acq_samples_val,        /* Number of samples */
-            acq_chan_val            /* Acquisition channel number */
+            acq_samples_val,
+            acq_chan_val
         };
         bpm_client_err_e err = bpm_acq_start(bpm_client, acq_service, &acq_req);
         fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
@@ -1803,7 +1805,7 @@ int main (int argc, char *argv [])
         free(valid_data);
     }
 
-    //Deallocate memory
+    /* Deallocate memory */
     free (default_broker_endp);
     free (broker_endp);
     free (acq_service);
