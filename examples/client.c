@@ -458,7 +458,7 @@ int main (int argc, char *argv [])
         {"getgainc",            no_argument,         NULL, getgainc},
         {"setgaind",            required_argument,   NULL, setgaind},
         {"getgaind",            no_argument,         NULL, getgaind},
-        {"rffesetsw",           no_argument,         NULL, rffesetsw},
+        {"rffesetsw",           required_argument,   NULL, rffesetsw},
         {"rffegetsw",           no_argument,         NULL, rffegetsw},
         {"rffesetatt",          required_argument,   NULL, rffesetatt},
         {"rffegetatt",          no_argument,         NULL, rffegetatt},
