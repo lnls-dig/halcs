@@ -932,7 +932,7 @@ int main (int argc, char *argv [])
                 append_item (call_list, item);
                 break;
 
-                /* Set Kx */
+                /* Set Ky */
             case setky:
                 item.name = DSP_NAME_SET_GET_KY;
                 item.service = DSP_MODULE_NAME;
