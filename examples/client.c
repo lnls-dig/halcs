@@ -758,7 +758,7 @@ int main (int argc, char *argv [])
             case 'D':
                 item.name = FMC130M_4CH_NAME_SI571_GET_DEFAULTS;
                 item.service = FMC130M_4CH_MODULE_NAME;
-                item.rw = 1;
+                item.rw = 0;
                 *(item.write_val) = item.rw;
                 *db_ptr = strtod(optarg, NULL);
                 append_item (call_list, item);
