@@ -583,7 +583,7 @@ int main (int argc, char *argv [])
             case 'c':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -597,7 +597,7 @@ int main (int argc, char *argv [])
             case 'C':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DATA0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -611,7 +611,7 @@ int main (int argc, char *argv [])
             case getdlyval:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -625,7 +625,7 @@ int main (int argc, char *argv [])
             case setdlyval:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_VAL0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -639,7 +639,7 @@ int main (int argc, char *argv [])
             case getdlyline:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -653,7 +653,7 @@ int main (int argc, char *argv [])
             case setdlyline:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_LINE0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -667,7 +667,7 @@ int main (int argc, char *argv [])
             case getdlyupdt:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -681,7 +681,7 @@ int main (int argc, char *argv [])
             case setdlyupdt:
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY_UPDT0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -695,7 +695,7 @@ int main (int argc, char *argv [])
             case 'V':
                 if ((err = parse_subopt (optarg, mount_opts, FMC130M_4CH_NAME_ADC_DLY0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = FMC130M_4CH_MODULE_NAME;
@@ -1106,7 +1106,7 @@ int main (int argc, char *argv [])
             case 'J':
                 if ((err = parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = DSP_MODULE_NAME;
@@ -1120,7 +1120,7 @@ int main (int argc, char *argv [])
             case 'j':
                 if ((err = parse_subopt (optarg, mount_opts, DSP_NAME_SET_GET_MONIT_AMP_CH0, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = DSP_MODULE_NAME;
@@ -1347,7 +1347,7 @@ int main (int argc, char *argv [])
             case rffesetatt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1361,7 +1361,7 @@ int main (int argc, char *argv [])
             case rffegetatt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_ATT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1375,7 +1375,7 @@ int main (int argc, char *argv [])
             case rffesettmp:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1389,7 +1389,7 @@ int main (int argc, char *argv [])
             case rffegettmp:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_TEMP1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1403,7 +1403,7 @@ int main (int argc, char *argv [])
             case rffesetpnt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1417,7 +1417,7 @@ int main (int argc, char *argv [])
             case rffegetpnt:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_SET_POINT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1450,7 +1450,7 @@ int main (int argc, char *argv [])
             case rffesetout:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1464,7 +1464,7 @@ int main (int argc, char *argv [])
             case rffegetout:
                 if ((err = parse_subopt (optarg, mount_opts, RFFE_NAME_SET_GET_OUTPUT1, corr_name, item.write_val)) != BPM_CLIENT_SUCCESS) {
                     fprintf(stderr, "%s: %s - '%s'\n", program_name, bpm_client_err_str(err), corr_name);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
                 item.name = strdup(corr_name);
                 item.service = RFFE_MODULE_NAME;
@@ -1630,7 +1630,7 @@ int main (int argc, char *argv [])
     /* Both Acq Chan and Acq Samples must be set or none of them */
     if ((acq_samples_set && !acq_chan_set) || (!acq_samples_set && acq_chan_set)) {
         fprintf(stderr, "%s: If --setsamples or --setchan is set the other must be too!\n", program_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if ( (acq_start || acq_get_block || acq_get_curve || acq_full_call) && (!acq_samples_set || !acq_chan_set)) {
@@ -1646,22 +1646,22 @@ int main (int argc, char *argv [])
         if (acq_full_call) {
             fprintf(stderr, "%s: If --fullacq is requested, --setchan and --setsamples must be set!\n", program_name);
             }
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if (acq_chan_set && (acq_chan_val >= END_CHAN_ID)) {
         fprintf(stderr, "%s: Invalid channel selected! This value must be lower than %u \n", program_name, END_CHAN_ID);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if ((acq_check && check_poll) && (poll_timeout == 0)) {
         fprintf(stderr, "%s: If --acqcheckpoll is set, --timeout must be too!\n", program_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if (acq_full_call && (poll_timeout == 0)) {
         fprintf(stderr, "%s: If --fullacq is requested, --timeout must be set!\n", program_name);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if (acq_full_call && (acq_start || acq_check || acq_get_block || acq_get_curve)) {
@@ -1692,7 +1692,7 @@ int main (int argc, char *argv [])
 
         if (err != BPM_CLIENT_SUCCESS) {
             fprintf (stderr, "[client]: BPM_ERROR: '%s'\n",bpm_client_err_str (err));
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         if (func_structure->retval != DISP_ARG_END && function->rw) {
