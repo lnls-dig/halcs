@@ -1587,6 +1587,8 @@ int main (int argc, char *argv [])
                 fprintf(stderr, "%s: bad option\n", program_name);
                 print_usage(stderr, 1);
         }
+        /* Reset the pointer to avoid data overlap */
+        *int_ptr = 0;
     }
 
     /* User input error handling */
