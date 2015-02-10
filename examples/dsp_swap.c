@@ -62,9 +62,18 @@ int main (int argc, char *argv [])
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
 
+    uint32_t trig_dir = 0;
+    fprintf (stdout, "[client:dsp]: trig_dir = %u\n", trig_dir);
+    bpm_client_err_e err = bpm_set_trig_dir (bpm_client, "BPM0:DEVIO:FMC130M_4CH0", trig_dir);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: bpm_set_trig_dir failed\n");
+        goto err_bpm_set;
+    }
+    fprintf (stdout, "[client:dsp]: bpm_set_trig_dir was successfully executed\n");
+
     uint32_t kx_set = 10000000;
     fprintf (stdout, "[client:dsp]: kx = %u\n", kx_set);
-    bpm_client_err_e err = bpm_set_kx (bpm_client, "BPM0:DEVIO:DSP0", kx_set);
+    err = bpm_set_kx (bpm_client, "BPM0:DEVIO:DSP0", kx_set);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:dsp]: bpm_set_kx failed\n");
         goto err_bpm_set;
@@ -134,7 +143,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:swap]: bpm_set_sw = %u was successfully executed\n",
                     sw);
 
-    uint32_t sw_en = 0;
+    uint32_t sw_en = 1;
     err = bpm_set_sw_en (bpm_client, "BPM0:DEVIO:SWAP0", sw_en);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:swap]: bpm_set_sw_en failed\n");
