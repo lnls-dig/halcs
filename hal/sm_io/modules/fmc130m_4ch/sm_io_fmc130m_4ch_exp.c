@@ -74,6 +74,17 @@ static int _fmc130m_4ch_leds (void *owner, void *args, void *ret)
     return -FMC130M_4CH_OK;
 }
 
+#define BPM_FMC130M_4CH_SI571_OE_MIN            0 /* SI571 Output disable */
+#define BPM_FMC130M_4CH_SI571_OE_MAX            1 /* SI571 Output enable */
+
+RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            CLK_DISTRIB, SI571_OE, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_SI571_OE_MIN, BPM_FMC130M_4CH_SI571_OE_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+
 #define BPM_FMC130M_4CH_PLL_FUNC_MIN            0 /* PLL FUNCTION pin 0 */
 #define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
 
@@ -84,26 +95,25 @@ RW_PARAM_FUNC(fmc130m_4ch, pll_func) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
-{
-    (void) ret;
-    assert (owner);
-    assert (args);
 
-    int err = -FMC130M_4CH_OK;
-    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
-    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
+#define BPM_FMC130M_4CH_PLL_STATUS_MIN          0 /* PLL STATUS pin 0 */
+#define BPM_FMC130M_4CH_PLL_STATUS_MAX          1 /* PLL STATUS pin 1 */
 
-    FMC130M_4CH_CHECK_ACTIVE(self);
+RW_PARAM_FUNC(fmc130m_4ch, pll_status) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            CLK_DISTRIB, PLL_STATUS, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_PLL_STATUS_MIN, BPM_FMC130M_4CH_PLL_STATUS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
-            "_fmc130m_4ch_ad9510_cfg_defaults\n");
-    smch_err_e serr = smch_ad9510_cfg_defaults (smch_ad9510);
-    ASSERT_TEST(serr == SMCH_SUCCESS, "Could not config AD9510 defaults",
-            err_smpr_write, -FMC130M_4CH_ERR);
+#define BPM_FMC130M_4CH_CLK_SEL_MIN             0 /* PLL CLK_SEL pin 0 */
+#define BPM_FMC130M_4CH_CLK_SEL_MAX             1 /* PLL CLK_SEL pin 1 */
 
-err_smpr_write:
-    return err;
+RW_PARAM_FUNC(fmc130m_4ch, clk_sel) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            CLK_DISTRIB, CLK_SEL, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_CLK_SEL_MIN, BPM_FMC130M_4CH_CLK_SEL_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
 }
 
 /* FIXME: Override DATA<channel_number>_VAL macros with the DATA_GLOBAL ones.
@@ -379,16 +389,6 @@ RW_PARAM_FUNC(fmc130m_4ch, test_data_en) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_SI571_OE_MIN            0 /* SI571 Output disable */
-#define BPM_FMC130M_4CH_SI571_OE_MAX            1 /* SI571 Output enable */
-
-RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
-    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
-            CLK_DISTRIB, SI571_OE, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_SI571_OE_MIN, BPM_FMC130M_4CH_SI571_OE_MAX, NO_CHK_FUNC,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
 #define BPM_FMC130M_4CH_TRIG_DIR_MIN            0 /* Trigger direction input */
 #define BPM_FMC130M_4CH_TRIG_DIR_MAX            1 /* Trigger direction output */
 
@@ -420,6 +420,29 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_val) {
 }
 
 /******************************** Chips Export functions *************************/
+
+static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
+{
+    (void) ret;
+    assert (owner);
+    assert (args);
+
+    int err = -FMC130M_4CH_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
+
+    FMC130M_4CH_CHECK_ACTIVE(self);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
+            "_fmc130m_4ch_ad9510_cfg_defaults\n");
+    smch_err_e serr = smch_ad9510_cfg_defaults (smch_ad9510);
+    ASSERT_TEST(serr == SMCH_SUCCESS, "Could not config AD9510 defaults",
+            err_smpr_write, -FMC130M_4CH_ERR);
+
+err_smpr_write:
+    return err;
+}
+
 
 /* Macros to avoid repetition of the function body AD9510 */
 typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param);
@@ -584,8 +607,10 @@ FMC130M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
 /* Exported function pointers */
 const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     _fmc130m_4ch_leds,
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
-    _fmc130m_4ch_ad9510_cfg_defaults,
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_status),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, clk_sel),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data0),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data1),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data2),
@@ -607,10 +632,10 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     FMC130M_4CH_ADC_DLY_FUNC_NAME(2),
     FMC130M_4CH_ADC_DLY_FUNC_NAME(3),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, test_data_en),
-    RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_dir),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_term),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_val),
+    _fmc130m_4ch_ad9510_cfg_defaults,
     FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),
