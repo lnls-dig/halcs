@@ -69,6 +69,26 @@ bpm_client_err_e bpm_set_fmc_pll_function (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_fmc_pll_function (bpm_client_t *self, char *service,
         uint32_t *fmc_pll_function);
 
+/* FMC PLL STATUS pin. Sets or clears the FMC PLL STATUS pin. This pin
+ * outputs the value selected on AD9510 MUX STATUS register.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_pll_status (bpm_client_t *self, char *service,
+        uint32_t fmc_pll_status);
+bpm_client_err_e bpm_get_fmc_pll_status (bpm_client_t *self, char *service,
+        uint32_t *fmc_pll_status);
+
+/* CLK SEL Functions. Set the reference input clock for the AD9510.
+ * 0: clock from external source (MMCX J4)
+ * 1: clock from FMC PIN (FMC_CLK line)
+ *
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_clk_sel (bpm_client_t *self, char *service,
+        uint32_t clk_sel);
+bpm_client_err_e bpm_get_fmc_clk_sel (bpm_client_t *self, char *service,
+        uint32_t *clk_sel);
+
 /* RAW ADC data functions */
 /* These set of functions read (get) the RAW ADC values.
  * All of the functions returns BPM_CLIENT_SUCCESS if the

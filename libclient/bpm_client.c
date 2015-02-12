@@ -165,6 +165,32 @@ PARAM_FUNC_CLIENT_READ(fmc_pll_function)
             fmc_pll_function);
 }
 
+/* STATUS pin functions */
+PARAM_FUNC_CLIENT_WRITE(fmc_pll_status)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_PLL_STATUS,
+            fmc_pll_status);
+}
+
+PARAM_FUNC_CLIENT_READ(fmc_pll_status)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_PLL_STATUS,
+            fmc_pll_status);
+}
+
+/* CLK_SEL pin functions */
+PARAM_FUNC_CLIENT_WRITE(fmc_clk_sel)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_CLK_SEL,
+            fmc_clk_sel);
+}
+
+PARAM_FUNC_CLIENT_READ(fmc_clk_sel)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_CLK_SEL,
+            fmc_clk_sel);
+}
+
 bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service)
 {
     assert (self);
