@@ -511,7 +511,7 @@ int main (int argc, char *argv [])
         fprintf(stderr, "[client]: Error in memory allocation for zlist\n");
     }
 
-    char *corr_name = zmalloc(50);
+    char corr_name[50];
     call_func_t item = {0};
 
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
@@ -1819,7 +1819,6 @@ int main (int argc, char *argv [])
     free (acq_service);
     free (board_number_str);
     free (bpm_number_str);
-    free (corr_name);
     bpm_client_destroy (&bpm_client);
     return 0;
 }
