@@ -236,22 +236,48 @@ bpm_client_err_e bpm_get_trig_val (bpm_client_t *self, char *service,
  * if server could not complete the request */
 bpm_client_err_e bpm_set_ad9510_pll_a_div (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_a_div);
+bpm_client_err_e bpm_get_ad9510_pll_a_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_a_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_b_div (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_b_div);
+bpm_client_err_e bpm_get_ad9510_pll_b_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_b_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_prescaler (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_prescaler);
+bpm_client_err_e bpm_get_ad9510_pll_prescaler (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_prescaler);
+
 bpm_client_err_e bpm_set_ad9510_r_div (bpm_client_t *self, char *service,
         uint32_t ad9510_r_div);
+bpm_client_err_e bpm_get_ad9510_r_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_r_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_pdown (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_pdown);
+bpm_client_err_e bpm_get_ad9510_pll_pdown (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_pdown);
+
 bpm_client_err_e bpm_set_ad9510_mux_status (bpm_client_t *self, char *service,
         uint32_t ad9510_mux_status);
+bpm_client_err_e bpm_get_ad9510_mux_status (bpm_client_t *self, char *service,
+        uint32_t *ad9510_mux_status);
+
 bpm_client_err_e bpm_set_ad9510_cp_current (bpm_client_t *self, char *service,
         uint32_t ad9510_cp_current);
+bpm_client_err_e bpm_get_ad9510_cp_current (bpm_client_t *self, char *service,
+        uint32_t *ad9510_cp_current);
+
 bpm_client_err_e bpm_set_ad9510_outputs (bpm_client_t *self, char *service,
         uint32_t ad9510_outputs);
+bpm_client_err_e bpm_get_ad9510_outputs (bpm_client_t *self, char *service,
+        uint32_t *ad9510_outputs);
+
 bpm_client_err_e bpm_set_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_clk_sel);
+bpm_client_err_e bpm_get_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_clk_sel);
 
 /* FMC SI571 Control.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
@@ -335,7 +361,7 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans, int timeout);
+        acq_trans_t *acq_trans, int timeout, bool new_acq);
 
 /********************** DSP Functions ********************/
 

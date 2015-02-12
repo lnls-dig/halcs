@@ -454,10 +454,22 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_pll_a_div)
             ad9510_pll_a_div);
 }
 
+PARAM_FUNC_CLIENT_READ(ad9510_pll_a_div)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
+            ad9510_pll_a_div);
+}
+
 /* AD9510 PLL B divider */
 PARAM_FUNC_CLIENT_WRITE(ad9510_pll_b_div)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
+            ad9510_pll_b_div);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_b_div)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
             ad9510_pll_b_div);
 }
 
@@ -468,10 +480,22 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_pll_prescaler)
             ad9510_pll_prescaler);
 }
 
+PARAM_FUNC_CLIENT_READ(ad9510_pll_prescaler)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
+            ad9510_pll_prescaler);
+}
+
 /* AD9510 R divider */
 PARAM_FUNC_CLIENT_WRITE(ad9510_r_div)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_R_DIV,
+            ad9510_r_div);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_r_div)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_R_DIV,
             ad9510_r_div);
 }
 
@@ -482,10 +506,22 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_pll_pdown)
             ad9510_pll_pdown);
 }
 
+PARAM_FUNC_CLIENT_READ(ad9510_pll_pdown)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
+            ad9510_pll_pdown);
+}
+
 /* AD9510 Mux Status */
 PARAM_FUNC_CLIENT_WRITE(ad9510_mux_status)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
+            ad9510_mux_status);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_mux_status)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
             ad9510_mux_status);
 }
 
@@ -496,6 +532,12 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_cp_current)
             ad9510_cp_current);
 }
 
+PARAM_FUNC_CLIENT_READ(ad9510_cp_current)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
+            ad9510_cp_current);
+}
+
 /* AD9510 Outputs */
 PARAM_FUNC_CLIENT_WRITE(ad9510_outputs)
 {
@@ -503,10 +545,22 @@ PARAM_FUNC_CLIENT_WRITE(ad9510_outputs)
             ad9510_outputs);
 }
 
+PARAM_FUNC_CLIENT_READ(ad9510_outputs)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
+            ad9510_outputs);
+}
+
 /* AD9510 PLL CLK Selection */
 PARAM_FUNC_CLIENT_WRITE(ad9510_pll_clk_sel)
 {
     return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
+            ad9510_pll_clk_sel);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_clk_sel)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
             ad9510_pll_clk_sel);
 }
 
@@ -798,7 +852,7 @@ err_null_report:
 }
 
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans, int timeout)
+        acq_trans_t *acq_trans, int timeout, bool new_acq)
 {
     assert (self);
     assert (service);
@@ -806,14 +860,17 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
     assert (acq_trans->block.data);
 
     /* Client requisition: data acquire */
-    bpm_client_err_e err = _bpm_data_acquire (self, service, &acq_trans->req);
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not request acqusition\n",
-            err_bpm_data_acquire);
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    if (new_acq) {
+        err = _bpm_data_acquire (self, service, &acq_trans->req);
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not request acqusition\n",
+                err_bpm_data_acquire);
 
-    /* Client requisition: wait data acquire indefinetly */
-    err = _bpm_wait_data_acquire_timed (self, service, timeout);
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Request acquisition timed out\n",
-            err_bpm_wait_data_acquire);
+        /* Client requisition: wait data acquire indefinetly */
+        err = _bpm_wait_data_acquire_timed (self, service, timeout);
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Request acquisition timed out\n",
+                err_bpm_wait_data_acquire);
+    }
 
     /* FIXME: When the last block is full 'block_n_valid exceeds by one */
     uint32_t block_n_valid = acq_trans->req.num_samples /
