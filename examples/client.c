@@ -106,16 +106,19 @@ int print_var (call_var_t *var)
 
     switch (DISP_GET_ATYPE(func_structure->retval))
     {
-        case DISP_ATYPE_UINT16:
-            printf ("%" PRIu16 "\n", ((uint16_t)*(var->read_val)));
+        case DISP_ATYPE_UINT16:;
+            uint16_t* read_val_ptr16 = (uint16_t *)var->read_val; /* Avoid strict-aliasing breaking */
+            printf ("%" PRIu16 "\n", *(read_val_ptr16));
             break;
 
-        case DISP_ATYPE_UINT32:
-            printf ("%" PRIu32 "\n", ((uint32_t)*(var->read_val)));
+        case DISP_ATYPE_UINT32:;
+            uint32_t* read_val_ptr32 = (uint32_t *)var->read_val; /* Avoid strict-aliasing breaking */
+            printf ("%" PRIu32 "\n", *(read_val_ptr32));
             break;
 
-        case DISP_ATYPE_UINT64:
-            printf ("%" PRIu64 "\n", ((uint64_t)*(var->read_val)));
+        case DISP_ATYPE_UINT64:;
+            uint64_t* read_val_ptr64 = (uint64_t *)var->read_val; /* Avoid strict-aliasing breaking */
+            printf ("%" PRIu64 "\n", *(read_val_ptr64));
             break;
 
         case DISP_ATYPE_DOUBLE:
