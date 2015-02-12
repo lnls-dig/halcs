@@ -1059,7 +1059,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
     *write_val = acq_trans->req.chan;
     *(write_val+4) = acq_trans->block.idx;
 
-    smio_acq_data_block_t read_val[sizeof (smio_acq_data_block_t)];
+    smio_acq_data_block_t read_val[1];
 
     /* Sent Message is:
      * frame 0: operation code
