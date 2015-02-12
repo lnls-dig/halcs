@@ -13,7 +13,9 @@
 #include "sm_ch_pca9547.h"
 
 #define FMC130M_4CH_DFLT_PLL_FUNC                   0x1
-#define FMC130M_4CH_DFLT_PCA9547_CFG                SMCH_PCA9547_NO_CHANNEL         /* No channel selected */
+#define FMC130M_4CH_DFLT_CLK_SEL                    0x0                         /* Clock from FMC front panel */
+#define FMC130M_4CH_DFLT_TRIG_DIR                   0x0                         /* Output direction */
+#define FMC130M_4CH_DFLT_PCA9547_CFG                SMCH_PCA9547_NO_CHANNEL     /* No channel selected */
 #define FMC130M_4CH_DFLT_SI571_OE                   0x1
 
 #define FMC130M_4CH_DFLT_SI57X_FOUT_FACTORY         SI57X_FOUT_FACTORY_DFLT

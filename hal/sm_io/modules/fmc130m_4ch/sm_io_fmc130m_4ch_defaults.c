@@ -53,6 +53,14 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC PLL function",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    client_err = bpm_set_fmc_clk_sel (config_client, service, FMC130M_4CH_DFLT_CLK_SEL);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC CLK SEL function",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = bpm_set_trig_dir (config_client, service, FMC130M_4CH_DFLT_TRIG_DIR);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC TRIG DIR function",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
     client_err = bpm_ad9510_cfg_defaults (config_client, service);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS ||
             client_err == BPM_CLIENT_ERR_AGAIN, "Could not configure AD9510",
