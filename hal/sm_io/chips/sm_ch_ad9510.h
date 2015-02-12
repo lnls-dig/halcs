@@ -49,17 +49,33 @@ smch_err_e smch_ad9510_reg_update (smch_ad9510_t *self);
 smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self);
 
 /* AD9510 PLL divider functions */
-smch_err_e smch_ad9510_pll_a_div (smch_ad9510_t *self, uint32_t div);
-smch_err_e smch_ad9510_pll_b_div (smch_ad9510_t *self, uint32_t div);
-smch_err_e smch_ad9510_pll_prescaler (smch_ad9510_t *self, uint32_t pre);
-smch_err_e smch_ad9510_r_div (smch_ad9510_t *self, uint32_t div);
+smch_err_e smch_ad9510_set_pll_a_div (smch_ad9510_t *self, uint32_t *div);
+smch_err_e smch_ad9510_get_pll_a_div (smch_ad9510_t *self, uint32_t *div);
+
+smch_err_e smch_ad9510_set_pll_b_div (smch_ad9510_t *self, uint32_t *div);
+smch_err_e smch_ad9510_get_pll_b_div (smch_ad9510_t *self, uint32_t *div);
+
+smch_err_e smch_ad9510_set_pll_prescaler (smch_ad9510_t *self, uint32_t *pre);
+smch_err_e smch_ad9510_get_pll_prescaler (smch_ad9510_t *self, uint32_t *pre);
+
+smch_err_e smch_ad9510_set_r_div (smch_ad9510_t *self, uint32_t *div);
+smch_err_e smch_ad9510_get_r_div (smch_ad9510_t *self, uint32_t *div);
 
 /* AD9510 PLL control functions */
-smch_err_e smch_ad9510_pll_pdown (smch_ad9510_t *self, uint32_t pdown);
-smch_err_e smch_ad9510_mux_status (smch_ad9510_t *self, uint32_t mux);
-smch_err_e smch_ad9510_cp_current (smch_ad9510_t *self, uint32_t cp_current);
-smch_err_e smch_ad9510_outputs (smch_ad9510_t *self, uint32_t out_en);
-smch_err_e smch_ad9510_pll_clk_sel (smch_ad9510_t *self, uint32_t clk_num);
+smch_err_e smch_ad9510_set_pll_pdown (smch_ad9510_t *self, uint32_t *pdown);
+smch_err_e smch_ad9510_get_pll_pdown (smch_ad9510_t *self, uint32_t *pdown);
+
+smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux);
+smch_err_e smch_ad9510_get_mux_status (smch_ad9510_t *self, uint32_t *mux);
+
+smch_err_e smch_ad9510_set_cp_current (smch_ad9510_t *self, uint32_t *cp_current);
+smch_err_e smch_ad9510_get_cp_current (smch_ad9510_t *self, uint32_t *cp_current);
+
+smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en);
+smch_err_e smch_ad9510_get_outputs (smch_ad9510_t *self, uint32_t *out_en);
+
+smch_err_e smch_ad9510_set_pll_clk_sel (smch_ad9510_t *self, uint32_t *clk_num);
+smch_err_e smch_ad9510_get_pll_clk_sel (smch_ad9510_t *self, uint32_t *clk_num);
 
 #endif
 
