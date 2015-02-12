@@ -48,16 +48,16 @@ bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
 void bpm_client_destroy (bpm_client_t **self_p);
 
 /* General function to execute all the other modules functions */
-bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, 
-        char *service, uint8_t *input, uint8_t *output);
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output);
 
 /* Translate function's name and returns its structure */
 const disp_op_t* bpm_func_translate (char *name);
 
 /* Wrapper to bpm_func_exec which translates the function name to
  * its exp_ops structure */
- bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, 
-        char *service, uint8_t *input, uint8_t *output);
+ bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output);
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
@@ -657,13 +657,13 @@ bpm_client_err_e bpm_get_rffe_sw_lvl (bpm_client_t *self, char *service,
 
 /* Helper Function */
 
-/* This function execute the given function *func in a disp_op_t 
+/* This function execute the given function *func in a disp_op_t
  * for a specific amount of time (timeout).
- * Returns BPM_CLIENT_SUCCESS if the functions has been successfully 
- * executed or error otherwise. 
+ * Returns BPM_CLIENT_SUCCESS if the functions has been successfully
+ * executed or error otherwise.
  * (see bpm_client_err.h for all possible errors)*/
-bpm_client_err_e func_polling (bpm_client_t *self, char *name, 
-        char *service, uint8_t *input, uint8_t *output, int timeout);
-        
+bpm_client_err_e func_polling (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output, int timeout);
+
 #endif
 

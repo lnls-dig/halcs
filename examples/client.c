@@ -78,8 +78,8 @@ typedef struct _call_var_t {
     char *service;
     int rw;
     int poll;
-    uint8_t write_val[MAX_VARIABLES_NUMBER];
-    uint8_t read_val[MAX_VARIABLES_NUMBER];
+    uint32_t write_val[MAX_VARIABLES_NUMBER];
+    uint32_t read_val[MAX_VARIABLES_NUMBER];
 } call_var_t;
 
 typedef call_var_t call_func_t;
@@ -159,7 +159,7 @@ char *mount_opts[] =
     [SUBOPT_END] = NULL
 };
 
-bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint8_t *input)
+bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, char *corr_name, uint32_t *input)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     strncpy(corr_name, "", strlen(corr_name));
@@ -516,9 +516,8 @@ int main (int argc, char *argv [])
 
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
+        double db_val = 0;
         bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-        double *db_ptr = (double *)(item.write_val+4);
-        uint32_t *int_ptr = (uint32_t *)(item.write_val+4);
 
         /* Get the user selected options */
         switch (ch)
@@ -570,7 +569,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -714,7 +713,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -733,7 +732,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -752,7 +751,8 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *db_ptr = strtod(optarg, NULL);
+                db_val = strtod(optarg, NULL);
+                memcpy((item.write_val+4), &db_val, sizeof(double));
                 append_item (call_list, item);
                 break;
 
@@ -762,7 +762,8 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *db_ptr = strtod(optarg, NULL);
+                db_val = strtod(optarg, NULL);
+                memcpy(item.write_val+4, &db_val, sizeof(double));
                 append_item (call_list, item);
                 break;
 
@@ -772,7 +773,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -791,7 +792,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -810,7 +811,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -829,7 +830,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -839,7 +840,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -849,7 +850,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -859,7 +860,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -869,7 +870,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -879,7 +880,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -889,7 +890,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -899,7 +900,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -909,7 +910,7 @@ int main (int argc, char *argv [])
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -921,7 +922,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -940,7 +941,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -959,7 +960,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -978,7 +979,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -997,7 +998,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1016,7 +1017,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1035,7 +1036,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1054,7 +1055,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1073,7 +1074,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1092,7 +1093,7 @@ int main (int argc, char *argv [])
                 item.service = DSP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1141,7 +1142,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1160,7 +1161,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1179,7 +1180,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1198,7 +1199,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1217,7 +1218,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1236,7 +1237,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1264,7 +1265,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1283,7 +1284,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1302,7 +1303,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1321,7 +1322,7 @@ int main (int argc, char *argv [])
                 item.service = SWAP_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1333,7 +1334,7 @@ int main (int argc, char *argv [])
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1436,7 +1437,7 @@ int main (int argc, char *argv [])
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1483,7 +1484,7 @@ int main (int argc, char *argv [])
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1502,7 +1503,7 @@ int main (int argc, char *argv [])
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1521,7 +1522,7 @@ int main (int argc, char *argv [])
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
                 *item.write_val = item.rw;
-                *int_ptr = strtoul(optarg, NULL, 10);
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
@@ -1590,8 +1591,6 @@ int main (int argc, char *argv [])
                 fprintf(stderr, "%s: bad option\n", program_name);
                 print_usage(stderr, 1);
         }
-        /* Reset the pointer to avoid data overlap */
-        *int_ptr = 0;
     }
 
     /* User input error handling */
@@ -1690,8 +1689,7 @@ int main (int argc, char *argv [])
         char *func_service = zmalloc (str_length+1);
         sprintf (func_service, "BPM%u:DEVIO:%s%u", board_number, function->service, bpm_number);
         const disp_op_t* func_structure = bpm_func_translate (function->name);
-        bpm_client_err_e err = bpm_func_exec (bpm_client, func_structure, func_service, (uint8_t *)function->write_val,
-                (uint8_t *)function->read_val);
+        bpm_client_err_e err = bpm_func_exec (bpm_client, func_structure, func_service, function->write_val, function->read_val);
 
         if (err != BPM_CLIENT_SUCCESS) {
             fprintf (stderr, "[client]: BPM_ERROR: '%s'\n",bpm_client_err_str (err));

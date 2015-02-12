@@ -136,10 +136,10 @@ err_self_alloc:
 
 /**************** General Function to call the others *********/
 
-bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint8_t *input, uint8_t *output)
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint32_t *input, uint32_t *output)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    
+
     /* Check input arguments */
     ASSERT_TEST(self != NULL, "Bpm_client is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
     ASSERT_TEST(func != NULL, "Function structure is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
@@ -152,7 +152,6 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
 
     /* Add the frame containing the opcode for the function desired (always first) */
     zmsg_addmem (msg, &func->opcode, sizeof (func->opcode));
-
 
     /* Add the arguments in their respective frames in the message */
     for (int i = 0; func->args[i] != DISP_ARG_END; ++i) {
@@ -242,7 +241,7 @@ const disp_op_t *bpm_func_translate (char *name)
     return 0;
 }
 
-bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output)
+bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output)
 {
     const disp_op_t *func = bpm_func_translate(name);
     bpm_client_err_e err = bpm_func_exec (self, func, service, input, output);
@@ -1012,7 +1011,7 @@ err_bpm_data_acquire:
 
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
-    uint8_t write_val[sizeof(uint32_t)*2] = {0};
+    uint32_t write_val[sizeof(uint32_t)*2] = {0};
     *write_val = acq_req->num_samples;
     *(write_val+4) = acq_req->chan;
 
@@ -1056,7 +1055,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
     assert (acq_trans);
     assert (acq_trans->block.data);
 
-    uint8_t write_val[sizeof(uint32_t)*2] = {0};
+    uint32_t write_val[sizeof(uint32_t)*2] = {0};
     *write_val = acq_trans->req.chan;
     *(write_val+4) = acq_trans->block.idx;
 
@@ -1068,7 +1067,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
      * frame 2: block required */
 
     const disp_op_t* func = bpm_func_translate(ACQ_NAME_GET_DATA_BLOCK);
-    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, (uint8_t *)read_val);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, (uint32_t *) read_val);
 
     /* Received Message is:
      * frame 0: error code
@@ -1097,7 +1096,6 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
             "acq_trans->block.data: %p\n", acq_trans->block.data);
 
 err_get_data_block:
-    free(read_val);
     return err;
 }
 
@@ -1733,16 +1731,16 @@ PARAM_FUNC_CLIENT_READ(rffe_sw_lvl)
 
 /**************** Helper Function ****************/
 
-static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout);
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout);
 
-bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout)
+bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
 {
     return _func_polling (self, name, service, input, output, timeout);
 }
 
 /* Polling Function */
 
-static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint8_t *input, uint8_t *output, int timeout)
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
 {
     if (timeout < 0) {
         timeout = INT_MAX;
