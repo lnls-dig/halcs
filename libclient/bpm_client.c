@@ -1748,7 +1748,7 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *ser
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time(NULL);
-    while ((time(NULL) - start)*1000 < timeout) {
+    while (time(NULL) - start < timeout) {
         if (zctx_interrupted) {
             err = BPM_CLIENT_INT;
             goto bpm_zctx_interrupted;
