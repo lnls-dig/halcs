@@ -1692,7 +1692,7 @@ int main (int argc, char *argv [])
         bpm_client_err_e err = bpm_func_exec (bpm_client, func_structure, func_service, function->write_val, function->read_val);
 
         if (err != BPM_CLIENT_SUCCESS) {
-            fprintf (stderr, "[client]: BPM_ERROR: '%s'\n",bpm_client_err_str (err));
+            fprintf (stderr, "[client]: %s\n",bpm_client_err_str (err));
             exit(EXIT_FAILURE);
         }
 
@@ -1704,8 +1704,7 @@ int main (int argc, char *argv [])
     zlist_destroy (&call_list);
 
     /***** Acquisition module routines *****/
-    int str_length = snprintf(NULL, 0, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
-    char *acq_service = zmalloc (str_length+1);
+    char acq_service[20];
     sprintf (acq_service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
 
     /* Request data acquisition on server */
@@ -1717,7 +1716,9 @@ int main (int argc, char *argv [])
             acq_chan_val
         };
         bpm_client_err_e err = bpm_acq_start(bpm_client, acq_service, &acq_req);
-        fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
+        if (err != BPM_CLIENT_SUCCESS) {
+            fprintf (stderr, "[client:acq]: '%s'\n", bpm_client_err_str(err));
+        }
     }
 
     /* Check if the previous acquisition has finished */
@@ -1726,7 +1727,9 @@ int main (int argc, char *argv [])
             func_polling (bpm_client, ACQ_NAME_CHECK_DATA_ACQUIRE, acq_service, NULL, NULL, poll_timeout);
         } else {
             bpm_client_err_e err = bpm_acq_check(bpm_client, acq_service);
-            fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
+            if (err != BPM_CLIENT_SUCCESS) {
+                fprintf (stderr, "[client:acq]: '%s'\n", bpm_client_err_str(err));
+            }
         }
     }
 
@@ -1752,7 +1755,9 @@ int main (int argc, char *argv [])
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
         } else {
             fprintf (stderr, "[client:acq]: bpm_get_block failed\n");
-            fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
+            if (err != BPM_CLIENT_SUCCESS) {
+                fprintf (stderr, "[client:acq]: '%s'\n", bpm_client_err_str(err));
+            }
         }
         free(valid_data);
     }
@@ -1777,8 +1782,7 @@ int main (int argc, char *argv [])
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
             fprintf (stdout, "[client:acq]: bpm_acq_get_curve was successfully executed\n");
         } else {
-            fprintf (stderr, "[client:acq]: bpm_acq_get_curve failed\n");
-            fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
+            fprintf (stderr, "[client:acq]: bpm_acq_get_curve failed: %s\n", bpm_client_err_str(err));
         }
         acq_get_curve = 0;
         free(valid_data);
@@ -1802,11 +1806,8 @@ int main (int argc, char *argv [])
 
         if (err == BPM_CLIENT_SUCCESS) {
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
-            fprintf (stdout, "[client:acq]: bpm_acq_full_call was successfully executed\n");
-        } else {
-            fprintf (stderr, "[client:acq]: bpm_acq_full_call failed\n");
-            fprintf (stderr, "[client:acq]: BPM_ERR: '%s'\n", bpm_client_err_str(err));
         }
+        fprintf (stderr, "[client:acq]: %s\n", bpm_client_err_str(err));
         acq_full_call = 0;
         free(valid_data);
     }
@@ -1814,7 +1815,6 @@ int main (int argc, char *argv [])
     /* Deallocate memory */
     free (default_broker_endp);
     free (broker_endp);
-    free (acq_service);
     free (board_number_str);
     free (bpm_number_str);
     bpm_client_destroy (&bpm_client);
