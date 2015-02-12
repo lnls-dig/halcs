@@ -535,7 +535,7 @@ smch_err_e smch_ad9510_set_cp_current (smch_ad9510_t *self, uint32_t *cp_current
         /* Get the respective code to be written in the register */
         AD9510_PLL_3_CP_CURRENT_W(
             __cp_current/AD9510_PLL3_CP_CURRENT_MIN - 1);
-    _smch_ad9510_write_8 (self, AD9510_REG_PLL_2, &data);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_3, &data);
 
     _smch_ad9510_reg_update (self);
     /* Wait for reset to complete */
