@@ -19,7 +19,7 @@
 #define FMC130M_4CH_DFLT_SI571_OE                   0x1
 
 #define FMC130M_4CH_DFLT_SI57X_FOUT_FACTORY         SI57X_FOUT_FACTORY_DFLT
-#define FMC130M_4CH_DFLT_SI57X_FOUT                 100000000   /* 100 MHz default */
+#define FMC130M_4CH_DFLT_SI57X_FOUT                 113040445   /* 113.040445 MHz default */
 
 smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);
