@@ -183,6 +183,7 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
     /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg);
+    err = *(uint32_t *)zframe_data(err_code);
 
     zframe_t *data_size_frm = NULL;
     zframe_t *data_frm = NULL;
