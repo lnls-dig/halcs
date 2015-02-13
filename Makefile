@@ -241,11 +241,15 @@ libmdp_install: libmdp_pre
 libmdp_uninstall: libmdp_pre
 	$(MAKE) -C $(LIBMDP_DIR) uninstall
 
-libmdp_clean: libmdp_pre
+libmdp_clean:
+ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
 	$(MAKE) -C $(LIBMDP_DIR) clean
+endif
 
-libmdp_mrproper: libmdp_pre
+libmdp_mrproper:
+ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
 	$(MAKE) -C $(LIBMDP_DIR) distclean
+endif
 
 libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
