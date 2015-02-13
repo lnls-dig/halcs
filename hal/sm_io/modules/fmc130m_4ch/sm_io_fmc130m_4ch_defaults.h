@@ -13,11 +13,13 @@
 #include "sm_ch_pca9547.h"
 
 #define FMC130M_4CH_DFLT_PLL_FUNC                   0x1
-#define FMC130M_4CH_DFLT_PCA9547_CFG                SMCH_PCA9547_NO_CHANNEL         /* No channel selected */
+#define FMC130M_4CH_DFLT_CLK_SEL                    0x0                         /* Clock from FMC front panel */
+#define FMC130M_4CH_DFLT_TRIG_DIR                   0x0                         /* Output direction */
+#define FMC130M_4CH_DFLT_PCA9547_CFG                SMCH_PCA9547_NO_CHANNEL     /* No channel selected */
 #define FMC130M_4CH_DFLT_SI571_OE                   0x1
 
 #define FMC130M_4CH_DFLT_SI57X_FOUT_FACTORY         SI57X_FOUT_FACTORY_DFLT
-#define FMC130M_4CH_DFLT_SI57X_FOUT                 100000000   /* 100 MHz default */
+#define FMC130M_4CH_DFLT_SI57X_FOUT                 113040445   /* 113.040445 MHz default */
 
 smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);

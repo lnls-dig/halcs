@@ -76,6 +76,7 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
     char *board_number_str = NULL;
+    char *bpm_number_str = NULL;
     char *chan_str = NULL;
     char **str_p = NULL;
 
@@ -109,6 +110,10 @@ int main (int argc, char *argv [])
         }
         else if (streq (argv[i], "-board")) { /* board_number: board number */
             str_p = &board_number_str;
+        }
+        else if (streq(argv[i], "-bpm"))
+        {
+            str_p = &bpm_number_str;
         }
         /* Fallout for options with parameters */
         else {
@@ -175,11 +180,30 @@ int main (int argc, char *argv [])
         }
     }
 
+    /* Set default bpm number */
+    uint32_t bpm_number;
+    if (bpm_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+                DFLT_BPM_NUMBER);
+        bpm_number = DFLT_BPM_NUMBER;
+    }
+    else {
+        bpm_number = strtoul (bpm_number_str, NULL, 10);
+
+        if (bpm_number > MAX_BPM_NUMBER) {
+            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+                    MAX_BPM_NUMBER);
+            bpm_number = MAX_BPM_NUMBER;
+        }
+    }
+
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:ACQ0", board_number);
+    sprintf (service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
+    //bool new_acq = false;
+    bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples = num_samples,
                                         .chan = chan,
@@ -190,7 +214,7 @@ int main (int argc, char *argv [])
                                       }
                             };
     bpm_client_err_e err = bpm_get_curve (bpm_client, service, &acq_trans,
-            5000);
+            50000, new_acq);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
         goto err_bpm_get_curve;

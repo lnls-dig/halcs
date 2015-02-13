@@ -21,6 +21,19 @@ disp_op_t fmc130m_4ch_leds_exp = {
     }
 };
 
+disp_op_t fmc130m_4ch_si571_oe_exp = {
+    .name = FMC130M_4CH_NAME_SI571_OE,
+    .opcode = FMC130M_4CH_OPCODE_SI571_OE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+
 disp_op_t fmc130m_4ch_pll_func_exp = {
     .name = FMC130M_4CH_NAME_PLL_FUNCTION,
     .opcode = FMC130M_4CH_OPCODE_PLL_FUNCTION,
@@ -33,12 +46,26 @@ disp_op_t fmc130m_4ch_pll_func_exp = {
     }
 };
 
-disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
-    .name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS,
-    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
-    .retval = DISP_ARG_END,
+disp_op_t fmc130m_4ch_pll_status_exp = {
+    .name = FMC130M_4CH_NAME_PLL_STATUS,
+    .opcode = FMC130M_4CH_OPCODE_PLL_STATUS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_clk_sel_exp = {
+    .name = FMC130M_4CH_NAME_CLK_SEL,
+    .opcode = FMC130M_4CH_OPCODE_CLK_SEL,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
@@ -296,18 +323,6 @@ disp_op_t fmc130m_4ch_test_data_en_exp = {
     }
 };
 
-disp_op_t fmc130m_4ch_si571_oe_exp = {
-    .name = FMC130M_4CH_NAME_SI571_OE,
-    .opcode = FMC130M_4CH_OPCODE_SI571_OE,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 disp_op_t fmc130m_4ch_trig_dir_exp = {
     .name = FMC130M_4CH_NAME_TRIG_DIR,
     .opcode = FMC130M_4CH_OPCODE_TRIG_DIR,
@@ -340,6 +355,16 @@ disp_op_t fmc130m_4ch_trig_val_exp = {
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
+    .name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS,
+    .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
         DISP_ARG_END
     }
 };
@@ -479,8 +504,10 @@ disp_op_t fmc130m_4ch_si571_get_defaults_exp = {
 /* Exported function description */
 const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_leds_exp,
+    &fmc130m_4ch_si571_oe_exp,
     &fmc130m_4ch_pll_func_exp,
-    &fmc130m_4ch_ad9510_cfg_defaults_exp,
+    &fmc130m_4ch_pll_status_exp,
+    &fmc130m_4ch_clk_sel_exp,
     &fmc130m_4ch_adc_data0_exp,
     &fmc130m_4ch_adc_data1_exp,
     &fmc130m_4ch_adc_data2_exp,
@@ -502,10 +529,10 @@ const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_adc_dly2_exp,
     &fmc130m_4ch_adc_dly3_exp,
     &fmc130m_4ch_test_data_en_exp,
-    &fmc130m_4ch_si571_oe_exp,
     &fmc130m_4ch_trig_dir_exp,
     &fmc130m_4ch_trig_term_exp,
     &fmc130m_4ch_trig_val_exp,
+    &fmc130m_4ch_ad9510_cfg_defaults_exp,
     &fmc130m_4ch_ad9510_pll_a_div_exp,
     &fmc130m_4ch_ad9510_pll_b_div_exp,
     &fmc130m_4ch_ad9510_pll_prescaler_exp,

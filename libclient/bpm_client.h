@@ -80,6 +80,26 @@ bpm_client_err_e bpm_set_fmc_pll_function (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_fmc_pll_function (bpm_client_t *self, char *service,
         uint32_t *fmc_pll_function);
 
+/* FMC PLL STATUS pin. Sets or clears the FMC PLL STATUS pin. This pin
+ * outputs the value selected on AD9510 MUX STATUS register.
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_pll_status (bpm_client_t *self, char *service,
+        uint32_t fmc_pll_status);
+bpm_client_err_e bpm_get_fmc_pll_status (bpm_client_t *self, char *service,
+        uint32_t *fmc_pll_status);
+
+/* CLK SEL Functions. Set the reference input clock for the AD9510.
+ * 0: clock from external source (MMCX J4)
+ * 1: clock from FMC PIN (FMC_CLK line)
+ *
+ * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+bpm_client_err_e bpm_set_fmc_clk_sel (bpm_client_t *self, char *service,
+        uint32_t clk_sel);
+bpm_client_err_e bpm_get_fmc_clk_sel (bpm_client_t *self, char *service,
+        uint32_t *clk_sel);
+
 /* RAW ADC data functions */
 /* These set of functions read (get) the RAW ADC values.
  * All of the functions returns BPM_CLIENT_SUCCESS if the
@@ -247,22 +267,48 @@ bpm_client_err_e bpm_get_trig_val (bpm_client_t *self, char *service,
  * if server could not complete the request */
 bpm_client_err_e bpm_set_ad9510_pll_a_div (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_a_div);
+bpm_client_err_e bpm_get_ad9510_pll_a_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_a_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_b_div (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_b_div);
+bpm_client_err_e bpm_get_ad9510_pll_b_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_b_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_prescaler (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_prescaler);
+bpm_client_err_e bpm_get_ad9510_pll_prescaler (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_prescaler);
+
 bpm_client_err_e bpm_set_ad9510_r_div (bpm_client_t *self, char *service,
         uint32_t ad9510_r_div);
+bpm_client_err_e bpm_get_ad9510_r_div (bpm_client_t *self, char *service,
+        uint32_t *ad9510_r_div);
+
 bpm_client_err_e bpm_set_ad9510_pll_pdown (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_pdown);
+bpm_client_err_e bpm_get_ad9510_pll_pdown (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_pdown);
+
 bpm_client_err_e bpm_set_ad9510_mux_status (bpm_client_t *self, char *service,
         uint32_t ad9510_mux_status);
+bpm_client_err_e bpm_get_ad9510_mux_status (bpm_client_t *self, char *service,
+        uint32_t *ad9510_mux_status);
+
 bpm_client_err_e bpm_set_ad9510_cp_current (bpm_client_t *self, char *service,
         uint32_t ad9510_cp_current);
+bpm_client_err_e bpm_get_ad9510_cp_current (bpm_client_t *self, char *service,
+        uint32_t *ad9510_cp_current);
+
 bpm_client_err_e bpm_set_ad9510_outputs (bpm_client_t *self, char *service,
         uint32_t ad9510_outputs);
+bpm_client_err_e bpm_get_ad9510_outputs (bpm_client_t *self, char *service,
+        uint32_t *ad9510_outputs);
+
 bpm_client_err_e bpm_set_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
         uint32_t ad9510_pll_clk_sel);
+bpm_client_err_e bpm_get_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
+        uint32_t *ad9510_pll_clk_sel);
 
 /* FMC SI571 Control.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
@@ -346,7 +392,7 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans, int timeout);
+        acq_trans_t *acq_trans, int timeout, bool new_acq);
 
 /* New version of bpm_data_acquire that uses the general function caller
  * bpm_func_exec */

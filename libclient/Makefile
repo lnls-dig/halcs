@@ -167,24 +167,14 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 
 # Compile static library
 %.a: $$($$*_OBJS) $(OBJ_REVISION)
-	$(AR) rcs $@ $?
+	$(AR) rcs $@ $^
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $? $(LDFLAGS)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) -DGIT_REVISION=\"$(REVISION)\" -c $<
-
-# Pull in dependency info for *existing* .o files and don't complain if the
-# corresponding .d file is not found
--include $(OBJS_all:.o=.d)
-
-# Always recompile common objects as the previous compilation,
-# from another makefile might not have compiled them with the
-# correct flags, as the fPIC for our shared libraries
-$(common_OBJS): FORCE
-FORCE:
 
 # Compile with position-independent objects.
 # Autodependencies generatation by Scott McPeak, November 2001,

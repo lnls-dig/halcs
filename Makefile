@@ -239,13 +239,17 @@ libmdp_install: libmdp_pre
 	ldconfig
 
 libmdp_uninstall: libmdp_pre
-	$(MAKE) -C $(LIBMDP_DIR) install
+	$(MAKE) -C $(LIBMDP_DIR) uninstall
 
-libmdp_clean: libmdp_pre
+libmdp_clean:
+ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
 	$(MAKE) -C $(LIBMDP_DIR) clean
+endif
 
-libmdp_mrproper: libmdp_pre
+libmdp_mrproper:
+ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
 	$(MAKE) -C $(LIBMDP_DIR) distclean
+endif
 
 libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
@@ -277,13 +281,13 @@ libclient_clean:
 libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
-deps: pcie_driver libmdp libbsmp
+deps: libmdp libbsmp
 
-deps_install: pcie_driver_install libmdp_install libbsmp_install
+deps_install: libmdp_install libbsmp_install
 
-deps_uninstall: pcie_driver_uninstall libmdp_uninstall libbsmp_uninstall
+deps_uninstall: libmdp_uninstall libbsmp_uninstall
 
-deps_clean: pcie_driver_clean libmdp_clean libbsmp_clean
+deps_clean: libmdp_clean libbsmp_clean
 
 deps_mrproper: libmdp_mrproper libbsmp_mrproper
 
