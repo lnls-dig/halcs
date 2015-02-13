@@ -35,18 +35,17 @@
     CHECK_HAL_ERR(err, LL_IO, "[ll_io:utils]",              \
             llio_err_str (err_type))
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 /************** Utility functions ****************/
 
-const llio_types_t llio_types [LLIO_TYPE_NUM] ={
-    {.name = GENERIC_DEV_STR,   .type = GENERIC_DEV},
-    {.name = PCIE_DEV_STR,      .type = PCIE_DEV},
-    {.name = ETH_DEV_STR,       .type = ETH_DEV},
-    {.name = INVALID_DEV_STR,   .type = INVALID_DEV}
+static const llio_types_t llio_dev_types_map [] ={
+    {.name = GENERIC_DEV_STR,    .type = GENERIC_DEV},
+    {.name = PCIE_DEV_STR,       .type = PCIE_DEV},
+    {.name = ETH_DEV_STR,        .type = ETH_DEV},
+    {.name = INVALID_DEV_STR,    .type = INVALID_DEV},
+    {.name = LLIO_TYPE_NAME_END, .type = LLIO_TYPE_END}        /* End marker */
 };
 
-char *llio_type_to_str (llio_type_e type)
+char *llio_gen_type_to_str (int type, const llio_types_t *llio_types)
 {
     /* Should be large enough for all possible debug levels */
     int size = 16;
@@ -55,7 +54,7 @@ char *llio_type_to_str (llio_type_e type)
 
     /* Do a simple linear search to look for matching IDs */
     uint32_t i;
-    for (i = 0; i < ARRAY_SIZE(llio_types); ++i) {
+    for (i = 0; llio_types [i].type != LLIO_TYPE_END; ++i) {
         if (type == llio_types [i].type) {
             const char *type_str = llio_types [i].name;
             strncpy (str, type_str, size-1);
@@ -65,18 +64,29 @@ char *llio_type_to_str (llio_type_e type)
         }
     }
 
+    /* No device found */
+    if (llio_types [i].type == LLIO_TYPE_END) {
+        free (str);
+        str = NULL;
+    }
+
 err_alloc_str:
     return str;
 }
 
-llio_type_e llio_str_to_type (const char *type_str)
+char *llio_type_to_str (llio_type_e type)
+{
+    return llio_gen_type_to_str (type, llio_dev_types_map);
+}
+
+int llio_str_to_gen_type (const char *type_str, const llio_types_t *llio_types)
 {
     assert (type_str);
-    llio_type_e type = INVALID_DEV;
+    int type = LLIO_TYPE_END; /* Not found */
 
     /* Do a simple linear search to look for matching names */
     uint32_t i;
-    for (i = 0; i < ARRAY_SIZE(llio_types); ++i) {
+    for (i = 0; llio_types [i].type != LLIO_TYPE_END; ++i) {
         if (streq (type_str, llio_types [i].name)) {
             type = llio_types [i].type;
             break;
@@ -85,3 +95,11 @@ llio_type_e llio_str_to_type (const char *type_str)
 
     return type;
 }
+
+llio_type_e llio_str_to_type (const char *type_str)
+{
+    llio_type_e ret = llio_str_to_gen_type (type_str, llio_dev_types_map);
+
+    return (ret == LLIO_TYPE_END)? INVALID_DEV : ret;
+}
+

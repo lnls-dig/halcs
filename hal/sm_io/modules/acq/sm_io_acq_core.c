@@ -17,27 +17,27 @@
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
-#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io_acq_core]", \
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
+    ASSERT_HAL_TEST(test_boolean, SM_IO, "[sm_io_acq_core]",                    \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
-#ifdef ASSERT_ALLOC
+#ifdef ASSERT_HAL_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io_acq_core]", \
-            smio_err_str(SMIO_ERR_ALLOC),                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)                   \
+    ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io_acq_core]",                            \
+            smio_err_str(SMIO_ERR_ALLOC),                                       \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
-#ifdef CHECK_ERR
+#ifdef CHECK_HAL_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, SM_IO, "[sm_io_acq_core]",   \
+#define CHECK_ERR(err, err_type)                                                \
+    CHECK_HAL_ERR(err, SM_IO, "[sm_io_acq_core]",                               \
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_acq_t * smio_acq_new (uint32_t num_samples)
+smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
 {
     smio_acq_t *self = (smio_acq_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -48,7 +48,12 @@ smio_acq_t * smio_acq_new (uint32_t num_samples)
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */
-    self->acq_buf = __acq_buf;
+    if (parent->inst_id > NUM_ACQ_CORE_SMIOS-1) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq_core] Instance ID invalid\n");
+        return NULL;
+    }
+
+    self->acq_buf = __acq_buf[parent->inst_id];
 
     return self;
 

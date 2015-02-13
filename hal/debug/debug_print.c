@@ -12,6 +12,8 @@
 #include "debug_print.h"
 #include "local_print.h"
 
+#define DBE_PRINT_PAD_FMT           "-5"
+
 /* Our logfile */
 static FILE *_debug_logfile = NULL;
 
@@ -40,7 +42,8 @@ static void _debug_log_write (char *dbg_lvl_str, char *msg)
     strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
 
     char log_text [1024];
-    snprintf (log_text, 1024, "%s: [%s] %s", dbg_lvl_str, date, msg);
+    snprintf (log_text, 1024, "%" DBE_PRINT_PAD_FMT "s: [%s] %s",
+            dbg_lvl_str, date, msg);
     fprintf (_debug_logfile, "%s", log_text);
     fflush (_debug_logfile);
 }
@@ -90,7 +93,7 @@ void debug_set_log_file (FILE *log_file)
     _debug_set_log_file (log_file);
 }
 
-int debug_set_log (const char *log_file_name)
+int debug_set_log (const char *log_file_name, const char *mode)
 {
     int err = -1;    /* Error */
     FILE *log_file = NULL;
@@ -105,7 +108,14 @@ int debug_set_log (const char *log_file_name)
             err = 2;
         }
         else {
-            log_file = fopen (log_file_name, "w");
+            if (mode == NULL) {
+                /* Be conservative if no mode is specified */
+                log_file = fopen (log_file_name, "a");
+            }
+            else {
+                log_file = fopen (log_file_name, mode);
+            }
+
             err = 0;
 
             if (log_file == NULL) {

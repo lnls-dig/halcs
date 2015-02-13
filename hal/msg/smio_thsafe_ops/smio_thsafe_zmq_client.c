@@ -38,21 +38,20 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, loff_t offs, uint8
         uint32_t size);
 static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, loff_t offs, const uint8_t *data,
         uint32_t size);
-static ssize_t _thsafe_zmq_client_recv_read (smio_t *self, uint8_t *data,
-        uint32_t size);
-static ssize_t _thsafe_zmq_client_recv_write (smio_t *self);
+static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
+        uint32_t size, bool accept_empty_data);
 
 /**** Open device ****/
 int thsafe_zmq_client_open (smio_t *self, llio_endpoint_t *endpoint)
 {
-    return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_OPEN);
+    return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_OPCODE_OPEN);
 }
 
 /**** Release device ****/
 
 int thsafe_zmq_client_release (smio_t *self, llio_endpoint_t *endpoint)
 {
-    return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_RELEASE);
+    return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_OPCODE_RELEASE);
 }
 
 /**** Read data from device ****/
@@ -94,7 +93,7 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, loff_t offs, size_t size, ui
     ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    uint32_t opcode = THSAFE_READ_BLOCK;
+    uint32_t opcode = THSAFE_OPCODE_READ_BLOCK;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_read_block\n");
 
@@ -124,7 +123,7 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, loff_t offs, size_t size, ui
      * frame 0: reply code
      * frame 1: return code
      * frame 2: data */
-    ret_size = _thsafe_zmq_client_recv_read (self, (uint8_t *) data, size);
+    ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) data, size, true);
 
 err_send_msg:
 err_add_size:
@@ -139,10 +138,9 @@ err_msg_alloc:
 ssize_t thsafe_zmq_client_write_block (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
 {
     assert (self);
-    ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    uint32_t opcode = THSAFE_WRITE_BLOCK;
+    uint32_t opcode = THSAFE_OPCODE_WRITE_BLOCK;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_write_block\n");
 
@@ -171,16 +169,25 @@ ssize_t thsafe_zmq_client_write_block (smio_t *self, loff_t offs, size_t size, c
 
     /* Message is:
      * frame 0: reply code
-     * frame 1: return code */
-    ret_size = _thsafe_zmq_client_recv_write (self);
+     * frame 1: return code
+     * frame 2: data */
+    uint32_t ret_data = 0;
+    ssize_t ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) &ret_data,
+            sizeof (ret_data), false);
+    ASSERT_TEST(ret_size == sizeof (ret_data), "Data size does not match the expected",
+            err_data_size);
 
+    zmsg_destroy (&send_msg);
+    return ret_data;
+
+err_data_size:
 err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
-    return ret_size;
+    return -1;
 }
 
 /**** Read data block via DMA from device, size in bytes ****/
@@ -239,17 +246,14 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
-     * frame 0: reply code
-     * frame 1: return code */
+     * frame 0: reply code */
     /* Returns NULL if confirmation was not OK or in case of error.
      * Returns the original message if the confirmation was OK */
     zmsg_t *recv_msg = _thsafe_zmq_client_recv_confirmation (self);
     ASSERT_TEST(recv_msg != NULL, "Could not receive confirmation code", err_null_raw_data);
 
     /* If we are here the message got a OK reply code.
-     * Just return the return code */
-    zframe_t *reply_frame = zmsg_pop (recv_msg);
-    zframe_destroy (&reply_frame); /* Don't do anything with the reply code */
+     * Just return the reply code */
     zframe_t *ret_code_frame = zmsg_pop (recv_msg);
 
     /* Check for malformed message */
@@ -291,19 +295,19 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, loff_t offs, uint8
 
     switch (size) {
         case THSAFE_READ_16_DSIZE:
-            opcode = THSAFE_READ_16;
+            opcode = THSAFE_OPCODE_READ_16;
         break;
 
         case THSAFE_READ_32_DSIZE:
-            opcode = THSAFE_READ_32;
+            opcode = THSAFE_OPCODE_READ_32;
         break;
 
         case THSAFE_READ_64_DSIZE:
-            opcode = THSAFE_READ_64;
+            opcode = THSAFE_OPCODE_READ_64;
         break;
 
         default:
-            opcode = THSAFE_READ_32;
+            opcode = THSAFE_OPCODE_READ_32;
     }
 
     /* Message is:
@@ -328,7 +332,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, loff_t offs, uint8
      * frame 0: reply code
      * frame 1: return code
      * frame 2: data */
-    ret_size = _thsafe_zmq_client_recv_read (self, data, size);
+    ret_size = _thsafe_zmq_client_recv_rw (self, data, size, true);
 
 err_send_msg:
 err_add_offset:
@@ -342,7 +346,6 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, loff_t offs, cons
         uint32_t size)
 {
     assert (self);
-    ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
     uint32_t opcode;
@@ -351,19 +354,19 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, loff_t offs, cons
 
     switch (size) {
         case THSAFE_WRITE_16_DSIZE:
-            opcode = THSAFE_WRITE_16;
+            opcode = THSAFE_OPCODE_WRITE_16;
         break;
 
         case THSAFE_WRITE_32_DSIZE:
-            opcode = THSAFE_WRITE_32;
+            opcode = THSAFE_OPCODE_WRITE_32;
         break;
 
         case THSAFE_WRITE_64_DSIZE:
-            opcode = THSAFE_WRITE_64;
+            opcode = THSAFE_OPCODE_WRITE_64;
         break;
 
         default:
-            opcode = THSAFE_WRITE_32;
+            opcode = THSAFE_OPCODE_WRITE_32;
     }
 
     /* Message is:
@@ -392,16 +395,25 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, loff_t offs, cons
 
     /* Message is:
      * frame 0: reply code
-     * frame 1: return code */
-    ret_size = _thsafe_zmq_client_recv_write (self);
+     * frame 1: return code
+     * frame 2: data */
+    uint32_t ret_data = 0;
+    ssize_t ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) &ret_data,
+            sizeof (ret_data), false);
+    ASSERT_TEST(ret_size == sizeof (ret_data), "Data size does not match the expected",
+            err_data_size);
 
+    zmsg_destroy (&send_msg);
+    return ret_data;
+
+err_data_size:
 err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
-    return ret_size;
+    return -1;
 }
 
 static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
@@ -447,78 +459,69 @@ err_recv_data:
     return NULL;
 }
 
-static ssize_t _thsafe_zmq_client_recv_read (smio_t *self, uint8_t *data,
-        uint32_t size)
+static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
+        uint32_t size, bool accept_empty_data)
 {
     ssize_t ret_size = -1;
 
     /* Returns NULL if confirmation was not OK or in case of error.
      * Returns the original message if the confirmation was OK */
     zmsg_t *recv_msg = _thsafe_zmq_client_recv_confirmation (self);
-    ASSERT_TEST(recv_msg != NULL, "Could not receive confirmation code", err_null_recv_msg);
+    ASSERT_TEST(recv_msg != NULL, "Could not receive confirmation code",
+            err_null_recv_msg);
 
     /* If we are here, confirmation code was OK. Check for second frame */
     zframe_t *reply_frame = zmsg_pop (recv_msg);
     zframe_destroy (&reply_frame); /* Don't do anything with the reply code */
 
     zframe_t *return_frame = zmsg_pop (recv_msg);
-    ASSERT_TEST(return_frame != NULL, "Could not receive retrurn code", err_null_ret_code_frame);
-    /* Check for return frame size */
-    ASSERT_TEST(zframe_size (return_frame) == THSAFE_RETURN_SIZE,
-            "Return frame size is wrong", err_wrong_size_ret_frame);
+    zframe_t *data_frame = NULL;
 
-    zframe_t *data_frame = zmsg_pop (recv_msg);
-    ASSERT_TEST(data_frame != NULL, "Could not receive data", err_recv_data);
+    /* Some messages accept an empty data frame */
+    if (return_frame == NULL && accept_empty_data) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Empty "
+                "data frame received\n");
+        ret_size = 0;
+    }
+    else {
+        ASSERT_TEST(return_frame != NULL, "Could not receive return code",
+                err_null_ret_code_frame);
+        /* Check for return frame size */
+        ASSERT_TEST(zframe_size (return_frame) == THSAFE_RETURN_SIZE,
+                "Return frame size is wrong", err_wrong_size_ret_frame);
 
-    /* Check if the frame has the number of bytes requested.
-     * For now, we consider a success only when the number of
-     * bytes requested is the same as the actually read*/
-    ASSERT_TEST((ssize_t) zframe_size (data_frame) ==
-            *(THSAFE_RETURN_TYPE *) zframe_data (return_frame),
-            "Received data frame size is wrong", err_recv_data);
+        data_frame = zmsg_pop (recv_msg);
+        ASSERT_TEST(data_frame != NULL, "Could not receive data", err_recv_data);
 
-    uint8_t* raw_data = (uint8_t *) zframe_data (data_frame);
-    memcpy (data, raw_data, size);
-    ret_size = size;
+        /* Check if the frame has the number of bytes requested.
+         * For now, we consider a success only when the number of
+         * bytes requested is the same as the actually read*/
+        size_t data_frame_size = zframe_size (data_frame);
+        THSAFE_RETURN_TYPE ret_frame_size =
+            *(THSAFE_RETURN_TYPE *) zframe_data (return_frame);
 
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Received data successfully\n");
+        ASSERT_TEST(ret_frame_size >= 0 &&
+                (THSAFE_RETURN_UTYPE) ret_frame_size == data_frame_size,
+                "Received data frame size is wrong", err_data_frame_size);
+        ASSERT_TEST(data_frame_size >= size,
+                "Specified buffer size is bigger than the available data",
+                err_buf_size_data);
 
+        uint8_t* raw_data = (uint8_t *) zframe_data (data_frame);
+        memcpy (data, raw_data, size);
+        ret_size = size;
+    }
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Received data "
+            "successfully\n");
+err_buf_size_data:
+err_data_frame_size:
     zframe_destroy (&data_frame);
 err_recv_data:
 err_wrong_size_ret_frame:
     zframe_destroy (&return_frame);
 err_null_ret_code_frame:
     zmsg_destroy (&recv_msg);
-err_null_recv_msg:
-    return ret_size;
-}
-
-static ssize_t _thsafe_zmq_client_recv_write (smio_t *self)
-{
-    ssize_t ret_size = -1;
-
-    /* Returns NULL if confirmation was not OK or in case of error.
-     * Returns the original message if the confirmation was OK */
-    zmsg_t *recv_msg = _thsafe_zmq_client_recv_confirmation (self);
-    ASSERT_TEST(recv_msg != NULL, "Could not receive confirmation code", err_null_recv_msg);
-
-    /* If we are here, confirmation code was OK. Check for second frame */
-    zframe_t *reply_frame = zmsg_pop (recv_msg);
-    zframe_destroy (&reply_frame); /* Don't do anything with the reply code */
-
-    zframe_t *return_frame = zmsg_pop (recv_msg);
-    ASSERT_TEST(return_frame != NULL, "Could not receive retrurn code", err_null_ret_code_frame);
-
-    /* Check for return frame size */
-    ASSERT_TEST(zframe_size (return_frame) == THSAFE_RETURN_SIZE,
-            "Return frame size is wrong", err_wrong_size_ret_frame);
-
-    ret_size = *(THSAFE_RETURN_TYPE *) zframe_data (return_frame);
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Received code: %zd\n", ret_size);
-
-err_wrong_size_ret_frame:
-    zframe_destroy (&return_frame);
-err_null_ret_code_frame:
 err_null_recv_msg:
     return ret_size;
 }
@@ -534,12 +537,12 @@ const smio_thsafe_client_ops_t smio_thsafe_client_zmq_ops = {
     .thsafe_client_write_32       = thsafe_zmq_client_write_32,    /* Write 32-bit data */
     .thsafe_client_write_64       = thsafe_zmq_client_write_64,    /* Write 64-bit data */
     .thsafe_client_read_block     = thsafe_zmq_client_read_block,  /* Read arbitrary block size data,
-                                           parameter size in bytes */
+                                                                        parameter size in bytes */
     .thsafe_client_write_block    = thsafe_zmq_client_write_block, /* Write arbitrary block size data,
-                                           parameter size in bytes */
+                                                                        parameter size in bytes */
     .thsafe_client_read_dma       = thsafe_zmq_client_read_dma,    /* Read arbitrary block size data via DMA,
-     _                                       parameter size in bytes */
+     _                                                                  parameter size in bytes */
     .thsafe_client_write_dma      = thsafe_zmq_client_write_dma    /* Write arbitrary block size data via DMA,
-                                            parameter size in bytes */
+                                                                        parameter size in bytes */
     /*.thsafe_client_read_info      = thsafe_zmq_client_read_info */   /* Read device information data */
 };

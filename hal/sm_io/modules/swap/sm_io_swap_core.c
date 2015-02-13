@@ -24,8 +24,8 @@
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) 	\
-        ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io_swap_core]", 		\
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)   \
+        ASSERT_HAL_ALLOC(ptr, SM_IO, "[sm_io_swap_core]",       \
                 smio_err_str(SMIO_ERR_ALLOC),                   \
                 err_goto_label, /* err_core */ __VA_ARGS__)
 
@@ -37,12 +37,12 @@
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_swap_t * smio_swap_new ()
+smio_swap_t * smio_swap_new (smio_t *parent)
 {
+    (void) parent;
+
     smio_swap_t *self = (smio_swap_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
-
-//	self->example = 0;
 
     return self;
 

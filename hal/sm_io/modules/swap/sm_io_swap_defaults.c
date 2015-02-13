@@ -27,6 +27,8 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:swap_defaults]",              \
             smio_err_str (err_type))
 
+#define SMIO_SWAP_LIBCLIENT_LOG_MODE                "a"
+
 /* We use the actual libclient to send and configure our default values,
  * maintaining internal consistency. So, in fact, we are sending ourselves
  * a message containing the default values. Because of this approach, we
@@ -44,8 +46,8 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
     bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
-    bpm_client_t *config_client = bpm_client_new (broker_endp, 0,
-            log_file_name);
+    bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_SWAP_LIBCLIENT_LOG_MODE);
 
     client_err = bpm_set_sw (config_client, service, SWAP_DFLT_SW);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching state",
@@ -53,11 +55,6 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
 
     client_err = bpm_set_sw_en (config_client, service, SWAP_DFLT_SW_EN);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching enable state",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_gain_b (config_client, service, SWAP_DFLT_GAIN_BB,
-            SWAP_DFLT_GAIN_BD);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set channel B gain",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     client_err = bpm_set_gain_a (config_client, service, SWAP_DFLT_GAIN_AA,

@@ -11,28 +11,92 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
-# Select board in which we will work. Options are: ml605, afc
-BOARD = ml605
+# Select board in which we will work. Options are: ml605 or afcv3
+BOARD ?= ml605
+#Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
+LOCAL_MSG_DBG ?= n
+#Select if we want to compile with debug mode on. Options are: y(es) or n(o)
+DBE_DBG ?= y
+# Select the FMC ADC board type. Options are: passive or active
+FMC130M_4CH_TYPE ?= passive
+# Select if we should program FMC EEPROM with some code or not. Option are:
+# active, passive or nothing (dont' program EEPROM)
+FMC130M_4CH_EEPROM_PROGRAM ?=
+# Selects if we want to compile DEV_MNGR. Options are: y(es) or n(o)
+WITH_DEV_MNGR ?= y
+# Selects the AFE RFFE version. Options are: 2
+AFE_RFFE_TYPE ?= 2
+# Selects the install location of the config file
+CFG_DIR ?= /etc/bpm_sw
+export CFG_DIR
 
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
+# Config filename
+CFG_FILENAME = bpm_sw.cfg
+
 INIT_SCRIPTS = init.sh shutdown.sh
 
-# Kernel stuff (pcie driver and library) relative
+# Subdmoules and third-party codes
+FOREIGN_DIR = foreign
+
+# Our submodules and third-party codes
+LIBMDP_DIR = $(FOREIGN_DIR)/libmdp/libmdp
+LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
+PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
+
+# PCIe driver stuff (pcie driver and library) relative
 # directory
-KERNEL_DIR = kernel
-KERNEL_VER = $(shell uname -r)
-DRIVER_OBJ = /lib/modules/$(KERNEL_VER)/extra/pciDriver.ko
+PCIE_DRIVER_VER = $(shell uname -r)
+DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 
 # Client library
 LIBCLIENT_DIR=libclient
 
 # General C flags
-CFLAGS = -std=gnu99 -O2 -DWR_SHIFT=2
+CFLAGS = -std=gnu99 -O2
 
-LOCAL_MSG_DBG ?= n
-DBE_DBG ?= n
+# Board selection
+ifeq ($(BOARD),ml605)
+CFLAGS += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
+endif
+
+ifeq ($(BOARD),afcv3)
+CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
+endif
+
+# Program FMC130M_4CH EEPROM
+ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),active)
+CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
+endif
+
+ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
+CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
+endif
+
+# Compile DEV MNGR or not
+ifeq ($(WITH_DEV_MNGR),y)
+CFLAGS += -D__WITH_DEV_MNGR__
+endif
+
+ifeq ($(AFE_RFFE_TYPE),1)
+CFLAGS += -D__AFE_RFFE_V1__
+endif
+
+ifeq ($(AFE_RFFE_TYPE),2)
+CFLAGS += -D__AFE_RFFE_V2__
+endif
+
+ifneq ($(CFG_DIR),)
+CFLAGS += -D__CFG_DIR__=$(CFG_DIR)
+endif
+
+ifneq ($(CFG_FILENAME),)
+CFLAGS += -D__CFG_FILENAME__=$(CFG_FILENAME)
+endif
+
+# Debug conditional flags
 CFLAGS_DEBUG =
 
 ifeq ($(LOCAL_MSG_DBG),y)
@@ -51,7 +115,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmdp -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 # General library flags -L<libdir>
 LFLAGS =
 
@@ -65,7 +129,7 @@ include hal/hal.mk
 
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
-	       -I$(KERNEL_DIR)/include/pcie \
+	       -I$(PCIE_DRIVER_DIR)/include/pcie \
 	       -I/usr/local/include
 
 # Merge all flags.
@@ -76,6 +140,9 @@ LDFLAGS = $(LDFLAGS_PLATFORM)
 # Output modules
 OUT = $(hal_OUT)
 
+# All possible output modules
+ALL_OUT = $(hal_all_OUT)
+
 .SECONDEXPANSION:
 
 # Save a git repository description
@@ -85,18 +152,21 @@ OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 
-.PHONY: all kernel clean mrproper install uninstall tests examples \
-	kernel_install kernel_uninstall kernel_check \
-	libclient libclient_install libclient_uninstall libclient_mrproper \
+.PHONY: all install uninstall clean mrproper \
+	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
+	libclient libclient_install libclient_uninstall libclient_clean libclient_mrproper \
+	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
+	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
 	tests tests_clean tests_mrproper \
-	examples_clean examples_mrproper
+	examples examples_clean examples_mrproper \
+	cfg cfg_install cfg_uninstall cfg_clean cfg_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: kernel libclient $(OUT)
+all: libclient cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(REVISION_NAME).o
@@ -135,26 +205,62 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 		sed -e 's/^ *//' -e 's/$$/:/' >> $*.d
 	@rm -f $*.d.tmp
 
-kernel: kernel_check
-	$(MAKE) -C $(KERNEL_DIR) all
+pcie_driver:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) all
 
 #Verify if the driver is in place
-kernel_check:
+pcie_driver_check:
 ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
-	@echo "Compilation will continue, but you must install";
-	@echo "and load the driver prior to initializing the software";
-	@sleep 2;
 endif
 
-kernel_install:
-	$(MAKE) -C $(KERNEL_DIR) install
+pcie_driver_install:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) install
 
-kernel_uninstall:
-	$(MAKE) -C $(KERNEL_DIR) uninstall
+pcie_driver_uninstall:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) uninstall
 
-kernel_clean:
-	$(MAKE) -C $(KERNEL_DIR) clean
+pcie_driver_clean:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
+
+libmdp_pre:
+ifeq ($(wildcard $(LIBMDP_DIR)/Makefile),)
+	@echo "LIBMDP is not configured. Configuring ..."
+	@cd $(LIBMDP_DIR) && \
+	    ./autogen.sh && \
+	    ./configure
+endif
+
+libmdp: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR)
+
+libmdp_install: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR) install
+	ldconfig
+
+libmdp_uninstall: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR) install
+
+libmdp_clean: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR) clean
+
+libmdp_mrproper: libmdp_pre
+	$(MAKE) -C $(LIBMDP_DIR) distclean
+
+libbsmp:
+	$(MAKE) -C $(LIBBSMP_DIR) all
+
+libbsmp_install:
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) install
+
+libbsmp_uninstall:
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) uninstall
+
+libbsmp_clean:
+	$(MAKE) -C $(LIBBSMP_DIR) clean
+
+libbsmp_mrproper:
+	$(MAKE) -C $(LIBBSMP_DIR) distclean
 
 libclient:
 	$(MAKE) -C $(LIBCLIENT_DIR) all
@@ -171,19 +277,29 @@ libclient_clean:
 libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
+deps: pcie_driver libmdp libbsmp
+
+deps_install: pcie_driver_install libmdp_install libbsmp_install
+
+deps_uninstall: pcie_driver_uninstall libmdp_uninstall libbsmp_uninstall
+
+deps_clean: pcie_driver_clean libmdp_clean libbsmp_clean
+
+deps_mrproper: libmdp_mrproper libbsmp_mrproper
+
 hal_install:
-	$(foreach hal_bin,$(OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+	$(foreach hal_bin,$(ALL_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
 
 hal_uninstall:
-	$(foreach hal_bin,$(OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
+	$(foreach hal_bin,$(ALL_OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(hal_script) $(CMDSEP))
 
 hal_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 hal_mrproper:
-	rm -f $(OUT)
+	rm -f $(ALL_OUT)
 
 tests:
 	$(MAKE) -C tests all
@@ -203,11 +319,26 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-install: hal_install kernel_install libclient_install
+cfg:
+	$(MAKE) -C cfg all
 
-uninstall: hal_uninstall kernel_uninstall libclient_uninstall
+cfg_install:
+	$(MAKE) -C cfg install
 
-clean: hal_clean kernel_clean libclient_clean examples_clean tests_clean
+cfg_uninstall:
+	$(MAKE) -C cfg uninstall
 
-mrproper: clean hal_mrproper libclient_mrproper examples_mrproper libclient_mrproper
+cfg_clean:
+	$(MAKE) -C cfg clean
+
+cfg_mrproper:
+	$(MAKE) -C cfg mrproper
+
+install: hal_install deps_install libclient_install cfg_install
+
+uninstall: hal_uninstall deps_uninstall libclient_uninstall cfg_uninstall
+
+clean: hal_clean deps_clean libclient_clean examples_clean tests_clean cfg_clean
+
+mrproper: clean hal_mrproper deps_mrproper libclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 

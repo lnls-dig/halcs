@@ -18,7 +18,9 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_SERVER,                /* Server could not complete request */
     BPM_CLIENT_ERR_AGAIN,                 /* Operation did not fully complete, try again */
     BPM_CLIENT_ERR_TIMEOUT,               /* Timeout occurred */
+    BPM_CLIENT_ERR_MSG,                   /* Unexpected message */
     BPM_CLIENT_INT,                       /* Interrupt occured */
+    BPM_CLIENT_ERR_INV_PARAM,             /* Invalid function parameters */
     BPM_CLIENT_ERR_END                    /* End of enum marker */
 };
 

@@ -20,6 +20,7 @@ enum _dmngr_err_e
     DMNGR_ERR_WAITCHLD,             /* Wait child routine error */
     DMNGR_ERR_SPAWNCHLD,            /* Spawn child routine error */
     DMNGR_ERR_BROK_RUNN,            /* Broker already running error */
+    DMNGR_ERR_CFG,                  /* Could not get property from config file */
     DMNGR_ERR_END                   /* End of enum marker */
 };
 

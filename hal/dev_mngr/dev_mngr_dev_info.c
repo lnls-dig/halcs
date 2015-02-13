@@ -36,7 +36,7 @@
 
 /* Creates a new instance of the Device Manager */
 devio_info_t * devio_info_new (char *dev_pathname, uint32_t id, llio_type_e type,
-        devio_state_e state)
+        devio_type_e devio_type, uint32_t smio_inst_id, devio_state_e state)
 {
     assert (dev_pathname);
 
@@ -47,6 +47,8 @@ devio_info_t * devio_info_new (char *dev_pathname, uint32_t id, llio_type_e type
     ASSERT_ALLOC (self->dev_pathname, err_pathname_alloc);
     self->id = id;
     self->type = type;
+    self->devio_type = devio_type;
+    self->smio_inst_id = smio_inst_id;
     self->state = state;
 
     return self;

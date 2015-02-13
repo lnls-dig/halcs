@@ -12,28 +12,23 @@
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 
-#define DEFAULT_NUM_SAMPLES         4096
-#define DEFAULT_CHAN_NUM            0
+#define DFLT_NUM_SAMPLES            4096
+#define DFLT_CHAN_NUM               0
+
+#define DFLT_BPM_NUMBER             0
+#define MAX_BPM_NUMBER              1
+
+#define DFLT_BOARD_NUMBER           0
+#define MAX_BOARD_NUMBER            5
+
 /* Arbitrary hard limits */
 #define MAX_NUM_SAMPLES             (1 << 28)
 #define MAX_NUM_CHANS               (1 << 8)
 
-typedef struct _acq_chan_t {
-    uint32_t chan;
-    uint32_t sample_size;
-} acq_chan_t;
-
-/* Global structure merging all of the channel's sample sizes */
-acq_chan_t __acq_chan[END_CHAN_ID] = { [0] = {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                     [1] = {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                     [2] = {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                     [3] = {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                     [4] = {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE} };
-
 void print_data (uint32_t chan, uint32_t *data, uint32_t size)
 {
     /* FIXME: Make it more generic */
-    if (chan == 0) {
+    if (chan == 0 || chan == 9) {
         int16_t *raw_data16 = (int16_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
             if (zctx_interrupted) {
@@ -70,6 +65,7 @@ void print_help (char *program_name)
             "\t-v Verbose output\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-s <num_samples_str> Number of samples\n"
+            "\t-board <AMC board = [0|1|2|3|4|5]>\n"
             "\t-ch <chan_str> Acquisition channel\n"
             , program_name);
 }
@@ -79,6 +75,8 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
+    char *board_number_str = NULL;
+    char *bpm_number_str = NULL;
     char *chan_str = NULL;
     char **str_p = NULL;
 
@@ -110,6 +108,13 @@ int main (int argc, char *argv [])
         else if (streq (argv[i], "-ch")) { /* ch: channel */
             str_p = &chan_str;
         }
+        else if (streq (argv[i], "-board")) { /* board_number: board number */
+            str_p = &board_number_str;
+        }
+        else if (streq(argv[i], "-bpm"))
+        {
+            str_p = &bpm_number_str;
+        }
         /* Fallout for options with parameters */
         else {
             *str_p = strdup (argv[i]);
@@ -127,8 +132,8 @@ int main (int argc, char *argv [])
     uint32_t num_samples;
     if (num_samples_str == NULL) {
         fprintf (stderr, "[client:acq]: Setting default value to number of samples: %u\n",
-                DEFAULT_NUM_SAMPLES);
-        num_samples = DEFAULT_NUM_SAMPLES;
+                DFLT_NUM_SAMPLES);
+        num_samples = DFLT_NUM_SAMPLES;
     }
     else {
         num_samples = strtoul (num_samples_str, NULL, 10);
@@ -139,13 +144,13 @@ int main (int argc, char *argv [])
             num_samples = MAX_NUM_SAMPLES;
         }
     }
-    fprintf (stdout, "[client:acq]: num_samples = %u\n", num_samples);
+    //fprintf (stdout, "[client:acq]: num_samples = %u\n", num_samples);
 
     /* Set default channel */
     uint32_t chan;
     if (chan_str == NULL) {
         fprintf (stderr, "[client:acq]: Setting default value to 'chan'\n");
-        chan = DEFAULT_CHAN_NUM;
+        chan = DFLT_CHAN_NUM;
     }
     else {
         chan = strtoul (chan_str, NULL, 10);
@@ -156,10 +161,49 @@ int main (int argc, char *argv [])
             chan = MAX_NUM_CHANS;
         }
     }
-    fprintf (stdout, "[client:acq]: chan = %u\n", chan);
+    //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
 
-    uint32_t data_size = num_samples*__acq_chan[chan].sample_size;
+    /* Set default board number */
+    uint32_t board_number;
+    if (board_number_str == NULL) {
+        fprintf (stderr, "[client:acq]: Setting default value to BOARD number: %u\n",
+                DFLT_BOARD_NUMBER);
+        board_number = DFLT_BOARD_NUMBER;
+    }
+    else {
+        board_number = strtoul (board_number_str, NULL, 10);
+
+        if (board_number > MAX_BOARD_NUMBER) {
+            fprintf (stderr, "[client:acq]: Board number too big! Defaulting to: %u\n",
+                    MAX_BOARD_NUMBER);
+            board_number = MAX_BOARD_NUMBER;
+        }
+    }
+
+    /* Set default bpm number */
+    uint32_t bpm_number;
+    if (bpm_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+                DFLT_BPM_NUMBER);
+        bpm_number = DFLT_BPM_NUMBER;
+    }
+    else {
+        bpm_number = strtoul (bpm_number_str, NULL, 10);
+
+        if (bpm_number > MAX_BPM_NUMBER) {
+            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+                    MAX_BPM_NUMBER);
+            bpm_number = MAX_BPM_NUMBER;
+        }
+    }
+
+    char service[50];
+    sprintf (service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+
+    uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
+    //bool new_acq = false;
+    bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples = num_samples,
                                         .chan = chan,
@@ -169,19 +213,24 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    bpm_client_err_e err = bpm_get_curve (bpm_client, "BPM0:DEVIO:ACQ", &acq_trans);
+    bpm_client_err_e err = bpm_get_curve (bpm_client, service, &acq_trans,
+            50000, new_acq);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
         goto err_bpm_get_curve;
     }
 
-    fprintf (stdout, "[client:acq]: bpm_get_curve was successfully executed\n");
+    //fprintf (stdout, "[client:acq]: bpm_get_curve was successfully executed\n");
+    fprintf (stdout, "clear\n");
     print_data (chan, data, acq_trans.block.bytes_read);
 
 err_bpm_get_curve:
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;
+    str_p = &board_number_str;
+    free (*str_p);
+    board_number_str = NULL;
     str_p = &num_samples_str;
     free (*str_p);
     num_samples_str = NULL;

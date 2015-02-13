@@ -19,6 +19,7 @@ enum _llio_err_e
     LLIO_ERR_INV_FUNC_PARAM,        /* Invalid function parameter */
     LLIO_ERR_SET_ENDP,              /* Could not set endpoint (device already opened)*/
     LLIO_ERR_DEV_CLOSE,             /* Error closing a device */
+    LLIO_ERR_CONN,                  /* Could establish connection to endpoint */
     LLIO_ERR_END                    /* End of enum marker */
 };
 

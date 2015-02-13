@@ -13,9 +13,11 @@
 static const char *msg_err [MSG_ERR_END] =
 {
     [MSG_SUCCESS]              = "Success",
-    [MSG_ERR]                  = "Messaging error",
     [MSG_ERR_ALLOC]            = "Could not allocate message",
-    [MSG_FUNC_NOT_IMPL]        = "Function not implemented"
+    [MSG_FUNC_NOT_IMPL]        = "Function not implemented",
+    [MSG_ERR_INV]              = "Invalid message structure",
+    [MSG_ERR_WRONG_ARGS]       = "Wrong arguments received (number or size)",
+    [MSG_ERR_UNEX_MSG]         = "Unexpected message type"
 };
 
 /* Convert enumeration type to string */
