@@ -281,13 +281,13 @@ libclient_clean:
 libclient_mrproper:
 	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
 
-deps: pcie_driver libmdp libbsmp
+deps: libmdp libbsmp
 
-deps_install: pcie_driver_install libmdp_install libbsmp_install
+deps_install: libmdp_install libbsmp_install
 
-deps_uninstall: pcie_driver_uninstall libmdp_uninstall libbsmp_uninstall
+deps_uninstall: libmdp_uninstall libbsmp_uninstall
 
-deps_clean: pcie_driver_clean libmdp_clean libbsmp_clean
+deps_clean: libmdp_clean libbsmp_clean
 
 deps_mrproper: libmdp_mrproper libbsmp_mrproper
 
