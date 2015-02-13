@@ -239,7 +239,7 @@ libmdp_install: libmdp_pre
 	ldconfig
 
 libmdp_uninstall: libmdp_pre
-	$(MAKE) -C $(LIBMDP_DIR) install
+	$(MAKE) -C $(LIBMDP_DIR) uninstall
 
 libmdp_clean: libmdp_pre
 	$(MAKE) -C $(LIBMDP_DIR) clean
