@@ -176,6 +176,10 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) -DGIT_REVISION=\"$(REVISION)\" -c $<
 
+# Pull in dependency info for *existing* .o files and don't complain if the
+# corresponding .d file is not found
+-include $(OBJS_all:.o=.d)
+
 # Compile with position-independent objects.
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
