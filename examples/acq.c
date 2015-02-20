@@ -28,7 +28,7 @@
 void print_data (uint32_t chan, uint32_t *data, uint32_t size)
 {
     /* FIXME: Make it more generic */
-    if (chan == 0 || chan == 9) {
+    if (chan == 0 /* Only ADC */ ) {
         int16_t *raw_data16 = (int16_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
             if (zctx_interrupted) {
@@ -156,10 +156,10 @@ int main (int argc, char *argv [])
     else {
         chan = strtoul (chan_str, NULL, 10);
 
-        if (chan > MAX_NUM_CHANS) {
+        if (chan > END_CHAN_ID-1) {
             fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
                     MAX_NUM_CHANS);
-            chan = MAX_NUM_CHANS;
+            chan = END_CHAN_ID-1;
         }
     }
     //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
