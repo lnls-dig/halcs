@@ -71,7 +71,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
 
-        return -ACQ_NUM_SAMPLES_OOR;
+        return -ACQ_NUM_CHAN_OOR;
     }
 
     /* number of samples required is out of the maximum limit */
