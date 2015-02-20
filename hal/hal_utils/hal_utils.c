@@ -36,7 +36,7 @@
             halutils_err_str (err_type))
 
 static char *_halutils_concat_strings_raw (const char *str1, const char* str2,
-        const char *str3, char sep);
+        const char *str3, bool with_sep, char sep)
 
 uint32_t num_to_str_len (uint32_t key, uint32_t base)
 {
@@ -91,23 +91,37 @@ char *halutils_stringify_hex_key (uint32_t key)
 #define SEPARATOR_BYTES 1
 /* FIXME: poorly written */
 static char *_halutils_concat_strings_raw (const char *str1, const char* str2,
-        const char *str3, char sep)
+        const char *str3, bool with_sep, char sep)
 {
     assert (str1);
     assert (str2);
 
+    uint32_t num_sep_bytes = (with_sep)? SEPARATOR_BYTES : 0;
+
     char *str = NULL;
     if (str3 != NULL) {
         str = zmalloc (strlen (str1) + strlen (str2) + strlen (str3) +
-                SEPARATOR_BYTES /* separator length */+ 1 /* \0 */);
+                num_sep_bytes /* separator length */+ 1 /* \0 */);
         ASSERT_ALLOC(str, err_str3_alloc);
-        sprintf (str, "%s%c%s%s", str1, sep, str2, str3);
+
+        if (with_sep) {
+            sprintf (str, "%s%c%s%s", str1, sep, str2, str3);
+        }
+        else {
+            sprintf (str, "%s%s%s", str1, str2, str3);
+        }
     }
     else {
         str = zmalloc (strlen(str1) + strlen(str2) +
-                SEPARATOR_BYTES /* separator length */+ 1 /* \0 */);
+                num_sep_bytes /* separator length */+ 1 /* \0 */);
         ASSERT_ALLOC(str, err_str2_alloc);
-        sprintf (str, "%s%c%s", str1, sep, str2);
+
+        if (with_sep) {
+            sprintf (str, "%s%c%s", str1, sep, str2);
+        }
+        else {
+            sprintf (str, "%s%s", str1, str2);
+        }
     }
 
     return str;
@@ -119,11 +133,16 @@ err_str2_alloc:
 
 char *halutils_concat_strings (const char *str1, const char* str2, char sep)
 {
-    return _halutils_concat_strings_raw (str1, str2, NULL, sep);
+    return _halutils_concat_strings_raw (str1, str2, NULL, true, sep);
+}
+
+char *halutils_concat_strings_no_sep (const char *str1, const char* str2)
+{
+    return _halutils_concat_strings_raw (str1, str2, NULL, false, 0);
 }
 
 char *halutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep)
 {
-    return _halutils_concat_strings_raw (str1, str2, str3, sep);
+    return _halutils_concat_strings_raw (str1, str2, str3, true, sep);
 }

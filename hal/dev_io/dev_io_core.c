@@ -289,8 +289,13 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
         /* Stringify ID */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Stringify hash ID\n");
-        char *key = halutils_concat_strings (smio_mod_dispatch[th_args->smio_id].name,
-                inst_id, '');
+        char *inst_id_str = halutils_stringify_dec_key (inst_id);
+        ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+        char *key = halutils_concat_strings_no_sep (smio_mod_dispatch[th_args->smio_id].name,
+                inst_id_str);
+        /* We don't need this anymore */
+        free (inst_id_str);
+        inst_id_str = NULL;
         ASSERT_ALLOC (key, err_key_alloc);
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
@@ -342,6 +347,8 @@ err_smio_service_alloc:
 err_pipe_hash_insert:
     free (key);
 err_key_alloc:
+    free (inst_id_str);
+err_inst_id_str_alloc:
     /* This is safe to call more than once */
     _devio_destroy_smio (self, smio_id);
 err_spawn_smio_thread:
@@ -358,13 +365,11 @@ devio_err_e devio_register_all_sm (devio_t *self)
     return DEVIO_ERR_FUNC_NOT_IMPL;
 }
 
-devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id, uint32_t inst_id)
+devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key)
 {
-    (void) self;
-    (void) smio_id;
-    (void) inst_id;
-    return DEVIO_ERR_FUNC_NOT_IMPL;
+    _devio_destroy_smio (self, smio_key);
 
+    return DEVIO_ERR_FUNC_NOT_IMPL;
 }
 
 devio_err_e devio_unregister_all_sm (devio_t *self)
@@ -540,6 +545,8 @@ err_hash_keys_alloc:
     return;
 }
 
+/* smio_key is the name of the SMIO + instance number, e.g.,
+ * FMC130M_4CH0*/
 static void _devio_destroy_smio (devio_t *self, const char *smio_key)
 {
     assert (self);
@@ -559,14 +566,16 @@ static void _devio_destroy_smio (devio_t *self, const char *smio_key)
     ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
             err_send_msg);
 
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
+            "to SMIO %s sent", smio_key);
+
     /* Finally, remove the pipe from hash */
-    zhash_delete (self->sm_io_h, key_c);
+    zhash_delete (self->sm_io_h, smio_key);
 
 err_send_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
 err_hash_lookup:
-    free (key_c);
 err_key_alloc:
     return;
 }
