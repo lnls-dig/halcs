@@ -289,12 +289,15 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
         /* Stringify ID */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Stringify hash ID\n");
-        char *key = halutils_stringify_hex_key (smio_mod_dispatch[i].id);
+        char *key = halutils_concat_strings (smio_mod_dispatch[th_args->smio_id].name,
+                inst_id, '');
         ASSERT_ALLOC (key, err_key_alloc);
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
-        zhash_insert (self->sm_io_h, key, self->pipes [pipe_idx]);
+        int zerr = zhash_insert (self->sm_io_h, key, self->pipes [pipe_idx]);
+        ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
+                err_pipe_hash_insert);
 
         /* Configure default values of the recently created SMIO using the
          * bootstrap registered function config_defaults () */
@@ -335,6 +338,8 @@ err_spawn_config_thread:
 err_th_config_args_alloc:
     free (smio_service);
 err_smio_service_alloc:
+    zhash_delete (self->sm_io_h, key);
+err_pipe_hash_insert:
     free (key);
 err_key_alloc:
     /* This is safe to call more than once */
@@ -519,16 +524,6 @@ err_hand_req:
 
 static void _devio_destroy_smio_all (devio_t *self)
 {
-#if 0
-    unsigned i;
-    for (i = 0; i < self->nnodes; ++i) {
-        /* This cannot fail at this point... but it can */
-        zmsg_t *msg = zmsg_new ();
-        /* An empty message means to selfdestruct */
-        zmsg_pushstr (msg, "");
-        zmsg_send (&msg, self->pipes [i]);
-    }
-#endif
     /* Get all hash keys */
     zlist_t *hash_keys = zhash_keys (self->sm_io_h);
     ASSERT_ALLOC (hash_keys, err_hash_keys_alloc);
@@ -536,10 +531,7 @@ static void _devio_destroy_smio_all (devio_t *self)
 
     /* Iterate over all keys removing each of one */
     for (; hash_item != NULL; hash_item = zlist_next (hash_keys)) {
-        /* FIXME: Usage of stroul fucntion for reconverting the string
-         * into a uint32_t */
-        _devio_destroy_smio (self, (uint32_t) strtoul (hash_item,
-                    (char **) NULL, 16));
+        _devio_destroy_smio (self, hash_item);
     }
 
     zlist_destroy (&hash_keys);
@@ -548,16 +540,12 @@ err_hash_keys_alloc:
     return;
 }
 
-static void _devio_destroy_smio (devio_t *self, uint32_t smio_id)
+static void _devio_destroy_smio (devio_t *self, const char *smio_key)
 {
     assert (self);
 
-    /* Stringify ID */
-    char *key_c = halutils_stringify_hex_key (smio_id);
-    ASSERT_ALLOC (key_c, err_key_alloc);
-
     /* Lookup SMIO reference in hash table */
-    void *pipe = zhash_lookup (self->sm_io_h, key_c);
+    void *pipe = zhash_lookup (self->sm_io_h, smio_key);
     ASSERT_TEST (pipe != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup);
 
