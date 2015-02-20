@@ -66,6 +66,7 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-s <num_samples_str> Number of samples\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
+            "\t-bpm <BPM number = [0|1]>\n"
             "\t-ch <chan_str> Acquisition channel\n"
             , program_name);
 }
@@ -202,7 +203,6 @@ int main (int argc, char *argv [])
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
-    //bool new_acq = false;
     bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples = num_samples,
