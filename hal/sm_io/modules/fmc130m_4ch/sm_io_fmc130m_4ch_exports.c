@@ -70,6 +70,54 @@ disp_op_t fmc130m_4ch_clk_sel_exp = {
     }
 };
 
+disp_op_t fmc130m_4ch_adc_rand_exp = {
+    .name = FMC130M_4CH_NAME_ADC_RAND,
+    .opcode = FMC130M_4CH_OPCODE_ADC_RAND,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_adc_dith_exp = {
+    .name = FMC130M_4CH_NAME_ADC_DITH,
+    .opcode = FMC130M_4CH_OPCODE_ADC_DITH,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_adc_shdn_exp = {
+    .name = FMC130M_4CH_NAME_ADC_SHDN,
+    .opcode = FMC130M_4CH_OPCODE_ADC_SHDN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc130m_4ch_adc_pga_exp = {
+    .name = FMC130M_4CH_NAME_ADC_PGA,
+    .opcode = FMC130M_4CH_OPCODE_ADC_PGA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t fmc130m_4ch_adc_data0_exp = {
     .name = FMC130M_4CH_NAME_ADC_DATA0,
     .opcode = FMC130M_4CH_OPCODE_ADC_DATA0,
@@ -508,6 +556,10 @@ const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_pll_func_exp,
     &fmc130m_4ch_pll_status_exp,
     &fmc130m_4ch_clk_sel_exp,
+    &fmc130m_4ch_adc_rand_exp,
+    &fmc130m_4ch_adc_dith_exp,
+    &fmc130m_4ch_adc_shdn_exp,
+    &fmc130m_4ch_adc_pga_exp,
     &fmc130m_4ch_adc_data0_exp,
     &fmc130m_4ch_adc_data1_exp,
     &fmc130m_4ch_adc_data2_exp,
