@@ -89,6 +89,29 @@ bpm_client_err_e bpm_set_fmc_clk_sel (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_fmc_clk_sel (bpm_client_t *self, char *service,
         uint32_t *clk_sel);
 
+/* ADC LTC2208 Control */
+/* These set of functions read (get) or write (set) some ADC LTC2208
+ * functionalities. Check LTC2208 datasheet for details.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_adc_rand (bpm_client_t *self, char *service,
+        uint32_t adc_rand);
+bpm_client_err_e bpm_get_adc_rand (bpm_client_t *self, char *service,
+        uint32_t *adc_rand);
+bpm_client_err_e bpm_set_adc_dith (bpm_client_t *self, char *service,
+        uint32_t adc_dith);
+bpm_client_err_e bpm_get_adc_dith (bpm_client_t *self, char *service,
+        uint32_t *adc_dith);
+bpm_client_err_e bpm_set_adc_shdn (bpm_client_t *self, char *service,
+        uint32_t adc_shdn);
+bpm_client_err_e bpm_get_adc_shdn (bpm_client_t *self, char *service,
+        uint32_t *adc_shdn);
+bpm_client_err_e bpm_set_adc_pga (bpm_client_t *self, char *service,
+        uint32_t adc_pga);
+bpm_client_err_e bpm_get_adc_pga (bpm_client_t *self, char *service,
+        uint32_t *adc_pga);
+
 /* RAW ADC data functions */
 /* These set of functions read (get) the RAW ADC values.
  * All of the functions returns BPM_CLIENT_SUCCESS if the

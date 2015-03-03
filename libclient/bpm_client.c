@@ -208,6 +208,50 @@ err_send_msg_alloc:
     return err;
 }
 
+/* ADC LTC2208 RAND */
+PARAM_FUNC_CLIENT_WRITE(adc_rand)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_RAND, adc_rand);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_rand)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_RAND, adc_rand);
+}
+
+/* ADC LTC2208 DITH */
+PARAM_FUNC_CLIENT_WRITE(adc_dith)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_DITH, adc_dith);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_dith)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_DITH, adc_dith);
+}
+
+/* ADC LTC2208 SHDN */
+PARAM_FUNC_CLIENT_WRITE(adc_shdn)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_SHDN, adc_shdn);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_shdn)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_SHDN, adc_shdn);
+}
+
+/* ADC LTC2208 PGA */
+PARAM_FUNC_CLIENT_WRITE(adc_pga)
+{
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_ADC_PGA, adc_pga);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_pga)
+{
+     return param_client_read (self, service, FMC130M_4CH_OPCODE_ADC_PGA, adc_pga);
+}
+
 /* RAW ADC data 0 value */
 PARAM_FUNC_CLIENT_WRITE(adc_data0)
 {
