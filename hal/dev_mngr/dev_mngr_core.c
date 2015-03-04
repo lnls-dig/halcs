@@ -678,10 +678,6 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
         }
     }
 
-    /* As we only have strings in our hash, we can use the simple autofree
-     * feature to cleanly destroy the items later. */
-    zhash_autofree (hints_h);
-
 err_cfg_exit:
     return err;
 }
