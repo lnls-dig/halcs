@@ -36,7 +36,7 @@
             halutils_err_str (err_type))
 
 static char *_halutils_concat_strings_raw (const char *str1, const char* str2,
-        const char *str3, bool with_sep, char sep)
+        const char *str3, bool with_sep, char sep);
 
 uint32_t num_to_str_len (uint32_t key, uint32_t base)
 {
