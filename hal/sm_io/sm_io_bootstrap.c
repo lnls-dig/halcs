@@ -254,31 +254,77 @@ static smio_err_e _smio_loop (smio_t *self)
      * and exit if the parent send a message through
      * the pipe socket */
     while (!zctx_interrupted) {
-        zframe_t *reply_to = NULL;
-        zmsg_t *request = mdp_worker_recv (self->worker, &reply_to);
+        /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
+        zmq_pollitem_t items [] = {
+            [SMIO_WORKER_SOCK] = {
+                .socket = self->worker,
+                .fd = 0,
+                .events = ZMQ_POLLIN,
+                .revents = 0
+            },
+            [SMIO_PIPE_SOCK] = {
+                .socket = self->pipe,
+                .fd = 0,
+                .events = ZMQ_POLLIN,
+                .revents = 0
+            }
+        };
 
-        if (request == NULL) {
-            break;                          /* Worker has been interrupted */
+        /* Wait up to 100 ms */
+        int rc = zmq_poll (items, SMIO_SOCKS_NUM, SMIO_POLLER_TIMEOUT);
+        ASSERT_TEST(rc != -1, "Poller has been interrupted",
+                err_loop_interrupted, SMIO_ERR_INTERRUPTED_POLLER);
+
+        /* Check for activity on WORKER socket */
+        if (items [SMIO_WORKER_SOCK].revents & ZMQ_POLLIN) {
+            zframe_t *reply_to = NULL;
+            zmsg_t *request = mdp_worker_recv (self->worker, &reply_to);
+
+            if (request == NULL) {
+                break;                          /* Worker has been interrupted */
+            }
+
+            exp_msg_zmq_t smio_args = {
+                .tag = EXP_MSG_ZMQ_TAG,
+                .msg = &request,
+                .reply_to = reply_to};
+            err = smio_do_op (self, &smio_args);
+
+            /* What can I do in case of error ?*/
+            if (err != SMIO_SUCCESS) {
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                        "[sm_io_bootstrap] smio_do_op: %s\n",
+                        smio_err_str (err));
+            }
+
+            /* Cleanup */
+            zframe_destroy (&reply_to);
+            zmsg_destroy (&request);
         }
 
-        exp_msg_zmq_t smio_args = {
-            .tag = EXP_MSG_ZMQ_TAG,
-            .msg = &request,
-            .reply_to = reply_to};
-        err = smio_do_op (self, &smio_args);
+        /* Check for activity on PIPE socket */
+        if (items [SMIO_PIPE_SOCK].revents & ZMQ_POLLIN) {
+            /* On any activity we destroy ourselves */
+            zmsg_t *request = zmsg_recv (self->pipe);
 
-        /* What can I do in case of error ?*/
-        if (err != SMIO_SUCCESS) {
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                    "[sm_io_bootstrap] smio_do_op: %s\n",
-                    smio_err_str (err));
+            if (request == NULL) {
+                break;                          /* Worker has been interrupted */
+            }
+
+            /* Every message through this channel is interpreted as a
+             * self-destruct one */
+            zmsg_destroy (&request);
+
+            /* Destroy SMIO instance. As we already do this on the main
+             * smio_startup (), we just need to exit this cleanly */
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
+                    "[sm_io_bootstrap] Received shutdown message on "
+                    "PIPE socket. Exiting ...\n");
+            break;
         }
-
-        /* Cleanup */
-        zframe_destroy (&reply_to);
-        zmsg_destroy (&request);
     }
 
+err_loop_interrupted:
     return err;
 }
 
