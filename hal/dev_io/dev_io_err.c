@@ -22,7 +22,8 @@ static const char *devio_err [DEVIO_ERR_END] =
     [DEVIO_ERR_UNINIT_POLLER]           = "Poller uninitilized",
     [DEVIO_ERR_INTERRUPTED_POLLER]      = "Poller interrupted. zeroMQ context was terminated or received interrupt signal",
     [DEVIO_ERR_BAD_MSG]                 = "Malformed message received",
-    [DEVIO_ERR_TERMINATED]              = "Terminated devio instance"
+    [DEVIO_ERR_TERMINATED]              = "Terminated devio instance",
+    [DEVIO_ERR_SMIO_DESTROY]            = "Could not destroy sm_io instance"
 };
 
 /* Convert enumeration type to string */
