@@ -42,6 +42,9 @@
             halutils_err_str (err_type))
 
 static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
+static halutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops);
+static halutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key);
+static halutils_err_e _disp_table_remove_all (disp_table_t *self);
 static void _disp_table_free_item (void *data);
 static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
 static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void *msg);
@@ -84,6 +87,7 @@ halutils_err_e disp_table_destroy (disp_table_t **self_p)
     if (*self_p) {
         disp_table_t *self = *self_p;
 
+        _disp_table_remove_all (self);
         zhash_destroy (&self->table_h);
         free (self);
         *self_p = NULL;
@@ -99,69 +103,17 @@ halutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t* disp_op)
 
 halutils_err_e disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
 {
-    assert (self);
-    assert (disp_ops);
-
-    halutils_err_e err = HALUTILS_SUCCESS;
-    const disp_op_t** disp_op_it = disp_ops;
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-        "[halutils:disp_table] Preparing to insert function in dispatch table\n");
-
-    for ( ; *disp_op_it != NULL; ++disp_op_it) {
-        halutils_err_e err = _disp_table_insert (self, *disp_op_it);
-        ASSERT_TEST(err == HALUTILS_SUCCESS,
-                "disp_table_insert_all: Could not insert function",
-                err_disp_insert);
-    }
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[halutils:disp_table] Exiting insert_all\n");
-
-err_disp_insert:
-    return err;
+    return _disp_table_insert_all (self, disp_ops);
 }
 
 halutils_err_e disp_table_remove (disp_table_t *self, uint32_t key)
 {
-    char *key_c = halutils_stringify_hex_key (key);
-    ASSERT_ALLOC (key_c, err_key_c_alloc);
-
-    /* Do a lookup first to free the return value */
-    disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null);
-
-    halutils_err_e err = _disp_table_cleanup_args_op (disp_op);
-    ASSERT_TEST (err == HALUTILS_SUCCESS, "Could not free registered return value",
-            err_disp_op_null);
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-        "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
-        key);
-    /* This will trigger the free function previously registered */
-    zhash_delete (self->table_h, key_c);
-
-    free (key_c);
-    return HALUTILS_SUCCESS;
-
-err_disp_op_null:
-    free (key_c);
-err_key_c_alloc:
-    return HALUTILS_ERR_ALLOC;
+    return _disp_table_remove (self, key);
 }
 
 halutils_err_e disp_table_remove_all (disp_table_t *self)
 {
-    assert (self);
-
-    zlist_t *hash_keys = zhash_keys (self->table_h);
-    void * table_item = zlist_first (hash_keys);
-
-    for ( ; table_item; table_item = zlist_next (hash_keys)) {
-        zhash_delete (self->table_h, (char *) table_item);
-    }
-
-    zlist_destroy (&hash_keys);
-    return HALUTILS_SUCCESS;
+    return _disp_table_remove_all (self);
 }
 
 halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
@@ -248,6 +200,50 @@ halutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 
 /**** Local helper functions ****/
 
+static halutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
+{
+    char *key_c = halutils_stringify_hex_key (key);
+    ASSERT_ALLOC (key_c, err_key_c_alloc);
+
+    /* Do a lookup first to free the return value */
+    disp_op_t *disp_op = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
+            err_disp_op_null);
+
+    halutils_err_e err = _disp_table_cleanup_args_op (disp_op);
+    ASSERT_TEST (err == HALUTILS_SUCCESS, "Could not free registered return value",
+            err_disp_op_null);
+
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+        "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
+        key);
+    /* This will trigger the free function previously registered */
+    zhash_delete (self->table_h, key_c);
+
+    free (key_c);
+    return HALUTILS_SUCCESS;
+
+err_disp_op_null:
+    free (key_c);
+err_key_c_alloc:
+    return HALUTILS_ERR_ALLOC;
+}
+
+static halutils_err_e _disp_table_remove_all (disp_table_t *self)
+{
+    assert (self);
+
+    zlist_t *hash_keys = zhash_keys (self->table_h);
+    void * table_item = zlist_first (hash_keys);
+
+    for ( ; table_item; table_item = zlist_next (hash_keys)) {
+        _disp_table_remove (self, halutils_numerify_hex_key ((char *) table_item));
+    }
+
+    zlist_destroy (&hash_keys);
+    return HALUTILS_SUCCESS;
+}
+
 static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *disp_op)
 {
     assert (self);
@@ -280,6 +276,30 @@ err_key_c_alloc:
 err_alloc_ret:
     return HALUTILS_ERR_ALLOC;
 }
+
+static halutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
+{
+    assert (self);
+    assert (disp_ops);
+
+    halutils_err_e err = HALUTILS_SUCCESS;
+    const disp_op_t** disp_op_it = disp_ops;
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+        "[halutils:disp_table] Preparing to insert function in dispatch table\n");
+
+    for ( ; *disp_op_it != NULL; ++disp_op_it) {
+        halutils_err_e err = _disp_table_insert (self, *disp_op_it);
+        ASSERT_TEST(err == HALUTILS_SUCCESS,
+                "disp_table_insert_all: Could not insert function",
+                err_disp_insert);
+    }
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+            "[halutils:disp_table] Exiting insert_all\n");
+
+err_disp_insert:
+    return err;
+}
+
 
 static halutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret)
 {
@@ -474,7 +494,10 @@ static halutils_err_e _disp_table_cleanup_args_op (const disp_op_t *disp_op)
             goto err_no_ownership;
         }
 
-        free (disp_op->ret);
+        /* I know... But we have to free the item anyway */
+        disp_op_t *disp_op_tmp = (disp_op_t *) disp_op;
+        free (disp_op_tmp->ret);
+
     }
 
 err_no_ownership:
