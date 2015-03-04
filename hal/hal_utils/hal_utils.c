@@ -88,6 +88,21 @@ char *halutils_stringify_hex_key (uint32_t key)
     return halutils_stringify_key (key, 16);
 }
 
+uint32_t halutils_numerify_key (const char *key, uint32_t base)
+{
+    return strtoul (key, NULL, base);
+}
+
+uint32_t halutils_numerify_dec_key (const char *key)
+{
+    return halutils_numerify_key (key, 10);
+}
+
+uint32_t halutils_numerify_hex_key (const char *key)
+{
+    return halutils_numerify_key (key, 16);
+}
+
 #define SEPARATOR_BYTES 1
 /* FIXME: poorly written */
 static char *_halutils_concat_strings_raw (const char *str1, const char* str2,
