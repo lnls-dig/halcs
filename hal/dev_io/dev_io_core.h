@@ -97,7 +97,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
 devio_err_e devio_register_all_sm (devio_t *self);
-devio_err_e devio_unregister_sm (devio_t *self, uint32_t smio_id, uint32_t inst_id);
+devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
 devio_err_e devio_unregister_all_sm (devio_t *self);
 /* Initilize poller with all of the initialized PIPE sockets */
 devio_err_e devio_init_poller_sm (devio_t *self);
