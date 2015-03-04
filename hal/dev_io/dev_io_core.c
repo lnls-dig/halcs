@@ -259,7 +259,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
                 "[dev_io_core:register_sm] Stringify hash ID\n");
         char *inst_id_str = halutils_stringify_dec_key (inst_id);
         ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-        char *key = halutils_concat_strings_no_sep (smio_mod_dispatch[th_args->smio_id].name,
+        char *key = halutils_concat_strings_no_sep (smio_mod_dispatch[i].name,
                 inst_id_str);
         /* We don't need this anymore */
         free (inst_id_str);
@@ -576,20 +576,6 @@ static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key)
     ASSERT_TEST (pipe != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
 
-#if 0
-    /* Send message to SMIO informing it to destroy itself */
-    /* This cannot fail at this point... but it can */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC (send_msg, err_msg_alloc, DEVIO_ERR_ALLOC);
-    /* An empty message means to selfdestruct */
-    zmsg_pushstr (send_msg, "");
-    int zerr = zmsg_send (&send_msg, pipe);
-    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
-            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
-
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
-            "to SMIO %s sent", smio_key);
-#endif
     err = _devio_send_destruct_msg (self, pipe);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
             "PIPE", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
