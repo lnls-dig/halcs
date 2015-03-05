@@ -23,9 +23,8 @@
 #include "mdp.h"
 
 /* SMIO sockets IDs */
-#define SMIO_WORKER_SOCK            0
-#define SMIO_PIPE_SOCK              1
-#define SMIO_END_SOCK               2
+#define SMIO_PIPE_SOCK              0
+#define SMIO_END_SOCK               1
 #define SMIO_SOCKS_NUM              SMIO_END_SOCK
 
 struct _devio_t;
