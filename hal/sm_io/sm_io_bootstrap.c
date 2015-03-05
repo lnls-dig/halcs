@@ -256,12 +256,6 @@ static smio_err_e _smio_loop (smio_t *self)
     while (!zctx_interrupted) {
         /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
         zmq_pollitem_t items [] = {
-            [SMIO_WORKER_SOCK] = {
-                .socket = self->worker,
-                .fd = 0,
-                .events = ZMQ_POLLIN,
-                .revents = 0
-            },
             [SMIO_PIPE_SOCK] = {
                 .socket = self->pipe,
                 .fd = 0,
@@ -270,20 +264,11 @@ static smio_err_e _smio_loop (smio_t *self)
             }
         };
 
-        /* Wait up to 100 ms */
-        int rc = zmq_poll (items, SMIO_SOCKS_NUM, SMIO_POLLER_TIMEOUT);
-        ASSERT_TEST(rc != -1, "Poller has been interrupted",
-                err_loop_interrupted, SMIO_ERR_INTERRUPTED_POLLER);
-
         /* Check for activity on WORKER socket */
-        if (items [SMIO_WORKER_SOCK].revents & ZMQ_POLLIN) {
-            zframe_t *reply_to = NULL;
-            zmsg_t *request = mdp_worker_recv (self->worker, &reply_to);
+        zframe_t *reply_to = NULL;
+        zmsg_t *request = mdp_worker_recv (self->worker, &reply_to, true);
 
-            if (request == NULL) {
-                break;                          /* Worker has been interrupted */
-            }
-
+        if (request != NULL) {
             exp_msg_zmq_t smio_args = {
                 .tag = EXP_MSG_ZMQ_TAG,
                 .msg = &request,
@@ -301,6 +286,11 @@ static smio_err_e _smio_loop (smio_t *self)
             zframe_destroy (&reply_to);
             zmsg_destroy (&request);
         }
+
+        /* Wait up to 100 ms */
+        int rc = zmq_poll (items, SMIO_SOCKS_NUM, SMIO_POLLER_TIMEOUT);
+        ASSERT_TEST(rc != -1, "Poller has been interrupted",
+                err_loop_interrupted, SMIO_ERR_INTERRUPTED_POLLER);
 
         /* Check for activity on PIPE socket */
         if (items [SMIO_PIPE_SOCK].revents & ZMQ_POLLIN) {
