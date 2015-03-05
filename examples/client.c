@@ -1718,6 +1718,7 @@ int main (int argc, char *argv [])
         bpm_client_err_e err = bpm_acq_start(bpm_client, acq_service, &acq_req);
         if (err != BPM_CLIENT_SUCCESS) {
             fprintf (stderr, "[client:acq]: '%s'\n", bpm_client_err_str(err));
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -1783,6 +1784,7 @@ int main (int argc, char *argv [])
             fprintf (stderr, "[client:acq]: bpm_acq_get_curve was successfully executed\n");
         } else {
             fprintf (stderr, "[client:acq]: bpm_acq_get_curve failed: %s\n", bpm_client_err_str(err));
+            exit(EXIT_FAILURE);
         }
         acq_get_curve = 0;
         free(valid_data);
