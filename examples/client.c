@@ -1751,7 +1751,7 @@ int main (int argc, char *argv [])
         bpm_client_err_e err = bpm_acq_get_data_block (bpm_client, acq_service, &acq_trans);
 
         if (err == BPM_CLIENT_SUCCESS) {
-            fprintf (stdout, "[client:acq]: bpm_get_block was successfully executed\n");
+            fprintf (stderr, "[client:acq]: bpm_get_block was successfully executed\n");
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
         } else {
             fprintf (stderr, "[client:acq]: bpm_get_block failed\n");
@@ -1780,7 +1780,7 @@ int main (int argc, char *argv [])
 
         if (err == BPM_CLIENT_SUCCESS) {
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
-            fprintf (stdout, "[client:acq]: bpm_acq_get_curve was successfully executed\n");
+            fprintf (stderr, "[client:acq]: bpm_acq_get_curve was successfully executed\n");
         } else {
             fprintf (stderr, "[client:acq]: bpm_acq_get_curve failed: %s\n", bpm_client_err_str(err));
         }
