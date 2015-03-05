@@ -168,6 +168,7 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc130m_4ch_t *self = *self_p;
 
+        smch_si57x_destroy (&self->smch_si571);
         smch_ad9510_destroy (&self->smch_ad9510);
         smch_24aa64_destroy (&self->smch_24aa64);
 
