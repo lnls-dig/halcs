@@ -38,6 +38,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *bpm_number_str = NULL;
     char *trig_dir_str = NULL;
+    char *trig_term_str = NULL;
     uint32_t get_pll_status = 0;
     char **str_p = NULL;
 
@@ -77,6 +78,9 @@ int main (int argc, char *argv [])
         }
         else if (streq (argv[i], "-trig_dir")) {
             str_p = &trig_dir_str;
+        }
+        else if (streq (argv[i], "-trig_term")) {
+            str_p = &trig_term_str;
         }
         /* Fallout for options with parameters */
         else {
@@ -143,6 +147,19 @@ int main (int argc, char *argv [])
         fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_trig_dir was successfully executed\n");
     }
 
+    uint32_t trig_term = 0;
+    if (trig_term_str != NULL) {
+        trig_term = strtoul (trig_term_str, NULL, 10);
+
+        fprintf (stdout, "[client:fmc130m_4ch]: trig_term = %u\n", trig_term);
+        err = bpm_set_trig_term (bpm_client, service, trig_term);
+        if (err != BPM_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_trig_term failed\n");
+            goto err_bpm_exit;
+        }
+        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_trig_term was successfully executed\n");
+    }
+
     if (get_pll_status) {
         uint32_t pll_status = 0;
         bpm_client_err_e err = bpm_get_fmc_pll_status (bpm_client, service, &pll_status);
@@ -156,6 +173,9 @@ int main (int argc, char *argv [])
 
 err_bpm_exit:
     bpm_client_destroy (&bpm_client);
+    str_p = &trig_term_str;
+    free (*str_p);
+    trig_term_str = NULL;
     str_p = &trig_dir_str;
     free (*str_p);
     trig_dir_str = NULL;

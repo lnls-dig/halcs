@@ -116,6 +116,50 @@ RW_PARAM_FUNC(fmc130m_4ch, clk_sel) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+
+/***************************** ADC LT2208 Control ***************************/
+#define BPM_FMC130M_4CH_RAND_MIN                0 /* RAND disabled */
+#define BPM_FMC130M_4CH_RAND_MAX                1 /* RAND enabled  */
+
+RW_PARAM_FUNC(fmc130m_4ch, adc_rand) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            ADC, RAND, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_RAND_MIN, BPM_FMC130M_4CH_RAND_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC130M_4CH_DITH_MIN                0 /* DITH disabled */
+#define BPM_FMC130M_4CH_DITH_MAX                1 /* DITH enabled  */
+
+RW_PARAM_FUNC(fmc130m_4ch, adc_dith) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            ADC, DITH, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_DITH_MIN, BPM_FMC130M_4CH_DITH_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC130M_4CH_SHDN_MIN                0 /* SHDN disabled */
+#define BPM_FMC130M_4CH_SHDN_MAX                1 /* SHDN enabled  */
+
+RW_PARAM_FUNC(fmc130m_4ch, adc_shdn) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            ADC, SHDN, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_SHDN_MIN, BPM_FMC130M_4CH_SHDN_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC130M_4CH_PGA_MIN                 0 /* PGA disabled */
+#define BPM_FMC130M_4CH_PGA_MAX                 1 /* PGA enabled  */
+
+RW_PARAM_FUNC(fmc130m_4ch, adc_pga) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            ADC, PGA, SINGLE_BIT_PARAM,
+            BPM_FMC130M_4CH_PGA_MIN, BPM_FMC130M_4CH_PGA_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+/********************* ADC RAW Data registers (for simple debug) **************/
+
 /* FIXME: Override DATA<channel_number>_VAL macros with the DATA_GLOBAL ones.
  * As the macros are defined with 32-bits and there is a shift involved, the
  * compiler complains about the size of the macro being bigger the the type
@@ -611,6 +655,10 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_status),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, clk_sel),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_rand),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_dith),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_shdn),
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_pga),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data0),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data1),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_data2),

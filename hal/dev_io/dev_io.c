@@ -178,6 +178,9 @@ int main (int argc, char *argv[])
             dev_id);
 
     /* We don't need it anymore */
+    str_p = &fe_smio_id_str;
+    free (*str_p);
+    fe_smio_id_str = NULL;
     str_p = &dev_type;
     free (*str_p);
     dev_type = NULL;
@@ -240,6 +243,8 @@ err_devio:
     devio_destroy (&devio);
 err_exit:
     str_p = &log_file_name;
+    free (*str_p);
+    str_p = &fe_smio_id_str;
     free (*str_p);
     str_p = &broker_endp;
     free (*str_p);

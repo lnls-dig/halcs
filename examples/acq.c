@@ -28,7 +28,7 @@
 void print_data (uint32_t chan, uint32_t *data, uint32_t size)
 {
     /* FIXME: Make it more generic */
-    if (chan == 0 || chan == 9) {
+    if (chan == 0 /* Only ADC */ ) {
         int16_t *raw_data16 = (int16_t *) data;
         for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
             if (zctx_interrupted) {
@@ -66,6 +66,7 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-s <num_samples_str> Number of samples\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
+            "\t-bpm <BPM number = [0|1]>\n"
             "\t-ch <chan_str> Acquisition channel\n"
             , program_name);
 }
@@ -155,10 +156,10 @@ int main (int argc, char *argv [])
     else {
         chan = strtoul (chan_str, NULL, 10);
 
-        if (chan > MAX_NUM_CHANS) {
+        if (chan > END_CHAN_ID-1) {
             fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
                     MAX_NUM_CHANS);
-            chan = MAX_NUM_CHANS;
+            chan = END_CHAN_ID-1;
         }
     }
     //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
@@ -202,7 +203,6 @@ int main (int argc, char *argv [])
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
-    //bool new_acq = false;
     bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples = num_samples,

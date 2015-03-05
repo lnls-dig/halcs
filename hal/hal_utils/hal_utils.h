@@ -31,11 +31,27 @@ char *halutils_stringify_dec_key (uint32_t key);
 /* Allocates a string with the necessary size to fit an hexadecimal key */
 char *halutils_stringify_hex_key (uint32_t key);
 
-/* Concatenates 2 strings togheter with a separator. returns the string if
+/* Converts a key string into the specified numeric base. Must fit into
+ * a uint32_t */
+uint32_t halutils_numerify_key (const char *key, uint32_t base);
+
+/* Converts a key string into the decimal base. Result must fit into
+ * a uint32_t */
+uint32_t halutils_numerify_dec_key (const char *key);
+
+/* Converts a key string into the hexadecimal base. Result must fit into
+ * a uint32_t */
+uint32_t halutils_numerify_hex_key (const char *key);
+
+/* Concatenates 2 strings together with a separator. returns the string if
  * OK, NULL in case of error */
 char *halutils_concat_strings (const char *str1, const char* str2, char sep);
 
-/* Concatenates 3 strings togheter with a separator between the first and second
+/* Concatenates 2 strings together without a separator. returns the string if
+ * OK, NULL in case of error */
+char *halutils_concat_strings_no_sep (const char *str1, const char* str2);
+
+/* Concatenates 3 strings together with a separator between the first and second
  * strings. returns the string if OK, NULL in case of error */
 char *halutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);

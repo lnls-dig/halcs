@@ -39,7 +39,7 @@ typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 #define ACQ_NOT_COMPLETED               2   /* Acquisition not completed */
 #define ACQ_BLOCK_OOR                   3   /* Block number out of range */
 #define ACQ_NUM_CHAN_OOR                4   /* Channel number out of range */
-#define ACQ_COULD_NOT_READ              5   /* Channel number out of range */
+#define ACQ_COULD_NOT_READ              5   /* Could not read memory block */
 #define ACQ_REPLY_END                   6   /* End marker */
 
 #endif
