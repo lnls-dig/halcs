@@ -331,7 +331,15 @@ int main (int argc, char *argv [])
 
     /* Long-only options */
     enum {
-        getdlyval = 1000,
+        getadcrand = 1000,
+        setadcrand,
+        getadcdith,
+        setadcdith,
+        getadcshdn,
+        setadcshdn,
+        getadcpga,
+        setadcpga,
+        getdlyval,
         setdlyval,
         getdlyline,
         setdlyline,
@@ -391,6 +399,7 @@ int main (int argc, char *argv [])
         timeout
     };
 
+    /* TODO: Check which 'set' functions are boolean and set them without the need of an entry value */
     static struct option long_options[] =
     {
         {"help",                no_argument,         NULL, 'h'},    
@@ -402,6 +411,14 @@ int main (int argc, char *argv [])
         {"getpll",              no_argument,         NULL, 'p'},
         {"setpll",              required_argument,   NULL, 'P'},
         {"ad9510default",       no_argument,         NULL, 'L'},
+        {"getadcrand",          no_argument,         NULL, getadcrand},
+        {"setadcrand",          required_argument,   NULL, setadcrand},
+        {"getadcdith",          no_argument,         NULL, getadcdith},
+        {"setadcdith",          required_argument,   NULL, setadcdith},
+        {"getadcshdn",          no_argument,         NULL, getadcshdn},
+        {"setadcshdn",          required_argument,   NULL, setadcshdn},
+        {"getadcpga",           no_argument,         NULL, getadcpga},
+        {"setadcpga",           required_argument,   NULL, setadcpga},
         {"getadcdata",          required_argument,   NULL, 'c'},
         {"setadcdata",          required_argument,   NULL, 'C'},
         {"getdlyval",           required_argument,   NULL, getdlyval},
@@ -578,6 +595,82 @@ int main (int argc, char *argv [])
                 item.name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS;
                 item.service = FMC130M_4CH_MODULE_NAME;
                 item.rw = 0;
+                append_item (call_list, item);
+                break;
+
+                /* Get ADC Rand */
+            case getadcrand:
+                item.name = FMC130M_4CH_NAME_ADC_RAND;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *item.write_val = item.rw;
+                append_item (call_list, item);
+                break;
+
+                /* Set ADC Rand */
+            case setadcrand:
+                item.name = FMC130M_4CH_NAME_ADC_RAND;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *item.write_val = item.rw;
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                /* Get ADC DITH */
+            case getadcdith:
+                item.name = FMC130M_4CH_NAME_ADC_DITH;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *item.write_val = item.rw;
+                append_item (call_list, item);
+                break;
+
+                /* Set ADC DITH */
+            case setadcdith:
+                item.name = FMC130M_4CH_NAME_ADC_DITH;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *item.write_val = item.rw;
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                /* Get ADC SHDN */
+            case getadcshdn:
+                item.name = FMC130M_4CH_NAME_ADC_SHDN;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *item.write_val = item.rw;
+                append_item (call_list, item);
+                break;
+
+                /* Set ADC SHDN */
+            case setadcshdn:
+                item.name = FMC130M_4CH_NAME_ADC_SHDN;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *item.write_val = item.rw;
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
+                append_item (call_list, item);
+                break;
+
+                /* Get ADC PGA */
+            case getadcpga:
+                item.name = FMC130M_4CH_NAME_ADC_PGA;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 1;
+                *item.write_val = item.rw;
+                append_item (call_list, item);
+                break;
+
+                /* Set ADC PGA */
+            case setadcpga:
+                item.name = FMC130M_4CH_NAME_ADC_PGA;
+                item.service = FMC130M_4CH_MODULE_NAME;
+                item.rw = 0;
+                *item.write_val = item.rw;
+                *(item.write_val+4) = strtoul(optarg, NULL, 10);
                 append_item (call_list, item);
                 break;
 
