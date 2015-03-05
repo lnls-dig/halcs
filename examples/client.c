@@ -1756,9 +1756,6 @@ int main (int argc, char *argv [])
             print_data_curve (acq_chan_val, acq_trans.block.data, acq_trans.block.bytes_read);
         } else {
             fprintf (stderr, "[client:acq]: bpm_get_block failed\n");
-            if (err != BPM_CLIENT_SUCCESS) {
-                fprintf (stderr, "[client:acq]: '%s'\n", bpm_client_err_str(err));
-            }
         }
         free(valid_data);
     }
