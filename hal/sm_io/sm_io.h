@@ -22,6 +22,11 @@
 #include "dispatch_table.h"
 #include "mdp.h"
 
+/* SMIO sockets IDs */
+#define SMIO_PIPE_SOCK              0
+#define SMIO_END_SOCK               1
+#define SMIO_SOCKS_NUM              SMIO_END_SOCK
+
 struct _devio_t;
 struct _smio_ops_t;
 struct _smio_thsafe_client_ops_t;

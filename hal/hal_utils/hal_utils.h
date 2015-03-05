@@ -43,11 +43,15 @@ uint32_t halutils_numerify_dec_key (const char *key);
  * a uint32_t */
 uint32_t halutils_numerify_hex_key (const char *key);
 
-/* Concatenates 2 strings togheter with a separator. returns the string if
+/* Concatenates 2 strings together with a separator. returns the string if
  * OK, NULL in case of error */
 char *halutils_concat_strings (const char *str1, const char* str2, char sep);
 
-/* Concatenates 3 strings togheter with a separator between the first and second
+/* Concatenates 2 strings together without a separator. returns the string if
+ * OK, NULL in case of error */
+char *halutils_concat_strings_no_sep (const char *str1, const char* str2);
+
+/* Concatenates 3 strings together with a separator between the first and second
  * strings. returns the string if OK, NULL in case of error */
 char *halutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);
