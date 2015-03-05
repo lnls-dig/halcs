@@ -402,11 +402,11 @@ int main (int argc, char *argv [])
     /* TODO: Check which 'set' functions are boolean and set them without the need of an entry value */
     static struct option long_options[] =
     {
-        {"help",                no_argument,         NULL, 'h'},    
-        {"verbose",             no_argument,         NULL, 'v'},    
+        {"help",                no_argument,         NULL, 'h'},
+        {"verbose",             no_argument,         NULL, 'v'},
         {"endpoint",            required_argument,   NULL, 'e'},
-        {"board",               required_argument,   NULL, 'd'},    
-        {"bpm",                 required_argument,   NULL, 'm'},    
+        {"board",               required_argument,   NULL, 'd'},
+        {"bpm",                 required_argument,   NULL, 'm'},
         {"leds",                required_argument,   NULL, 'l'},
         {"getpll",              no_argument,         NULL, 'p'},
         {"setpll",              required_argument,   NULL, 'P'},
