@@ -512,7 +512,7 @@ int main (int argc, char *argv [])
     }
 
     char corr_name[50];
-    call_func_t item = {0};
+    call_func_t item = {0,0,0,0,{0},{0}};
 
     while ((ch = getopt_long_only(argc, argv, shortopt , long_options, NULL)) != -1)
     {
