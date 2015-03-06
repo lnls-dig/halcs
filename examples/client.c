@@ -176,6 +176,7 @@ bpm_client_err_e parse_subopt (char *subopts, char *mount_opts[], char* name, ch
         {
             case CHANNEL:
                     memcpy(corr_name+len-1, value, strlen(value));
+                    memcpy(corr_name+len, "\0", 1);
                     break;
             case VALUE:
                     temp_value = value;
