@@ -11,8 +11,12 @@
 #define ADC0_CHAN_ID                    0
 #define ADC0_SAMPLE_SIZE                8 /* 8 Bytes -> ADC0 = 16-bit / ADC1 = 16-bit ... */
 
+/* ADC SWAPPED (after the switching module) */
+#define ADCSWAP0_CHAN_ID                (ADC0_CHAN_ID + 1)
+#define ADCSWAP0_SAMPLE_SIZE            8 /* 8 Bytes -> ADCSWAP0 = 16-bit / ADCSWAP1 = 16-bit ... */
+
 /* MIXER I */
-#define MIX0_CHAN_ID                    (ADC0_CHAN_ID + 1)
+#define MIX0_CHAN_ID                    (ADCSWAP0_CHAN_ID + 1)
 #define MIX0_SAMPLE_SIZE                16 /* 16 Bytes -> MIX0 = 32-bit / MIX1 = 32-bit ... */
 
 /* TBT AMP */
