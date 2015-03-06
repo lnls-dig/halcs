@@ -77,6 +77,13 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .sample_size = DDR3_ADC0_SAMPLE_SIZE
         },
         {
+            .id = ADCSWAP0_CHAN_ID,
+            .start_addr = DDR3_ADCSWAP0_START_ADDR,
+            .end_addr = DDR3_ADCSWAP0_END_ADDR,
+            .max_samples = DDR3_ADCSWAP0_MAX_SAMPLES,
+            .sample_size = DDR3_ADCSWAP0_SAMPLE_SIZE
+        },
+        {
             .id = MIX0_CHAN_ID,
             .start_addr = DDR3_MIX0_START_ADDR,
             .end_addr = DDR3_MIX0_END_ADDR,
@@ -141,6 +148,13 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .end_addr = DDR3_ADC1_END_ADDR,
             .max_samples = DDR3_ADC1_MAX_SAMPLES,
             .sample_size = DDR3_ADC0_SAMPLE_SIZE
+        },
+        {
+            .id = ADCSWAP0_CHAN_ID,
+            .start_addr = DDR3_ADCSWAP1_START_ADDR,
+            .end_addr = DDR3_ADCSWAP1_END_ADDR,
+            .max_samples = DDR3_ADCSWAP1_MAX_SAMPLES,
+            .sample_size = DDR3_ADCSWAP0_SAMPLE_SIZE
         },
         {
             .id = MIX0_CHAN_ID,
