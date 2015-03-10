@@ -408,14 +408,17 @@ static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len)
     size_t bytesleft = len;  /* how many we have left to send */
     ssize_t n;
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io_eth] Sending %lu bytes\n", len);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sending %lu bytes\n", len);
 
     while (total < len) {
         n = send (fd, (char *) buf+total, bytesleft, 0);
-        DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io_eth] Sent %ld bytes\n", n);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sent %ld bytes\n", n);
+
+        /* On error, don't try to recover, just inform it to the caller*/
         if (n == -1) {
             return -1;
         }
+
         total += n;
         bytesleft -= n;
     }
@@ -429,14 +432,22 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
     size_t bytesleft = len; /* how many we have left to recv */
     ssize_t n;
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io_eth] Receiving %lu bytes\n", len);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Receiving %lu bytes\n", len);
 
     while (total < len) {
         n = recv (fd, (char *) buf+total, bytesleft, 0);
-        DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io_eth] Received %ld bytes\n", n);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Received %ld bytes\n", n);
+
+        /* On error, don't try to recover, just inform it to the caller*/
         if (n == -1) {
-            break;
+            return -1;
         }
+
+        /* Disconnected endpoint */
+        if (n == 0) {
+            return -1;
+        }
+
         total += n;
         bytesleft -= n;
     }
