@@ -388,9 +388,10 @@ err_ret_groups:
 /* BSMP function I/O */
 static int _smpr_proto_bsmp_send (uint8_t *data, uint32_t *count)
 {
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr:bsmp] Sending %u bytes\n", *count);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Sending %u bytes\n", *count);
     ssize_t ret = smio_thsafe_client_write_block (bsmp_glue.parent, 0, *count,
             (uint32_t *) data);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Sent %u bytes\n", *count);
 
     /* Update count with the number of bytes received */
     int err;
@@ -412,10 +413,10 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
     int err = 0;
 
     /* First we must received the packet header */
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr:bsmp] Receiving %u bytes\n", len);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Receiving %u bytes\n", len);
     ssize_t ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *) data);
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr:bsmp] Received %ld bytes\n", ret);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %ld bytes\n", ret);
 
     if (ret >= 0) {
         *count = ret;
@@ -433,11 +434,11 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
      * FIXME */
     len = (data [1] << 8) + data [2];
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr:bsmp] Receiving another %u "
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Receiving another %u "
             "bytes\n", len);
     ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *)(data + *count));
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[sm_pr:bsmp] Received another %ld "
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %ld "
             "bytes\n", ret);
 
     if (ret >= 0) {
