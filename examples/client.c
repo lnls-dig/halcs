@@ -388,8 +388,7 @@ int main (int argc, char *argv [])
         rffegettmpctr,
         rffesetout,
         rffegetout,
-        rffesetrst,
-        rffegetrst,
+        rffereset,
         rffesetrpg,
         rffegetrpg,
         rffesetswlvl,
@@ -498,8 +497,7 @@ int main (int argc, char *argv [])
         {"rffegettmpctr",       no_argument,         NULL, rffegettmpctr},
         {"rffesetout",          required_argument,   NULL, rffesetout},
         {"rffegetout",          required_argument,   NULL, rffegetout},
-        {"rffesetrst",          required_argument,   NULL, rffesetrst},
-        {"rffegetrst",          no_argument,         NULL, rffegetrst},
+        {"rffereset",           required_argument,   NULL, rffereset},
         {"rffesetrpg",          required_argument,   NULL, rffesetrpg},
         {"rffegetrpg",          no_argument,         NULL, rffegetrpg},
         {"rffesetswlvl",        required_argument,   NULL, rffesetswlvl},
@@ -1566,8 +1564,8 @@ int main (int argc, char *argv [])
                 free(item.name);
                 break;
 
-                /* Set RFFE Reset */
-            case rffesetrst:
+                /* RFFE Reset */
+            case rffereset:
                 item.name = RFFE_NAME_SET_GET_RESET;
                 item.service = RFFE_MODULE_NAME;
                 item.rw = 0;
