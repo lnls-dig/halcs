@@ -421,7 +421,6 @@ int main (int argc, char *argv [])
         {"getadcpga",           no_argument,         NULL, getadcpga},
         {"setadcpga",           required_argument,   NULL, setadcpga},
         {"getadcdata",          required_argument,   NULL, 'c'},
-        {"setadcdata",          required_argument,   NULL, 'C'},
         {"getdlyval",           required_argument,   NULL, getdlyval},
         {"setdlyval",           required_argument,   NULL, setdlyval},
         {"getdlyline",          required_argument,   NULL, getdlyline},
@@ -462,15 +461,10 @@ int main (int argc, char *argv [])
         {"getfofbth",           no_argument,         NULL, getfofbth},
         {"setmonitth",          required_argument,   NULL, setmonitth},
         {"getmonitth",          no_argument,         NULL, getmonitth},
-        {"setmonitamp",         required_argument,   NULL, 'J'},
         {"getmonitamp",         required_argument,   NULL, 'j'},
-        {"setmonitposx",        required_argument,   NULL, 'X'},
         {"getmonitposx",        required_argument,   NULL, 'x'},
-        {"setmonitposy",        required_argument,   NULL, 'Y'},
         {"getmonitposy",        required_argument,   NULL, 'y'},
-        {"setmonitposq",        required_argument,   NULL, 'Q'},
         {"getmonitposq",        required_argument,   NULL, 'q'},
-        {"setmonitpossum",      required_argument,   NULL, 'S'},
         {"getmonitpossum",      required_argument,   NULL, 's'},
         {"setsw",               required_argument,   NULL, 'W'},
         {"getsw",               no_argument,         NULL, 'w'},
@@ -522,7 +516,7 @@ int main (int argc, char *argv [])
         {NULL, 0, NULL, 0}
     };
 
-    const char* shortopt = "hve:d:m:l:pP:Lc:C:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:J:xX:yY:qQ:sS:wW:tT:zZ:fF:E:H:IKA:";
+    const char* shortopt = "hve:d:m:l:pP:Lc:u:U:V:nN:oO:i:D:a:b:r:R:B:M:u:U:k:j:xyqswW:tT:zZ:fF:E:H:IKA:";
 
     zlist_t *call_list = zlist_new();
     if (call_list == NULL) {
@@ -1579,15 +1573,6 @@ int main (int argc, char *argv [])
                 item.rw = 0;
                 *item.write_val = item.rw;
                 *(item.write_val+4) = strtoul(optarg, NULL, 10);
-                append_item (call_list, item);
-                break;
-
-                /* Get RFFE Reset */
-            case rffegetrst:
-                item.name = RFFE_NAME_SET_GET_RESET;
-                item.service = RFFE_MODULE_NAME;
-                item.rw = 1;
-                *item.write_val = item.rw;
                 append_item (call_list, item);
                 break;
 
