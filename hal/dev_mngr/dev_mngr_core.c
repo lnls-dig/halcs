@@ -556,7 +556,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
                 /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
                         "[dev_mngr_core:scan_devs] Could not find any more endpoint
                         hints for FEs\n"); */
-                break;
+                continue;
             }
 
             /* Prepare respective DEVIO structure */
