@@ -223,7 +223,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     if (block_n > block_n_max) {    /* block required out of the limits */
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-                "Block required is out of the limit\n");
+                "Block %u of channel %u is out of range\n", block_n, chan);
         return -ACQ_BLOCK_OOR;
     }
 
@@ -251,26 +251,27 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     if (block_n > block_n_valid) {
         /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
-                "Block required is not valid\n");
+                "Block %u of channel %u is not valid\n", block_n, chan);
         return -ACQ_BLOCK_OOR;
     }   /* Last valid data conditions check done */
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
-                "Block required has %u valid samples\n", over_samples);
         reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
     }
     else { /* if block_n < block_n_valid */
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
-                "Block required is full of valid data\n");
         reply_size = BLOCK_SIZE;
     }
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
+            "Reading block %u of channel %u with %u valid samples\n",
+            block_n, chan, reply_size);
 
     uint32_t addr_i = SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
         block_n * BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "Memory start address = 0x%08x\n", addr_i);
+            "Block %u of channel %u start address = 0x%08x\n", block_n,
+            chan, addr_i);
 
     smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) ret;
 
