@@ -295,6 +295,7 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     uint32_t acq_id = 0x4519a0ad;
     uint32_t dsp_id = 0x1bafbf1e;
     uint32_t swap_id = 0x12897592;
+    uint32_t afc_diag_id = 0x51954750;
     devio_err_e err = DEVIO_SUCCESS;
 
 /* ML605 or AFCv3 */
@@ -346,6 +347,12 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     }
 
     err = devio_register_sm (devio, swap_id, DSP2_BASE_ADDR, 1);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        goto err_register_sm;
+    }
+
+    err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_register_sm;
