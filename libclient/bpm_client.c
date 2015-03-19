@@ -1494,3 +1494,30 @@ PARAM_FUNC_CLIENT_READ(rffe_sw_lvl)
             rffe_sw_lvl);
 }
 
+/********************** AFC Diagnostics Functions ********************/
+
+/* AFC card slot */
+PARAM_FUNC_CLIENT_WRITE(afc_diag_card_slot)
+{
+    return param_client_write (self, service, AFC_DIAG_OPCODE_SET_GET_CARD_SLOT,
+            afc_diag_card_slot);
+}
+
+PARAM_FUNC_CLIENT_READ(afc_diag_card_slot)
+{
+    return param_client_read (self, service, AFC_DIAG_OPCODE_SET_GET_CARD_SLOT,
+            afc_diag_card_slot);
+}
+
+/* AFC IPMI address */
+PARAM_FUNC_CLIENT_WRITE(afc_diag_ipmi_addr)
+{
+    return param_client_write (self, service, AFC_DIAG_OPCODE_SET_GET_IPMI_ADDR,
+            afc_diag_ipmi_addr);
+}
+
+PARAM_FUNC_CLIENT_READ(afc_diag_ipmi_addr)
+{
+    return param_client_read (self, service, AFC_DIAG_OPCODE_SET_GET_IPMI_ADDR,
+            afc_diag_ipmi_addr);
+}

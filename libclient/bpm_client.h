@@ -690,5 +690,24 @@ bpm_client_err_e bpm_set_rffe_sw_lvl (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_rffe_sw_lvl (bpm_client_t *self, char *service,
         uint32_t *rffe_sw_lvl);
 
+/********************** AFC Diagnostics Functions ********************/
+/* AFC Card Slot functions */
+/* These set of functions write (set) read (get) the card slot.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_afc_diag_card_slot (bpm_client_t *self, char *service,
+        uint32_t afc_diag_card_slot);
+bpm_client_err_e bpm_get_afc_diag_card_slot (bpm_client_t *self, char *service,
+        uint32_t *afc_diag_card_slot);
+
+/* AFC IPMI Address functions */
+/* These set of functions write (set) read (get) the IPMI address.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_afc_diag_ipmi_addr (bpm_client_t *self, char *service,
+        uint32_t afc_diag_ipmi_addr);
+bpm_client_err_e bpm_get_afc_diag_ipmi_addr (bpm_client_t *self, char *service,
+        uint32_t *afc_diag_ipmi_addr);
+
 #endif
 
