@@ -76,7 +76,10 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->log_file = strdup (log_file_name);
+    if (log_file_name != NULL) {
+        self->log_file = strdup (log_file_name);
+    }
+
     ASSERT_TEST((self->log_file == NULL && log_file_name == NULL)
             || (self->log_file != NULL && log_file_name != NULL),
             "Error setting log file!", err_log_file);
