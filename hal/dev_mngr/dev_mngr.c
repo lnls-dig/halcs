@@ -11,15 +11,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>       /* perror */
 #include <sys/types.h>
-#include <sys/wait.h>   /* waitpid */
 #include <stdarg.h>
 #include <sys/stat.h>   /* chmod */
 
 #include "dev_mngr.h"
 #include "debug_print.h"
 #include "hal_varg.h"
+#include "hal_utils.h"
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 #define DFLT_BIND_ADDR              "0"
@@ -38,73 +37,6 @@
 #else
 #error "Config filename not defined!"
 #endif
-
-int dmngr_wait_chld_f (void)
-{
-    int chld_status;
-    pid_t chld_pid = waitpid (-1, &chld_status, WNOHANG);
-
-    /* Error or no child exists */
-    if (chld_pid == (pid_t) -1) {
-        /* Not actually an error if ECHILD. Do nothing... */
-        if (errno == ECHILD) {
-            /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] no child to wait for\n"); */
-            return 0;
-        }
-
-        return -1;
-    }
-
-    /* Child exists but have not changed its state */
-    if (chld_pid == (pid_t) 0) {
-        /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] Child has not changed its state\n"); */
-        return 0;
-    }
-
-    /* Child exists and has changed its state. Check fior the return status */
-    if (WIFEXITED (chld_status)) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_WARN, "[dev_mngr] Child exited%s with status %d\n",
-                WCOREDUMP(chld_status) ? " and dumped core" : "",
-                WEXITSTATUS(chld_status));
-    }
-
-    if (WIFSTOPPED (chld_status)) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_WARN, "[dev_mngr] Child stopped by signal %d\n",
-                WSTOPSIG(chld_status));
-    }
-
-    if (WIFSIGNALED (chld_status)) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_WARN, "[dev_mngr] Child signalled by signal %d\n",
-                WTERMSIG(chld_status));
-    }
-
-    return 0;
-}
-
-int dmngr_spawn_chld_f (const char *program, char *const argv[])
-{
-    /* Fill the devio strucutre and create a new process
-     * in charge of handling it */
-    pid_t child = fork ();
-
-    if (child == -1) {
-        perror ("[dev_mngr] fork");
-        /* What to do in case of error? retry ? */
-        return -1;
-    }
-    else if (child == 0) { /* Child */
-        int err = execv (program, argv);
-
-        if (err < 0) {
-            perror ("[dev_mngr] execl");
-            return -1;
-        }
-    }
-    else { /* Parent */
-    }
-
-    return 0; /* Success */
-}
 
 void print_help (char *program_name)
 {
@@ -305,8 +237,8 @@ int main (int argc, char *argv[])
     }
 #endif
 
-    dmngr_set_wait_clhd_handler (dmngr, &dmngr_wait_chld_f);
-    dmngr_set_spawn_clhd_handler (dmngr, &dmngr_spawn_chld_f);
+    dmngr_set_wait_clhd_handler (dmngr, &halutils_wait_chld);
+    dmngr_set_spawn_clhd_handler (dmngr, &halutils_spawn_chld);
 
     err = dmngr_register_sig_handlers (dmngr);
     if (err != DMNGR_SUCCESS) {

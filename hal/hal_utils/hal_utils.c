@@ -6,6 +6,8 @@
  */
 
 #include <stdio.h>
+#include <sys/wait.h>   /* waitpid */
+#include <errno.h>       /* perror */
 
 #include "hal_utils.h"
 #include "hal_utils_err.h"
@@ -161,3 +163,71 @@ char *halutils_concat_strings3 (const char *str1, const char* str2,
 {
     return _halutils_concat_strings_raw (str1, str2, str3, true, sep);
 }
+
+int halutils_spawn_chld (const char *program, char *const argv[])
+{
+    pid_t child = fork ();
+
+    if (child == -1) {
+        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[halutils] Could not fork child. "
+                "Errno = %d\n", errno);
+        /* What to do in case of error? retry ? */
+        return -1;
+    }
+    else if (child == 0) { /* Child */
+        int err = execv (program, argv);
+
+        if (err < 0) {
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[halutils] Could not exec child. "
+                    "Errno = %d\n", errno);
+            return -1;
+        }
+    }
+    else { /* Parent */
+    }
+
+    return child;
+}
+
+int halutils_wait_chld (void)
+{
+    int chld_status;
+    pid_t chld_pid = waitpid (-1, &chld_status, WNOHANG);
+
+    /* Error or no child exists */
+    if (chld_pid == (pid_t) -1) {
+        /* Not actually an error if ECHILD. Do nothing... */
+        if (errno == ECHILD) {
+            /* DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[halutils] no child to wait for\n"); */
+            return 0;
+        }
+
+        return -1;
+    }
+
+    /* Child exists but have not changed its state */
+    if (chld_pid == (pid_t) 0) {
+        /* DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[halutils] Child has not changed its state\n"); */
+        return 0;
+    }
+
+    /* Child exists and has changed its state. Check fior the return status */
+    if (WIFEXITED (chld_status)) {
+        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "[halutils] Child exited%s with status %d\n",
+                WCOREDUMP(chld_status) ? " and dumped core" : "",
+                WEXITSTATUS(chld_status));
+    }
+
+    if (WIFSTOPPED (chld_status)) {
+        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "[halutils] Child stopped by signal %d\n",
+                WSTOPSIG(chld_status));
+    }
+
+    if (WIFSIGNALED (chld_status)) {
+        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "[halutils] Child signalled by signal %d\n",
+                WTERMSIG(chld_status));
+    }
+
+    return 0;
+}
+
