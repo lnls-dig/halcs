@@ -583,6 +583,9 @@ static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key)
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
             "PIPE", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
+    /* Close socket */
+    zmq_term (&pipe);
+
     /* Finally, remove the pipe from hash. FIXME: What if the SMIO does not
      * exit? We will loose its reference ...*/
     zhash_delete (self->sm_io_h, smio_key);
