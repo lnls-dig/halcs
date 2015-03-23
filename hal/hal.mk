@@ -31,11 +31,17 @@ dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
 dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
 	   $(msg_OBJS) $(debug_OBJS) $(hal_utils_OBJS)
 
+dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) $(sm_io_OBJS) \
+	   $(msg_OBJS) $(debug_OBJS) $(hal_utils_OBJS)
+
 dev_mngr_LIBS =
 dev_mngr_STATIC_LIBS =
 
 dev_io_LIBS = -lbsmp
 dev_io_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
+
+dev_io_cfg_LIBS = -lbsmp
+dev_io_cfg_STATIC_LIBS = $(LIBCLIENT_DIR)/libbpmclient.a
 
 # Merge all hal objects together
 hal_OBJS = $(debug_OBJS) \
