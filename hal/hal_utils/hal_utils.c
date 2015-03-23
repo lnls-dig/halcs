@@ -170,7 +170,7 @@ int halutils_spawn_chld (const char *program, char *const argv[])
 
     if (child == -1) {
         DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[halutils] Could not fork child. "
-                "Errno = %d\n", errno);
+                "Errno = %d, %s\n", errno, strerror(errno));
         /* What to do in case of error? retry ? */
         return -1;
     }
@@ -179,7 +179,7 @@ int halutils_spawn_chld (const char *program, char *const argv[])
 
         if (err < 0) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[halutils] Could not exec child. "
-                    "Errno = %d\n", errno);
+                    "Errno = %d, %s\n", errno, strerror(errno));
             return -1;
         }
     }
