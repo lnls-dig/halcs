@@ -17,6 +17,10 @@ FMC130M_4CH_EEPROM_PROGRAM=
 WITH_DEV_MNGR=y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE=2
+# Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
+# If selected, the FPGA firmware must have the AFC diagnostics module
+# synthesized.
+WITH_DEVIO_CFG=y
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
@@ -34,6 +38,7 @@ COMMAND_HAL="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+    WITH_DEVIO_CFG=${WITH_DEVIO_CFG} \
     CFG_DIR=${CFG_DIR} && \
     sudo make install"
 
@@ -43,8 +48,8 @@ COMMAND_LIBCLIENT="\
     DBE_DBG=${DBE_DBG} libclient && \
     sudo make libclient_install"
 
+    #"${COMMAND_DEPS}"
 COMMAND_ARRAY=(
-    "${COMMAND_DEPS}"
     "${COMMAND_HAL}"
     "${COMMAND_LIBCLIENT}"
 )
