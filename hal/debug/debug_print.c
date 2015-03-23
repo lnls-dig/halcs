@@ -124,6 +124,10 @@ int debug_set_log (const char *log_file_name, const char *mode)
             }
         }
     }
+    else {
+        /* Default to stdout */
+        log_file = stdout;
+    }
 
     _debug_set_log_file (log_file);
     return err;
