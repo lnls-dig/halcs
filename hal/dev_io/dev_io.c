@@ -303,6 +303,9 @@ int main (int argc, char *argv[])
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll2_all_sm error. Exiting ...\n");
             goto err_devio;
         }
+
+        /* wait child */
+        halutils_wait_chld ();
     }
 
 err_devio:
