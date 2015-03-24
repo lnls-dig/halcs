@@ -48,6 +48,8 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+#define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
+
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe);
@@ -67,7 +69,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     debug_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     char *dev_type_c = llio_type_to_str (type);
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
             " with exported service %s, for a %s device \n\tlocated on %s,"
             " broker address %s, with logfile on %s ...\n", name, dev_type_c,
             endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
@@ -554,12 +556,19 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe)
     ASSERT_ALLOC (send_msg, err_msg_alloc, DEVIO_ERR_ALLOC);
     /* An empty message means to selfdestruct */
     zmsg_pushstr (send_msg, "");
-    int zerr = zmsg_send (&send_msg, pipe);
-    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
-            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
-            "to SMIO sent\n");
+    /* Try to send the message a few times and then give up */
+    uint32_t tries = 0;
+    for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
+        int zerr = zmsg_send (&send_msg, pipe);
+        if (zerr == 0) {
+            break;
+        }
+    }
+
+    ASSERT_TEST (tries < DEVIO_MAX_DESTRUCT_MSG_TRIES, "Could not send "
+            "self-destruct message to SMIO instance",
+            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
 err_send_msg:
     zmsg_destroy (&send_msg);
@@ -582,9 +591,6 @@ static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key)
     err = _devio_send_destruct_msg (self, pipe);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
             "PIPE", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
-
-    /* Close socket */
-    zmq_term (&pipe);
 
     /* Finally, remove the pipe from hash. FIXME: What if the SMIO does not
      * exit? We will loose its reference ...*/
