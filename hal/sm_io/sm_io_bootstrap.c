@@ -250,10 +250,10 @@ static smio_err_e _smio_loop (smio_t *self)
             "[sm_io_bootstrap] Main loop starting\n");
 
     smio_err_e err = SMIO_SUCCESS;
-    /* Begin infinite polling on Majordomo socket
+    /* Begin infinite polling on Majordomo/PIPE socket
      * and exit if the parent send a message through
      * the pipe socket */
-    while (!zctx_interrupted) {
+    while (true) {
         /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
         zmq_pollitem_t items [] = {
             [SMIO_PIPE_SOCK] = {
