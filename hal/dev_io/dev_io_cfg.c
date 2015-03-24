@@ -217,16 +217,14 @@ int main (int argc, char *argv[])
 
         /* devio_poll_all_sm (devio); */
         err = devio_poll2_all_sm (devio);
-	if (err != DEVIO_SUCCESS) {
-	    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll2_all_sm error. Exiting ...\n");
-	    goto err_devio;
+        if (err != DEVIO_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll2_all_sm error. Exiting ...\n");
+            goto err_devio;
         }
     }
 
-	    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io_cfg] here!\n");
 err_devio:
     devio_destroy (&devio);
-	    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io_cfg] here2!\n");
 err_exit:
     str_p = &log_file_name;
     free (*str_p);
