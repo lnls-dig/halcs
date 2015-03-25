@@ -121,10 +121,8 @@ err_inst_id_str_alloc:
 /************************************************************/
 /*************** SMIO Config Thread entry-point  ************/
 /************************************************************/
-void smio_config_defaults (void *args, zctx_t *ctx, void *pipe)
+void *smio_config_defaults (void *args)
 {
-    (void) pipe;
-    (void) ctx;
     th_config_args_t *th_args = (th_config_args_t *) args;
 
     /* We must export our service as the combination of the
@@ -151,7 +149,7 @@ err_smio_service_alloc:
     free (inst_id_str);
 err_inst_id_str_alloc:
     free (th_args);
-    return;
+    return NULL;
 }
 
 /************************************************************/
