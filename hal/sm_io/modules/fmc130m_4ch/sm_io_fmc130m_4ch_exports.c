@@ -420,7 +420,7 @@ disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
 disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp = {
     .name = FMC130M_4CH_NAME_AD9510_PLL_A_DIV,
     .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -432,7 +432,7 @@ disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp = {
 disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp = {
     .name = FMC130M_4CH_NAME_AD9510_PLL_B_DIV,
     .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -444,7 +444,7 @@ disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp = {
 disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp = {
     .name = FMC130M_4CH_NAME_AD9510_PLL_PRESCALER,
     .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -456,7 +456,7 @@ disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp = {
 disp_op_t fmc130m_4ch_ad9510_r_div_exp = {
     .name = FMC130M_4CH_NAME_AD9510_R_DIV,
     .opcode = FMC130M_4CH_OPCODE_AD9510_R_DIV,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -468,7 +468,7 @@ disp_op_t fmc130m_4ch_ad9510_r_div_exp = {
 disp_op_t fmc130m_4ch_ad9510_pll_pdown_exp = {
     .name = FMC130M_4CH_NAME_AD9510_PLL_PDOWN,
     .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -480,7 +480,7 @@ disp_op_t fmc130m_4ch_ad9510_pll_pdown_exp = {
 disp_op_t fmc130m_4ch_ad9510_mux_status_exp = {
     .name = FMC130M_4CH_NAME_AD9510_MUX_STATUS,
     .opcode = FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -492,7 +492,7 @@ disp_op_t fmc130m_4ch_ad9510_mux_status_exp = {
 disp_op_t fmc130m_4ch_ad9510_cp_current_exp = {
     .name = FMC130M_4CH_NAME_AD9510_CP_CURRENT,
     .opcode = FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -504,7 +504,7 @@ disp_op_t fmc130m_4ch_ad9510_cp_current_exp = {
 disp_op_t fmc130m_4ch_ad9510_outputs_exp = {
     .name = FMC130M_4CH_NAME_AD9510_OUTPUTS,
     .opcode = FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
@@ -516,7 +516,7 @@ disp_op_t fmc130m_4ch_ad9510_outputs_exp = {
 disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp = {
     .name = FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL,
     .opcode = FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
