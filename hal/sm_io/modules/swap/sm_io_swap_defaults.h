@@ -13,13 +13,12 @@
                                                             No switching */
 #define SWAP_DFLT_SW_EN                 0               /* Switching clock is disable */
 
-#define _SWAP_DFLT_DIV_CLK              1120            /* in ADC counts */
+#define _SWAP_DFLT_DIV_CLK              980             /* in ADC counts */
 
 /* This parameter was not supposed to be like this. We need to divide by 2,
  * because the RFFE uses the FPGA switching clock as a trigger to regenerate
- * it internally. FIXME: The -4 constant is a bug in the FPGAthat must be
- * corrected! */
-#define SWAP_DFLT_DIV_CLK                (_SWAP_DFLT_DIV_CLK/2-4)   /* in ADC counts */
+ * it internally */
+#define SWAP_DFLT_DIV_CLK                (_SWAP_DFLT_DIV_CLK/2)   /* in ADC counts */
 
 /************************** Gain Default Values ******************************/
 
