@@ -511,7 +511,7 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
         uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
                                                                                 \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling " \
-                "AD9510 function");                                             \
+                "AD9510 function\n");                                           \
                                                                                 \
         FMC130M_4CH_CHECK_ACTIVE(self);                                         \
                                                                                 \
@@ -528,7 +528,7 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
                 *((uint32_t *) ret) = value;                                    \
                 err = sizeof (value);                                           \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
-                        "AD9510 function read value = 0x%08X", value);          \
+                        "AD9510 function read value = 0x%08X\n", value);        \
             }                                                                   \
         }                                                                       \
         else {                                                                  \
