@@ -468,8 +468,9 @@ smch_err_e smch_ad9510_get_mux_status (smch_ad9510_t *self, uint32_t *mux)
 {
     smch_err_e err = SMCH_SUCCESS;
 
-    _smch_ad9510_read_8 (self, AD9510_REG_PLL_2, (uint8_t *) mux);
-    *mux = AD9510_PLL_2_MUX_SEL_R(*mux);
+    uint8_t data = 0;
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_2, &data);
+    *mux = AD9510_PLL_2_MUX_SEL_R(data);
 
     return err;
 }
