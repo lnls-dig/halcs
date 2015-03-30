@@ -328,6 +328,9 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
 
         /* Invalid BAR */
         default:
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
+                    "----------------------------------------------------------\n"
+                    "[ll_io_pcie:_pcie_rw_32] Invalid BAR access\n");
             return -1;
     }
 
@@ -341,8 +344,6 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t 
     uint32_t num_bytes_rem = size;
     /* Number of bytes read/written, for faster comparison */
     uint32_t num_bytes_rw = 0;
-    /* PCIe timeout correlation counter */
-    ////uint32_t timeout_count = 0;
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "----------------------------------------------------------\n"
             "[ll_io_pcie:_pcie_rw_bar2_block_raw] pg_start = %u, pg_end = %lu...\n",
@@ -388,7 +389,6 @@ static ssize_t _pcie_rw_bar2_block_td (llio_t *self, uint32_t pg_start, loff_t p
                     pcie_timeout_patt, PCIE_TIMEOUT_PATT_SIZE)) {
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_bar2_td] Timeout detected. Retrying\n");
-            /////////////////////
             _pcie_timeout_reset (self);
             usleep (PCIE_TIMEOUT_WAIT);
         }
@@ -457,7 +457,6 @@ static ssize_t _pcie_rw_bar4_block_td (llio_t *self, uint32_t pg_start, loff_t p
                     pcie_timeout_patt, PCIE_TIMEOUT_PATT_SIZE)) {
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_bar4_td] Timeout detected. Retrying\n");
-            //////////////
             _pcie_timeout_reset (self);
             usleep (PCIE_TIMEOUT_WAIT);
         }
@@ -531,6 +530,9 @@ static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t 
 
         /* Invalid BAR */
         default:
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
+                    "----------------------------------------------------------\n"
+                    "[ll_io_pcie:_pcie_rw_32] Invalid BAR access\n");
             break;
     }
 
