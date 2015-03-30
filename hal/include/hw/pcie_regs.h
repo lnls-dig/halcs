@@ -112,10 +112,10 @@
 #define BAR2NO                              2
 #define BAR4NO                              4
 
-/* For the PCIe device, we only have up to 28 address bits, as
+/* For the PCIe device, we only have up to 60 address bits, as
  * the 4 MSB are reserved for selecting the BAR to operate on */
 /********** PCIe Address MSB (BARs) part extractor **********/
-#define PCIE_ADDR_BAR_SHIFT                 28          /* bits */
+#define PCIE_ADDR_BAR_SHIFT                 60          /* bits */
 #define PCIE_ADDR_BAR_MAX                   4           /* bits */
 #define PCIE_ADDR_BAR_MASK                  (((1 << PCIE_ADDR_BAR_MAX)-1) << \
                                                 PCIE_ADDR_BAR_SHIFT)
@@ -126,15 +126,15 @@
 
 /* For use by LL_IO */
 /* We divide the PCIe Wishbone addresses as:
- * bits 32 to 28: BAR address (0, 2 or 4)
- * bits 27 to 0: Wishbone physical address (2^28-1 to 0)*/
-#define BAR4_ADDR                       (BAR4NO << PCIE_ADDR_BAR_SHIFT)
-#define BAR2_ADDR                       (BAR2NO << PCIE_ADDR_BAR_SHIFT)
-#define BAR0_ADDR                       (BAR0NO << PCIE_ADDR_BAR_SHIFT)
+ * bits 64 to 60: BAR address (0, 2 or 4)
+ * bits 59 to 0: Wishbone physical address (2^59-1 to 0)*/
+#define BAR4_ADDR                           (BAR4NO << PCIE_ADDR_BAR_SHIFT)
+#define BAR2_ADDR                           (BAR2NO << PCIE_ADDR_BAR_SHIFT)
+#define BAR0_ADDR                           (BAR0NO << PCIE_ADDR_BAR_SHIFT)
 
 /********** PCIe Address LSB (generic) part extractor **********/
 #define PCIE_ADDR_GEN_SHIFT                 0           /* bits */
-#define PCIE_ADDR_GEN_MAX                   28          /* bits */
+#define PCIE_ADDR_GEN_MAX                   60          /* bits */
 #define PCIE_ADDR_GEN_MASK                  (((1 << PCIE_ADDR_GEN_MAX)-1) << \
                                                 PCIE_ADDR_GEN_SHIFT)
 
