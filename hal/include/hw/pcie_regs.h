@@ -108,16 +108,16 @@
 /************************************************************/
 
 /********** BAR numbers **********/
-#define BAR0NO                              0
-#define BAR2NO                              2
-#define BAR4NO                              4
+#define BAR0NO                              0ULL
+#define BAR2NO                              2ULL
+#define BAR4NO                              4ULL
 
 /* For the PCIe device, we only have up to 60 address bits, as
  * the 4 MSB are reserved for selecting the BAR to operate on */
 /********** PCIe Address MSB (BARs) part extractor **********/
 #define PCIE_ADDR_BAR_SHIFT                 60          /* bits */
 #define PCIE_ADDR_BAR_MAX                   4           /* bits */
-#define PCIE_ADDR_BAR_MASK                  (((1 << PCIE_ADDR_BAR_MAX)-1) << \
+#define PCIE_ADDR_BAR_MASK                  (((1ULL << PCIE_ADDR_BAR_MAX)-1) << \
                                                 PCIE_ADDR_BAR_SHIFT)
 
 /* PCIe LSB (generic) part extractor */
@@ -135,7 +135,7 @@
 /********** PCIe Address LSB (generic) part extractor **********/
 #define PCIE_ADDR_GEN_SHIFT                 0           /* bits */
 #define PCIE_ADDR_GEN_MAX                   60          /* bits */
-#define PCIE_ADDR_GEN_MASK                  (((1 << PCIE_ADDR_GEN_MAX)-1) << \
+#define PCIE_ADDR_GEN_MASK                  (((1ULL << PCIE_ADDR_GEN_MAX)-1) << \
                                                 PCIE_ADDR_GEN_SHIFT)
 
 /* PCIe LSB (generic) part extractor */
