@@ -51,7 +51,7 @@ struct _smpr_t {
 };
 
 /* Open protocol */
-typedef int (*proto_open_fp) (struct _smpr_t *self, uint32_t base, void *args);
+typedef int (*proto_open_fp) (struct _smpr_t *self, uint64_t base, void *args);
 /* Release protocol */
 typedef int (*proto_release_fp) (struct _smpr_t *self);
 /* Read data from protocol */
@@ -113,7 +113,7 @@ void *smpr_unset_handler (smpr_t *self);
 /************************************************************/
 
 /* Open protocol */
-int smpr_open (smpr_t *self, uint32_t base, void *args);
+int smpr_open (smpr_t *self, uint64_t base, void *args);
 /* Release protocol */
 int smpr_release (smpr_t *self);
 /* Read data from protocol */

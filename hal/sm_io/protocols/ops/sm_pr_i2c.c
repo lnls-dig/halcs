@@ -55,7 +55,7 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the proto_i2c */
-smpr_proto_i2c_t * smpr_proto_i2c_new (uint32_t base)
+smpr_proto_i2c_t * smpr_proto_i2c_new (uint64_t base)
 {
     smpr_proto_i2c_t *self = (smpr_proto_i2c_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_i2c_alloc);
@@ -86,7 +86,7 @@ smpr_err_e smpr_proto_i2c_destroy (smpr_proto_i2c_t **self_p)
 /************ smpr_proto_ops_i2c Implementation **********/
 
 /* Open I2C protocol */
-int i2c_open (smpr_t *self, uint32_t base, void *args)
+int i2c_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 

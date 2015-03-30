@@ -198,7 +198,7 @@ static smpr_err_e _smpr_unregister_proto_ops (const smpr_proto_ops_t **ops)
 }
 
 /**** Open device ****/
-int smpr_open (smpr_t *self, uint32_t base, void* args)
+int smpr_open (smpr_t *self, uint64_t base, void* args)
     SMPR_FUNC_WRAPPER (proto_open, base, args)
 
 /**** Release device ****/

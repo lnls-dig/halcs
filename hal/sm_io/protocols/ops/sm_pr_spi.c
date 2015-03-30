@@ -52,7 +52,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the proto_spi */
-smpr_proto_spi_t * smpr_proto_spi_new (uint32_t base)
+smpr_proto_spi_t * smpr_proto_spi_new (uint64_t base)
 {
     smpr_proto_spi_t *self = (smpr_proto_spi_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_spi_alloc);
@@ -83,7 +83,7 @@ smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
 /************ smpr_proto_ops_spi Implementation **********/
 
 /* Open SPI protocol */
-int spi_open (smpr_t *self, uint32_t base, void *args)
+int spi_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 

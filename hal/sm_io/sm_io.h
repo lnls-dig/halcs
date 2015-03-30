@@ -38,7 +38,7 @@ struct _smio_t {
                                            the same from the SDB ID */
     uint32_t inst_id;                   /* Instance ID. This differentiate SMIOs
                                            of the same type */
-    uint32_t base;                      /* Base SMIO address */
+    uint64_t base;                      /* Base SMIO address */
     char *name;                         /* Identification of this sm_io instance */
     char *service;                      /* Exported service name */
     /* int verbose; */                  /* Print activity to stdout */

@@ -55,7 +55,7 @@ static bool _smch_ad9510_wait_completion (smch_ad9510_t *self, unsigned int trie
 static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 
 /* Creates a new instance of the SMCH AD9510 */
-smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint32_t base, uint32_t ss,
+smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
         int verbose)
 {
     (void) verbose;

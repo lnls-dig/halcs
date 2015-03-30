@@ -33,7 +33,7 @@ extern const smpr_proto_ops_t smpr_proto_ops_bsmp;
 
 /* Device endpoint */
 struct _smpr_proto_bsmp_t {
-    uint32_t base;                                      /* Core base address */
+    uint64_t base;                                      /* Core base address */
     bsmp_client_t *client;                              /* BSMP client instance */
     struct bsmp_func_info_list *funcs_list;             /* BSMP function handler */
     struct bsmp_var_info_list *vars_list;               /* BSMP variables handler */
@@ -48,7 +48,7 @@ typedef struct _smpr_proto_bsmp_t smpr_proto_bsmp_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Endpoint*/
-smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint32_t base);
+smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint64_t base);
 /* Destroy an instance of the Endpoint */
 smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p);
 

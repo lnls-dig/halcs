@@ -71,7 +71,7 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
 static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
 
 /* Creates a new instance of the SMCH SI57X */
-smch_si57x_t * smch_si57x_new (smio_t *parent, uint32_t base, uint32_t addr,
+smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
         int verbose)
 {
     (void) verbose;

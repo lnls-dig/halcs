@@ -42,7 +42,7 @@ static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *da
 static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data);
 
 /* Creates a new instance of the SMCH PCA9547 */
-smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint32_t base, uint32_t addr,
+smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint64_t base, uint32_t addr,
         int verbose)
 {
     (void) verbose;

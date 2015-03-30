@@ -25,7 +25,7 @@ typedef struct _smch_ad9510_t smch_ad9510_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH AD9510 */
-smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint32_t base, uint32_t ss,
+smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
         int verbose);
 /* Destroy an instance of the SMCH AD9510 */
 smch_err_e smch_ad9510_destroy (smch_ad9510_t **self_p);

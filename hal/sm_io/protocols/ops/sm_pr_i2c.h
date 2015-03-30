@@ -39,7 +39,7 @@ extern const smpr_proto_ops_t smpr_proto_ops_i2c;
 
 /* Device endpoint */
 struct _smpr_proto_i2c_t {
-    uint32_t base;              /* Core base address */
+    uint64_t base;              /* Core base address */
     uint32_t sys_freq;          /* System clock [Hz] */
     uint32_t i2c_freq;          /* I2C clock [Hz] */
     uint32_t init_config;       /* I2C initial config register */
@@ -52,7 +52,7 @@ typedef struct _smpr_proto_i2c_t smpr_proto_i2c_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Endpoint*/
-smpr_proto_i2c_t * smpr_proto_i2c_new (uint32_t base);
+smpr_proto_i2c_t * smpr_proto_i2c_new (uint64_t base);
 /* Destroy an instance of the Endpoint */
 smpr_err_e smpr_proto_i2c_destroy (smpr_proto_i2c_t **self_p);
 

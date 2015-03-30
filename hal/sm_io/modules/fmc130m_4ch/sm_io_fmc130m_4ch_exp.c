@@ -328,7 +328,7 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_dly_updt3) {
 
 /* Low-level ADC delay function. Must be called with the correct arguments, so
  * only internal functions shall use this */
-static int _fmc130m_4ch_set_adc_dly_ll (smio_t* owner, uint32_t addr, uint32_t dly_val,
+static int _fmc130m_4ch_set_adc_dly_ll (smio_t* owner, uint64_t addr, uint32_t dly_val,
         uint32_t dly_type)
 {
     uint32_t val = 0;
