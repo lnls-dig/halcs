@@ -157,7 +157,7 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from I2C */
-ssize_t i2c_read_16 (smpr_t *self, loff_t offs, uint16_t *data, uint32_t flags)
+ssize_t i2c_read_16 (smpr_t *self, uint64_t offs, uint16_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -167,7 +167,7 @@ ssize_t i2c_read_16 (smpr_t *self, loff_t offs, uint16_t *data, uint32_t flags)
 }
 
 /* Write 16-bit data to PCIe device */
-ssize_t i2c_write_16 (smpr_t *self, loff_t offs, const uint16_t *data, uint32_t flags)
+ssize_t i2c_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data, uint32_t flags)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -175,7 +175,7 @@ ssize_t i2c_write_16 (smpr_t *self, loff_t offs, const uint16_t *data, uint32_t 
 }
 
 /* Read 32-bit data from I2C */
-ssize_t i2c_read_32 (smpr_t *self, loff_t offs, uint32_t *data, uint32_t flags)
+ssize_t i2c_read_32 (smpr_t *self, uint64_t offs, uint32_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -185,7 +185,7 @@ ssize_t i2c_read_32 (smpr_t *self, loff_t offs, uint32_t *data, uint32_t flags)
 }
 
 /* Write 32-bit data to PCIe device */
-ssize_t i2c_write_32 (smpr_t *self, loff_t offs, const uint32_t *data, uint32_t flags)
+ssize_t i2c_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data, uint32_t flags)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -193,7 +193,7 @@ ssize_t i2c_write_32 (smpr_t *self, loff_t offs, const uint32_t *data, uint32_t 
 }
 
 /* Read 64-bit data from I2C */
-ssize_t i2c_read_64 (smpr_t *self, loff_t offs, uint64_t *data, uint32_t flags)
+ssize_t i2c_read_64 (smpr_t *self, uint64_t offs, uint64_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -203,7 +203,7 @@ ssize_t i2c_read_64 (smpr_t *self, loff_t offs, uint64_t *data, uint32_t flags)
 }
 
 /* Write 64-bit data to PCIe device */
-ssize_t i2c_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t flags)
+ssize_t i2c_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data, uint32_t flags)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -211,7 +211,7 @@ ssize_t i2c_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t 
 }
 
 /* Read data block from PCIe device, size in bytes */
-ssize_t i2c_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
+ssize_t i2c_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data,
         uint32_t flags)
 {
     (void) offs;
@@ -221,7 +221,7 @@ ssize_t i2c_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t i2c_write_block (smpr_t *self, loff_t offs, size_t size, const uint32_t *data,
+ssize_t i2c_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data,
         uint32_t flags)
 {
     (void) offs;

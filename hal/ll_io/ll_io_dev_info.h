@@ -18,7 +18,7 @@
 
 /* This hold the SDB structures of the device */
 struct _llio_dev_info_t {
-    loff_t sdb_addr;                    /* Location of the SDB structures in device */
+    uint64_t sdb_addr;                    /* Location of the SDB structures in device */
     bool parsed;                        /* True if device was already parsed */
     zlist_t *sdb;                       /* List holding the SDB structures of the device */
 };

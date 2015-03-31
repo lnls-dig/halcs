@@ -193,59 +193,59 @@ int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint)
     SMIO_FUNC_WRAPPER (thsafe_client_release, endpoint)
 
 /**** Read data from device ****/
-ssize_t smio_thsafe_client_read_16 (smio_t *self, loff_t offs, uint16_t *data)
+ssize_t smio_thsafe_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
 {
     ASSERT_FUNC(thsafe_client_read_16);
     return self->thsafe_client_ops->thsafe_client_read_16 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_client_read_32 (smio_t *self, loff_t offs, uint32_t *data)
+ssize_t smio_thsafe_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_read_32);
     return self->thsafe_client_ops->thsafe_client_read_32 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_client_read_64 (smio_t *self, loff_t offs, uint64_t *data)
+ssize_t smio_thsafe_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
 {
     ASSERT_FUNC(thsafe_client_read_64);
     return self->thsafe_client_ops->thsafe_client_read_64 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, loff_t offs, uint16_t *data)
+ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_16, offs, data)
-ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, loff_t offs, uint32_t *data)
+ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_32, offs, data)
-ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, loff_t offs, uint64_t *data)
+ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_64, offs, data)
 
 /**** Write data to device ****/
-ssize_t smio_thsafe_client_write_16 (smio_t *self, loff_t offs, const uint16_t *data)
+ssize_t smio_thsafe_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
 {
     ASSERT_FUNC(thsafe_client_write_16);
     return self->thsafe_client_ops->thsafe_client_write_16 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_client_write_32 (smio_t *self, loff_t offs, const uint32_t *data)
+ssize_t smio_thsafe_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_write_32);
     return self->thsafe_client_ops->thsafe_client_write_32 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_client_write_64 (smio_t *self, loff_t offs, const uint64_t *data)
+ssize_t smio_thsafe_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
 {
     ASSERT_FUNC(thsafe_client_write_64);
     return self->thsafe_client_ops->thsafe_client_write_64 (self, self->base | offs, data);
 }
 
-ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, loff_t offs, const uint16_t *data)
+ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_16, offs, data)
-ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, loff_t offs, const uint32_t *data)
+ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_32, offs, data)
-ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, loff_t offs, const uint64_t *data)
+ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_64, offs, data)
 
 /**** Read data block from device function pointer, size in bytes ****/
-ssize_t smio_thsafe_client_read_block (smio_t *self, loff_t offs, size_t size,
+ssize_t smio_thsafe_client_read_block (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_read_block);
@@ -253,11 +253,11 @@ ssize_t smio_thsafe_client_read_block (smio_t *self, loff_t offs, size_t size,
             size, data);
 }
 
-ssize_t smio_thsafe_raw_client_read_block (smio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_block, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t smio_thsafe_client_write_block (smio_t *self, loff_t offs, size_t size,
+ssize_t smio_thsafe_client_write_block (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_write_block);
@@ -265,11 +265,11 @@ ssize_t smio_thsafe_client_write_block (smio_t *self, loff_t offs, size_t size,
             size, data);
 }
 
-ssize_t smio_thsafe_raw_client_write_block (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_block, offs, size, data)
 
 /**** Read data block via DMA from device, size in bytes ****/
-ssize_t smio_thsafe_client_read_dma (smio_t *self, loff_t offs, size_t size,
+ssize_t smio_thsafe_client_read_dma (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_read_dma);
@@ -277,11 +277,11 @@ ssize_t smio_thsafe_client_read_dma (smio_t *self, loff_t offs, size_t size,
             size, data);
 }
 
-ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_dma, offs, size, data)
 
 /**** Write data block via DMA from device, size in bytes ****/
-ssize_t smio_thsafe_client_write_dma (smio_t *self, loff_t offs, size_t size,
+ssize_t smio_thsafe_client_write_dma (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
 {
     ASSERT_FUNC(thsafe_client_write_dma);
@@ -289,7 +289,7 @@ ssize_t smio_thsafe_client_write_dma (smio_t *self, loff_t offs, size_t size,
             size, data);
 }
 
-ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, loff_t offs, size_t size, const uint32_t *data)
+ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_dma, offs, size, data)
 
 /**** Read device information function pointer ****/

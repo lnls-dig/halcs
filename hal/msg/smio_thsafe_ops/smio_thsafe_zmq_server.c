@@ -117,7 +117,7 @@ static int _thsafe_zmq_server_read_16 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_16\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_16 (self->llio, offset, (uint16_t *) ret);
@@ -132,7 +132,7 @@ disp_op_t thsafe_zmq_server_read_16_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT16, uint16_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_END
     }
 };
@@ -147,7 +147,7 @@ static int _thsafe_zmq_server_read_32 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_32\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_32 (self->llio, offset, (uint32_t *) ret);
@@ -162,7 +162,7 @@ disp_op_t thsafe_zmq_server_read_32_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_END
     }
 };
@@ -177,7 +177,7 @@ static int _thsafe_zmq_server_read_64 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_64\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_64 (self->llio, offset, (uint64_t *) ret);
@@ -192,7 +192,7 @@ disp_op_t thsafe_zmq_server_read_64_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_END
     }
 };
@@ -207,7 +207,7 @@ static int _thsafe_zmq_server_write_16 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_16\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint16_t *data_write = (uint16_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
@@ -224,7 +224,7 @@ disp_op_t thsafe_zmq_server_write_16_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT16, uint16_t),
         DISP_ARG_END
     }
@@ -238,7 +238,7 @@ static int _thsafe_zmq_server_write_32 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_32\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint32_t *data_write = (uint32_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
@@ -255,7 +255,7 @@ disp_op_t thsafe_zmq_server_write_32_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
@@ -269,7 +269,7 @@ static int _thsafe_zmq_server_write_64 (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_64\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint64_t *data_write = (uint64_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
@@ -286,7 +286,7 @@ disp_op_t thsafe_zmq_server_write_64_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_END
     }
@@ -300,7 +300,7 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
-    loff_t offset = *(loff_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     size_t read_bsize = *(size_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %lu, "
@@ -319,7 +319,7 @@ disp_op_t thsafe_zmq_server_read_block_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
         DISP_ARG_END
     }
@@ -334,7 +334,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
     THSAFE_MSG_ZMQ_ARG_TYPE offset_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
-    loff_t offset = *(loff_t *) GEN_MSG_ZMQ_ARG_DATA(offset_arg);
+    uint64_t offset = *(uint64_t *) GEN_MSG_ZMQ_ARG_DATA(offset_arg);
     /* We now own the argument and must clean it after use */
     THSAFE_MSG_ZMQ_ARG_TYPE data_write_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
     uint32_t *data_write = (uint32_t *)
@@ -363,7 +363,7 @@ disp_op_t thsafe_zmq_server_write_block_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
         DISP_ARG_END
     }
@@ -385,7 +385,7 @@ disp_op_t thsafe_zmq_server_read_dma_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
         DISP_ARG_END
     }
@@ -407,7 +407,7 @@ disp_op_t thsafe_zmq_server_write_dma_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, loff_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
         DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
         DISP_ARG_END
     }

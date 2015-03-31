@@ -45,12 +45,12 @@
 
 static uint32_t pcie_timeout_patt [PCIE_TIMEOUT_PATT_SIZE];
 
-static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw);
-static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw);
+static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw);
-static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw);
-static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size,
+static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size,
         uint32_t *data, int rw);
 static ssize_t _pcie_timeout_reset (llio_t *self);
 
@@ -190,12 +190,12 @@ err_dealloc:
  * the 4 MSB are reserved for selecting the BAR to operate on */
 
 /* Read data from PCIe device */
-ssize_t pcie_read_32 (llio_t *self, loff_t offs, uint32_t *data)
+ssize_t pcie_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
 {
     return _pcie_rw_32 (self, offs, data, READ_FROM_BAR);
 }
 
-ssize_t pcie_read_64 (llio_t *self, loff_t offs, uint64_t *data)
+ssize_t pcie_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
 {
     return _pcie_rw_32 (self, offs,
             (uint32_t *) data, READ_FROM_BAR)
@@ -205,13 +205,13 @@ ssize_t pcie_read_64 (llio_t *self, loff_t offs, uint64_t *data)
 }
 
 /* Write data to PCIe device */
-ssize_t pcie_write_32 (llio_t *self, loff_t offs, const uint32_t *data)
+ssize_t pcie_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
 {
     uint32_t _data = *data;
     return _pcie_rw_32 (self, offs, &_data, WRITE_TO_BAR);
 }
 
-ssize_t pcie_write_64 (llio_t *self, loff_t offs, const uint64_t *data)
+ssize_t pcie_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
 {
     uint64_t _data = *data;
     return _pcie_rw_32 (self, offs,
@@ -222,20 +222,20 @@ ssize_t pcie_write_64 (llio_t *self, loff_t offs, const uint64_t *data)
 }
 
 /* Read data block from PCIe device, size in bytes */
-ssize_t pcie_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t pcie_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _pcie_rw_block (self, offs, size, data, READ_FROM_BAR);
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t pcie_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t pcie_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     /* _pcie_rw_block with WRITE_TO_BAR does not modify "data" */
     return _pcie_rw_block (self, offs, size, data, WRITE_TO_BAR);
 }
 
 /* Read data block from PCIe device, size in bytes */
-ssize_t pcie_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t pcie_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     (void) self;
     (void) offs;
@@ -245,7 +245,7 @@ ssize_t pcie_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t pcie_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     (void) self;
     (void) offs;
@@ -264,7 +264,7 @@ ssize_t pcie_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data)
 */
 
 /************ Helper functions **********/
-static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
+static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw)
 {
     if (!self->endpoint->opened) {
         return -1;
@@ -272,9 +272,9 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
 
     /* Determine which bar to operate on */
     int bar_no = PCIE_ADDR_BAR (offs);
-    loff_t full_offs = PCIE_ADDR_GEN (offs);
+    uint64_t full_offs = PCIE_ADDR_GEN (offs);
     int pg_num;
-    loff_t pg_offs;
+    uint64_t pg_offs;
 
     /* FIXME: This switch is in the critical path! Remove it */
     switch (bar_no) {
@@ -337,7 +337,7 @@ static ssize_t _pcie_rw_32 (llio_t *self, loff_t offs, uint32_t *data, int rw)
     return sizeof (*data);
 }
 
-static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw)
 {
     uint32_t offs = pg_offs;
@@ -372,7 +372,7 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, loff_t 
 }
 
 /* Read/Write BAR2 block with timeout detection */
-static ssize_t _pcie_rw_bar2_block_td (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_bar2_block_td (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw)
 {
     size_t num_bytes_rw = 0;
@@ -407,7 +407,7 @@ static ssize_t _pcie_rw_bar2_block_td (llio_t *self, uint32_t pg_start, loff_t p
     return num_bytes_rw;
 }
 
-static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw)
 {
     uint32_t offs = pg_offs;
@@ -440,7 +440,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, loff_t 
 
 /* Read/Write BAR4 block with timeout detection.
  * FIXME: Reduce code repetition. _pcie_rw_bar2_block_td () is almost the same */
-static ssize_t _pcie_rw_bar4_block_td (llio_t *self, uint32_t pg_start, loff_t pg_offs,
+static ssize_t _pcie_rw_bar4_block_td (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
         uint32_t *data, uint32_t size, int rw)
 {
     size_t num_bytes_rw = 0;
@@ -475,7 +475,7 @@ static ssize_t _pcie_rw_bar4_block_td (llio_t *self, uint32_t pg_start, loff_t p
     return num_bytes_rw;
 }
 
-static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t *data, int rw)
+static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data, int rw)
 {
     if (!self->endpoint->opened) {
         return -1;
@@ -483,9 +483,9 @@ static ssize_t _pcie_rw_block (llio_t *self, loff_t offs, size_t size, uint32_t 
 
     /* Determine which bar to operate on */
     int bar_no = PCIE_ADDR_BAR (offs);
-    loff_t full_offs = PCIE_ADDR_GEN (offs);
+    uint64_t full_offs = PCIE_ADDR_GEN (offs);
     int pg_start;
-    loff_t pg_offs;
+    uint64_t pg_offs;
     ssize_t ret_size = -1;
 
     switch (bar_no) {
@@ -544,7 +544,7 @@ static ssize_t _pcie_timeout_reset (llio_t *self)
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "[ll_io_pcie:_pcie_timeout_reset] Reseting timeout\n");
 
-    loff_t offs = BAR0_ADDR | PCIE_CFG_REG_TX_CTRL;
+    uint64_t offs = BAR0_ADDR | PCIE_CFG_REG_TX_CTRL;
     uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
     return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
 }
