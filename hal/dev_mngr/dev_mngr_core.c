@@ -632,7 +632,7 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
 
     /* Navigate through all of our board siblings */
     for (; board_cfg != NULL; board_cfg = zconfig_next (board_cfg)) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Config file: "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Config file: "
                 "board_cfg name: %s\n", zconfig_name (board_cfg));
 
         zconfig_t *bpm_cfg = zconfig_child (board_cfg);
