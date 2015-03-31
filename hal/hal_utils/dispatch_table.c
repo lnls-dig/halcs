@@ -46,8 +46,6 @@ static halutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_
 static halutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key);
 static halutils_err_e _disp_table_remove_all (disp_table_t *self);
 static void _disp_table_free_item (void *data);
-static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
-static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void *msg);
 static halutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 static halutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
@@ -59,9 +57,14 @@ static halutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_o
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
 static halutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret);
-static halutils_err_e _disp_table_set_ret_op (const disp_op_t * disp_op, void **ret);
 static halutils_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
-static halutils_err_e _disp_table_cleanup_args_op (const disp_op_t *disp_op);
+
+/* Disp Op Handler functions */
+static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
+static halutils_err_e _disp_table_check_args_op (disp_op_handler_t *disp_op_handler,
+        void *msg);
+static halutils_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret);
+static halutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op);
 
 disp_table_t *disp_table_new (void)
 {
@@ -152,19 +155,20 @@ halutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
 halutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key)
 {
     halutils_err_e err = HALUTILS_SUCCESS;
-    disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null, HALUTILS_ERR_NO_FUNC_REG);
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
+            err_disp_op_handler_null, HALUTILS_ERR_NO_FUNC_REG);
 
-    err = _disp_table_cleanup_args_op (disp_op);
+    err = _disp_table_cleanup_args_op (disp_op_handler);
 
-err_disp_op_null:
+err_disp_op_handler_null:
     return err;
 }
 
-disp_op_t *disp_table_lookup (disp_table_t *self, uint32_t key)
+const disp_op_t *disp_table_lookup (disp_table_t *self, uint32_t key)
 {
-    return _disp_table_lookup (self, key);
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    return disp_op_handler->op;
 }
 
 int disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
@@ -198,51 +202,9 @@ halutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
     return _disp_table_set_ret (self, key, ret);
 }
 
-/**** Local helper functions ****/
-
-static halutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
-{
-    char *key_c = halutils_stringify_hex_key (key);
-    ASSERT_ALLOC (key_c, err_key_c_alloc);
-
-    /* Do a lookup first to free the return value */
-    disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null);
-
-    halutils_err_e err = _disp_table_cleanup_args_op (disp_op);
-    ASSERT_TEST (err == HALUTILS_SUCCESS, "Could not free registered return value",
-            err_disp_op_null);
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-        "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
-        key);
-    /* This will trigger the free function previously registered */
-    zhash_delete (self->table_h, key_c);
-
-    free (key_c);
-    return HALUTILS_SUCCESS;
-
-err_disp_op_null:
-    free (key_c);
-err_key_c_alloc:
-    return HALUTILS_ERR_ALLOC;
-}
-
-static halutils_err_e _disp_table_remove_all (disp_table_t *self)
-{
-    assert (self);
-
-    zlist_t *hash_keys = zhash_keys (self->table_h);
-    void * table_item = zlist_first (hash_keys);
-
-    for ( ; table_item; table_item = zlist_next (hash_keys)) {
-        _disp_table_remove (self, halutils_numerify_hex_key ((char *) table_item));
-    }
-
-    zlist_destroy (&hash_keys);
-    return HALUTILS_SUCCESS;
-}
+/******************************************************************************/
+/************************** Local static functions ****************************/
+/******************************************************************************/
 
 static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *disp_op)
 {
@@ -253,14 +215,19 @@ static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *d
             "[halutils:disp_table] Registering function \"%s\" (%p) opcode (%u) "
             "into dispatch table\n", disp_op->name, disp_op->func_fp, disp_op->opcode);
 
-    /* FIXME: We want disp_op to be const, but we need to allocate the return value */
-    halutils_err_e herr = _disp_table_alloc_ret (disp_op, (void **) &disp_op->ret);
+    /* Wrap disp_op into disp_op_handler structure */
+    disp_op_handler_t *disp_op_handler = disp_op_handler_new ();
+    ASSERT_ALLOC (disp_op_handler, err_disp_op_handler_new);
+
+    disp_op_handler->op = disp_op;
+
+    halutils_err_e herr = _disp_table_alloc_ret (disp_op_handler->op, &disp_op_handler->ret);
     ASSERT_TEST (herr == HALUTILS_SUCCESS, "Return value could not be allocated",
             err_alloc_ret);
 
-    char *key_c = halutils_stringify_hex_key (disp_op->opcode);
+    char *key_c = halutils_stringify_hex_key (disp_op_handler->op->opcode);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
-    int zerr = zhash_insert (self->table_h, key_c, (void *) disp_op);
+    int zerr = zhash_insert (self->table_h, key_c, disp_op_handler);
     ASSERT_TEST(zerr == 0, "Could not insert item into dispatch table",
             err_insert_hash);
     /* Setup free function */
@@ -272,9 +239,17 @@ static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *d
 err_insert_hash:
     free (key_c);
 err_key_c_alloc:
-    _disp_table_cleanup_args_op (disp_op);
+    _disp_table_cleanup_args_op (disp_op_handler);
 err_alloc_ret:
+    disp_op_handler_destroy (&disp_op_handler);
+err_disp_op_handler_new:
     return HALUTILS_ERR_ALLOC;
+}
+
+static void _disp_table_free_item (void *data)
+{
+    disp_op_handler_t *disp_op_handler = (disp_op_handler_t *) data;
+    disp_op_handler_destroy (&disp_op_handler);
 }
 
 static halutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
@@ -298,6 +273,50 @@ static halutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_
 
 err_disp_insert:
     return err;
+}
+
+static halutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
+{
+    char *key_c = halutils_stringify_hex_key (key);
+    ASSERT_ALLOC (key_c, err_key_c_alloc);
+
+    /* Do a lookup first to free the return value */
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
+            err_disp_op_handler_null);
+
+    halutils_err_e err = _disp_table_cleanup_args_op (disp_op_handler);
+    ASSERT_TEST (err == HALUTILS_SUCCESS, "Could not free registered return value",
+            err_disp_op_handler_null);
+
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+        "[halutils:disp_table] Removing function (key = %u) into dispatch table\n",
+        key);
+    /* This will trigger the free function previously registered */
+    zhash_delete (self->table_h, key_c);
+
+    free (key_c);
+    return HALUTILS_SUCCESS;
+
+err_disp_op_handler_null:
+    free (key_c);
+err_key_c_alloc:
+    return HALUTILS_ERR_ALLOC;
+}
+
+static halutils_err_e _disp_table_remove_all (disp_table_t *self)
+{
+    assert (self);
+
+    zlist_t *hash_keys = zhash_keys (self->table_h);
+    void * table_item = zlist_first (hash_keys);
+
+    for ( ; table_item; table_item = zlist_next (hash_keys)) {
+        _disp_table_remove (self, halutils_numerify_hex_key ((char *) table_item));
+    }
+
+    zlist_destroy (&hash_keys);
+    return HALUTILS_SUCCESS;
 }
 
 
@@ -328,69 +347,16 @@ err_no_ownership:
     return err;
 }
 
-static halutils_err_e _disp_table_set_ret_op (const disp_op_t * disp_op, void **ret)
-{
-    assert (disp_op);
-    halutils_err_e err = HALUTILS_SUCCESS;
-
-    /* Check if there is a return value registered */
-    if (disp_op->retval == DISP_ARG_END) {
-        *ret = NULL;
-        err = HALUTILS_SUCCESS;
-        goto err_exit;
-    }
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[halutils:disp_table] _disp_table_set_ret_op: Setting return value ...\n");
-
-    /* FIXME: This shouldn't happen, as this type of error is caught on
-     * initialization of the dispatch function */
-    ASSERT_ALLOC (disp_op->ret, err_ret_alloc, HALUTILS_ERR_ALLOC);
-    *ret = disp_op->ret;
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[halutils:disp_table] _disp_table_set_ret_op: Return value set\n");
-
-err_ret_alloc:
-err_exit:
-    return err;
-}
-
 static halutils_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 {
     halutils_err_e err = HALUTILS_SUCCESS;
-    const disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null, HALUTILS_ERR_NO_FUNC_REG);
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
+            err_disp_op_handler_null, HALUTILS_ERR_NO_FUNC_REG);
 
-    err = _disp_table_set_ret_op (disp_op, ret);
+    err = _disp_table_set_ret_op (disp_op_handler, ret);
 
-err_disp_op_null:
-    return err;
-}
-
-static void _disp_table_free_item (void *data)
-{
-    (void) data;
-}
-
-static halutils_err_e _disp_table_check_args_op (const disp_op_t *disp_op, void *msg)
-{
-    assert (disp_op);
-    halutils_err_e err = HALUTILS_ERR_INV_LESS_ARGS;
-
-    /* Try to guess which type of message we are dealing with */
-    switch (msg_guess_type (msg)) {
-        case MSG_EXP_ZMQ:
-            err = _disp_table_check_exp_zmq_args (disp_op, (exp_msg_zmq_t *) msg);
-            break;
-        case MSG_THSAFE_ZMQ:
-            err = _disp_table_check_thsafe_zmq_args (disp_op, (zmq_server_args_t *) msg);
-            break;
-        default:
-            break;
-    }
-
+err_disp_op_handler_null:
     return err;
 }
 
@@ -398,20 +364,20 @@ static halutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret)
 {
     halutils_err_e err = HALUTILS_SUCCESS;
-    disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null, HALUTILS_ERR_NO_FUNC_REG);
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
+            err_disp_op_handler_null, HALUTILS_ERR_NO_FUNC_REG);
 
     /* Check arguments for consistency */
-    err = _disp_table_check_args_op (disp_op, args);
+    err = _disp_table_check_args_op (disp_op_handler, args);
     ASSERT_TEST (err == HALUTILS_SUCCESS, "Arguments received are invalid",
             err_inv_args);
 
     /* Point "ret" to previously allocated return value */
-    err = _disp_table_set_ret_op (disp_op, ret);
+    err = _disp_table_set_ret_op (disp_op_handler, ret);
 
 err_inv_args:
-err_disp_op_null:
+err_disp_op_handler_null:
     return err;
 }
 
@@ -486,40 +452,6 @@ static halutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_o
     return _disp_table_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
 }
 
-static halutils_err_e _disp_table_cleanup_args_op (const disp_op_t *disp_op)
-{
-    assert (disp_op);
-    if (disp_op->ret) {
-        if (disp_op->retval_owner == DISP_OWNER_FUNC) {
-            goto err_no_ownership;
-        }
-
-        /* I know... But we have to free the item anyway */
-        disp_op_t *disp_op_tmp = (disp_op_t *) disp_op;
-        free (disp_op_tmp->ret);
-
-    }
-
-err_no_ownership:
-    return HALUTILS_SUCCESS;
-}
-
-static disp_op_t *_disp_table_lookup (disp_table_t *self, uint32_t key)
-{
-    disp_op_t *disp_op = NULL;
-    char *key_c = halutils_stringify_hex_key (key);
-    ASSERT_ALLOC (key_c, err_key_c_alloc);
-
-    disp_op = zhash_lookup (self->table_h, key_c);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered function",
-            err_func_p_wrapper_null);
-
-err_func_p_wrapper_null:
-    free (key_c);
-err_key_c_alloc:
-    return disp_op;
-}
-
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret)
 {
@@ -528,24 +460,140 @@ static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void
             "[halutils:disp_table] Calling function (key = %u, addr = %p) from dispatch table\n",
             key, disp_op->func_fp); */
     /* The function pointer is never NULL */
-    disp_op_t *disp_op = _disp_table_lookup (self, key);
-    ASSERT_TEST (disp_op != NULL, "Could not find registered key",
-            err_disp_op_null, -1);
+    disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
+            err_disp_op_handler_null, -1);
 
     /* Check if there is a registered function */
-    ASSERT_TEST (disp_op->func_fp != NULL, "No function registered",
-            err_disp_op_func_fp_null, -1);
+    ASSERT_TEST (disp_op_handler->op->func_fp != NULL, "No function registered",
+            err_disp_op_handler_func_fp_null, -1);
 
     /* Check if "ret" is pointing to something valid */
-    ASSERT_TEST ((disp_op->retval != DISP_ARG_END && ret != NULL) ||
-            (disp_op->retval == DISP_ARG_END && ret == NULL),
+    ASSERT_TEST ((disp_op_handler->op->retval != DISP_ARG_END && ret != NULL) ||
+            (disp_op_handler->op->retval == DISP_ARG_END && ret == NULL),
             "Invalid return pointer value", err_inv_ret_value_null, -1);
 
-    err = disp_op->func_fp (owner, args, ret);
+    err = disp_op_handler->op->func_fp (owner, args, ret);
 
 err_inv_ret_value_null:
-err_disp_op_func_fp_null:
-err_disp_op_null:
+err_disp_op_handler_func_fp_null:
+err_disp_op_handler_null:
     return err;
+}
+
+/******************************************************************************/
+/*********************** Disp Op Handler functions ****************************/
+/******************************************************************************/
+
+disp_op_handler_t *disp_op_handler_new ()
+{
+    disp_op_handler_t *self = zmalloc (sizeof *self);
+    ASSERT_ALLOC (self, err_disp_op_handler_alloc);
+
+    self->ret = NULL;
+
+    return self;
+
+err_disp_op_handler_alloc:
+    return NULL;
+}
+
+halutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        disp_op_handler_t *self = *self_p;
+
+        free (self);
+        *self_p = NULL;
+    }
+
+    return HALUTILS_SUCCESS;
+}
+
+static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key)
+{
+    disp_op_handler_t *disp_op_handler = NULL;
+
+    char *key_c = halutils_stringify_hex_key (key);
+    ASSERT_ALLOC (key_c, err_key_c_alloc);
+
+    disp_op_handler = zhash_lookup (self->table_h, key_c);
+    ASSERT_TEST (disp_op_handler != NULL, "Could not find registered function",
+            err_func_p_wrapper_null);
+
+err_func_p_wrapper_null:
+    free (key_c);
+err_key_c_alloc:
+    return disp_op_handler;
+}
+
+static halutils_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret)
+{
+    assert (disp_op_handler);
+    halutils_err_e err = HALUTILS_SUCCESS;
+
+    /* Check if there is a return value registered */
+    if (disp_op_handler->op->retval == DISP_ARG_END) {
+        *ret = NULL;
+        err = HALUTILS_SUCCESS;
+        goto err_exit;
+    }
+
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+            "[halutils:disp_table] _disp_table_set_ret_op: Setting return value ...\n");
+
+    /* FIXME: This shouldn't happen, as this type of error is caught on
+     * initialization of the dispatch function */
+    ASSERT_ALLOC (disp_op_handler->ret, err_ret_alloc, HALUTILS_ERR_ALLOC);
+    *ret = disp_op_handler->ret;
+
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+            "[halutils:disp_table] _disp_table_set_ret_op: Return value set\n");
+
+err_ret_alloc:
+err_exit:
+    return err;
+}
+
+static halutils_err_e _disp_table_check_args_op (disp_op_handler_t *disp_op_handler,
+        void *msg)
+{
+    assert (disp_op_handler);
+    halutils_err_e err = HALUTILS_ERR_INV_LESS_ARGS;
+
+    /* Try to guess which type of message we are dealing with */
+    switch (msg_guess_type (msg)) {
+        case MSG_EXP_ZMQ:
+            err = _disp_table_check_exp_zmq_args (disp_op_handler->op,
+                    (exp_msg_zmq_t *) msg);
+            break;
+        case MSG_THSAFE_ZMQ:
+            err = _disp_table_check_thsafe_zmq_args (disp_op_handler->op,
+                    (zmq_server_args_t *) msg);
+            break;
+        default:
+            break;
+    }
+
+    return err;
+}
+
+static halutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_handler)
+{
+    assert (disp_op_handler);
+
+    if (disp_op_handler->ret) {
+        if (disp_op_handler->op->retval_owner == DISP_OWNER_FUNC) {
+            goto err_no_ownership;
+        }
+
+        free (disp_op_handler->ret);
+        disp_op_handler->ret = NULL;
+    }
+
+err_no_ownership:
+    return HALUTILS_SUCCESS;
 }
 

@@ -65,20 +65,26 @@ enum _disp_val_owner_e {
                                            necessary */
 };
 
-typedef enum _disp_val_owner_e disp_val_owner_e;
-
 struct _disp_op_t {
-    const char *name;                   /* Function name */
-    uint32_t opcode;                    /* Operation code */
-    disp_table_func_fp func_fp;         /* Pointer to exported function */
-    uint32_t retval;                    /* Type of return value */
-    disp_val_owner_e retval_owner;      /* Who owns the return value */
-    void *ret;                          /* Buffer for function return value */
-    uint32_t args [];                   /* Zero-terminated */
+    const char *name;                       /* Function name */
+    uint32_t opcode;                        /* Operation code */
+    disp_table_func_fp func_fp;             /* Pointer to exported function */
+    uint32_t retval;                        /* Type of return value */
+    enum _disp_val_owner_e retval_owner;    /* Who owns the return value */
+    uint32_t args [];                       /* Zero-terminated */
 };
 
+struct _disp_op_handler_t {
+    const struct _disp_op_t *op;            /* Function description */
+    void *ret;                              /* Buffer for function return value */
+};
+
+/* Return buffer owner */
+typedef enum _disp_val_owner_e disp_val_owner_e;
 /* Dispatch exported interface function structure */
 typedef struct _disp_op_t disp_op_t;
+/* Handler for the Dispatch exported function */
+typedef struct _disp_op_handler_t disp_op_handler_t;
 
 /***************** Our methods *****************/
 
@@ -97,12 +103,17 @@ halutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
 halutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 halutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key);
-disp_op_t *disp_table_lookup (disp_table_t *self, uint32_t key);
+const disp_op_t *disp_table_lookup (disp_table_t *self, uint32_t key);
 int disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
 int disp_table_check_call (disp_table_t *self, uint32_t key, void *owner,
         void *args, void **ret);
 halutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
+
+/*********************** Disp Op Handler functions ****************************/
+
+disp_op_handler_t *disp_op_handler_new (void);
+halutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p);
 
 #endif
 

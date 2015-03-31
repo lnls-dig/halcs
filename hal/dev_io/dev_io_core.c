@@ -48,6 +48,8 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+#define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
+
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe);
@@ -67,7 +69,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     debug_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     char *dev_type_c = llio_type_to_str (type);
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
             " with exported service %s, for a %s device \n\tlocated on %s,"
             " broker address %s, with logfile on %s ...\n", name, dev_type_c,
             endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
@@ -76,7 +78,10 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     devio_t *self = (devio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->log_file = strdup (log_file_name);
+    if (log_file_name != NULL) {
+        self->log_file = strdup (log_file_name);
+    }
+
     ASSERT_TEST((self->log_file == NULL && log_file_name == NULL)
             || (self->log_file != NULL && log_file_name != NULL),
             "Error setting log file!", err_log_file);
@@ -234,7 +239,6 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
      * the sm_io module */
     th_boot_args_t *th_args = NULL;
     th_config_args_t *th_config_args = NULL;
-    void *config_pipe = NULL;
     char *key = NULL;
     uint32_t pipe_idx = 0;
 
@@ -317,8 +321,9 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
         th_config_args->log_file = self->log_file;
         th_config_args->inst_id = inst_id;
 
-        config_pipe = zthread_fork (self->ctx, smio_config_defaults, th_config_args);
-        ASSERT_TEST (config_pipe != NULL, "Could not spawn config thread",
+        /* Create detached thread just for configuring the new recently created SMIO */
+        zerr = zthread_new (smio_config_defaults, th_config_args);
+        ASSERT_TEST (zerr == 0, "Could not spawn config thread",
                 err_spawn_config_thread);
 
         /* stop on first match */
@@ -551,12 +556,19 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe)
     ASSERT_ALLOC (send_msg, err_msg_alloc, DEVIO_ERR_ALLOC);
     /* An empty message means to selfdestruct */
     zmsg_pushstr (send_msg, "");
-    int zerr = zmsg_send (&send_msg, pipe);
-    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
-            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
-            "to SMIO sent\n");
+    /* Try to send the message a few times and then give up */
+    uint32_t tries = 0;
+    for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
+        int zerr = zmsg_send (&send_msg, pipe);
+        if (zerr == 0) {
+            break;
+        }
+    }
+
+    ASSERT_TEST (tries < DEVIO_MAX_DESTRUCT_MSG_TRIES, "Could not send "
+            "self-destruct message to SMIO instance",
+            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
 err_send_msg:
     zmsg_destroy (&send_msg);

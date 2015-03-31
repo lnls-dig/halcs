@@ -18,6 +18,9 @@
 #define DSP_CTRL_RAW_REGS_OFFS                      0x0000
 #define DSP_BPM_RAW_SWAP_OFFS                       0x0100
 
+/* AFC DIAG Components */
+#define WB_AFC_DIAG_CTRL_RAW_REGS_OFFS              0x0000
+
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
@@ -66,6 +69,11 @@
 #define WB_ACQ2_BASE_RAW_ADDR                       0x00360000
 
 #define WB_PERIPH_RAW_ADDR                          0x00370000
+
+#define WB_AFC_DIAG_RAW_ADDR                        0x00380000
+
+#define WB_AFC_DIAG_CTRL_RAW_REGS                  (WB_AFC_DIAG_RAW_ADDR + \
+                                                        WB_AFC_DIAG_CTRL_RAW_REGS_OFFS)
 
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
@@ -134,6 +142,10 @@
 #define WB_ACQ2_BASE_ADDR                           (BAR4_ADDR | WB_ACQ2_BASE_RAW_ADDR)
 
 #define WB_PERIPH_BASE_ADDR                         (BAR4_ADDR | WB_PERIPH_RAW_ADDR)
+
+#define WB_AFC_DIAG_BASE_ADDR                       (BAR4_ADDR | WB_AFC_DIAG_RAW_ADDR)
+
+#define WB_AFC_DIAG_CTRL_REGS                       (BAR4_ADDR | WB_AFC_DIAG_CTRL_RAW_REGS)
 
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)

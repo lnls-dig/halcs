@@ -56,4 +56,13 @@ char *halutils_concat_strings_no_sep (const char *str1, const char* str2);
 char *halutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);
 
+/* Spawns (fork and exec) a new process. Returns, for the parent process, -1
+ * in case of error and child's PID (> 0) if success. For the child process,
+ * returns -1 in case of error and 0 in case of success */
+int halutils_spawn_chld (const char *program, char *const argv[]);
+
+/* Wait for a child process, printing the exit status and possible errors
+ * in the global LOG. Returns 0 in case of success and -1 in case of error */
+int halutils_wait_chld (void);
+
 #endif

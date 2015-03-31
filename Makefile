@@ -26,6 +26,10 @@ FMC130M_4CH_EEPROM_PROGRAM ?=
 WITH_DEV_MNGR ?= y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE ?= 2
+# Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
+# If selected, the FPGA firmware must have the AFC diagnostics module
+# synthesized.
+WITH_DEVIO_CFG ?= y
 # Selects the install location of the config file
 CFG_DIR ?= /etc/bpm_sw
 export CFG_DIR
@@ -86,6 +90,11 @@ endif
 
 ifeq ($(AFE_RFFE_TYPE),2)
 CFLAGS += -D__AFE_RFFE_V2__
+endif
+
+# Compile DEVIO Config or not
+ifeq ($(WITH_DEVIO_CFG),y)
+CFLAGS += -D__WITH_DEVIO_CFG__
 endif
 
 ifneq ($(CFG_DIR),)
