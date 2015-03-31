@@ -375,7 +375,7 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     devio_err_e err = DEVIO_SUCCESS;
 
     /* ML605 or AFCv3 */
-#if defined (__BOARD_ML605__) || defined (__BOARD_AFCV3__)
+#if defined (__BOARD_ML605__) || (__BOARD_AFCV3__)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning default SMIOs ...\n");
     err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
