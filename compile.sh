@@ -20,7 +20,7 @@ AFE_RFFE_TYPE=2
 # Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_DEVIO_CFG=y
+WITH_DEVIO_CFG=n
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
@@ -48,8 +48,8 @@ COMMAND_LIBCLIENT="\
     DBE_DBG=${DBE_DBG} libclient && \
     sudo make libclient_install"
 
-    #"${COMMAND_DEPS}"
 COMMAND_ARRAY=(
+    "${COMMAND_DEPS}"
     "${COMMAND_HAL}"
     "${COMMAND_LIBCLIENT}"
 )
