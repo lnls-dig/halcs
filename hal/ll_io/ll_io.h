@@ -42,21 +42,21 @@ typedef int (*open_fp)(struct _llio_t *self, struct _llio_endpoint_t *endpoint);
 /* Release device function pointer */
 typedef int (*release_fp)(struct _llio_t *self, struct _llio_endpoint_t *endpoint);
 /* Read data from device function pointers */
-typedef ssize_t (*read_16_fp)(struct _llio_t *self, loff_t offs, uint16_t *data);
-typedef ssize_t (*read_32_fp)(struct _llio_t *self, loff_t offs, uint32_t *data);
-typedef ssize_t (*read_64_fp)(struct _llio_t *self, loff_t offs, uint64_t *data);
+typedef ssize_t (*read_16_fp)(struct _llio_t *self, uint64_t offs, uint16_t *data);
+typedef ssize_t (*read_32_fp)(struct _llio_t *self, uint64_t offs, uint32_t *data);
+typedef ssize_t (*read_64_fp)(struct _llio_t *self, uint64_t offs, uint64_t *data);
 /* Write data to device function pointers */
-typedef ssize_t (*write_16_fp)(struct _llio_t *self, loff_t offs, const uint16_t *data);
-typedef ssize_t (*write_32_fp)(struct _llio_t *self, loff_t offs, const uint32_t *data);
-typedef ssize_t (*write_64_fp)(struct _llio_t *self, loff_t offs, const uint64_t *data);
+typedef ssize_t (*write_16_fp)(struct _llio_t *self, uint64_t offs, const uint16_t *data);
+typedef ssize_t (*write_32_fp)(struct _llio_t *self, uint64_t offs, const uint32_t *data);
+typedef ssize_t (*write_64_fp)(struct _llio_t *self, uint64_t offs, const uint64_t *data);
 /* Read data block from device function pointer, size in bytes */
-typedef ssize_t (*read_block_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*read_block_fp)(struct _llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block from device function pointer, size in bytes */
-typedef ssize_t (*write_block_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*write_block_fp)(struct _llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Read data block via DMA from device function pointer, size in bytes */
-typedef ssize_t (*read_dma_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*read_dma_fp)(struct _llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block via DMA from device function pointer, size in bytes */
-typedef ssize_t (*write_dma_fp)(struct _llio_t *self, loff_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*write_dma_fp)(struct _llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Read device information function pointer */
 /* typedef int (*read_info_fp)(struct _llio_t *self, struct _llio_dev_info_t *dev_info); moved to dev_io */
 
@@ -108,21 +108,21 @@ int llio_open (llio_t *self, llio_endpoint_t *endpoint);
 /* Release device */
 int llio_release (llio_t *self, llio_endpoint_t *endpoint);
 /* Read data from device */
-ssize_t llio_read_16 (llio_t *self, loff_t offs, uint16_t *data);
-ssize_t llio_read_32 (llio_t *self, loff_t offs, uint32_t *data);
-ssize_t llio_read_64 (llio_t *self, loff_t offs, uint64_t *data);
+ssize_t llio_read_16 (llio_t *self, uint64_t offs, uint16_t *data);
+ssize_t llio_read_32 (llio_t *self, uint64_t offs, uint32_t *data);
+ssize_t llio_read_64 (llio_t *self, uint64_t offs, uint64_t *data);
 /* Write data to device */
-ssize_t llio_write_16 (llio_t *self, loff_t offs, const uint16_t *data);
-ssize_t llio_write_32 (llio_t *self, loff_t offs, const uint32_t *data);
-ssize_t llio_write_64 (llio_t *self, loff_t offs, const uint64_t *data);
+ssize_t llio_write_16 (llio_t *self, uint64_t offs, const uint16_t *data);
+ssize_t llio_write_32 (llio_t *self, uint64_t offs, const uint32_t *data);
+ssize_t llio_write_64 (llio_t *self, uint64_t offs, const uint64_t *data);
 /* Read data block from device, size in bytes */
-ssize_t llio_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data);
+ssize_t llio_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block from device, size in bytes */
-ssize_t llio_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data);
+ssize_t llio_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Read data block via DMA from device, size in bytes */
-ssize_t llio_read_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data);
+ssize_t llio_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block via DMA from device, size in bytes */
-ssize_t llio_write_dma (llio_t *self, loff_t offs, size_t size, uint32_t *data);
+ssize_t llio_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
 /* Read device information */
 /* int llio_read_info (llio_t *self, llio_dev_info_t *dev_info); Moved to dev_io */
 

@@ -66,7 +66,7 @@ struct _th_boot_args_t {
     char *broker;                   /* Endpoint to connect to broker */
     char *service;                  /* (part of) the service name to be exported */
     int verbose;                    /* Print trace information to stdout*/
-    uint32_t base;                  /* SMIO base address */
+    uint64_t base;                  /* SMIO base address */
     uint32_t inst_id;               /* SMIO instance ID */
 };
 

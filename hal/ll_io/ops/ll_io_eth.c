@@ -66,9 +66,9 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
 static void *_get_in_addr(struct sockaddr *sa);
 static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len);
-static ssize_t _eth_read_generic (llio_t *self, loff_t offs, uint32_t *data,
+static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
         size_t size);
-static ssize_t _eth_write_generic (llio_t *self, loff_t offs, const uint32_t *data,
+static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
         size_t size);
 
 /************ Our methods implementation **********/
@@ -240,58 +240,58 @@ err_dealloc:
 }
 
 /* Read data from Eth device */
-ssize_t eth_read_16 (llio_t *self, loff_t offs, uint16_t *data)
+ssize_t eth_read_16 (llio_t *self, uint64_t offs, uint16_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_read_32 (llio_t *self, loff_t offs, uint32_t *data)
+ssize_t eth_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_read_64 (llio_t *self, loff_t offs, uint64_t *data)
+ssize_t eth_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
 /* Write data to Eth device */
-ssize_t eth_write_16 (llio_t *self, loff_t offs, const uint16_t *data)
+ssize_t eth_write_16 (llio_t *self, uint64_t offs, const uint16_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_write_32 (llio_t *self, loff_t offs, const uint32_t *data)
+ssize_t eth_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_write_64 (llio_t *self, loff_t offs, const uint64_t *data)
+ssize_t eth_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
 /* Read data block from Eth device, size in bytes */
-ssize_t eth_read_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t eth_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _eth_read_generic (self, offs, data, size);
 }
 
 /* Write data block to Eth device, size in bytes */
-ssize_t eth_write_block (llio_t *self, loff_t offs, size_t size, uint32_t *data)
+ssize_t eth_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _eth_write_generic (self, offs, data, size);
 }
 
 /******************************* Static Functions *****************************/
 
-static ssize_t _eth_read_generic (llio_t *self, loff_t offs, uint32_t *data,
+static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
         size_t size)
 {
     (void) offs;
@@ -299,7 +299,7 @@ static ssize_t _eth_read_generic (llio_t *self, loff_t offs, uint32_t *data,
             size);
 }
 
-static ssize_t _eth_write_generic (llio_t *self, loff_t offs, const uint32_t *data,
+static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
         size_t size)
 {
     (void) offs;

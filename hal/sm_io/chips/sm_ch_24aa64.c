@@ -51,7 +51,7 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
         uint8_t *data, size_t size);
 
 /* Creates a new instance of the SMCH 24AA64 */
-smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint32_t base, uint32_t addr,
+smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
         int verbose)
 {
     (void) verbose;

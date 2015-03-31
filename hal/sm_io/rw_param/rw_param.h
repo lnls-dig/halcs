@@ -80,9 +80,9 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
         uint32_t __value;                                                       \
-        uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
+        uint64_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-                "GET_PARAM_" #reg "_" #field ": reading from address 0x%08x\n", \
+                "GET_PARAM_" #reg "_" #field ": reading from address 0x%"PRIx64 "\n", \
                 self->base | addr);                                             \
         ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(self, addr,     \
             &__value);                                                          \
@@ -121,9 +121,9 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
-        uint32_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
+        uint64_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
-                "SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%08x\n", \
+                "SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%"PRIx64 "\n", \
                 value, self->base | addr);                                      \
         if (EXPAND_CHECK_LIM_NE(min, max)                                       \
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
@@ -165,7 +165,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
             }                                                                   \
             else {                                                              \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] " \
-                        "SET_PARAM_" #reg "_" #field ": updated 0x%08x to address 0x%08x\n", \
+                        "SET_PARAM_" #reg "_" #field ": updated 0x%08x to address 0x%"PRIx64 "\n", \
                         __write_value, self->base | addr);                      \
             }                                                                   \
         }                                                                       \

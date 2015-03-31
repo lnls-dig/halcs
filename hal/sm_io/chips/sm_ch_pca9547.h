@@ -27,7 +27,7 @@ typedef struct _smch_pca9547_t smch_pca9547_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH PCA9547 */
-smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint32_t base, uint32_t addr,
+smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint64_t base, uint32_t addr,
         int verbose);
 /* Destroy an instance of the SMCH PCA9547 */
 smch_err_e smch_pca9547_destroy (smch_pca9547_t **self_p);

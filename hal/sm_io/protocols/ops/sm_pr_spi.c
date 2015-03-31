@@ -52,7 +52,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the proto_spi */
-smpr_proto_spi_t * smpr_proto_spi_new (uint32_t base)
+smpr_proto_spi_t * smpr_proto_spi_new (uint64_t base)
 {
     smpr_proto_spi_t *self = (smpr_proto_spi_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_spi_alloc);
@@ -83,7 +83,7 @@ smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
 /************ smpr_proto_ops_spi Implementation **********/
 
 /* Open SPI protocol */
-int spi_open (smpr_t *self, uint32_t base, void *args)
+int spi_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 
@@ -155,7 +155,7 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from SPI */
-ssize_t spi_read_16 (smpr_t *self, loff_t offs, uint16_t *data, uint32_t flags)
+ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -165,7 +165,7 @@ ssize_t spi_read_16 (smpr_t *self, loff_t offs, uint16_t *data, uint32_t flags)
 }
 
 /* Write 16-bit data to SPI device */
-ssize_t spi_write_16 (smpr_t *self, loff_t offs, const uint16_t *data, uint32_t flags)
+ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data, uint32_t flags)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -173,7 +173,7 @@ ssize_t spi_write_16 (smpr_t *self, loff_t offs, const uint16_t *data, uint32_t 
 }
 
 /* Read 32-bit data from SPI */
-ssize_t spi_read_32 (smpr_t *self, loff_t offs, uint32_t *data, uint32_t flags)
+ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -183,7 +183,7 @@ ssize_t spi_read_32 (smpr_t *self, loff_t offs, uint32_t *data, uint32_t flags)
 }
 
 /* Write 32-bit data to SPI device */
-ssize_t spi_write_32 (smpr_t *self, loff_t offs, const uint32_t *data, uint32_t flags)
+ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data, uint32_t flags)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -191,7 +191,7 @@ ssize_t spi_write_32 (smpr_t *self, loff_t offs, const uint32_t *data, uint32_t 
 }
 
 /* Read 64-bit data from SPI */
-ssize_t spi_read_64 (smpr_t *self, loff_t offs, uint64_t *data, uint32_t flags)
+ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data, uint32_t flags)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -201,7 +201,7 @@ ssize_t spi_read_64 (smpr_t *self, loff_t offs, uint64_t *data, uint32_t flags)
 }
 
 /* Write 64-bit data to SPI device */
-ssize_t spi_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t flags)
+ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data, uint32_t flags)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -209,7 +209,7 @@ ssize_t spi_write_64 (smpr_t *self, loff_t offs, const uint64_t *data, uint32_t 
 }
 
 /* Read data block from SPI device, size in bytes */
-ssize_t spi_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
+ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data,
         uint32_t flags)
 {
     (void) offs;
@@ -220,7 +220,7 @@ ssize_t spi_read_block (smpr_t *self, loff_t offs, size_t size, uint32_t *data,
 }
 
 /* Write data block from SPI device, size in bytes */
-ssize_t spi_write_block (smpr_t *self, loff_t offs, size_t size, const uint32_t *data,
+ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data,
         uint32_t flags)
 {
     (void) offs;

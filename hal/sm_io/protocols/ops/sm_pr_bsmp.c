@@ -45,7 +45,7 @@ smpr_proto_glue_bsmp_t bsmp_glue;
 /*************** Our methods implementation **********/
 
 /* Creates a new instance of the proto_bsmp */
-smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint32_t base)
+smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint64_t base)
 {
     smpr_proto_bsmp_t *self = (smpr_proto_bsmp_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_bsmp_alloc);
@@ -82,7 +82,7 @@ smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p)
 /************ smpr_proto_ops_bsmp Implementation **********/
 
 /* Open BSMP protocol */
-int bsmp_open (smpr_t *self, uint32_t base, void *args)
+int bsmp_open (smpr_t *self, uint64_t base, void *args)
 {
     (void) args;
     assert (self);

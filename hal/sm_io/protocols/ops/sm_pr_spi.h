@@ -40,7 +40,7 @@ extern const smpr_proto_ops_t smpr_proto_ops_spi;
 
 /* Device endpoint */
 struct _smpr_proto_spi_t {
-    uint32_t base;              /* Core base address */
+    uint64_t base;              /* Core base address */
     uint32_t sys_freq;          /* System clock [Hz] */
     uint32_t spi_freq;          /* SPI clock [Hz] */
     uint32_t init_config;       /* SPI initial config register */
@@ -52,7 +52,7 @@ typedef struct _smpr_proto_spi_t smpr_proto_spi_t;
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Endpoint*/
-smpr_proto_spi_t * smpr_proto_spi_new (uint32_t base);
+smpr_proto_spi_t * smpr_proto_spi_new (uint64_t base);
 /* Destroy an instance of the Endpoint */
 smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p);
 

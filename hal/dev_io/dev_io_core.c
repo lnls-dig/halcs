@@ -229,7 +229,7 @@ devio_err_e devio_print_info (devio_t *self)
 }
 
 /* Register an specific sm_io modules to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
+devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id)
 {
     assert (self);
@@ -334,6 +334,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint32_t base,
      * allocated parameters are either free'd or its ownership
      * is transfered to the calling function/thread */
     free (key);
+    key = NULL;
+
     return DEVIO_SUCCESS;
 
 err_spawn_config_thread:
