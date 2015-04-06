@@ -10,7 +10,6 @@
 
 #include "dispatch_table.h"
 
-extern disp_op_t rffe_set_get_kx_exp;
 extern disp_op_t rffe_set_get_sw_exp;
 extern disp_op_t rffe_set_get_att1_exp;
 extern disp_op_t rffe_set_get_att2_exp;
