@@ -57,7 +57,7 @@ char *llio_gen_type_to_str (int type, const llio_types_t *llio_types)
     for (i = 0; llio_types [i].type != LLIO_TYPE_END; ++i) {
         if (type == llio_types [i].type) {
             const char *type_str = llio_types [i].name;
-            strncpy (str, type_str, size-1);
+            strncpy (str, type_str, size);
             /* Just be be safe ... */
             str [size-1] = '\0';
             break;
