@@ -220,6 +220,7 @@ static halutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *d
     ASSERT_ALLOC (disp_op_handler, err_disp_op_handler_new);
 
     disp_op_handler->op = disp_op;
+    disp_op_handler->ret = NULL;
 
     halutils_err_e herr = _disp_table_alloc_ret (disp_op_handler->op, &disp_op_handler->ret);
     ASSERT_TEST (herr == HALUTILS_SUCCESS, "Return value could not be allocated",
