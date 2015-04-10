@@ -145,7 +145,10 @@ $(LIBCLIENT)_HEADERS = $($(LIBCLIENT)_OBJS_LIB:.o=.h) $($(LIBCLIENT)_CODE_HEADER
 $(LIBCLIENT)_INST_HEADERS = $($(LIBCLIENT)_HEADERS) $($(LIBCLIENT)_ACQ_HEADER_BASENAME).h
 
 # Save a git repository description
-REVISION = $(shell git describe --dirty --always)
+GIT_REVISION = $(shell git describe --dirty --always)
+GIT_USER_NAME = $(shell git config --get user.name)
+GIT_USER_EMAIL = $(shell git config --get user.email)
+
 REVISION_NAME = revision
 OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
@@ -178,7 +181,10 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
-	$(CC) $(CFLAGS) -DGIT_REVISION=\"$(REVISION)\" -c $<
+	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+        -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
+        -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
+        -c $<
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
