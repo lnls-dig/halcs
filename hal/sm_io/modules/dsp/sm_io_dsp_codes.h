@@ -11,8 +11,8 @@
 #include <inttypes.h>
 
 /* Messaging OPCODES */
-#define DSP_OPCODE_SIZE                  (sizeof(uint32_t))
-#define DSP_OPCODE_TYPE                  uint32_t
+#define DSP_OPCODE_TYPE                     uint32_t
+#define DSP_OPCODE_SIZE                     (sizeof (DSP_OPCODE_TYPE))
 
 #define DSP_OPCODE_SET_GET_KX               0
 #define DSP_NAME_SET_GET_KX                 "dsp_set_get_kx"
@@ -43,12 +43,5 @@
 #define DSP_OPCODE_SET_GET_MONIT_POS_SUM    13
 #define DSP_NAME_SET_GET_MONIT_POS_SUM      "dsp_set_get_monit_pos_sum"
 #define DSP_OPCODE_END                      14
-
-#if 0
-#define DSP_OPCODE_SET_GET_DDS_FREQ         3
-#define DSP_NAME_SET_GET_DDS_FREQ           "set_get_dds_freq"
-
-#define DSP_OPCODE_END                      4
-#endif
 
 #endif

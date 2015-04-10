@@ -11,8 +11,8 @@
 #include <inttypes.h>
 
 /* Messaging OPCODES */
-#define SWAP_OPCODE_SIZE                    (sizeof(uint32_t))
 #define SWAP_OPCODE_TYPE                    uint32_t
+#define SWAP_OPCODE_SIZE                    (sizeof (SWAP_OPCODE_TYPE))
 
 #define SWAP_OPCODE_SET_GET_SW              0
 #define SWAP_NAME_SET_GET_SW                "swap_set_get_sw"

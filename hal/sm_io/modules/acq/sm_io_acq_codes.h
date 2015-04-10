@@ -19,8 +19,8 @@ struct _smio_acq_data_block_t {
 typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 
 /* Messaging OPCODES */
-#define ACQ_OPCODE_SIZE                  (sizeof(uint32_t))
 #define ACQ_OPCODE_TYPE                  uint32_t
+#define ACQ_OPCODE_SIZE                  (sizeof (ACQ_OPCODE_TYPE))
 
 #define ACQ_OPCODE_DATA_ACQUIRE         0
 #define ACQ_NAME_DATA_ACQUIRE           "acq_data_acquire"
@@ -31,8 +31,8 @@ typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 #define ACQ_OPCODE_END                  3
 
 /* Messaging Reply OPCODES */
-#define ACQ_REPLY_SIZE                  (sizeof(uint32_t))
 #define ACQ_REPLY_TYPE                  uint32_t
+#define ACQ_REPLY_SIZE                  (sizeof (ACQ_REPLY_TYPE))
 
 #define ACQ_OK                          0   /* Operation was successful */
 #define ACQ_NUM_SAMPLES_OOR             1   /* Number of samples out of range */

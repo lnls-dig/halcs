@@ -28,8 +28,8 @@ struct _smio_rffe_version_t {
 typedef struct _smio_rffe_version_t smio_rffe_version_t;
 
 /* Messaging OPCODES */
-#define RFFE_OPCODE_SIZE                        (sizeof(uint32_t))
 #define RFFE_OPCODE_TYPE                        uint32_t
+#define RFFE_OPCODE_SIZE                        (sizeof (RFFE_OPCODE_TYPE))
 
 #define RFFE_OPCODE_SET_GET_SW                  0
 #define RFFE_NAME_SET_GET_SW                    "rffe_sw"
@@ -66,6 +66,10 @@ typedef struct _smio_rffe_version_t smio_rffe_version_t;
 #define RFFE_OPCODE_SET_GET_SW_LVL              16
 #define RFFE_NAME_SET_GET_SW_LVL                "rffe_sw_lvl"
 #define RFFE_OPCODE_END                         17
+
+/* Messaging Reply OPCODES */
+#define RFFE_REPLY_TYPE                         uint32_t
+#define RFFE_REPLY_SIZE                         (sizeof (RFFE_REPLY_TYPE))
 
 #define RFFE_OK                                  0   /* Operation was successful */
 #define RFFE_ERR                                 1   /* Could not set/get value */

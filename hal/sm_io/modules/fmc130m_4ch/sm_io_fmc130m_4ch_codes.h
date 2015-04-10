@@ -11,8 +11,8 @@
 #include <inttypes.h>
 
 /* Messaging OPCODES */
-#define FMC130M_4CH_OPCODE_SIZE                         (sizeof(uint32_t))
 #define FMC130M_4CH_OPCODE_TYPE                         uint32_t
+#define FMC130M_4CH_OPCODE_SIZE                         (sizeof (FMC130M_4CH_OPCODE_TYPE))
 
 #define FMC130M_4CH_OPCODE_LEDS                         0
 #define FMC130M_4CH_NAME_LEDS                           "fmc130m_4ch_leds"
@@ -107,8 +107,8 @@
 #define FMC130M_4CH_OPCODE_END                          45
 
 /* Messaging Reply OPCODES */
-#define FMC130M_4CH_REPLY_SIZE                          (sizeof(uint32_t))
 #define FMC130M_4CH_REPLY_TYPE                          uint32_t
+#define FMC130M_4CH_REPLY_SIZE                          (sizeof (FMC130M_4CH_REPLY_TYPE))
 
 #define FMC130M_4CH_OK                                  0   /* Operation was successful */
 #define FMC130M_4CH_ERR                                 1   /* Could not set/get value */

@@ -20,8 +20,8 @@ struct _smio_afc_diag_revision_data_t {
 typedef struct _smio_afc_diag_revision_data_t smio_afc_diag_revision_data_t;
 
 /* Messaging OPCODES */
-#define AFC_DIAG_OPCODE_SIZE                        (sizeof(uint32_t))
 #define AFC_DIAG_OPCODE_TYPE                        uint32_t
+#define AFC_DIAG_OPCODE_SIZE                        (sizeof (AFC_DIAG_OPCODE_TYPE))
 
 #define AFC_DIAG_OPCODE_SET_GET_CARD_SLOT           0
 #define AFC_DIAG_NAME_SET_GET_CARD_SLOT             "afc_diag_card_slot"
@@ -36,6 +36,10 @@ typedef struct _smio_afc_diag_revision_data_t smio_afc_diag_revision_data_t;
 #define AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL        5
 #define AFC_DIAG_NAME_GET_BUILD_USER_EMAIL          "afc_diag_build_user_email"
 #define AFC_DIAG_OPCODE_END                         6
+
+/* Messaging Reply OPCODES */
+#define AFC_DIAG_REPLY_TYPE                         uint32_t
+#define AFC_DIAG_REPLY_SIZE                         (sizeof (AFC_DIAG_REPLY_TYPE))
 
 #define AFC_DIAG_OK                                 0   /* Operation was successful */
 #define AFC_DIAG_ERR                                1   /* Could not set/get value */
