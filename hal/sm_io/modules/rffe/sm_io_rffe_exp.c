@@ -56,59 +56,57 @@ typedef smch_err_e (*smch_rffe_func_fp) (smch_rffe_t *self, uint32_t id,
 #define RFFE_FUNC_NAME_HEADER(func_name)                                \
     static int RFFE_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-#define RFFE_FUNC_BODY_RW_VAR(owner, args, ret, read_func, write_func,  \
-        id, error_msg)                                                  \
-    do {                                                                \
-        assert (owner);                                                 \
-        assert (args);                                                  \
-                                                                        \
-        int err = -RFFE_OK;                                             \
-        SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                  \
-        smch_rffe_t *smch_rffe = SMIO_CTL_HANDLER(self);                \
-        uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);        \
-                                                                        \
-        EXP_MSG_ZMQ_ARG_TYPE param_zmq = EXP_MSG_ZMQ_PEEK_NEXT_ARG(args); \
-        size_t param_size = EXP_MSG_ZMQ_ARG_SIZE(param_zmq);            \
-        void *param = EXP_MSG_ZMQ_ARG_DATA(param_zmq);                  \
-        uint32_t ret_size = DISP_GET_ASIZE(rffe_exp_ops [id]->retval);  \
-                                                                        \
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rffe_exp] Calling " \
-                "RFFE function ID %u\n", id);                           \
-                                                                        \
-        smch_err_e serr = SMCH_SUCCESS;                                 \
-        /* Call specific function */                                    \
-        if (rw) {                                                       \
-            serr = ((smch_rffe_func_fp) read_func) (smch_rffe, id,      \
-                    (uint8_t *) ret, ret_size);                         \
-            if (serr != SMCH_SUCCESS) {                                 \
-                err = -RFFE_ERR;                                        \
-            }                                                           \
-            else {                                                      \
-                err = ret_size;                                         \
-            }                                                           \
-        }                                                               \
-        else {                                                          \
-            serr = ((smch_rffe_func_fp) write_func) (smch_rffe, id,     \
-                    (uint8_t *) param, param_size);                     \
-            if (serr != SMCH_SUCCESS) {                                 \
-                err = -RFFE_ERR;                                        \
-            }                                                           \
-            else {                                                      \
-                err = -RFFE_OK;                                         \
-            }                                                           \
-        }                                                               \
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,                           \
-                "[sm_io:rffe_exp] Function %s %s\n",                    \
-                rffe_exp_ops [id]->name,                                \
-                (err == -RFFE_ERR)? error_msg : "successfully executed"); \
-                                                                        \
-        return err;                                                     \
-                                                                        \
-    } while(0)
+static int _rffe_var_rw (void *owner, void *args, void *ret,
+        smch_rffe_func_fp read_func, smch_rffe_func_fp write_func,
+        RFFE_OPCODE_TYPE id, const char *error_msg)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -RFFE_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smch_rffe_t *smch_rffe = SMIO_CTL_HANDLER(self);
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    EXP_MSG_ZMQ_ARG_TYPE param_zmq = EXP_MSG_ZMQ_PEEK_NEXT_ARG(args);
+    size_t param_size = EXP_MSG_ZMQ_ARG_SIZE(param_zmq);
+    void *param = EXP_MSG_ZMQ_ARG_DATA(param_zmq);
+    uint32_t ret_size = DISP_GET_ASIZE(rffe_exp_ops [id]->retval);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rffe_exp] Calling "
+            "RFFE function ID %u\n", id);
+
+    smch_err_e serr = SMCH_SUCCESS;
+    /* Call specific function */
+    if (rw) {
+        serr = (read_func) (smch_rffe, id, (uint8_t *) ret, ret_size);
+        if (serr != SMCH_SUCCESS) {
+            err = -RFFE_ERR;
+        }
+        else {
+            err = ret_size;
+        }
+    }
+    else {
+        serr = (write_func) (smch_rffe, id, (uint8_t *) param, param_size);
+        if (serr != SMCH_SUCCESS) {
+            err = -RFFE_ERR;
+        }
+        else {
+            err = -RFFE_OK;
+        }
+    }
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "[sm_io:rffe_exp] Function %s %s\n",
+            rffe_exp_ops [id]->name,
+            (err == -RFFE_ERR)? error_msg : "successfully executed");
+
+    return err;
+}
 
 RFFE_FUNC_NAME_HEADER(sw)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_SW,
             "Could not set/get RFFE switching");
 }
@@ -116,35 +114,35 @@ RFFE_FUNC_NAME_HEADER(sw)
 
 RFFE_FUNC_NAME_HEADER(att1)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_ATT1,
             "Could not set/get RFFE attenuator 1");
 }
 
 RFFE_FUNC_NAME_HEADER(att2)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_ATT2,
             "Could not set/get RFFE attenuator 2");
 }
 
 RFFE_FUNC_NAME_HEADER(temp1)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP1,
             "Could not set/get RFFE temperature 1");
 }
 
 RFFE_FUNC_NAME_HEADER(temp2)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP2,
             "Could not set/get RFFE temperature 2");
 }
 
 RFFE_FUNC_NAME_HEADER(temp3)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP3,
             "Could not set/get RFFE temperature 3");
 }
@@ -152,35 +150,35 @@ RFFE_FUNC_NAME_HEADER(temp3)
 
 RFFE_FUNC_NAME_HEADER(temp4)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP4,
             "Could not set/get RFFE temperature 4");
 }
 
 RFFE_FUNC_NAME_HEADER(set_point1)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT1,
             "Could not set/get RFFE set point 1");
 }
 
 RFFE_FUNC_NAME_HEADER(set_point2)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT2,
             "Could not set/get RFFE set point 2");
 }
 
 RFFE_FUNC_NAME_HEADER(temp_control)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP_CONTROL,
             "Could not set/get RFFE temperature control");
 }
 
 RFFE_FUNC_NAME_HEADER(output1)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_OUTPUT1,
             "Could not set/get RFFE output 1");
 }
@@ -188,35 +186,35 @@ RFFE_FUNC_NAME_HEADER(output1)
 
 RFFE_FUNC_NAME_HEADER(output2)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_OUTPUT2,
             "Could not set/get RFFE output 2");
 }
 
 RFFE_FUNC_NAME_HEADER(reset)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_RESET,
             "Could not set/get RFFE reset");
 }
 
 RFFE_FUNC_NAME_HEADER(reprog)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_REPROG,
             "Could not set/get RFFE reprogramming");
 }
 
 RFFE_FUNC_NAME_HEADER(data)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_DATA,
             "Could not set/get RFFE data");
 }
 
 RFFE_FUNC_NAME_HEADER(version)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_VERSION,
             "Could not set/get RFFE version");
 }
@@ -224,7 +222,7 @@ RFFE_FUNC_NAME_HEADER(version)
 
 RFFE_FUNC_NAME_HEADER(sw_lvl)
 {
-    RFFE_FUNC_BODY_RW_VAR(owner, args, ret, smch_rffe_read_var,
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
             smch_rffe_write_var, RFFE_OPCODE_SET_GET_SW_LVL,
             "Could not set/get RFFE switching level");
 }
