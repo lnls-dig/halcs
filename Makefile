@@ -132,12 +132,12 @@ LFLAGS =
 OBJS_PLATFORM =
 
 # Include other Makefiles as needed here
-#include services/services.mk
-#include clients/clients.mk
 include hal/hal.mk
+include revision/revision.mk
 
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
+            $(revision_INCLUDE_DIRS) \
 	       -I$(PCIE_DRIVER_DIR)/include/pcie \
 	       -I/usr/local/include
 
@@ -155,11 +155,15 @@ ALL_OUT = $(hal_all_OUT)
 .SECONDEXPANSION:
 
 # Save a git repository description
-REVISION = $(shell git describe --dirty --always)
-REVISION_NAME = revision
-OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
+GIT_REVISION = $(shell git describe --dirty --always)
+GIT_USER_NAME = $(shell git config --get user.name)
+GIT_USER_EMAIL = $(shell git config --get user.email)
 
-OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
+OBJS_all =  $(hal_OBJS) $(revision_OBJS)
+
+# Sources
+all_SRCS = $(patsubst %.o,%.c,$(OBJS_all))
+revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 .PHONY: all install uninstall clean mrproper \
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
@@ -178,11 +182,15 @@ OBJS_all =  $(hal_OBJS) $(OBJ_REVISION)
 all: libclient cfg $(OUT)
 
 # Output Rule
-$(OUT): $$($$@_OBJS) $(REVISION_NAME).o
+$(OUT): $$($$@_OBJS) $(revision_OBJS)
 	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS)
 
-$(REVISION_NAME).o: $(REVISION_NAME).c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION=\"$(REVISION)\" -c $<
+# Special rule for the revision object
+$(revision_OBJS): $(revision_SRCS)
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+        -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
+        -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
+        -c $< -o $@
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -301,7 +309,7 @@ deps_clean: libmdp_clean libbsmp_clean
 deps_mrproper: libmdp_mrproper libbsmp_mrproper
 
 hal_install:
-	$(foreach hal_bin,$(ALL_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+	$(foreach hal_bin,$(hal_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
 	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
 
 hal_uninstall:
