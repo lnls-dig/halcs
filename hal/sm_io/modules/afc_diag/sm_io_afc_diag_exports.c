@@ -34,10 +34,62 @@ disp_op_t afc_diag_set_get_ipmi_addr_exp = {
     }
 };
 
+disp_op_t afc_diag_get_build_revision_exp = {
+    .name = AFC_DIAG_NAME_GET_BUILD_REVISION,
+    .opcode = AFC_DIAG_OPCODE_GET_BUILD_REVISION,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, smio_afc_diag_revision_data_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_diag_get_build_date_exp = {
+    .name = AFC_DIAG_NAME_GET_BUILD_DATE,
+    .opcode = AFC_DIAG_OPCODE_GET_BUILD_DATE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, smio_afc_diag_revision_data_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_diag_get_build_user_name_exp = {
+    .name = AFC_DIAG_NAME_GET_BUILD_USER_NAME,
+    .opcode = AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, smio_afc_diag_revision_data_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_diag_get_build_user_email_exp = {
+    .name = AFC_DIAG_NAME_GET_BUILD_USER_EMAIL,
+    .opcode = AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, smio_afc_diag_revision_data_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *afc_diag_exp_ops [] = {
     &afc_diag_set_get_card_slot_exp,
     &afc_diag_set_get_ipmi_addr_exp,
+    &afc_diag_get_build_revision_exp,
+    &afc_diag_get_build_date_exp,
+    &afc_diag_get_build_user_name_exp,
+    &afc_diag_get_build_user_email_exp,
     NULL
 };
 

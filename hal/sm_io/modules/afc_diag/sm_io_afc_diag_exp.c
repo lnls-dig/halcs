@@ -19,6 +19,7 @@
 #include "sm_io_afc_diag_defaults.h"
 #include "sm_io_afc_diag_exports.h"
 #include "hal_stddef.h"
+#include "revision.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -59,10 +60,91 @@ RW_PARAM_FUNC(afc_diag, ipmi_addr) {
             /* No maximum limit */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+/* Software ID functions */
+
+/* Macros to avoid repetition of the function body */
+typedef int (*smio_afc_diag_func_fp) (char *dest, size_t size);
+
+/* Macros to avoid repetition of the function body */
+#define AFC_DIAG_INFO_FUNC_NAME(func_name)                                      \
+    _afc_diag_info_get_ ## func_name
+
+#define AFC_DIAG_INFO_FUNC_NAME_HEADER(func_name)                               \
+    static int AFC_DIAG_INFO_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
+
+static int _afc_diag_info_rw (void *owner, void *args, void *ret,
+        smio_afc_diag_func_fp read_func, AFC_DIAG_OPCODE_TYPE id,
+        const char *error_msg)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -AFC_DIAG_OK;
+    /* Unused parameter */
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    (void) rw;
+
+    /* Unused parameter */
+    uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    (void) param;
+    uint32_t ret_size = DISP_GET_ASIZE(afc_diag_exp_ops [id]->retval);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:afc_diag_exp] Calling "
+            "AFC_DIAG function ID %u\n", id);
+
+    /* Call specific function */
+    int herr = (read_func) (ret, ret_size);
+
+    if (herr < 0 || (uint32_t) herr >= ret_size) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
+                "[sm_io:afc_diag_exp] Could not clone string. Enconding error or "
+                "truncation occured\n");
+        err = -AFC_DIAG_ERR;
+    }
+    else {
+        err = herr;
+    }
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "[sm_io:afc_diag_exp] Function %s %s\n",
+            afc_diag_exp_ops [id]->name,
+            (err == -AFC_DIAG_ERR)? error_msg : "successfully executed");
+
+    return err;
+}
+
+AFC_DIAG_INFO_FUNC_NAME_HEADER(build_revision)
+{
+    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_revision,
+            AFC_DIAG_OPCODE_GET_BUILD_REVISION, "Could not get build revision");
+}
+
+AFC_DIAG_INFO_FUNC_NAME_HEADER(build_date)
+{
+    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_date,
+            AFC_DIAG_OPCODE_GET_BUILD_DATE, "Could not get build date");
+}
+
+AFC_DIAG_INFO_FUNC_NAME_HEADER(build_user_name)
+{
+    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_user_name,
+            AFC_DIAG_OPCODE_GET_BUILD_USER_NAME, "Could not get build user name");
+}
+
+AFC_DIAG_INFO_FUNC_NAME_HEADER(build_user_email)
+{
+    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_user_email,
+            AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL, "Could not get build user email");
+}
+
 /* Exported function pointers */
 const disp_table_func_fp afc_diag_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_diag, card_slot),
     RW_PARAM_FUNC_NAME(afc_diag, ipmi_addr),
+    AFC_DIAG_INFO_FUNC_NAME(build_revision),
+    AFC_DIAG_INFO_FUNC_NAME(build_date),
+    AFC_DIAG_INFO_FUNC_NAME(build_user_name),
+    AFC_DIAG_INFO_FUNC_NAME(build_user_email),
     NULL
 };
 
