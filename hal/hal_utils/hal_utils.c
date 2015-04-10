@@ -6,12 +6,13 @@
  */
 
 #include <stdio.h>
-#include <sys/wait.h>   /* waitpid */
-#include <errno.h>       /* perror */
+#include <sys/wait.h>       /* waitpid */
+#include <errno.h>          /* perror */
 
 #include "hal_utils.h"
 #include "hal_utils_err.h"
 #include "hal_assert.h"
+#include "revision.h"
 #include "czmq.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -39,6 +40,10 @@
 
 static char *_halutils_concat_strings_raw (const char *str1, const char* str2,
         const char *str3, bool with_sep, char sep);
+
+/*******************************************************************/
+/*****************  String manipulation functions ******************/
+/*******************************************************************/
 
 uint32_t num_to_str_len (uint32_t key, uint32_t base)
 {
@@ -164,6 +169,10 @@ char *halutils_concat_strings3 (const char *str1, const char* str2,
     return _halutils_concat_strings_raw (str1, str2, str3, true, sep);
 }
 
+/*******************************************************************/
+/*****************  System Fork/Exec functions *********************/
+/*******************************************************************/
+
 int halutils_spawn_chld (const char *program, char *const argv[])
 {
     pid_t child = fork ();
@@ -231,3 +240,81 @@ int halutils_wait_chld (void)
     return 0;
 }
 
+/*******************************************************************/
+/************************ Revision functions ***********************/
+/*******************************************************************/
+
+static char *_halutils_clone_str (const char *str)
+{
+    assert (str);
+
+    size_t str_size = strlen (str)+1;
+    char *new_str = zmalloc (str_size);
+    ASSERT_ALLOC (new_str, err_str_alloc);
+
+    int errs = snprintf (new_str, str_size, "%s", str);
+    ASSERT_TEST (errs >= 0,
+            "[halutils] Could not clone string. Enconding error?\n",
+            err_copy_str);
+    /* This shouldn't happen. Only when the number of characters written is
+     * less than the whole buffer, it is guaranteed that the string was
+     * written successfully */
+    ASSERT_TEST ((size_t) errs < str_size,
+            "[halutils] Cloned string was truncated\n", err_trunc_str);
+
+    return new_str;
+
+err_trunc_str:
+err_copy_str:
+err_str_alloc:
+    return NULL;
+}
+
+static int _halutils_copy_str (char *dest, const char *src, size_t size)
+{
+    assert (dest);
+    assert (src);
+
+    int errs = snprintf (dest, size, "%s", src);
+    return errs;
+}
+
+char *halutils_clone_build_rev (void)
+{
+    return _halutils_clone_str (build_revision);
+}
+
+char *halutils_clone_build_date (void)
+{
+    return _halutils_clone_str (build_date);
+}
+
+char *halutils_clone_build_user_name (void)
+{
+    return _halutils_clone_str (build_user_name);
+}
+
+char *halutils_clone_build_user_email (void)
+{
+    return _halutils_clone_str (build_user_email);
+}
+
+int halutils_copy_build_revision (char *dest, size_t size)
+{
+    return _halutils_copy_str (dest, build_revision, size);
+}
+
+int halutils_copy_build_date (char *dest, size_t size)
+{
+    return _halutils_copy_str (dest, build_date, size);
+}
+
+int halutils_copy_build_user_name (char *dest, size_t size)
+{
+    return _halutils_copy_str (dest, build_user_name, size);
+}
+
+int halutils_copy_build_user_email (char *dest, size_t size)
+{
+    return _halutils_copy_str (dest, build_user_email, size);
+}

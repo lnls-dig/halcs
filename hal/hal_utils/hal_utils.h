@@ -9,6 +9,7 @@
 #define _HAL_UTILS_H_
 
 #include <inttypes.h>
+#include <stddef.h>
 
 /* Returns the necessary string length including the termianting null character
  * for a number in a arbitrary base */
@@ -64,5 +65,33 @@ int halutils_spawn_chld (const char *program, char *const argv[]);
 /* Wait for a child process, printing the exit status and possible errors
  * in the global LOG. Returns 0 in case of success and -1 in case of error */
 int halutils_wait_chld (void);
+
+/* Clone the build revision. Returns the cloned string is successfully or NULL
+ * on error */
+char *halutils_clone_build_revision (void);
+/* Copies the build revision into a pre-allocated buffer. Returns a negative number
+ * on error and the number of copied bytes otherwise */
+int halutils_copy_build_revision (char *dest, size_t size);
+
+/* Clone the build date. Returns the cloned string is successfully or NULL
+ * on error */
+char *halutils_clone_build_date (void);
+/* Copies the build date into a pre-allocated buffer. Returns a negative number
+ * on error and the number of copied bytes otherwise */
+int halutils_copy_build_date (char *dest, size_t size);
+
+/* Clone the build user name. Returns the cloned string is successfully or NULL
+ * on error */
+char *halutils_clone_build_user_name (void);
+/* Copies the build user name into a pre-allocated buffer. Returns a negative number
+ * on error and the number of copied bytes otherwise */
+int halutils_copy_build_user_name (char *dest, size_t size);
+
+/* Clone the build user email. Returns the cloned string is successfully or NULL
+ * on error */
+char *halutils_clone_build_user_email (void);
+/* Copies the build user email into a pre-allocated buffer. Returns a negative number
+ * on error and the number of copied bytes otherwise */
+int halutils_copy_build_user_email (char *dest, size_t size);
 
 #endif
