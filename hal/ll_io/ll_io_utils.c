@@ -35,6 +35,8 @@
     CHECK_HAL_ERR(err, LL_IO, "[ll_io:utils]",              \
             llio_err_str (err_type))
 
+#define LLIO_TYPE_STR_SIZE          16
+
 /************** Utility functions ****************/
 
 static const llio_types_t llio_dev_types_map [] ={
@@ -48,7 +50,7 @@ static const llio_types_t llio_dev_types_map [] ={
 char *llio_gen_type_to_str (int type, const llio_types_t *llio_types)
 {
     /* Should be large enough for all possible debug levels */
-    int size = 16;
+    size_t size = LLIO_TYPE_STR_SIZE;
     char *str = zmalloc (size*sizeof (char));
     ASSERT_ALLOC(str, err_alloc_str);
 
@@ -57,9 +59,17 @@ char *llio_gen_type_to_str (int type, const llio_types_t *llio_types)
     for (i = 0; llio_types [i].type != LLIO_TYPE_END; ++i) {
         if (type == llio_types [i].type) {
             const char *type_str = llio_types [i].name;
-            strncpy (str, type_str, size);
-            /* Just be be safe ... */
-            str [size-1] = '\0';
+
+            int errs = snprintf (str, size, "%s", type_str);
+            ASSERT_TEST (errs >= 0,
+                    "[ll_io:utils] Could not clone string. Enconding error?\n",
+                    err_copy_str);
+            /* This shouldn't happen. Only when the number of characters written is
+             * less than the whole buffer, it is guaranteed that the string was
+             * written successfully */
+            ASSERT_TEST ((size_t) errs < size,
+                    "[ll_io:utils] Cloned string was truncated\n", err_trunc_str);
+
             break;
         }
     }
@@ -70,8 +80,15 @@ char *llio_gen_type_to_str (int type, const llio_types_t *llio_types)
         str = NULL;
     }
 
-err_alloc_str:
     return str;
+
+    /* Fail miserably for now ... */
+err_trunc_str:
+err_copy_str:
+    free (str);
+    str = NULL;
+err_alloc_str:
+    return NULL;
 }
 
 char *llio_type_to_str (llio_type_e type)
