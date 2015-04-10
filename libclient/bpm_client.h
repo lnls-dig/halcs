@@ -709,5 +709,19 @@ bpm_client_err_e bpm_set_afc_diag_ipmi_addr (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_afc_diag_ipmi_addr (bpm_client_t *self, char *service,
         uint32_t *afc_diag_ipmi_addr);
 
+/* AFC Revision functions */
+/* These set of functions read (get) revision information, like build ID,
+ * date, user name and email by the person who compiled the sofware.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data);
+bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data);
+bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data);
+bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data);
+
 #endif
 

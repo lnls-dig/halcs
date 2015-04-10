@@ -1521,3 +1521,40 @@ PARAM_FUNC_CLIENT_READ(afc_diag_ipmi_addr)
     return param_client_read (self, service, AFC_DIAG_OPCODE_SET_GET_IPMI_ADDR,
             afc_diag_ipmi_addr);
 }
+
+/* Build Revision */
+bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
+            rw, revision_data, sizeof (*revision_data));
+}
+
+/* Build Date */
+bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
+            rw, revision_data, sizeof (*revision_data));
+}
+
+/* Build User Name */
+bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
+            rw, revision_data, sizeof (*revision_data));
+}
+
+/* Build User Email */
+bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
+        smio_afc_diag_revision_data_t *revision_data)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
+            rw, revision_data, sizeof (*revision_data));
+}
+
