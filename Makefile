@@ -56,7 +56,7 @@ PCIE_DRIVER_VER = $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 
 # Client library
-LIBCLIENT_DIR=libclient
+LIBBPMCLIENT_DIR=src/libs/libbpmclient
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
@@ -131,9 +131,12 @@ LFLAGS =
 # Specific platform objects
 OBJS_PLATFORM =
 
+# Source directory
+SRC_DIR = src
+
 # Include other Makefiles as needed here
-include hal/hal.mk
-include revision/revision.mk
+include $(SRC_DIR)/hal/hal.mk
+include $(SRC_DIR)/revision/revision.mk
 
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
@@ -167,7 +170,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 .PHONY: all install uninstall clean mrproper \
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
-	libclient libclient_install libclient_uninstall libclient_clean libclient_mrproper \
+	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
@@ -179,7 +182,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: libclient cfg $(OUT)
+all: libbpmclient cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
@@ -283,20 +286,20 @@ libbsmp_clean:
 libbsmp_mrproper:
 	$(MAKE) -C $(LIBBSMP_DIR) distclean
 
-libclient:
-	$(MAKE) -C $(LIBCLIENT_DIR) all
+libbpmclient:
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
-libclient_install:
-	$(MAKE) -C $(LIBCLIENT_DIR) install
+libbpmclient_install:
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) install
 
-libclient_uninstall:
-	$(MAKE) -C $(LIBCLIENT_DIR) uninstall
+libbpmclient_uninstall:
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) uninstall
 
-libclient_clean:
-	$(MAKE) -C $(LIBCLIENT_DIR) clean
+libbpmclient_clean:
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) clean
 
-libclient_mrproper:
-	$(MAKE) -C $(LIBCLIENT_DIR) mrproper
+libbpmclient_mrproper:
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
 
 deps: libmdp libbsmp
 
@@ -355,11 +358,11 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: hal_install deps_install libclient_install cfg_install
+install: hal_install deps_install libbpmclient_install cfg_install
 
-uninstall: hal_uninstall deps_uninstall libclient_uninstall cfg_uninstall
+uninstall: hal_uninstall deps_uninstall libbpmclient_uninstall cfg_uninstall
 
-clean: hal_clean deps_clean libclient_clean examples_clean tests_clean cfg_clean
+clean: hal_clean deps_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean hal_mrproper deps_mrproper libclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean hal_mrproper deps_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 
