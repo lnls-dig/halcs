@@ -2,7 +2,7 @@
 #define _DDR3_MAP_ML605_H_
 
 #include "acq_chan_ml605.h"
-#include "hal_varg.h"
+#include "varg_macros.h"
 
 /* Does the acquisition channel gets a memory region? */
 #define DDR3_MEM_BOOL(MEM_SIZE)         IF(MEM_SIZE > 0)(1, 0)

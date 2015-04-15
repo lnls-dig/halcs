@@ -7,7 +7,7 @@
 
 #include <inttypes.h>
 #include <mdp.h>
-#include "hal_varg.h"
+#include "varg_macros.h"
 #include "rw_param_codes.h"
 #include "msg.h"
 

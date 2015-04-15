@@ -17,7 +17,7 @@
 
 #include "dev_mngr.h"
 #include "debug_print.h"
-#include "hal_varg.h"
+#include "varg_macros.h"
 #include "hal_utils.h"
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"

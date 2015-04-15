@@ -5,8 +5,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _HAL_VARG_H_
-#define _HAL_VARG_H_
+#ifndef _VARG_MACROS_H_
+#define _VARG_MACROS_H_
 
 /********************** Detecting NULL passed to MACRO ************************/
 /* based on from "Detect empty macro arguments" from Jens Gustedt, published
