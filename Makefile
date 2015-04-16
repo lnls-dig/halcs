@@ -55,8 +55,10 @@ PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 PCIE_DRIVER_VER = $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 
-# Client library
-LIBBPMCLIENT_DIR=src/libs/libbpmclient
+# Project libraries
+LIBERRHAND_DIR = src/libs/liberrhand
+LIBCONVC_DIR = src/libs/libconvc
+LIBBPMCLIENT_DIR = src/libs/libbpmclient
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
@@ -112,8 +114,23 @@ ifeq ($(LOCAL_MSG_DBG),y)
 CFLAGS_DEBUG += -DLOCAL_MSG_DBG=1
 endif
 
-ifeq ($(DBE_DBG),y)
-CFLAGS_DEBUG += -DDBE_DBG=1
+# To enable this option, use: make ERRHAND_DBG=y
+ifneq ($(ERRHAND_DBG),)
+CFLAGS_DEBUG += -DERRHAND_DBG=$(ERRHAND_DBG)
+endif
+
+# To enable this option use: make ERRHAND_MIN_LEVEL=DBG_MIN_TRACE
+ifneq ($(ERRHAND_MIN_LEVEL),)
+CFLAGS_DEBUG += -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL)
+endif
+
+# To enable this option use: make ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | \
+# DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
+#
+# You can also OR the available subsytems to enable debug messages in just the
+# those subsytems. See file errhand_opts.h for more information
+ifneq ($(ERRHAND_SUBSYS_ON),)
+CFLAGS_DEBUG += -DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 endif
 
 # Debug flags -D<flasg_name>=<value>
@@ -125,8 +142,14 @@ LDFLAGS_PLATFORM =
 
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
+
+# FIXME: make the project libraries easily interchangeable, specifying
+# the lib only a single time
+PROJECT_LIBS_NAME = liberrhand libconvc libbpmclient
+PROJECT_LIBS = -lerrhand -lconvc -lbpmclient
+
 # General library flags -L<libdir>
-LFLAGS =
+LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/lbpmclient
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -142,6 +165,9 @@ include $(SRC_DIR)/revision/revision.mk
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
             $(revision_INCLUDE_DIRS) \
 	       -I$(PCIE_DRIVER_DIR)/include/pcie \
+           -Isrc/libs/liberrhand \
+           -Isrc/libs/libconvc \
+           -Isrc/libs/libbpmclient \
 	       -I/usr/local/include
 
 # Merge all flags.
@@ -170,6 +196,8 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 .PHONY: all install uninstall clean mrproper \
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
+	liberrhand liberrhand_install liberrhand_uninstall liberrhand_clean liberrhand_mrproper \
+	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
@@ -182,11 +210,11 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: libbpmclient cfg $(OUT)
+all: $(PROJECT_LIBS_NAME) cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS)
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
@@ -286,6 +314,38 @@ libbsmp_clean:
 libbsmp_mrproper:
 	$(MAKE) -C $(LIBBSMP_DIR) distclean
 
+# Project Libraries
+
+liberrhand:
+	$(MAKE) -C $(LIBERRHAND_DIR) all
+
+liberrhand_install:
+	$(MAKE) -C $(LIBERRHAND_DIR) install
+
+liberrhand_uninstall:
+	$(MAKE) -C $(LIBERRHAND_DIR) uninstall
+
+liberrhand_clean:
+	$(MAKE) -C $(LIBERRHAND_DIR) clean
+
+liberrhand_mrproper:
+	$(MAKE) -C $(LIBERRHAND_DIR) mrproper
+
+libconvc:
+	$(MAKE) -C $(LIBCONVC_DIR) all
+
+libconvc_install:
+	$(MAKE) -C $(LIBCONVC_DIR) install
+
+libconvc_uninstall:
+	$(MAKE) -C $(LIBCONVC_DIR) uninstall
+
+libconvc_clean:
+	$(MAKE) -C $(LIBCONVC_DIR) clean
+
+libconvc_mrproper:
+	$(MAKE) -C $(LIBCONVC_DIR) mrproper
+
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
@@ -300,6 +360,8 @@ libbpmclient_clean:
 
 libbpmclient_mrproper:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
+
+# External project dependencies
 
 deps: libmdp libbsmp
 
@@ -362,7 +424,7 @@ install: hal_install deps_install libbpmclient_install cfg_install
 
 uninstall: hal_uninstall deps_uninstall libbpmclient_uninstall cfg_uninstall
 
-clean: hal_clean deps_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: hal_clean deps_clean liberrhand_clean libconvc_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean hal_mrproper deps_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean hal_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 

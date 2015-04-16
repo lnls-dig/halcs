@@ -7,7 +7,11 @@ BOARD=afcv3
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG=n
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
-DBE_DBG=y
+ERRHAND_DBG=y
+# Select the minimum debug verbosity. See liberrhand file errhand_opts.h for more info.
+ERRHAND_MIN_LEVEL=DBG_LVL_TRACE
+# Select the subsytems which will have the debug on. See liberrhand file errhand_opts.h for more info.
+ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
 # Select the FMC ADC board type. Options are: passive or active
 FMC130M_4CH_TYPE=passive
 # Select if we should program FMC EEPROM with some code or not. Option are:
@@ -20,7 +24,7 @@ AFE_RFFE_TYPE=2
 # Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_DEVIO_CFG=n
+WITH_DEVIO_CFG=y
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
@@ -32,8 +36,10 @@ COMMAND_DEPS="\
 
 COMMAND_HAL="\
     make BOARD=${BOARD} \
+    ERRHAND_DBG=${ERRHAND_DBG} \
+    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
     LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
-    DBE_DBG=${DBE_DBG} \
     FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
@@ -42,16 +48,18 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     sudo make install"
 
-COMMAND_LIBCLIENT="\
+COMMAND_LIBBPMCLIENT="\
     make BOARD=${BOARD} \
-    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
-    DBE_DBG=${DBE_DBG} libclient && \
-    sudo make libclient_install"
+    ERRHAND_DBG=${ERRHAND_DBG} \
+    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+    ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON} \
+    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} && \
+    sudo make libbpmclient_install"
 
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_HAL}"
-    "${COMMAND_LIBCLIENT}"
+    "${COMMAND_LIBBPMCLIENT}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
