@@ -38,16 +38,25 @@ ifeq ($(BOARD),afcv3)
 CFLAGS += -D__BOARD_AFCV3__
 endif
 
-LOCAL_MSG_DBG ?= n
-DBE_DBG ?= n
 CFLAGS_DEBUG =
 
-ifeq ($(LOCAL_MSG_DBG),y)
-CFLAGS_DEBUG += -DLOCAL_MSG_DBG=1
+# To enable this option, use: make ERRHAND_DBG=y
+ifneq ($(ERRHAND_DBG),)
+CFLAGS_DEBUG += -DERRHAND_DBG=$(ERRHAND_DBG)
 endif
 
-ifeq ($(DBE_DBG),y)
-CFLAGS_DEBUG += -DDBE_DBG=1
+# To enable this option use: make ERRHAND_MIN_LEVEL=DBG_MIN_TRACE
+ifneq ($(ERRHAND_MIN_LEVEL),)
+CFLAGS_DEBUG += -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL)
+endif
+
+# To enable this option use: make ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | \
+# DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
+#
+# You can also OR the available subsytems to enable debug messages in just the
+# those subsytems. See file errhand_opts.h for more information
+ifneq ($(ERRHAND_SUBSYS_ON),)
+CFLAGS_DEBUG += -DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 endif
 
 # Debug flags -D<flasg_name>=<value>
@@ -66,8 +75,7 @@ LFLAGS =
 # Specific board objects
 OBJS_BOARD = ../../hal/sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
-OBJS_PLATFORM = ../../hal/debug/debug_print.o ../../hal/debug/local_print.o \
-		../../hal/debug/debug_subsys.o
+OBJS_PLATFORM =
 # Objects that are not specificaly related to the bpm_client, but composes
 # our library, as it eases some tasks for us
 OBJS_EXTERNAL = ../../hal/sm_io/modules/sm_io_codes.o \
@@ -79,7 +87,7 @@ OBJS_EXTERNAL = ../../hal/sm_io/modules/sm_io_codes.o \
                 ../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_exports.o
 
 # Include directories
-INCLUDE_DIRS = -I. -I../../hal/include -I../../hal/debug \
+INCLUDE_DIRS = -I. -I../../hal/include -I../liberrhand \
 	       -I../../hal/sm_io/modules \
 	       -I../../hal/sm_io/modules/fmc130m_4ch \
 	       -I../../hal/sm_io/modules/acq \
@@ -87,7 +95,6 @@ INCLUDE_DIRS = -I. -I../../hal/include -I../../hal/debug \
 	       -I../../hal/sm_io/modules/dsp \
 	       -I../../hal/sm_io/modules/rffe \
 	       -I../../hal/sm_io/modules/afc_diag \
-	       -I../../hal/sm_io/rw_param \
 	       -I../../hal/hal_utils \
 	       -I../../hal/include/hw \
 	       -I../../hal/boards/$(BOARD) \
@@ -104,7 +111,7 @@ OUT = $(LIBBPMCLIENT)
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBBPMCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
+$(LIBBPMCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o bpm_client_rw_param.o
 
 # Objects common for both server and client libraries.
 common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
@@ -149,7 +156,7 @@ GIT_REVISION = $(shell git describe --dirty --always)
 GIT_USER_NAME = $(shell git config --get user.name)
 GIT_USER_EMAIL = $(shell git config --get user.email)
 
-REVISION_NAME = revision
+REVISION_NAME = bpm_client_revision
 OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS) \
