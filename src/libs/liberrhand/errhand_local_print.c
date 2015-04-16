@@ -7,12 +7,12 @@
 
 #include <czmq.h>
 
-char *local_vprintf (const char *format, va_list argptr)
+char *errhand_lprint_vprintf (const char *format, va_list argptr)
 {
     return zsys_vprintf (format, argptr);
 }
 
-void local_print_zmq_msg (zmsg_t *msg, FILE *file)
+void errhand_lprint_zmq_msg (zmsg_t *msg, FILE *file)
 {
     zmsg_fprint (msg, file);
     fprintf (file, "--------------------------------------\n");

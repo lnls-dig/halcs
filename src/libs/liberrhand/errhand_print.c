@@ -9,15 +9,17 @@
 #include <stdlib.h>
 #include <time.h>
 #include <czmq.h>
-#include "debug_print.h"
-#include "local_print.h"
 
-#define DBE_PRINT_PAD_FMT           "-5"
+#include "errhand_print.h"
+#include "errhand_local_print.h"
+#include "errhand_subsys.h"
+
+#define ERRHAND_PRINT_PAD_FMT           "-5"
 
 /* Our logfile */
-static FILE *_debug_logfile = NULL;
+static FILE *_errhand_logfile = NULL;
 
-void debug_print (const char *fmt, ...)
+void errhand_print (const char *fmt, ...)
 {
     va_list args;
 
@@ -28,11 +30,11 @@ void debug_print (const char *fmt, ...)
 
 /* Based on CZMQ s_log () function. Available in
  * https://github.com/zeromq/czmq/blob/master/src/zsys.c */
-static void _debug_log_write (char *dbg_lvl_str, char *msg)
+static void _errhand_log_write (char *errhand_lvl_str, char *msg)
 {
     /* Default to stdout */
-    if (!_debug_logfile) {
-        _debug_logfile = stdout;
+    if (!_errhand_logfile) {
+        _errhand_logfile = stdout;
     }
 
     time_t curtime = time (NULL);
@@ -42,39 +44,39 @@ static void _debug_log_write (char *dbg_lvl_str, char *msg)
     strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
 
     char log_text [1024];
-    snprintf (log_text, 1024, "%" DBE_PRINT_PAD_FMT "s: [%s] %s",
-            dbg_lvl_str, date, msg);
-    fprintf (_debug_logfile, "%s", log_text);
-    fflush (_debug_logfile);
+    snprintf (log_text, 1024, "%" ERRHAND_PRINT_PAD_FMT "s: [%s] %s",
+            errhand_lvl_str, date, msg);
+    fprintf (_errhand_logfile, "%s", log_text);
+    fflush (_errhand_logfile);
 }
 
 /* Based on CZMQ zsys_error () function. Available in
  * https://github.com/zeromq/czmq/blob/master/src/zsys.c */
-void debug_log_print (int dbg_lvl, const char *fmt, ...)
+void errhand_log_print (int errhand_lvl, const char *fmt, ...)
 {
     va_list argptr;
     va_start (argptr, fmt);
-    char *msg = local_vprintf (fmt, argptr);
+    char *msg = errhand_lprint_vprintf (fmt, argptr);
     va_end (argptr);
 
-    /* Convert debug level code to string */
-    char *dbg_lvl_str = dbg_lvl_to_str (dbg_lvl);
-    _debug_log_write (dbg_lvl_str, msg);
+    /* Convert errhand level code to string */
+    char *errhand_lvl_str = errhand_lvl_to_str (errhand_lvl);
+    _errhand_log_write (errhand_lvl_str, msg);
     free (msg);
-    free (dbg_lvl_str);
+    free (errhand_lvl_str);
 }
 
-void debug_log_print_zmq_msg (zmsg_t *msg)
+void errhand_log_print_zmq_msg (zmsg_t *msg)
 {
     /* Default to stdout */
-    if (!_debug_logfile) {
-        _debug_logfile = stdout;
+    if (!_errhand_logfile) {
+        _errhand_logfile = stdout;
     }
 
-    local_print_zmq_msg (msg, _debug_logfile);
+    errhand_lprint_zmq_msg (msg, _errhand_logfile);
 }
 
-void debug_print_vec (const char *fmt, const char *data, int len)
+void errhand_print_vec (const char *fmt, const char *data, int len)
 {
     int i;
     for (i = 0; i < len; ++i)
@@ -83,17 +85,17 @@ void debug_print_vec (const char *fmt, const char *data, int len)
     printf ("\n");
 }
 
-static void _debug_set_log_file (FILE *log_file)
+static void _errhand_set_log_file (FILE *log_file)
 {
-    _debug_logfile = log_file;
+    _errhand_logfile = log_file;
 }
 
-void debug_set_log_file (FILE *log_file)
+void errhand_set_log_file (FILE *log_file)
 {
-    _debug_set_log_file (log_file);
+    _errhand_set_log_file (log_file);
 }
 
-int debug_set_log (const char *log_file_name, const char *mode)
+int errhand_set_log (const char *log_file_name, const char *mode)
 {
     int err = -1;    /* Error */
     FILE *log_file = NULL;
@@ -129,7 +131,7 @@ int debug_set_log (const char *log_file_name, const char *mode)
         log_file = stdout;
     }
 
-    _debug_set_log_file (log_file);
+    _errhand_set_log_file (log_file);
     return err;
 }
 

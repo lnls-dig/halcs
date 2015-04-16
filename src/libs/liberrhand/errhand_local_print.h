@@ -6,10 +6,10 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _LOCAL_PRINT_H_
-#define _LOCAL_PRINT_H_
+#ifndef _ERRHAND_LOCAL_PRINT_H_
+#define _ERRHAND_LOCAL_PRINT_H_
 
-char *local_vprintf (const char *format, va_list argptr);
-void local_print_zmq_msg (zmsg_t *msg, FILE *file);
+char *errhand_lprint_vprintf (const char *format, va_list argptr);
+void errhand_lprint_zmq_msg (zmsg_t *msg, FILE *file);
 
 #endif
