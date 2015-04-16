@@ -84,7 +84,7 @@ common_OBJS =
 
 # Objects for each version of library
 $(LIBERRHAND)_OBJS = $(common_OBJS) $($(LIBERRHAND)_OBJS_LIB)
-$(LIBERRHAND)_CODE_HEADERS = errhand_opts.h errhand.h
+$(LIBERRHAND)_CODE_HEADERS = errhand_opts.h errhand.h varg_macros.h
 
 $(LIBERRHAND)_HEADERS = $($(LIBERRHAND)_OBJS_LIB:.o=.h) $($(LIBERRHAND)_CODE_HEADERS)
 
