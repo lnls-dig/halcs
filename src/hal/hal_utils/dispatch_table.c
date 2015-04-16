@@ -16,7 +16,7 @@
 #include "hal_utils.h"
 #include "dispatch_table.h"
 #include "msg.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

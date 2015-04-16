@@ -5,7 +5,7 @@
 
 #include "czmq.h"
 #include "dev_io.h"
-#include "debug_print.h"
+#include "errhand.h"
 #include "board.h"
 
 #define DEVIO_SERVICE_LEN       50

@@ -12,7 +12,7 @@
 #include "sm_io.h"
 #include "sm_io_exports.h"
 #include "dev_io_core.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "ddr3_map.h"
 #include "board.h"
 #include "rw_param.h"

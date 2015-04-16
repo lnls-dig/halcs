@@ -19,7 +19,7 @@
 #include <netinet/tcp.h>
 
 #include "ll_io_eth.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "ll_io_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

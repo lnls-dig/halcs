@@ -9,8 +9,7 @@
 #include <glob.h>
 
 #include "dev_mngr_core.h"
-#include "hal_assert.h"
-#include "debug_print.h"
+#include "errhand.h"
 #include "hal_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -131,7 +130,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_filename, DEVMNGR_DFLT_LOG_MODE);
+    errhand_set_log (log_filename, DEVMNGR_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEV_MNGR worker"
             " with \n\tdiscovery endpoint (ignored for now) %s, with logfile %s"

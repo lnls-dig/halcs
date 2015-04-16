@@ -5,8 +5,8 @@
 
 #include "czmq.h"
 #include "dev_io.h"
-#include "debug_print.h"
 #include "board.h"
+#include "errhand.h"
 #include "bpm_client.h"
 
 #define DEVIO_SERVICE_LEN           50

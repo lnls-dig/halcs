@@ -18,7 +18,7 @@
 #include "wb_i2c_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

@@ -1,6 +1,5 @@
 # debug.mk must be declared before dev_mngr.mk, as they are variables
 # exported by the former used by the latter
-include $(SRC_DIR)/hal/debug/debug.mk
 include $(SRC_DIR)/hal/ll_io/ll_io.mk
 include $(SRC_DIR)/hal/sm_io/sm_io.mk
 include $(SRC_DIR)/hal/sdb/sdb.mk

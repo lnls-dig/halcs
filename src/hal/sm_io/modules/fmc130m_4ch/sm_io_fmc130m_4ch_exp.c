@@ -13,7 +13,7 @@
 #include "sm_io.h"
 #include "dev_io_core.h"
 #include "board.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "rw_param.h"
 #include "wb_fmc130m_4ch_regs.h"
 #include "sm_io_fmc130m_4ch_exports.h"

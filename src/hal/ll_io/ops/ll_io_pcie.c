@@ -6,7 +6,7 @@
  */
 
 #include "ll_io_pcie.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

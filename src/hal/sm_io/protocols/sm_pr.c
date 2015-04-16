@@ -14,7 +14,7 @@
 #include "sm_pr_spi.h"
 #include "sm_pr_i2c.h"
 #include "sm_pr_bsmp.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

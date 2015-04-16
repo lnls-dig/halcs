@@ -6,7 +6,7 @@
  */
 
 #include "smio_thsafe_zmq_client.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "msg_err.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

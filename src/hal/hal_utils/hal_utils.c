@@ -11,7 +11,7 @@
 
 #include "hal_utils.h"
 #include "hal_utils_err.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "revision.h"
 #include "czmq.h"
 

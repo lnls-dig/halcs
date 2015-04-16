@@ -8,8 +8,7 @@
 #include <string.h>
 
 #include "dev_mngr_dev_info.h"
-#include "hal_assert.h"
-#include "debug_print.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

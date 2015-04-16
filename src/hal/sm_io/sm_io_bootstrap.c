@@ -10,7 +10,7 @@
 #include "sm_io_bootstrap.h"
 #include "sm_io.h"
 #include "exp_ops_codes.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "hal_utils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

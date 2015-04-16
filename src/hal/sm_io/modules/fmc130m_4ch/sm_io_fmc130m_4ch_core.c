@@ -12,7 +12,7 @@
 #include "sm_io_fmc130m_4ch_core.h"
 #include "sm_io_fmc130m_4ch_defaults.h"
 #include "sm_io_err.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "hal_stddef.h"
 #include "board.h"
 

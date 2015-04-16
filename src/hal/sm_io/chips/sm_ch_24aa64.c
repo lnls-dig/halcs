@@ -13,7 +13,7 @@
 
 #include "sm_ch_24aa64.h"
 #include "sm_pr.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "e24aa64_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

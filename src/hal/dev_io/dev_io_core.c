@@ -10,7 +10,7 @@
 
 #include "dev_io_core.h"
 #include "dev_io_err.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "sm_io_mod_dispatch.h"
 #include "msg.h"
 #include "rw_param.h"
@@ -66,7 +66,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
+    errhand_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     char *dev_type_c = llio_type_to_str (type);
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"

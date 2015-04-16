@@ -1,4 +1,4 @@
-#include "hal_assert.h"
+#include "errhand.h"
 #include "sm_io_err.h"
 #include "sm_io_fmc130m_4ch_defaults.h"
 /* We actually use the libclient to do the "heavy" work for us */

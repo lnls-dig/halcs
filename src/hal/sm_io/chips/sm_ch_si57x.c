@@ -13,7 +13,7 @@
 
 #include "sm_ch_si57x.h"
 #include "sm_pr.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "hal_stddef.h"
 #include "si57x_regs.h"
 #include "sm_ch_si57x_defaults.h"

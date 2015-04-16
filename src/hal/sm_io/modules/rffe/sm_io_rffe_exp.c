@@ -11,7 +11,7 @@
 #include "sm_io_rffe_codes.h"
 #include "sm_io.h"
 #include "dev_io_core.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "board.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"

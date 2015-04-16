@@ -8,7 +8,7 @@
 #include "sm_io.h"
 #include "exp_ops_codes.h"
 #include "rw_param.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

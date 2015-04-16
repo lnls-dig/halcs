@@ -13,7 +13,7 @@
 
 #include "sm_ch_ad9510.h"
 #include "sm_pr.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "ad9510_regs.h"
 #include "sm_ch_ad9510_defaults.h"
 

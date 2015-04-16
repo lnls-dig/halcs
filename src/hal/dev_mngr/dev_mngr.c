@@ -16,8 +16,8 @@
 #include <sys/stat.h>   /* chmod */
 
 #include "dev_mngr.h"
-#include "debug_print.h"
 #include "varg_macros.h"
+#include "errhand.h"
 #include "hal_utils.h"
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"

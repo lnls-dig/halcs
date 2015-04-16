@@ -7,7 +7,7 @@
 
 #include "msg.h"
 #include "msg_err.h"
-#include "hal_assert.h"
+#include "errhand.h"
 #include "sm_io.h"
 #include "sm_io_exports.h"
 #include "rw_param_codes.h"
