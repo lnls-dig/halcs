@@ -12,31 +12,31 @@
 #include <assert.h>
 #include <czmq.h>
 
+#include "errhand.h"
 #include "convc.h"
-#include "debug_assert.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_TEST(test_boolean, LL_IO, "[ll_io:utils]",       \
+    ASSERT_HAL_TEST(test_boolean, HAL_UTILS, "[convc]",             \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, LL_IO, "[ll_io:utils]",             \
-            llio_err_str(LLIO_ERR_ALLOC),                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
+    ASSERT_HAL_ALLOC(ptr, HAL_UTILS, "[convc]",                     \
+            convc_err_str(CONVC_ERR_ALLOC),                         \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, LL_IO, "[ll_io:utils]",              \
-            llio_err_str (err_type))
+#define CHECK_ERR(err, err_type)                                    \
+    CHECK_HAL_ERR(err, HAL_UTILS, "[convc]",                        \
+            convc_err_str (err_type))
 
 #define CONVC_TYPE_STR_SIZE          16
 
@@ -57,13 +57,13 @@ char *convc_gen_type_to_str (int type, const convc_types_t *convc_types)
 
             int errs = snprintf (str, size, "%s", type_str);
             ASSERT_TEST (errs >= 0,
-                    "[ll_io:utils] Could not clone string. Enconding error?\n",
+                    "[convc] Could not clone string. Enconding error?\n",
                     err_copy_str);
             /* This shouldn't happen. Only when the number of characters written is
              * less than the whole buffer, it is guaranteed that the string was
              * written successfully */
             ASSERT_TEST ((size_t) errs < size,
-                    "[ll_io:utils] Cloned string was truncated\n", err_trunc_str);
+                    "[convc] Cloned string was truncated\n", err_trunc_str);
 
             break;
         }

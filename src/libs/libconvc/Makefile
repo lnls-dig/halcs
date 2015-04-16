@@ -13,10 +13,29 @@ MAKE =		make
 
 PWD = 		$(shell pwd)
 
-LIBDEBUG = libdebug
+LIBCONVC = libconvc
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
+
+# To enable this option, use: make ERRHAND_DBG=y
+ifneq ($(ERRHAND_DBG),)
+CFLAGS_DEBUG += -DERRHAND_DBG=$(ERRHAND_DBG)
+endif
+
+# To enable this option use: make ERRHAND_MIN_LEVEL=DBG_MIN_TRACE
+ifneq ($(ERRHAND_MIN_LEVEL),)
+CFLAGS_DEBUG += -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL)
+endif
+
+# To enable this option use: make ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | \
+# DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
+#
+# You can also OR the available subsytems to enable debug messages in just the
+# those subsytems. See file errhand_opts.h for more information
+ifneq ($(ERRHAND_SUBSYS_ON),)
+CFLAGS_DEBUG += -DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
+endif
 
 # Debug flags -D<flasg_name>=<value>
 CFLAGS_DEBUG += -g
@@ -32,7 +51,7 @@ LIBS =
 LFLAGS =
 
 # Include directories
-INCLUDE_DIRS = -I.
+INCLUDE_DIRS = -I. -I../liberrhand
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
@@ -40,23 +59,23 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 
 # Output library names
-OUT = $(LIBDEBUG)
+OUT = $(LIBCONVC)
 
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBDEBUG)_OBJS_LIB = debug_print.o debug_subsys.o local_print.o
+$(LIBCONVC)_OBJS_LIB = convc.o convc_err.o
 
 # Objects common for this library
 common_OBJS =
 
 # Objects for each version of library
-$(LIBDEBUG)_OBJS = $(common_OBJS) $($(LIBDEBUG)_OBJS_LIB)
-$(LIBDEBUG)_CODE_HEADERS = debug_opts.h
+$(LIBCONVC)_OBJS = $(common_OBJS) $($(LIBCONVC)_OBJS_LIB)
+$(LIBCONVC)_CODE_HEADERS =
 
-$(LIBDEBUG)_HEADERS = $($(LIBDEBUG)_OBJS_LIB:.o=.h) $($(LIBDEBUG)_CODE_HEADERS)
+$(LIBCONVC)_HEADERS = $($(LIBCONVC)_OBJS_LIB:.o=.h) $($(LIBCONVC)_CODE_HEADERS)
 
-OBJS_all = $(common_OBJS) $($(LIBDEBUG)_OBJS)
+OBJS_all = $(common_OBJS) $($(LIBCONVC)_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a

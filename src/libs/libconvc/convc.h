@@ -10,6 +10,8 @@
 
 #include <inttypes.h>
 
+#include "convc_err.h"
+
 #define CONVC_TYPE_END               0xFFFF
 #define CONVC_TYPE_NAME_END          ""
 
