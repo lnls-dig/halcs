@@ -6,7 +6,7 @@
  */
 
 #include "dev_io_utils.h"
-#include "ll_io_utils.h"
+#include "convc.h"
 #include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -34,21 +34,21 @@
 
 /************** Utility functions ****************/
 
-static const llio_types_t devio_types_map [] = {
+static const convc_types_t devio_types_map [] = {
     {.name = BE_DEVIO_STR,          .type = BE_DEVIO},
     {.name = FE_DEVIO_STR,          .type = FE_DEVIO},
     {.name = INVALID_DEVIO_STR,     .type = INVALID_DEVIO},
-    {.name = LLIO_TYPE_NAME_END,    .type = LLIO_TYPE_END}        /* End marker */
+    {.name = CONVC_TYPE_NAME_END,   .type = CONVC_TYPE_END}        /* End marker */
 };
 
 devio_type_e devio_str_to_type (const char *type_str)
 {
-    devio_type_e ret = llio_str_to_gen_type (type_str, devio_types_map);
+    devio_type_e ret = convc_str_to_gen_type (type_str, devio_types_map);
 
-    return (ret == LLIO_TYPE_END)? INVALID_DEVIO: ret;
+    return (ret == CONVC_TYPE_END)? INVALID_DEVIO: ret;
 }
 
 char *devio_type_to_str (devio_type_e type)
 {
-    return llio_gen_type_to_str (type, devio_types_map);
+    return convc_gen_type_to_str (type, devio_types_map);
 }

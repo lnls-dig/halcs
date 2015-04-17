@@ -60,7 +60,6 @@
 #define LLIO_ETH_REGEX_ADDR_HIT             2
 #define LLIO_ETH_REGEX_PORT_HIT             3
 
-static llio_eth_type_e _llio_str_to_eth_type (const char *type_str);
 static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         char* port);
 static void *_get_in_addr(struct sockaddr *sa);
@@ -82,7 +81,7 @@ llio_dev_eth_t * llio_dev_eth_new (const char *sock_type, const char *hostname,
     assert (port);
 
     /* Convert socke type into enum */
-    llio_eth_type_e type = _llio_str_to_eth_type (sock_type);
+    llio_eth_type_e type = llio_str_to_eth_type (sock_type);
     ASSERT_TEST (type != INVALID_ETH_SOCK, "Invalid ethernet socket",
             err_llio_sock_type);
 
@@ -308,20 +307,6 @@ static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *
 }
 
 /******************************* Helper Functions *****************************/
-
-const llio_types_t llio_eth_types_map [] ={
-    {.name = TCP_ETH_SOCK_STR,      .type = TCP_ETH_SOCK},
-    {.name = UDP_ETH_SOCK_STR,      .type = UDP_ETH_SOCK},
-    {.name = INVALID_ETH_SOCK_STR,  .type = INVALID_ETH_SOCK},
-    {.name = LLIO_TYPE_NAME_END,    .type = LLIO_TYPE_END}        /* End marker */
-};
-
-static llio_eth_type_e _llio_str_to_eth_type (const char *type_str)
-{
-    llio_eth_type_e ret = llio_str_to_gen_type (type_str, llio_eth_types_map);
-
-    return (ret == LLIO_TYPE_END)? INVALID_ETH_SOCK: ret;
-}
 
 static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         char* port)

@@ -1,5 +1,3 @@
-include $(SRC_DIR)/hal/dev_io/utils/utils.mk
-
 dev_io_DIR = $(SRC_DIR)/hal/dev_io
 
 # Here we call <output_name>_core_OBJS as we need to add
