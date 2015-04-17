@@ -8,7 +8,7 @@
 #ifndef _SM_PR_SPI_DEFAULTS_H_
 #define _SM_PR_SPI_DEFAULTS_H_
 
-#include "wb_spi_regs.h"
+#include "hw/wb_spi_regs.h"
 
 #define  SM_PR_SPI_DFLT_SYS_FREQ        100000000       /* 100 MHz */
 #define  SM_PR_SPI_DFLT_SPI_FREQ        100000          /* 100 KHz */

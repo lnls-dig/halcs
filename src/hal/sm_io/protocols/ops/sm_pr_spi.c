@@ -17,7 +17,7 @@
 #include "sm_io.h"
 #include "sm_pr_spi.h"
 #include "sm_pr_spi_defaults.h"
-#include "wb_spi_regs.h"
+#include "hw/wb_spi_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
 #include "errhand.h"

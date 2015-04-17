@@ -15,7 +15,7 @@
 #include "board.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
-#include "wb_afc_diag_regs.h"
+#include "hw/wb_afc_diag_regs.h"
 #include "sm_io_afc_diag_defaults.h"
 #include "sm_io_afc_diag_exports.h"
 #include "hal_stddef.h"

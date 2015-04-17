@@ -15,7 +15,7 @@
 #include "sm_pr.h"
 #include "errhand.h"
 #include "hal_stddef.h"
-#include "si57x_regs.h"
+#include "chips/si57x_regs.h"
 #include "sm_ch_si57x_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

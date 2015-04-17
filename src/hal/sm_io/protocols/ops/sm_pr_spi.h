@@ -10,8 +10,8 @@
 
 #include "sm_pr.h"
 #include "sm_pr_err.h"
-#include "wb_spi_regs.h"
-#include "smpr_spi_regs.h"
+#include "hw/wb_spi_regs.h"
+#include "protocols/smpr_spi_regs.h"
 
 #define SM_PR_SPI_MAX_TRIES                 10
 #define SM_PR_SPI_USLEEP                    1000

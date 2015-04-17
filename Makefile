@@ -161,13 +161,18 @@ SRC_DIR = src
 include $(SRC_DIR)/hal/hal.mk
 include $(SRC_DIR)/revision/revision.mk
 
+# Project boards
+boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
+
 # Include directories
 INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
-            $(revision_INCLUDE_DIRS) \
+	       $(revision_INCLUDE_DIRS) \
+	       $(boards_INCLUDE_DIRS) \
 	       -I$(PCIE_DRIVER_DIR)/include/pcie \
-           -Isrc/libs/liberrhand \
-           -Isrc/libs/libconvc \
-           -Isrc/libs/libbpmclient \
+	       -Iinclude \
+	       -Isrc/libs/liberrhand \
+	       -Isrc/libs/libconvc \
+	       -Isrc/libs/libbpmclient \
 	       -I/usr/local/include
 
 # Merge all flags.

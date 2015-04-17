@@ -16,7 +16,7 @@
 #include "ddr3_map.h"
 #include "board.h"
 #include "rw_param.h"
-#include "wb_acq_core_regs.h"
+#include "hw/wb_acq_core_regs.h"
 #include "sm_io_acq_exports.h"
 #include "hal_stddef.h"
 

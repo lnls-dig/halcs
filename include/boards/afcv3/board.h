@@ -1,7 +1,7 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "board/afcv3/defs.h"
+#include "priv_defs/defs.h"
 
 /****************************/
 /*    General Definitions  */

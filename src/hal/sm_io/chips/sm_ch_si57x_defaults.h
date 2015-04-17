@@ -8,7 +8,7 @@
 #ifndef _SMCH_SI57X_DEFAULTS_H_
 #define _SMCH_SI57X_DEFAULTS_H_
 
-#include "si57x_regs.h"
+#include "chips/si57x_regs.h"
 
 #define SMCH_SI57X_DFLT_FXTAL                   0.0
 #define SMCH_SI57X_DFLT_N1                      0

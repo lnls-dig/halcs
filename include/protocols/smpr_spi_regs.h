@@ -8,7 +8,7 @@
 #ifndef _SMPR_SPI_REGS_H_
 #define _SMPR_SPI_REGS_H_
 
-#include "wb_spi_regs.h"
+#include "hw/wb_spi_regs.h"
 
 /* Copied from wb_acq_core_regs.h */
 #if defined( __GNUC__)

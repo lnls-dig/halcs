@@ -1,7 +1,7 @@
 #ifndef _MEM_LAYOUT_H_
 #define _MEM_LAYOUT_H_
 
-#include "pcie_regs.h"
+#include "hw/pcie_regs.h"
 #include "acq_chan_afcv3.h"
 
 #define NUM_FMC130M_4CH_SMIOS                       2

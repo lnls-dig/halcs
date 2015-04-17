@@ -9,7 +9,7 @@
 #define _SM_IO_SWAP_USEFUL_MACROS_H_
 
 #include <inttypes.h>
-#include "wb_bpm_swap_regs.h"
+#include "hw/wb_bpm_swap_regs.h"
 
 /* Some useful macros */
 #define RW_SWAP_GAIN_LOWER_R(val)           BPM_SWAP_A_A_R(val)

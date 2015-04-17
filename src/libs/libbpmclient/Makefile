@@ -86,8 +86,12 @@ OBJS_EXTERNAL = ../../hal/sm_io/modules/sm_io_codes.o \
                 ../../hal/sm_io/modules/rffe/sm_io_rffe_exports.o \
                 ../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_exports.o
 
+# Project boards
+boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
+
 # Include directories
-INCLUDE_DIRS = -I. -I../../hal/include -I../liberrhand \
+INCLUDE_DIRS = -I. -I../../../include -I../liberrhand \
+	       $(boards_INCLUDE_DIRS) \
 	       -I../../hal/sm_io/modules \
 	       -I../../hal/sm_io/modules/fmc130m_4ch \
 	       -I../../hal/sm_io/modules/acq \
@@ -96,8 +100,6 @@ INCLUDE_DIRS = -I. -I../../hal/include -I../liberrhand \
 	       -I../../hal/sm_io/modules/rffe \
 	       -I../../hal/sm_io/modules/afc_diag \
 	       -I../../hal/hal_utils \
-	       -I../../hal/include/hw \
-	       -I../../hal/boards/$(BOARD) \
 	       -I/usr/local/include
 
 # Merge all flags. Optimize for size (-Os)
@@ -141,9 +143,10 @@ $(LIBBPMCLIENT)_FUNC_EXPORTS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m
 #	../../hal/include/mem_layout/ml605/acq_chan_ml605.h \
 #	../../hal/include/mem_layout/afcv3/acq_chan_afcv3.h
 
-$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
-$(LIBBPMCLIENT)_ACQ_HEADERS += \
-	../../hal/include/board/$(BOARD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
+#$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
+#$(LIBBPMCLIENT)_ACQ_HEADERS += \
+#	../../../include/board/$(BOARD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
+$(LIBBPMCLIENT)_ACQ_HEADERS += ../../../include/acq_chan.h
 
 $(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_OBJS_LIB:.o=.h) $($(LIBBPMCLIENT)_CODE_HEADERS) \
     $($(LIBBPMCLIENT)_FUNC_EXPORTS)

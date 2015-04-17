@@ -16,7 +16,7 @@
 #include "rw_param.h"
 #include "rw_param_codes.h"
 #include "sm_io_swap_useful_macros.h"
-#include "wb_bpm_swap_regs.h"
+#include "hw/wb_bpm_swap_regs.h"
 #include "sm_io_swap_defaults.h"
 #include "sm_io_swap_exports.h"
 #include "hal_stddef.h"

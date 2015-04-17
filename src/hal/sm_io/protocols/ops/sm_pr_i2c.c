@@ -15,7 +15,7 @@
 #include "sm_io.h"
 #include "sm_pr_i2c.h"
 #include "sm_pr_i2c_defaults.h"
-#include "wb_i2c_regs.h"
+#include "hw/wb_i2c_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
 #include "errhand.h"

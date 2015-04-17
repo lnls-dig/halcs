@@ -9,7 +9,7 @@
 #define _FMC130M_4CH_DEFAULTS_H_
 
 #include "sm_io_err.h"
-#include "si57x_regs.h"
+#include "chips/si57x_regs.h"
 #include "sm_ch_pca9547.h"
 
 #define FMC130M_4CH_DFLT_PLL_FUNC                   0x1

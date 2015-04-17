@@ -13,7 +13,7 @@
 #include "dev_io_core.h"
 #include "errhand.h"
 #include "board.h"
-#include "wb_pos_calc_regs.h"
+#include "hw/wb_pos_calc_regs.h"
 #include "rw_param.h"
 #include "rw_param_codes.h"
 #include "sm_io_dsp_defaults.h"

@@ -10,8 +10,8 @@
 
 #include "sm_pr.h"
 #include "sm_pr_err.h"
-#include "wb_i2c_regs.h"
-#include "smpr_i2c_regs.h"
+#include "hw/wb_i2c_regs.h"
+#include "protocols/smpr_i2c_regs.h"
 
 #define SM_PR_I2C_MAX_TRIES                 10
 #define SM_PR_I2C_USLEEP                    1000

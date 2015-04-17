@@ -14,7 +14,7 @@
 #include "sm_ch_ad9510.h"
 #include "sm_pr.h"
 #include "errhand.h"
-#include "ad9510_regs.h"
+#include "chips/ad9510_regs.h"
 #include "sm_ch_ad9510_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

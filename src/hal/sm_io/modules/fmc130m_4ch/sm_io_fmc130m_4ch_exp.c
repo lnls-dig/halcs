@@ -15,7 +15,7 @@
 #include "board.h"
 #include "errhand.h"
 #include "rw_param.h"
-#include "wb_fmc130m_4ch_regs.h"
+#include "hw/wb_fmc130m_4ch_regs.h"
 #include "sm_io_fmc130m_4ch_exports.h"
 #include "hal_stddef.h"
 
