@@ -127,7 +127,7 @@ $(LIBBPMCLIENT)_CODE_HEADERS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m
 	../../hal/sm_io/modules/rffe/sm_io_rffe_codes.h \
 	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
 	../../hal/sm_io/modules/sm_io_codes.h \
-	../../hal/include/acq_chan_gen_defs.h \
+	../../../include/acq_chan_gen_defs.h \
 	../../hal/hal_utils/dispatch_table.h \
 	../../hal/hal_utils/hal_utils_err.h \
 	bpm_client_codes.h
