@@ -502,7 +502,7 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
         hs_div = si57x_hs_div_values[i];
 
         /* Calculate lowest possible value for n1 */
-        n1 = div_u64 (div_u64 (SI57X_FDCO_MIN, hs_div), (uint64_t) FLOOR(frequency));
+        n1 = hutils_div_u64 (hutils_div_u64 (SI57X_FDCO_MIN, hs_div), (uint64_t) FLOOR(frequency));
 
         if (!n1 || (n1 & 1)) {
             n1++;

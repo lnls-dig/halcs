@@ -58,6 +58,7 @@ DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 # Project libraries
 LIBERRHAND_DIR = src/libs/liberrhand
 LIBCONVC_DIR = src/libs/libconvc
+LIBHUTILS_DIR = src/libs/libhutils
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
 
 # General C flags
@@ -145,11 +146,12 @@ LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libbpmclient
-PROJECT_LIBS = -lerrhand -lconvc -lbpmclient
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libbpmclient
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -lbpmclient
 
 # General library flags -L<libdir>
-LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/lbpmclient
+LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
+         -Lsrc/libs/lbpmclient
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -172,6 +174,7 @@ INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
 	       -Iinclude \
 	       -Isrc/libs/liberrhand \
 	       -Isrc/libs/libconvc \
+	       -Isrc/libs/libhutils \
 	       -Isrc/libs/libbpmclient \
 	       -I/usr/local/include
 
@@ -203,6 +206,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
 	liberrhand liberrhand_install liberrhand_uninstall liberrhand_clean liberrhand_mrproper \
 	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
+	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
@@ -351,6 +355,21 @@ libconvc_clean:
 libconvc_mrproper:
 	$(MAKE) -C $(LIBCONVC_DIR) mrproper
 
+libhutils:
+	$(MAKE) -C $(LIBHUTILS_DIR) all
+
+libhutils_install:
+	$(MAKE) -C $(LIBHUTILS_DIR) install
+
+libhutils_uninstall:
+	$(MAKE) -C $(LIBHUTILS_DIR) uninstall
+
+libhutils_clean:
+	$(MAKE) -C $(LIBHUTILS_DIR) clean
+
+libhutils_mrproper:
+	$(MAKE) -C $(LIBHUTILS_DIR) mrproper
+
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
@@ -425,9 +444,9 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: hal_install deps_install libbpmclient_install cfg_install
+install: hal_install deps_install liberrhand_install libconvc_install libbpmclient_install cfg_install
 
-uninstall: hal_uninstall deps_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: hal_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libbpmclient_uninstall cfg_uninstall
 
 clean: hal_clean deps_clean liberrhand_clean libconvc_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 

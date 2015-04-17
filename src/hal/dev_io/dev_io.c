@@ -194,7 +194,7 @@ int main (int argc, char *argv[])
         char *argv_exec [] = {DEVIO_CFG_NAME, "-n", devio_type_str,"-t", dev_type,
             "-i", dev_id_str, "-e", dev_entry, "-b", broker_endp, NULL};
         /* Spawn Config DEVIO */
-        child_devio_cfg_pid = halutils_spawn_chld (DEVIO_CFG_NAME, argv_exec);
+        child_devio_cfg_pid = hutils_spawn_chld (DEVIO_CFG_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
@@ -236,7 +236,7 @@ int main (int argc, char *argv[])
     /* Kill DEVIO cfg as we've already got our slot number */
     kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
     /* Wait child */
-    halutils_wait_chld ();
+    hutils_wait_chld ();
 #endif
 
     /* We don't need it anymore */
@@ -305,7 +305,7 @@ int main (int argc, char *argv[])
         }
 
         /* wait child */
-        halutils_wait_chld ();
+        hutils_wait_chld ();
     }
 
 err_devio:

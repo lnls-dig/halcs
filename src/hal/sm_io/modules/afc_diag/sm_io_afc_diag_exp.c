@@ -115,25 +115,25 @@ static int _afc_diag_info_rw (void *owner, void *args, void *ret,
 
 AFC_DIAG_INFO_FUNC_NAME_HEADER(build_revision)
 {
-    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_revision,
+    return _afc_diag_info_rw(owner, args, ret, revision_copy_build_revision,
             AFC_DIAG_OPCODE_GET_BUILD_REVISION, "Could not get build revision");
 }
 
 AFC_DIAG_INFO_FUNC_NAME_HEADER(build_date)
 {
-    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_date,
+    return _afc_diag_info_rw(owner, args, ret, revision_copy_build_date,
             AFC_DIAG_OPCODE_GET_BUILD_DATE, "Could not get build date");
 }
 
 AFC_DIAG_INFO_FUNC_NAME_HEADER(build_user_name)
 {
-    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_user_name,
+    return _afc_diag_info_rw(owner, args, ret, revision_copy_build_user_name,
             AFC_DIAG_OPCODE_GET_BUILD_USER_NAME, "Could not get build user name");
 }
 
 AFC_DIAG_INFO_FUNC_NAME_HEADER(build_user_email)
 {
-    return _afc_diag_info_rw(owner, args, ret, halutils_copy_build_user_email,
+    return _afc_diag_info_rw(owner, args, ret, revision_copy_build_user_email,
             AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL, "Could not get build user email");
 }
 

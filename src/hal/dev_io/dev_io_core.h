@@ -11,7 +11,7 @@
 #include "czmq.h"
 #include "mdp.h"
 
-#include "hal_utils.h"
+#include "hutils.h"
 #include "dispatch_table.h"
 #include "dev_io_err.h"
 #include "ll_io.h"

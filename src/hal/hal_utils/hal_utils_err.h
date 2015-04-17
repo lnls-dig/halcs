@@ -8,24 +8,24 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#ifndef _HALUTILS_ERR_H_
-#define _HALUTILS_ERR_H_
+#ifndef _HUTILS_ERR_H_
+#define _HUTILS_ERR_H_
 
-enum _halutils_err_e
+enum _hutils_err_e
 {
-    HALUTILS_SUCCESS = 0,               /* No error */
-    HALUTILS_ERR_ALLOC,                 /* Could not allocate memory */
-    HALUTILS_ERR_NULL_POINTER,          /* Null pointer received */
-    HALUTILS_ERR_NO_FUNC_REG,           /* No function registered */
-    HALUTILS_ERR_INV_LESS_ARGS,         /* Less arguments than specified passed */
-    HALUTILS_ERR_INV_MORE_ARGS,         /* More arguments than specified passed */
-    HALUTILS_ERR_INV_SIZE_ARG,          /* Invalid size of argument size */
-    HALUTILS_ERR_END
+    HUTILS_SUCCESS = 0,               /* No error */
+    HUTILS_ERR_ALLOC,                 /* Could not allocate memory */
+    HUTILS_ERR_NULL_POINTER,          /* Null pointer received */
+    HUTILS_ERR_NO_FUNC_REG,           /* No function registered */
+    HUTILS_ERR_INV_LESS_ARGS,         /* Less arguments than specified passed */
+    HUTILS_ERR_INV_MORE_ARGS,         /* More arguments than specified passed */
+    HUTILS_ERR_INV_SIZE_ARG,          /* Invalid size of argument size */
+    HUTILS_ERR_END
 };
 
-typedef enum _halutils_err_e halutils_err_e;
+typedef enum _hutils_err_e hutils_err_e;
 
 /* Convert enumeration type to string */
-const char * halutils_err_str (halutils_err_e err);
+const char * hutils_err_str (hutils_err_e err);
 
 #endif

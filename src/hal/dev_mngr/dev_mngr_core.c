@@ -10,7 +10,7 @@
 
 #include "dev_mngr_core.h"
 #include "errhand.h"
-#include "hal_utils.h"
+#include "hutils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -425,9 +425,9 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         /* Alloc and convert types */
         dev_type_c = llio_type_to_str (devio_info->type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
-        dev_id_c = halutils_stringify_dec_key (devio_info->id);
+        dev_id_c = hutils_stringify_dec_key (devio_info->id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
-        smio_inst_id_c = halutils_stringify_dec_key (devio_info->smio_inst_id);
+        smio_inst_id_c = hutils_stringify_dec_key (devio_info->smio_inst_id);
         ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DMNGR_ERR_ALLOC);
 
         /* Argument options are "process name", "device type" and

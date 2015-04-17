@@ -18,7 +18,7 @@
 #include "dev_mngr.h"
 #include "varg_macros.h"
 #include "errhand.h"
-#include "hal_utils.h"
+#include "hutils.h"
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 #define DFLT_BIND_ADDR              "0"
@@ -237,8 +237,8 @@ int main (int argc, char *argv[])
     }
 #endif
 
-    dmngr_set_wait_clhd_handler (dmngr, &halutils_wait_chld);
-    dmngr_set_spawn_clhd_handler (dmngr, &halutils_spawn_chld);
+    dmngr_set_wait_clhd_handler (dmngr, &hutils_wait_chld);
+    dmngr_set_spawn_clhd_handler (dmngr, &hutils_spawn_chld);
 
     err = dmngr_register_sig_handlers (dmngr);
     if (err != DMNGR_SUCCESS) {

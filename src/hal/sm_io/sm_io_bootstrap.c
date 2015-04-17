@@ -11,7 +11,7 @@
 #include "sm_io.h"
 #include "exp_ops_codes.h"
 #include "errhand.h"
-#include "hal_utils.h"
+#include "hutils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -61,9 +61,9 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
     ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-    char *smio_service = halutils_concat_strings3 (th_args->service,
+    char *smio_service = hutils_concat_strings3 (th_args->service,
             smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
@@ -107,7 +107,7 @@ err_call_init:
 err_self_alloc:
     /* We can't output this message at a later time as we depend on the smio_service
      * variable. This is not so bad, though, as most of the time we will not fail
-     * in halutils_concat_strings () function */
+     * in hutils_concat_strings () function */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_bootstrap] SMIO Thread %s exiting ...\n",
             smio_service);
     free (smio_service);
@@ -128,9 +128,9 @@ void *smio_config_defaults (void *args)
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
-    char *inst_id_str = halutils_stringify_dec_key (th_args->inst_id);
+    char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
     ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-    char *smio_service = halutils_concat_strings3 (th_args->service,
+    char *smio_service = hutils_concat_strings3 (th_args->service,
             smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 

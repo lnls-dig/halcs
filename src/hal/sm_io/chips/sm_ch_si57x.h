@@ -13,7 +13,7 @@
 
 #include "sm_pr_i2c.h"
 #include "sm_ch_err.h"
-#include "hal_math.h"
+#include "hutils_math.h"
 
 struct _smch_si57x_t {
     smpr_t *i2c;                    /* I2C protocol object */

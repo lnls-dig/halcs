@@ -17,7 +17,7 @@
 #include "sm_io_thsafe_codes.h"
 #include "sm_io_bootstrap.h"
 #include "ll_io_utils.h"
-#include "hal_utils.h"
+#include "hutils.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -139,9 +139,9 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     self->disp_table_thsafe_ops = disp_table_new ();
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
-    halutils_err_e halutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
+    hutils_err_e hutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
             self->thsafe_server_ops);
-    ASSERT_TEST(halutils_err==HALUTILS_SUCCESS, "Could not initialize dispatch table",
+    ASSERT_TEST(hutils_err==HUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
     /* Finally, initialize mdp_worker with service being the BPM<board_number> */
@@ -261,9 +261,9 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
          * alloc can fail */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Stringify hash ID\n");
-        char *inst_id_str = halutils_stringify_dec_key (inst_id);
+        char *inst_id_str = hutils_stringify_dec_key (inst_id);
         ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-        char *key = halutils_concat_strings_no_sep (smio_mod_dispatch[i].name,
+        char *key = hutils_concat_strings_no_sep (smio_mod_dispatch[i].name,
                 inst_id_str);
         /* We don't need this anymore */
         free (inst_id_str);
