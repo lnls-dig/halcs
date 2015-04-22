@@ -151,7 +151,7 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -lbpmclient
 
 # General library flags -L<libdir>
 LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
-         -Lsrc/libs/lbpmclient
+         -Lsrc/libs/libbpmclient
 
 # Specific platform objects
 OBJS_PLATFORM =
