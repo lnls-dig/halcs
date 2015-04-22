@@ -29,10 +29,10 @@ dev_mngr_LIBS =
 dev_mngr_STATIC_LIBS =
 
 dev_io_LIBS = -lbsmp
-dev_io_STATIC_LIBS = $(LIBBPMCLIENT_DIR)/libbpmclient.a
+dev_io_STATIC_LIBS =
 
 dev_io_cfg_LIBS = -lbsmp
-dev_io_cfg_STATIC_LIBS = $(LIBBPMCLIENT_DIR)/libbpmclient.a
+dev_io_cfg_STATIC_LIBS =
 
 # Merge all hal objects together
 hal_OBJS = $(debug_OBJS) \
