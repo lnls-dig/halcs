@@ -163,7 +163,6 @@ SRC_DIR = src
 # Include other Makefiles as needed here
 include $(SRC_DIR)/ll_io/ll_io.mk
 include $(SRC_DIR)/sm_io/sm_io.mk
-include $(SRC_DIR)/sdb/sdb.mk
 include $(SRC_DIR)/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
@@ -174,7 +173,6 @@ boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS =  \
-	       $(sdb_INCLUDE_DIRS) \
 	       $(ll_io_INCLUDE_DIRS) \
 	       $(sm_io_INCLUDE_DIRS) \
 	       $(msg_INCLUDE_DIRS) \
