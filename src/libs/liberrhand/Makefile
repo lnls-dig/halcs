@@ -15,6 +15,12 @@ PWD = 		$(shell pwd)
 
 LIBERRHAND = liberrhand
 
+# Config variables suitable for creating shared libraries
+LIB_VER_MAJOR = 1
+LIB_VER_MINOR = 0
+LIB_VER_REVISION = 0
+LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
+
 INSTALL_DIR ?= /usr/local
 export INSTALL_DIR
 
@@ -168,5 +174,5 @@ clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 mrproper: clean
-	rm -f *.a
+	rm -f *.a *.so.$(LIB_VER)
 
