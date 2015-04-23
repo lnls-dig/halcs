@@ -90,7 +90,7 @@ OBJS_EXTERNAL = ../../hal/sm_io/modules/sm_io_codes.o \
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils \
+INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils -I../libdisptable \
 	       $(boards_INCLUDE_DIRS) \
 	       -I../../hal/sm_io/modules \
 	       -I../../hal/sm_io/modules/fmc130m_4ch \
@@ -99,7 +99,6 @@ INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils \
 	       -I../../hal/sm_io/modules/dsp \
 	       -I../../hal/sm_io/modules/rffe \
 	       -I../../hal/sm_io/modules/afc_diag \
-	       -I../../hal/hal_utils \
 	       -I/usr/local/include
 
 # Merge all flags. Optimize for size (-Os)
@@ -128,7 +127,8 @@ $(LIBBPMCLIENT)_CODE_HEADERS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m
 	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
 	../../hal/sm_io/modules/sm_io_codes.h \
 	../../../include/acq_chan_gen_defs.h \
-	../../hal/hal_utils/disp_table.h \
+	../libdisptable/disp_table.h \
+	../libdisptable/disp_table_err.h \
 	../libhutils/hutils.h \
 	../libhutils/hutils_err.h \
 	../libhutils/hutils_math.h \
@@ -142,20 +142,13 @@ $(LIBBPMCLIENT)_FUNC_EXPORTS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m
 	../../hal/sm_io/modules/rffe/sm_io_rffe_exports.h \
 	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
 
-# Install only specific acq_chan.h defintions according to the BOARD MACRO
-#	../../hal/include/mem_layout/ml605/acq_chan_ml605.h \
-#	../../hal/include/mem_layout/afcv3/acq_chan_afcv3.h
-
-#$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
-#$(LIBBPMCLIENT)_ACQ_HEADERS += \
-#	../../../include/board/$(BOARD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
 $(LIBBPMCLIENT)_ACQ_HEADERS += ../../../include/acq_chan.h
 
 $(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_OBJS_LIB:.o=.h) $($(LIBBPMCLIENT)_CODE_HEADERS) \
     $($(LIBBPMCLIENT)_FUNC_EXPORTS)
 
 # Installation headers
-$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS) $($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h
+$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS)
 
 # Save a git repository description
 GIT_REVISION = $(shell git describe --dirty --always)
@@ -183,7 +176,7 @@ TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile static library
 %.a: $$($$*_OBJS) $(OBJ_REVISION)
@@ -234,15 +227,6 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 #	$(MAKE) -C $@ all
 #
 
-# Prepare the environment for install rule
-pre_inst:
-	$(foreach header,$($(LIBBPMCLIENT)_ACQ_HEADERS),cp -p $(header) \
-		$(PWD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h $(CMDSEP))
-
-pre_clean:
-	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h, \
-		rm -f $(header) $(CMDSEP))
-
 install:
 	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
@@ -258,7 +242,7 @@ uninstall:
 	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
 		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
 
-clean: pre_clean
+clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean

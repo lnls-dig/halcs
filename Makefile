@@ -59,6 +59,7 @@ DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 LIBERRHAND_DIR = src/libs/liberrhand
 LIBCONVC_DIR = src/libs/libconvc
 LIBHUTILS_DIR = src/libs/libhutils
+LIBDISPTABLE_DIR = src/libs/libdisptable
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
 
 # General C flags
@@ -147,11 +148,11 @@ LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
 PROJECT_LIBS_NAME = liberrhand libconvc libhutils libbpmclient
-PROJECT_LIBS = -lerrhand -lconvc -lhutils -lbpmclient
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient
 
 # General library flags -L<libdir>
 LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
-         -Lsrc/libs/libbpmclient
+         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -175,6 +176,7 @@ INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
 	       -Isrc/libs/liberrhand \
 	       -Isrc/libs/libconvc \
 	       -Isrc/libs/libhutils \
+	       -Isrc/libs/libdisptable \
 	       -Isrc/libs/libbpmclient \
 	       -I/usr/local/include
 
@@ -207,6 +209,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	liberrhand liberrhand_install liberrhand_uninstall liberrhand_clean liberrhand_mrproper \
 	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
+	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
@@ -369,6 +372,21 @@ libhutils_clean:
 
 libhutils_mrproper:
 	$(MAKE) -C $(LIBHUTILS_DIR) mrproper
+
+libdisptable:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) all
+
+libdisptable_install:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) install
+
+libdisptable_uninstall:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) uninstall
+
+libdisptable_clean:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) clean
+
+libdisptable_mrproper:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) mrproper
 
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
