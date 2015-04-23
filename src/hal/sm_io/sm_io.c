@@ -33,30 +33,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
-#define CHECK_FUNC(func_p)                              \
-    do {                                                \
-        if(func_p == NULL) {                            \
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,         \
-                    "[sm_io] %s\n",                     \
-                    smio_err_str (SMIO_ERR_FUNC_NOT_IMPL)); \
-            return -SMIO_ERR_FUNC_NOT_IMPL;             \
-        }                                               \
-    } while(0)
-
-#define ASSERT_FUNC(func_name)                          \
-    do {                                                \
-        assert (self);                                  \
-        assert (self->thsafe_client_ops);               \
-        CHECK_FUNC (self->thsafe_client_ops->func_name); \
-    } while(0)
-
-/* Declare wrapper for all SMIO functions API */
-#define SMIO_FUNC_WRAPPER(func_name, ...)               \
-{                                                       \
-    ASSERT_FUNC(func_name);                             \
-    return self->thsafe_client_ops->func_name (self, ##__VA_ARGS__);  \
-}
-
 static smio_err_e _smio_do_op (void *owner, void *msg);
 
 /************************************************************/
@@ -183,6 +159,30 @@ err_do_op:
 /************************************************************/
 /************* SMIO thsafe wrapper functions   **************/
 /************************************************************/
+
+#define CHECK_FUNC(func_p)                                  \
+    do {                                                    \
+        if(func_p == NULL) {                                \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,             \
+                    "[sm_io] %s\n",                         \
+                    smio_err_str (SMIO_ERR_FUNC_NOT_IMPL)); \
+            return -SMIO_ERR_FUNC_NOT_IMPL;                 \
+        }                                                   \
+    } while(0)
+
+#define ASSERT_FUNC(func_name)                              \
+    do {                                                    \
+        assert (self);                                      \
+        assert (self->thsafe_client_ops);                   \
+        CHECK_FUNC (self->thsafe_client_ops->func_name);    \
+    } while(0)
+
+/* Declare wrapper for all SMIO functions API */
+#define SMIO_FUNC_WRAPPER(func_name, ...)                   \
+{                                                           \
+    ASSERT_FUNC(func_name);                                 \
+    return self->thsafe_client_ops->func_name (self, ##__VA_ARGS__);  \
+}
 
 /**** Open device ****/
 int smio_thsafe_client_open (smio_t *self, llio_endpoint_t *endpoint)

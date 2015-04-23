@@ -85,7 +85,9 @@ typedef struct _llio_t llio_t;
 /* Opaque llio_ops structure */
 typedef struct _llio_ops_t llio_ops_t;
 
-/***************** Our methods *****************/
+/************************************************************/
+/************************* Our methods **********************/
+/************************************************************/
 
 /* Creates a new instance of the Low-level I/O */
 llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose);
@@ -101,7 +103,9 @@ llio_err_e llio_get_endpoint (llio_t *self, char **name);
  * to be part of the API */
 /* llio_err_e llio_register_ops (llio_t *self, llio_ops_t *llio_ops); */
 
-/********* Low-level generic methods API *********/
+/************************************************************/
+/**************** Low Level generic methods API *************/
+/************************************************************/
 
 /* Open device */
 int llio_open (llio_t *self, llio_endpoint_t *endpoint);

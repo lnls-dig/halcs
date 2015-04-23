@@ -154,7 +154,9 @@ static llio_err_e _llio_unregister_ops (const llio_ops_t **ops)
     return LLIO_SUCCESS;
 }
 
-/********* Low-level generic methods API *********/
+/************************************************************/
+/**************** Low Level generic methods API *************/
+/************************************************************/
 
 #define CHECK_FUNC(func_p)                              \
     do {                                                \
@@ -166,12 +168,17 @@ static llio_err_e _llio_unregister_ops (const llio_ops_t **ops)
         }                                               \
     } while(0)
 
+#define ASSERT_FUNC(func_name)                          \
+    do {                                                \
+        assert (self);                                  \
+        assert (self->ops);                             \
+        CHECK_FUNC (self->ops->func_name);              \
+    } while(0)
+
 /* Declare wrapper for all LLIO functions API */
 #define LLIO_FUNC_WRAPPER(func_name, ...)               \
 {                                                       \
-    assert (self);                                      \
-    assert (self->ops);                                 \
-    CHECK_FUNC (self->ops->func_name);                  \
+    ASSERT_FUNC(func_name);                             \
     return self->ops->func_name (self, ##__VA_ARGS__);  \
 }
 
