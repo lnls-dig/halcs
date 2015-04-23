@@ -41,7 +41,9 @@ hal_OBJS = $(debug_OBJS) \
 	   $(sm_io_OBJS) \
 	   $(msg_OBJS) \
 	   $(dev_mngr_core_OBJS) \
-	   $(dev_io_core_OBJS)
+	   $(dev_io_core_OBJS) \
+	   $(dev_io_OBJS) \
+	   $(dev_io_cfg_OBJS)
 
 # Merge all include directories together
 hal_all_INCLUDE_DIRS += $(debug_INCLUDE_DIRS) \
