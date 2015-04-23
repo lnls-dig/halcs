@@ -155,7 +155,67 @@ err_inv_msg:
     return err;
 }
 
-/*************************** Static Functions *****************************/
+msg_err_e msg_check_gen_zmq_args (const disp_op_t *disp_op, zmsg_t *zmq_msg)
+{
+    msg_err_e err = MSG_SUCCESS;
+    GEN_MSG_ZMQ_ARG_TYPE zmq_arg = GEN_MSG_ZMQ_PEEK_FIRST(zmq_msg);
+
+    /* Iterate over all arguments and check if they match in size with the
+     * specified disp_op parameters */
+    const uint32_t *args_it = disp_op->args;
+    unsigned i;
+    for (i = 0 ; *args_it != DISP_ARG_END; ++args_it, ++i) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE,
+                "[msg] Checking argument #%u for function \"%s\"\n",
+                i, disp_op->name);
+        /* We have argument to check according to disp_op->args */
+        if (zmq_arg == NULL) {
+            DBE_DEBUG (DBG_MSG | DBG_LVL_ERR,
+                    "[msg] Missing arguments in message"
+                    " received for function \"%s\"\n", disp_op->name);
+            err = MSG_ERR_INV_LESS_ARGS;
+            goto err_inv_less_args;
+        }
+
+        /* We have received something and will check for (byte) size
+         * correctness */
+        if ((GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) > DISP_GET_ASIZE(*args_it)) ||
+                (DISP_GET_ATYPE(*args_it) != DISP_ATYPE_VAR &&
+                 GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it))) {
+            DBE_DEBUG (DBG_MSG | DBG_LVL_ERR,
+                    "[msg] Invalid size of argument #%u"
+                    " received for function \"%s\"\n", i, disp_op->name);
+            err = MSG_ERR_INV_SIZE_ARG;
+            goto err_inv_size_args;
+        }
+
+        zmq_arg = GEN_MSG_ZMQ_PEEK_NEXT_ARG(zmq_msg);
+    }
+
+    /* According to disp_op->args we are done. So, check if the message received
+     * has any more arguments */
+    if (zmq_arg != NULL) {
+        DBE_DEBUG (DBG_MSG | DBG_LVL_ERR,
+                "[msg] Extra arguments in message"
+                " received for function \"%s\"\n", disp_op->name);
+        err = MSG_ERR_INV_MORE_ARGS;
+        goto err_inv_more_args;
+    }
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE,
+            "[msg] No errors detected on the received arguments "
+            "for function \"%s\"\n", disp_op->name);
+
+err_inv_more_args:
+err_inv_size_args:
+err_inv_less_args:
+    GEN_MSG_ZMQ_PEEK_EXIT(zmq_msg);
+    return err;
+}
+
+/************************************************************/
+/********************* Static Functions *********************/
+/************************************************************/
 
 static msg_type_e _msg_guess_type (void *msg)
 {
@@ -262,7 +322,9 @@ static msg_err_e _msg_format_client_response (int disp_table_ret,
     return MSG_SUCCESS;
 }
 
-/********************* Helper functions ************************/
+/************************************************************/
+/********************* Helper Functions *********************/
+/************************************************************/
 
 static RW_REPLY_TYPE _msg_format_reply_code (int reply_code)
 {
