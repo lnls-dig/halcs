@@ -19,6 +19,9 @@ enum _msg_err_e
     MSG_ERR_INV,                   /* Invalid message structure */
     MSG_ERR_WRONG_ARGS,            /* Wrong arguments received (number or size) */
     MSG_ERR_UNEX_MSG,              /* Unexpected message type */
+    MSG_ERR_INV_LESS_ARGS,         /* Less arguments than specified passed */
+    MSG_ERR_INV_MORE_ARGS,         /* More arguments than specified passed */
+    MSG_ERR_INV_SIZE_ARG,          /* Invalid size of argument size */
     MSG_ERR_END
 };
 

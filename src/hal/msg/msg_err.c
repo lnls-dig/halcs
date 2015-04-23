@@ -17,7 +17,10 @@ static const char *msg_err [MSG_ERR_END] =
     [MSG_FUNC_NOT_IMPL]        = "Function not implemented",
     [MSG_ERR_INV]              = "Invalid message structure",
     [MSG_ERR_WRONG_ARGS]       = "Wrong arguments received (number or size)",
-    [MSG_ERR_UNEX_MSG]         = "Unexpected message type"
+    [MSG_ERR_UNEX_MSG]         = "Unexpected message type",
+    [MSG_ERR_INV_LESS_ARGS]    = "Less arguments than specified passed",
+    [MSG_ERR_INV_MORE_ARGS]    = "More arguments than specified passed",
+    [MSG_ERR_INV_SIZE_ARG]     = "Invalid size of argument size"
 };
 
 /* Convert enumeration type to string */
