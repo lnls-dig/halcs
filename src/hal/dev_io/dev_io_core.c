@@ -50,6 +50,13 @@
 
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 
+/* DEVIO dispatch table operations */
+const disp_table_ops_t devio_disp_table_ops;
+
+/* Dispatch table message check handler */
+static hutils_err_e _devio_check_msg_args (disp_table_t *disp_table,
+        const disp_op_t *disp_op, void *args);
+
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe);
@@ -136,7 +143,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     ASSERT_ALLOC(self->sm_io_h, err_sm_io_h_alloc);
 
     /* Init sm_io_thsafe_ops_h dispatch table */
-    self->disp_table_thsafe_ops = disp_table_new ();
+    self->disp_table_thsafe_ops = disp_table_new (&devio_disp_table_ops);
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
     hutils_err_e hutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
@@ -506,7 +513,39 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
     return _devio_do_smio_op (self, msg);
 }
 
-/**************** Helper Functions ***************/
+/************************************************************/
+/***************** Dispatch table callbacks *****************/
+/************************************************************/
+
+static hutils_err_e _devio_check_msg_args (disp_table_t *disp_table,
+        const disp_op_t *disp_op, void *args)
+{
+    assert (disp_table);
+    assert (disp_op);
+    assert (args);
+
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* Check if the message tis the correct one */
+    ASSERT_TEST (msg_guess_type (args) == MSG_THSAFE_ZMQ, "Invalid message tag",
+            err_inv_msg, DEVIO_ERR_BAD_MSG);
+    msg_err_e merr = msg_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
+    ASSERT_TEST (merr == MSG_SUCCESS, "Unrecognized message. Message arguments "
+            "checking failed", err_msg_args_check, DEVIO_ERR_BAD_MSG);
+
+err_msg_args_check:
+err_inv_msg:
+    return err;
+}
+
+const disp_table_ops_t devio_disp_table_ops = {
+    .check_msg_args = _devio_check_msg_args
+};
+
+/************************************************************/
+/********************* Helper Functions *********************/
+/************************************************************/
+
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
     assert (self);
