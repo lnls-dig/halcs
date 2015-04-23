@@ -161,14 +161,25 @@ OBJS_PLATFORM =
 SRC_DIR = src
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/hal/hal.mk
+include $(SRC_DIR)/ll_io/ll_io.mk
+include $(SRC_DIR)/sm_io/sm_io.mk
+include $(SRC_DIR)/sdb/sdb.mk
+include $(SRC_DIR)/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/dev_io/dev_io.mk
+include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
+INCLUDE_DIRS =  \
+	       $(sdb_INCLUDE_DIRS) \
+	       $(ll_io_INCLUDE_DIRS) \
+	       $(sm_io_INCLUDE_DIRS) \
+	       $(msg_INCLUDE_DIRS) \
+	       $(dev_mngr_INCLUDE_DIRS) \
+	       $(dev_io_INCLUDE_DIRS) \
 	       $(revision_INCLUDE_DIRS) \
 	       $(boards_INCLUDE_DIRS) \
 	       -I$(PCIE_DRIVER_DIR)/include/pcie \
@@ -186,10 +197,31 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 
 # Output modules
-OUT = $(hal_OUT)
+OUT = $(dev_mngr_OUT) $(dev_io_OUT)
 
 # All possible output modules
-ALL_OUT = $(hal_all_OUT)
+ALL_OUT = $(dev_mngr_all_OUT) $(dev_io_all_OUT)
+
+# Out objects
+dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
+                 $(exp_ops_OBJS) $(thsafe_msg_zmq_OBJS) \
+                 $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
+
+dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+               $(sm_io_OBJS) $(msg_OBJS)
+
+dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+                   $(sm_io_OBJS) $(msg_OBJS)
+
+# Specific libraries for OUT targets
+dev_mngr_LIBS =
+dev_mngr_STATIC_LIBS =
+
+dev_io_LIBS = -lbsmp
+dev_io_STATIC_LIBS =
+
+dev_io_cfg_LIBS = -lbsmp
+dev_io_cfg_STATIC_LIBS =
 
 .SECONDEXPANSION:
 
@@ -198,7 +230,13 @@ GIT_REVISION = $(shell git describe --dirty --always)
 GIT_USER_NAME = $(shell git config --get user.name)
 GIT_USER_EMAIL = $(shell git config --get user.email)
 
-OBJS_all =  $(hal_OBJS) $(revision_OBJS)
+OBJS_all = $(ll_io_OBJS) \
+	   $(sm_io_OBJS) \
+	   $(msg_OBJS) \
+	   $(dev_mngr_OBJS) \
+	   $(dev_io_OBJS) \
+	   $(dev_io_cfg_OBJS) \
+	   $(revision_OBJS)
 
 # Sources
 all_SRCS = $(patsubst %.o,%.c,$(OBJS_all))
