@@ -51,7 +51,7 @@ LIBS =
 LFLAGS =
 
 # Include directories
-INCLUDE_DIRS = -I. -I../liberrhand
+INCLUDE_DIRS = -I. -I../liberrhand -I../libhutils
 
 # Merge all flags. Optimize for size (-Os)
 CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
