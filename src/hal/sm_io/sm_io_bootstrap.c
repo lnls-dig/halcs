@@ -12,6 +12,7 @@
 #include "exp_ops_codes.h"
 #include "errhand.h"
 #include "hutils.h"
+#include "disp_table.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -45,7 +46,7 @@
 const disp_table_ops_t smio_disp_table_ops;
 
 /* Dispatch table message check handler */
-static hutils_err_e _smio_check_msg_args (disp_table_t *disp_table,
+static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
 
 static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
@@ -183,7 +184,7 @@ smio_err_e smio_loop (struct _smio_t *self)
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
 
-static hutils_err_e _smio_check_msg_args (disp_table_t *disp_table,
+static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args)
 {
     assert (disp_table);

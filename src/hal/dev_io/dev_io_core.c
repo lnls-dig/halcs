@@ -18,6 +18,7 @@
 #include "sm_io_bootstrap.h"
 #include "ll_io_utils.h"
 #include "hutils.h"
+#include "disp_table.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -54,7 +55,7 @@
 const disp_table_ops_t devio_disp_table_ops;
 
 /* Dispatch table message check handler */
-static hutils_err_e _devio_check_msg_args (disp_table_t *disp_table,
+static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
 
 /* Do the SMIO operation */
@@ -517,7 +518,7 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
 
-static hutils_err_e _devio_check_msg_args (disp_table_t *disp_table,
+static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args)
 {
     assert (disp_table);

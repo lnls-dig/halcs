@@ -10,16 +10,16 @@
 
 #include "disp_table_err.h"
 
-static const char *hutils_err [HUTILS_ERR_END] =
+static const char *disp_table_err [DISP_TABLE_ERR_END] =
 {
-    [HUTILS_SUCCESS]              = "Success",
-    [HUTILS_ERR_ALLOC]            = "Could not allocate memory",
-    [HUTILS_ERR_NULL_POINTER]     = "Null pointer received",
-    [HUTILS_ERR_NO_FUNC_REG]      = "No function registered"
+    [DISP_TABLE_SUCCESS]              = "Success",
+    [DISP_TABLE_ERR_ALLOC]            = "Could not allocate memory",
+    [DISP_TABLE_ERR_NULL_POINTER]     = "Null pointer received",
+    [DISP_TABLE_ERR_NO_FUNC_REG]      = "No function registered"
 };
 
 /* Convert enumeration type to string */
-const char * hutils_err_str (hutils_err_e err)
+const char * disp_table_err_str (disp_table_err_e err)
 {
-    return hutils_err [err];
+    return disp_table_err [err];
 }

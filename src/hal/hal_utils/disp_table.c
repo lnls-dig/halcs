@@ -14,6 +14,7 @@
 #include <inttypes.h>
 
 #include "disp_table.h"
+#include "hutils.h"
 #include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -21,40 +22,40 @@
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
-    ASSERT_HAL_TEST(test_boolean, HAL_UTILS, "[halultis:disp_table]",           \
+    ASSERT_HAL_TEST(test_boolean, HAL_UTILS, "[disp_table]",                    \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
 #define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)                   \
-    ASSERT_HAL_ALLOC(ptr, HAL_UTILS, "[hutils:disp_table]",                   \
-            hutils_err_str(HUTILS_ERR_ALLOC),                               \
+    ASSERT_HAL_ALLOC(ptr, HAL_UTILS, "[disp_table]",                            \
+            disp_table_err_str(DISP_TABLE_ERR_ALLOC),                           \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
 #define CHECK_ERR(err, err_type)                                                \
-    CHECK_HAL_ERR(err, HAL_UTILS, "[hutils:disp_table]",                      \
-            hutils_err_str (err_type))
+    CHECK_HAL_ERR(err, HAL_UTILS, "[disp_table]",                               \
+            disp_table_err_str (err_type))
 
-static hutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
-static hutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops);
-static hutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key);
-static hutils_err_e _disp_table_remove_all (disp_table_t *self);
+static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
+static disp_table_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops);
+static disp_table_err_e _disp_table_remove (disp_table_t *self, uint32_t key);
+static disp_table_err_e _disp_table_remove_all (disp_table_t *self);
 static void _disp_table_free_item (void *data);
-static hutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
+static disp_table_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
-static hutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret);
-static hutils_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
+static disp_table_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret);
+static disp_table_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
 
 /* Disp Op Handler functions */
 static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
-static hutils_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret);
-static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op);
+static disp_table_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret);
+static disp_table_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op);
 
 disp_table_t *disp_table_new (const disp_table_ops_t *ops)
 {
@@ -76,7 +77,7 @@ err_self_alloc:
     return NULL;
 }
 
-hutils_err_e disp_table_destroy (disp_table_t **self_p)
+disp_table_err_e disp_table_destroy (disp_table_t **self_p)
 {
     assert (self_p);
 
@@ -90,37 +91,37 @@ hutils_err_e disp_table_destroy (disp_table_t **self_p)
         *self_p = NULL;
     }
 
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 }
 
-hutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t* disp_op)
+disp_table_err_e disp_table_insert (disp_table_t *self, const disp_op_t* disp_op)
 {
     return _disp_table_insert (self, disp_op);
 }
 
-hutils_err_e disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
+disp_table_err_e disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
 {
     return _disp_table_insert_all (self, disp_ops);
 }
 
-hutils_err_e disp_table_remove (disp_table_t *self, uint32_t key)
+disp_table_err_e disp_table_remove (disp_table_t *self, uint32_t key)
 {
     return _disp_table_remove (self, key);
 }
 
-hutils_err_e disp_table_remove_all (disp_table_t *self)
+disp_table_err_e disp_table_remove_all (disp_table_t *self)
 {
     return _disp_table_remove_all (self);
 }
 
-hutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
+disp_table_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
         const disp_table_func_fp *func_fps)
 {
     assert (self);
     assert (disp_ops);
     assert (func_fps);
 
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
 
     disp_op_t **disp_ops_it = disp_ops;
     const disp_table_func_fp *func_fps_it = func_fps;
@@ -134,24 +135,24 @@ hutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
     ASSERT_TEST ((*disp_ops_it == NULL && *func_fps_it == NULL) ,
             "Attempt to initialize the function descriptor vector with an "
             "uneven number of function pointers", err_desc_null,
-            HUTILS_ERR_NULL_POINTER);
+            DISP_TABLE_ERR_NULL_POINTER);
 
 err_desc_null:
     return err;
 }
 
-hutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
+disp_table_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret)
 {
     return _disp_table_check_args (self, key, args, ret);
 }
 
-hutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key)
+disp_table_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key)
 {
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
     disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
     ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
-            err_disp_op_handler_null, HUTILS_ERR_NO_FUNC_REG);
+            err_disp_op_handler_null, DISP_TABLE_ERR_NO_FUNC_REG);
 
     err = _disp_table_cleanup_args_op (disp_op_handler);
 
@@ -174,11 +175,11 @@ int disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
 int disp_table_check_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void **ret)
 {
-    hutils_err_e herr = HUTILS_SUCCESS;
+    disp_table_err_e herr = DISP_TABLE_SUCCESS;
     int err = -1;
 
     herr = _disp_table_check_args (self, key, args, ret);
-    ASSERT_TEST(herr == HUTILS_SUCCESS, "Wrong arguments received",
+    ASSERT_TEST(herr == DISP_TABLE_SUCCESS, "Wrong arguments received",
             err_invalid_args, -1);
 
     /* Received arguments are OK, and the return value "ret" was allocated if the
@@ -191,7 +192,7 @@ err_invalid_args:
     return err;
 }
 
-hutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
+disp_table_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 {
     return _disp_table_set_ret (self, key, ret);
 }
@@ -200,13 +201,13 @@ hutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 /************************** Local static functions ****************************/
 /******************************************************************************/
 
-static hutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *disp_op)
+static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *disp_op)
 {
     assert (self);
     assert (disp_op);
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] Registering function \"%s\" (%p) opcode (%u) "
+            "[disp_table] Registering function \"%s\" (%p) opcode (%u) "
             "into dispatch table\n", disp_op->name, disp_op->func_fp, disp_op->opcode);
 
     /* Wrap disp_op into disp_op_handler structure */
@@ -216,8 +217,8 @@ static hutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *dis
     disp_op_handler->op = disp_op;
     disp_op_handler->ret = NULL;
 
-    hutils_err_e herr = _disp_table_alloc_ret (disp_op_handler->op, &disp_op_handler->ret);
-    ASSERT_TEST (herr == HUTILS_SUCCESS, "Return value could not be allocated",
+    disp_table_err_e herr = _disp_table_alloc_ret (disp_op_handler->op, &disp_op_handler->ret);
+    ASSERT_TEST (herr == DISP_TABLE_SUCCESS, "Return value could not be allocated",
             err_alloc_ret);
 
     char *key_c = hutils_stringify_hex_key (disp_op_handler->op->opcode);
@@ -229,7 +230,7 @@ static hutils_err_e _disp_table_insert (disp_table_t *self, const disp_op_t *dis
     zhash_freefn (self->table_h, key_c, _disp_table_free_item);
 
     free (key_c);
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 
 err_insert_hash:
     free (key_c);
@@ -238,7 +239,7 @@ err_key_c_alloc:
 err_alloc_ret:
     disp_op_handler_destroy (&disp_op_handler);
 err_disp_op_handler_new:
-    return HUTILS_ERR_ALLOC;
+    return DISP_TABLE_ERR_ALLOC;
 }
 
 static void _disp_table_free_item (void *data)
@@ -247,30 +248,30 @@ static void _disp_table_free_item (void *data)
     disp_op_handler_destroy (&disp_op_handler);
 }
 
-static hutils_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
+static disp_table_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
 {
     assert (self);
     assert (disp_ops);
 
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
     const disp_op_t** disp_op_it = disp_ops;
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-        "[hutils:disp_table] Preparing to insert function in dispatch table\n");
+        "[disp_table] Preparing to insert function in dispatch table\n");
 
     for ( ; *disp_op_it != NULL; ++disp_op_it) {
-        hutils_err_e err = _disp_table_insert (self, *disp_op_it);
-        ASSERT_TEST(err == HUTILS_SUCCESS,
+        disp_table_err_e err = _disp_table_insert (self, *disp_op_it);
+        ASSERT_TEST(err == DISP_TABLE_SUCCESS,
                 "disp_table_insert_all: Could not insert function",
                 err_disp_insert);
     }
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] Exiting insert_all\n");
+            "[disp_table] Exiting insert_all\n");
 
 err_disp_insert:
     return err;
 }
 
-static hutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
+static disp_table_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
 {
     char *key_c = hutils_stringify_hex_key (key);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
@@ -280,26 +281,26 @@ static hutils_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
     ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
             err_disp_op_handler_null);
 
-    hutils_err_e err = _disp_table_cleanup_args_op (disp_op_handler);
-    ASSERT_TEST (err == HUTILS_SUCCESS, "Could not free registered return value",
+    disp_table_err_e err = _disp_table_cleanup_args_op (disp_op_handler);
+    ASSERT_TEST (err == DISP_TABLE_SUCCESS, "Could not free registered return value",
             err_disp_op_handler_null);
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-        "[hutils:disp_table] Removing function (key = %u) into dispatch table\n",
+        "[disp_table] Removing function (key = %u) into dispatch table\n",
         key);
     /* This will trigger the free function previously registered */
     zhash_delete (self->table_h, key_c);
 
     free (key_c);
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 
 err_disp_op_handler_null:
     free (key_c);
 err_key_c_alloc:
-    return HUTILS_ERR_ALLOC;
+    return DISP_TABLE_ERR_ALLOC;
 }
 
-static hutils_err_e _disp_table_remove_all (disp_table_t *self)
+static disp_table_err_e _disp_table_remove_all (disp_table_t *self)
 {
     assert (self);
 
@@ -311,14 +312,14 @@ static hutils_err_e _disp_table_remove_all (disp_table_t *self)
     }
 
     zlist_destroy (&hash_keys);
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 }
 
 
-static hutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret)
+static disp_table_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret)
 {
     assert (disp_op);
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
 
     if (disp_op->retval_owner == DISP_OWNER_FUNC) {
         goto err_no_ownership;
@@ -330,11 +331,11 @@ static hutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret)
     }
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] Allocating %u bytes for the return value of"
+            "[disp_table] Allocating %u bytes for the return value of"
             " function %s\n", DISP_GET_ASIZE(disp_op->retval), disp_op->name);
 
     *ret = zmalloc(DISP_GET_ASIZE(disp_op->retval));
-    ASSERT_ALLOC (*ret, err_ret_alloc, HUTILS_ERR_ALLOC);
+    ASSERT_ALLOC (*ret, err_ret_alloc, DISP_TABLE_ERR_ALLOC);
 
 err_size_zero:
 err_ret_alloc:
@@ -342,12 +343,12 @@ err_no_ownership:
     return err;
 }
 
-static hutils_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
+static disp_table_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret)
 {
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
     disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
     ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
-            err_disp_op_handler_null, HUTILS_ERR_NO_FUNC_REG);
+            err_disp_op_handler_null, DISP_TABLE_ERR_NO_FUNC_REG);
 
     err = _disp_table_set_ret_op (disp_op_handler, ret);
 
@@ -355,18 +356,18 @@ err_disp_op_handler_null:
     return err;
 }
 
-static hutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
+static disp_table_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret)
 {
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
     disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
     ASSERT_TEST (disp_op_handler != NULL, "Could not find registered key",
-            err_disp_op_handler_null, HUTILS_ERR_NO_FUNC_REG);
+            err_disp_op_handler_null, DISP_TABLE_ERR_NO_FUNC_REG);
 
     /* Check arguments for consistency */
     /* Call registered function to check message */
     err =  disp_table_ops_check_msg (self, disp_op_handler->op, args);
-    ASSERT_TEST (err == HUTILS_SUCCESS, "Arguments received are invalid",
+    ASSERT_TEST (err == DISP_TABLE_SUCCESS, "Arguments received are invalid",
             err_inv_args);
 
     /* Point "ret" to previously allocated return value */
@@ -382,7 +383,7 @@ static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void
 {
     int err = 0;
     /* DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] Calling function (key = %u, addr = %p) from dispatch table\n",
+            "[disp_table] Calling function (key = %u, addr = %p) from dispatch table\n",
             key, disp_op->func_fp); */
     /* The function pointer is never NULL */
     disp_op_handler_t *disp_op_handler = _disp_table_lookup (self, key);
@@ -423,7 +424,7 @@ err_disp_op_handler_alloc:
     return NULL;
 }
 
-hutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p)
+disp_table_err_e disp_op_handler_destroy (disp_op_handler_t **self_p)
 {
     assert (self_p);
 
@@ -434,7 +435,7 @@ hutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p)
         *self_p = NULL;
     }
 
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 }
 
 static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key)
@@ -454,35 +455,35 @@ err_key_c_alloc:
     return disp_op_handler;
 }
 
-static hutils_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret)
+static disp_table_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret)
 {
     assert (disp_op_handler);
-    hutils_err_e err = HUTILS_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
 
     /* Check if there is a return value registered */
     if (disp_op_handler->op->retval == DISP_ARG_END) {
         *ret = NULL;
-        err = HUTILS_SUCCESS;
+        err = DISP_TABLE_SUCCESS;
         goto err_exit;
     }
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] _disp_table_set_ret_op: Setting return value ...\n");
+            "[disp_table] _disp_table_set_ret_op: Setting return value ...\n");
 
     /* FIXME: This shouldn't happen, as this type of error is caught on
      * initialization of the dispatch function */
-    ASSERT_ALLOC (disp_op_handler->ret, err_ret_alloc, HUTILS_ERR_ALLOC);
+    ASSERT_ALLOC (disp_op_handler->ret, err_ret_alloc, DISP_TABLE_ERR_ALLOC);
     *ret = disp_op_handler->ret;
 
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] _disp_table_set_ret_op: Return value set\n");
+            "[disp_table] _disp_table_set_ret_op: Return value set\n");
 
 err_ret_alloc:
 err_exit:
     return err;
 }
 
-static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_handler)
+static disp_table_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_handler)
 {
     assert (disp_op_handler);
 
@@ -496,7 +497,7 @@ static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_hand
     }
 
 err_no_ownership:
-    return HUTILS_SUCCESS;
+    return DISP_TABLE_SUCCESS;
 }
 
 /************************************************************/
@@ -507,9 +508,9 @@ err_no_ownership:
     do {                                                \
         if(func_p == NULL) {                            \
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,     \
-                    "[hutils:disp_table] %s\n",         \
-                    hutils_err_str (HUTILS_ERR_NO_FUNC_REG)); \
-            return HUTILS_ERR_NO_FUNC_REG;              \
+                    "[disp_table] %s\n",                \
+                    disp_table_err_str (DISP_TABLE_ERR_NO_FUNC_REG)); \
+            return DISP_TABLE_ERR_NO_FUNC_REG;          \
         }                                               \
     } while(0)
 
@@ -528,7 +529,7 @@ err_no_ownership:
 }
 
 /**** Check message arguments ****/
-hutils_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
+disp_table_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
         void *args)
     DISP_TABLE_FUNC_WRAPPER(check_msg_args, disp_op, args);
 

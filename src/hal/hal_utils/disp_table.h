@@ -15,7 +15,7 @@
 #define _DISPATCH_TABLE_H_
 
 #include <czmq.h>
-#include "hutils.h"
+#include "disp_table_err.h"
 
 struct _disp_table_ops_t;
 struct _disp_op_t;
@@ -30,7 +30,7 @@ struct _disp_table_t {
 };
 
 /* Check message arguments function pointer */
-typedef hutils_err_e (*check_msg_args_fp)(struct _disp_table_t *self,
+typedef disp_table_err_e (*check_msg_args_fp)(struct _disp_table_t *self,
         const struct _disp_op_t *disp_op, void *args);
 
 struct _disp_table_ops_t {
@@ -106,7 +106,7 @@ typedef struct _disp_op_handler_t disp_op_handler_t;
 /************************************************************/
 
 /* Check message arguments */
-hutils_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
+disp_table_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
         void *args);
 
 /************************************************************/
@@ -114,33 +114,33 @@ hutils_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp
 /************************************************************/
 
 disp_table_t *disp_table_new (const disp_table_ops_t *ops);
-hutils_err_e disp_table_destroy (disp_table_t **self_p);
+disp_table_err_e disp_table_destroy (disp_table_t **self_p);
 
-hutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t *disp_op);
-hutils_err_e disp_table_insert_all (disp_table_t *self,
+disp_table_err_e disp_table_insert (disp_table_t *self, const disp_op_t *disp_op);
+disp_table_err_e disp_table_insert_all (disp_table_t *self,
         const disp_op_t **disp_ops);
-hutils_err_e disp_table_remove (disp_table_t *self, uint32_t key);
-hutils_err_e disp_table_remove_all (disp_table_t *self);
+disp_table_err_e disp_table_remove (disp_table_t *self, uint32_t key);
+disp_table_err_e disp_table_remove_all (disp_table_t *self);
 
-hutils_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
+disp_table_err_e disp_table_fill_desc (disp_table_t *self, disp_op_t **disp_ops,
         const disp_table_func_fp *func_fps);
 
-hutils_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
+disp_table_err_e disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
-hutils_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key);
+disp_table_err_e disp_table_cleanup_args (disp_table_t *self, uint32_t key);
 const disp_op_t *disp_table_lookup (disp_table_t *self, uint32_t key);
 int disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
 int disp_table_check_call (disp_table_t *self, uint32_t key, void *owner,
         void *args, void **ret);
-hutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
+disp_table_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
 
 /************************************************************/
 /**************** Disp Op Handler functions *****************/
 /************************************************************/
 
 disp_op_handler_t *disp_op_handler_new (void);
-hutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p);
+disp_table_err_e disp_op_handler_destroy (disp_op_handler_t **self_p);
 
 #endif
 
