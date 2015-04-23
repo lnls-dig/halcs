@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "hal_utils_err.h"
+#include "disp_table_err.h"
 
 static const char *hutils_err [HUTILS_ERR_END] =
 {

@@ -12,7 +12,7 @@
 #include "mdp.h"
 
 #include "hutils.h"
-#include "dispatch_table.h"
+#include "disp_table.h"
 #include "dev_io_err.h"
 #include "ll_io.h"
 /* #include "sm_io.h" */

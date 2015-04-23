@@ -7,8 +7,8 @@ hal_utils_DIR = $(SRC_DIR)/hal/hal_utils
 #		 $(hal_utils_DIR)/hal_utils_err.o \
 #		 $(hal_utils_DIR)/dispatch_table.o \
 #		 $(msg_DIR)/msg.o
-hal_utils_OBJS = $(hal_utils_DIR)/dispatch_table.o \
-				 $(msg_DIR)/msg.o
+hal_utils_OBJS = $(hal_utils_DIR)/disp_table.o \
+				 $(hal_utils_DIR)/disp_table_err.o
 
 hal_utils_INCLUDE_DIRS = $(hal_utils_DIR)
 

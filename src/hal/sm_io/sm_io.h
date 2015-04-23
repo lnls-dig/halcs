@@ -19,7 +19,7 @@
 #include "sm_io_mod_dispatch.h"
 #include "sm_io_exports.h"
 #include "msg.h"
-#include "dispatch_table.h"
+#include "disp_table.h"
 #include "mdp.h"
 
 /* SMIO sockets IDs */

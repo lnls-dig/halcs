@@ -128,7 +128,7 @@ $(LIBBPMCLIENT)_CODE_HEADERS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m
 	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
 	../../hal/sm_io/modules/sm_io_codes.h \
 	../../../include/acq_chan_gen_defs.h \
-	../../hal/hal_utils/dispatch_table.h \
+	../../hal/hal_utils/disp_table.h \
 	../libhutils/hutils.h \
 	../libhutils/hutils_err.h \
 	../libhutils/hutils_math.h \

@@ -8,7 +8,7 @@
 #ifndef _SM_IO_DSP_EXPORTS_H_
 #define _SM_IO_DSP_EXPORTS_H_
 
-#include "dispatch_table.h"
+#include "disp_table.h"
 
 extern disp_op_t dsp_set_get_kx_exp;
 extern disp_op_t dsp_set_get_ky_exp;

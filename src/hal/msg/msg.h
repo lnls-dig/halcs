@@ -16,7 +16,7 @@
 #include "smio_thsafe_zmq_server.h"
 #include "smio_thsafe_zmq_client.h"
 
-#include "dispatch_table.h"
+#include "disp_table.h"
 
 #define MSG_OPCODE_SIZE                     (sizeof (uint32_t))
 /* Arbitrary number*/
