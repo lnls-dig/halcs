@@ -41,6 +41,13 @@
  * more byte allocated */
 #define EXTRA_SMIO_SERV_BYTES       1
 
+/* SMIO dispatch table operations */
+const disp_table_ops_t smio_disp_table_ops;
+
+/* Dispatch table message check handler */
+static hutils_err_e _smio_check_msg_args (disp_table_t *disp_table,
+        const disp_op_t *disp_op, void *args);
+
 static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
         void *pipe, char *service);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
@@ -173,6 +180,35 @@ smio_err_e smio_loop (struct _smio_t *self)
 }
 
 /************************************************************/
+/***************** Dispatch table callbacks *****************/
+/************************************************************/
+
+static hutils_err_e _smio_check_msg_args (disp_table_t *disp_table,
+        const disp_op_t *disp_op, void *args)
+{
+    assert (disp_table);
+    assert (disp_op);
+    assert (args);
+
+    devio_err_e err = SMIO_SUCCESS;
+
+    /* Check if the message tis the correct one */
+    ASSERT_TEST (msg_guess_type (args) == MSG_THSAFE_ZMQ, "Invalid message tag",
+            err_inv_msg, SMIO_ERR_MSG_NOT_SUPP);
+    msg_err_e merr = msg_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
+    ASSERT_TEST (merr == MSG_SUCCESS, "Unrecognized message. Message arguments "
+            "checking failed", err_msg_args_check, SMIO_ERR_MSG_NOT_SUPP);
+
+err_msg_args_check:
+err_inv_msg:
+    return err;
+}
+
+const disp_table_ops_t smio_disp_table_ops = {
+    .check_msg_args = _smio_check_msg_args
+};
+
+/************************************************************/
 /****************** Local helper functions ******************/
 /************************************************************/
 
@@ -189,7 +225,7 @@ static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
     ASSERT_ALLOC(self->service, err_service_alloc);
 
     /* Setup Dispatch table */
-    self->exp_ops_dtable = disp_table_new ();
+    self->exp_ops_dtable = disp_table_new (&smio_disp_table_ops);
     ASSERT_ALLOC(self->exp_ops_dtable, err_exp_ops_dtable_alloc);
 
     self->smio_handler = NULL;      /* This is set by the device functions */
