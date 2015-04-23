@@ -1,0 +1,8 @@
+Project Dependencies:
+    liberrhand
+    libbpmclient
+
+Foreign Dependencies:
+    libmdp
+    libczmq
+    libzmq
