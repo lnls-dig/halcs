@@ -147,7 +147,7 @@ LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libhutils libbpmclient
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient
 PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient
 
 # General library flags -L<libdir>

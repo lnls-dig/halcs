@@ -3,7 +3,7 @@
 TOP_DIR=..
 REMOTE_HOME="/home"
 REMOTE_USERNAME="lnls-bpm"
-REMOTE_IP=10.0.18.39
+REMOTE_IP=10.0.18.52
 LOCAL_IP=10.0.18.35
 REMOTE_DIR="bpm-sw-deploy"
 BOARD_TYPE="afcv3"
@@ -37,5 +37,10 @@ SYM_FILES=$(find . -type l ! -iname "*.[o|a]" ! -iname "*orig" \
     ! -path "./majordomo*" ! -path "./.git*")
 
 echo "Copying files to ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}"
-rsync -Rpr ${SRC_FILES} ${SYM_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}
+rsync -Rpr ${SRC_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}
+rsync -Rpr ${SYM_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}
+
+echo "Compiling source files with \"${COMPILE_CMD}\""
+ssh -l ${REMOTE_USERNAME} ${REMOTE_IP} "cd ${REMOTE_DEPLOY_DIR} && \
+    ${COMPILE_CMD}"
 
