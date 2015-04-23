@@ -14,7 +14,6 @@
 #include <inttypes.h>
 
 #include "dispatch_table.h"
-#include "msg.h"
 #include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -47,12 +46,6 @@ static hutils_err_e _disp_table_remove_all (disp_table_t *self);
 static void _disp_table_free_item (void *data);
 static hutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
-static hutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
-            zmsg_t *zmq_msg);
-static hutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
-        exp_msg_zmq_t *args);
-static hutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_op,
-        zmq_server_args_t *args);
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
         void *ret);
 static hutils_err_e _disp_table_alloc_ret (const disp_op_t *disp_op, void **ret);
@@ -60,19 +53,20 @@ static hutils_err_e _disp_table_set_ret (disp_table_t *self, uint32_t key, void 
 
 /* Disp Op Handler functions */
 static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key);
-static hutils_err_e _disp_table_check_args_op (disp_op_handler_t *disp_op_handler,
-        void *msg);
 static hutils_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handler, void **ret);
 static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op);
 
-disp_table_t *disp_table_new (void)
+disp_table_t *disp_table_new (const disp_table_ops_t *ops)
 {
+    assert (ops);
+
     disp_table_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_self_alloc);
     self->table_h = zhash_new ();
     ASSERT_ALLOC (self->table_h, err_table_h_alloc);
     /* Only work for strings
     zhash_autofree (self->table_h);*/
+    self->ops = ops;
 
     return self;
 
@@ -90,6 +84,7 @@ hutils_err_e disp_table_destroy (disp_table_t **self_p)
         disp_table_t *self = *self_p;
 
         _disp_table_remove_all (self);
+        self->ops = NULL;
         zhash_destroy (&self->table_h);
         free (self);
         *self_p = NULL;
@@ -369,7 +364,8 @@ static hutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
             err_disp_op_handler_null, HUTILS_ERR_NO_FUNC_REG);
 
     /* Check arguments for consistency */
-    err = _disp_table_check_args_op (disp_op_handler, args);
+    /* Call registered function to check message */
+    err =  disp_table_ops_check_msg (self, disp_op_handler->op, args);
     ASSERT_TEST (err == HUTILS_SUCCESS, "Arguments received are invalid",
             err_inv_args);
 
@@ -379,77 +375,6 @@ static hutils_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
 err_inv_args:
 err_disp_op_handler_null:
     return err;
-}
-
-static hutils_err_e _disp_table_check_gen_zmq_args (const disp_op_t *disp_op,
-        zmsg_t *zmq_msg)
-{
-    hutils_err_e err = HUTILS_SUCCESS;
-    GEN_MSG_ZMQ_ARG_TYPE zmq_arg = GEN_MSG_ZMQ_PEEK_FIRST(zmq_msg);
-
-    /* Iterate over all arguments and check if they match in size with the
-     * specified disp_op parameters */
-    const uint32_t *args_it = disp_op->args;
-    unsigned i;
-    for (i = 0 ; *args_it != DISP_ARG_END; ++args_it, ++i) {
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-                "[hutils:disp_table] Checking argument #%u for function \"%s\"\n",
-                i, disp_op->name);
-        /* We have argument to check according to disp_op->args */
-        if (zmq_arg == NULL) {
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
-                    "[hutils:disp_table] Missing arguments in message"
-                    " received for function \"%s\"\n", disp_op->name);
-            err = HUTILS_ERR_INV_LESS_ARGS;
-            goto err_inv_less_args;
-        }
-
-        /* We have received something and will check for (byte) size
-         * correctness */
-        if ((GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) > DISP_GET_ASIZE(*args_it)) ||
-                (DISP_GET_ATYPE(*args_it) != DISP_ATYPE_VAR &&
-                 GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it))) {
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
-                    "[hutils:disp_table] Invalid size of argument #%u"
-                    " received for function \"%s\"\n", i, disp_op->name);
-            err = HUTILS_ERR_INV_SIZE_ARG;
-            goto err_inv_size_args;
-        }
-
-        zmq_arg = GEN_MSG_ZMQ_PEEK_NEXT_ARG(zmq_msg);
-    }
-
-    /* According to disp_op->args we are done. So, check if the message received
-     * has any more arguments */
-    if (zmq_arg != NULL) {
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
-                "[hutils:disp_table] Extra arguments in message"
-                " received for function \"%s\"\n", disp_op->name);
-        err = HUTILS_ERR_INV_MORE_ARGS;
-        goto err_inv_more_args;
-    }
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:disp_table] No errors detected on the received arguments "
-            "for function \"%s\"\n", disp_op->name);
-
-err_inv_more_args:
-err_inv_size_args:
-err_inv_less_args:
-    GEN_MSG_ZMQ_PEEK_EXIT(zmq_msg);
-    return err;
-}
-
-static hutils_err_e _disp_table_check_exp_zmq_args (const disp_op_t *disp_op,
-        exp_msg_zmq_t *args)
-{
-    return _disp_table_check_gen_zmq_args (disp_op, EXP_MSG_ZMQ(args));
-}
-
-static hutils_err_e _disp_table_check_thsafe_zmq_args (const disp_op_t *disp_op,
-        zmq_server_args_t *args)
-{
-    return _disp_table_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
 }
 
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
@@ -557,29 +482,6 @@ err_exit:
     return err;
 }
 
-static hutils_err_e _disp_table_check_args_op (disp_op_handler_t *disp_op_handler,
-        void *msg)
-{
-    assert (disp_op_handler);
-    hutils_err_e err = HUTILS_ERR_INV_LESS_ARGS;
-
-    /* Try to guess which type of message we are dealing with */
-    switch (msg_guess_type (msg)) {
-        case MSG_EXP_ZMQ:
-            err = _disp_table_check_exp_zmq_args (disp_op_handler->op,
-                    (exp_msg_zmq_t *) msg);
-            break;
-        case MSG_THSAFE_ZMQ:
-            err = _disp_table_check_thsafe_zmq_args (disp_op_handler->op,
-                    (zmq_server_args_t *) msg);
-            break;
-        default:
-            break;
-    }
-
-    return err;
-}
-
 static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_handler)
 {
     assert (disp_op_handler);
@@ -596,4 +498,37 @@ static hutils_err_e _disp_table_cleanup_args_op (disp_op_handler_t *disp_op_hand
 err_no_ownership:
     return HUTILS_SUCCESS;
 }
+
+/************************************************************/
+/********************* Generic methods API ******************/
+/************************************************************/
+
+#define CHECK_FUNC(func_p)                              \
+    do {                                                \
+        if(func_p == NULL) {                            \
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,     \
+                    "[hutils:disp_table] %s\n",         \
+                    hutils_err_str (HUTILS_ERR_NO_FUNC_REG)); \
+            return HUTILS_ERR_NO_FUNC_REG;              \
+        }                                               \
+    } while(0)
+
+#define ASSERT_FUNC(func_name)                          \
+    do {                                                \
+        assert (self);                                  \
+        assert (self->ops);                             \
+        CHECK_FUNC (self->ops->func_name);              \
+    } while(0)
+
+/* Declare wrapper for all LLIO functions API */
+#define DISP_TABLE_FUNC_WRAPPER(func_name, ...)         \
+{                                                       \
+    ASSERT_FUNC(func_name);                             \
+    return self->ops->func_name (self, ##__VA_ARGS__);  \
+}
+
+/**** Check message arguments ****/
+hutils_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
+        void *args)
+    DISP_TABLE_FUNC_WRAPPER(check_msg_args, disp_op, args);
 

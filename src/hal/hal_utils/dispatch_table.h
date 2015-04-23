@@ -17,15 +17,25 @@
 #include <czmq.h>
 #include "hutils.h"
 
+struct _disp_table_ops_t;
+struct _disp_op_t;
+
 struct _disp_table_t {
     /* Hash containg all the sm_io thsafe operations
      * that we need to handle. It is composed
      * of key (4-char ID) / value (pointer to funtion) */
     zhash_t *table_h;
+    /* Dispatch table operations */
+    const struct _disp_table_ops_t *ops;
 };
 
-/* Opaque class structure */
-typedef struct _disp_table_t disp_table_t;
+/* Check message arguments function pointer */
+typedef hutils_err_e (*check_msg_args_fp)(struct _disp_table_t *self,
+        const struct _disp_op_t *disp_op, void *args);
+
+struct _disp_table_ops_t {
+    check_msg_args_fp check_msg_args;               /* Check message arguments */
+};
 
 /* Generic function pointer */
 typedef int (*disp_table_func_fp)(void *owner, void * args, void *ret);
@@ -48,6 +58,11 @@ enum _disp_at_e {
                                        Typically a structure */
 };
 
+/* Opaque class structure */
+typedef struct _disp_table_t disp_table_t;
+/* Dispatch table operations */
+typedef struct _disp_table_ops_t disp_table_ops_t;
+/* Argument type */
 typedef enum _disp_at_e disp_at_e;
 
 /* FIXME: large arguments can overflow the macro!
@@ -86,9 +101,19 @@ typedef struct _disp_op_t disp_op_t;
 /* Handler for the Dispatch exported function */
 typedef struct _disp_op_handler_t disp_op_handler_t;
 
-/***************** Our methods *****************/
+/************************************************************/
+/********************* Generic methods API ******************/
+/************************************************************/
 
-disp_table_t *disp_table_new (void);
+/* Check message arguments */
+hutils_err_e disp_table_ops_check_msg (disp_table_t *self, const disp_op_t *disp_op,
+        void *args);
+
+/************************************************************/
+/************************* Our methods **********************/
+/************************************************************/
+
+disp_table_t *disp_table_new (const disp_table_ops_t *ops);
 hutils_err_e disp_table_destroy (disp_table_t **self_p);
 
 hutils_err_e disp_table_insert (disp_table_t *self, const disp_op_t *disp_op);
@@ -110,7 +135,9 @@ int disp_table_check_call (disp_table_t *self, uint32_t key, void *owner,
         void *args, void **ret);
 hutils_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **ret);
 
-/*********************** Disp Op Handler functions ****************************/
+/************************************************************/
+/**************** Disp Op Handler functions *****************/
+/************************************************************/
 
 disp_op_handler_t *disp_op_handler_new (void);
 hutils_err_e disp_op_handler_destroy (disp_op_handler_t **self_p);
