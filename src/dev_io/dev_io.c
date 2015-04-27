@@ -281,7 +281,7 @@ int main (int argc, char *argv[])
     }
 
     /* err = devio_init_poller_sm (devio); */
-    err = devio_init_poller2_sm (devio);
+    err = devio_init_poller_sm (devio);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_init_poller_sm error!\n");
         goto err_devio;
@@ -298,9 +298,9 @@ int main (int argc, char *argv[])
          *      request as appropriate */
 
         /* devio_poll_all_sm (devio); */
-        err = devio_poll2_all_sm (devio);
+        err = devio_poll_all_sm (devio);
         if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll2_all_sm error. Exiting ...\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll_all_sm error. Exiting ...\n");
             goto err_devio;
         }
 

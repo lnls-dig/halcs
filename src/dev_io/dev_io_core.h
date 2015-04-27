@@ -29,8 +29,7 @@ struct _devio_t {
     /*mdp_worker_t *worker;*/           /* zeroMQ Majordomo Worker */
     zctx_t *ctx;                        /* zeroMQ Context */
     void **pipes;                       /* Address nodes using this array of pipes */
-    zpoller_t *poller;                  /* Poller structure to multiplex threads messages */
-    zmq_pollitem_t *poller2;            /* Poller structure to multiplex threads messages. New version */
+    zmq_pollitem_t *poller;            /* Poller structure to multiplex threads messages. New version */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
     char *log_file;                     /* Log filename for tracing and debugging */
@@ -101,10 +100,8 @@ devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
 devio_err_e devio_unregister_all_sm (devio_t *self);
 /* Initilize poller with all of the initialized PIPE sockets */
 devio_err_e devio_init_poller_sm (devio_t *self);
-devio_err_e devio_init_poller2_sm (devio_t *self);
 /* Poll all PIPE sockets */
 devio_err_e devio_poll_all_sm (devio_t *self);
-devio_err_e devio_poll2_all_sm (devio_t *self);
 /* Router for all the opcodes registered for this dev_io */
 /* devio_err_e devio_do_op (devio_t *self, uint32_t opcode, int nargs, ...); */
 /* Router for all of the low-level operations for this dev_io */
