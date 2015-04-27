@@ -38,16 +38,25 @@ ifeq ($(BOARD),afcv3)
 CFLAGS += -D__BOARD_AFCV3__
 endif
 
-LOCAL_MSG_DBG ?= n
-DBE_DBG ?= n
 CFLAGS_DEBUG =
 
-ifeq ($(LOCAL_MSG_DBG),y)
-CFLAGS_DEBUG += -DLOCAL_MSG_DBG=1
+# To enable this option, use: make ERRHAND_DBG=y
+ifneq ($(ERRHAND_DBG),)
+CFLAGS_DEBUG += -DERRHAND_DBG=$(ERRHAND_DBG)
 endif
 
-ifeq ($(DBE_DBG),y)
-CFLAGS_DEBUG += -DDBE_DBG=1
+# To enable this option use: make ERRHAND_MIN_LEVEL=DBG_MIN_TRACE
+ifneq ($(ERRHAND_MIN_LEVEL),)
+CFLAGS_DEBUG += -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL)
+endif
+
+# To enable this option use: make ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | \
+# DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
+#
+# You can also OR the available subsytems to enable debug messages in just the
+# those subsytems. See file errhand_opts.h for more information
+ifneq ($(ERRHAND_SUBSYS_ON),)
+CFLAGS_DEBUG += -DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 endif
 
 # Debug flags -D<flasg_name>=<value>
@@ -64,33 +73,32 @@ LIBS = -lzmq -lczmq -lmdp
 LFLAGS =
 
 # Specific board objects
-OBJS_BOARD = ../../hal/sm_io/modules/acq/ddr3_map.o
+OBJS_BOARD = ../../sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
-OBJS_PLATFORM = ../../hal/debug/debug_print.o ../../hal/debug/local_print.o \
-		../../hal/debug/debug_subsys.o
+OBJS_PLATFORM =
 # Objects that are not specificaly related to the bpm_client, but composes
 # our library, as it eases some tasks for us
-OBJS_EXTERNAL = ../../hal/sm_io/modules/sm_io_codes.o \
-                ../../hal/sm_io/modules/acq/sm_io_acq_exports.o \
-                ../../hal/sm_io/modules/dsp/sm_io_dsp_exports.o \
-                ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
-                ../../hal/sm_io/modules/swap/sm_io_swap_exports.o \
-                ../../hal/sm_io/modules/rffe/sm_io_rffe_exports.o \
-                ../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_exports.o
+OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
+                ../../sm_io/modules/acq/sm_io_acq_exports.o \
+                ../../sm_io/modules/dsp/sm_io_dsp_exports.o \
+                ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
+                ../../sm_io/modules/swap/sm_io_swap_exports.o \
+                ../../sm_io/modules/rffe/sm_io_rffe_exports.o \
+                ../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.o
+
+# Project boards
+boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS = -I. -I../../hal/include -I../../hal/debug \
-	       -I../../hal/sm_io/modules \
-	       -I../../hal/sm_io/modules/fmc130m_4ch \
-	       -I../../hal/sm_io/modules/acq \
-	       -I../../hal/sm_io/modules/swap \
-	       -I../../hal/sm_io/modules/dsp \
-	       -I../../hal/sm_io/modules/rffe \
-	       -I../../hal/sm_io/modules/afc_diag \
-	       -I../../hal/sm_io/rw_param \
-	       -I../../hal/hal_utils \
-	       -I../../hal/include/hw \
-	       -I../../hal/boards/$(BOARD) \
+INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils -I../libdisptable \
+	       $(boards_INCLUDE_DIRS) \
+	       -I../../sm_io/modules \
+	       -I../../sm_io/modules/fmc130m_4ch \
+	       -I../../sm_io/modules/acq \
+	       -I../../sm_io/modules/swap \
+	       -I../../sm_io/modules/dsp \
+	       -I../../sm_io/modules/rffe \
+	       -I../../sm_io/modules/afc_diag \
 	       -I/usr/local/include
 
 # Merge all flags. Optimize for size (-Os)
@@ -104,52 +112,50 @@ OUT = $(LIBBPMCLIENT)
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBBPMCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o rw_param_client.o
+$(LIBBPMCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o bpm_client_rw_param.o
 
 # Objects common for both server and client libraries.
 common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 
 # Objects for each version of library
 $(LIBBPMCLIENT)_OBJS = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS_LIB)
-$(LIBBPMCLIENT)_CODE_HEADERS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../../hal/sm_io/modules/acq/sm_io_acq_codes.h \
-	../../hal/sm_io/modules/dsp/sm_io_dsp_codes.h \
-	../../hal/sm_io/modules/swap/sm_io_swap_codes.h \
-	../../hal/sm_io/modules/rffe/sm_io_rffe_codes.h \
-	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
-	../../hal/sm_io/modules/sm_io_codes.h \
-	../../hal/include/acq_chan_gen_defs.h \
-	../../hal/hal_utils/dispatch_table.h \
-	../../hal/hal_utils/hal_utils_err.h \
+$(LIBBPMCLIENT)_CODE_HEADERS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	../../sm_io/modules/acq/sm_io_acq_codes.h \
+	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
+	../../sm_io/modules/swap/sm_io_swap_codes.h \
+	../../sm_io/modules/rffe/sm_io_rffe_codes.h \
+	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
+	../../sm_io/modules/sm_io_codes.h \
+	../../../include/acq_chan_gen_defs.h \
+	../libdisptable/disp_table.h \
+	../libdisptable/disp_table_err.h \
+	../libhutils/hutils.h \
+	../libhutils/hutils_err.h \
+	../libhutils/hutils_math.h \
+	../libhutils/hutils_utils.h \
 	bpm_client_codes.h
 
-$(LIBBPMCLIENT)_FUNC_EXPORTS = ../../hal/sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
-	../../hal/sm_io/modules/acq/sm_io_acq_exports.h \
-	../../hal/sm_io/modules/dsp/sm_io_dsp_exports.h \
-	../../hal/sm_io/modules/swap/sm_io_swap_exports.h \
-	../../hal/sm_io/modules/rffe/sm_io_rffe_exports.h \
-	../../hal/sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
+$(LIBBPMCLIENT)_FUNC_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+	../../sm_io/modules/acq/sm_io_acq_exports.h \
+	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
+	../../sm_io/modules/swap/sm_io_swap_exports.h \
+	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
+	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
 
-# Install only specific acq_chan.h defintions according to the BOARD MACRO
-#	../../hal/include/mem_layout/ml605/acq_chan_ml605.h \
-#	../../hal/include/mem_layout/afcv3/acq_chan_afcv3.h
-
-$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
-$(LIBBPMCLIENT)_ACQ_HEADERS += \
-	../../hal/include/board/$(BOARD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
+$(LIBBPMCLIENT)_ACQ_HEADERS += ../../../include/acq_chan.h
 
 $(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_OBJS_LIB:.o=.h) $($(LIBBPMCLIENT)_CODE_HEADERS) \
     $($(LIBBPMCLIENT)_FUNC_EXPORTS)
 
 # Installation headers
-$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS) $($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h
+$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS)
 
 # Save a git repository description
 GIT_REVISION = $(shell git describe --dirty --always)
 GIT_USER_NAME = $(shell git config --get user.name)
 GIT_USER_EMAIL = $(shell git config --get user.email)
 
-REVISION_NAME = revision
+REVISION_NAME = bpm_client_revision
 OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
 
 OBJS_all = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS) \
@@ -170,7 +176,7 @@ TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile static library
 %.a: $$($$*_OBJS) $(OBJ_REVISION)
@@ -221,15 +227,6 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 #	$(MAKE) -C $@ all
 #
 
-# Prepare the environment for install rule
-pre_inst:
-	$(foreach header,$($(LIBBPMCLIENT)_ACQ_HEADERS),cp -p $(header) \
-		$(PWD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h $(CMDSEP))
-
-pre_clean:
-	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h, \
-		rm -f $(header) $(CMDSEP))
-
 install:
 	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
@@ -245,7 +242,7 @@ uninstall:
 	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
 		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
 
-clean: pre_clean
+clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean

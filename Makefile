@@ -55,8 +55,13 @@ PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 PCIE_DRIVER_VER = $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
 
-# Client library
-LIBBPMCLIENT_DIR=src/libs/libbpmclient
+# Project libraries
+LIBERRHAND_DIR = src/libs/liberrhand
+LIBCONVC_DIR = src/libs/libconvc
+LIBHUTILS_DIR = src/libs/libhutils
+LIBDISPTABLE_DIR = src/libs/libdisptable
+LIBBPMCLIENT_DIR = src/libs/libbpmclient
+LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
@@ -112,8 +117,23 @@ ifeq ($(LOCAL_MSG_DBG),y)
 CFLAGS_DEBUG += -DLOCAL_MSG_DBG=1
 endif
 
-ifeq ($(DBE_DBG),y)
-CFLAGS_DEBUG += -DDBE_DBG=1
+# To enable this option, use: make ERRHAND_DBG=y
+ifneq ($(ERRHAND_DBG),)
+CFLAGS_DEBUG += -DERRHAND_DBG=$(ERRHAND_DBG)
+endif
+
+# To enable this option use: make ERRHAND_MIN_LEVEL=DBG_MIN_TRACE
+ifneq ($(ERRHAND_MIN_LEVEL),)
+CFLAGS_DEBUG += -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL)
+endif
+
+# To enable this option use: make ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | \
+# DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"'
+#
+# You can also OR the available subsytems to enable debug messages in just the
+# those subsytems. See file errhand_opts.h for more information
+ifneq ($(ERRHAND_SUBSYS_ON),)
+CFLAGS_DEBUG += -DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 endif
 
 # Debug flags -D<flasg_name>=<value>
@@ -125,8 +145,15 @@ LDFLAGS_PLATFORM =
 
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
+
+# FIXME: make the project libraries easily interchangeable, specifying
+# the lib only a single time
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient libsdbfs
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient -lsdbfs
+
 # General library flags -L<libdir>
-LFLAGS =
+LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
+         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient -Lforeign/libsdbfs
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -135,13 +162,33 @@ OBJS_PLATFORM =
 SRC_DIR = src
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/hal/hal.mk
+include $(SRC_DIR)/ll_io/ll_io.mk
+include $(SRC_DIR)/sm_io/sm_io.mk
+include $(SRC_DIR)/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/dev_io/dev_io.mk
+include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 
+# Project boards
+boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
+
 # Include directories
-INCLUDE_DIRS = $(hal_INCLUDE_DIRS) \
-            $(revision_INCLUDE_DIRS) \
+INCLUDE_DIRS =  \
+	       $(ll_io_INCLUDE_DIRS) \
+	       $(sm_io_INCLUDE_DIRS) \
+	       $(msg_INCLUDE_DIRS) \
+	       $(dev_mngr_INCLUDE_DIRS) \
+	       $(dev_io_INCLUDE_DIRS) \
+	       $(revision_INCLUDE_DIRS) \
+	       $(boards_INCLUDE_DIRS) \
 	       -I$(PCIE_DRIVER_DIR)/include/pcie \
+	       -Iinclude \
+	       -Isrc/libs/liberrhand \
+	       -Isrc/libs/libconvc \
+	       -Isrc/libs/libhutils \
+	       -Isrc/libs/libdisptable \
+	       -Isrc/libs/libbpmclient \
+	       -Iforeign/libsdbfs \
 	       -I/usr/local/include
 
 # Merge all flags.
@@ -150,10 +197,31 @@ CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
 LDFLAGS = $(LDFLAGS_PLATFORM)
 
 # Output modules
-OUT = $(hal_OUT)
+OUT = $(dev_mngr_OUT) $(dev_io_OUT)
 
 # All possible output modules
-ALL_OUT = $(hal_all_OUT)
+ALL_OUT = $(dev_mngr_all_OUT) $(dev_io_all_OUT)
+
+# Out objects
+dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
+                 $(exp_ops_OBJS) $(thsafe_msg_zmq_OBJS) \
+                 $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
+
+dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+               $(sm_io_OBJS) $(msg_OBJS)
+
+dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+                   $(sm_io_OBJS) $(msg_OBJS)
+
+# Specific libraries for OUT targets
+dev_mngr_LIBS =
+dev_mngr_STATIC_LIBS =
+
+dev_io_LIBS = -lbsmp
+dev_io_STATIC_LIBS =
+
+dev_io_cfg_LIBS = -lbsmp
+dev_io_cfg_STATIC_LIBS =
 
 .SECONDEXPANSION:
 
@@ -162,7 +230,13 @@ GIT_REVISION = $(shell git describe --dirty --always)
 GIT_USER_NAME = $(shell git config --get user.name)
 GIT_USER_EMAIL = $(shell git config --get user.email)
 
-OBJS_all =  $(hal_OBJS) $(revision_OBJS)
+OBJS_all = $(ll_io_OBJS) \
+	   $(sm_io_OBJS) \
+	   $(msg_OBJS) \
+	   $(dev_mngr_OBJS) \
+	   $(dev_io_OBJS) \
+	   $(dev_io_cfg_OBJS) \
+	   $(revision_OBJS)
 
 # Sources
 all_SRCS = $(patsubst %.o,%.c,$(OBJS_all))
@@ -170,7 +244,12 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 .PHONY: all install uninstall clean mrproper \
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
+	liberrhand liberrhand_install liberrhand_uninstall liberrhand_clean liberrhand_mrproper \
+	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
+	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
+	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
+	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
@@ -182,11 +261,11 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: libbpmclient cfg $(OUT)
+all: $(PROJECT_LIBS_NAME) cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS)
+	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
@@ -286,6 +365,68 @@ libbsmp_clean:
 libbsmp_mrproper:
 	$(MAKE) -C $(LIBBSMP_DIR) distclean
 
+# Project Libraries
+
+liberrhand:
+	$(MAKE) -C $(LIBERRHAND_DIR) all
+
+liberrhand_install:
+	$(MAKE) -C $(LIBERRHAND_DIR) install
+
+liberrhand_uninstall:
+	$(MAKE) -C $(LIBERRHAND_DIR) uninstall
+
+liberrhand_clean:
+	$(MAKE) -C $(LIBERRHAND_DIR) clean
+
+liberrhand_mrproper:
+	$(MAKE) -C $(LIBERRHAND_DIR) mrproper
+
+libconvc:
+	$(MAKE) -C $(LIBCONVC_DIR) all
+
+libconvc_install:
+	$(MAKE) -C $(LIBCONVC_DIR) install
+
+libconvc_uninstall:
+	$(MAKE) -C $(LIBCONVC_DIR) uninstall
+
+libconvc_clean:
+	$(MAKE) -C $(LIBCONVC_DIR) clean
+
+libconvc_mrproper:
+	$(MAKE) -C $(LIBCONVC_DIR) mrproper
+
+libhutils:
+	$(MAKE) -C $(LIBHUTILS_DIR) all
+
+libhutils_install:
+	$(MAKE) -C $(LIBHUTILS_DIR) install
+
+libhutils_uninstall:
+	$(MAKE) -C $(LIBHUTILS_DIR) uninstall
+
+libhutils_clean:
+	$(MAKE) -C $(LIBHUTILS_DIR) clean
+
+libhutils_mrproper:
+	$(MAKE) -C $(LIBHUTILS_DIR) mrproper
+
+libdisptable:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) all
+
+libdisptable_install:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) install
+
+libdisptable_uninstall:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) uninstall
+
+libdisptable_clean:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) clean
+
+libdisptable_mrproper:
+	$(MAKE) -C $(LIBDISPTABLE_DIR) mrproper
+
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
@@ -300,6 +441,23 @@ libbpmclient_clean:
 
 libbpmclient_mrproper:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
+
+libsdbfs:
+	$(MAKE) -C $(LIBSDBFS_DIR) all
+
+libsdbfs_install:
+	$(MAKE) -C $(LIBSDBFS_DIR) install
+
+libsdbfs_uninstall:
+	$(MAKE) -C $(LIBSDBFS_DIR) uninstall
+
+libsdbfs_clean:
+	$(MAKE) -C $(LIBSDBFS_DIR) clean
+
+libsdbfs_mrproper:
+	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
+
+# External project dependencies
 
 deps: libmdp libbsmp
 
@@ -358,11 +516,11 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: hal_install deps_install libbpmclient_install cfg_install
+install: hal_install deps_install liberrhand_install libconvc_install libhutils_install libbpmclient_install cfg_install
 
-uninstall: hal_uninstall deps_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: hal_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libbpmclient_uninstall cfg_uninstall
 
-clean: hal_clean deps_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: hal_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean hal_mrproper deps_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean hal_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 

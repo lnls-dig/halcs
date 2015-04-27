@@ -6,14 +6,14 @@
  */
 
 #include "bpm_client.h"
-#include "hal_assert.h"
+#include "errhand.h"
 
 #include "sm_io_acq_codes.h"
 #include "sm_io_dsp_codes.h"
 #include "sm_io_swap_codes.h"
 #include "sm_io_swap_useful_macros.h"
-#include "rw_param_codes.h"
-#include "rw_param_client.h"
+#include "bpm_client_rw_param_codes.h"
+#include "bpm_client_rw_param.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -118,7 +118,7 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    debug_set_log (log_file_name, log_mode);
+    errhand_set_log (log_file_name, log_mode);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBBPMCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
