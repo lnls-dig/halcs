@@ -61,6 +61,7 @@ LIBCONVC_DIR = src/libs/libconvc
 LIBHUTILS_DIR = src/libs/libhutils
 LIBDISPTABLE_DIR = src/libs/libdisptable
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
+LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
@@ -147,12 +148,12 @@ LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient
-PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient libsdbfs
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient -lsdbfs
 
 # General library flags -L<libdir>
 LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
-         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient
+         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient -Lforeign/libsdbfs
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -187,6 +188,7 @@ INCLUDE_DIRS =  \
 	       -Isrc/libs/libhutils \
 	       -Isrc/libs/libdisptable \
 	       -Isrc/libs/libbpmclient \
+	       -Iforeign/libsdbfs \
 	       -I/usr/local/include
 
 # Merge all flags.
@@ -247,6 +249,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
+	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	hal_install hal_uninstall hal_clean hal_mrproper \
@@ -438,6 +441,21 @@ libbpmclient_clean:
 
 libbpmclient_mrproper:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
+
+libsdbfs:
+	$(MAKE) -C $(LIBSDBFS_DIR) all
+
+libsdbfs_install:
+	$(MAKE) -C $(LIBSDBFS_DIR) install
+
+libsdbfs_uninstall:
+	$(MAKE) -C $(LIBSDBFS_DIR) uninstall
+
+libsdbfs_clean:
+	$(MAKE) -C $(LIBSDBFS_DIR) clean
+
+libsdbfs_mrproper:
+	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
 
 # External project dependencies
 
