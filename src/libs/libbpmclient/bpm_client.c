@@ -1225,7 +1225,7 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
 
     /* Print some debug messages */
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-            "read_size: %u\n", read_val->data_size);
+            "read_size: %u\n", read_size);
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
             "acq_trans->block.data: %p\n", acq_trans->block.data);
 
@@ -1241,7 +1241,7 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
     assert (acq_trans->block.data);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    
+
     uint32_t block_n_valid = acq_trans->req.num_samples /
         (BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size);
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_full_acq: "
