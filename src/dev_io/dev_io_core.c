@@ -612,6 +612,9 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe)
             "self-destruct message to SMIO instance",
             err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
+            "to SMIO sent");
+
 err_send_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:

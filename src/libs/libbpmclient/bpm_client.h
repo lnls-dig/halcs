@@ -47,6 +47,17 @@ bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
  * server */
 void bpm_client_destroy (bpm_client_t **self_p);
 
+/* General function to execute all the other modules functions */
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output);
+
+/* Translate function's name and returns its structure */
+const disp_op_t* bpm_func_translate (char *name);
+
+/* Wrapper to bpm_func_exec which translates the function name to
+ * its exp_ops structure */
+ bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output);
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
@@ -406,6 +417,29 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq);
 
+/* New version of bpm_data_acquire that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
+
+/* New version of bpm_check_data_acquire that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
+
+/* New version of bpm_get_data_block that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+
+/* New version of bpm_get_curve that uses the general function caller
+ * bpm_func_exec */
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+
+/* Perform a full acquisition process (Acquisition request, checking if
+ * its done and receiving the full curve).
+ * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
+ * otherwise. The data read is returned in acq_trans->block.data along with
+ * the number of bytes effectivly read in acq_trans->block.bytes_read */
+bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */
@@ -722,6 +756,17 @@ bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *ser
         smio_afc_diag_revision_data_t *revision_data);
 bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
         smio_afc_diag_revision_data_t *revision_data);
+
+/* Helper Function */
+
+/* This function execute the given function *func in a disp_op_t
+ * for a specific amount of time (timeout).
+ * Returns BPM_CLIENT_SUCCESS if the functions has been successfully
+ * executed or error otherwise.
+ * (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e func_polling (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output, int timeout);
+
 
 #endif
 

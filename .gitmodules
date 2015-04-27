@@ -7,3 +7,6 @@
 [submodule "foreign/libmdp"]
 	path = foreign/libmdp
 	url = https://github.com/lnls-dig/majordomo.git
+[submodule "foreign/bpm-sw-cli"]
+	path = foreign/bpm-sw-cli
+	url = https://github.com/lnls-dig/bpm-sw-cli.git

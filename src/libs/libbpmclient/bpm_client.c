@@ -141,6 +141,119 @@ err_self_alloc:
     return NULL;
 }
 
+/**************** General Function to call the others *********/
+
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint32_t *input, uint32_t *output)
+{
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+
+    /* Check input arguments */
+    ASSERT_TEST(self != NULL, "Bpm_client is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
+    ASSERT_TEST(func != NULL, "Function structure is NULL", err_null_exp, BPM_CLIENT_ERR_INV_FUNCTION);
+    ASSERT_TEST(!(func->args[0] != DISP_ARG_END && input == NULL), "Invalid input arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
+    ASSERT_TEST(!(func->retval != DISP_ARG_END && output == NULL), "Invalid output arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
+
+    /* Create the message */
+    zmsg_t *msg = zmsg_new ();
+    ASSERT_ALLOC(msg, err_msg_alloc, BPM_CLIENT_ERR_ALLOC);
+
+    /* Add the frame containing the opcode for the function desired (always first) */
+    zmsg_addmem (msg, &func->opcode, sizeof (func->opcode));
+
+    /* Add the arguments in their respective frames in the message */
+    for (int i = 0; func->args[i] != DISP_ARG_END; ++i) {
+        /* Get the size of the message being sent */
+        uint32_t in_size = DISP_GET_ASIZE(func->args[i]);
+        /* Create a frame to compose the message */
+        zmsg_addmem (msg, input, in_size);
+        /* Moves along the pointer */
+        input += in_size;
+    }
+
+    mdp_client_send (self->mdp_client, service, &msg);
+
+    /* Receive report */
+    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
+
+    /* Message is:
+     * frame 0: Error code
+     * frame 1: Number of bytes received
+     * frame 2+: Data received      */
+
+    /* Handling malformed messages */
+    size_t msg_size = zmsg_size (report);
+    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
+            "Unexpected message received", err_msg);
+
+    /* Get message contents */
+    zframe_t *err_code = zmsg_pop(report);
+    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg);
+    err = *(uint32_t *)zframe_data(err_code);
+
+    zframe_t *data_size_frm = NULL;
+    zframe_t *data_frm = NULL;
+    if (msg_size == MSG_FULL_SIZE)
+    {
+        data_size_frm = zmsg_pop (report);
+        ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
+        data_frm = zmsg_pop (report);
+        ASSERT_TEST(data_frm != NULL, "Could not receive data", err_null_data);
+
+        ASSERT_TEST(zframe_size (data_size_frm) == RW_REPLY_SIZE,
+                "Wrong <number of payload bytes> parameter size", err_msg_fmt);
+
+        /* Size in the second frame must match the frame size of the third */
+        RW_REPLY_TYPE data_size = *(RW_REPLY_TYPE *) zframe_data(data_size_frm);
+        ASSERT_TEST(data_size == zframe_size (data_frm),
+                "<payload> parameter size does not match size in <number of payload bytes> parameter",
+                err_msg_fmt);
+
+        uint32_t *data_out = (uint32_t *)zframe_data(data_frm);
+        /* Copy message contents to user */
+        memcpy (output, data_out, data_size);
+    }
+
+err_msg_fmt:
+    zframe_destroy (&data_frm);
+err_null_data:
+    zframe_destroy (&data_size_frm);
+err_null_data_size:
+    zframe_destroy (&err_code);
+err_msg:
+    zmsg_destroy (&report);
+err_msg_alloc:
+    zmsg_destroy (&msg);
+err_null_exp:
+err_inv_param:
+    return err;
+}
+
+const disp_op_t *bpm_func_translate (char *name)
+{
+    if (name != NULL)
+    {
+        /* Search the function table for a match in the 'name' field */
+        for (int i=0; smio_exp_ops[i] != NULL; i++)
+        {
+            for (int j=0; smio_exp_ops[i][j] != NULL; j++)
+            {
+                if (streq(name, smio_exp_ops[i][j]->name))
+                {
+                    return smio_exp_ops[i][j];
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output)
+{
+    const disp_op_t *func = bpm_func_translate(name);
+    bpm_client_err_e err = bpm_func_exec (self, func, service, input, output);
+    return err;
+}
 /**************** FMC130M SMIO Functions ****************/
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
 {
@@ -667,6 +780,11 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
         int timeout);
 static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
+static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service);
+static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
 
 bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
@@ -688,6 +806,31 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans)
 {
     return _bpm_get_data_block (self, service, acq_trans);
+}
+
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
+{
+    return _bpm_acq_start (self, service, acq_req);
+}
+
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service)
+{
+    return _bpm_acq_check (self, service);
+}
+
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    return _bpm_acq_get_data_block (self, service, acq_trans);
+}
+
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    return _bpm_acq_get_curve (self, service, acq_trans);
+}
+
+bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout)
+{
+    return _bpm_full_acq (self, service, acq_trans, timeout);
 }
 
 static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
@@ -1000,6 +1143,232 @@ err_bpm_data_acquire:
     return err;
 }
 
+static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
+{
+    uint32_t write_val[sizeof(uint32_t)*2] = {0};
+    *write_val = acq_req->num_samples;
+    *(write_val+4) = acq_req->chan;
+
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_DATA_ACQUIRE);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, NULL);
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "bpm_data_acquire: Data acquire was not required correctly",
+            err_data_acquire, BPM_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully acquired*/
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
+            "Data acquire was successfully required\n");
+
+err_data_acquire:
+    return err;
+}
+
+static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
+{
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_CHECK_DATA_ACQUIRE);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, NULL, NULL);
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+            "bpm_check_data_acquire: Check fail: data acquire was not completed",
+            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+
+    /* If we are here, then the request was successfully acquired*/
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_acq_check: "
+            "Check ok: data acquire was successfully completed\n");
+
+err_check_data_acquire:
+    return err;
+}
+
+static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    assert (self);
+    assert (service);
+    assert (acq_trans);
+    assert (acq_trans->block.data);
+
+    uint32_t write_val[sizeof(uint32_t)*2] = {0};
+    *write_val = acq_trans->req.chan;
+    *(write_val+4) = acq_trans->block.idx;
+
+    smio_acq_data_block_t read_val[1];
+
+    /* Sent Message is:
+     * frame 0: operation code
+     * frame 1: channel
+     * frame 2: block required */
+
+    const disp_op_t* func = bpm_func_translate(ACQ_NAME_GET_DATA_BLOCK);
+    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, (uint32_t *) read_val);
+
+    /* Received Message is:
+     * frame 0: error code
+     * frame 1: data size
+     * frame 2: data block */
+
+    /* Check if any error ocurred */
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+            "bpm_get_data_block: Data block was not acquired",
+            err_get_data_block, BPM_CLIENT_ERR_SERVER);
+
+    /* Data size effectively returned */
+    uint32_t read_size = (acq_trans->block.data_size < read_val->valid_bytes) ?
+        acq_trans->block.data_size : read_val->valid_bytes;
+
+    /* Copy message contents to user */
+    memcpy (acq_trans->block.data, read_val->data, read_size);
+
+    /* Inform user about the number of bytes effectively copied */
+    acq_trans->block.bytes_read = read_size;
+
+    /* Print some debug messages */
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "read_size: %u\n", read_val->data_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
+            "acq_trans->block.data: %p\n", acq_trans->block.data);
+
+err_get_data_block:
+    return err;
+}
+
+static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+{
+    assert (self);
+    assert (service);
+    assert (acq_trans);
+    assert (acq_trans->block.data);
+
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    
+    uint32_t block_n_valid = acq_trans->req.num_samples /
+        (BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_full_acq: "
+            "block_n_valid = %u\n", block_n_valid);
+
+    /* Total bytes read */
+    uint32_t total_bread = 0;
+    uint32_t data_size = acq_trans->block.data_size;
+    /* Save the original buffer size for later */
+    uint32_t *original_data_pt = acq_trans->block.data;
+
+    /* Fill all blocks */
+    for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
+        }
+
+        acq_trans->block.idx = block_n;
+        err = bpm_acq_get_data_block(self, service, acq_trans);
+
+        /* Check for return code */
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+                "_bpm_get_data_block failed. block_n is probably out of range",
+                err_bpm_get_data_block);
+
+        total_bread += acq_trans->block.bytes_read;
+        acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
+        acq_trans->block.data_size -= acq_trans->block.bytes_read;
+
+        /* Print some debug messages */
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Total bytes read up to now: %u\n", total_bread);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data pointer addr: %p\n", acq_trans->block.data);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data buffer size: %u\n", acq_trans->block.data_size);
+    }
+
+    /* Return to client the total number of bytes read */
+    acq_trans->block.bytes_read = total_bread;
+    acq_trans->block.data_size = data_size;
+    acq_trans->block.data = original_data_pt;
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+            "Data curve of %u bytes was successfully acquired\n", total_bread);
+
+bpm_zctx_interrupted:
+err_bpm_get_data_block:
+    return err;
+}
+
+static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout)
+{
+    /* TODO: Use a error check like ASSERT_TEST instead assert() */
+    assert (self);
+    assert (service);
+    assert (acq_trans);
+    assert (acq_trans->block.data);
+
+    /* Send Acquisition Request */
+    bpm_acq_start (self, service, &acq_trans->req);
+
+    /* Wait until the acquisition is finished */
+    bpm_client_err_e err = func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE, service, NULL, NULL, timeout);
+
+    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+            "bpm_check_data_acquire: Check fail: data acquire was not completed",
+            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+
+    /* If we are here, then the acquisition was successfully completed*/
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_acq_check: "
+            "Check ok: data acquire was successfully completed\n");
+
+    /* FIXME: When the last block is full 'block_n_valid exceeds by one */
+    uint32_t block_n_valid = acq_trans->req.num_samples /
+        (BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size);
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_full_acq: "
+            "block_n_valid = %u\n", block_n_valid);
+
+    uint32_t total_bread = 0;   /* Total bytes read */
+    uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size for later */
+    uint32_t *original_data_pt = acq_trans->block.data;
+
+    /* Change this section of the code, responsible for receiving data, by the get_curve function, yet to be implemented */
+
+    /* Client requisition: get data block */
+    for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
+        }
+
+        acq_trans->block.idx = block_n;
+        err = bpm_acq_get_data_block(self, service, acq_trans);
+
+        /* Check for return code */
+        ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
+                "_bpm_get_data_block failed. block_n is probably out of range",
+                err_bpm_get_data_block);
+
+        total_bread += acq_trans->block.bytes_read;
+        acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
+        acq_trans->block.data_size -= acq_trans->block.bytes_read;
+
+        /* Print some debug messages */
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Total bytes read up to now: %u\n", total_bread);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data pointer addr: %p\n", acq_trans->block.data);
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+                "Data buffer size: %u\n", acq_trans->block.data_size);
+    }
+
+    /* Return to client the total number of bytes read */
+    acq_trans->block.bytes_read = total_bread;
+    acq_trans->block.data_size = data_size;
+    acq_trans->block.data = original_data_pt;
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
+            "Data curve of %u bytes was successfully acquired\n", total_bread);
+
+bpm_zctx_interrupted:
+err_bpm_get_data_block:
+err_check_data_acquire:
+    return err;
+}
 /**************** DSP SMIO Functions ****************/
 
 /* Kx functions */
@@ -1558,3 +1927,45 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
             rw, revision_data, sizeof (*revision_data));
 }
 
+
+
+/**************** Helper Function ****************/
+
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout);
+
+bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
+{
+    return _func_polling (self, name, service, input, output, timeout);
+}
+
+/* Polling Function */
+
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
+{
+    if (timeout < 0) {
+        timeout = INT_MAX;
+    }
+
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    time_t start = time(NULL);
+    while (time(NULL) - start < timeout) {
+        if (zctx_interrupted) {
+            err = BPM_CLIENT_INT;
+            goto bpm_zctx_interrupted;
+        }
+        const disp_op_t* func = bpm_func_translate(name);
+        err = bpm_func_exec(self, func, service, input, output);
+        if (err == BPM_CLIENT_SUCCESS)
+        {
+            goto exit;
+        }
+        usleep (1000);
+    }
+
+    /* timeout occured */
+    err = BPM_CLIENT_ERR_TIMEOUT;
+
+bpm_zctx_interrupted:
+exit:
+    return err;
+}
