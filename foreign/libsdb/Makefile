@@ -39,5 +39,7 @@ $(LIB): $(OBJS)
 clean:
 	rm -f $(OBJS) $(LIB) *~ core
 
+mrproper: clean
+
 # add the other unused targets, so the rule in ../Makefile works
-modules install modules_install:
+modules install uninstall modules_install:
