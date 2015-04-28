@@ -15,10 +15,6 @@
 #include "disp_table.h"
 #include "dev_io_err.h"
 #include "ll_io.h"
-/* #include "sm_io.h" */
-
-/* #include "sm_io_thsafe_codes.h" */
-/* #include "sm_io_bootstrap.h" */
 
 /* SMIO hash key length in chars */
 #define SMIO_HKEY_LEN                   8
@@ -26,7 +22,6 @@
 
 struct _devio_t {
     /* General information */
-    /*mdp_worker_t *worker;*/           /* zeroMQ Majordomo Worker */
     zctx_t *ctx;                        /* zeroMQ Context */
     void **pipes;                       /* Address nodes using this array of pipes */
     zmq_pollitem_t *poller;            /* Poller structure to multiplex threads messages. New version */
@@ -42,13 +37,13 @@ struct _devio_t {
      * smio client part of the llio operations and the de-facto
      * llio operations */
     const disp_op_t **thsafe_server_ops;
-    /* Hash containg all the sm_io objects that
+    /* Hash containing all the sm_io objects that
      * this dev_io can handle. It is composed
      * of key (10-char ID) / value (sm_io instance) */
     zhash_t *sm_io_h;
-    /* Dispatch table containg all the sm_io thsafe operations
+    /* Dispatch table containing all the sm_io thsafe operations
      * that we need to handle. It is composed
-     * of key (4-char ID) / value (pointer to funtion) */
+     * of key (4-char ID) / value (pointer to function) */
     disp_table_t *disp_table_thsafe_ops;
 };
 
