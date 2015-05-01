@@ -179,8 +179,6 @@ err_llio_name_alloc:
 err_endp_broker_alloc:
     free (self->name);
 err_name_alloc:
-    free (self->poller);
-err_poller_alloc:
     free (self->pipes);
 err_pipes_alloc:
     free (self->log_file);
