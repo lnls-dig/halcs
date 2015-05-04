@@ -14,5 +14,6 @@ setup(
     license='COPYING',
     description='Library for interfacing with the LNLS BPM server',
     long_description=readme,
+    data_files=[('', ['_libbpmclient.so'])],
     install_requires=[]
 )

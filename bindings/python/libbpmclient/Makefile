@@ -84,12 +84,11 @@ $(REVISION_NAME_PYTHON).o: $(REVISION_NAME_PYTHON).c
 	@rm -f $*.d.tmp
 
 install:
-	$(foreach lib,$(TARGET_PYTHON_SO),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach lib,$(TARGET_PYTHON_PY),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
+	python setup.py install
 
 uninstall:
-	$(foreach lib,$(TARGET_PYTHON_SO),ls -l $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach lib,$(TARGET_PYTHON_PY),ls -l $(INSTALL_DIR)/lib $(CMDSEP))
+	python setup.py install --record .python_install_files
+	cat .python_install_files | xargs rm -rf
 
 clean:
 	rm -f $(OBJS_PYTHON_all) $(OBJS_PYTHON_all:.o=.d) $(REVISION_NAME).o
