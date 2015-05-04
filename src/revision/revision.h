@@ -8,10 +8,10 @@
 #ifndef _REVISION_
 #define _REVISION_
 
-extern const char *build_revision;
-extern const char *build_date;
-extern const char *build_user_name;
-extern const char *build_user_email;
+extern const char *const build_revision;
+extern const char *const build_date;
+extern const char *const build_user_name;
+extern const char *const build_user_email;
 
 /* Clone the build revision. Returns the cloned string is successfully or NULL
  * on error */
