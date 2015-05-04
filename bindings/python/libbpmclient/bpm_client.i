@@ -31,7 +31,9 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_END                    /* End of enum marker */
 };
 
+%inline %{
 typedef enum _bpm_client_err_e bpm_client_err_e;
+%}
 
 /* Convert enumeration type to string */
 const char * bpm_client_err_str (bpm_client_err_e err);
@@ -44,7 +46,9 @@ struct _bpm_client_t {
     const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
 };
 
+%inline %{
 typedef struct _bpm_client_t bpm_client_t;
+%}
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -371,7 +375,9 @@ struct _acq_req_t {
     uint32_t chan;                              /* Acquisition channel number */
 };
 
+%inline %{
 typedef struct _acq_req_t acq_req_t;
+%}
 
 /* Acquistion data block */
 struct _acq_block_t {
@@ -382,7 +388,9 @@ struct _acq_block_t {
     uint32_t bytes_read;                        /* Number of bytes effectively read */
 };
 
+%inline %{
 typedef struct _acq_block_t acq_block_t;
+%}
 
 /* Acquistion transaction */
 struct _acq_trans_t {
@@ -390,7 +398,9 @@ struct _acq_trans_t {
     acq_block_t block;                          /* Block or whole curve read */
 };
 
+%inline %{
 typedef struct _acq_trans_t acq_trans_t;
+%}
 
 /* Acquisition channel definitions */
 struct _acq_chan_t {
@@ -398,7 +408,9 @@ struct _acq_chan_t {
     uint32_t sample_size;
 };
 
+%inline %{
 typedef struct _acq_chan_t acq_chan_t;
+%}
 
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];

@@ -2978,6 +2978,9 @@ SWIGINTERNINLINE PyObject*
 }
 
 
+typedef enum _bpm_client_err_e bpm_client_err_e;
+
+
 #include <limits.h>
 #if !defined(SWIG_NO_LLONG_MAX)
 # if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
@@ -3168,6 +3171,9 @@ SWIG_FromCharPtr(const char *cptr)
 }
 
 
+typedef struct _bpm_client_t bpm_client_t;
+
+
 SWIGINTERN int
 SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 {
@@ -3327,6 +3333,18 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
   }  
   return res;
 }
+
+
+typedef struct _acq_req_t acq_req_t;
+
+
+typedef struct _acq_block_t acq_block_t;
+
+
+typedef struct _acq_trans_t acq_trans_t;
+
+
+typedef struct _acq_chan_t acq_chan_t;
 
 
 SWIGINTERN int
