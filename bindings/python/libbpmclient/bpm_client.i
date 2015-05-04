@@ -8,6 +8,7 @@
 %module libbpmclient
 %{
 #include "bpm_client.h"
+#include "bpm_client_revision.h"
 %}
 
 %include "stdint.i"
@@ -15,6 +16,12 @@
 
 %apply unsigned int *OUTPUT { uint32_t *result };
 %apply unsigned int *OUTPUT { uint32_t *gain_dir, uint32_t *gain_inv };
+
+/* Revision */
+extern const char *const build_revision;
+extern const char *const build_date;
+extern const char *const build_user_name;
+extern const char *const build_user_email;
 
 /* Error types */
 enum _bpm_client_err_e

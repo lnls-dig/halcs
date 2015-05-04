@@ -25,7 +25,8 @@ TARGET_PYTHON_PY = $(addsuffix $(LIB_PYTHON_PY_SUFFIX), $(OUT))
 
 # We need to prefix the OBJS_all variable as this refer to LIBBPMCLIENT_DIR
 $(LIBBPMCLIENT)_OBJS_PYTHON = $(addprefix $(LIBBPMCLIENT_DIR)/, $($(LIBBPMCLIENT)_OBJS))
-OBJ_REVISION_PYTHON = $(addprefix $(LIBBPMCLIENT_DIR)/, $(OBJS_REVISION))
+REVISION_NAME_PYTHON = $(addprefix $(LIBBPMCLIENT_DIR)/, $(REVISION_NAME))
+OBJ_REVISION_PYTHON = $(addsuffix .o, $(REVISION_NAME_PYTHON))
 
 OBJS_PYTHON_all = $($(LIBBPMCLIENT)_OBJS_PYTHON) $($(LIBBPMCLIENT)_OBJS_PYTHON_LIB) \
 				  $(OBJ_REVISION_PYTHON)
@@ -45,11 +46,11 @@ _$(LIBBPMCLIENT).so: $($(LIBBPMCLIENT)_OBJS_PYTHON) $(OBJ_REVISION_PYTHON) $($(L
 swig_python:
 	swig3.0 -python $($(LIBBPMCLIENT)_SWIG_INPUT)
 
-#$(REVISION_NAME).o: $(REVISION_NAME).c
-#	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
-#        -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
-#        -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
-#        -c $<
+$(REVISION_NAME_PYTHON).o: $(REVISION_NAME_PYTHON).c
+	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+        -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
+        -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
+        -c $< -o $@
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
