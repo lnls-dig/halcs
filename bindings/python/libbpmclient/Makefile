@@ -84,10 +84,9 @@ $(REVISION_NAME_PYTHON).o: $(REVISION_NAME_PYTHON).c
 	@rm -f $*.d.tmp
 
 install:
-	python setup.py install
+	python setup.py install --record .python_install_files
 
 uninstall:
-	python setup.py install --record .python_install_files
 	cat .python_install_files | xargs rm -rf
 
 clean:
