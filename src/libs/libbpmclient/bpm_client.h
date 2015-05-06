@@ -15,12 +15,12 @@
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
 
-struct _acq_chan_t;
+struct _acq_chan_desc_t;
 
 /* Our structure */
 struct _bpm_client_t {
     mdp_client_t *mdp_client;                   /* Majordomo client instance */
-    const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
+    const struct _acq_chan_desc_t *acq_chan;         /* Acquisition buffer table */
 };
 
 typedef struct _bpm_client_t bpm_client_t;
@@ -371,15 +371,7 @@ struct _acq_trans_t {
 typedef struct _acq_trans_t acq_trans_t;
 
 /* Acquisition channel definitions */
-struct _acq_chan_t {
-    uint32_t chan;
-    uint32_t sample_size;
-};
-
-typedef struct _acq_chan_t acq_chan_t;
-
-/* Acquisition channel definitions */
-extern acq_chan_t acq_chan[END_CHAN_ID];
+extern acq_chan_desc_t acq_chan[END_CHAN_ID];
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
  * through the use of acq_req_t structure.

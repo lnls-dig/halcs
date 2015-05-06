@@ -46,34 +46,161 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
 /* Acquisition channel definitions for user's application */
 #if defined(__BOARD_ML605__)
 /* Global structure merging all of the channel's sample sizes */
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [5] = {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [6] = {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [7] = {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
-                                    };
+acq_chan_desc_t acq_chan[END_CHAN_ID] =  {
+    [0] = {
+        .chan = ADC0_CHAN_ID,
+        .num_words_sample = ADC0_NUM_WORDS_SAMPLE,
+        .word_type = ADC0_WORD_TYPE,
+        .sample_size = ADC0_SAMPLE_SIZE,
+    },
+    [1] = {
+        .chan = TBTAMP0_CHAN_ID,
+        .num_words_sample = TBTAMP0_NUM_WORDS_SAMPLE,
+        .word_type = TBTAMP0_WORD_TYPE,
+        .sample_size = TBTAMP0_SAMPLE_SIZE,
+    },
+    [2] = {
+        .chan = TBTPOS0_CHAN_ID,
+        .num_words_sample = TBTPOS0_NUM_WORDS_SAMPLE,
+        .word_type = TBTPOS0_WORD_TYPE,
+        .sample_size = TBTPOS0_SAMPLE_SIZE,
+    },
+    [3] = {
+        .chan = FOFBAMP0_CHAN_ID,
+        .num_words_sample = FOFBAMP0_NUM_WORDS_SAMPLE,
+        .word_type = FOFBAMP0_WORD_TYPE,
+        .sample_size = FOFBAMP0_SAMPLE_SIZE,
+    },
+    [4] = {
+        .chan = FOFBPOS0_CHAN_ID,
+        .num_words_sample = FOFBPOS0_NUM_WORDS_SAMPLE,
+        .word_type = FOFBPOS0_WORD_TYPE,
+        .sample_size = FOFBPOS0_SAMPLE_SIZE,
+    },
+    [5] = {
+        .chan = MONITAMP0_CHAN_ID,
+        .num_words_sample = MONITAMP0_NUM_WORDS_SAMPLE,
+        .word_type = MONITAMP0_WORD_TYPE,
+        .sample_size = MONITAMP0_SAMPLE_SIZE,
+    },
+    [6] = {
+        .chan = MONITPOS0_CHAN_ID,
+        .num_words_sample = MONITPOS0_NUM_WORDS_SAMPLE,
+        .word_type = MONITPOS0_WORD_TYPE,
+        .sample_size = MONITPOS0_SAMPLE_SIZE,
+    },
+    [7] = {
+        .chan = MONIT1POS0_CHAN_ID,
+        .num_words_sample = MONIT1POS0_NUM_WORDS_SAMPLE,
+        .word_type = MONIT1POS0_WORD_TYPE,
+        .sample_size = MONIT1POS0_SAMPLE_SIZE,
+    }
+};
 #elif defined(__BOARD_AFCV3__)
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1]   =  {.chan = ADCSWAP0_CHAN_ID, .sample_size = ADCSWAP0_SAMPLE_SIZE},
-                                        [2]   =  {.chan = MIXIQ120_CHAN_ID, .sample_size = MIXIQ120_SAMPLE_SIZE},
-                                        [3]   =  {.chan = MIXIQ340_CHAN_ID, .sample_size = MIXIQ340_SAMPLE_SIZE},
-                                        [4]   =  {.chan = TBTDECIMIQ120_CHAN_ID, .sample_size = TBTDECIMIQ120_SAMPLE_SIZE},
-                                        [5]   =  {.chan = TBTDECIMIQ340_CHAN_ID, .sample_size = TBTDECIMIQ340_SAMPLE_SIZE},
-                                        [6]   =  {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [7]   =  {.chan = TBTPHA0_CHAN_ID, .sample_size = TBTPHA0_SAMPLE_SIZE},
-                                        [8]   =  {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [9]   =  {.chan = FOFBDECIMIQ120_CHAN_ID, .sample_size = FOFBDECIMIQ120_SAMPLE_SIZE},
-                                        [10]  =  {.chan = FOFBDECIMIQ340_CHAN_ID, .sample_size = FOFBDECIMIQ340_SAMPLE_SIZE},
-                                        [11]  =  {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [12]  =  {.chan = FOFBPHA0_CHAN_ID, .sample_size = FOFBPHA0_SAMPLE_SIZE},
-                                        [13]  =  {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [14]  =  {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [15]  =  {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [16]  =  {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
-                                    };
+acq_chan_desc_t acq_chan[END_CHAN_ID] =  {
+    [0]  = {
+        .chan = ADC0_CHAN_ID,
+        .num_words_sample = ADC0_NUM_WORDS_SAMPLE,
+        .word_type = ADC0_WORD_TYPE,
+        .sample_size = ADC0_SAMPLE_SIZE,
+    },
+    [1]  = {
+        .chan = ADCSWAP0_CHAN_ID,
+        .num_words_sample = ADCSWAP0_NUM_WORDS_SAMPLE,
+        .word_type = ADCSWAP0_WORD_TYPE,
+        .sample_size = ADCSWAP0_SAMPLE_SIZE,
+    },
+    [2]  = {
+        .chan = MIXIQ120_CHAN_ID,
+        .num_words_sample = MIXIQ120_NUM_WORDS_SAMPLE,
+        .word_type = MIXIQ120_WORD_TYPE,
+        .sample_size = MIXIQ120_SAMPLE_SIZE,
+    },
+    [3]  = {
+        .chan = MIXIQ340_CHAN_ID,
+        .num_words_sample = MIXIQ340_NUM_WORDS_SAMPLE,
+        .word_type = MIXIQ340_WORD_TYPE,
+        .sample_size = MIXIQ340_SAMPLE_SIZE,
+    },
+    [4]  = {
+        .chan = TBTDECIMIQ120_CHAN_ID,
+        .num_words_sample = TBTDECIMIQ120_NUM_WORDS_SAMPLE,
+        .word_type = TBTDECIMIQ120_WORD_TYPE,
+        .sample_size = TBTDECIMIQ120_SAMPLE_SIZE,
+    },
+    [5]  = {
+        .chan = TBTDECIMIQ340_CHAN_ID,
+        .num_words_sample = TBTDECIMIQ340_NUM_WORDS_SAMPLE,
+        .word_type = TBTDECIMIQ340_WORD_TYPE,
+        .sample_size = TBTDECIMIQ340_SAMPLE_SIZE,
+    },
+    [6]  = {
+        .chan = TBTAMP0_CHAN_ID,
+        .num_words_sample = TBTAMP0_NUM_WORDS_SAMPLE,
+        .word_type = TBTAMP0_WORD_TYPE,
+        .sample_size = TBTAMP0_SAMPLE_SIZE,
+    },
+    [7]  = {
+        .chan = TBTPHA0_CHAN_ID,
+        .num_words_sample = TBTPHA0_NUM_WORDS_SAMPLE,
+        .word_type = TBTPHA0_WORD_TYPE,
+        .sample_size = TBTPHA0_SAMPLE_SIZE,
+    },
+    [8]  = {
+        .chan = TBTPOS0_CHAN_ID,
+        .num_words_sample = TBTPOS0_NUM_WORDS_SAMPLE,
+        .word_type = TBTPOS0_WORD_TYPE,
+        .sample_size = TBTPOS0_SAMPLE_SIZE,
+    },
+    [9]  = {
+        .chan = FOFBDECIMIQ120_CHAN_ID,
+        .num_words_sample = FOFBDECIMIQ120_NUM_WORDS_SAMPLE,
+        .word_type = FOFBDECIMIQ120_WORD_TYPE,
+        .sample_size = FOFBDECIMIQ120_SAMPLE_SIZE,
+    },
+    [10] = {
+        .chan = FOFBDECIMIQ340_CHAN_ID,
+        .num_words_sample = FOFBDECIMIQ340_NUM_WORDS_SAMPLE,
+        .word_type = FOFBDECIMIQ340_WORD_TYPE,
+        .sample_size = FOFBDECIMIQ340_SAMPLE_SIZE,
+    },
+    [11] = {
+        .chan = FOFBAMP0_CHAN_ID,
+        .num_words_sample = FOFBAMP0_NUM_WORDS_SAMPLE,
+        .word_type = FOFBAMP0_WORD_TYPE,
+        .sample_size = FOFBAMP0_SAMPLE_SIZE,
+    },
+    [12] = {
+        .chan = FOFBPHA0_CHAN_ID,
+        .num_words_sample = FOFBPHA0_NUM_WORDS_SAMPLE,
+        .word_type = FOFBPHA0_WORD_TYPE,
+        .sample_size = FOFBPHA0_SAMPLE_SIZE,
+    },
+    [13] = {
+        .chan = FOFBPOS0_CHAN_ID,
+        .num_words_sample = FOFBPOS0_NUM_WORDS_SAMPLE,
+        .word_type = FOFBPOS0_WORD_TYPE,
+        .sample_size = FOFBPOS0_SAMPLE_SIZE,
+    },
+    [14] = {
+        .chan = MONITAMP0_CHAN_ID,
+        .num_words_sample = MONITAMP0_NUM_WORDS_SAMPLE,
+        .word_type = MONITAMP0_WORD_TYPE,
+        .sample_size = MONITAMP0_SAMPLE_SIZE,
+    },
+    [15] = {
+        .chan = MONITPOS0_CHAN_ID,
+        .num_words_sample = MONITPOS0_NUM_WORDS_SAMPLE,
+        .word_type = MONITPOS0_WORD_TYPE,
+        .sample_size = MONITPOS0_SAMPLE_SIZE,
+    },
+    [16] = {
+        .chan = MONIT1POS0_CHAN_ID,
+        .num_words_sample = MONIT1POS0_NUM_WORDS_SAMPLE,
+        .word_type = MONIT1POS0_WORD_TYPE,
+        .sample_size = MONIT1POS0_SAMPLE_SIZE,
+    }
+};
 #else
 #error "Unsupported board!"
 #endif
