@@ -1,0 +1,11 @@
+Project Dependencies:
+    liberrhand
+    libhutils
+    libdisptable
+
+Foreign Dependencies:
+    libmdp
+    libczmq
+    libzmq
+    swig
+    numpy==1.8
