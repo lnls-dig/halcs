@@ -551,7 +551,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
             char *endpoint_fe = zhash_lookup (self->hints_h, hints_key);
             /* If key is not found, assume we don't have any more AFE to
              * prepare */
-            if (endpoint_fe == NULL) {
+            if (endpoint_fe == NULL || streq (endpoint_fe, "")) {
                 /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
                         "[dev_mngr_core:scan_devs] Could not find any more endpoint
                         hints for FEs\n"); */
