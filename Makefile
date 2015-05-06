@@ -252,7 +252,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
-	hal_install hal_uninstall hal_clean hal_mrproper \
+	core_install core_uninstall core_clean core_mrproper \
 	tests tests_clean tests_mrproper \
 	examples examples_clean examples_mrproper \
 	cfg cfg_install cfg_uninstall cfg_clean cfg_mrproper
@@ -469,18 +469,18 @@ deps_clean: libmdp_clean libbsmp_clean
 
 deps_mrproper: libmdp_mrproper libbsmp_mrproper
 
-hal_install:
-	$(foreach hal_bin,$(hal_OUT),install -m 755 $(hal_bin) $(INSTALL_DIR)/bin $(CMDSEP))
-	$(foreach hal_script,$(INIT_SCRIPTS),install -m 755 $(hal_script) $(INSTALL_DIR)/etc $(CMDSEP))
+core_install:
+	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(INSTALL_DIR)/bin $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) $(INSTALL_DIR)/etc $(CMDSEP))
 
-hal_uninstall:
-	$(foreach hal_bin,$(ALL_OUT),rm -f $(INSTALL_DIR)/bin/$(hal_bin) $(CMDSEP))
-	$(foreach hal_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(hal_script) $(CMDSEP))
+core_uninstall:
+	$(foreach core_bin,$(ALL_OUT),rm -f $(INSTALL_DIR)/bin/$(core_bin) $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(core_script) $(CMDSEP))
 
-hal_clean:
+core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
-hal_mrproper:
+core_mrproper:
 	rm -f $(ALL_OUT)
 
 tests:
@@ -516,11 +516,11 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: hal_install deps_install liberrhand_install libconvc_install libhutils_install libbpmclient_install cfg_install
+install: core_install deps_install liberrhand_install libconvc_install libhutils_install libbpmclient_install cfg_install
 
-uninstall: hal_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libbpmclient_uninstall cfg_uninstall
 
-clean: hal_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean hal_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 
