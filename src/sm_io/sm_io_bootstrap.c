@@ -194,9 +194,9 @@ static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
     devio_err_e err = SMIO_SUCCESS;
 
     /* Check if the message tis the correct one */
-    ASSERT_TEST (msg_guess_type (args) == MSG_THSAFE_ZMQ, "Invalid message tag",
+    ASSERT_TEST (msg_guess_type (args) == MSG_EXP_ZMQ, "Invalid message tag",
             err_inv_msg, SMIO_ERR_MSG_NOT_SUPP);
-    msg_err_e merr = msg_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
+    msg_err_e merr = msg_check_gen_zmq_args (disp_op, EXP_MSG_ZMQ(args));
     ASSERT_TEST (merr == MSG_SUCCESS, "Unrecognized message. Message arguments "
             "checking failed", err_msg_args_check, SMIO_ERR_MSG_NOT_SUPP);
 
