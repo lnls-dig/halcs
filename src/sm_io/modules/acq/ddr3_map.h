@@ -5,11 +5,11 @@
 #include "board.h"
 
 struct _acq_buf_t {
-  uint32_t id;
-  uint32_t start_addr;
-  uint32_t end_addr;
-  uint32_t max_samples;
-  uint32_t sample_size;
+    uint32_t id;                        /* Channel ID */
+    uint32_t start_addr;                /* Channel start address */
+    uint32_t end_addr;                  /* Channel end address */
+    uint32_t max_samples;               /* Maximum number of channels */
+    acq_chan_desc_t chan_desc;          /* Channel descriptor */
 };
 
 typedef struct _acq_buf_t acq_buf_t;

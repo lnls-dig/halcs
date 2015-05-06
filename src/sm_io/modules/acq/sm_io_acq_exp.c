@@ -101,7 +101,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
     uint32_t num_samples_div_pre =
-        DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+        DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].chan_desc.sample_size;
     uint32_t num_samples_aligned_pre = num_samples + num_samples_div_pre -
         (num_samples % num_samples_div_pre);
     /* Pre trigger samples */
@@ -212,11 +212,11 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr,
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size);
+            SMIO_ACQ_HANDLER(self)->acq_buf[chan].chan_desc.sample_size);
 
     uint32_t block_n_max = ( SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr -
             SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) / BLOCK_SIZE;
+            SMIO_ACQ_HANDLER(self)->acq_buf[chan].chan_desc.sample_size) / BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
@@ -233,7 +233,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "last num_samples = %u\n", num_samples);
 
-    uint32_t n_max_samples = BLOCK_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+    uint32_t n_max_samples = BLOCK_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].chan_desc.sample_size;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
@@ -257,7 +257,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+        reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].chan_desc.sample_size;
     }
     else { /* if block_n < block_n_valid */
         reply_size = BLOCK_SIZE;
