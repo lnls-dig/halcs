@@ -22,6 +22,7 @@
 
 %apply unsigned int *OUTPUT { uint32_t *result };
 %apply unsigned int *OUTPUT { uint32_t *gain_dir, uint32_t *gain_inv };
+%apply double *OUTPUT { double *rffe_out };
 
 /* Revision */
 extern const char *const build_revision;
@@ -721,6 +722,19 @@ bpm_client_err_e bpm_get_gain_d (bpm_client_t *self, char *service,
 
 /********************** RFFE Functions ********************/
 
+/* This must match the RFFE BSMP server */
+#define RFFE_BLOCK_SIZE                         127
+
+typedef struct {
+    uint8_t data[RFFE_BLOCK_SIZE];              /* data buffer */
+} smio_rffe_data_block_t;
+
+#define RFFE_VERSION_SIZE                       8
+
+typedef struct {
+    char data[RFFE_VERSION_SIZE];               /* data buffer */
+} smio_rffe_version_t;
+
 /* Switching functions */
 /* These set of functions write (set) or read (get) the RFFE switching
  * scheme. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
@@ -737,24 +751,24 @@ bpm_client_err_e bpm_get_rffe_sw (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_rffe_att1 (bpm_client_t *self, char *service,
         double rffe_att1);
 bpm_client_err_e bpm_get_rffe_att1 (bpm_client_t *self, char *service,
-        double *rffe_att1);
-bpm_client_err_e bpm_set_rffe_att2 (bpm_client_t *self, char *service,
-        double rffe_att2);
-bpm_client_err_e bpm_get_rffe_att2 (bpm_client_t *self, char *service,
-        double *rffe_att2);
+            double *rffe_out);
+    bpm_client_err_e bpm_set_rffe_att2 (bpm_client_t *self, char *service,
+            double rffe_att2);
+    bpm_client_err_e bpm_get_rffe_att2 (bpm_client_t *self, char *service,
+        double *rffe_out);
 
 /* Temperature functions */
 /* These set of functions read (get) the RFFE temperature
  * values. All of the functions returns BPM_CLIENT_SUCCESS if the parameter
  * was correctly set or error (see bpm_client_err.h for all possible errors)*/
 bpm_client_err_e bpm_get_rffe_temp1 (bpm_client_t *self, char *service,
-        double *rffe_temp1);
+        double *rffe_out);
 bpm_client_err_e bpm_get_rffe_temp2 (bpm_client_t *self, char *service,
-        double *rffe_temp2);
+        double *rffe_out);
 bpm_client_err_e bpm_get_rffe_temp3 (bpm_client_t *self, char *service,
-        double *rffe_temp3);
+        double *rffe_out);
 bpm_client_err_e bpm_get_rffe_temp4 (bpm_client_t *self, char *service,
-        double *rffe_temp4);
+        double *rffe_out);
 
 /* Temperature control set point unctions */
 /* These set of functions write (set) or read (get) the RFFE set point
@@ -763,11 +777,11 @@ bpm_client_err_e bpm_get_rffe_temp4 (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_rffe_set_point1 (bpm_client_t *self, char *service,
         double rffe_set_point1);
 bpm_client_err_e bpm_get_rffe_set_point1 (bpm_client_t *self, char *service,
-        double *rffe_set_point1);
+        double *rffe_out);
 bpm_client_err_e bpm_set_rffe_set_point2 (bpm_client_t *self, char *service,
         double rffe_set_point2);
 bpm_client_err_e bpm_get_rffe_set_point2 (bpm_client_t *self, char *service,
-        double *rffe_set_point2);
+        double *rffe_out);
 
 /* Temperature control enable functions */
 /* These set of functions write (set) or read (get) the RFFE temperatue control
@@ -785,11 +799,11 @@ bpm_client_err_e bpm_get_rffe_temp_control (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_rffe_output1 (bpm_client_t *self, char *service,
         double rffe_output1);
 bpm_client_err_e bpm_get_rffe_output1 (bpm_client_t *self, char *service,
-        double *rffe_output1);
+        double *rffe_out);
 bpm_client_err_e bpm_set_rffe_output2 (bpm_client_t *self, char *service,
         double rffe_output2);
 bpm_client_err_e bpm_get_rffe_output2 (bpm_client_t *self, char *service,
-        double *rffe_output2);
+        double *rffe_out);
 
 /* Reset functions */
 /* These set of functions write (set) or read (get) the RFFE reset state
