@@ -1,4 +1,6 @@
 LIBBPMCLIENT_DIR = ../../../src/libs/libbpmclient
+# FIXME
+NUMPY_DIR = /usr/lib/python2.7/dist-packages/numpy
 
 include $(LIBBPMCLIENT_DIR)/Makefile.inc
 
@@ -9,7 +11,8 @@ INCLUDE_DIRS_ABS = $(filter -I/%, $(INCLUDE_DIRS))
 INCLUDE_DIRS_REL = $(filter-out -I/%, $(INCLUDE_DIRS))
 
 INCLUDE_DIRS_PYTHON = $(addprefix -I$(LIBBPMCLIENT_DIR)/, $(INCLUDE_DIRS_REL:-I%=%))
-INCLUDE_DIRS_PYTHON += $(INCLUDE_DIRS_ABS)
+INCLUDE_DIRS_PYTHON += $(INCLUDE_DIRS_ABS) \
+					   -I$(NUMPY_DIR)/core/include
 
 # Library objects
 $(LIBBPMCLIENT)_OBJS_PYTHON_LIB = bpm_client_wrap.o
@@ -44,7 +47,8 @@ _$(LIBBPMCLIENT).so: $($(LIBBPMCLIENT)_OBJS_PYTHON) $(OBJ_REVISION_PYTHON) $($(L
 	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS) $(LIBS)
 
 swig_python:
-	swig3.0 -python $($(LIBBPMCLIENT)_SWIG_INPUT)
+#	swig -python -debug-tmsearch -debug-tmused $($(LIBBPMCLIENT)_SWIG_INPUT)
+	swig -python $($(LIBBPMCLIENT)_SWIG_INPUT)
 
 $(REVISION_NAME_PYTHON).o: $(REVISION_NAME_PYTHON).c
 	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
