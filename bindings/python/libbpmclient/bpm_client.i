@@ -7,12 +7,18 @@
 
 %module libbpmclient
 %{
+#define SWIG_FILE_WITH_INIT
 #include "bpm_client.h"
 #include "bpm_client_revision.h"
 %}
 
 %include "stdint.i"
 %include "typemaps.i"
+%include "numpy.i"
+
+%init %{
+    import_array();
+%}
 
 %apply unsigned int *OUTPUT { uint32_t *result };
 %apply unsigned int *OUTPUT { uint32_t *gain_dir, uint32_t *gain_inv };
@@ -24,8 +30,7 @@ extern const char *const build_user_name;
 extern const char *const build_user_email;
 
 /* Error types */
-enum _bpm_client_err_e
-{
+typedef enum {
     BPM_CLIENT_SUCCESS = 0,               /* No error */
     BPM_CLIENT_ERR_ALLOC,                 /* Could not allocate memory */
     BPM_CLIENT_ERR_SERVER,                /* Server could not complete request */
@@ -36,26 +41,18 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_INV_PARAM,             /* Invalid function parameters */
     BPM_CLIENT_ERR_INV_FUNCTION,          /* Invalid function */
     BPM_CLIENT_ERR_END                    /* End of enum marker */
-};
-
-%inline %{
-typedef enum _bpm_client_err_e bpm_client_err_e;
-%}
+} bpm_client_err_e;
 
 /* Convert enumeration type to string */
 const char * bpm_client_err_str (bpm_client_err_e err);
 
-struct _acq_chan_t;
+struct _acq_chan_desc_t;
 
 /* Our structure */
-struct _bpm_client_t {
+typedef struct {
     mdp_client_t *mdp_client;                   /* Majordomo client instance */
-    const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
-};
-
-%inline %{
-typedef struct _bpm_client_t bpm_client_t;
-%}
+    const struct _acq_chan_desc_t *acq_chan;    /* Acquisition channel descriptor */
+} bpm_client_t;
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -376,51 +373,124 @@ bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
 
 /********************** ACQ SMIO Functions ********************/
 
+%include "carrays.i"
+%array_class(int16_t, int16Array);
+%array_class(uint16_t, uint16Array);
+%array_class(int32_t, int32Array);
+%array_class(uint32_t, uint32Array);
+
 /* Acquistion request */
-struct _acq_req_t {
+typedef struct {
     uint32_t num_samples;                       /* Number of samples */
     uint32_t chan;                              /* Acquisition channel number */
-};
-
-%inline %{
-typedef struct _acq_req_t acq_req_t;
-%}
+} acq_req_t;
 
 /* Acquistion data block */
-struct _acq_block_t {
+typedef struct {
     uint32_t idx;                               /* Block index */
-
     uint32_t *data;                             /* Block or complete curve read */
     uint32_t data_size;                         /* data_out buffer size */
     uint32_t bytes_read;                        /* Number of bytes effectively read */
-};
-
-%inline %{
-typedef struct _acq_block_t acq_block_t;
-%}
+} acq_block_t;
 
 /* Acquistion transaction */
-struct _acq_trans_t {
+typedef struct {
     acq_req_t req;                              /* Request */
     acq_block_t block;                          /* Block or whole curve read */
-};
+} acq_trans_t;
 
-%inline %{
-typedef struct _acq_trans_t acq_trans_t;
-%}
+/* Acquisition word type */
+typedef enum {
+    ACQ_WORD_TYPE_ERROR = 0xFF,
+    ACQ_WORD_TYPE_NONE  = 0,           /* used as terminator */
+    ACQ_WORD_TYPE_INT16 = 1,
+    ACQ_WORD_TYPE_UINT16,
+    ACQ_WORD_TYPE_INT32,
+    ACQ_WORD_TYPE_UINT32,
+    ACQ_WORD_TYPE_INT64,
+    ACQ_WORD_TYPE_UINT64,
+    ACQ_WORD_TYPE_FLOAT,
+    ACQ_WORD_TYPE_DOUBLE,
+} acq_word_type_e;
 
 /* Acquisition channel definitions */
-struct _acq_chan_t {
-    uint32_t chan;
-    uint32_t sample_size;
-};
-
-%inline %{
-typedef struct _acq_chan_t acq_chan_t;
-%}
+typedef struct {
+    uint32_t chan;                      /* Channel number */
+    uint32_t num_words_sample;          /* Number of words per sample */
+    acq_word_type_e word_type;          /* Word type */
+    uint32_t sample_size;               /* Total sample size */
+} acq_chan_desc_t;
 
 /* Acquisition channel definitions */
-extern acq_chan_t acq_chan[END_CHAN_ID];
+extern acq_chan_desc_t acq_chan[END_CHAN_ID];
+
+%typemap (in) acq_trans_t *acq_trans {
+    int res = SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, SWIG_POINTER_DISOWN | 0 );
+    if (!SWIG_IsOK(res)) {
+        SWIG_exception_fail(SWIG_ArgError(res), "argument " " of type '" "acq_trans_t *""'");
+    }
+
+    if ($1 == 0) {
+        PyErr_SetString(PyExc_TypeError,"NULL Pointer not allowed");
+        return NULL;
+    }
+
+    if ($1->req.chan >= END_CHAN_ID) {
+        PyErr_SetString(PyExc_TypeError,"Requested channel is out of range");
+        return NULL;
+    }
+
+    int bytes = $1->req.num_samples * acq_chan[$1->req.chan].sample_size;
+    $1->block.data = (uint32_t *) malloc(bytes);
+
+    if ($1->block.data == NULL) {
+        PyErr_SetString(PyExc_TypeError,"Could not alloc data buffer");
+        return NULL;
+    }
+
+    $1->block.data_size = bytes;
+}
+
+/*%typemap(freearg) acq_trans_t *acq_trans {
+    free($1->block.data);
+}*/
+
+%typemap (out) acq_trans_t * {
+    npy_intp dims[1] = { ($1->block.bytes_read / acq_chan[$1->req.chan].sample_size) *
+        acq_chan[$1->req.chan].num_words_sample};
+    PyObject * array = NULL;
+    switch (acq_chan[$1->req.chan].word_type) {
+        case ACQ_WORD_TYPE_INT16:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_INT16, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_UINT16:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_UINT16, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_INT32:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_INT32, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_UINT32:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_UINT32, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_INT64:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_INT64, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_UINT64:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_UINT64, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_FLOAT:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, (void*)($1->block.data));
+            break;
+        case ACQ_WORD_TYPE_DOUBLE:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT64, (void*)($1->block.data));
+            break;
+        default:
+            array = PyArray_SimpleNewFromData(1, dims, NPY_INT16, (void*)($1->block.data));
+    }
+
+    if (!array) SWIG_fail;
+    $result = SWIG_Python_AppendOutput($result,array);
+}
 
 /* Start acquisition on a specific channel with an spoecif number of samples,
  * through the use of acq_req_t structure.
