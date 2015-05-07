@@ -5,7 +5,7 @@ readme = open('README.txt').read()
 
 setup(
     name='libbpmclient',
-    version=libbpmclient.build_revision,
+    version='0.1',
     author='LNLS',
     author_email='lucas.russo@lnls.br',
     packages=find_packages(),
