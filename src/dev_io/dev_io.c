@@ -282,6 +282,10 @@ int main (int argc, char *argv[])
     free (*str_p);
     broker_endp = NULL;
 
+    /* Print SDB devices */
+    devio_print_info (devio);
+
+    /* Spawn platform SMIOSs */
     devio_err_e err = _spawn_platform_smios (devio, devio_type, fe_smio_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] _spawn_platform_smios error!\n");

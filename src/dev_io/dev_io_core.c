@@ -19,6 +19,8 @@
 #include "ll_io_utils.h"
 #include "hutils.h"
 #include "disp_table.h"
+#include "libsdbfs.h"
+#include "hw/pcie_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -241,12 +243,58 @@ devio_err_e devio_destroy (devio_t **self_p)
     return DEVIO_SUCCESS;
 }
 
+
+static int __devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
+        int count)
+{
+    return llio_read_block (((devio_t *)fs->drvdata)->llio, BAR4_ADDR | (offset), count, 
+            (uint32_t *) buf);
+}
+
+#define SDB_ADDRESS             0x00300000UL
+
 /* Read specific information about the device. Typically,
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self)
 {
-    (void) self;
-    return DEVIO_ERR_FUNC_NOT_IMPL;
+    devio_err_e err = DEVIO_SUCCESS;
+    /* The sdb filesystem itself */
+    struct sdbfs bpm_fpga_sdb = {
+        .name = "fpga-area",
+        .drvdata = (void *) self,
+        .blocksize = 1, /* Not currently used */
+        .entrypoint = SDB_ADDRESS,
+        .data = 0,
+        .flags = 0,
+        .read = __devio_read_llio_block
+    };
+    struct sdb_device *d;
+    int new = 1;
+
+    int serr = sdbfs_dev_create(&bpm_fpga_sdb);
+    ASSERT_TEST (serr == 0, "Could not create SDBFS",
+            err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP /* FIXME: temporary*/);
+
+    while ( (d = sdbfs_scan(&bpm_fpga_sdb, new)) != NULL) {
+        /*
+         * "%.19s" is not working for XINT printf, and zeroing
+         * d->sdb_component.product.record_type won't work, as
+         * the device is read straight from fpga ROM registers
+         */
+        const int namesize = sizeof(d->sdb_component.product.name);
+        char name[namesize + 1];
+
+        memcpy(name, d->sdb_component.product.name, sizeof(name));
+        name[namesize] = '\0';
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "dev  0x%08lx @ %06lx, %s\n",
+                (long)(d->sdb_component.product.device_id),
+                bpm_fpga_sdb.f_offset, name);
+        new = 0;
+    }
+
+    sdbfs_dev_destroy(&bpm_fpga_sdb);
+err_sdbfs_create:
+    return err;
 }
 
 /* Register an specific sm_io modules to this device */
