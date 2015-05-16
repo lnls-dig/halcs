@@ -47,8 +47,6 @@
 #define DEVIO_POLLER_TIMEOUT                100        /* in msec */
 #define DEVIO_DFLT_LOG_MODE                 "w"
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 
 /* DEVIO dispatch table operations */
@@ -244,13 +242,12 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     uint32_t pipe_idx = 0;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-            "[dev_io_core:register_sm] smio_mod_dispatch table size = %ld\n",
-            ARRAY_SIZE(smio_mod_dispatch));
+            "[dev_io_core:register_sm] searching for SMIO ID match\n");
 
     /* For now, just do a simple linear search. We can afford this, as
      * we don't expect to insert new sm_io modules often */
     unsigned int i;
-    for (i = 0; i < ARRAY_SIZE(smio_mod_dispatch); ++i) {
+    for (i = 0; smio_mod_dispatch[i].id != SMIO_DISPATCH_END_ID; ++i) {
         if (smio_mod_dispatch[i].id != smio_id) {
             continue;
         }
