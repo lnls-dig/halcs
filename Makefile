@@ -244,6 +244,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 .PHONY: all install uninstall clean mrproper \
 	pcie_driver pcie_driver_install pcie_driver_uninstall pcie_driver_clean pcie_driver_check \
+	lib_pcie_driver lib_pcie_driver_install lib_pcie_driver_uninstall lib_pcie_driver_clean lib_pcie_driver_mrproper \
 	liberrhand liberrhand_install liberrhand_uninstall liberrhand_clean liberrhand_mrproper \
 	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
@@ -321,6 +322,20 @@ pcie_driver_uninstall:
 
 pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
+
+lib_pcie_driver:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver
+
+lib_pcie_driver_install:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_install
+
+lib_pcie_driver_uninstall:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_uninstall
+
+lib_pcie_driver_clean:
+	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_clean
+
+lib_pcie_driver_mrproper: lib_pcie_driver_clean
 
 libmdp_pre:
 ifeq ($(wildcard $(LIBMDP_DIR)/Makefile),)
@@ -459,15 +474,15 @@ libsdbfs_mrproper:
 
 # External project dependencies
 
-deps: libmdp libbsmp
+deps: libmdp libbsmp lib_pcie_driver
 
-deps_install: libmdp_install libbsmp_install
+deps_install: libmdp_install libbsmp_install lib_pcie_driver_install
 
-deps_uninstall: libmdp_uninstall libbsmp_uninstall
+deps_uninstall: libmdp_uninstall libbsmp_uninstall lib_pcie_driver_uninstall
 
-deps_clean: libmdp_clean libbsmp_clean
+deps_clean: libmdp_clean libbsmp_clean lib_pcie_driver_clean
 
-deps_mrproper: libmdp_mrproper libbsmp_mrproper
+deps_mrproper: libmdp_mrproper libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(INSTALL_DIR)/bin $(CMDSEP))
