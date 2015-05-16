@@ -10,10 +10,7 @@
 
 #include <inttypes.h>
 
-/* #include "sm_io_bootstrap.h" */
-
-/* Number of known specific modules that we can handle */
-#define MOD_DISPATCH_END 6
+#define SMIO_DISPATCH_END_ID       0xdeaddead
 
 struct _smio_bootstrap_ops_t;
 
@@ -26,6 +23,6 @@ struct _smio_mod_dispatch_t {
 typedef struct _smio_mod_dispatch_t smio_mod_dispatch_t;
 
 extern const smio_mod_dispatch_t
-    smio_mod_dispatch[MOD_DISPATCH_END];
+    smio_mod_dispatch [];
 
 #endif
