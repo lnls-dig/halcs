@@ -156,10 +156,15 @@ int eth_open (llio_t *self, llio_endpoint_t *endpoint)
 
     /* Extract the socket type, host address and port number from the endpoint
      * name */
-    int hits = zrex_hits (endp_regex, endpoint_name);
-    ASSERT_TEST(hits == LLIO_ETH_REGEX_HITS,
+    bool endp_matches = zrex_matches (endp_regex, endpoint_name);
+    ASSERT_TEST(endp_matches == true,
             "Could not match endpoint string to the expected pattern",
             err_endp_match, -1);
+
+    int hits = zrex_hits (endp_regex);
+    ASSERT_TEST(hits == LLIO_ETH_REGEX_HITS,
+            "Number of LLIO endpoint hits was unexpected",
+            err_endp_hits, -1);
 
     const char *endp_sock_type = zrex_hit (endp_regex, LLIO_ETH_REGEX_SOCK_TYPE_HIT);
     ASSERT_TEST(endp_sock_type != NULL, "Could not retrieve socket type string",
@@ -204,6 +209,7 @@ err_dev_handler_alloc:
 err_endp_port_retrieve:
 err_endp_addr_retrieve:
 err_endp_sock_type_retrieve:
+err_endp_hits:
 err_endp_match:
 err_inv_regex_exp:
     zrex_destroy (&endp_regex);
