@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
 
