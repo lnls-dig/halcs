@@ -9,6 +9,9 @@ env:
 - BOARD=ml605
 - BOARD=afcv3
 
+before_install:
+- git submodule update --init --recursive
+
 #   Build-check-install all subprojects
 before_script:
 - sudo apt-get install uuid-dev
