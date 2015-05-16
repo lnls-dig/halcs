@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
+
 # Beam Position Monitor Software
 
 Software for controlling the AFC BPM boards
