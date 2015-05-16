@@ -176,8 +176,6 @@ int main (int argc, char *argv[])
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_entry, llio_type,
             broker_endp, verbose, log_file_name);
-    /* devio_t *devio = devio_new ("BPM0:DEVIO", *str_p, llio_type,
-            "tcp://localhost:5555", verbose); */
 
     if (devio == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_new error!\n");
@@ -269,13 +267,17 @@ err_register_sm:
 
 static devio_err_e _spawn_be_platform_smios (devio_t *devio)
 {
-    uint32_t afc_diag_id = 0x51954750;
     devio_err_e err = DEVIO_SUCCESS;
 
-/* ML605 or AFCv3 */
-#if defined (__BOARD_ML605__) || defined (__BOARD_AFCV3__)
+    /* ML605 specific */
+#if defined (__BOARD_ML605__)
+    (void) devio;
+    goto err_register_sm;
+
     /* AFCv3 spefific */
-#if defined (__BOARD_AFCV3__)
+#elif defined (__BOARD_AFCV3__)
+    uint32_t afc_diag_id = 0x51954750;
+
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning AFCv3 specific SMIOs ...\n");
 
     err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
@@ -283,7 +285,7 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
         goto err_register_sm;
     }
-#endif
+
 #else
 #error "BE FPGA Board not supported!"
 #endif
