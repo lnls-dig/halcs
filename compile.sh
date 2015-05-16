@@ -1,9 +1,24 @@
 #!/bin/bash
 
+VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
+
+#######################################
 # All of our Makefile options
+#######################################
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD=afcv3
+BOARD=$1
+
+if [ -z "$BOARD" ]; then
+    echo "\"BOARD\" variable unset. "$VALID_BOARDS_STR
+    exit 1
+fi
+
+if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
+    echo "Unsupported board. "$VALID_BOARDS_STR
+    exit 1
+fi
+
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG=n
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
