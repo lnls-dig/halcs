@@ -388,22 +388,23 @@ err_ret_groups:
 /* BSMP function I/O */
 static int _smpr_proto_bsmp_send (uint8_t *data, uint32_t *count)
 {
+    int err = 0;
+
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Sending %u bytes\n", *count);
     ssize_t ret = smio_thsafe_client_write_block (bsmp_glue.parent, 0, *count,
             (uint32_t *) data);
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Sent %u bytes\n", *count);
 
-    /* Update count with the number of bytes received */
-    int err;
-    if (ret >= 0) {
-        *count = ret;
-        err = 0;
-    }
-    else {
+    if (ret < 0) {
         *count = 0;
         err = -1;
+        goto err_packet_send;
     }
 
+    /* Update count with the number of bytes received */
+    *count = ret;
+
+err_packet_send:
     return err;
 }
 
@@ -418,14 +419,13 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
             (uint32_t *) data);
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %ld bytes\n", ret);
 
-    if (ret >= 0) {
-        *count = ret;
-        err = 0;
-    }
-    else { /* error */
+    if (ret < 0) {
         *count = 0;
-        return -1;
+        err = -1;
+        goto err_packet_header;
     }
+
+    *count = ret;
 
     /* Now, we parse the protocol header and determine how many bytes
      * we have left to read. Very protocol dependent. See BSMP documentation.
@@ -441,15 +441,16 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %ld "
             "bytes\n", ret);
 
-    if (ret >= 0) {
-        *count += ret;
-        err = 0;
-    }
-    else { /* error */
+    if (ret < 0) {
         *count = 0;
-        return -1;
+        err = -1;
+        goto err_packet_payload;
     }
 
+    *count += ret;
+
+err_packet_payload:
+err_packet_header:
     return err;
 }
 
