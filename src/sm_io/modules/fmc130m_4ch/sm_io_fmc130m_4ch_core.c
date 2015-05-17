@@ -154,8 +154,8 @@ err_smch_24aa64_alloc:
         smch_pca9547_destroy (&self->smch_pca9547);
     }
 err_smch_pca9547_alloc:
-    free (self);
 err_num_fmc130m_4ch_smios:
+    free (self);
 err_self_alloc:
     return NULL;
 }
