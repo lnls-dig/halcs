@@ -265,6 +265,7 @@ char *hutils_clone_str (const char *str)
 
 err_trunc_str:
 err_copy_str:
+    free (new_str);
 err_str_alloc:
     return NULL;
 }
