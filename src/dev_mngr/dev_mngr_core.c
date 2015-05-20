@@ -97,6 +97,10 @@
                                     DEVIO_LOG_INST_TYPE "." \
                                     DEVIO_LOG_SUFFIX
 
+#define DEVIO_MLM_PREFIX_CFG_DIR    "/usr/local"
+#define DEVIO_MLM_CFG_DIR           "/etc/malamute"
+#define DEVIO_MLM_CFG_FILENAME      "malamute.cfg"
+
 /* Configuration variables. To be filled by dev_mngr */
 const char *dmngr_log_filename = NULL;
 char *dmngr_log_dir = NULL;
@@ -345,7 +349,9 @@ dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawning Broker ...\n");
 
     /* Specify if broker is to be run in verbose mode or not */
-    char *argv_exec[] = {"malamute", NULL};
+    char *argv_exec[] = {"malamute", "-f", DEVIO_MLM_PREFIX_CFG_DIR"/"
+        DEVIO_MLM_CFG_DIR"/"DEVIO_MLM_CFG_FILENAME, NULL};
+
     int spawn_err = _dmngr_spawn_chld (self, "malamute", argv_exec);
 
     /* Just fail miserably, for now */
