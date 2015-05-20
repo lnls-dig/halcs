@@ -184,7 +184,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS) $(LIBS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
