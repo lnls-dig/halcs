@@ -46,7 +46,6 @@ INIT_SCRIPTS = init.sh shutdown.sh
 FOREIGN_DIR = foreign
 
 # Our submodules and third-party codes
-LIBMDP_DIR = $(FOREIGN_DIR)/libmdp/libmdp
 LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
 PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 
@@ -251,7 +250,6 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
-	libmdp libmdp_install libmdp_uninstall libmdp_clean libmdp_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	core_install core_uninstall core_clean core_mrproper \
 	tests tests_clean tests_mrproper \
@@ -336,34 +334,6 @@ lib_pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_clean
 
 lib_pcie_driver_mrproper: lib_pcie_driver_clean
-
-libmdp_pre:
-ifeq ($(wildcard $(LIBMDP_DIR)/Makefile),)
-	@echo "LIBMDP is not configured. Configuring ..."
-	@cd $(LIBMDP_DIR) && \
-	    ./autogen.sh && \
-	    ./configure
-endif
-
-libmdp: libmdp_pre
-	$(MAKE) -C $(LIBMDP_DIR)
-
-libmdp_install: libmdp_pre
-	$(MAKE) -C $(LIBMDP_DIR) install
-	ldconfig
-
-libmdp_uninstall: libmdp_pre
-	$(MAKE) -C $(LIBMDP_DIR) uninstall
-
-libmdp_clean:
-ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
-	$(MAKE) -C $(LIBMDP_DIR) clean
-endif
-
-libmdp_mrproper:
-ifneq ($(wildcard $(LIBMDP_DIR)/Makefile),)
-	$(MAKE) -C $(LIBMDP_DIR) distclean
-endif
 
 libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
@@ -474,15 +444,15 @@ libsdbfs_mrproper:
 
 # External project dependencies
 
-deps: libmdp libbsmp lib_pcie_driver
+deps: libbsmp lib_pcie_driver
 
-deps_install: libmdp_install libbsmp_install lib_pcie_driver_install
+deps_install: libbsmp_install lib_pcie_driver_install
 
-deps_uninstall: libmdp_uninstall libbsmp_uninstall lib_pcie_driver_uninstall
+deps_uninstall: libbsmp_uninstall lib_pcie_driver_uninstall
 
-deps_clean: libmdp_clean libbsmp_clean lib_pcie_driver_clean
+deps_clean: libbsmp_clean lib_pcie_driver_clean
 
-deps_mrproper: libmdp_mrproper libbsmp_mrproper lib_pcie_driver_mrproper
+deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(PREFIX)/bin $(CMDSEP))
