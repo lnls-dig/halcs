@@ -202,7 +202,7 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    while (!zctx_interrupted) {
+    while (!zsys_interrupted) {
         /* Step 1: Loop though all the SDB records and intialize (boot) the
          * smio modules*/
         /* Step 2: Optionally, register the necessary smio modules specifying

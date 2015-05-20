@@ -255,7 +255,7 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Monitoring devices ...\n");
 
     /* Do until a C^c is pressed (daemon mode unset) or SIGTERM signal arrives */
-    while (!zctx_interrupted) {
+    while (!zsys_interrupted) {
 
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] ., PID: %d\n", getpid()); */
 

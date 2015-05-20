@@ -951,9 +951,9 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time (NULL);
     while ((time(NULL) - start)*1000 < timeout) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         err = _bpm_check_data_acquire (self, service);
@@ -971,7 +971,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 exit:
     return err;
 }
@@ -1103,9 +1103,9 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
     uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size fopr later */
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1137,7 +1137,7 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         "Data curve of %u bytes was successfully acquired\n", total_bread);
 
 err_bpm_get_data_block:
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_wait_data_acquire:
 err_bpm_data_acquire:
     return err;
@@ -1255,9 +1255,9 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
 
     /* Fill all blocks */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1289,7 +1289,7 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "Data curve of %u bytes was successfully acquired\n", total_bread);
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_get_data_block:
     return err;
 }
@@ -1330,9 +1330,9 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_tr
 
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1364,7 +1364,7 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_tr
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "Data curve of %u bytes was successfully acquired\n", total_bread);
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_get_data_block:
 err_check_data_acquire:
     return err;
@@ -1949,9 +1949,9 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *ser
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time(NULL);
     while (time(NULL) - start < timeout) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
         const disp_op_t* func = bpm_func_translate(name);
         err = bpm_func_exec(self, func, service, input, output);
@@ -1965,7 +1965,7 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *ser
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 exit:
     return err;
 }
