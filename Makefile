@@ -31,11 +31,10 @@ AFE_RFFE_TYPE ?= 2
 # synthesized.
 WITH_DEVIO_CFG ?= y
 # Selects the install location of the config file
-CFG_DIR ?= /etc/bpm_sw
-export CFG_DIR
-
 PREFIX ?= /usr/local
 export PREFIX
+CFG_DIR ?= ${PREFIX}/etc/bpm_sw
+export CFG_DIR
 
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
