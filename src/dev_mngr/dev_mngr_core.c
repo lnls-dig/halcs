@@ -327,6 +327,8 @@ bool dmngr_is_broker_running (dmngr_t *self)
 
 dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
 {
+    (void) broker_endp;
+
     assert (self);
     assert (broker_endp);
 
@@ -343,9 +345,8 @@ dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawning Broker ...\n");
 
     /* Specify if broker is to be run in verbose mode or not */
-    char *argv_exec[] = {"mdp_broker", broker_endp, NULL};
-    /* char *argv_exec[] = {"mdp_broker", "-v", NULL}; */
-    int spawn_err = _dmngr_spawn_chld (self, "mdp_broker", argv_exec);
+    char *argv_exec[] = {"malamute", NULL};
+    int spawn_err = _dmngr_spawn_chld (self, "malamute", argv_exec);
 
     /* Just fail miserably, for now */
     ASSERT_TEST(spawn_err >= 0, "Could not spawn broker",

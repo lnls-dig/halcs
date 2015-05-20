@@ -62,8 +62,7 @@ void smio_startup (zsock_t *pipe, void *args)
 {
     /* FIXME: priv pointer is unused for now! We should use it to differentiate
      * between multiple smio instances of the same type controlling multiple
-     * modules of the same type. Otherwise, we would ended up with two workers
-     * for the same thing (see Majordomo protocol) */
+     * modules of the same type */
     th_boot_args_t *th_args = (th_boot_args_t *) args;
     /* Signal parent we are initializing */
     zsock_signal (pipe, 0);
@@ -241,13 +240,17 @@ static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
             args->broker, service, args->verbose);
-    /* self->worker = mdp_worker_new (self->ctx, args->broker, service, args->verbose); */
-    self->worker = NULL;
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
+    self->worker = mlm_client_new ();
     ASSERT_ALLOC(self->worker, err_worker_alloc);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
+
+    int rc = mlm_client_connect (self->worker, args->broker, 1000, service);
+    ASSERT_TEST(rc >= 0, "Could not connect MLM to broker", err_mlm_connect);
 
     return self;
 
+err_mlm_connect:
+    mlm_client_destroy (&self->worker);
 err_worker_alloc:
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
@@ -265,7 +268,7 @@ static smio_err_e _smio_destroy (struct _smio_t **self_p)
     if (*self_p) {
         struct _smio_t *self = *self_p;
 
-        mdp_worker_destroy (&self->worker);
+        mlm_client_destroy (&self->worker);
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
@@ -288,7 +291,7 @@ static smio_err_e _smio_loop (smio_t *self)
 
     smio_err_e err = SMIO_SUCCESS;
     bool terminated = false;
-    /* Begin infinite polling on Majordomo/PIPE socket
+    /* Begin infinite polling on Malamute/PIPE socket
      * and exit if the parent send a message through
      * the pipe socket */
     while (!terminated) {
@@ -299,31 +302,14 @@ static smio_err_e _smio_loop (smio_t *self)
                 .fd = 0,
                 .events = ZMQ_POLLIN,
                 .revents = 0
+            },
+            [SMIO_MLM_SOCK] = {
+                .socket = self->worker,
+                .fd = 0,
+                .events = ZMQ_POLLIN,
+                .revents = 0
             }
         };
-
-        /* Check for activity on WORKER socket */
-        zframe_t *reply_to = NULL;
-        zmsg_t *request = mdp_worker_recv (self->worker, &reply_to, true);
-
-        if (request != NULL) {
-            exp_msg_zmq_t smio_args = {
-                .tag = EXP_MSG_ZMQ_TAG,
-                .msg = &request,
-                .reply_to = reply_to};
-            err = smio_do_op (self, &smio_args);
-
-            /* What can I do in case of error ?*/
-            if (err != SMIO_SUCCESS) {
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                        "[sm_io_bootstrap] smio_do_op: %s\n",
-                        smio_err_str (err));
-            }
-
-            /* Cleanup */
-            zframe_destroy (&reply_to);
-            zmsg_destroy (&request);
-        }
 
         /* Wait up to 100 ms */
         int rc = zmq_poll (items, SMIO_SOCKS_NUM, SMIO_POLLER_TIMEOUT);
@@ -336,6 +322,7 @@ static smio_err_e _smio_loop (smio_t *self)
             zmsg_t *request = zmsg_recv (self->pipe);
 
             if (request == NULL) {
+                err = SMIO_ERR_INTERRUPTED_POLLER;
                 break;                          /* Worker has been interrupted */
             }
 
@@ -358,6 +345,35 @@ static smio_err_e _smio_loop (smio_t *self)
             free (command);
             zmsg_destroy (&request);
         }
+
+        /* Check for activity on PIPE socket */
+        if (items [SMIO_MLM_SOCK].revents & ZMQ_POLLIN) {
+            /* Check for activity on WORKER socket */
+            zmsg_t *request = mlm_client_recv (self->worker);
+
+            if (request == NULL) {
+                err = SMIO_ERR_INTERRUPTED_POLLER;
+                break;                          /* Worker has been interrupted */
+            }
+
+            exp_msg_zmq_t smio_args = {
+                .tag = EXP_MSG_ZMQ_TAG,
+                .msg = &request,
+                .reply_to = NULL /* Unused field in MLM protocol */
+            };
+            err = smio_do_op (self, &smio_args);
+
+            /* What can I do in case of error ?*/
+            if (err != SMIO_SUCCESS) {
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                        "[sm_io_bootstrap] smio_do_op: %s\n",
+                        smio_err_str (err));
+            }
+
+            /* Cleanup */
+            zmsg_destroy (&request);
+        }
+
     }
 
 err_loop_interrupted:

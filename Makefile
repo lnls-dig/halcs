@@ -144,7 +144,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lm -lzmq -lczmq -lmdp -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmlm -lpcidriver
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time

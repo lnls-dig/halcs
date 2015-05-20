@@ -48,6 +48,7 @@
 #define DEVIO_DFLT_LOG_MODE                 "w"
 
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
+#define DEVIO_LINGER_TIME                   100         /* in ms */
 
 /* DEVIO dispatch table operations */
 const disp_table_ops_t devio_disp_table_ops;
@@ -101,11 +102,7 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     /* Setup new poller. It uses the low-level zmq_poll API */
     self->poller = NULL;
 
-    /* Initilize mdp_worrker last, as we need to have everything ready
-     * when we attemp to register in broker. Actually, we still need
-     * to parse the SDB strucutres and register the operations in the
-     * hash tables... * TODO (FIXME?): Find a better initialitazion routine before registering
-     * to the broker the request from clients */
+    /* Setup strings/options */
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
     self->endpoint_broker = strdup (endpoint_broker);
@@ -146,15 +143,11 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     ASSERT_TEST(hutils_err==HUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
-    /* Finally, initialize mdp_worker with service being the BPM<board_number> */
-    /* self->worker = mdp_worker_new (endpoint_broker, name, verbose);
-    ASSERT_ALLOC(self->worker, err_worker_alloc); */
-
-    /* Adjust linger time for Majordomo protocol (MDP) */
+    /* Adjust linger time for our sockets */
     /* A non-zero linger value is required for DISCONNECT to be sent
-     * when the worker is destroyed.  100 is arbitrary but chosen to be
+     * when the worker is destroyed. 100 is arbitrary but chosen to be
      * sufficient for common cases without significant delay in broken ones. */
-    zsys_set_linger (100);
+    zsys_set_linger (DEVIO_LINGER_TIME);
 
     return self;
 

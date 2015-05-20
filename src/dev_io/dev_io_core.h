@@ -9,7 +9,7 @@
 #define _DEV_IO_CORE_H_
 
 #include "czmq.h"
-#include "mdp.h"
+#include <malamute.h>
 
 #include "hutils.h"
 #include "disp_table.h"

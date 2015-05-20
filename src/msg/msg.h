@@ -42,8 +42,8 @@ msg_err_e msg_validate (void *msg, msg_type_e expected_msg_type);
  * message checking */
 msg_err_e msg_check_gen_zmq_args (const disp_op_t *disp_op, zmsg_t *zmq_msg);
 
-/* Handle MDP protocol (used by SMIOs, for instance) request */
-msg_err_e msg_handle_mdp_request (void *owner, void *args,
+/* Handle MLM protocol (used by SMIOs, for instance) request */
+msg_err_e msg_handle_mlm_request (void *owner, void *args,
         disp_table_t *disp_table);
 /* Handle regular protocol (used by DEVIOs, for instance) request */
 msg_err_e msg_handle_sock_request (void *owner, void *args,

@@ -147,7 +147,7 @@ static smio_err_e _smio_do_op (void *owner, void *msg)
             err_do_op);
 
     disp_table_t *disp_table = self->exp_ops_dtable;
-    msg_err_e merr = msg_handle_mdp_request (owner, msg, disp_table);
+    msg_err_e merr = msg_handle_mlm_request (owner, msg, disp_table);
     ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
            SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
