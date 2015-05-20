@@ -149,19 +149,15 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     /* Finally, initialize mdp_worker with service being the BPM<board_number> */
     /* self->worker = mdp_worker_new (endpoint_broker, name, verbose);
     ASSERT_ALLOC(self->worker, err_worker_alloc); */
-    /* Finally, initialize out zeroMQ context */
-    self->ctx = zctx_new ();
-    ASSERT_ALLOC(self->ctx, err_ctx_alloc);
 
     /* Adjust linger time for Majordomo protocol (MDP) */
     /* A non-zero linger value is required for DISCONNECT to be sent
      * when the worker is destroyed.  100 is arbitrary but chosen to be
      * sufficient for common cases without significant delay in broken ones. */
-    zctx_set_linger (self->ctx, 100);
+    zsys_set_linger (100);
 
     return self;
 
-err_ctx_alloc:
 err_disp_table_init:
     disp_table_destroy (&self->disp_table_thsafe_ops);
 err_disp_table_thsafe_ops_alloc:
@@ -201,7 +197,6 @@ devio_err_e devio_destroy (devio_t **self_p)
         /* Notice that we destroy the worker first, as to
          * unregister from broker as soon as possible to avoid
          * loosing requests from clients */
-        zctx_destroy (&self->ctx);
         disp_table_destroy (&self->disp_table_thsafe_ops);
         zhash_destroy (&self->sm_io_h);
         self->thsafe_server_ops = NULL;
@@ -289,8 +284,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
                 "[dev_io_core:register_sm] Calling boot func\n");
 
         pipe_idx = self->nnodes++;
-        self->pipes [pipe_idx] = zthread_fork (self->ctx, smio_startup,
-                th_args);
+        self->pipes [pipe_idx] = zactor_new (smio_startup, th_args);
         ASSERT_TEST (self->pipes [pipe_idx] != NULL, "Could not spawn SMIO thread",
                 err_spawn_smio_thread);
 

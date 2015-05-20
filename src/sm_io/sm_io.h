@@ -47,8 +47,7 @@ struct _smio_t {
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
-    zctx_t *ctx;                        /* Our context */
-    void *pipe;                         /* Pipe back to parent to exchange messages */
+    zsock_t *pipe;                      /* Pipe back to parent to exchange messages */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;

@@ -49,8 +49,8 @@ const disp_table_ops_t smio_disp_table_ops;
 static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
 
-static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
-        void *pipe, char *service);
+static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
+        char *service);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
 static smio_err_e _smio_loop (smio_t *self);
 
@@ -58,13 +58,15 @@ static smio_err_e _smio_loop (smio_t *self);
 /****************** SMIO Thread entry-point  ****************/
 /************************************************************/
 /* FIXME: Do some sanity check before calling functions from smio_mod_dispatch*/
-void smio_startup (void *args, zctx_t *ctx, void *pipe)
+void smio_startup (zsock_t *pipe, void *args)
 {
     /* FIXME: priv pointer is unused for now! We should use it to differentiate
      * between multiple smio instances of the same type controlling multiple
      * modules of the same type. Otherwise, we would ended up with two workers
      * for the same thing (see Majordomo protocol) */
     th_boot_args_t *th_args = (th_boot_args_t *) args;
+    /* Signal parent we are initializing */
+    zsock_signal (pipe, 0);
 
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
@@ -80,7 +82,7 @@ void smio_startup (void *args, zctx_t *ctx, void *pipe)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
             "allocating resources ...\n", smio_service);
 
-    smio_t *self = _smio_new (th_args, ctx, pipe, smio_service);
+    smio_t *self = _smio_new (th_args, pipe, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
@@ -116,7 +118,7 @@ err_self_alloc:
     /* We can't output this message at a later time as we depend on the smio_service
      * variable. This is not so bad, though, as most of the time we will not fail
      * in hutils_concat_strings () function */
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_bootstrap] SMIO Thread %s exiting ...\n",
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_bootstrap] SMIO Thread %s exiting\n",
             smio_service);
     free (smio_service);
 err_smio_service_alloc:
@@ -164,10 +166,10 @@ err_inst_id_str_alloc:
 /************ SMIO Bootstrap wrapper functions **************/
 /************************************************************/
 
-struct _smio_t *smio_new (th_boot_args_t* args, struct _zctx_t *ctx, void *pipe,
+struct _smio_t *smio_new (th_boot_args_t* args, zsock_t *pipe,
         char *service)
 {
-    return _smio_new (args, ctx, pipe, service);
+    return _smio_new (args, pipe, service);
 }
 
 smio_err_e smio_destroy (struct _smio_t **self_p)
@@ -214,8 +216,8 @@ const disp_table_ops_t smio_disp_table_ops = {
 /************************************************************/
 
 /* Boot new sm_io instance of fmc130m_4ch */
-static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
-        void *pipe, char *service)
+static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
+        char *service)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
@@ -230,7 +232,6 @@ static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
     ASSERT_ALLOC(self->exp_ops_dtable, err_exp_ops_dtable_alloc);
 
     self->smio_handler = NULL;      /* This is set by the device functions */
-    self->ctx = ctx;
     self->pipe = pipe;
     self->inst_id = args->inst_id;
 
@@ -240,7 +241,8 @@ static struct _smio_t *_smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
             args->broker, service, args->verbose);
-    self->worker = mdp_worker_new (self->ctx, args->broker, service, args->verbose);
+    /* self->worker = mdp_worker_new (self->ctx, args->broker, service, args->verbose); */
+    self->worker = NULL;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
     ASSERT_ALLOC(self->worker, err_worker_alloc);
 
@@ -285,10 +287,11 @@ static smio_err_e _smio_loop (smio_t *self)
             "[sm_io_bootstrap] Main loop starting\n");
 
     smio_err_e err = SMIO_SUCCESS;
+    bool terminated = false;
     /* Begin infinite polling on Majordomo/PIPE socket
      * and exit if the parent send a message through
      * the pipe socket */
-    while (true) {
+    while (!terminated) {
         /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
         zmq_pollitem_t items [] = {
             [SMIO_PIPE_SOCK] = {
@@ -336,16 +339,24 @@ static smio_err_e _smio_loop (smio_t *self)
                 break;                          /* Worker has been interrupted */
             }
 
-            /* Every message through this channel is interpreted as a
-             * self-destruct one */
-            zmsg_destroy (&request);
+            char *command = zmsg_popstr (request);
+            /* A $TERM message on this means to self-destruct */
+            if (streq (command, "$TERM")) {
+                /* Destroy SMIO instance. As we already do this on the main
+                 * smio_startup (), we just need to exit this cleanly */
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
+                        "[sm_io_bootstrap] Received shutdown message on "
+                        "PIPE socket. Exiting.\n");
+                terminated = true;
+            }
+            else {
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
+                        "[sm_io_bootstrap]  Invalid message received on PIPE socket.\n"
+                        "This was probably supposed to go through another socket\n");
+            }
 
-            /* Destroy SMIO instance. As we already do this on the main
-             * smio_startup (), we just need to exit this cleanly */
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
-                    "[sm_io_bootstrap] Received shutdown message on "
-                    "PIPE socket. Exiting ...\n");
-            break;
+            free (command);
+            zmsg_destroy (&request);
         }
     }
 

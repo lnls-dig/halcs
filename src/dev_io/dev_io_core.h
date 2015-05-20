@@ -22,9 +22,8 @@
 
 struct _devio_t {
     /* General information */
-    zctx_t *ctx;                        /* zeroMQ Context */
-    void **pipes;                       /* Address nodes using this array of pipes */
-    zmq_pollitem_t *poller;            /* Poller structure to multiplex threads messages. New version */
+    zactor_t **pipes;                   /* Address nodes using this array of actors */
+    zmq_pollitem_t *poller;             /* Poller structure to multiplex threads messages. New version */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
     char *log_file;                     /* Log filename for tracing and debugging */
