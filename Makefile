@@ -34,8 +34,8 @@ WITH_DEVIO_CFG ?= y
 CFG_DIR ?= /etc/bpm_sw
 export CFG_DIR
 
-INSTALL_DIR ?= /usr/local
-export INSTALL_DIR
+PREFIX ?= /usr/local
+export PREFIX
 
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
@@ -369,10 +369,10 @@ libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
 
 libbsmp_install:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) install
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) install
 
 libbsmp_uninstall:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(INSTALL_DIR) uninstall
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) uninstall
 
 libbsmp_clean:
 	$(MAKE) -C $(LIBBSMP_DIR) clean
@@ -485,12 +485,12 @@ deps_clean: libmdp_clean libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libmdp_mrproper libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
-	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(INSTALL_DIR)/bin $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) $(INSTALL_DIR)/etc $(CMDSEP))
+	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(PREFIX)/bin $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) $(PREFIX)/etc $(CMDSEP))
 
 core_uninstall:
-	$(foreach core_bin,$(ALL_OUT),rm -f $(INSTALL_DIR)/bin/$(core_bin) $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),rm -f $(INSTALL_DIR)/etc/$(core_script) $(CMDSEP))
+	$(foreach core_bin,$(ALL_OUT),rm -f $(PREFIX)/bin/$(core_bin) $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),rm -f $(PREFIX)/etc/$(core_script) $(CMDSEP))
 
 core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

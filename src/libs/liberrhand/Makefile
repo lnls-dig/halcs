@@ -21,8 +21,8 @@ LIB_VER_MINOR = 0
 LIB_VER_REVISION = 0
 LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
 
-INSTALL_DIR ?= /usr/local
-export INSTALL_DIR
+PREFIX ?= /usr/local
+export PREFIX
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -fPIC
@@ -156,19 +156,19 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 	@rm -f $*.d.tmp
 
 install:
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach header,$($(LIBBPMCLIENT)_INST_HEADERS),install -m 755 $(header) $(INSTALL_DIR)/include $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBBPMCLIENT)_INST_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
-		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
+		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
