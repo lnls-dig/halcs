@@ -48,7 +48,7 @@ bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
     zmsg_addmem (request, &rw, sizeof (rw));
     zmsg_addmem (request, param, size);
 
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
 err_send_msg_alloc:
 err_param_null:
@@ -64,7 +64,7 @@ bpm_client_err_e param_client_recv_rw (bpm_client_t *self, char *service,
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
     /* Receive report */
-    *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    *report = mlm_client_recv (self->mlm_client);
     ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg,
             BPM_CLIENT_ERR_SERVER);
 

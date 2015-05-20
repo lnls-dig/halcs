@@ -9,7 +9,7 @@
 #define _BPM_CLIENT_RW_PARAM_H_
 
 #include <inttypes.h>
-#include <mdp.h>
+#include <malamute.h>
 
 #include "bpm_client_codes.h"
 #include "bpm_client_rw_param_codes.h"
