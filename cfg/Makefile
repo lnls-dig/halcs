@@ -11,7 +11,9 @@ OBJCOPY =	$(CROSS_COMPILE)objcopy
 SIZE =		$(CROSS_COMPILE)size
 MAKE =		make
 
-CFG_DIR ?= /etc/bpm_sw
+PREFIX ?= /usr/local
+
+CFG_DIR ?= ${PREFIX}/etc/bpm_sw
 
 # Get all .cfg files
 CFG_FILES ?= $(wildcard *.cfg)
