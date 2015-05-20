@@ -139,15 +139,6 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     dmngr_t *self = (dmngr_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    /* Initialize the Device Manager */
-    self->ctx = zctx_new ();
-    ASSERT_ALLOC(self->ctx, err_ctx_alloc);
-
-    /* Create Dealer for use with zbeacon */
-    self->dealer = zsocket_new (self->ctx, ZMQ_DEALER);
-    ASSERT_ALLOC(self->dealer, err_dealer_alloc);
-    zsocket_bind (self->dealer, "%s", endpoint);
-
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
     self->endpoint = strdup (endpoint);
@@ -168,6 +159,13 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     self->broker_running = false;
 
+    /* Create Dealer for use with zbeacon and bind it to the endpoint */
+    self->dealer = zsock_new_dealer (NULL);
+    ASSERT_ALLOC(self->dealer, err_dealer_alloc);
+    int rc = zsock_bind (self->dealer, "%s", self->endpoint);
+    ASSERT_TEST(rc > -1, "Dealer socket could not bind to specified endpoint",
+            err_dealer_bind);
+
     /* Scan devios for the first time */
     uint32_t num_devs_found = 0;
     dmngr_err_e err = _dmngr_scan_devs (self, &num_devs_found);
@@ -181,8 +179,12 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     return self;
 
 err_scan_devs:
+    zsock_unbind (self->dealer, "%s", endpoint);
+err_dealer_bind:
+    zsock_destroy (&self->dealer);
+err_dealer_alloc:
 err_hints_h_alloc:
-        zhash_destroy (&self->devio_info_h);
+    zhash_destroy (&self->devio_info_h);
 err_devio_info_h_alloc:
     zlist_destroy (&self->ops->sig_ops);
 err_list_alloc:
@@ -192,10 +194,6 @@ err_ops_alloc:
 err_endpoint_alloc:
     free (self->name);
 err_name_alloc:
-    zsocket_destroy (self->ctx, self->dealer);
-err_dealer_alloc:
-    zctx_destroy (&self->ctx);
-err_ctx_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -210,14 +208,14 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
         dmngr_t *self = *self_p;
 
         /* Starting destructing by the last resource */
+        zsock_unbind (self->dealer, "%s", self->endpoint);
+        zsock_destroy (&self->dealer);
         zhash_destroy (&self->hints_h);
         zhash_destroy (&self->devio_info_h);
         zlist_destroy (&self->ops->sig_ops);
         free (self->ops);
         free (self->endpoint);
         free (self->name);
-        zsocket_destroy (self->ctx, self->dealer);
-        zctx_destroy (&self->ctx);
 
         free (self);
         *self_p = NULL;
