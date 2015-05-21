@@ -87,7 +87,7 @@ typedef struct _th_config_args_t th_config_args_t;
 /************************ Our methods ***********************/
 /************************************************************/
 void smio_startup (zsock_t *pipe, void *args);
-void *smio_config_defaults (void *args);
+void smio_config_defaults (zsock_t *pipe, void *args);
 struct _smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe, char *service);
 smio_err_e smio_destroy (struct _smio_t **self_p);
 smio_err_e smio_loop (struct _smio_t *self);

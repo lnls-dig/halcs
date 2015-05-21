@@ -306,10 +306,20 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         th_config_args->log_file = self->log_file;
         th_config_args->inst_id = inst_id;
 
-        /* Create detached thread just for configuring the new recently created SMIO */
-        zerr = zthread_new (smio_config_defaults, th_config_args);
-        ASSERT_TEST (zerr == 0, "Could not spawn config thread",
+        /* Create actor just for configuring the new recently created SMIO */
+        zactor_t *config_actor = zactor_new (smio_config_defaults, th_config_args);
+        ASSERT_TEST (config_actor != NULL, "Could not spawn config thread",
                 err_spawn_config_thread);
+
+        /* Ok, we've created our actor. Now, we wait for it to signal its end */
+        zsock_wait (config_actor);
+        /* Now, we send a TERM message to the actor, indicating we want it to
+         * end */
+        zerr = zstr_sendx (config_actor, "$TERM", NULL);
+        /* ASSERT_TEST (zerr != -1, "Could send $TERM message to actor",
+                err_end_config_thread); */
+        /* Lastly, destroy the actor */
+        zactor_destroy (&config_actor);
 
         /* stop on first match */
         break;

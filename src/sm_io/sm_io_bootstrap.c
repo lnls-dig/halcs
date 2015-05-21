@@ -130,9 +130,11 @@ err_inst_id_str_alloc:
 /************************************************************/
 /*************** SMIO Config Thread entry-point  ************/
 /************************************************************/
-void *smio_config_defaults (void *args)
+void smio_config_defaults (zsock_t *pipe, void *args)
 {
     th_config_args_t *th_args = (th_config_args_t *) args;
+    /* Signal parent we are initializing */
+    zsock_signal (pipe, 0);
 
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
@@ -151,14 +153,34 @@ void *smio_config_defaults (void *args)
     SMIO_DISPATCH_FUNC_WRAPPER_GEN(config_defaults, th_args->broker,
             smio_service, th_args->log_file);
 
+    /* We've finished configuring the SMIO. Tell DEVIO we are done */
+    zsock_signal (pipe, 0);
+
+    /* Wait for $TERM message from DEVIO to end */
+    bool terminated = false;
+    while (!terminated) {
+        zmsg_t *msg = zmsg_recv (pipe);
+        if (msg == NULL) {
+            break; /* Interrupted */
+        }
+
+        char *command = zmsg_popstr (msg);
+        if (streq (command, "$TERM")) {
+            terminated = true;
+        }
+
+        free (command);
+        zmsg_destroy (&msg);
+    }
+
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
-            "exiting\n", smio_service);
+            "terminating with %s\n", smio_service, (terminated)? "success" : "error");
+
     free (smio_service);
 err_smio_service_alloc:
     free (inst_id_str);
 err_inst_id_str_alloc:
     free (th_args);
-    return NULL;
 }
 
 /************************************************************/
