@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 killall dev_io
-killall mdp_broker
+killall malamute
 killall dev_mngr
 

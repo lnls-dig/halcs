@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TOP_DIR=..
 BOARD_TYPE="afcv3"
