@@ -374,13 +374,18 @@ devio_err_e devio_init_poller_sm (devio_t *self)
 
     unsigned int i;
     for (i = 0; i < self->nnodes; ++i) {
-        items [i].socket = self->pipes [i];
+        items [i].socket = zsock_resolve (self->pipes [i]);
+        ASSERT_TEST(items [i].socket != NULL, "Invalid socket reference",
+                err_inv_socket, DEVIO_ERR_INV_SOCKET);
         items [i].events = ZMQ_POLLIN;
     }
 
     /* This should be freed on dev_io exit */
     self->poller = items;
+    return err;
 
+err_inv_socket:
+    free (items);
 err_alloc_items:
 err_no_nodes:
     return err;
