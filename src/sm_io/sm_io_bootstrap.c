@@ -291,6 +291,16 @@ static smio_err_e _smio_loop (smio_t *self)
 
     smio_err_e err = SMIO_SUCCESS;
     bool terminated = false;
+    void *pipe_zmq_socket = NULL;
+    void *worker_zmq_socket = NULL;
+
+    pipe_zmq_socket = zsock_resolve (self->pipe);
+    ASSERT_TEST (pipe_zmq_socket != NULL, "Invalid PIPE socket reference",
+            err_inv_pipe_socket, SMIO_ERR_INV_SOCKET);
+    worker_zmq_socket = zsock_resolve (self->worker);
+    ASSERT_TEST (worker_zmq_socket != NULL, "Invalid WORKER socket reference",
+            err_inv_worker_socket, SMIO_ERR_INV_SOCKET);
+
     /* Begin infinite polling on Malamute/PIPE socket
      * and exit if the parent send a message through
      * the pipe socket */
@@ -298,13 +308,13 @@ static smio_err_e _smio_loop (smio_t *self)
         /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
         zmq_pollitem_t items [] = {
             [SMIO_PIPE_SOCK] = {
-                .socket = self->pipe,
+                .socket = pipe_zmq_socket,
                 .fd = 0,
                 .events = ZMQ_POLLIN,
                 .revents = 0
             },
             [SMIO_MLM_SOCK] = {
-                .socket = self->worker,
+                .socket = worker_zmq_socket,
                 .fd = 0,
                 .events = ZMQ_POLLIN,
                 .revents = 0
@@ -377,6 +387,8 @@ static smio_err_e _smio_loop (smio_t *self)
     }
 
 err_loop_interrupted:
+err_inv_worker_socket:
+err_inv_pipe_socket:
     return err;
 }
 
