@@ -22,7 +22,8 @@ static const char *smio_err [SMIO_ERR_END] =
     [SMIO_ERR_CONFIG_DFLT]          = "Could not configure the default values",
     [SMIO_ERR_MSG_NOT_SUPP]         = "Exported message not supported",
     [SMIO_ERR_INTERRUPTED_POLLER]   = "Poller interrupted. zeroMQ context was "
-        "terminated or received interrupt signal"
+        "terminated or received interrupt signal",
+    [SMIO_ERR_INV_SOCKET]           = "Invalid socket reference"
 };
 
 /* Convert enumeration type to string */
