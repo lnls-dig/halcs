@@ -124,7 +124,6 @@ err_smio_service_alloc:
     free (inst_id_str);
 err_inst_id_str_alloc:
     free (th_args);
-    return;
 }
 
 /************************************************************/
