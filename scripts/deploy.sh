@@ -1,21 +1,34 @@
 #!/bin/bash
 
 TOP_DIR=..
-REMOTE_HOME="/home"
-REMOTE_USERNAME="lnls-bpm"
-REMOTE_IP=10.0.18.52
-LOCAL_IP=10.0.18.35
-REMOTE_DIR="bpm-sw-deploy"
 BOARD_TYPE="afcv3"
+REMOTE_USERNAME=$1
+REMOTE_IP=$2
+REMOTE_DIR=$3
 
-REMOTE_DEPLOY_DIR="${REMOTE_HOME}/${REMOTE_USERNAME}/${REMOTE_DIR}"
-REMOTE_LOG_DIR="/media/remote_logs"
+function usage {
+    echo "Usage: $0 <remote_username> <remote_ip> <remote_dir>"
+}
 
-CREATE_DIR_CMD="mkdir -p ${REMOTE_DEPLOY_DIR}"
-MOUNT_REMOTE_LOG_CMD="sshfs ${whoami}@${LOCAL_IP}:~/remote_logs ${REMOTE_LOG_DIR}"
-COMPILE_CMD="./compile.sh"
-#RUN_CMD="./init.sh tcp ${REMOTE_IP} ${REMOTE_LOG_DIR}"
-#RUN_CMD="systemctl start bpm-sw.service"
+if [ -z "$REMOTE_USERNAME" ]; then
+    echo "\"REMOTE_USERNAME\" variable unset."
+    usage
+    exit 1
+fi
+
+if [ -z "$REMOTE_IP" ]; then
+    echo "\"REMOTE_IP\" variable unset."
+    usage
+    exit 1
+fi
+
+if [ -z "$REMOTE_DIR" ]; then
+    echo "\"REMOTE_DIR\" variable unset."
+    usage
+    exit 1
+fi
+
+CREATE_DIR_CMD="mkdir -p ${REMOTE_DIR}"
 
 # Change working directory
 cd ${TOP_DIR}
@@ -24,23 +37,10 @@ cd ${TOP_DIR}
 echo "Creating remote directories on ${REMOTE_USERNAME}@${REMOTE_IP}"
 ssh -l ${REMOTE_USERNAME} ${REMOTE_IP} "${CREATE_DIR_CMD}"
 
-# Mount remote log directory
-#echo "Mounting remote LOG directory to ${REMOTE_LOG_DIR}"
-#ssh -l ${REMOTE_USERNAME} ${REMOTE_IP} "${MOUNT_REMOTE_LOG_CMD}"
-
 # Find all source files
 SRC_FILES=$(find . -type f ! -iname "*.[o|a]" ! -iname "*orig" \
     ! -iname "*.swp" ! -iname "*.swap" ! -iname "*.txt" ! -iname "*.pyc" \
-    ! -path "./majordomo*" ! -path "./.git*")
-SYM_FILES=$(find . -type l ! -iname "*.[o|a]" ! -iname "*orig" \
-    ! -iname "*.swp" ! -iname "*.swap" ! -iname "*.txt" ! -iname "*.pyc" \
-    ! -path "./majordomo*" ! -path "./.git*")
+    ! -path "./.git*")
 
-echo "Copying files to ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}"
-rsync -Rpr ${SRC_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}
-rsync -Rpr ${SYM_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DEPLOY_DIR}
-
-echo "Compiling source files with \"${COMPILE_CMD}\""
-ssh -l ${REMOTE_USERNAME} ${REMOTE_IP} "cd ${REMOTE_DEPLOY_DIR} && \
-    ${COMPILE_CMD}"
-
+echo "Copying files to ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DIR}"
+rsync -Rpr ${SRC_FILES} ${REMOTE_USERNAME}@${REMOTE_IP}:${REMOTE_DIR}
