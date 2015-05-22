@@ -319,7 +319,7 @@ static smio_err_e _smio_loop (smio_t *self)
     pipe_mgmt_zmq_socket = zsock_resolve (self->pipe_mgmt);
     ASSERT_TEST (pipe_mgmt_zmq_socket != NULL, "Invalid PIPE Management socket reference",
             err_inv_pipe_mgmt_socket, SMIO_ERR_INV_SOCKET);
-    worker_zmq_socket = zsock_resolve (self->worker);
+    worker_zmq_socket = zactor_resolve (mlm_client_actor (self->worker));
     ASSERT_TEST (worker_zmq_socket != NULL, "Invalid WORKER socket reference",
             err_inv_worker_socket, SMIO_ERR_INV_SOCKET);
 
