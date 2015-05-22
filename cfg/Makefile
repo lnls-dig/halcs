@@ -24,7 +24,7 @@ CFG_FILES ?= $(wildcard *.cfg)
 all:
 
 install:
-	@mkdir -p $(CFG_DIR)
+	@mkdir -m 755 -p $(CFG_DIR)
 	$(foreach cfg,$(CFG_FILES),install -m 755 $(cfg) $(CFG_DIR)/ $(CMDSEP))
 
 uninstall:
