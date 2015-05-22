@@ -22,7 +22,8 @@
 
 struct _devio_t {
     /* General information */
-    zactor_t **pipes;                   /* Address nodes using this array of actors */
+    zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
+    zsock_t **pipes_msg;                /* Address nodes using this array of actors (Message PIPES) */
     zmq_pollitem_t *poller;             /* Poller structure to multiplex threads messages. New version */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */

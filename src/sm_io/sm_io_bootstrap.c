@@ -49,8 +49,8 @@ const disp_table_ops_t smio_disp_table_ops;
 static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
 
-static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
-        char *service);
+static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, char *service);
 static smio_err_e _smio_destroy (struct _smio_t **self_p);
 static smio_err_e _smio_loop (smio_t *self);
 
@@ -64,8 +64,10 @@ void smio_startup (zsock_t *pipe, void *args)
      * between multiple smio instances of the same type controlling multiple
      * modules of the same type */
     th_boot_args_t *th_args = (th_boot_args_t *) args;
+    zsock_t *pipe_mgmt = pipe;
+    zsock_t *pipe_msg = th_args->pipe_msg;
     /* Signal parent we are initializing */
-    zsock_signal (pipe, 0);
+    zsock_signal (pipe_mgmt, 0);
 
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
@@ -81,7 +83,7 @@ void smio_startup (zsock_t *pipe, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
             "allocating resources ...\n", smio_service);
 
-    smio_t *self = _smio_new (th_args, pipe, smio_service);
+    smio_t *self = _smio_new (th_args, pipe_mgmt, pipe_msg, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Call SMIO init function to finish initializing its internal strucutres */
@@ -186,10 +188,10 @@ err_inst_id_str_alloc:
 /************ SMIO Bootstrap wrapper functions **************/
 /************************************************************/
 
-struct _smio_t *smio_new (th_boot_args_t* args, zsock_t *pipe,
-        char *service)
+struct _smio_t *smio_new (th_boot_args_t* args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, char *service)
 {
-    return _smio_new (args, pipe, service);
+    return _smio_new (args, pipe_mgmt, pipe_msg, service);
 }
 
 smio_err_e smio_destroy (struct _smio_t **self_p)
@@ -235,9 +237,9 @@ const disp_table_ops_t smio_disp_table_ops = {
 /****************** Local helper functions ******************/
 /************************************************************/
 
-/* Boot new sm_io instance of fmc130m_4ch */
-static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
-        char *service)
+/* Boot new SMIO instance */
+static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, char *service)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
@@ -252,7 +254,8 @@ static struct _smio_t *_smio_new (th_boot_args_t *args, zsock_t *pipe,
     ASSERT_ALLOC(self->exp_ops_dtable, err_exp_ops_dtable_alloc);
 
     self->smio_handler = NULL;      /* This is set by the device functions */
-    self->pipe = pipe;
+    self->pipe_mgmt = pipe_mgmt;
+    self->pipe_msg = pipe_msg;
     self->inst_id = args->inst_id;
 
     /* Initialize SMIO base address */
@@ -303,8 +306,6 @@ static smio_err_e _smio_destroy (struct _smio_t **self_p)
     return SMIO_SUCCESS;
 }
 
-/* FIXME: Poll on PIPE socket as well and in case of any arriving message
- * destroy itself */
 static smio_err_e _smio_loop (smio_t *self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
@@ -312,12 +313,12 @@ static smio_err_e _smio_loop (smio_t *self)
 
     smio_err_e err = SMIO_SUCCESS;
     bool terminated = false;
-    void *pipe_zmq_socket = NULL;
+    void *pipe_mgmt_zmq_socket = NULL;
     void *worker_zmq_socket = NULL;
 
-    pipe_zmq_socket = zsock_resolve (self->pipe);
-    ASSERT_TEST (pipe_zmq_socket != NULL, "Invalid PIPE socket reference",
-            err_inv_pipe_socket, SMIO_ERR_INV_SOCKET);
+    pipe_mgmt_zmq_socket = zsock_resolve (self->pipe_mgmt);
+    ASSERT_TEST (pipe_mgmt_zmq_socket != NULL, "Invalid PIPE Management socket reference",
+            err_inv_pipe_mgmt_socket, SMIO_ERR_INV_SOCKET);
     worker_zmq_socket = zsock_resolve (self->worker);
     ASSERT_TEST (worker_zmq_socket != NULL, "Invalid WORKER socket reference",
             err_inv_worker_socket, SMIO_ERR_INV_SOCKET);
@@ -328,8 +329,8 @@ static smio_err_e _smio_loop (smio_t *self)
     while (!terminated) {
         /* Listen to WORKER (requests from clients) and PIPE (managment) sockets */
         zmq_pollitem_t items [] = {
-            [SMIO_PIPE_SOCK] = {
-                .socket = pipe_zmq_socket,
+            [SMIO_PIPE_MGMT_SOCK] = {
+                .socket = pipe_mgmt_zmq_socket,
                 .fd = 0,
                 .events = ZMQ_POLLIN,
                 .revents = 0
@@ -348,9 +349,9 @@ static smio_err_e _smio_loop (smio_t *self)
                 err_loop_interrupted, SMIO_ERR_INTERRUPTED_POLLER);
 
         /* Check for activity on PIPE socket */
-        if (items [SMIO_PIPE_SOCK].revents & ZMQ_POLLIN) {
+        if (items [SMIO_PIPE_MGMT_SOCK].revents & ZMQ_POLLIN) {
             /* On any activity we destroy ourselves */
-            zmsg_t *request = zmsg_recv (self->pipe);
+            zmsg_t *request = zmsg_recv (self->pipe_mgmt);
 
             if (request == NULL) {
                 err = SMIO_ERR_INTERRUPTED_POLLER;
@@ -409,7 +410,7 @@ static smio_err_e _smio_loop (smio_t *self)
 
 err_loop_interrupted:
 err_inv_worker_socket:
-err_inv_pipe_socket:
+err_inv_pipe_mgmt_socket:
     return err;
 }
 

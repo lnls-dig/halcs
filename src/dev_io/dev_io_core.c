@@ -59,7 +59,7 @@ static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
 
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
-static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe);
+static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt);
 static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key);
 static devio_err_e _devio_destroy_smio_all (devio_t *self);
 
@@ -94,8 +94,10 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
             "Error setting log file!", err_log_file);
 
     /* Initialize the sockets structure to talk to nodes */
-    self->pipes = zmalloc (sizeof (*self->pipes) * NODES_MAX_LEN);
-    ASSERT_ALLOC(self->pipes, err_pipes_alloc);
+    self->pipes_mgmt = zmalloc (sizeof (*self->pipes_mgmt) * NODES_MAX_LEN);
+    ASSERT_ALLOC(self->pipes_mgmt, err_pipes_mgmt_alloc);
+    self->pipes_msg = zmalloc (sizeof (*self->pipes_msg) * NODES_MAX_LEN);
+    ASSERT_ALLOC(self->pipes_msg, err_pipes_msg_alloc);
     /* 0 nodes for now... */
     self->nnodes = 0;
 
@@ -166,8 +168,10 @@ err_llio_name_alloc:
 err_endp_broker_alloc:
     free (self->name);
 err_name_alloc:
-    free (self->pipes);
-err_pipes_alloc:
+    free (self->pipes_msg);
+err_pipes_msg_alloc:
+    free (self->pipes_mgmt);
+err_pipes_mgmt_alloc:
     free (self->log_file);
 err_log_file:
     free (self);
@@ -198,7 +202,8 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->endpoint_broker);
         free (self->name);
         free (self->poller);
-        free (self->pipes);
+        free (self->pipes_msg);
+        free (self->pipes_mgmt);
         free (self->log_file);
         free (self);
         *self_p = NULL;
@@ -227,7 +232,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     th_boot_args_t *th_args = NULL;
     th_config_args_t *th_config_args = NULL;
     char *key = NULL;
-    uint32_t pipe_idx = 0;
+    uint32_t pipe_mgmt_idx = 0;
+    uint32_t pipe_msg_idx = 0;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] searching for SMIO ID match\n");
@@ -259,6 +265,14 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Allocating thread args\n");
 
+        /* Increment PIPE indexes */
+        pipe_mgmt_idx = self->nnodes++;
+        pipe_msg_idx = pipe_mgmt_idx;
+
+        /* Create PIPE message to talk to SMIO */
+        zsock_t *pipe_msg_backend;
+        self->pipes_msg [pipe_msg_idx] = zsys_create_pipe (&pipe_msg_backend);
+
         /* Alloacate thread arguments struct and pass it to the
          * thread. It is the responsability of the calling thread
          * to clear this structure after using it! */
@@ -267,6 +281,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         th_args->parent = self;
         /* FIXME: weak identifier */
         th_args->smio_id = i;
+        th_args->pipe_msg = pipe_msg_backend;
         th_args->broker = self->endpoint_broker;
         th_args->service = self->name;
         th_args->verbose = self->verbose;
@@ -276,14 +291,13 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Calling boot func\n");
 
-        pipe_idx = self->nnodes++;
-        self->pipes [pipe_idx] = zactor_new (smio_startup, th_args);
-        ASSERT_TEST (self->pipes [pipe_idx] != NULL, "Could not spawn SMIO thread",
+        self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_startup, th_args);
+        ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
                 err_spawn_smio_thread);
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
-        int zerr = zhash_insert (self->sm_io_h, key, self->pipes [pipe_idx]);
+        int zerr = zhash_insert (self->sm_io_h, key, self->pipes_mgmt [pipe_mgmt_idx]);
         /* We must not fail here, as we will loose our reference to the SMIO
          * thread otherwise */
         ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
@@ -341,7 +355,7 @@ err_th_config_args_alloc:
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
-    _devio_send_destruct_msg (self, self->pipes [pipe_idx]);
+    _devio_send_destruct_msg (self, self->pipes_mgmt [pipe_mgmt_idx]);
 err_spawn_smio_thread:
     free (th_args);
 err_th_args_alloc:
@@ -384,7 +398,7 @@ devio_err_e devio_init_poller_sm (devio_t *self)
 
     unsigned int i;
     for (i = 0; i < self->nnodes; ++i) {
-        items [i].socket = zsock_resolve (self->pipes [i]);
+        items [i].socket = zsock_resolve (self->pipes_msg [i]);
         ASSERT_TEST(items [i].socket != NULL, "Invalid socket reference",
                 err_inv_socket, DEVIO_ERR_INV_SOCKET);
         items [i].events = ZMQ_POLLIN;
@@ -520,23 +534,23 @@ err_hash_keys_alloc:
     return err;
 }
 
-static devio_err_e _devio_send_destruct_msg (devio_t *self, void *pipe)
+static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt)
 {
     assert (self);
-    assert (pipe);
+    assert (pipe_mgmt);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Send message to SMIO informing it to destroy itself */
     /* This cannot fail at this point... but it can */
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC (send_msg, err_msg_alloc, DEVIO_ERR_ALLOC);
-    /* An empty message means to selfdestruct */
-    zmsg_pushstr (send_msg, "");
+    /* $TERM message means to selfdestruct */
+    zmsg_pushstr (send_msg, "$TERM");
 
     /* Try to send the message a few times and then give up */
     uint32_t tries = 0;
     for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
-        int zerr = zmsg_send (&send_msg, pipe);
+        int zerr = zmsg_send (&send_msg, pipe_mgmt);
         if (zerr == 0) {
             break;
         }
@@ -563,13 +577,13 @@ static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key)
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Lookup SMIO reference in hash table */
-    void *pipe = zhash_lookup (self->sm_io_h, smio_key);
-    ASSERT_TEST (pipe != NULL, "Could not find SMIO registered with this ID",
+    zactor_t *pipe_mgmt = (zactor_t *) zhash_lookup (self->sm_io_h, smio_key);
+    ASSERT_TEST (pipe_mgmt != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
 
-    err = _devio_send_destruct_msg (self, pipe);
+    err = _devio_send_destruct_msg (self, pipe_mgmt);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
-            "PIPE", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
+            "PIPE management", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
     /* Finally, remove the pipe from hash. FIXME: What if the SMIO does not
      * exit? We will loose its reference ...*/

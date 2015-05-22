@@ -23,7 +23,7 @@
 #include "disp_table.h"
 
 /* SMIO sockets IDs */
-#define SMIO_PIPE_SOCK              0
+#define SMIO_PIPE_MGMT_SOCK         0
 #define SMIO_MLM_SOCK               1
 #define SMIO_END_SOCK               2
 #define SMIO_SOCKS_NUM              SMIO_END_SOCK
@@ -48,7 +48,8 @@ struct _smio_t {
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
-    zsock_t *pipe;                      /* Pipe back to parent to exchange messages */
+    zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
+    zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
