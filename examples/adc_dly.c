@@ -186,7 +186,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:adc_dly]: ADC delay value = %u\n", dly_val);
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {

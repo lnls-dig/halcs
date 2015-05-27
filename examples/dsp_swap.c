@@ -127,9 +127,9 @@ int main (int argc, char *argv [])
 
     /* Generate the service names for each SMIO */
     char service_dsp[50];
-    sprintf (service_dsp, "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
+    snprintf (service_dsp, strlen (service_dsp)+1, "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
     char service_swap[50];
-    sprintf (service_swap, "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
+    snprintf (service_swap, strlen (service_swap)+1, "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {
