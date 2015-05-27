@@ -228,6 +228,9 @@ err_bpm_get_curve:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
+    str_p = &bpm_number_str;
+    free (*str_p);
+    bpm_number_str = NULL;
     str_p = &num_samples_str;
     free (*str_p);
     num_samples_str = NULL;
