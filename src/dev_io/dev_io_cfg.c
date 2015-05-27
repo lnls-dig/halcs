@@ -196,27 +196,19 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    err = devio_init_poller_sm (devio);
+    /* Step 1: Loop though all the SDB records and intialize (boot) the
+     * smio modules*/
+    /* Step 2: Optionally, register the necessary smio modules specifying
+     * its ID and calling devio_register_sm */
+    /* Step 3: Poll all PIPE's sockets to determine if we have something to
+     * handle, like messages from smios */
+    /*      Step 3.5: If we do, call devio_handle_smio () and treat its
+     *      request as appropriate */
+    err = devio_loop (devio);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_init_poller_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_loop error: %s\n",
+                devio_err_str (err));
         goto err_devio;
-    }
-
-    while (!zsys_interrupted) {
-        /* Step 1: Loop though all the SDB records and intialize (boot) the
-         * smio modules*/
-        /* Step 2: Optionally, register the necessary smio modules specifying
-         * its ID and calling devio_register_sm */
-        /* Step 3: Poll all PIPE's sockets to determine if we have something to
-         * handle, like messages from smios */
-        /*      Step 3.5: If we do, call devio_handle_smio () and treat its
-         *      request as appropriate */
-
-        err = devio_poll_all_sm (devio);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll2_all_sm error. Exiting ...\n");
-            goto err_devio;
-        }
     }
 
 err_devio:
