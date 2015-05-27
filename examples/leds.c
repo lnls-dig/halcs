@@ -15,7 +15,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 void print_help (char *program_name)
 {
@@ -85,12 +84,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:leds]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
