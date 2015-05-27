@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <stdbool.h>
+#include <malamute.h>
 
 /* #include "dev_io_core.h" */
 #include "ll_io.h"
@@ -20,11 +21,11 @@
 #include "sm_io_exports.h"
 #include "msg.h"
 #include "disp_table.h"
-#include "mdp.h"
 
 /* SMIO sockets IDs */
-#define SMIO_PIPE_SOCK              0
-#define SMIO_END_SOCK               1
+#define SMIO_PIPE_MGMT_SOCK         0
+#define SMIO_MLM_SOCK               1
+#define SMIO_END_SOCK               2
 #define SMIO_SOCKS_NUM              SMIO_END_SOCK
 
 struct _devio_t;
@@ -42,13 +43,13 @@ struct _smio_t {
     char *name;                         /* Identification of this sm_io instance */
     char *service;                      /* Exported service name */
     /* int verbose; */                  /* Print activity to stdout */
-    mdp_worker_t *worker;               /* zeroMQ Majordomo worker */
+    mlm_client_t *worker;               /* zeroMQ Malamute client (worker) */
     struct _devio_t *parent;            /* Pointer back to parent dev_io */
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
-    zctx_t *ctx;                        /* Our context */
-    void *pipe;                         /* Pipe back to parent to exchange messages */
+    zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
+    zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;

@@ -39,6 +39,7 @@
             bpm_client_err_str (err_type))
 
 #define BPMCLIENT_DFLT_LOG_MODE             "w"
+#define BPMCLIENT_MLM_CONNECT_TIMEOUT       1000        /* in ms */
 
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode);
@@ -104,7 +105,8 @@ void bpm_client_destroy (bpm_client_t **self_p)
         bpm_client_t *self = *self_p;
 
         self->acq_chan = NULL;
-        mdp_client_destroy (&self->mdp_client);
+        mlm_client_destroy (&self->mlm_client);
+        zuuid_destroy (&self->uuid);
         free (self);
         *self_p = NULL;
     }
@@ -114,6 +116,8 @@ void bpm_client_destroy (bpm_client_t **self_p)
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode)
 {
+    (void) verbose;
+
     assert (broker_endp);
 
     /* Set logfile available for all dev_mngr and dev_io instances.
@@ -126,16 +130,30 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
 
     bpm_client_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
-    self->mdp_client = mdp_client_new (broker_endp, verbose);
-    ASSERT_TEST(self->mdp_client!=NULL, "Could not create MDP client",
-            err_mdp_client);
+
+    /* Generate UUID to work with MLM broker */
+    self->uuid = zuuid_new ();
+    ASSERT_ALLOC(self->uuid, err_uuid_alloc);
+
+    self->mlm_client = mlm_client_new ();
+    ASSERT_TEST(self->mlm_client!=NULL, "Could not create MLM client",
+            err_mlm_client);
+
+    /* Connect to broker with current UUID address in canonical form */
+    int rc = mlm_client_connect (self->mlm_client, broker_endp,
+            BPMCLIENT_MLM_CONNECT_TIMEOUT, zuuid_str_canonical (self->uuid));
+    ASSERT_TEST(rc >= 0, "Could not connect MLM client to broker", err_mlm_connect);
 
     /* Initialize acquisition table */
     self->acq_chan = acq_chan;
 
     return self;
 
-err_mdp_client:
+err_mlm_connect:
+    mlm_client_destroy (&self->mlm_client);
+err_mlm_client:
+    zuuid_destroy (&self->uuid);
+err_uuid_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -170,10 +188,10 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
         input += in_size;
     }
 
-    mdp_client_send (self->mdp_client, service, &msg);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &msg);
 
     /* Receive report */
-    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    zmsg_t *report = mlm_client_recv (self->mlm_client);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
 
     /* Message is:
@@ -267,7 +285,7 @@ bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t led
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &leds, sizeof (leds));
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
 err_send_msg_alloc:
     return err;
@@ -323,7 +341,7 @@ bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service)
     zmsg_t *request = zmsg_new ();
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
 err_send_msg_alloc:
     return err;
@@ -851,10 +869,10 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &acq_req->num_samples, sizeof (acq_req->num_samples));
     zmsg_addmem (request, &acq_req->chan, sizeof (acq_req->chan));
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    zmsg_t *report = mlm_client_recv (self->mlm_client);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:
@@ -897,10 +915,10 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
      * frame 0: operation code      */
     zmsg_t *request = zmsg_new ();
     zmsg_addmem (request, &operation, sizeof (operation));
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    zmsg_t *report = mlm_client_recv (self->mlm_client);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:
@@ -951,9 +969,9 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time (NULL);
     while ((time(NULL) - start)*1000 < timeout) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         err = _bpm_check_data_acquire (self, service);
@@ -971,7 +989,7 @@ static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 exit:
     return err;
 }
@@ -995,10 +1013,10 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &acq_trans->req.chan, sizeof (acq_trans->req.chan));
     zmsg_addmem (request, &acq_trans->block.idx, sizeof (acq_trans->block.idx));
-    mdp_client_send (self->mdp_client, service, &request);
+    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mdp_client_recv (self->mdp_client, NULL, NULL);
+    zmsg_t *report = mlm_client_recv (self->mlm_client);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:
@@ -1103,9 +1121,9 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
     uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size fopr later */
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1137,7 +1155,7 @@ bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         "Data curve of %u bytes was successfully acquired\n", total_bread);
 
 err_bpm_get_data_block:
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_wait_data_acquire:
 err_bpm_data_acquire:
     return err;
@@ -1255,9 +1273,9 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
 
     /* Fill all blocks */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1289,7 +1307,7 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "Data curve of %u bytes was successfully acquired\n", total_bread);
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_get_data_block:
     return err;
 }
@@ -1330,9 +1348,9 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_tr
 
     /* Client requisition: get data block */
     for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
 
         acq_trans->block.idx = block_n;
@@ -1364,7 +1382,7 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_tr
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
             "Data curve of %u bytes was successfully acquired\n", total_bread);
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 err_bpm_get_data_block:
 err_check_data_acquire:
     return err;
@@ -1949,9 +1967,9 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *ser
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     time_t start = time(NULL);
     while (time(NULL) - start < timeout) {
-        if (zctx_interrupted) {
+        if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
-            goto bpm_zctx_interrupted;
+            goto bpm_zsys_interrupted;
         }
         const disp_op_t* func = bpm_func_translate(name);
         err = bpm_func_exec(self, func, service, input, output);
@@ -1965,7 +1983,7 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *ser
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
-bpm_zctx_interrupted:
+bpm_zsys_interrupted:
 exit:
     return err;
 }

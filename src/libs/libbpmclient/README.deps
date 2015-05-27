@@ -4,6 +4,6 @@ Project Dependencies:
     libdisptable
 
 Foreign Dependencies:
-    libmdp
+    libmlm
     libczmq
     libzmq

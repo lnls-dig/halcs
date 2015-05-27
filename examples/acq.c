@@ -3,7 +3,6 @@
  *   * a client and the FPGA device
  *    */
 
-#include <mdp.h>
 #include <czmq.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -19,7 +18,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 /* Arbitrary hard limits */
 #define MAX_NUM_SAMPLES             (1 << 28)
@@ -127,8 +125,6 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-
     /* Set default number samples */
     uint32_t num_samples;
     if (num_samples_str == NULL) {
@@ -173,12 +169,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:acq]: Board number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
@@ -199,7 +189,13 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
@@ -224,6 +220,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "clear\n");
     print_data (chan, data, acq_trans.block.bytes_read);
 
+err_bpm_client_new:
 err_bpm_get_curve:
     str_p = &chan_str;
     free (*str_p);
@@ -231,6 +228,9 @@ err_bpm_get_curve:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
+    str_p = &bpm_number_str;
+    free (*str_p);
+    bpm_number_str = NULL;
     str_p = &num_samples_str;
     free (*str_p);
     num_samples_str = NULL;

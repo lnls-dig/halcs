@@ -63,6 +63,7 @@ typedef struct _smio_bootstrap_ops_t smio_bootstrap_ops_t;
 struct _th_boot_args_t {
     struct _devio_t *parent;        /* Pointer back to devo parent */
     uint32_t smio_id;               /* ID of the SMIO instance */
+    zsock_t *pipe_msg;              /* Message PIPE to actor */
     char *broker;                   /* Endpoint to connect to broker */
     char *service;                  /* (part of) the service name to be exported */
     int verbose;                    /* Print trace information to stdout*/
@@ -86,10 +87,10 @@ typedef struct _th_config_args_t th_config_args_t;
 /************************************************************/
 /************************ Our methods ***********************/
 /************************************************************/
-void smio_startup (void *args, zctx_t *ctx, void *pipe);
-void *smio_config_defaults (void *args);
-struct _smio_t *smio_new (th_boot_args_t *args, struct _zctx_t *ctx,
-        void *pipe, char *service);
+void smio_startup (zsock_t *pipe, void *args);
+void smio_config_defaults (zsock_t *pipe, void *args);
+struct _smio_t *smio_new (th_boot_args_t* args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, char *service);
 smio_err_e smio_destroy (struct _smio_t **self_p);
 smio_err_e smio_loop (struct _smio_t *self);
 

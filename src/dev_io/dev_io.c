@@ -233,10 +233,14 @@ int main (int argc, char *argv[])
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
 
+    /* FIXME: give some time for the process to terminate gracefully */
+    sleep (4);
     /* Kill DEVIO cfg as we've already got our slot number */
     kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
     /* Wait child */
     hutils_wait_chld ();
+    /* Destroy libclient */
+    bpm_client_destroy (&client_cfg);
 #endif
 
     /* We don't need it anymore */
@@ -280,33 +284,23 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    /* err = devio_init_poller_sm (devio); */
-    err = devio_init_poller_sm (devio);
+    /* Step 1: Loop though all the SDB records and intialize (boot) the
+     * smio modules*/
+    /* Step 2: Optionally, register the necessary smio modules specifying
+     * its ID and calling devio_register_sm */
+    /* Step 3: Poll all PIPE's sockets to determine if we have something to
+     * handle, like messages from smios */
+    /*      Step 3.5: If we do, call devio_handle_smio () and treat its
+     *      request as appropriate */
+    err = devio_loop (devio);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_init_poller_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_loop error: %s\n",
+                devio_err_str (err));
         goto err_devio;
     }
 
-    while (!zctx_interrupted) {
-        /* Step 1: Loop though all the SDB records and intialize (boot) the
-         * smio modules*/
-        /* Step 2: Optionally, register the necessary smio modules specifying
-         * its ID and calling devio_register_sm */
-        /* Step 3: Poll all PIPE's sockets to determine if we have something to
-         * handle, like messages from smios */
-        /*      Step 3.5: If we do, call devio_handle_smio () and treat its
-         *      request as appropriate */
-
-        /* devio_poll_all_sm (devio); */
-        err = devio_poll_all_sm (devio);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_poll_all_sm error. Exiting ...\n");
-            goto err_devio;
-        }
-
-        /* wait child */
-        hutils_wait_chld ();
-    }
+    /* wait child */
+    hutils_wait_chld ();
 
 err_devio:
     devio_destroy (&devio);

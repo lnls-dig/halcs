@@ -16,8 +16,8 @@ PWD = 		$(shell pwd)
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
 
-INSTALL_DIR ?= /usr/local
-export INSTALL_DIR
+PREFIX ?= /usr/local
+export PREFIX
 
 LIBBPMCLIENT = libbpmclient
 
@@ -67,7 +67,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmdp
+LIBS = -lzmq -lczmq -lmlm -luuid
 
 # General library flags -L<libdir>
 LFLAGS =
@@ -188,7 +188,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS) $(LIBS)
 
 $(REVISION_NAME).o: $(REVISION_NAME).c
 	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
@@ -241,19 +241,19 @@ pre_clean:
 		rm -f $(header) $(CMDSEP))
 
 install:
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
-	$(foreach header,$($(LIBBPMCLIENT)_INST_HEADERS),install -m 755 $(header) $(INSTALL_DIR)/include $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBBPMCLIENT)_INST_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(INSTALL_DIR)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),rm -f $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
-		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
+		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean: pre_clean
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o

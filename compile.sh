@@ -43,7 +43,8 @@ WITH_DEVIO_CFG=y
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
-CFG_DIR=/etc/bpm_sw
+PREFIX=/usr/local
+CFG_DIR=${PREFIX}/etc/bpm_sw
 
 COMMAND_DEPS="\
     make deps && \

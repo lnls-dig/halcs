@@ -18,7 +18,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 #define DFLT_ADC_DLY_VALUE          10
 #define MAX_ADC_DLY_VALUE           31
@@ -113,12 +112,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:leds]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
@@ -193,9 +186,13 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:adc_dly]: ADC delay value = %u\n", dly_val);
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     /* Call the appropriate delay function. FIXME: the case construct is
      * not generic nor expansible */
@@ -217,6 +214,7 @@ int main (int argc, char *argv [])
             break;
     }
 
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     str_p = &board_number_str;

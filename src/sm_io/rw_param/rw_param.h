@@ -6,7 +6,7 @@
  */
 
 #include <inttypes.h>
-#include <mdp.h>
+#include <malamute.h>
 #include "varg_macros.h"
 #include "rw_param_codes.h"
 #include "msg.h"

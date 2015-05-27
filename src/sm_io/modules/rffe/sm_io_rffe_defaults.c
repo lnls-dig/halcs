@@ -47,6 +47,7 @@ smio_err_e rffe_config_defaults (char *broker_endp, char *service,
 
     bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
             log_file_name, SMIO_RFFE_LIBBPMCLIENT_LOG_MODE);
+    ASSERT_ALLOC(config_client, err_alloc_client);
 
     client_err = bpm_set_rffe_sw (config_client, service, RFFE_DFLT_SW);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RFFE switching value",
@@ -62,5 +63,8 @@ smio_err_e rffe_config_defaults (char *broker_endp, char *service,
 
 err_param_set:
     bpm_client_destroy (&config_client);
+err_alloc_client:
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:rffe_defaults] Exiting Config thread %s\n",
+        service);
     return err;
 }

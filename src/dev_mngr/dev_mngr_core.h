@@ -47,8 +47,7 @@ struct _dmngr_ops_t {
 
 struct _dmngr_t {
     /* General information */
-    zctx_t *ctx;                /* zeroMQ context */
-    void *dealer;               /* zeroMQ Dealer socket */
+    zsock_t *dealer;            /* zeroMQ Dealer socket */
     char *name;                 /* Identification of this dmngr instance */
     char *endpoint;             /* Endpoint to connect to */
     int verbose;                /* Print activity to stdout */

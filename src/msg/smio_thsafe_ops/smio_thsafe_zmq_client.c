@@ -116,7 +116,7 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, uint64_t offs, size_t size, 
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe);
+    zerr = zmsg_send (&send_msg, self->pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -164,7 +164,7 @@ ssize_t thsafe_zmq_client_write_block (smio_t *self, uint64_t offs, size_t size,
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe);
+    zerr = zmsg_send (&send_msg, self->pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -242,7 +242,7 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
 #ifdef LOCAL_MSG_DBG
     debug_log_print_zmq_msg (send_msg);
 #endif
-    zerr = zmsg_send (&send_msg, self->pipe);
+    zerr = zmsg_send (&send_msg, self->pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -325,7 +325,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe);
+    zerr = zmsg_send (&send_msg, self->pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -389,7 +389,7 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, co
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe);
+    zerr = zmsg_send (&send_msg, self->pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message",
             err_send_msg);
 
@@ -422,7 +422,7 @@ static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
 
     assert (self);
     /* Wait for response */
-    zmsg_t *recv_msg = zmsg_recv (self->pipe);
+    zmsg_t *recv_msg = zmsg_recv (self->pipe_msg);
     /* Do not pop the message, just set a cursor to it */
     zframe_t *reply_frame = zmsg_first (recv_msg);
 

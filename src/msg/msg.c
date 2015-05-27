@@ -47,8 +47,8 @@ static msg_err_e _msg_format_client_response (int disp_table_ret,
 static RW_REPLY_TYPE _msg_format_reply_code (int reply_code);
 static zmsg_t * _msg_create_client_response (RW_REPLY_TYPE reply_code, uint32_t reply_size,
         uint32_t *data_out, bool with_data_frame);
-static void _msg_send_client_response_mdp (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, mdp_worker_t *worker,
+static void _msg_send_client_response_mlm (RW_REPLY_TYPE reply_code, uint32_t reply_size,
+        uint32_t *data_out, bool with_data_frame, mlm_client_t *worker,
         zframe_t *reply_to);
 static void _msg_send_client_response_sock (RW_REPLY_TYPE reply_code, uint32_t reply_size,
         uint32_t *data_out, bool with_data_frame, zframe_t *reply_to);
@@ -63,8 +63,8 @@ msg_err_e msg_validate (void *msg, msg_type_e expected_msg_type)
     return _msg_validate (msg, expected_msg_type);
 }
 
-/* Handle MDP protocol (used by SMIOs, for instance) request */
-msg_err_e msg_handle_mdp_request (void *owner, void *args,
+/* Handle MLM protocol (used by SMIOs, for instance) request */
+msg_err_e msg_handle_mlm_request (void *owner, void *args,
         disp_table_t *disp_table)
 {
     msg_err_e err = MSG_SUCCESS;
@@ -97,14 +97,14 @@ msg_err_e msg_handle_mdp_request (void *owner, void *args,
             err_format_response);
 
     /* Send response back to client */
-    _msg_send_client_response_mdp (reply_code, disp_table_ret, ret, with_data_frame,
+    _msg_send_client_response_mlm (reply_code, disp_table_ret, ret, with_data_frame,
            self->worker, msg->reply_to);
 
     return err;
 
 err_format_response:
 err_get_opcode:
-    _msg_send_client_response_mdp (PARAM_ERR, 0, NULL, false, self->worker,
+    _msg_send_client_response_mlm (PARAM_ERR, 0, NULL, false, self->worker,
             msg->reply_to);
 err_inv_msg:
     return err;
@@ -331,16 +331,17 @@ static RW_REPLY_TYPE _msg_format_reply_code (int reply_code)
     return (reply_code < 0) ? -reply_code : reply_code;
 }
 
-static void _msg_send_client_response_mdp (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, mdp_worker_t *worker,
+static void _msg_send_client_response_mlm (RW_REPLY_TYPE reply_code, uint32_t reply_size,
+        uint32_t *data_out, bool with_data_frame, mlm_client_t *worker,
         zframe_t *reply_to)
 {
+    (void) reply_to;
     zmsg_t *msg = _msg_create_client_response (reply_code, reply_size, data_out,
             with_data_frame);
     ASSERT_TEST(msg != NULL, "Could format client message",
             err_fmt_client_message);
 
-    mdp_worker_send (worker, &msg, reply_to);
+    mlm_client_sendto (worker, mlm_client_sender (worker), NULL, NULL, 0, &msg);
 err_fmt_client_message:
     return;
 }

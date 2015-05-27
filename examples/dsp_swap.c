@@ -16,7 +16,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 void print_help (char *program_name)
 {
@@ -107,12 +106,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:dsp]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
@@ -134,11 +127,15 @@ int main (int argc, char *argv [])
 
     /* Generate the service names for each SMIO */
     char service_dsp[50];
-    sprintf (service_dsp, "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
+    snprintf (service_dsp, strlen (service_dsp)+1, "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
     char service_swap[50];
-    sprintf (service_swap, "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
+    snprintf (service_swap, strlen (service_swap)+1, "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t kx_set = 10000000;
     fprintf (stdout, "[client:dsp]: kx = %u\n", kx_set);
@@ -289,6 +286,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:swap]: bpm_set_gain_d = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
+err_bpm_client_new:
 err_bpm_exit:
 err_bpm_get:
 err_bpm_set:

@@ -47,6 +47,7 @@ smio_err_e afc_diag_config_defaults (char *broker_endp, char *service,
 
     bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
             log_file_name, SMIO_AFC_DIAG_LIBBPMCLIENT_LOG_MODE);
+    ASSERT_ALLOC(config_client, err_alloc_client);
 
     uint32_t card_slot = 0;
     client_err = bpm_get_afc_diag_card_slot (config_client, service, &card_slot);
@@ -60,5 +61,8 @@ smio_err_e afc_diag_config_defaults (char *broker_endp, char *service,
 
 err_param_get:
     bpm_client_destroy (&config_client);
+err_alloc_client:
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:afc_diag_defaults] Exiting Config thread %s\n",
+        service);
     return err;
 }

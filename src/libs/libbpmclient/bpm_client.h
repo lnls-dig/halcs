@@ -9,7 +9,7 @@
 #define _BPM_CLIENT_H_
 
 #include <inttypes.h>
-#include <mdp.h>
+#include <malamute.h>
 
 #include "bpm_client_codes.h"
 #include "bpm_client_err.h"
@@ -19,7 +19,8 @@ struct _acq_chan_t;
 
 /* Our structure */
 struct _bpm_client_t {
-    mdp_client_t *mdp_client;                   /* Majordomo client instance */
+    zuuid_t * uuid;                             /* Client UUID */
+    mlm_client_t *mlm_client;                   /* Malamute client instance */
     const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
 };
 

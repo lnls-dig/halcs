@@ -6,22 +6,36 @@ Software for controlling the AFC BPM boards
 
 ## Prerequisites:
 
-Make sure you have the following libraries installed:
+Make sure you have the following libraries installed, either by download
+the binaries or executing the instructions below:
 
-* zeromq-4.0.4 (http://zeromq.org/area:download)
-* czmq-2.2.0 (http://czmq.zeromq.org/page:get-the-software)
+* zeromq-4.2.0 (http://zeromq.org/area:download)
+* czmq-3.0.1 (http://czmq.zeromq.org/page:get-the-software)
+* mlm-0.1.0 (https://github.com/zeromq/malamute.git)
 
-Cloning this repository
+## Optional libraries:
+
+* uuid (distribution available):
+
+	sudo apt-get install uuid
+
+### Prerequisites Installation Instructions
+
+	git clone git://github.com/zeromq/libzmq.git && \
+	git clone git://github.com/zeromq/czmq.git && \
+	git clone git://github.com/zeromq/malamute.git &&
+	for project in libsodium libzmq czmq malamute; do
+	    cd $project
+	    ./autogen.sh
+	    ./configure && make check
+	    sudo make install
+	    sudo ldconfig
+	    cd ..
+	done
+
+## Cloning this repository
 
 	git clone --recursive https://github.com/lerwys/bpm-sw.git
-
-Install the Majordomo application from this repository (autotools-based)
-
-	cd majordomo/libmdp
-
-Execute the traditional sequence of autotools commands:
-
-	./autogen.sh && make && sudo make install
 
 ## PCIe Installation Instructions
 
@@ -194,7 +208,7 @@ the PCIe kernel driver.
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	./compile.sh
+	./compile.sh <board type = [ml605|afcv3]>
 
 ### Client
 
