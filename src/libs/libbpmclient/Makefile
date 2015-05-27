@@ -142,13 +142,17 @@ $(LIBBPMCLIENT)_FUNC_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch
 	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
 
-$(LIBBPMCLIENT)_ACQ_HEADERS += ../../../include/acq_chan.h
+# Install only specific acq_chan.h defintions according to the BOARD MACRO
+$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
+$(LIBBPMCLIENT)_ACQ_HEADERS = \
+	../../../include/boards/$(BOARD)/priv_defs/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
+$(LIBBPMCLIENT)_INST_ACQ_HEADERS = $($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h
 
 $(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_OBJS_LIB:.o=.h) $($(LIBBPMCLIENT)_CODE_HEADERS) \
     $($(LIBBPMCLIENT)_FUNC_EXPORTS)
 
 # Installation headers
-$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS)
+$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS) $($(LIBBPMCLIENT)_INST_ACQ_HEADERS)
 
 # Save a git repository description
 GIT_REVISION = $(shell git describe --dirty --always)
@@ -170,13 +174,13 @@ TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
 TARGET_SHARED = $(addsuffix $(LIB_SHARED_SUFFIX), $(OUT))
 TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 
-.PHONY: all clean mrproper install uninstall
+.PHONY: all clean mrproper pre_inst pre_clean install uninstall
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 
 # Compile static library
 %.a: $$($$*_OBJS) $(OBJ_REVISION)
@@ -227,6 +231,15 @@ $(REVISION_NAME).o: $(REVISION_NAME).c
 #	$(MAKE) -C $@ all
 #
 
+# Prepare the environment for install rule
+pre_inst:
+	$(foreach header,$($(LIBBPMCLIENT)_ACQ_HEADERS),cp -p $(header) \
+		$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS) $(CMDSEP))
+
+pre_clean:
+	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS), \
+		rm -f $(header) $(CMDSEP))
+
 install:
 	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(INSTALL_DIR)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(INSTALL_DIR)/lib/$(lib) $(CMDSEP))
@@ -242,7 +255,7 @@ uninstall:
 	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
 		$(INSTALL_DIR)/include/$(header) $(CMDSEP))
 
-clean:
+clean: pre_clean
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d) $(REVISION_NAME).o
 
 mrproper: clean
