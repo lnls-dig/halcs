@@ -11,12 +11,19 @@
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 
+#define DFLT_BPM_NUMBER             0
+#define MAX_BPM_NUMBER              1
+
+#define DFLT_BOARD_NUMBER           0
+
 void print_help (char *program_name)
 {
     printf( "Usage: %s [options]\n"
             "\t-h This help message\n"
             "\t-v Verbose output\n"
-            "\t-b <broker_endpoint> Broker endpoint\n", program_name);
+            "\t-b <broker_endpoint> Broker endpoint\n"
+            "\t-board <AMC board = [0|1|2|3|4|5]>\n"
+            "\t-bpm <BPM number = [0|1]>\n", program_name);
 }
 
 int main (int argc, char *argv [])
@@ -58,11 +65,42 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
+    /* Set default board number */
+    uint32_t board_number;
+    if (board_number_str == NULL) {
+        fprintf (stderr, "[client:acq]: Setting default value to BOARD number: %u\n",
+                DFLT_BOARD_NUMBER);
+        board_number = DFLT_BOARD_NUMBER;
+    }
+    else {
+        board_number = strtoul (board_number_str, NULL, 10);
+    }
+
+    /* Set default bpm number */
+    uint32_t bpm_number;
+    if (bpm_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+                DFLT_BPM_NUMBER);
+        bpm_number = DFLT_BPM_NUMBER;
+    }
+    else {
+        bpm_number = strtoul (bpm_number_str, NULL, 10);
+
+        if (bpm_number > MAX_BPM_NUMBER) {
+            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+                    MAX_BPM_NUMBER);
+            bpm_number = MAX_BPM_NUMBER;
+        }
+    }
+
+    char service [50];
+    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:FMC130M_4CH%u",
+            board_number, bpm_number);
+
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
 
     uint32_t adc_data;
-    bpm_client_err_e err = bpm_get_adc_data0 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0",
-            &adc_data);
+    bpm_client_err_e err = bpm_get_adc_data0 (bpm_client, service, &adc_data);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_adc_data0 failed\n");
         goto err_get_adc_data;
@@ -70,8 +108,7 @@ int main (int argc, char *argv [])
 
     fprintf (stdout, "[client:adc_data]: data0 = %d\n", (int16_t) adc_data);
 
-    err = bpm_get_adc_data1 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0",
-            &adc_data);
+    err = bpm_get_adc_data1 (bpm_client, service, &adc_data);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_adc_data1 failed\n");
         goto err_get_adc_data;
@@ -79,8 +116,7 @@ int main (int argc, char *argv [])
 
     fprintf (stdout, "[client:adc_data]: data1 = %d\n", (int16_t) adc_data);
 
-    err = bpm_get_adc_data2 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0",
-            &adc_data);
+    err = bpm_get_adc_data2 (bpm_client, service, &adc_data);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_adc_data2 failed\n");
         goto err_get_adc_data;
@@ -88,8 +124,7 @@ int main (int argc, char *argv [])
 
     fprintf (stdout, "[client:adc_data]: data2 = %d\n", (int16_t) adc_data);
 
-    err = bpm_get_adc_data3 (bpm_client, "BPM0:DEVIO:FMC130M_4CH0",
-            &adc_data);
+    err = bpm_get_adc_data3 (bpm_client, service, &adc_data);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_adc_data3 failed\n");
         goto err_get_adc_data;
