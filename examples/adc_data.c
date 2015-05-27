@@ -30,6 +30,8 @@ int main (int argc, char *argv [])
 {
     int verbose = 0;
     char *broker_endp = NULL;
+    char *board_number_str = NULL;
+    char *bpm_number_str = NULL;
     char **str_p = NULL;
 
     if (argc < 2) {
@@ -98,6 +100,10 @@ int main (int argc, char *argv [])
             board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t adc_data;
     bpm_client_err_e err = bpm_get_adc_data0 (bpm_client, service, &adc_data);
@@ -132,10 +138,17 @@ int main (int argc, char *argv [])
 
     fprintf (stdout, "[client:adc_data]: data3 = %d\n", (int16_t) adc_data);
 
+err_bpm_client_new:
 err_get_adc_data:
     bpm_client_destroy (&bpm_client);
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
+    str_p = &board_number_str;
+    free (*str_p);
+    board_number_str = NULL;
+    str_p = &bpm_number_str;
+    free (*str_p);
+    bpm_number_str = NULL;
     return 0;
 }

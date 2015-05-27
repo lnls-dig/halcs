@@ -59,6 +59,10 @@ int main (int argc, char *argv [])
     }
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t monit_amp;
     bpm_client_err_e err = bpm_get_monit_amp_ch0 (bpm_client, "BPM0:DEVIO:DSP0",
@@ -97,6 +101,7 @@ int main (int argc, char *argv [])
 
     fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch3 = %u\n", monit_amp);
 
+err_bpm_client_new:
 err_get_monit_amp:
     bpm_client_destroy (&bpm_client);
     str_p = &broker_endp;

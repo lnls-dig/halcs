@@ -132,6 +132,10 @@ int main (int argc, char *argv [])
     sprintf (service_swap, "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t kx_set = 10000000;
     fprintf (stdout, "[client:dsp]: kx = %u\n", kx_set);
@@ -282,6 +286,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:swap]: bpm_set_gain_d = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
+err_bpm_client_new:
 err_bpm_exit:
 err_bpm_get:
 err_bpm_set:

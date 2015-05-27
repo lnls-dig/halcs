@@ -141,6 +141,10 @@ int main (int argc, char *argv [])
     sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     bpm_client_err_e err = bpm_set_si571_set_freq (bpm_client, service, si571_freq);
     if (err != BPM_CLIENT_SUCCESS){
@@ -148,6 +152,7 @@ int main (int argc, char *argv [])
         goto err_bpm_set_freq;
     }
 
+err_bpm_client_new:
 err_bpm_set_freq:
     bpm_client_destroy (&bpm_client);
 

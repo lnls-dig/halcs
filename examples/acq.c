@@ -125,8 +125,6 @@ int main (int argc, char *argv [])
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-
     /* Set default number samples */
     uint32_t num_samples;
     if (num_samples_str == NULL) {
@@ -176,7 +174,7 @@ int main (int argc, char *argv [])
     /* Set default bpm number */
     uint32_t bpm_number;
     if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to BPM number: %u\n",
+        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
                 DFLT_BPM_NUMBER);
         bpm_number = DFLT_BPM_NUMBER;
     }
@@ -184,7 +182,7 @@ int main (int argc, char *argv [])
         bpm_number = strtoul (bpm_number_str, NULL, 10);
 
         if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:acq]: BPM number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
                     MAX_BPM_NUMBER);
             bpm_number = MAX_BPM_NUMBER;
         }
@@ -192,6 +190,12 @@ int main (int argc, char *argv [])
 
     char service[50];
     sprintf (service, "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+
+    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
@@ -216,6 +220,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "clear\n");
     print_data (chan, data, acq_trans.block.bytes_read);
 
+err_bpm_client_new:
 err_bpm_get_curve:
     str_p = &chan_str;
     free (*str_p);

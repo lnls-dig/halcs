@@ -205,9 +205,13 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     for (i = 0; i < MAX_NUM_FUNCS; ++i) {
         if (func_call [i].call == 1) {
@@ -223,6 +227,7 @@ int main (int argc, char *argv [])
         }
     }
 
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     /* ugly... */

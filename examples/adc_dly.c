@@ -189,6 +189,10 @@ int main (int argc, char *argv [])
     sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     /* Call the appropriate delay function. FIXME: the case construct is
      * not generic nor expansible */
@@ -210,6 +214,7 @@ int main (int argc, char *argv [])
             break;
     }
 
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     str_p = &board_number_str;

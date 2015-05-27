@@ -107,6 +107,10 @@ int main (int argc, char *argv [])
     sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     for (i = 0; i < 32768; ++i) {
         uint32_t leds = (1 << 1);
@@ -122,6 +126,7 @@ int main (int argc, char *argv [])
         }
     }
 
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     str_p = &broker_endp;
