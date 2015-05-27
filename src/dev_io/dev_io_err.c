@@ -17,6 +17,7 @@ static const char *devio_err [DEVIO_ERR_END] =
     [DEVIO_ERR_FUNC_NOT_IMPL]           = "Function not implemented",
     [DEVIO_ERR_NO_SMIO_OP]              = "No sm_io registered for this opcode",
     [DEVIO_ERR_NO_SMIO_ID]              = "No sm_io registered with this ID",
+    [DEVIO_ERR_MAX_SMIOS]               = "Maximum number os SMIOs reached",
     [DEVIO_ERR_SMIO_DO_OP]              = "Error calling specific sm_io function",
     [DEVIO_ERR_NO_NODES]                = "No thread nodes available",
     [DEVIO_ERR_UNINIT_POLLER]           = "Poller uninitilized",

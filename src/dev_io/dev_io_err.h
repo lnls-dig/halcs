@@ -19,6 +19,7 @@ enum _devio_err_e
     DEVIO_ERR_SMIO_DO_OP,           /* Error calling sm_io specific function */
     DEVIO_ERR_NO_SMIO_OP,           /* No sm_io registered for the opcode argument */
     DEVIO_ERR_NO_SMIO_ID,           /* No sm_io registered with the id argument */
+    DEVIO_ERR_MAX_SMIOS,            /* Maximum number os SMIOs reached */
     DEVIO_ERR_NO_NODES,             /* No thread nodes available */
     DEVIO_ERR_UNINIT_POLLER,        /* Uninitliazed poller */
     DEVIO_ERR_INTERRUPTED_POLLER,   /* Poller interrupted. zeroMQ context was terminated or received interrupt signal */
