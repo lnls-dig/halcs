@@ -45,6 +45,7 @@
 
 #define LLIO_STR                            ":LLIO\0"
 #define DEVIO_POLLER_TIMEOUT                100        /* in msec */
+#define DEVIO_POLLER_CONFIG_TIMEOUT         0          /* in msec */
 #define DEVIO_DFLT_LOG_MODE                 "w"
 
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
@@ -59,9 +60,9 @@ static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
 
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
-static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt);
-static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key);
-static devio_err_e _devio_destroy_smio_all (devio_t *self);
+static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor);
+static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const char *smio_key);
+static devio_err_e _devio_destroy_smio_all (devio_t *self, zhash_t *smio_h);
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
@@ -98,11 +99,16 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     ASSERT_ALLOC(self->pipes_mgmt, err_pipes_mgmt_alloc);
     self->pipes_msg = zmalloc (sizeof (*self->pipes_msg) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_msg, err_pipes_msg_alloc);
+    self->pipes_config = zmalloc (sizeof (*self->pipes_config) * NODES_MAX_LEN);
+    ASSERT_ALLOC(self->pipes_config, err_pipes_config_alloc);
     /* 0 nodes for now... */
     self->nnodes = 0;
 
-    /* Setup new poller. It uses the low-level zmq_poll API */
-    self->poller = NULL;
+    /* Setup pollers */
+    self->poller = zpoller_new (NULL);
+    ASSERT_ALLOC(self->poller, err_poller_alloc);
+    self->poller_config = zpoller_new (NULL);
+    ASSERT_ALLOC(self->poller_config, err_poller_config_alloc);
 
     /* Setup strings/options */
     self->name = strdup (name);
@@ -136,6 +142,10 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     self->sm_io_h = zhash_new ();
     ASSERT_ALLOC(self->sm_io_h, err_sm_io_h_alloc);
 
+    /* Init sm_io_cfg_h hash */
+    self->sm_io_cfg_h = zhash_new ();
+    ASSERT_ALLOC(self->sm_io_cfg_h, err_sm_io_cfg_h_alloc);
+
     /* Init sm_io_thsafe_ops_h dispatch table */
     self->disp_table_thsafe_ops = disp_table_new (&devio_disp_table_ops);
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
@@ -156,6 +166,8 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
 err_disp_table_init:
     disp_table_destroy (&self->disp_table_thsafe_ops);
 err_disp_table_thsafe_ops_alloc:
+    zhash_destroy (&self->sm_io_cfg_h);
+err_sm_io_cfg_h_alloc:
     zhash_destroy (&self->sm_io_h);
 err_sm_io_h_alloc:
     llio_release (self->llio, NULL);
@@ -168,6 +180,12 @@ err_llio_name_alloc:
 err_endp_broker_alloc:
     free (self->name);
 err_name_alloc:
+    zpoller_destroy (&self->poller_config);
+err_poller_config_alloc:
+    zpoller_destroy (&self->poller);
+err_poller_alloc:
+    free (self->pipes_config);
+err_pipes_config_alloc:
     free (self->pipes_msg);
 err_pipes_msg_alloc:
     free (self->pipes_mgmt);
@@ -188,20 +206,31 @@ devio_err_e devio_destroy (devio_t **self_p)
         devio_t *self = *self_p;
 
         /* Destroy children threads before proceeding */
-        _devio_destroy_smio_all (self);
+        _devio_destroy_smio_all (self, self->sm_io_cfg_h);
+        _devio_destroy_smio_all (self, self->sm_io_h);
 
         /* Starting destructing by the last resource */
         /* Notice that we destroy the worker first, as to
          * unregister from broker as soon as possible to avoid
          * loosing requests from clients */
         disp_table_destroy (&self->disp_table_thsafe_ops);
+        zhash_destroy (&self->sm_io_cfg_h);
         zhash_destroy (&self->sm_io_h);
         self->thsafe_server_ops = NULL;
         llio_release (self->llio, NULL);
         llio_destroy (&self->llio);
         free (self->endpoint_broker);
         free (self->name);
-        free (self->poller);
+        zpoller_destroy (&self->poller_config);
+        zpoller_destroy (&self->poller);
+        /* Destroy all remamining sockets if any */
+        uint32_t i;
+        for (i = 0; i < NODES_MAX_LEN; ++i) {
+            zactor_destroy (&self->pipes_config [i]);
+            zsock_destroy (&self->pipes_msg [i]);
+            zactor_destroy (&self->pipes_mgmt [i]);
+        }
+        free (self->pipes_config);
         free (self->pipes_msg);
         free (self->pipes_mgmt);
         free (self->log_file);
@@ -226,6 +255,10 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
 {
     assert (self);
 
+    devio_err_e err = DEVIO_ERR_ALLOC;
+    ASSERT_TEST (self->nnodes <= NODES_MAX_LEN, "Maximum number of SMIOs reached",
+            err_max_smios_reached, DEVIO_ERR_MAX_SMIOS);
+
     /* Search the sm_io_mod_dsapatch table for the smio_id and,
      * if found, call the correspondent bootstrap code to initilize
      * the sm_io module */
@@ -234,6 +267,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     char *key = NULL;
     uint32_t pipe_mgmt_idx = 0;
     uint32_t pipe_msg_idx = 0;
+    uint32_t pipe_config_idx = 0;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] searching for SMIO ID match\n");
@@ -268,10 +302,13 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         /* Increment PIPE indexes */
         pipe_mgmt_idx = self->nnodes++;
         pipe_msg_idx = pipe_mgmt_idx;
+        pipe_config_idx = pipe_mgmt_idx;
 
         /* Create PIPE message to talk to SMIO */
         zsock_t *pipe_msg_backend;
         self->pipes_msg [pipe_msg_idx] = zsys_create_pipe (&pipe_msg_backend);
+        ASSERT_TEST (self->pipes_msg [pipe_msg_idx] != NULL, "Could not create message PIPE",
+                err_create_pipe_msg);
 
         /* Alloacate thread arguments struct and pass it to the
          * thread. It is the responsability of the calling thread
@@ -297,11 +334,16 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
-        int zerr = zhash_insert (self->sm_io_h, key, self->pipes_mgmt [pipe_mgmt_idx]);
+        int zerr = zhash_insert (self->sm_io_h, key, &self->pipes_mgmt [pipe_mgmt_idx]);
         /* We must not fail here, as we will loose our reference to the SMIO
          * thread otherwise */
         ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
                 err_pipe_hash_insert);
+
+        /* Add actor to message poll */
+        zerr = zpoller_add (self->poller, self->pipes_msg [pipe_msg_idx]);
+        ASSERT_TEST (zerr == 0, "Could not insert PIPE into poller",
+                err_poller_insert);
 
         /* Configure default values of the recently created SMIO using the
          * bootstrap registered function config_defaults () */
@@ -320,20 +362,25 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         th_config_args->log_file = self->log_file;
         th_config_args->inst_id = inst_id;
 
-        /* Create actor just for configuring the new recently created SMIO */
-        zactor_t *config_actor = zactor_new (smio_config_defaults, th_config_args);
-        ASSERT_TEST (config_actor != NULL, "Could not spawn config thread",
-                err_spawn_config_thread);
+        /* Create actor just for configuring the new recently created SMIO. We will
+           check for its end later on poll_all_sm function */
+        self->pipes_config [pipe_config_idx] = zactor_new (smio_config_defaults,
+                th_config_args);
+        ASSERT_TEST (self->pipes_config [pipe_config_idx] != NULL,
+                "Could not spawn config thread", err_spawn_config_thread);
 
-        /* Ok, we've created our actor. Now, we wait for it to signal its end */
-        zsock_wait (config_actor);
-        /* Now, we send a TERM message to the actor, indicating we want it to
-         * end */
-        zerr = zstr_sendx (config_actor, "$TERM", NULL);
-        /* ASSERT_TEST (zerr != -1, "Could send $TERM message to actor",
-                err_end_config_thread); */
-        /* Lastly, destroy the actor */
-        zactor_destroy (&config_actor);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_sm] Inserting config hash with key: %s\n", key);
+        zerr = zhash_insert (self->sm_io_cfg_h, key, &self->pipes_config [pipe_config_idx]);
+        /* We must not fail here, as we will loose our reference to the SMIO
+         * thread otherwise */
+        ASSERT_TEST (zerr == 0, "Could not insert Config PIPE hash key. Duplicated value?",
+                err_cfg_pipe_hash_insert);
+
+        /* Add actor to config poll */
+        zerr = zpoller_add (self->poller_config, self->pipes_config [pipe_config_idx]);
+        ASSERT_TEST (zerr == 0, "Could not insert PIPE into Config poller",
+                err_poller_config_insert);
 
         /* stop on first match */
         break;
@@ -347,22 +394,33 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
 
     return DEVIO_SUCCESS;
 
+err_poller_config_insert:
+    zhash_delete (self->sm_io_cfg_h, key);
+err_cfg_pipe_hash_insert:
+    /* If we can't insert the SMIO thread key in hash,
+     * destroy it as we won't have a reference to it later! */
+    _devio_send_destruct_msg (self, &self->pipes_config [pipe_config_idx]);
 err_spawn_config_thread:
     /* FIXME: Destroy SMIO thread as we could configure it? */
     free (th_config_args);
 err_th_config_args_alloc:
+    zpoller_remove (self->poller, self->pipes_msg [pipe_msg_idx]);
+err_poller_insert:
     zhash_delete (self->sm_io_h, key);
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
-    _devio_send_destruct_msg (self, self->pipes_mgmt [pipe_mgmt_idx]);
+    _devio_send_destruct_msg (self, &self->pipes_mgmt [pipe_mgmt_idx]);
 err_spawn_smio_thread:
+    zsock_destroy (&self->pipes_msg [pipe_msg_idx]);
+err_create_pipe_msg:
     free (th_args);
 err_th_args_alloc:
     free (key);
 err_key_alloc:
 err_inst_id_str_alloc:
-    return DEVIO_ERR_ALLOC;
+err_max_smios_reached:
+    return err;
 }
 
 /* Register all sm_io module that this device can handle,
@@ -375,84 +433,120 @@ devio_err_e devio_register_all_sm (devio_t *self)
 
 devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key)
 {
-    return _devio_destroy_smio (self, smio_key);
+    /* Don't care for errors here, as the Config actor is probably already
+     * gone */
+    _devio_destroy_smio (self, self->sm_io_cfg_h, smio_key);
+    devio_err_e err = _devio_destroy_smio (self, self->sm_io_h, smio_key);
+    ASSERT_TEST(err == DEVIO_SUCCESS, "Could not destroy SMIO",
+            err_destroy_smio, DEVIO_ERR_SMIO_DESTROY);
+
+err_destroy_smio:
+    return err;
 }
 
 devio_err_e devio_unregister_all_sm (devio_t *self)
 {
-    return _devio_destroy_smio_all (self);
-}
+    devio_err_e err = _devio_destroy_smio_all (self, self->sm_io_cfg_h);
+    ASSERT_TEST(err == DEVIO_SUCCESS, "Could not destroy Config SMIOs",
+            err_destroy_cfg_smios, DEVIO_ERR_SMIO_DESTROY);
+    err = _devio_destroy_smio_all (self, self->sm_io_h);
+    ASSERT_TEST(err == DEVIO_SUCCESS, "Could not destroy SMIOs",
+            err_destroy_smios, DEVIO_ERR_SMIO_DESTROY);
 
-devio_err_e devio_init_poller_sm (devio_t *self)
-{
-    devio_err_e err = DEVIO_SUCCESS;
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-            "[dev_io_core:poll_all_sm] Calling init_poller_sm\n");
-
-    /* Check minimum number of nodes */
-    ASSERT_TEST(self->nnodes > 0, "There are no SMIOs registered!",
-            err_no_nodes, DEVIO_ERR_NO_NODES);
-
-    zmq_pollitem_t *items = zmalloc (sizeof (*items) * self->nnodes);
-    ASSERT_ALLOC(items, err_alloc_items, DEVIO_ERR_ALLOC);
-
-    unsigned int i;
-    for (i = 0; i < self->nnodes; ++i) {
-        items [i].socket = zsock_resolve (self->pipes_msg [i]);
-        ASSERT_TEST(items [i].socket != NULL, "Invalid socket reference",
-                err_inv_socket, DEVIO_ERR_INV_SOCKET);
-        items [i].events = ZMQ_POLLIN;
-    }
-
-    /* This should be freed on dev_io exit */
-    self->poller = items;
-    return err;
-
-err_inv_socket:
-    free (items);
-err_alloc_items:
-err_no_nodes:
+err_destroy_cfg_smios:
+err_destroy_smios:
     return err;
 }
 
 devio_err_e devio_poll_all_sm (devio_t *self)
 {
+    assert (self);
+
     devio_err_e err = DEVIO_SUCCESS;
+    char *service_id = NULL;
+    char *command = NULL;
 
     ASSERT_TEST(self->poller, "Unitialized poller!",
             err_uninitialized_poller, DEVIO_ERR_UNINIT_POLLER);
+    ASSERT_TEST(self->poller_config, "Unitialized config poller!",
+            err_uninitialized_poller_config, DEVIO_ERR_UNINIT_POLLER);
 
-    /* Wait up to 100 ms */
-    int rc = zmq_poll (self->poller, self->nnodes, DEVIO_POLLER_TIMEOUT);
-    ASSERT_TEST(rc != -1, "devio_poll_all_sm: poller interrupted", err_poller_interrupted,
-            DEVIO_ERR_INTERRUPTED_POLLER);
+    while (!zsys_interrupted) {
+        /* Poll Message sockets */
+        zsock_t *which = zpoller_wait (self->poller, DEVIO_POLLER_TIMEOUT);
+        ASSERT_TEST(which != NULL || zpoller_expired (self->poller),
+                "devio_poll_all_sm: poller interrupted", err_poller_interrupted,
+                DEVIO_ERR_INTERRUPTED_POLLER);
 
-    /* Timeout */
-    if (rc == 0) {  /* Exit silently */
-        /*DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-                "[dev_io_core:poll_all_sm] poller expired\n");*/
-        goto err_poller_expired;
-    }
-
-    /* Loop once through all the available sockets */
-    unsigned int i;
-    for (i = 0; i < self->nnodes; ++i) {
-        if (self->poller [i].revents & ZMQ_POLLIN) {
-            zmsg_t *recv_msg = zmsg_recv (self->poller [i].socket);
+        /* Activity on socket */
+        if (which != NULL) {
+            /* Receive message */
+            zmsg_t *recv_msg = zmsg_recv (which);
+            if (recv_msg == NULL) {
+                break; /* Interrupted */
+            }
             /* Prepare the args structure */
             zmq_server_args_t server_args = {
                 .tag = ZMQ_SERVER_ARGS_TAG,
                 .msg = &recv_msg,
-                .reply_to = self->poller [i].socket};
+                .reply_to = which};
             err = _devio_do_smio_op (self, &server_args);
 
             /* Cleanup */
             zmsg_destroy (&recv_msg);
         }
+
+        /* Poll Config sockets */
+        zactor_t *which_config = zpoller_wait (self->poller_config, DEVIO_POLLER_CONFIG_TIMEOUT);
+        ASSERT_TEST(which_config != NULL || zpoller_expired (self->poller_config),
+                "devio_poll_all_sm: poller_config interrupted",
+                err_poller_config_interrupted, DEVIO_ERR_INTERRUPTED_POLLER);
+
+        /* Activity on socket */
+        if (which_config != NULL) {
+            /* Remove config actror from poller */
+            zpoller_remove (self->poller_config, which_config);
+            /* Receive message */
+            zmsg_t *recv_msg = zmsg_recv (which_config);
+            if (recv_msg == NULL) {
+                break; /* Interrupted */
+            }
+
+            service_id = zmsg_popstr (recv_msg);
+            ASSERT_TEST(service_id != NULL, "devio_poll_all_sm: received NULL service_id string",
+                    err_poller_config_null_service, DEVIO_ERR_BAD_MSG);
+            command = zmsg_popstr (recv_msg);
+            ASSERT_TEST(command != NULL, "devio_poll_all_sm: poller_config received NULL command string",
+                    err_poller_config_null_command, DEVIO_ERR_BAD_MSG);
+
+            /* CONFIG DONE means the config thread is finished and should
+             * be destroyed */
+            if (streq (command, "CONFIG DONE")) {
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                        "[dev_io_core:poll_all_sm] Config thread signalled "
+                        "CONFIG DONE. Terminating thread\n");
+                /* Terminate config thread */
+                zstr_sendx (which_config, "$TERM", NULL);
+                /* Lastly, destroy the actor */
+                err = _devio_destroy_smio (self, self->sm_io_cfg_h, service_id);
+                ASSERT_TEST(err == DEVIO_SUCCESS, "devio_poll_all_sm: Could not destroy SMIO",
+                        err_poller_destroy_cfg_smio, DEVIO_ERR_SMIO_DESTROY);
+            }
+
+err_poller_destroy_cfg_smio:
+err_poller_config_null_command:
+err_poller_config_null_service:
+            free (command);
+            command = NULL;
+            free (service_id);
+            service_id = NULL;
+            zmsg_destroy (&recv_msg);
+        }
     }
 
-err_poller_expired:
+err_poller_config_interrupted:
 err_poller_interrupted:
+err_uninitialized_poller_config:
 err_uninitialized_poller:
     return err;
 }
@@ -505,25 +599,25 @@ static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
     disp_table_t *disp_table = self->disp_table_thsafe_ops;
     msg_err_e merr = msg_handle_sock_request (self, msg, disp_table);
     ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
-           SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
+            SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
 err_hand_req:
     return err;
 }
 
-static devio_err_e _devio_destroy_smio_all (devio_t *self)
+static devio_err_e _devio_destroy_smio_all (devio_t *self, zhash_t *smio_h)
 {
     assert (self);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Get all hash keys */
-    zlist_t *hash_keys = zhash_keys (self->sm_io_h);
+    zlist_t *hash_keys = zhash_keys (smio_h);
     ASSERT_ALLOC (hash_keys, err_hash_keys_alloc, DEVIO_ERR_ALLOC);
     char *hash_item = zlist_first (hash_keys);
 
     /* Iterate over all keys removing each of one */
     for (; hash_item != NULL; hash_item = zlist_next (hash_keys)) {
-        err = _devio_destroy_smio (self, hash_item);
+        err = _devio_destroy_smio (self, smio_h, hash_item);
         ASSERT_TEST (err == DEVIO_SUCCESS, "Could not destroy SMIO "
                 "instance", err_smio_destroy, DEVIO_ERR_SMIO_DESTROY);
     }
@@ -534,10 +628,11 @@ err_hash_keys_alloc:
     return err;
 }
 
-static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt)
+static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
 {
     assert (self);
-    assert (pipe_mgmt);
+    assert (actor);
+    assert (*actor);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Send message to SMIO informing it to destroy itself */
@@ -550,7 +645,7 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt)
     /* Try to send the message a few times and then give up */
     uint32_t tries = 0;
     for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
-        int zerr = zmsg_send (&send_msg, pipe_mgmt);
+        int zerr = zmsg_send (&send_msg, *actor);
         if (zerr == 0) {
             break;
         }
@@ -563,6 +658,9 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t *pipe_mgmt)
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
             "to SMIO sent\n");
 
+    /* Lastly, destroy the actor */
+    zactor_destroy (actor);
+
 err_send_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
@@ -571,23 +669,23 @@ err_msg_alloc:
 
 /* smio_key is the name of the SMIO + instance number, e.g.,
  * FMC130M_4CH0*/
-static devio_err_e _devio_destroy_smio (devio_t *self, const char *smio_key)
+static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const char *smio_key)
 {
     assert (self);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Lookup SMIO reference in hash table */
-    zactor_t *pipe_mgmt = (zactor_t *) zhash_lookup (self->sm_io_h, smio_key);
-    ASSERT_TEST (pipe_mgmt != NULL, "Could not find SMIO registered with this ID",
+    zactor_t **actor = (zactor_t **) zhash_lookup (smio_h, smio_key);
+    ASSERT_TEST (actor != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
 
-    err = _devio_send_destruct_msg (self, pipe_mgmt);
+    err = _devio_send_destruct_msg (self, actor);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
             "PIPE management", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
     /* Finally, remove the pipe from hash. FIXME: What if the SMIO does not
      * exit? We will loose its reference ...*/
-    zhash_delete (self->sm_io_h, smio_key);
+    zhash_delete (smio_h, smio_key);
 
 err_send_msg:
 err_hash_lookup:

@@ -24,7 +24,9 @@ struct _devio_t {
     /* General information */
     zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
     zsock_t **pipes_msg;                /* Address nodes using this array of actors (Message PIPES) */
-    zmq_pollitem_t *poller;             /* Poller structure to multiplex threads messages. New version */
+    zactor_t **pipes_config;            /* Address config actors using this array of actors (Config PIPES) */
+    zpoller_t *poller;                  /* Poller structure to multiplex threads messages */
+    zpoller_t *poller_config;           /* Poller structure to multiplex config threads messages*/
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
     char *log_file;                     /* Log filename for tracing and debugging */
@@ -41,6 +43,10 @@ struct _devio_t {
      * this dev_io can handle. It is composed
      * of key (10-char ID) / value (sm_io instance) */
     zhash_t *sm_io_h;
+    /* Hash containing all the Config sm_io objects that
+     * this dev_io can handle. It is composed
+     * of key (10-char ID) / value (sm_io instance) */
+    zhash_t *sm_io_cfg_h;
     /* Dispatch table containing all the sm_io thsafe operations
      * that we need to handle. It is composed
      * of key (4-char ID) / value (pointer to function) */
@@ -93,8 +99,6 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id,
 devio_err_e devio_register_all_sm (devio_t *self);
 devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
 devio_err_e devio_unregister_all_sm (devio_t *self);
-/* Initilize poller with all of the initialized PIPE sockets */
-devio_err_e devio_init_poller_sm (devio_t *self);
 /* Poll all PIPE sockets */
 devio_err_e devio_poll_all_sm (devio_t *self);
 /* Router for all the opcodes registered for this dev_io */
