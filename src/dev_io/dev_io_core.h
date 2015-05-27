@@ -100,7 +100,7 @@ devio_err_e devio_register_all_sm (devio_t *self);
 devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
 devio_err_e devio_unregister_all_sm (devio_t *self);
 /* Poll all PIPE sockets */
-devio_err_e devio_poll_all_sm (devio_t *self);
+devio_err_e devio_loop (devio_t *self);
 /* Router for all the opcodes registered for this dev_io */
 /* devio_err_e devio_do_op (devio_t *self, uint32_t opcode, int nargs, ...); */
 /* Router for all of the low-level operations for this dev_io */

@@ -458,7 +458,7 @@ err_destroy_smios:
     return err;
 }
 
-devio_err_e devio_poll_all_sm (devio_t *self)
+devio_err_e devio_loop (devio_t *self)
 {
     assert (self);
 
@@ -475,7 +475,7 @@ devio_err_e devio_poll_all_sm (devio_t *self)
         /* Poll Message sockets */
         zsock_t *which = zpoller_wait (self->poller, DEVIO_POLLER_TIMEOUT);
         ASSERT_TEST(which != NULL || zpoller_expired (self->poller),
-                "devio_poll_all_sm: poller interrupted", err_poller_interrupted,
+                "devio_loop: poller interrupted", err_poller_interrupted,
                 DEVIO_ERR_INTERRUPTED_POLLER);
 
         /* Activity on socket */
@@ -499,7 +499,7 @@ devio_err_e devio_poll_all_sm (devio_t *self)
         /* Poll Config sockets */
         zactor_t *which_config = zpoller_wait (self->poller_config, DEVIO_POLLER_CONFIG_TIMEOUT);
         ASSERT_TEST(which_config != NULL || zpoller_expired (self->poller_config),
-                "devio_poll_all_sm: poller_config interrupted",
+                "devio_loop: poller_config interrupted",
                 err_poller_config_interrupted, DEVIO_ERR_INTERRUPTED_POLLER);
 
         /* Activity on socket */
@@ -513,10 +513,10 @@ devio_err_e devio_poll_all_sm (devio_t *self)
             }
 
             service_id = zmsg_popstr (recv_msg);
-            ASSERT_TEST(service_id != NULL, "devio_poll_all_sm: received NULL service_id string",
+            ASSERT_TEST(service_id != NULL, "devio_loop: received NULL service_id string",
                     err_poller_config_null_service, DEVIO_ERR_BAD_MSG);
             command = zmsg_popstr (recv_msg);
-            ASSERT_TEST(command != NULL, "devio_poll_all_sm: poller_config received NULL command string",
+            ASSERT_TEST(command != NULL, "devio_loop: poller_config received NULL command string",
                     err_poller_config_null_command, DEVIO_ERR_BAD_MSG);
 
             /* CONFIG DONE means the config thread is finished and should
@@ -529,7 +529,7 @@ devio_err_e devio_poll_all_sm (devio_t *self)
                 zstr_sendx (which_config, "$TERM", NULL);
                 /* Lastly, destroy the actor */
                 err = _devio_destroy_smio (self, self->sm_io_cfg_h, service_id);
-                ASSERT_TEST(err == DEVIO_SUCCESS, "devio_poll_all_sm: Could not destroy SMIO",
+                ASSERT_TEST(err == DEVIO_SUCCESS, "devio_loop: Could not destroy SMIO",
                         err_poller_destroy_cfg_smio, DEVIO_ERR_SMIO_DESTROY);
             }
 
