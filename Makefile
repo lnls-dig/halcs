@@ -39,7 +39,8 @@ export CFG_DIR
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
 
-INIT_SCRIPTS = init.sh shutdown.sh
+# Init sripts
+INIT_SCRIPTS =
 
 # Subdmoules and third-party codes
 FOREIGN_DIR = foreign
