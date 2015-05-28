@@ -50,7 +50,7 @@
  * udp://10.0.0.0:8888
  * */
 #define LLIO_ETH_REGEX                                      \
-    "^(tcp|udp)://(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$"
+    "^(tcp|udp)://(\\d+\\.\\d+\\.\\d+\\.\\d+):(\\d+)$"
 
 /* Number of expected hits (socket type, address, port number) +
  * whole pattern */
@@ -334,7 +334,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
 
     rv = getaddrinfo (hostname, port, &hints, &servinfo);
     /* DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
-            "[ll_io_eth] Error executing getaddrinfo: %s\n", gai_strerror(rv)); */
+       "[ll_io_eth] Error executing getaddrinfo: %s\n", gai_strerror(rv)); */
     ASSERT_TEST (rv == 0, "Could not get address information",
             err_getaddrinfo, -1);
 
@@ -350,7 +350,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         /* This is important for correct behaviour */
         rv = setsockopt(*fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(int));
         /* DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
-                "[ll_io_eth] Error executing setsockpot: %s\n", strerror(errno));*/
+           "[ll_io_eth] Error executing setsockpot: %s\n", strerror(errno));*/
         ASSERT_TEST (rv == 0, "Could not set endpoint options",
                 err_setsockopt, -1);
 
@@ -456,12 +456,12 @@ const llio_ops_t llio_ops_eth = {
     .write_32       = eth_write_32,     /* Write 32-bit data */
     .write_64       = eth_write_64,     /* Write 64-bit data */
     .read_block     = eth_read_block,   /* Read arbitrary block size data,
-                                          parameter size in bytes */
+                                           parameter size in bytes */
     .write_block    = eth_write_block,  /* Write arbitrary block size data,
-                                            parameter size in bytes */
+                                           parameter size in bytes */
     .read_dma       = NULL,             /* Read arbitrary block size data via DMA,
-                                            parameter size in bytes */
+                                           parameter size in bytes */
     .write_dma      = NULL,             /* Write arbitrary block size data via DMA,
-                                            parameter size in bytes */
+                                           parameter size in bytes */
     /*.read_info      = pcie_read_info */   /* Read device information data */
 };
