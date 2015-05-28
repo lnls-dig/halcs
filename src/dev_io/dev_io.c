@@ -233,12 +233,16 @@ int main (int argc, char *argv[])
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
 
-    /* FIXME: give some time for the process to terminate gracefully */
-    sleep (4);
-    /* Kill DEVIO cfg as we've already got our slot number */
-    kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
-    /* Wait child */
-    hutils_wait_chld ();
+    if (llio_type == PCIE_DEV) {
+        /* FIXME: give some time for the process to terminate gracefully */
+        sleep (5);
+        /* Kill DEVIO cfg as we've already got our slot number */
+        if (child_devio_cfg_pid > 0) {
+            kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
+        }
+        /* Wait child */
+        hutils_wait_chld ();
+    }
     /* Destroy libclient */
     bpm_client_destroy (&client_cfg);
 #endif
