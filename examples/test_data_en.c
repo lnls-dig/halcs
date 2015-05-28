@@ -129,7 +129,7 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:test_data_en]: test_data_en = %u\n", test_data_en);
 
     char service[50];
-    snprintf (service, strlen (service)+1, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {
