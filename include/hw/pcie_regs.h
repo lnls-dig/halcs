@@ -158,12 +158,15 @@
 #define PCIE_ADDR_WB_PG(addr)               ((addr & ~PCIE_WB_PG_MASK) >> \
                                                 PCIE_WB_PG_MAX)
 
+/*************************** PCIe BAR RW type **************************/
+#define BAR_RW_TYPE                         uint32_t
+
 /********** Read or write to BAR **********/
 #define BAR_RW_8(barp, addr, datap, rw)                             \
     do {                                                            \
         (rw) ?                                                      \
-        (*(datap) = *(uint32_t *)(((uint8_t *)barp) + (addr))) :    \
-        (*(uint32_t *)(((uint8_t *)barp) + (addr)) = *(datap));     \
+        (*(datap) = *(BAR_RW_TYPE *)(((uint8_t *)barp) + (addr))) : \
+        (*(BAR_RW_TYPE *)(((uint8_t *)barp) + (addr)) = *(datap));  \
     } while (0)
 
 /* BAR0 is BYTE addressed for the user */
@@ -200,31 +203,41 @@
 #define BAR_RW_8_BLOCK(barp, addr, size, datap, rw)                 \
     do {                                                            \
         if (rw) {                                                   \
-            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
-                *((datap) + j) = *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr); \
+            for (uint32_t j = 0; j < size/sizeof (BAR_RW_TYPE); ++j) { \
+                *((datap) + j) = *(BAR_RW_TYPE *)(((uint8_t *)barp) + \
+                        addr + (j << WB_DWORD_ACC));                \
             }                                                       \
         }                                                           \
         else {                                                      \
-            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
-                *(uint32_t *)(((uint8_t *)barp) + j*sizeof (*barp) + addr) = *((datap) + j); \
-            };                                                      \
+            for (uint32_t j = 0; j < size/sizeof (BAR_RW_TYPE); ++j) { \
+                *(BAR_RW_TYPE *)(((uint8_t *)barp) +                \
+                        addr + (j << WB_DWORD_ACC)) = *((datap) + j); \
+            }                                                       \
         }                                                           \
     } while (0)
+
+#define BAR0_RW_BLOCK(barp, addr, size, datap, rw)                  \
+    BAR_RW_8_BLOCK(barp, addr, size, datap, rw)
 
 #define BAR2_RW_BLOCK(barp, addr, size, datap, rw)                  \
     BAR_RW_8_BLOCK(barp, addr, size, datap, rw)
 
 #define BAR4_RW_BLOCK(barp, addr, size, datap, rw)                  \
     do {                                                            \
+        uint32_t j = 0;                                             \
         if (rw) {                                                   \
-            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
-                *((datap) + j) = *((barp) + j + addr);              \
+            for (j = 0; j < size/sizeof (BAR_RW_TYPE); ++j) {       \
+                *((datap) + j) = *((barp) + addr + (j << WB_DWORD_ACC)); \
             }                                                       \
         }                                                           \
         else {                                                      \
-            for (uint32_t j = 0; j < size/sizeof (*barp); ++j) {    \
-                *((barp) + j + addr) = *((datap) + j);              \
+            for (j = 0; j < size/sizeof (BAR_RW_TYPE); ++j) {       \
+                *((barp) + addr + (j << WB_DWORD_ACC)) = *((datap) + j); \
             }                                                       \
+        }                                                           \
+        /* RW one last word if size not multiple of sizeof (barp)*/ \
+        if (size % sizeof (BAR_RW_TYPE) != 0) {                     \
+            BAR4_RW(barp, addr + (j << WB_DWORD_ACC), (datap) + j, rw); \
         }                                                           \
     } while (0)
 
