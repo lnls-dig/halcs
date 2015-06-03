@@ -8,22 +8,14 @@
 #ifndef _SM_IO_ACQ_CORE_H_
 #define _SM_IO_ACQ_CORE_H_
 
-#include <inttypes.h>
-#include "sm_io_err.h"
-#include "ddr3_map.h"
-#include "sm_io.h"
-
-typedef struct _acq_params_t {
+typedef struct {
       uint32_t num_samples;
 } acq_params_t;
 
-struct _smio_acq_t {
+typedef struct {
     acq_params_t acq_params[END_CHAN_ID];
     const acq_buf_t *acq_buf;
-};
-
-/* Opaque class structure */
-typedef struct _smio_acq_t smio_acq_t;
+} smio_acq_t;
 
 /***************** Our methods *****************/
 

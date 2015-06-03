@@ -5,12 +5,9 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "msg.h"
-#include "msg_err.h"
-#include "errhand.h"
-#include "sm_io.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_exports.h"
-#include "rw_param_codes.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -80,6 +77,10 @@ msg_err_e msg_handle_mlm_request (void *owner, void *args,
 
     /* If we are here, this is the only option */
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    mlm_client_t *worker = smio_get_worker (self);
+    ASSERT_TEST(worker != NULL, "Could not get SMIO worker", err_get_smio_worker,
+            MSG_ERR_ALLOC);
+
     exp_msg_zmq_t *msg = (exp_msg_zmq_t *) args;
     /* Get opcode */
     err = _msg_exp_zmq_get_opcode (msg, &opcode_data);
@@ -98,14 +99,15 @@ msg_err_e msg_handle_mlm_request (void *owner, void *args,
 
     /* Send response back to client */
     _msg_send_client_response_mlm (reply_code, disp_table_ret, ret, with_data_frame,
-           self->worker, msg->reply_to);
+           worker, msg->reply_to);
 
     return err;
 
 err_format_response:
 err_get_opcode:
-    _msg_send_client_response_mlm (PARAM_ERR, 0, NULL, false, self->worker,
+    _msg_send_client_response_mlm (PARAM_ERR, 0, NULL, false, worker,
             msg->reply_to);
+err_get_smio_worker:
 err_inv_msg:
     return err;
 }

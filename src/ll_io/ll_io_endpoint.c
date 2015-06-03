@@ -5,38 +5,44 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "ll_io_endpoint.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_TEST(test_boolean, LL_IO, "ll_io_endpoint",  \
+    ASSERT_HAL_TEST(test_boolean, LL_IO, "ll_io_endpoint",          \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, LL_IO, "ll_io_endpoint",          \
-            llio_err_str(LLIO_ERR_ALLOC),                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
+    ASSERT_HAL_ALLOC(ptr, LL_IO, "ll_io_endpoint",                  \
+            llio_err_str(LLIO_ERR_ALLOC),                           \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, LL_IO, "ll_io_endpoint",             \
+#define CHECK_ERR(err, err_type)                                    \
+    CHECK_HAL_ERR(err, LL_IO, "ll_io_endpoint",                     \
             llio_err_str (err_type))
 
-static llio_err_e _llio_endpoint_set (llio_endpoint_t *self, const char *name);
-static llio_err_e _llio_endpoint_get (llio_endpoint_t *self, char **endpoint);
+/* Device endpoint structure */
+struct _llio_endpoint_t {
+    bool open;                          /* True if device if already opened */
+    char *name;                         /* Name of the endpoint, e.g., "/dev/fpga0"
+                                           and "tcp://192.168.0.100:5556" */
+};
+
+/* Set endpoint name */
+static llio_err_e _llio_endpoint_set_name (llio_endpoint_t *self, const char *name);
+/* Get endpoint name */
+static const char *_llio_endpoint_get_name (llio_endpoint_t *self);
+/* Clone endpoint name */
+static char *_llio_endpoint_clone_name (llio_endpoint_t *self);
 
 /* Creates a new instance of the Endpoint*/
 llio_endpoint_t * llio_endpoint_new (const char *endpoint)
@@ -45,9 +51,9 @@ llio_endpoint_t * llio_endpoint_new (const char *endpoint)
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Initilialize llio_endpoint */
-    self->opened = false;
+    self->open = false;
 
-    llio_err_e err = _llio_endpoint_set (self, endpoint);
+    llio_err_e err = _llio_endpoint_set_name (self, endpoint);
     ASSERT_TEST(err==LLIO_SUCCESS, llio_err_str(err), err_name_alloc);
 
     return self;
@@ -75,52 +81,84 @@ llio_err_e llio_endpoint_destroy (llio_endpoint_t **self_p)
     return LLIO_SUCCESS;
 }
 
-/* Register endpoint to llio instance */
-llio_err_e llio_endpoint_set (llio_endpoint_t *self, const char *name)
+/* Set endpoint open status */
+llio_err_e llio_endpoint_set_open (llio_endpoint_t *self, bool open)
 {
     assert (self);
-    return _llio_endpoint_set (self, name);
+    self->open = open;
+
+    return LLIO_SUCCESS;
+}
+
+/* Get endpoint open status */
+bool llio_endpoint_get_open (llio_endpoint_t *self)
+{
+    assert (self);
+    assert (open);
+
+    return self->open;
+}
+
+/* Register endpoint to llio instance */
+llio_err_e llio_endpoint_set_name (llio_endpoint_t *self, const char *name)
+{
+    assert (self);
+    return _llio_endpoint_set_name (self, name);
 }
 
 /* Get endpoint from name from instance of llio_endpoint */
-llio_err_e llio_endpoint_get (llio_endpoint_t *self, char **endpoint)
+const char *llio_endpoint_get_name (llio_endpoint_t *self)
 {
     assert (self);
-    return _llio_endpoint_get (self, endpoint);
+    return _llio_endpoint_get_name (self);
+}
+
+/* Clone endpoint from name from instance of llio_endpoint */
+char *llio_endpoint_clone_name (llio_endpoint_t *self)
+{
+    assert (self);
+    return _llio_endpoint_clone_name (self);
 }
 
 /**************** Helper Functions ***************/
 
-static llio_err_e _llio_endpoint_set (llio_endpoint_t *self, const char *name)
+/* Set endpoint name if not already open */
+static llio_err_e _llio_endpoint_set_name (llio_endpoint_t *self, const char *name)
 {
-    if (self->opened) {
-        return LLIO_ERR_SET_ENDP;
-    }
+    assert (self);
+    llio_err_e err = LLIO_SUCCESS;
+
+    ASSERT_TEST(self->open == false, "Could not set endpoint name. Endpoint" \
+            "is already open\n", err_open_endp, LLIO_ERR_SET_ENDP);
 
     if (name) {
         if (self->name) {
             free (self->name);
         }
         self->name = strdup (name);
-        ASSERT_ALLOC(self->name, err_name_alloc);
+        ASSERT_ALLOC(self->name, err_name_alloc, LLIO_ERR_ALLOC);
     }
 
-    return LLIO_SUCCESS;
-
-    /* FIXME Remove goto label as it doesn't enhance anything,
-     * as we have only one pssible chance of error */
 err_name_alloc:
-    return LLIO_ERR_ALLOC;
+err_open_endp:
+    return err;
 }
 
 /* Get endpoint from name from instance of llio_endpoint */
-static llio_err_e _llio_endpoint_get (llio_endpoint_t *self, char **endpoint)
+static const char *_llio_endpoint_get_name (llio_endpoint_t *self)
 {
-    *endpoint = strdup (self->name);
-    ASSERT_ALLOC(*endpoint, err_alloc);
+    assert (self);
+    return self->name;
+}
 
-    return LLIO_SUCCESS;
+/* Clone endpoint from name from instance of llio_endpoint */
+static char *_llio_endpoint_clone_name (llio_endpoint_t *self)
+{
+    assert (self);
+
+    char *endpoint = strdup (self->name);
+    ASSERT_ALLOC(endpoint, err_alloc);
 
 err_alloc:
-    return LLIO_ERR_ALLOC;
+    return endpoint;
 }

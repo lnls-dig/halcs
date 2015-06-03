@@ -5,19 +5,14 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdlib.h>
-
-#include "sm_io_fmc130m_4ch_exp.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_fmc130m_4ch_defaults.h"
-#include "sm_io.h"
-#include "dev_io_core.h"
-#include "board.h"
-#include "errhand.h"
-#include "rw_param.h"
-#include "hw/wb_fmc130m_4ch_regs.h"
 #include "sm_io_fmc130m_4ch_exports.h"
-#include "hal_stddef.h"
+#include "sm_io_fmc130m_4ch_core.h"
+#include "sm_io_fmc130m_4ch_exp.h"
+#include "hw/wb_fmc130m_4ch_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -44,12 +39,17 @@
 
 #define FMC130M_4CH_CHECK_ACTIVE(self)                          \
     ({                                                          \
-        if (SMIO_FMC130_HANDLER(self)->type !=                  \
-                TYPE_FMC130M_4CH_ACTIVE) {                      \
+        smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);  \
+        if (fmc130m == NULL) {                                  \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
+                "Could not get SMIO FMC130M handler\n");        \
+            return -FMC130M_4CH_ERR;                            \
+        }                                                       \
+        if (fmc130m->type != TYPE_FMC130M_4CH_ACTIVE) {         \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:fmc130m_4ch_exp] "\
                 "Board is not of ACTIVE type. Unimplemented "   \
                 "function for this type of FMC130M_4CH board\n"); \
-                return -FMC130M_4CH_UNINPL;                     \
+            return -FMC130M_4CH_UNINPL;                         \
         }                                                       \
     })
 
@@ -473,7 +473,10 @@ static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
 
     int err = -FMC130M_4CH_OK;
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
-    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);
+    smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);
+    ASSERT_TEST(fmc130m != NULL, "Could not get SMIO FMC130M handler",
+            err_get_fmc130m_handler, -FMC130M_4CH_ERR);
+    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(fmc130m);
 
     FMC130M_4CH_CHECK_ACTIVE(self);
 
@@ -484,6 +487,7 @@ static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
             err_smpr_write, -FMC130M_4CH_ERR);
 
 err_smpr_write:
+err_get_fmc130m_handler:
     return err;
 }
 
@@ -506,7 +510,10 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
                                                                                 \
         int err = -FMC130M_4CH_OK;                                              \
         SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
-        smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(self);                 \
+        smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);                  \
+        ASSERT_TEST(fmc130m != NULL, "Could not get SMIO FMC130M handler",      \
+                err_get_fmc130m_handler, -FMC130M_4CH_ERR);                     \
+        smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(fmc130m);              \
         uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
         uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
                                                                                 \
@@ -542,9 +549,8 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
             }                                                                   \
         }                                                                       \
                                                                                 \
+err_get_fmc130m_handler:                                                        \
         return err;                                                             \
-                                                                                \
-                                                                                \
     } while(0)
 
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_a_div)
@@ -619,7 +625,10 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
                                                                                 \
         int err = -FMC130M_4CH_OK;                                              \
         SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
-        smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(self);                    \
+        smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);                  \
+        ASSERT_TEST(fmc130m != NULL, "Could not get SMIO FMC130M handler",      \
+                err_get_fmc130m_handler, -FMC130M_4CH_ERR);                     \
+        smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(fmc130m);                 \
         uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
         (void) rw;  /* Ignored for now */                                       \
         double param = *(double *) EXP_MSG_ZMQ_NEXT_ARG(args);                  \
@@ -632,6 +641,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
                 err_smpr_write, -FMC130M_4CH_ERR);                              \
                                                                                 \
 err_smpr_write:                                                                 \
+err_get_fmc130m_handler:                                                        \
         return err;                                                             \
                                                                                 \
     } while(0)
@@ -768,14 +778,18 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
 
     smio_err_e err = SMIO_SUCCESS;
 
-    self->id = FMC130M_4CH_SDB_DEVID;
-    self->name = strdup (FMC130M_4CH_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
+    err = smio_set_id (self, FMC130M_4CH_SDB_DEVID);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO id", err_set_id);
+    err = smio_set_name (self, FMC130M_4CH_SDB_NAME);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO name", err_set_name);
 
     /* Set SMIO ops pointers */
-    self->ops = &fmc130m_4ch_ops;
-    self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
-
+    err = smio_set_ops (self, &fmc130m_4ch_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO operations",
+            err_smio_set_ops);
+    err = smio_set_thsafe_client_ops (self, &smio_thsafe_client_zmq_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO thsafe operations",
+            err_smio_set_thsafe_ops);
 
     /* Fill the disp_op_t description structure with the callbacks. */
 
@@ -788,18 +802,31 @@ smio_err_e fmc130m_4ch_init (smio_t * self)
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 
-    self->exp_ops = fmc130m_4ch_exp_ops;
+    err = smio_set_exp_ops (self, fmc130m_4ch_exp_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO exported operations",
+            err_smio_set_exp_ops);
 
     /* Initialize specific structure */
-    self->smio_handler = smio_fmc130m_4ch_new (self);
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
+    smio_fmc130m_4ch_t *smio_handler = smio_fmc130m_4ch_new (self);
+    ASSERT_ALLOC(smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
+    err = smio_set_handler (self, smio_handler);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO handler",
+            err_smio_set_handler);
 
     return err;
 
+err_smio_set_handler:
+    smio_fmc130m_4ch_destroy (&smio_handler);
 err_smio_handler_alloc:
+    smio_set_exp_ops (self, NULL);
+err_smio_set_exp_ops:
 err_fill_desc:
-    free (self->name);
-err_name_alloc:
+    smio_set_thsafe_client_ops (self, NULL);
+err_smio_set_thsafe_ops:
+    smio_set_ops (self, NULL);
+err_smio_set_ops:
+err_set_name:
+err_set_id:
     return err;
 }
 
@@ -808,13 +835,20 @@ smio_err_e fmc130m_4ch_shutdown (smio_t *self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Shutting down fmc130m_4ch\n");
 
-    smio_fmc130m_4ch_destroy ((smio_fmc130m_4ch_t **) &self->smio_handler);
-    self->exp_ops = NULL;
-    self->thsafe_client_ops = NULL;
-    self->ops = NULL;
-    free (self->name);
+    smio_err_e err = SMIO_SUCCESS;
+    smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);
+    ASSERT_TEST(fmc130m != NULL, "Could not get FMC130M handler",
+            err_fmc130m_handler, SMIO_ERR_ALLOC /* FIXME: improve return code */);
 
-    return SMIO_SUCCESS;
+    /* Destroy SMIO instance */
+    smio_fmc130m_4ch_destroy (&fmc130m);
+    /* Nullify operation pointers */
+    smio_set_exp_ops (self, NULL);
+    smio_set_thsafe_client_ops (self, NULL);
+    smio_set_ops (self, NULL);
+
+err_fmc130m_handler:
+    return err;
 }
 
 const smio_bootstrap_ops_t fmc130m_4ch_bootstrap_ops = {

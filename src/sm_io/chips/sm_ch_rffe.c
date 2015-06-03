@@ -11,9 +11,7 @@
  * Description: Software driver for EEPROM RFFE chip
  */
 
-#include "sm_ch_rffe.h"
-#include "sm_pr.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -42,6 +40,10 @@
 #define SMCH_RFFE_USECS_WAIT              10000
 #define SMCH_RFFE_WAIT(usecs)             usleep(usecs)
 #define SMCH_RFFE_WAIT_DFLT               SMCH_RFFE_WAIT(SMCH_RFFE_USECS_WAIT)
+
+struct _smch_rffe_t {
+    smpr_t *bsmp;                                       /* BSMP protocol object */
+};
 
 /* Creates a new instance of the SMCH RFFE */
 smch_rffe_t * smch_rffe_new (smio_t *parent, int verbose)

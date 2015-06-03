@@ -5,10 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "smio_thsafe_zmq_server.h"
-#include "dev_io_exports.h"
-#include "errhand.h"
-#include "msg_err.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -40,6 +37,7 @@ static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_open\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
@@ -52,7 +50,7 @@ static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
     llio_endpoint_t *llio_endpoint = (llio_endpoint_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to actually perform the operation */
-    int32_t llio_ret = llio_open (self->llio, llio_endpoint);
+    int32_t llio_ret = llio_open (llio, llio_endpoint);
     *(int32_t *) ret = llio_ret;
 
     return (llio_ret < 0) ? llio_ret : (int) sizeof(int32_t);
@@ -65,7 +63,8 @@ disp_op_t thsafe_zmq_server_open_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, llio_endpoint_t),
+        /* FIXME: this is unused */
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, 0),
         DISP_ARG_END
     }
 };
@@ -77,6 +76,7 @@ static int _thsafe_zmq_server_release (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_release\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
@@ -89,7 +89,7 @@ static int _thsafe_zmq_server_release (void *owner, void *args, void *ret)
     llio_endpoint_t *llio_endpoint = (llio_endpoint_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to actually perform the operation */
-    int32_t llio_ret = llio_release (self->llio, llio_endpoint);
+    int32_t llio_ret = llio_release (llio, llio_endpoint);
     *(int32_t *) ret = llio_ret;
 
     return (llio_ret < 0) ? llio_ret : (int) sizeof(int32_t);
@@ -102,7 +102,8 @@ disp_op_t thsafe_zmq_server_release_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, llio_endpoint_t),
+        /* FIXME: this is unused */
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, 0),
         DISP_ARG_END
     }
 };
@@ -115,12 +116,13 @@ static int _thsafe_zmq_server_read_16 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_16\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_16 (self->llio, offset, (uint16_t *) ret);
+    int32_t llio_ret = llio_read_16 (llio, offset, (uint16_t *) ret);
 
     return llio_ret;
 }
@@ -145,12 +147,13 @@ static int _thsafe_zmq_server_read_32 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_32\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_32 (self->llio, offset, (uint32_t *) ret);
+    int32_t llio_ret = llio_read_32 (llio, offset, (uint32_t *) ret);
 
     return llio_ret;
 }
@@ -175,12 +178,13 @@ static int _thsafe_zmq_server_read_64 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_64\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_64 (self->llio, offset, (uint64_t *) ret);
+    int32_t llio_ret = llio_read_64 (llio, offset, (uint64_t *) ret);
 
     return llio_ret;
 }
@@ -205,13 +209,14 @@ static int _thsafe_zmq_server_write_16 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_16\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint16_t *data_write = (uint16_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_16 (self->llio, offset, data_write);
+    int32_t llio_ret = llio_write_16 (llio, offset, data_write);
     *(int32_t *) ret = llio_ret;
 
     return sizeof (int32_t);
@@ -236,13 +241,14 @@ static int _thsafe_zmq_server_write_32 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_32\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint32_t *data_write = (uint32_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_32 (self->llio, offset, data_write);
+    int32_t llio_ret = llio_write_32 (llio, offset, data_write);
     *(int32_t *) ret = llio_ret;
 
     return sizeof (int32_t);
@@ -267,13 +273,14 @@ static int _thsafe_zmq_server_write_64 (void *owner, void *args, void *ret)
     assert (args);
 
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_64\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     uint64_t *data_write = (uint64_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_write_64 (self->llio, offset, data_write);
+    int32_t llio_ret = llio_write_64 (llio, offset, data_write);
     *(int32_t *) ret = llio_ret;
 
     return sizeof (int32_t);
@@ -298,6 +305,7 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
     assert (owner);
     assert (args);
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
@@ -306,7 +314,7 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %lu, "
             "size = %ld\n", offset, read_bsize);
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_block (self->llio, offset, read_bsize,
+    int32_t llio_ret = llio_read_block (llio, offset, read_bsize,
             (uint32_t *) ret);
 
     return llio_ret;
@@ -331,6 +339,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
     assert (owner);
     assert (args);
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
     THSAFE_MSG_ZMQ_ARG_TYPE offset_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
@@ -345,7 +354,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 
     /* We must accept every block size. So, we just perform the actual LLIO
      * operation */
-    int32_t llio_ret = llio_write_block (self->llio, offset, data_write_size,
+    int32_t llio_ret = llio_write_block (llio, offset, data_write_size,
             data_write);
     *(int32_t *) ret = llio_ret;
 

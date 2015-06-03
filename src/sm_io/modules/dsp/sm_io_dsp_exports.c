@@ -5,6 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
+#include "sm_io_exports_helper.h"
 #include "sm_io_dsp_exports.h"
 #include "sm_io_dsp_codes.h"
 

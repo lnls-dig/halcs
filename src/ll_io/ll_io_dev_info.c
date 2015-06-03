@@ -5,34 +5,37 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <string.h>
-#include <stdio.h>
-
-#include "ll_io_dev_info.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
-    ASSERT_HAL_TEST(test_boolean, LL_IO, "ll_io_dev_info",  \
+    ASSERT_HAL_TEST(test_boolean, LL_IO, "ll_io_dev_info",          \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, LL_IO, "ll_io_dev_info",          \
-            llio_err_str(LLIO_ERR_ALLOC),                   \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
+    ASSERT_HAL_ALLOC(ptr, LL_IO, "ll_io_dev_info",                  \
+            llio_err_str(LLIO_ERR_ALLOC),                           \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, LL_IO, "ll_io_dev_info",             \
+#define CHECK_ERR(err, err_type)                                    \
+    CHECK_HAL_ERR(err, LL_IO, "ll_io_dev_info",                     \
             llio_err_str (err_type))
+
+/* This hold the SDB structures of the device */
+struct _llio_dev_info_t {
+    uint64_t sdb_addr;                  /* Location of the SDB structures in device */
+    bool parsed;                        /* True if device was already parsed */
+    zlist_t *sdb;                       /* List holding the SDB structures of the device */
+};
 
 /* Creates a new instance of Device Information */
 llio_dev_info_t * llio_dev_info_new ()

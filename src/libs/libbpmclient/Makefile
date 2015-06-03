@@ -91,6 +91,7 @@ boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils -I../libdisptable \
+		   -I../libconvc \
 	       $(boards_INCLUDE_DIRS) \
 	       -I../../sm_io/modules \
 	       -I../../sm_io/modules/fmc130m_4ch \

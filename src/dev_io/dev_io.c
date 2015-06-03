@@ -1,13 +1,11 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>          /* getpid, getppid */
-#include <unistd.h>
+/*
+ * Copyright (C) 2015 LNLS (www.lnls.br)
+ * Author: Lucas Russo <lucas.russo@lnls.br>
+ *
+ * Released according to the GNU LGPL, version 3 or any later version.
+ */
 
-#include "czmq.h"
-#include "dev_io.h"
-#include "board.h"
-#include "errhand.h"
-#include "bpm_client.h"
+#include "bpm_server.h"
 
 #define DEVIO_SERVICE_LEN           50
 #define DEVIO_CFG_NAME              "dev_io_cfg"
@@ -466,4 +464,3 @@ static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_
 err_register_sm:
     return err;
 }
-

@@ -5,8 +5,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "sm_io_mod_dispatch.h"
-/* Include all available module we can handle */
+#include "bpm_server.h"
+/* Private headers. Include all available module we can handle */
 #include "sm_io_fmc130m_4ch_exp.h"
 #include "sm_io_acq_exp.h"
 #include "sm_io_dsp_exp.h"
@@ -57,4 +57,3 @@ const smio_mod_dispatch_t smio_mod_dispatch [] = {
         .bootstrap_ops = NULL
     }
 };
-

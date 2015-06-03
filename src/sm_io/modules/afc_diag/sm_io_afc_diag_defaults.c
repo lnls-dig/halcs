@@ -1,8 +1,13 @@
-#include "errhand.h"
-#include "sm_io_err.h"
+/*
+ * Copyright (C) 2014 LNLS (www.lnls.br)
+ * Author: Lucas Russo <lucas.russo@lnls.br>
+ *
+ * Released according to the GNU LGPL, version 3 or any later version.
+ */
+
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_afc_diag_defaults.h"
-/* We actually use the libclient to do the "heavy" work for us */
-#include "bpm_client.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

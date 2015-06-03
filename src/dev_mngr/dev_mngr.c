@@ -5,20 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <unistd.h>
-#include <signal.h>      /* sigaction */
-//#include <asm/siginfo.h> /* siginfo_t */
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <stdarg.h>
-#include <sys/stat.h>   /* chmod */
-
-#include "dev_mngr.h"
-#include "varg_macros.h"
-#include "errhand.h"
-#include "hutils.h"
+#include "bpm_server.h"
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 #define DFLT_BIND_ADDR              "0"

@@ -11,11 +11,8 @@
  * Description: Software driver for XTAL Si57x chip
  */
 
-#include "sm_ch_si57x.h"
-#include "sm_pr.h"
-#include "errhand.h"
-#include "hal_stddef.h"
-#include "chips/si57x_regs.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_ch_si57x_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -46,6 +43,16 @@
 #define SMCH_SI57X_USECS_WAIT               10000
 #define SMCH_SI57X_WAIT(usecs)              usleep(usecs)
 #define SMCH_SI57X_WAIT_DFLT                SMCH_SI57X_WAIT(SMCH_SI57X_USECS_WAIT)
+
+struct _smch_si57x_t {
+    smpr_t *i2c;                    /* I2C protocol object */
+    uint32_t addr;                  /* I2C address for this SI57X chip */
+    double fxtal;                   /* Internal crystal frequency */
+    unsigned int n1;                /* N1 divider value */
+    unsigned int hs_div;            /* High Speed divider value */
+    uint64_t rfreq;                 /* RFreq value */
+    double frequency;               /* Output crystal frequency */
+};
 
 static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
         const uint8_t *data);

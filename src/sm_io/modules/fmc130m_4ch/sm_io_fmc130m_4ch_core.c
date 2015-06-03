@@ -5,16 +5,11 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdlib.h>
-#include <assert.h>
-#include <czmq.h>
-
-#include "sm_io_fmc130m_4ch_core.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_fmc130m_4ch_defaults.h"
-#include "sm_io_err.h"
-#include "errhand.h"
-#include "hal_stddef.h"
-#include "board.h"
+#include "sm_io_fmc130m_4ch_core.h"
+#include "sm_io_fmc130m_4ch_structs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -48,20 +43,21 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     assert (parent);
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
+    uint32_t inst_id = smio_get_inst_id (parent);
 
     /* Check if Instance ID is within our expected limits */
-    ASSERT_TEST(parent->inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
+    ASSERT_TEST(inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
             err_num_fmc130m_4ch_smios);
 
     /* FMC130M_4CH isntance 0 is the one controlling this CI */
     /* FIXME: This breaks generality for this class */
-    if (parent->inst_id == 0) {
+    if (inst_id == 0) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] PCA9547 initializing, "
-                " addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_pca9547_addr[parent->inst_id],
-                parent->inst_id);
+                " addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_pca9547_addr[inst_id],
+                inst_id);
         /* FPGA I2C Switch */
         self->smch_pca9547 = smch_pca9547_new (parent, FMC_130M_EEPROM_I2C_OFFS,
-                fmc130m_4ch_pca9547_addr[parent->inst_id], 0);
+                fmc130m_4ch_pca9547_addr[inst_id], 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
 
         /* Enable default I2C channel */
@@ -72,11 +68,11 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] 24AA64 initializing, "
-            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_24aa64_addr[parent->inst_id],
-            parent->inst_id);
+            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_24aa64_addr[inst_id],
+            inst_id);
     /* EEPROM  is on the same I2C bus as the LM75A */
     self->smch_24aa64 = smch_24aa64_new (parent, FMC_130M_LM75A_I2C_OFFS,
-            fmc130m_4ch_24aa64_addr[parent->inst_id], 0);
+            fmc130m_4ch_24aa64_addr[inst_id], 0);
     ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
 
     uint32_t data_24aa64;
@@ -116,17 +112,17 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     /* Now, initialize the FMC130M_4CH with the appropriate structures*/
     if (self->type == TYPE_FMC130M_4CH_ACTIVE) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] AD9510 initializing, "
-                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_ad9510_addr[parent->inst_id],
-                parent->inst_id);
+                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_ad9510_addr[inst_id],
+                inst_id);
         self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS,
-                fmc130m_4ch_ad9510_addr[parent->inst_id], 0);
+                fmc130m_4ch_ad9510_addr[inst_id], 0);
         ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] SI571 initializing, "
-                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_si571_addr[parent->inst_id],
-                parent->inst_id);
+                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_si571_addr[inst_id],
+                inst_id);
         self->smch_si571 = smch_si57x_new (parent, FMC_130M_SI571_I2C_OFFS,
-                fmc130m_4ch_si571_addr[parent->inst_id], 0);
+                fmc130m_4ch_si571_addr[inst_id], 0);
         ASSERT_ALLOC(self->smch_si571, err_smch_si571_alloc);
     }
     else { /* PASSIVE or Unsupported*/
@@ -188,7 +184,7 @@ static smio_err_e _smio_fmc130m_4ch_set_type (smio_fmc130m_4ch_t *self,
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-    fmc130M_4ch_type_e type = TYPE_FMC130M_4CH_UNDEF;
+    fmc130m_4ch_type_e type = TYPE_FMC130M_4CH_UNDEF;
 
     switch (type_code) {
         case FMC130M_4CH_ACTIVE_MD5:

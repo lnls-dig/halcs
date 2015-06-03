@@ -5,12 +5,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <string.h>
 #include <glob.h>
-
-#include "dev_mngr_core.h"
-#include "errhand.h"
-#include "hutils.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -100,6 +96,24 @@
 #define DEVIO_MLM_PREFIX_CFG_DIR    "/usr/local"
 #define DEVIO_MLM_CFG_DIR           "/etc/malamute"
 #define DEVIO_MLM_CFG_FILENAME      "malamute.cfg"
+
+struct _dmngr_t {
+    /* General information */
+    zsock_t *dealer;            /* zeroMQ Dealer socket */
+    char *name;                 /* Identification of this dmngr instance */
+    char *endpoint;             /* Endpoint to connect to */
+    int verbose;                /* Print activity to stdout */
+
+    /* General management operations */
+    dmngr_ops_t *ops;
+
+    /* zeroMQ broker management */
+    bool broker_running;        /* true if broker is already running */
+
+    /* Device managment */
+    zhash_t *devio_info_h;
+    zhash_t *hints_h;           /* Config hints from configuration file */
+};
 
 /* Configuration variables. To be filled by dev_mngr */
 const char *dmngr_log_filename = NULL;
@@ -373,11 +387,15 @@ dmngr_err_e dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         char *devio_log_prefix, bool respawn_killed_devio)
 {
+    assert (self);
+    assert (broker_endp);
+
     dmngr_err_e err = DMNGR_SUCCESS;
     char *dev_type_c = NULL;
     char *devio_type_c = NULL;
     char *dev_id_c = NULL;
     char *smio_inst_id_c = NULL;
+    char *dev_pathname = NULL;
 
     /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawing all DEVIO workers\n");*/
 
@@ -389,32 +407,44 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
 
     /* Iterate over all keys spawning the DEVIOs */
     for (; devio_info_key != NULL; devio_info_key = zlist_next (devio_info_key_list)) {
-        /* FIXME: Usage of stroul function for reconverting the string
-         * into a uint32_t */
+        /* Free any possibly dev_pathname allocated but not free'd */
+        free (dev_pathname);
+        dev_pathname = NULL;
+
+        /* Look for DEVIO */
         devio_info_t *devio_info = zhash_lookup (self->devio_info_h,
                 devio_info_key);
 
+        /* Get all devio_info properties */
+        uint32_t id = devio_info_get_id (devio_info);
+        llio_type_e type = devio_info_get_llio_type (devio_info);
+        devio_type_e devio_type = devio_info_get_devio_type (devio_info);
+        uint32_t smio_inst_id = devio_info_get_smio_inst_id (devio_info);
+        dev_pathname = devio_info_clone_dev_pathname (devio_info);
+        ASSERT_ALLOC (dev_pathname, err_dev_pathname_alloc, DMNGR_ERR_ALLOC);
+        devio_state_e state = devio_info_get_state (devio_info);
+
         /* If device is already running or is stopped or inactive, don't do
          * anything */
-        if (devio_info->state != READY_TO_RUN &&
-                devio_info->state != KILLED) {
+        if (state != READY_TO_RUN &&
+                state != KILLED) {
             /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Device located in"
                     " %s is running, stopped or inactive. Skipping device...\n",
-                    devio_info->dev_pathname); */
+                    dev_pathname); */
             continue;
         }
 
         /* If device was killed but the respawn option of off, don't do
          * anything */
-        if (devio_info->state == KILLED && !respawn_killed_devio){
+        if (state == KILLED && !respawn_killed_devio){
             /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Device located in"
                     " %s is dead, but the option \n\trespawn_killed_devio is off. Skipping device...\n",
-                    devio_info->dev_pathname); */
+                    dev_pathname); */
             continue;
         }
 
         /* Get DEVIO type to set-up correct log filename */
-        devio_type_c = devio_type_to_str (devio_info->devio_type);
+        devio_type_c = devio_type_to_str (devio_type);
         ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
 
         /* Set up logdir. Defaulting it to stdout */
@@ -424,25 +454,25 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         if (devio_log_prefix != NULL) {
             snprintf (devio_log_filename, LOG_FILENAME_LEN,
                     "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
-                    devio_info->id, devio_type_c, devio_info->smio_inst_id);
+                    id, devio_type_c, smio_inst_id);
         }
 
         /* Alloc and convert types */
-        dev_type_c = llio_type_to_str (devio_info->type);
+        dev_type_c = llio_type_to_str (type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
-        dev_id_c = hutils_stringify_dec_key (devio_info->id);
+        dev_id_c = hutils_stringify_dec_key (id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DMNGR_ERR_ALLOC);
-        smio_inst_id_c = hutils_stringify_dec_key (devio_info->smio_inst_id);
+        smio_inst_id_c = hutils_stringify_dec_key (smio_inst_id);
         ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DMNGR_ERR_ALLOC);
 
         /* Argument options are "process name", "device type" and
          *"dev entry" */
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEVIO worker"
                 " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
-                "logfile on %s ...\n", dev_type_c, devio_info->dev_pathname, devio_info->id,
+                "logfile on %s ...\n", dev_type_c, dev_pathname, id,
                 broker_endp, devio_log_filename);
         char *argv_exec [] = {DEVIO_NAME, "-n", devio_type_c,"-t", dev_type_c,
-            "-i", dev_id_c, "-e", devio_info->dev_pathname, "-s", smio_inst_id_c,
+            "-i", dev_id_c, "-e", dev_pathname, "-s", smio_inst_id_c,
             "-b", broker_endp, "-l", devio_log_filename, NULL};
         int spawn_err = _dmngr_spawn_chld (self, DEVIO_NAME, argv_exec);
 
@@ -454,11 +484,14 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         dev_id_c = NULL;
         free (smio_inst_id_c);
         smio_inst_id_c = NULL;
+        free (dev_pathname);
+        dev_pathname = NULL;
         /* Just fail miserably, for now */
         ASSERT_TEST(spawn_err == 0, "Could not spawn DEVIO instance",
                 err_spawn, DMNGR_ERR_SPAWNCHLD);
 
-        devio_info->state = RUNNING;
+        state = RUNNING;
+        devio_info_set_state (devio_info, state);
     }
 
 err_spawn:
@@ -470,6 +503,8 @@ err_dev_id_c_alloc:
 err_dev_type_c_alloc:
     free (devio_type_c);
 err_devio_type_c_alloc:
+    free (dev_pathname);
+err_dev_pathname_alloc:
     zlist_destroy (&devio_info_key_list);
 err_hash_keys_alloc:
     return err;

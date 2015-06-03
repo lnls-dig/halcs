@@ -8,8 +8,6 @@
 #ifndef _SM_IO_FMC130M_4CH_CODES_H_
 #define _SM_IO_FMC130M_4CH_CODES_H_
 
-#include <inttypes.h>
-
 /* Messaging OPCODES */
 #define FMC130M_4CH_OPCODE_TYPE                         uint32_t
 #define FMC130M_4CH_OPCODE_SIZE                         (sizeof (FMC130M_4CH_OPCODE_TYPE))

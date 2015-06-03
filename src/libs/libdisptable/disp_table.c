@@ -40,6 +40,15 @@
     CHECK_HAL_ERR(err, HAL_UTILS, "[disp_table]",                               \
             disp_table_err_str (err_type))
 
+struct _disp_table_t {
+    /* Hash containg all the sm_io thsafe operations
+     * that we need to handle. It is composed
+     * of key (4-char ID) / value (pointer to funtion) */
+    zhash_t *table_h;
+    /* Dispatch table operations */
+    const disp_table_ops_t *ops;
+};
+
 static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t* disp_op);
 static disp_table_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops);
 static disp_table_err_e _disp_table_remove (disp_table_t *self, uint32_t key);

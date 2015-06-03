@@ -14,13 +14,9 @@
  *                 MOSI line)
  */
 
-#include "sm_io.h"
-#include "sm_pr_spi.h"
+#include "bpm_server.h"
+/* private headers */
 #include "sm_pr_spi_defaults.h"
-#include "hw/wb_spi_regs.h"
-#include "rw_param.h"
-#include "rw_param_codes.h"
-#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -45,6 +41,17 @@
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr:spi]",                    \
             smpr_err_str (err_type))
 
+#define SM_PR_SPI_MAX_TRIES                 10
+#define SM_PR_SPI_USLEEP                    1000
+
+/* Device endpoint */
+typedef struct {
+    uint64_t base;              /* Core base address */
+    uint32_t sys_freq;          /* System clock [Hz] */
+    uint32_t spi_freq;          /* SPI clock [Hz] */
+    uint32_t init_config;       /* SPI initial config register */
+} smpr_proto_spi_t;
+
 static smpr_err_e _spi_init (smpr_t *self);
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         size_t size, spi_mode_e mode, uint32_t flags);
@@ -52,7 +59,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the proto_spi */
-smpr_proto_spi_t * smpr_proto_spi_new (uint64_t base)
+static smpr_proto_spi_t * smpr_proto_spi_new (uint64_t base)
 {
     smpr_proto_spi_t *self = (smpr_proto_spi_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_spi_alloc);
@@ -66,7 +73,7 @@ err_smpr_proto_spi_alloc:
 }
 
 /* Destroy an instance of the proto_spi */
-smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
+static smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
 {
     assert (self_p);
 
@@ -235,8 +242,10 @@ static smpr_err_e _spi_init (smpr_t *self)
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Inside _spi_init\n");
     smpr_err_e err = SMPR_SUCCESS;
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_spi_t *spi_proto = SMPR_PROTO_SPI(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_spi_t *spi_proto = smpr_get_handler (self);
+    ASSERT_TEST(spi_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:spi] Calculating SPI frequency\n");
     /* Set SPI clock */
@@ -305,6 +314,7 @@ static smpr_err_e _spi_init (smpr_t *self)
 #endif
 
 err_exit:
+err_proto_handler:
     return err;
 }
 
@@ -321,8 +331,10 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
             SPI_PROTO_CTRL_CHAR_LEN_MASK+1+1, "Invalid size for spi transfer",
             err_inv_size, -1);
 
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_spi_t *spi_proto = SMPR_PROTO_SPI(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_spi_t *spi_proto = smpr_get_handler (self);
+    ASSERT_TEST(spi_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     uint32_t config;
     rw_err = GET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO,
@@ -440,6 +452,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 
 err_exit:
 err_inv_size:
+err_proto_handler:
     return err;
 }
 

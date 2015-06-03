@@ -1,3 +1,13 @@
+/*
+ * Copyright (C) 2014 LNLS (www.lnls.br)
+ * Author: Lucas Russo <lucas.russo@lnls.br>
+ *
+ * Released according to the GNU LGPL, version 3 or any later version.
+ */
+
+#include <czmq.h>
+#include "acq_chan_gen_defs.h"
+#include "board.h"
 #include "ddr3_map.h"
 
 #if defined(__BOARD_ML605__)

@@ -5,9 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "dev_io_utils.h"
-#include "convc.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

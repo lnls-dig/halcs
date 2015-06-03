@@ -8,16 +8,9 @@
 #ifndef _SM_IO_SWAP_CORE_H_
 #define _SM_IO_SWAP_CORE_H_
 
-#include <inttypes.h>
-#include "sm_io_err.h"
-#include "sm_io.h"
-
-struct _smio_swap_t {
+typedef struct {
     const uint32_t example;
-};
-
-/* Opaque class structure */
-typedef struct _smio_swap_t smio_swap_t;
+} smio_swap_t;
 
 /***************** Our methods *****************/
 

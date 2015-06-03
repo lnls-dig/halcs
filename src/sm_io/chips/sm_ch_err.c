@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "sm_ch_err.h"
+#include "bpm_server.h"
 
 static const char *smch_err [SMCH_ERR_END] =
 {
