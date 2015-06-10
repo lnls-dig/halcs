@@ -16,9 +16,4 @@ dev_mngr_OBJS =
 dev_mngr_OUT =
 endif
 
-dev_mngr_ALL_DIRS = $(dev_mngr_DIR)
-
-# Add -I prefix to all include directories
-dev_mngr_INCLUDE_DIRS = $(addprefix -I, $(dev_mngr_ALL_DIRS))
-
 dev_mngr_all_OUT = dev_mngr

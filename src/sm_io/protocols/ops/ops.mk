@@ -6,5 +6,3 @@ sm_io_protocols_ops_OBJS = $(sm_io_protocols_ops_DIR)/sm_pr_spi.o \
 #		 $(sm_io_protocols_ops_DIR)/sm_pr_bypass.o \
 #		 $(sm_io_protocols_ops_DIR)/sm_pr_1w.o \
 #		 $(sm_io_protocols_ops_DIR)/sm_pr_gpio.o
-
-sm_io_protocols_ops_INCLUDE_DIRS = $(sm_io_protocols_ops_DIR)

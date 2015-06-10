@@ -11,9 +11,6 @@ dev_io_core_OBJS = $(dev_io_DIR)/dev_io_core.o \
 
 dev_io_OBJS = $(dev_io_DIR)/dev_io.o
 
-dev_io_ALL_DIRS = $(dev_io_DIR) \
-    $(LIBBPMCLIENT_DIR)
-
 dev_io_OUT = dev_io
 
 ifeq ($(WITH_DEVIO_CFG),y)
@@ -23,9 +20,6 @@ else
 dev_io_cfg_OBJS =
 dev_io_cfg_OUT =
 endif
-
-# Add -I prefix to all include directories
-dev_io_INCLUDE_DIRS = $(addprefix -I, $(dev_io_ALL_DIRS))
 
 dev_io_OUT += $(dev_io_cfg_OUT)
 

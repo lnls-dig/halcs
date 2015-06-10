@@ -7,14 +7,3 @@ msg_OBJS = $(msg_DIR)/msg.o \
 	   $(msg_DIR)/msg_err.o \
 	   $(exp_ops_OBJS) \
 	   $(smio_thsafe_ops_OBJS)
-
-msg_ALL_DIRS = $(msg_DIR) \
-		   $(exp_ops_INCLUDE_DIRS) \
-		   $(smio_thsafe_ops_INCLUDE_DIRS)
-
-# Add -I prefix to all include directories
-msg_INCLUDE_DIRS = $(addprefix -I, $(msg_ALL_DIRS))
-
-# FIXME: For use in hal.mk with dev_mngr_OBJS
-thsafe_msg_zmq_OBJS = $(smio_thsafe_ops_DIR)/thsafe_msg_zmq.o \
-		      $(msg_DIR)/msg_err.o
