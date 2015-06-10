@@ -172,15 +172,7 @@ include $(SRC_DIR)/revision/revision.mk
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS =  \
-	       $(ll_io_INCLUDE_DIRS) \
-	       $(sm_io_INCLUDE_DIRS) \
-	       $(msg_INCLUDE_DIRS) \
-	       $(dev_mngr_INCLUDE_DIRS) \
-	       $(dev_io_INCLUDE_DIRS) \
-	       $(revision_INCLUDE_DIRS) \
-	       $(boards_INCLUDE_DIRS) \
-	       -I$(PCIE_DRIVER_DIR)/include/pcie \
+INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Iinclude \
 	       -Isrc/libs/liberrhand \
 	       -Isrc/libs/libconvc \
