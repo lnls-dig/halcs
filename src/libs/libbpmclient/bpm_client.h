@@ -15,15 +15,6 @@
 #include "bpm_client_err.h"
 #include "acq_chan.h"           /* SMIO acq channel definition */
 
-struct _acq_chan_t;
-
-/* Our structure */
-struct _bpm_client_t {
-    zuuid_t * uuid;                             /* Client UUID */
-    mlm_client_t *mlm_client;                   /* Malamute client instance */
-    const struct _acq_chan_t *acq_chan;         /* Acquisition buffer table */
-};
-
 typedef struct _bpm_client_t bpm_client_t;
 
 /********************************************************/
@@ -57,8 +48,14 @@ const disp_op_t* bpm_func_translate (char *name);
 
 /* Wrapper to bpm_func_exec which translates the function name to
  * its exp_ops structure */
- bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name,
+bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output);
+
+/********************** Accessor Methods **********************/
+
+/* Get MLM client handler from client */
+mlm_client_t *bpm_get_mlm_client (bpm_client_t *self);
+
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
@@ -345,39 +342,31 @@ bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquistion request */
-struct _acq_req_t {
+typedef struct {
     uint32_t num_samples;                       /* Number of samples */
     uint32_t chan;                              /* Acquisition channel number */
-};
-
-typedef struct _acq_req_t acq_req_t;
+} acq_req_t;
 
 /* Acquistion data block */
-struct _acq_block_t {
+typedef struct {
     uint32_t idx;                               /* Block index */
 
     uint32_t *data;                             /* Block or complete curve read */
     uint32_t data_size;                         /* data_out buffer size */
     uint32_t bytes_read;                        /* Number of bytes effectively read */
-};
-
-typedef struct _acq_block_t acq_block_t;
+} acq_block_t;
 
 /* Acquistion transaction */
-struct _acq_trans_t {
+typedef struct {
     acq_req_t req;                              /* Request */
     acq_block_t block;                          /* Block or whole curve read */
-};
-
-typedef struct _acq_trans_t acq_trans_t;
+} acq_trans_t;
 
 /* Acquisition channel definitions */
-struct _acq_chan_t {
+typedef struct {
     uint32_t chan;
     uint32_t sample_size;
-};
-
-typedef struct _acq_chan_t acq_chan_t;
+} acq_chan_t;
 
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];
@@ -767,7 +756,6 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
  * (see bpm_client_err.h for all possible errors)*/
 bpm_client_err_e func_polling (bpm_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output, int timeout);
-
 
 #endif
 

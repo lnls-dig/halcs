@@ -41,6 +41,13 @@
 #define BPMCLIENT_DFLT_LOG_MODE             "w"
 #define BPMCLIENT_MLM_CONNECT_TIMEOUT       1000        /* in ms */
 
+/* Our structure */
+struct _bpm_client_t {
+    zuuid_t * uuid;                             /* Client UUID */
+    mlm_client_t *mlm_client;                   /* Malamute client instance */
+    const acq_chan_t *acq_chan;                 /* Acquisition buffer table */
+};
+
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode);
 
@@ -272,6 +279,15 @@ bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name, char *serv
     bpm_client_err_e err = bpm_func_exec (self, func, service, input, output);
     return err;
 }
+
+/********************** Accessor Methods **********************/
+
+mlm_client_t *bpm_get_mlm_client (bpm_client_t *self)
+{
+    assert (self);
+    return self->mlm_client;
+}
+
 /**************** FMC130M SMIO Functions ****************/
 bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
 {

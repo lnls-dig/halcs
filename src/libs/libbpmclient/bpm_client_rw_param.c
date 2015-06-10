@@ -42,15 +42,20 @@ bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
     ASSERT_TEST(param != NULL, "param_client_send_gen_rw (): parameter cannot be NULL",
             err_param_null, BPM_CLIENT_ERR_INV_PARAM);
 
+    mlm_client_t *client = bpm_get_mlm_client (self);
+    ASSERT_TEST(client != NULL, "Could not get BPM client handler", err_get_handler,
+            BPM_CLIENT_ERR_SERVER);
+
     zmsg_t *request = zmsg_new ();
     ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
     zmsg_addmem (request, &operation, sizeof (operation));
     zmsg_addmem (request, &rw, sizeof (rw));
     zmsg_addmem (request, param, size);
 
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
+    mlm_client_sendto (client, service, NULL, NULL, 0, &request);
 
 err_send_msg_alloc:
+err_get_handler:
 err_param_null:
     return err;
 }
@@ -64,11 +69,15 @@ bpm_client_err_e param_client_recv_rw (bpm_client_t *self, char *service,
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
     /* Receive report */
-    *report = mlm_client_recv (self->mlm_client);
+    mlm_client_t *client = bpm_get_mlm_client (self);
+    ASSERT_TEST(client != NULL, "Could not get BPM client handler", err_get_handler,
+            BPM_CLIENT_ERR_SERVER);
+    *report = mlm_client_recv (client);
     ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg,
             BPM_CLIENT_ERR_SERVER);
 
 err_null_msg:
+err_get_handler:
     return err;
 }
 
