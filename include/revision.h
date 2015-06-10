@@ -8,6 +8,10 @@
 #ifndef _REVISION_
 #define _REVISION_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const char *build_revision;
 extern const char *build_date;
 extern const char *build_user_name;
@@ -40,5 +44,9 @@ char *revision_clone_build_user_email (void);
 /* Copies the build user email into a pre-allocated buffer. Returns a negative number
  * on error and the number of copied bytes otherwise */
 int revision_copy_build_user_email (char *dest, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
