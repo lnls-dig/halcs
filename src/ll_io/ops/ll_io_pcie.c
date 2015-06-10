@@ -8,8 +8,8 @@
 #include "bpm_server.h"
 
 /* PCIe specifics */
+#include <pciDriver/lib/pciDriver.h>
 #include "hw/pcie_regs.h"
-#include "lib/pciDriver.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
