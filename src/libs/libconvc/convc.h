@@ -9,18 +9,15 @@
 #define _CONVC_H_
 
 #include <inttypes.h>
-
 #include "convc_err.h"
 
 #define CONVC_TYPE_END               0xFFFF
 #define CONVC_TYPE_NAME_END          ""
 
-struct _convc_types_t {
+typedef struct {
     int type;
     char *name;
-};
-
-typedef struct _convc_types_t convc_types_t;
+} convc_types_t;
 
 /************** Utility functions ****************/
 
