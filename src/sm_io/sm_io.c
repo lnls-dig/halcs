@@ -127,12 +127,12 @@ err_self_alloc:
     return NULL;
 }
 
-smio_err_e smio_destroy (struct _smio_t **self_p)
+smio_err_e smio_destroy (smio_t **self_p)
 {
     assert (self_p);
 
     if (*self_p) {
-        struct _smio_t *self = *self_p;
+        smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
         zsock_destroy (&self->pipe_msg);
@@ -278,7 +278,7 @@ const disp_table_ops_t smio_disp_table_ops = {
 /************************************************************/
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e smio_attach (smio_t *self, struct _devio_t *parent)
+smio_err_e smio_attach (smio_t *self, devio_t *parent)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
