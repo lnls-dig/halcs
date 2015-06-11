@@ -17,9 +17,7 @@
 
 /* Internal libraries dependencies */
 #include "acq_chan.h"
-
-/* General dependencies */
-#include "bpm_client_codes.h"
+#include "disp_table.h"
 
 /* BPM version macros for compile-time API detection */
 

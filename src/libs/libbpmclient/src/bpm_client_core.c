@@ -9,6 +9,7 @@
 /* Private headers */
 #include "errhand.h"
 #include "bpm_client_rw_param_codes.h"
+#include "bpm_client_codes.h"
 #include "sm_io_swap_useful_macros.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -1856,7 +1857,7 @@ PARAM_FUNC_CLIENT_READ(rffe_reprog)
 
 /* RFFE set/get data */
 bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
-        smio_rffe_data_block_t *rffe_data_block)
+        struct _smio_rffe_data_block_t *rffe_data_block)
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
@@ -1864,7 +1865,7 @@ bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
 }
 
 bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
-        smio_rffe_data_block_t *rffe_data_block)
+        struct _smio_rffe_data_block_t *rffe_data_block)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
@@ -1873,7 +1874,7 @@ bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
 
 /* RFFE get version */
 bpm_client_err_e bpm_get_rffe_version (bpm_client_t *self, char *service,
-        smio_rffe_version_t *rffe_version)
+        struct _smio_rffe_version_t *rffe_version)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_VERSION,
@@ -1923,7 +1924,7 @@ PARAM_FUNC_CLIENT_READ(afc_diag_ipmi_addr)
 
 /* Build Revision */
 bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data)
+        struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
@@ -1932,7 +1933,7 @@ bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *serv
 
 /* Build Date */
 bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data)
+        struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
@@ -1941,7 +1942,7 @@ bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
 
 /* Build User Name */
 bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data)
+        struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
@@ -1950,7 +1951,7 @@ bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *ser
 
 /* Build User Email */
 bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data)
+        struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,

@@ -12,6 +12,10 @@
 extern "C" {
 #endif
 
+struct _smio_rffe_data_block_t;
+struct _smio_rffe_version_t;
+struct _smio_afc_diag_revision_data_t;
+
 /********************************************************/
 /************************ Our API ***********************/
 /********************************************************/
@@ -689,16 +693,16 @@ bpm_client_err_e bpm_get_rffe_reprog (bpm_client_t *self, char *service,
  * if the parameter was correctly set or error (see bpm_client_err.h for all
  * possible errors)*/
 bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
-        smio_rffe_data_block_t *rffe_data_block);
+        struct _smio_rffe_data_block_t *rffe_data_block);
 bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
-        smio_rffe_data_block_t *rffe_data_block);
+        struct _smio_rffe_data_block_t *rffe_data_block);
 
 /* Version functions */
 /* These set of functions read (get) the RFFE version.
  * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see bpm_client_err.h for all possible errors)*/
 bpm_client_err_e bpm_get_rffe_version (bpm_client_t *self, char *service,
-        smio_rffe_version_t *rffe_version);
+        struct _smio_rffe_version_t *rffe_version);
 
 /* Switching level functions */
 /* These set of functions write (set) read (get) the RFFE switching level.
@@ -734,13 +738,13 @@ bpm_client_err_e bpm_get_afc_diag_ipmi_addr (bpm_client_t *self, char *service,
  * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see bpm_client_err.h for all possible errors)*/
 bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data);
+        struct _smio_afc_diag_revision_data_t *revision_data);
 bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data);
+        struct _smio_afc_diag_revision_data_t *revision_data);
 bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data);
+        struct _smio_afc_diag_revision_data_t *revision_data);
 bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
-        smio_afc_diag_revision_data_t *revision_data);
+        struct _smio_afc_diag_revision_data_t *revision_data);
 
 /* Helper Function */
 
