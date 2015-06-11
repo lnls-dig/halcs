@@ -11,9 +11,9 @@
 /* This should suffice for these type of information */
 #define AFC_DIAG_REVISION_BLOCK_SIZE            128
 
-typedef struct {
+struct _smio_afc_diag_revision_data_t {
     uint8_t data[AFC_DIAG_REVISION_BLOCK_SIZE];       /* data buffer */
-} smio_afc_diag_revision_data_t;
+};
 
 /* Messaging OPCODES */
 #define AFC_DIAG_OPCODE_TYPE                        uint32_t

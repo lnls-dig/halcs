@@ -6,8 +6,7 @@
  */
 
 #include "sm_io_exports_helper.h"
-#include "sm_io_fmc130m_4ch_exports.h"
-#include "sm_io_fmc130m_4ch_codes.h"
+#include "sm_io_codes.h"
 
 /* Description SMIO FMC130M_4CH functions */
 

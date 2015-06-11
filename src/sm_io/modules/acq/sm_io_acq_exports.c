@@ -6,8 +6,7 @@
  */
 
 #include "sm_io_exports_helper.h"
-#include "sm_io_acq_exports.h"
-#include "sm_io_acq_codes.h"
+#include "sm_io_codes.h"
 
 /* Description SMIO ACQ functions */
 

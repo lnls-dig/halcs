@@ -6,10 +6,7 @@
  */
 
 #include "sm_io_exports_helper.h"
-#include "sm_io_rffe_exports.h"
-#include "sm_io_rffe_codes.h"
-
-/* Description SMIO RFFE functions */
+#include "sm_io_codes.h"
 
 disp_op_t rffe_set_get_sw_exp = {
     .name = RFFE_NAME_SET_GET_SW,

@@ -13,15 +13,15 @@
 /* This must match the RFFE BSMP server */
 #define RFFE_BLOCK_SIZE                         127
 
-typedef struct {
+struct _smio_rffe_data_block_t {
     uint8_t data[RFFE_BLOCK_SIZE];              /* data buffer */
-} smio_rffe_data_block_t;
+};
 
 #define RFFE_VERSION_SIZE                       8
 
-typedef struct {
+struct _smio_rffe_version_t {
     char data[RFFE_VERSION_SIZE];               /* data buffer */
-} smio_rffe_version_t;
+};
 
 /* Messaging OPCODES */
 #define RFFE_OPCODE_TYPE                        uint32_t
