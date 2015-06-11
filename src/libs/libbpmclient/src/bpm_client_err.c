@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "bpm_client_err.h"
+#include "bpm_client.h"
 
 static const char *bpm_client_err [BPM_CLIENT_ERR_END] =
 {

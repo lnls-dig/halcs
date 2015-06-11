@@ -5,11 +5,11 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "errhand.h"
-
 #include "bpm_client.h"
-#include "bpm_client_rw_param.h"
+/* Private headers */
+#include "errhand.h"
 #include "bpm_client_rw_param_codes.h"
+#include "bpm_client_revision.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

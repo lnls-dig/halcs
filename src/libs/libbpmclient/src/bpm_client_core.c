@@ -6,14 +6,10 @@
  */
 
 #include "bpm_client.h"
+/* Private headers */
 #include "errhand.h"
-
-#include "sm_io_acq_codes.h"
-#include "sm_io_dsp_codes.h"
-#include "sm_io_swap_codes.h"
-#include "sm_io_swap_useful_macros.h"
 #include "bpm_client_rw_param_codes.h"
-#include "bpm_client_rw_param.h"
+#include "sm_io_swap_useful_macros.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -1960,8 +1956,6 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
             rw, revision_data, sizeof (*revision_data));
 }
-
-
 
 /**************** Helper Function ****************/
 

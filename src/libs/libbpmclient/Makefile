@@ -72,6 +72,9 @@ LIBS = -lzmq -lczmq -lmlm -luuid
 # General library flags -L<libdir>
 LFLAGS =
 
+# Source directory
+SRC_DIR = src
+
 # Specific board objects
 OBJS_BOARD = ../../sm_io/modules/acq/ddr3_map.o
 # Specific platform objects
@@ -90,9 +93,10 @@ OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS = -I. -I../../../include -I../liberrhand -I../libhutils -I../libdisptable \
+INCLUDE_DIRS = -I. -Iinclude -I../liberrhand -I../libhutils -I../libdisptable \
 		   -I../libconvc \
 	       $(boards_INCLUDE_DIRS) \
+	       -I../../../include \
 	       -I../../sm_io/modules \
 	       -I../../sm_io/modules/fmc130m_4ch \
 	       -I../../sm_io/modules/acq \
@@ -113,7 +117,8 @@ OUT = $(LIBBPMCLIENT)
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBBPMCLIENT)_OBJS_LIB = bpm_client.o bpm_client_err.o bpm_client_rw_param.o
+$(LIBBPMCLIENT)_OBJS_LIB = $(SRC_DIR)/bpm_client_core.o $(SRC_DIR)/bpm_client_err.o \
+	$(SRC_DIR)/bpm_client_rw_param.o
 
 # Objects common for both server and client libraries.
 common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
@@ -133,8 +138,7 @@ $(LIBBPMCLIENT)_CODE_HEADERS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch
 	../libhutils/hutils.h \
 	../libhutils/hutils_err.h \
 	../libhutils/hutils_math.h \
-	../libhutils/hutils_utils.h \
-	bpm_client_codes.h
+	../libhutils/hutils_utils.h
 
 $(LIBBPMCLIENT)_FUNC_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
 	../../sm_io/modules/acq/sm_io_acq_exports.h \
@@ -149,7 +153,11 @@ $(LIBBPMCLIENT)_ACQ_HEADERS = \
 	../../../include/boards/$(BOARD)/priv_defs/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
 $(LIBBPMCLIENT)_INST_ACQ_HEADERS = $($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h
 
-$(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_OBJS_LIB:.o=.h) $($(LIBBPMCLIENT)_CODE_HEADERS) \
+$(LIBBPMCLIENT)_HEADERS_LIB = include/bpm_client.h include/bpm_client_classes.h \
+	include/bpm_client_prelude.h include/bpm_client_codes.h \
+	$(subst src/,include/, $(patsubst %.o,%.h,$($(LIBBPMCLIENT)_OBJS_LIB)))
+
+$(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_HEADERS_LIB) $($(LIBBPMCLIENT)_CODE_HEADERS) \
     $($(LIBBPMCLIENT)_FUNC_EXPORTS)
 
 # Installation headers
@@ -160,11 +168,11 @@ GIT_REVISION = $(shell git describe --dirty --always)
 GIT_USER_NAME = $(shell git config --get user.name)
 GIT_USER_EMAIL = $(shell git config --get user.email)
 
-REVISION_NAME = bpm_client_revision
-OBJ_REVISION = $(addsuffix .o, $(REVISION_NAME))
+revision_OBJS = $(SRC_DIR)/bpm_client_revision.o
+revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
 OBJS_all = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS) \
-	   $(OBJ_REVISION)
+	   $(revision_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a
@@ -184,18 +192,19 @@ TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 all: $(TARGET_STATIC) $(TARGET_SHARED_VER) pre_inst
 
 # Compile static library
-%.a: $$($$*_OBJS) $(OBJ_REVISION)
+%.a: $$($$*_OBJS) $(revision_OBJS)
 	$(AR) rcs $@ $^
 
 # Compile dynamic library
-%.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
+%.so.$(LIB_VER): $$($$*_OBJS) $(revision_OBJS)
 	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS) $(LIBS)
 
-$(REVISION_NAME).o: $(REVISION_NAME).c
-	$(CC) $(CFLAGS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+# Special rule for the revision object
+$(revision_OBJS): $(revision_SRCS)
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
         -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
         -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
-        -c $<
+        -c $< -o $@
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found

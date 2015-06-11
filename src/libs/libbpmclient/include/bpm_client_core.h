@@ -5,17 +5,12 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _BPM_CLIENT_H_
-#define _BPM_CLIENT_H_
+#ifndef _BPM_CLIENT_CORE_H_
+#define _BPM_CLIENT_CORE_H_
 
-#include <inttypes.h>
-#include <malamute.h>
-
-#include "bpm_client_codes.h"
-#include "bpm_client_err.h"
-#include "acq_chan.h"           /* SMIO acq channel definition */
-
-typedef struct _bpm_client_t bpm_client_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -757,5 +752,8 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
 bpm_client_err_e func_polling (bpm_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output, int timeout);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

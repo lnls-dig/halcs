@@ -8,12 +8,9 @@
 #ifndef _BPM_CLIENT_RW_PARAM_H_
 #define _BPM_CLIENT_RW_PARAM_H_
 
-#include <inttypes.h>
-#include <malamute.h>
-
-#include "bpm_client_codes.h"
-#include "bpm_client_rw_param_codes.h"
-#include "bpm_client_err.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define READ_MODE                   1
 #define WRITE_MODE                  0
@@ -87,5 +84,8 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
 bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
         uint32_t operation, double *param_out);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

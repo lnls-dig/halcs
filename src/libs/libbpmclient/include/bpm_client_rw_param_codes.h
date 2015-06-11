@@ -8,6 +8,10 @@
 #ifndef _BPM_CLIENT_RW_PARAM_CODES_
 #define _BPM_CLIENT_RW_PARAM_CODES_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Messaging Reply OPCODES */
 #define RW_REPLY_SIZE                  (sizeof(uint32_t))
 #define RW_REPLY_TYPE                  uint32_t
@@ -22,5 +26,9 @@
 
 #define PARAM_OK                        0
 #define PARAM_ERR                       1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
