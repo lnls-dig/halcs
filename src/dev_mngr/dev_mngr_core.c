@@ -13,22 +13,22 @@
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
-    ASSERT_HAL_TEST(test_boolean, DEV_MNGR, "dev_mngr_core",\
+    ASSERT_HAL_TEST(test_boolean, DEV_MNGR, "[dev_mngr_core]",  \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
-#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...) \
-    ASSERT_HAL_ALLOC(ptr, DEV_MNGR, "dev_mngr_core",        \
-            dmngr_err_str(DMNGR_ERR_ALLOC),                 \
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)   \
+    ASSERT_HAL_ALLOC(ptr, DEV_MNGR, "[dev_mngr_core]",          \
+            dmngr_err_str(DMNGR_ERR_ALLOC),                     \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef CHECK_ERR
 #undef CHECK_ERR
 #endif
-#define CHECK_ERR(err, err_type)                            \
-    CHECK_HAL_ERR(err, DEV_MNGR, "dev_mngr_core",           \
+#define CHECK_ERR(err, err_type)                                \
+    CHECK_HAL_ERR(err, DEV_MNGR, "[dev_mngr_core]",             \
             dmngr_err_str (err_type))
 
 #define LOG_FILENAME_LEN            50
@@ -550,7 +550,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
         /* Only when the number of characters written is less than the whole buffer,
          * it is guaranteed that the string was written successfully */
         ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (key),
-                "[dev_mngr] Could not generate DBE config path\n", err_cfg_key,
+                "Could not generate DBE config path", err_cfg_key,
                 DMNGR_ERR_CFG);
 
         const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h,
@@ -585,8 +585,8 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
             /* Only when the number of characters written is less than the whole buffer,
              * it is guaranteed that the string was written successfully */
             ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
-                    "[dev_mngr] Could not generate AFE bind address from "
-                    "configuration file\n", err_cfg_exit, DMNGR_ERR_CFG);
+                    "Could not generate AFE bind address from configuration "
+                    "file", err_cfg_exit, DMNGR_ERR_CFG);
 
             char *endpoint_fe = zhash_lookup (self->hints_h, hints_key);
             /* If key is not found, assume we don't have any more AFE to
@@ -659,29 +659,29 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
 
     /* First find the dev_io property */
     zconfig_t *devio_cfg = zconfig_locate (root_cfg, "/dev_io");
-    ASSERT_TEST (devio_cfg != NULL, "[dev_mngr] Could not find "
-            "dev_io property in configuration file\n", err_cfg_exit,
+    ASSERT_TEST (devio_cfg != NULL, "Could not find "
+            "dev_io property in configuration file", err_cfg_exit,
             DMNGR_ERR_CFG);
 
     /* Now, find all of our child */
     zconfig_t *board_cfg = zconfig_child (devio_cfg);
-    ASSERT_TEST (board_cfg != NULL, "[dev_mngr] Could not find "
-            "board* property in configuration file\n", err_cfg_exit,
+    ASSERT_TEST (board_cfg != NULL, "Could not find "
+            "board* property in configuration file", err_cfg_exit,
             DMNGR_ERR_CFG);
 
     /* Navigate through all of our board siblings */
     for (; board_cfg != NULL; board_cfg = zconfig_next (board_cfg)) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Config file: "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "Config file: "
                 "board_cfg name: %s\n", zconfig_name (board_cfg));
 
         zconfig_t *bpm_cfg = zconfig_child (board_cfg);
-        ASSERT_TEST (bpm_cfg != NULL, "[dev_mngr] Could not find "
-                "bpm* property in configuration file\n", err_cfg_exit,
+        ASSERT_TEST (bpm_cfg != NULL, "Could not find "
+                "bpm* property in configuration file", err_cfg_exit,
                 DMNGR_ERR_CFG);
 
         /* Navigate through all of our bpm siblings and fill the hash table */
         for (; bpm_cfg != NULL; bpm_cfg = zconfig_next (bpm_cfg)) {
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Config file: "
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "Config file: "
                     "bpm_cfg name: %s\n", zconfig_name (bpm_cfg));
 
             /* Now, we expect to find the bind address of this bpm/board instance
@@ -689,7 +689,7 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
             char *hints_value = zconfig_resolve (bpm_cfg, "/afe/bind",
                     NULL);
             ASSERT_TEST (hints_value != NULL, "[dev_mngr] Could not find "
-                    "AFE bind address in configuration file\n", err_cfg_exit,
+                    "AFE bind address in configuration file", err_cfg_exit,
                     DMNGR_ERR_CFG);
 
             /* Now, we only need to generate a valid key to insert in the hash.
@@ -706,14 +706,13 @@ dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
                     "[dev_mngr] Could not generate AFE bind address from "
                     "configuration file\n", err_cfg_exit, DMNGR_ERR_CFG);
 
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] AFE hint endpoint "
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] AFE hint endpoint "
                     "hash key: \"%s\", value: \"%s\"\n", hints_key, hints_value);
 
             /* Insert this value in the hash table */
             errs = zhash_insert (hints_h, hints_key, hints_value);
-            ASSERT_TEST (errs == 0, "[dev_mngr] Could not find "
-                    "insert AFE endpoint to hash table\n", err_cfg_exit,
-                    DMNGR_ERR_CFG);
+            ASSERT_TEST (errs == 0, "Could not find insert AFE endpoint to "
+                    "hash table", err_cfg_exit, DMNGR_ERR_CFG);
         }
     }
 
