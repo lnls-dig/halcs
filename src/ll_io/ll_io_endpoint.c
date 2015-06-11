@@ -94,7 +94,6 @@ llio_err_e llio_endpoint_set_open (llio_endpoint_t *self, bool open)
 bool llio_endpoint_get_open (llio_endpoint_t *self)
 {
     assert (self);
-    assert (open);
 
     return self->open;
 }
