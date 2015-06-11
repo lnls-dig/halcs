@@ -178,7 +178,7 @@ INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Isrc/libs/libconvc \
 	       -Isrc/libs/libhutils \
 	       -Isrc/libs/libdisptable \
-	       -Isrc/libs/libbpmclient \
+	       -Isrc/libs/libbpmclient/include \
 	       -Iforeign/libsdbfs \
 	       -I/usr/local/include
 
