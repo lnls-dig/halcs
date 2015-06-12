@@ -40,10 +40,6 @@
 #define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
 #define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
 
-/* Arbitrary hard limit for the maximum number of AFE DEVIOs
- * for each DBE DEVIO */
-#define DEVIO_MAX_FE_DEVIOS         16
-
 #define DEVIO_NAME                  "dev_io"
 
 /* FPGA DEVIO */
@@ -544,45 +540,9 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
                 devio_info_id, PCIE_DEV, DEVIO_BE_TYPE, 0, READY_TO_RUN);
         ASSERT_TEST (err == DMNGR_SUCCESS, "Could not insert DEVIO",
                 err_devio_insert_alloc);
-
-        /* For each PCIE device find, register Ethernet devices to control
-         * our RFFEs. Do a lookup in our hints_h hash to look for endpoints
-         * to bind to */
-        uint32_t j;
-        for (j = 0; j < DEVIO_MAX_FE_DEVIOS; ++j) {
-            char hints_key [DMNGR_CFG_HASH_KEY_MAX_LEN];
-            int errs = snprintf (hints_key, sizeof (hints_key),
-                    DMNGR_CFG_HASH_KEY_PATTERN_COMPL, devio_info_id, j,
-                    DMNGR_CFG_AFE);
-
-            /* Only when the number of characters written is less than the whole buffer,
-             * it is guaranteed that the string was written successfully */
-            ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
-                    "Could not generate AFE bind address from configuration "
-                    "file", err_cfg_exit, DMNGR_ERR_CFG);
-
-            char *endpoint_fe = zhash_lookup (self->hints_h, hints_key);
-            /* If key is not found, assume we don't have any more AFE to
-             * prepare */
-            if (endpoint_fe == NULL || streq (endpoint_fe, "")) {
-                /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
-                        "[dev_mngr_core:scan_devs] Could not find any more endpoint
-                        hints for FEs\n"); */
-                continue;
-            }
-
-            /* Prepare respective DEVIO structure */
-            err = _dmngr_prepare_devio (self, hints_key, endpoint_fe,
-                    devio_info_id, ETH_DEV, DEVIO_FE_TYPE, j,
-                    READY_TO_RUN);
-            ASSERT_TEST (err == DMNGR_SUCCESS, "Could not prepare associated FE DEVIO",
-                    err_devio_fe_insert_alloc);
-        }
     }
 
     /* devio_info_destroy (&devio_info); */
-err_devio_fe_insert_alloc:
-err_cfg_exit:
 err_devio_insert_alloc:
 err_cfg_key:
     globfree (&glob_dev);
