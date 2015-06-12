@@ -78,9 +78,6 @@ dmngr_err_e dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
 dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         char *devio_log_filename, bool respawn_killed_devio);
 
-/* Utility functions */
-dmngr_err_e dmngr_get_hints (zconfig_t *root_cfg, zhash_t *hints_h);
-
 #ifdef __cplusplus
 }
 #endif

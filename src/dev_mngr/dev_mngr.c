@@ -150,8 +150,8 @@ int main (int argc, char *argv[])
 
     /* Read DEVIO suggested bind endpoints and fill the hash table with
      * the corresponding keys */
-    dmngr_err_e err = dmngr_get_hints (root_cfg, dmngr_hints);
-    if (err != DMNGR_SUCCESS) {
+    hutils_err_e herr = hutils_get_hints (root_cfg, dmngr_hints);
+    if (herr != HUTILS_SUCCESS) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not get hints "
                 "from configuration file\n");
         goto err_cfg_exit;
@@ -227,7 +227,7 @@ int main (int argc, char *argv[])
     dmngr_set_wait_clhd_handler (dmngr, &hutils_wait_chld);
     dmngr_set_spawn_clhd_handler (dmngr, &hutils_spawn_chld);
 
-    err = dmngr_register_sig_handlers (dmngr);
+    dmngr_err_e err = dmngr_register_sig_handlers (dmngr);
     if (err != DMNGR_SUCCESS) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] dmngr_register_sig_handler error!\n");
         goto err_sig_handlers;
