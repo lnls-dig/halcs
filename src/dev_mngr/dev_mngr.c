@@ -7,6 +7,29 @@
 
 #include "bpm_server.h"
 
+/* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
+#ifdef ASSERT_TEST
+#undef ASSERT_TEST
+#endif
+#define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
+    ASSERT_HAL_TEST(test_boolean, DEV_MNGR, "[dev_mngr]",           \
+            err_str, err_goto_label, /* err_core */ __VA_ARGS__)
+
+#ifdef ASSERT_ALLOC
+#undef ASSERT_ALLOC
+#endif
+#define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
+    ASSERT_HAL_ALLOC(ptr, DEV_MNGR, "[dev_mngr]",                   \
+            dmngr_err_str (DMNGR_ERR_ALLOC),                        \
+            err_goto_label, /* err_core */ __VA_ARGS__)
+
+#ifdef CHECK_ERR
+#undef CHECK_ERR
+#endif
+#define CHECK_ERR(err, err_type)                                    \
+    CHECK_HAL_ERR(err, DEV_MNGR, "[dev_mngr]",                      \
+            dmngr_err_str (err_type))
+
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
 #define DFLT_BIND_ADDR              "0"
 #define IPC_FILE_PERM               0777
