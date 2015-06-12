@@ -305,10 +305,9 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    /* wait child */
-    hutils_wait_chld ();
-
 err_devio:
+    /* wait child, if any */
+    hutils_wait_chld ();
     devio_destroy (&devio);
 err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
