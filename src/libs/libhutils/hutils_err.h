@@ -15,11 +15,7 @@ enum _hutils_err_e
 {
     HUTILS_SUCCESS = 0,               /* No error */
     HUTILS_ERR_ALLOC,                 /* Could not allocate memory */
-    HUTILS_ERR_NULL_POINTER,          /* Null pointer received */
-    HUTILS_ERR_NO_FUNC_REG,           /* No function registered */
-    HUTILS_ERR_INV_LESS_ARGS,         /* Less arguments than specified passed */
-    HUTILS_ERR_INV_MORE_ARGS,         /* More arguments than specified passed */
-    HUTILS_ERR_INV_SIZE_ARG,          /* Invalid size of argument size */
+    HUTILS_ERR_CFG,                   /* Could not get property from config file */
     HUTILS_ERR_END
 };
 
