@@ -76,7 +76,7 @@ LFLAGS =
 SRC_DIR = src
 
 # Specific board objects
-OBJS_BOARD = ../../sm_io/modules/acq/ddr3_map.o
+OBJS_BOARD =
 # Specific platform objects
 OBJS_PLATFORM =
 # Objects that are not specificaly related to the bpm_client, but composes
