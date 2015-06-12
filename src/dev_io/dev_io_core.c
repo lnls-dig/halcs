@@ -49,6 +49,7 @@ struct _devio_t {
     zpoller_t *poller_config;           /* Poller structure to multiplex config threads messages*/
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
+    uint32_t id;                        /* ID number of this instance */
     char *log_file;                     /* Log filename for tracing and debugging */
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
@@ -88,8 +89,9 @@ static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const ch
 static devio_err_e _devio_destroy_smio_all (devio_t *self, zhash_t *smio_h);
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
-        char *endpoint_broker, int verbose, const char *log_file_name)
+devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
+        llio_type_e type, char *endpoint_broker, int verbose,
+        const char *log_file_name)
 {
     assert (name);
     assert (endpoint_dev);
@@ -136,6 +138,11 @@ devio_t * devio_new (char *name, char *endpoint_dev, llio_type_e type,
     /* Setup strings/options */
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
+
+    /* Setup ID number */
+    self->id = id;
+
+    /* Setup Broker endpoint */
     self->endpoint_broker = strdup (endpoint_broker);
     ASSERT_ALLOC(self->endpoint_broker, err_endp_broker_alloc);
     self->verbose = verbose;
