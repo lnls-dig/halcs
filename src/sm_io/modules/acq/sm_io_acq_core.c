@@ -5,13 +5,10 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdlib.h>
-#include <assert.h>
-#include <czmq.h>
-
+#include "bpm_server.h"
+/* Private headers */
+#include "ddr3_map.h"
 #include "sm_io_acq_core.h"
-#include "sm_io_err.h"
-#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -41,6 +38,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
 {
     smio_acq_t *self = (smio_acq_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
+    uint32_t inst_id = smio_get_inst_id (parent);
 
     /* Set default value for all channels */
     for (uint32_t i = 0; i < END_CHAN_ID; i++) {
@@ -48,12 +46,12 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */
-    if (parent->inst_id > NUM_ACQ_CORE_SMIOS-1) {
+    if (inst_id > NUM_ACQ_CORE_SMIOS-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq_core] Instance ID invalid\n");
         return NULL;
     }
 
-    self->acq_buf = __acq_buf[parent->inst_id];
+    self->acq_buf = __acq_buf[inst_id];
 
     return self;
 

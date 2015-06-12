@@ -8,16 +8,12 @@
 #ifndef _SM_IO_AFC_DIAG_CODES_H_
 #define _SM_IO_AFC_DIAG_CODES_H_
 
-#include <inttypes.h>
-
 /* This should suffice for these type of information */
 #define AFC_DIAG_REVISION_BLOCK_SIZE            128
 
 struct _smio_afc_diag_revision_data_t {
     uint8_t data[AFC_DIAG_REVISION_BLOCK_SIZE];       /* data buffer */
 };
-
-typedef struct _smio_afc_diag_revision_data_t smio_afc_diag_revision_data_t;
 
 /* Messaging OPCODES */
 #define AFC_DIAG_OPCODE_TYPE                        uint32_t

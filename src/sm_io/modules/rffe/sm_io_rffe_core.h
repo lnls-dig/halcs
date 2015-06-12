@@ -8,20 +8,11 @@
 #ifndef _SM_IO_RFFE_CORE_H_
 #define _SM_IO_RFFE_CORE_H_
 
-#include <inttypes.h>
-#include "sm_io_err.h"
-#include "sm_io.h"
-#include "sm_ch_rffe.h"
+#define SMIO_CTL_HANDLER(smio_handler) (smio_handler->ctl)
 
-#define SMIO_RFFE_HANDLER(self) ((smio_rffe_t *) self->smio_handler)
-#define SMIO_CTL_HANDLER(self) (SMIO_RFFE_HANDLER(self)->ctl)
-
-struct _smio_rffe_t {
+typedef struct {
     smch_rffe_t *ctl;
-};
-
-/* Opaque class structure */
-typedef struct _smio_rffe_t smio_rffe_t;
+} smio_rffe_t;
 
 /***************** Our methods *****************/
 

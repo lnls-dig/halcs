@@ -241,24 +241,17 @@
         }                                                           \
     } while (0)
 
-/* FIXME: Figure it out another convenient way of doing this without hiding code! */
-/* Macros for ease the PCIe BAR pointer verbosity. */
-#define BAR_ACCESS_GEN(bar_addr)        (((llio_dev_pcie_t *)self->dev_handler)->bar_addr)
-#define BAR0                            BAR_ACCESS_GEN(bar0)
-#define BAR2                            BAR_ACCESS_GEN(bar2)
-#define BAR4                            BAR_ACCESS_GEN(bar4)
-
 /* Setting WB and SDRAM pages */
-#define SET_PG(which, num)              \
-    do {                                \
-        BAR0[which >> WB_DWORD_ACC] =   \
-                num;                    \
+#define SET_PG(bar0, which, num)                \
+    do {                                        \
+        bar0[which >> WB_DWORD_ACC] =           \
+                num;                            \
     } while (0)
 
-#define SET_SDRAM_PG(num)               \
-    SET_PG(PCIE_CFG_REG_SDRAM_PG, num)
+#define SET_SDRAM_PG(bar0, num)                 \
+    SET_PG(bar0, PCIE_CFG_REG_SDRAM_PG, num)
 
-#define SET_WB_PG(num)                  \
-    SET_PG(PCIE_CFG_REG_WB_PG, num)
+#define SET_WB_PG(bar0, num)                    \
+    SET_PG(bar0, PCIE_CFG_REG_WB_PG, num)
 
 #endif

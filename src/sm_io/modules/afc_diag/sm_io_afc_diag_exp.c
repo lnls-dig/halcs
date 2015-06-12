@@ -5,21 +5,14 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdlib.h>
-
-#include "sm_io_afc_diag_exp.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_afc_diag_codes.h"
-#include "sm_io.h"
-#include "dev_io_core.h"
-#include "errhand.h"
-#include "board.h"
-#include "rw_param.h"
-#include "rw_param_codes.h"
-#include "hw/wb_afc_diag_regs.h"
 #include "sm_io_afc_diag_defaults.h"
 #include "sm_io_afc_diag_exports.h"
-#include "hal_stddef.h"
-#include "revision.h"
+#include "sm_io_afc_diag_core.h"
+#include "sm_io_afc_diag_exp.h"
+#include "hw/wb_afc_diag_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -215,13 +208,18 @@ smio_err_e afc_diag_init (smio_t * self)
 
     smio_err_e err = SMIO_SUCCESS;
 
-    self->id = AFC_DIAG_DEVID;
-    self->name = strdup (AFC_DIAG_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_SUCCESS);
+    err = smio_set_id (self, AFC_DIAG_DEVID);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO id", err_set_id);
+    err = smio_set_name (self, AFC_DIAG_NAME);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO name", err_set_name);
 
     /* Set SMIO ops pointers */
-    self->ops = &afc_diag_ops;
-    self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
+    err = smio_set_ops (self, &afc_diag_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO operations",
+            err_smio_set_ops);
+    err = smio_set_thsafe_client_ops (self, &smio_thsafe_client_zmq_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO thsafe operations",
+            err_smio_set_thsafe_ops);
 
     /* disp_op_t structure is const and all of the functions performing on it
      * obviously receives a const argument, but here (and only on the SMIO
@@ -231,18 +229,31 @@ smio_err_e afc_diag_init (smio_t * self)
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 
-    self->exp_ops = afc_diag_exp_ops;
+    err = smio_set_exp_ops (self, afc_diag_exp_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO exported operations",
+            err_smio_set_exp_ops);
 
     /* Initialize specific structure */
-    self->smio_handler = smio_afc_diag_new (self);
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_SUCCESS);
+    smio_afc_diag_t *smio_handler = smio_afc_diag_new (self);
+    ASSERT_ALLOC(smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
+    err = smio_set_handler (self, smio_handler);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO handler",
+            err_smio_set_handler);
 
     return err;
 
+err_smio_set_handler:
+    smio_afc_diag_destroy (&smio_handler);
 err_smio_handler_alloc:
+    smio_set_exp_ops (self, NULL);
+err_smio_set_exp_ops:
 err_fill_desc:
-    free (self->name);
-err_name_alloc:
+    smio_set_thsafe_client_ops (self, NULL);
+err_smio_set_thsafe_ops:
+    smio_set_ops (self, NULL);
+err_smio_set_ops:
+err_set_name:
+err_set_id:
     return err;
 }
 
@@ -251,13 +262,20 @@ smio_err_e afc_diag_shutdown (smio_t *self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:afc_diag_exp] Shutting down afc_diag\n");
 
-    smio_afc_diag_destroy ((smio_afc_diag_t **)&self->smio_handler);
-    self->exp_ops = NULL;
-    self->thsafe_client_ops = NULL;
-    self->ops = NULL;
-    free (self->name);
+    smio_err_e err = SMIO_SUCCESS;
+    smio_afc_diag_t *afc_diag = smio_get_handler (self);
+    ASSERT_TEST(afc_diag != NULL, "Could not get AFC DIAG handler",
+            err_afc_diag_handler, SMIO_ERR_ALLOC /* FIXME: improve return code */);
 
-    return SMIO_SUCCESS;
+    /* Destroy SMIO instance */
+    smio_afc_diag_destroy (&afc_diag);
+    /* Nullify operation pointers */
+    smio_set_exp_ops (self, NULL);
+    smio_set_thsafe_client_ops (self, NULL);
+    smio_set_ops (self, NULL);
+
+err_afc_diag_handler:
+    return err;
 }
 
 const smio_bootstrap_ops_t afc_diag_bootstrap_ops = {

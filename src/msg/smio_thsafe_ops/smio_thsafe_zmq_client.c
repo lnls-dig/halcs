@@ -5,9 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "smio_thsafe_zmq_client.h"
-#include "errhand.h"
-#include "msg_err.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -94,6 +92,9 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, uint64_t offs, size_t size, 
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
     uint32_t opcode = THSAFE_OPCODE_READ_BLOCK;
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_read_block\n");
 
@@ -116,7 +117,7 @@ ssize_t thsafe_zmq_client_read_block (smio_t *self, uint64_t offs, size_t size, 
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe_msg);
+    zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -129,6 +130,7 @@ err_send_msg:
 err_add_size:
 err_add_offset:
 err_add_opcode:
+err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret_size;
@@ -141,6 +143,9 @@ ssize_t thsafe_zmq_client_write_block (smio_t *self, uint64_t offs, size_t size,
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
     uint32_t opcode = THSAFE_OPCODE_WRITE_BLOCK;
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_write_block\n");
 
@@ -164,7 +169,7 @@ ssize_t thsafe_zmq_client_write_block (smio_t *self, uint64_t offs, size_t size,
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe_msg);
+    zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -185,6 +190,7 @@ err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
+err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return -1;
@@ -222,10 +228,15 @@ ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, c
 
 int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode)
 {
+    (void) endpoint;
     assert (self);
+
     int ret = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_release\n");
     /* Message is:
@@ -234,7 +245,8 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
     int zerr = zmsg_addmem (send_msg, &opcode, sizeof (opcode));
     ASSERT_TEST(zerr == 0, "Could not add OPEN opcode in message",
             err_add_opcode);
-    zerr = zmsg_addmem (send_msg, endpoint, sizeof (*endpoint));
+    /* FIXME: This is wrong and unused */
+    zerr = zmsg_addmem (send_msg, 0, 0);
     ASSERT_TEST(zerr == 0, "Could not add endpoint in message",
             err_add_endpoint);
 
@@ -242,7 +254,7 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
 #ifdef LOCAL_MSG_DBG
     debug_log_print_zmq_msg (send_msg);
 #endif
-    zerr = zmsg_send (&send_msg, self->pipe_msg);
+    zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -277,6 +289,7 @@ err_null_raw_data:
 err_send_msg:
 err_add_endpoint:
 err_add_opcode:
+err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret;
@@ -289,6 +302,9 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
     ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
     uint32_t opcode;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_read_generic\n");
@@ -325,7 +341,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe_msg);
+    zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -337,6 +353,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
 err_send_msg:
 err_add_offset:
 err_add_opcode:
+err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret_size;
@@ -348,6 +365,9 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, co
     assert (self);
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
     uint32_t opcode;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_write_generic\n");
@@ -389,7 +409,7 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, co
     debug_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, self->pipe_msg);
+    zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message",
             err_send_msg);
 
@@ -411,6 +431,7 @@ err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
+err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return -1;
@@ -421,8 +442,11 @@ static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_zmq_client_recv_confirmation\n");
 
     assert (self);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
     /* Wait for response */
-    zmsg_t *recv_msg = zmsg_recv (self->pipe_msg);
+    zmsg_t *recv_msg = zmsg_recv (pipe_msg);
     /* Do not pop the message, just set a cursor to it */
     zframe_t *reply_frame = zmsg_first (recv_msg);
 
@@ -456,6 +480,7 @@ err_reply_code_not_ok:
 err_null_raw_data:
 err_recv_data:
     zmsg_destroy (&recv_msg);
+err_get_pipe_msg:
     return NULL;
 }
 

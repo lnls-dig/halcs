@@ -8,8 +8,6 @@
 #ifndef _SM_IO_AFC_DIAG_EXPORTS_H_
 #define _SM_IO_AFC_DIAG_EXPORTS_H_
 
-#include "disp_table.h"
-
 extern disp_op_t afc_diag_set_get_card_slot_exp;
 extern disp_op_t afc_diag_set_get_ipmi_addr_exp;
 extern disp_op_t afc_diag_get_build_revision_exp;

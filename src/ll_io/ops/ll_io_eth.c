@@ -5,22 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <inttypes.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netinet/tcp.h>
-
-#include "ll_io_eth.h"
-#include "errhand.h"
-#include "ll_io_utils.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -60,6 +45,14 @@
 #define LLIO_ETH_REGEX_ADDR_HIT             2
 #define LLIO_ETH_REGEX_PORT_HIT             3
 
+/* Device endpoint */
+typedef struct {
+    llio_eth_type_e type;
+    int fd;
+    char *hostname;
+    char *port;
+} llio_dev_eth_t;
+
 static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         char* port);
 static void *_get_in_addr(struct sockaddr *sa);
@@ -73,7 +66,7 @@ static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the dev_eth */
-llio_dev_eth_t * llio_dev_eth_new (const char *sock_type, const char *hostname,
+static llio_dev_eth_t * llio_dev_eth_new (const char *sock_type, const char *hostname,
         const char *port)
 {
     assert (sock_type);
@@ -113,7 +106,7 @@ err_llio_sock_type:
 }
 
 /* Destroy an instance of the Endpoint */
-llio_err_e llio_dev_eth_destroy (llio_dev_eth_t **self_p)
+static llio_err_e llio_dev_eth_destroy (llio_dev_eth_t **self_p)
 {
     if (*self_p) {
         llio_dev_eth_t *self = *self_p;
@@ -132,14 +125,20 @@ llio_err_e llio_dev_eth_destroy (llio_dev_eth_t **self_p)
 /************ llio_ops_eth Implementation **********/
 
 /* Open ETH device */
-int eth_open (llio_t *self, llio_endpoint_t *endpoint)
+static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
 {
-    (void) endpoint;
-    if (self->endpoint->opened) {
+    if (llio_get_endpoint_open (self)) {
+        /* Device is already opened. So, we return success */
         return 0;
     }
 
+    llio_err_e lerr = LLIO_SUCCESS;
     int err = 0;
+    if (endpoint != NULL) {
+        lerr = llio_set_endpoint (self, endpoint);
+        ASSERT_TEST(lerr == LLIO_SUCCESS, "Could not set endpoint on ETH device",
+                err_endpoint_set, -1);
+    }
 
     /* Parse the endpoint name */
     zrex_t *endp_regex = zrex_new (LLIO_ETH_REGEX);
@@ -150,10 +149,9 @@ int eth_open (llio_t *self, llio_endpoint_t *endpoint)
     ASSERT_TEST(valid, "Regex expression is not valid", err_inv_regex_exp, -1);
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
-            "[ll_io_eth] Endpoint is %s\n", self->endpoint->name);
+            "[ll_io_eth] Endpoint is %s\n", llio_get_endpoint_name (self));
 
-    char *endpoint_name = self->endpoint->name;
-
+    const char *endpoint_name = llio_get_endpoint_name (self);
     /* Extract the socket type, host address and port number from the endpoint
      * name */
     bool endp_matches = zrex_matches (endp_regex, endpoint_name);
@@ -185,24 +183,24 @@ int eth_open (llio_t *self, llio_endpoint_t *endpoint)
             "[ll_io_eth] Endpoint port is %s\n", endp_port);
 
     /* Create new private ETH handler */
-    self->dev_handler = llio_dev_eth_new (endp_sock_type, endp_addr,
+    llio_dev_eth_t *dev_eth = llio_dev_eth_new (endp_sock_type, endp_addr,
             endp_port);
-    ASSERT_TEST(self->dev_handler != NULL, "Could not allocate dev_handler",
+    ASSERT_TEST(dev_eth != NULL, "Could not allocate dev_handler",
             err_dev_handler_alloc, -1);
 
-    err = _llio_eth_conn (&(LLIO_ETH_HANDLER(self)->fd), LLIO_ETH_HANDLER(self)->type,
-            LLIO_ETH_HANDLER(self)->hostname, LLIO_ETH_HANDLER(self)->port);
-    ASSERT_TEST(err == LLIO_SUCCESS, "Could not connect to endpoint",
-            err_eth_conn);
+    err = _llio_eth_conn (&dev_eth->fd, dev_eth->type, dev_eth->hostname,
+        dev_eth->port);
+    ASSERT_TEST(err == 0, "Could not connect to endpoint", err_eth_conn);
 
+    llio_set_dev_handler (self, dev_eth);
     /* Signal that the endpoint is opened and ready to work */
-    self->endpoint->opened = true;
+    llio_set_endpoint_open (self, true);
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
             "[ll_io_eth] Opened ETH device located at %s\n",
-            self->endpoint->name);
+            llio_get_endpoint_name (self));
 
-    return 0;
+    return err;
 
 err_eth_conn:
 err_dev_handler_alloc:
@@ -214,76 +212,85 @@ err_endp_match:
 err_inv_regex_exp:
     zrex_destroy (&endp_regex);
 err_endp_regex_alloc:
-    return -1;
+err_endpoint_set:
+    return err;
 }
 
 /* Release ETH device */
-int eth_release (llio_t *self, llio_endpoint_t *endpoint)
+static int eth_release (llio_t *self, llio_endpoint_t *endpoint)
 {
     (void) endpoint;
 
-    /* Nothing to close */
-    if (!self->endpoint->opened) {
+    if (!llio_get_endpoint_open (self)) {
+        /* Nothing to close */
         return 0;
     }
 
-    /* Deattach specific device handler to generic one */
-    llio_err_e err = llio_dev_eth_destroy ((llio_dev_eth_t **) &self->dev_handler);
-    ASSERT_TEST (err==LLIO_SUCCESS, "Could not close device appropriately", err_dealloc);
+    llio_err_e lerr = LLIO_SUCCESS;
+    int err = 0;
+    llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
+            err_dev_eth_handler, -1);
 
-    self->dev_handler = NULL;
-    /* TODO: should we use llio_endpoint_set_opened() to close the endpoint? */
-    self->endpoint->opened = false;
+    /* Deattach specific device handler to generic one */
+    lerr = llio_dev_eth_destroy (&dev_eth);
+    ASSERT_TEST (lerr==LLIO_SUCCESS, "Could not close device appropriately",
+            err_dealloc, -1);
+
+    llio_set_dev_handler (self, NULL);
+    llio_set_endpoint_open (self, false);
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
-            "[ll_io_eth] Closed ETH device located at %s\n", self->endpoint->name);
+            "[ll_io_eth] Closed ETH device located at %s\n",
+            llio_get_endpoint_name (self));
 
-    return 0;
+    return err;
 
 err_dealloc:
-    return -1;
+err_dev_eth_handler:
+    return err;
 }
 
 /* Read data from Eth device */
-ssize_t eth_read_16 (llio_t *self, uint64_t offs, uint16_t *data)
+static ssize_t eth_read_16 (llio_t *self, uint64_t offs, uint16_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
+static ssize_t eth_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
+static ssize_t eth_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
             sizeof (*data));
 }
 
 /* Write data to Eth device */
-ssize_t eth_write_16 (llio_t *self, uint64_t offs, const uint16_t *data)
+static ssize_t eth_write_16 (llio_t *self, uint64_t offs, const uint16_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
+static ssize_t eth_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
-ssize_t eth_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
+static ssize_t eth_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
             sizeof (*data));
 }
 
 /* Read data block from Eth device, size in bytes */
-ssize_t eth_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
+static ssize_t eth_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _eth_read_generic (self, offs, data, size);
 }
@@ -300,16 +307,32 @@ static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
         size_t size)
 {
     (void) offs;
-    return _eth_recvall (LLIO_ETH_HANDLER(self)->fd, (uint8_t *) data,
-            size);
+
+    ssize_t err = 0;
+    llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
+            err_dev_eth_handler, -1);
+
+    err = _eth_recvall (dev_eth->fd, (uint8_t *) data, size);
+
+err_dev_eth_handler:
+    return err;
 }
 
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
         size_t size)
 {
     (void) offs;
-    return _eth_sendall (LLIO_ETH_HANDLER(self)->fd, (uint8_t *) data,
-            size);
+
+    ssize_t err = 0;
+    llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
+            err_dev_eth_handler, -1);
+
+    err = _eth_sendall (dev_eth->fd, (uint8_t *) data, size);
+
+err_dev_eth_handler:
+    return err;
 }
 
 /******************************* Helper Functions *****************************/

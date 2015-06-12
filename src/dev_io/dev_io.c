@@ -1,13 +1,11 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>          /* getpid, getppid */
-#include <unistd.h>
+/*
+ * Copyright (C) 2015 LNLS (www.lnls.br)
+ * Author: Lucas Russo <lucas.russo@lnls.br>
+ *
+ * Released according to the GNU LGPL, version 3 or any later version.
+ */
 
-#include "czmq.h"
-#include "dev_io.h"
-#include "board.h"
-#include "errhand.h"
-#include "bpm_client.h"
+#include "bpm_server.h"
 
 #define DEVIO_SERVICE_LEN           50
 #define DEVIO_CFG_NAME              "dev_io_cfg"
@@ -307,10 +305,9 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    /* wait child */
-    hutils_wait_chld ();
-
 err_devio:
+    /* wait child, if any */
+    hutils_wait_chld ();
     devio_destroy (&devio);
 err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
@@ -466,4 +463,3 @@ static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_
 err_register_sm:
     return err;
 }
-

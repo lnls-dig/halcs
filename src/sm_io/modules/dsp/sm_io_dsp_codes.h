@@ -8,8 +8,6 @@
 #ifndef _SM_IO_DSP_CODES_H_
 #define _SM_IO_DSP_CODES_H_
 
-#include <inttypes.h>
-
 /* Messaging OPCODES */
 #define DSP_OPCODE_TYPE                     uint32_t
 #define DSP_OPCODE_SIZE                     (sizeof (DSP_OPCODE_TYPE))

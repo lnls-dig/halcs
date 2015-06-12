@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "dev_io_err.h"
+#include "bpm_server.h"
 
 static const char *devio_err [DEVIO_ERR_END] =
 {
@@ -25,7 +25,7 @@ static const char *devio_err [DEVIO_ERR_END] =
     [DEVIO_ERR_BAD_MSG]                 = "Malformed message received",
     [DEVIO_ERR_TERMINATED]              = "Terminated devio instance",
     [DEVIO_ERR_SMIO_DESTROY]            = "Could not destroy sm_io instance",
-    [DEVIO_ERR_INV_SOCKET]              = "Invalid socket reference"
+    [DEVIO_ERR_MOD_LLIO]                = "Error modifying LLIO instance"
 };
 
 /* Convert enumeration type to string */

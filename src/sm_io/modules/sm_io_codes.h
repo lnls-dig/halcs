@@ -8,6 +8,19 @@
 #ifndef _SM_IO_CODES_H_
 #define _SM_IO_CODES_H_
 
+#include <inttypes.h>
+
+/* Forward references */
+
+/* Forward smio_acq_data_block_t declaration structure */
+typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
+/* Forward smio_afc_diag_revision_data_t declaration structure */
+typedef struct _smio_afc_diag_revision_data_t smio_afc_diag_revision_data_t;
+/* Forward smio_rffe_data_block_t declaration structure */
+typedef struct _smio_rffe_data_block_t smio_rffe_data_block_t;
+/* Forward smio_rffe_version_t declaration structure */
+typedef struct _smio_rffe_version_t smio_rffe_version_t;
+
 /* Include all module's codes */
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_acq_codes.h"

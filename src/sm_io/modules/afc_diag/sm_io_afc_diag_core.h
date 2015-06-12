@@ -8,18 +8,9 @@
 #ifndef _SM_IO_AFC_DIAG_CORE_H_
 #define _SM_IO_AFC_DIAG_CORE_H_
 
-#include <inttypes.h>
-#include "sm_io_err.h"
-#include "sm_io.h"
-
-#define SMIO_AFC_DIAG_HANDLER(self) ((smio_afc_diag_t *) self->smio_handler)
-
-struct _smio_afc_diag_t {
+typedef struct {
     const uint32_t example;
-};
-
-/* Opaque class structure */
-typedef struct _smio_afc_diag_t smio_afc_diag_t;
+} smio_afc_diag_t;
 
 /***************** Our methods *****************/
 

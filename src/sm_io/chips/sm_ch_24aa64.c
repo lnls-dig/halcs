@@ -11,10 +11,7 @@
  * Description: Software driver for EEPROM 24AA64 chip
  */
 
-#include "sm_ch_24aa64.h"
-#include "sm_pr.h"
-#include "errhand.h"
-#include "chips/e24aa64_regs.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -44,6 +41,11 @@
 #define SMCH_24AA64_USECS_WAIT              10000
 #define SMCH_24AA64_WAIT(usecs)             usleep(usecs)
 #define SMCH_24AA64_WAIT_DFLT               SMCH_24AA64_WAIT(SMCH_24AA64_USECS_WAIT)
+
+struct _smch_24aa64_t {
+    smpr_t *i2c;                    /* I2C protocol object */
+    uint32_t addr;                  /* I2C address for this 24AA64 chip */
+};
 
 static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
         const uint8_t *data, size_t size);
@@ -252,4 +254,3 @@ ssize_t smch_24aa64_probe_bus (smch_24aa64_t *self)
 
     return err;
 }
-

@@ -7,10 +7,7 @@
  * Description: Software driver for rPCA9547 I2C switch chip
  */
 
-#include "sm_ch_pca9547.h"
-#include "sm_pr.h"
-#include "errhand.h"
-#include "chips/pca9547_regs.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,6 +34,10 @@
 
 #define SMCH_PCA9547_NAME                    "I2C_PCA9547"
 
+struct _smch_pca9547_t {
+    smpr_t *i2c;                    /* I2C protocol object */
+    uint32_t addr;                  /* I2C address for this PCA9547 chip */
+};
 
 static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data);
 static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data);
@@ -170,4 +171,3 @@ smch_err_e smch_pca9547_en_chan (smch_pca9547_t *self, uint8_t chan)
 err_exit:
     return err;
 }
-

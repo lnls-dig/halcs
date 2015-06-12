@@ -5,14 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "ll_io.h"
-#include "ll_io_pcie.h"
-#include "ll_io_eth.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,10 +30,29 @@
     CHECK_HAL_ERR(err, LL_IO, "[ll_io]",                    \
             llio_err_str (err_type))
 
+/* LLIO class object */
+struct _llio_t {
+    llio_type_e type;                   /* Device type (PCIe, Ethnernet, or other) */
+    void *dev_handler;                  /* Generic pointer to a device handler. This
+                                            must be cast to a specific type by the
+                                            devices functions */
+    char *name;                         /* Identification of this llio instance */
+    int verbose;                        /* Print activity to stdout */
+
+    /* Endpoint to connect to */
+    llio_endpoint_t *endpoint;
+    /* SDB device info */
+    /* struct _llio_dev_info_t *dev_info; Moved to dev_io */
+    /* Device operations */
+    const llio_ops_t *ops;
+};
+
 /* Register Low-level operations to llio instance. Helpper function */
 static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **llio_ops);
 /* Unregister Low-level operations to llio instance. Helpper function */
 static llio_err_e _llio_unregister_ops (const llio_ops_t **ops);
+/* Get open endpoint status */
+static bool _llio_get_endpoint_open (llio_t *self);
 
 /* Creates a new instance of the Low-level I/O */
 llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
@@ -59,8 +71,11 @@ llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
     self->verbose = verbose;
 
     /* Initilialize llio_endpoint */
-    self->endpoint = llio_endpoint_new (endpoint);
-    ASSERT_ALLOC(self->endpoint, err_endpoint_alloc);
+    self->endpoint = NULL;
+    if (endpoint != NULL) {
+        self->endpoint = llio_endpoint_new (endpoint);
+        ASSERT_ALLOC(self->endpoint, err_endpoint_alloc);
+    }
 
     /* Initilialize llio_dev_info */
     /* self->dev_info = llio_dev_info_new ();
@@ -110,14 +125,75 @@ llio_err_e llio_destroy (llio_t **self_p)
     return LLIO_SUCCESS;
 }
 
-llio_err_e llio_set_endpoint (llio_t *self, const char *name)
+/* Set endpoint */
+llio_err_e llio_set_endpoint (llio_t *self, llio_endpoint_t *endpoint)
 {
-    return llio_endpoint_set (self->endpoint, name);
+    assert (self);
+    llio_err_e err = LLIO_SUCCESS;
+
+    /* Check if device is already opened. If it is, we can't change the
+     * endpoint */
+    ASSERT_TEST(_llio_get_endpoint_open (self), "Could not set endpoint. "
+            "Endpoint is open", err_endpoint_set, LLIO_ERR_SET_ENDP);
+
+    err = llio_endpoint_destroy (&self->endpoint);
+    ASSERT_TEST(err == LLIO_SUCCESS, "Could not close endpoint",
+            err_endpoint_close, LLIO_ERR_SET_ENDP);
+    self->endpoint = endpoint;
+
+err_endpoint_close:
+err_endpoint_set:
+    return err;
 }
 
-llio_err_e llio_get_endpoint (llio_t *self, char **name)
+/* Get endpoint */
+const llio_endpoint_t *llio_get_endpoint (llio_t *self)
 {
-    return llio_endpoint_get (self->endpoint, name);
+    assert (self);
+    return self->endpoint;
+}
+
+llio_err_e llio_set_endpoint_open (llio_t *self, bool open)
+{
+    return llio_endpoint_set_open (self->endpoint, open);
+}
+
+bool llio_get_endpoint_open (llio_t *self)
+{
+    return _llio_get_endpoint_open (self);
+}
+
+llio_err_e llio_set_endpoint_name (llio_t *self, const char *name)
+{
+    return llio_endpoint_set_name (self->endpoint, name);
+}
+
+const char *llio_get_endpoint_name (llio_t *self)
+{
+    return llio_endpoint_get_name (self->endpoint);
+}
+
+char *llio_clone_endpoint_name (llio_t *self)
+{
+    return llio_endpoint_clone_name (self->endpoint);
+}
+
+llio_err_e llio_set_dev_handler (llio_t *self, void *dev_handler)
+{
+    self->dev_handler = dev_handler;
+    return LLIO_SUCCESS;
+}
+
+void *llio_get_dev_handler (llio_t *self)
+{
+    return self->dev_handler;
+}
+
+/**************** Static function ****************/
+
+static bool _llio_get_endpoint_open (llio_t *self)
+{
+    return llio_endpoint_get_open (self->endpoint);
 }
 
 /**************** Helper Functions ***************/

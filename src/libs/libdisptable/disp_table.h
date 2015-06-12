@@ -17,31 +17,14 @@
 #include <czmq.h>
 #include "disp_table_err.h"
 
-struct _disp_table_ops_t;
-struct _disp_op_t;
-
-struct _disp_table_t {
-    /* Hash containg all the sm_io thsafe operations
-     * that we need to handle. It is composed
-     * of key (4-char ID) / value (pointer to funtion) */
-    zhash_t *table_h;
-    /* Dispatch table operations */
-    const struct _disp_table_ops_t *ops;
-};
-
-/* Check message arguments function pointer */
-typedef disp_table_err_e (*check_msg_args_fp)(struct _disp_table_t *self,
-        const struct _disp_op_t *disp_op, void *args);
-
-struct _disp_table_ops_t {
-    check_msg_args_fp check_msg_args;               /* Check message arguments */
-};
+/* Opaque class structure */
+typedef struct _disp_table_t disp_table_t;
 
 /* Generic function pointer */
 typedef int (*disp_table_func_fp)(void *owner, void * args, void *ret);
 
 /* Argument type (and retval type). The size is encoded in the same word */
-enum _disp_at_e {
+typedef enum {
     DISP_ATYPE_ERROR = 0xFF,
     DISP_ATYPE_NONE  = 0,           /* used as terminator */
     DISP_ATYPE_INT16 = 1,
@@ -56,14 +39,7 @@ enum _disp_at_e {
     DISP_ATYPE_VAR                  /* variable argument size. Allowed to be
                                        up to the size of the encoded argument.
                                        Typically a structure */
-};
-
-/* Opaque class structure */
-typedef struct _disp_table_t disp_table_t;
-/* Dispatch table operations */
-typedef struct _disp_table_ops_t disp_table_ops_t;
-/* Argument type */
-typedef enum _disp_at_e disp_at_e;
+} disp_at_e;
 
 /* FIXME: large arguments can overflow the macro!
  * Encoding of argument type and size in one word */
@@ -73,33 +49,38 @@ typedef enum _disp_at_e disp_at_e;
 #define DISP_GET_ASIZE(word) ((word) & 0xFFFFFF)
 #define DISP_ARG_END __DISP_ARG_ENCODE(DISP_ATYPE_NONE, 0) /* zero */
 
-enum _disp_val_owner_e {
+/* Return buffer owner */
+typedef enum {
     DISP_OWNER_FUNC = 0,            /* Value is owned by the function itself*/
     DISP_OWNER_OTHER                /* Value is owned by someone else and
                                            must take care of allocations, if
                                            necessary */
-};
+} disp_val_owner_e;
 
-struct _disp_op_t {
+/* Dispatch exported interface function structure */
+typedef struct {
     const char *name;                       /* Function name */
     uint32_t opcode;                        /* Operation code */
     disp_table_func_fp func_fp;             /* Pointer to exported function */
     uint32_t retval;                        /* Type of return value */
-    enum _disp_val_owner_e retval_owner;    /* Who owns the return value */
+    disp_val_owner_e retval_owner;          /* Who owns the return value */
     uint32_t args [];                       /* Zero-terminated */
-};
+} disp_op_t;
 
-struct _disp_op_handler_t {
-    const struct _disp_op_t *op;            /* Function description */
-    void *ret;                              /* Buffer for function return value */
-};
+/* Check message arguments function pointer */
+typedef disp_table_err_e (*check_msg_args_fp)(disp_table_t *self,
+        const disp_op_t *disp_op, void *args);
 
-/* Return buffer owner */
-typedef enum _disp_val_owner_e disp_val_owner_e;
-/* Dispatch exported interface function structure */
-typedef struct _disp_op_t disp_op_t;
+/* Dispatch table operations */
+typedef struct {
+    check_msg_args_fp check_msg_args;       /* Check message arguments */
+} disp_table_ops_t;
+
 /* Handler for the Dispatch exported function */
-typedef struct _disp_op_handler_t disp_op_handler_t;
+typedef struct {
+    const disp_op_t *op;                    /* Function description */
+    void *ret;                              /* Buffer for function return value */
+} disp_op_handler_t;
 
 /************************************************************/
 /********************* Generic methods API ******************/

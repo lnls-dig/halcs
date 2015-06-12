@@ -5,22 +5,9 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <string.h>
-#include <stdio.h>
-
-#include "dev_io_core.h"
-#include "dev_io_err.h"
-#include "errhand.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_io_mod_dispatch.h"
-#include "msg.h"
-#include "rw_param.h"
-#include "sm_io_thsafe_codes.h"
-#include "sm_io_bootstrap.h"
-#include "ll_io_utils.h"
-#include "hutils.h"
-#include "disp_table.h"
-#include "libsdbfs.h"
-#include "hw/pcie_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -52,6 +39,40 @@
 
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 #define DEVIO_LINGER_TIME                   100         /* in ms */
+
+struct _devio_t {
+    /* General information */
+    zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
+    zsock_t **pipes_msg;                /* Address nodes using this array of actors (Message PIPES) */
+    zactor_t **pipes_config;            /* Address config actors using this array of actors (Config PIPES) */
+    zpoller_t *poller;                  /* Poller structure to multiplex threads messages */
+    zpoller_t *poller_config;           /* Poller structure to multiplex config threads messages*/
+    unsigned int nnodes;                /* Number of actual nodes */
+    char *name;                         /* Identification of this worker instance */
+    char *log_file;                     /* Log filename for tracing and debugging */
+    char *endpoint_broker;              /* Broker location to connect to */
+    int verbose;                        /* Print activity to stdout */
+
+    /* ll_io instance for Low-Level operations*/
+    llio_t *llio;
+    /* Server part of the llio operations. This is the bridge between the
+     * smio client part of the llio operations and the de-facto
+     * llio operations */
+    const disp_op_t **thsafe_server_ops;
+    /* Hash containing all the sm_io objects that
+     * this dev_io can handle. It is composed
+     * of key (10-char ID) / value (sm_io instance) */
+    zhash_t *sm_io_h;
+    /* Hash containing all the Config sm_io objects that
+     * this dev_io can handle. It is composed
+     * of key (10-char ID) / value (sm_io instance) */
+    zhash_t *sm_io_cfg_h;
+    /* Dispatch table containing all the sm_io thsafe operations
+     * that we need to handle. It is composed
+     * of key (4-char ID) / value (pointer to function) */
+    disp_table_t *disp_table_thsafe_ops;
+};
+
 
 /* DEVIO dispatch table operations */
 const disp_table_ops_t devio_disp_table_ops;
@@ -247,7 +268,7 @@ devio_err_e devio_destroy (devio_t **self_p)
 static int __devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
         int count)
 {
-    return llio_read_block (((devio_t *)fs->drvdata)->llio, BAR4_ADDR | (offset), count, 
+    return llio_read_block (((devio_t *)fs->drvdata)->llio, BAR4_ADDR | (offset), count,
             (uint32_t *) buf);
 }
 
@@ -604,6 +625,32 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg)
     return _devio_do_smio_op (self, msg);
 }
 
+devio_err_e devio_set_llio (devio_t *self, llio_t *llio)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* Check if the LLIO is already opened. If it is, we can't change the
+     * LLIO */
+    ASSERT_TEST(llio_get_endpoint_open (self->llio), "Could not set LLIO. "
+            "LLIO is open", err_llio_set, DEVIO_ERR_MOD_LLIO);
+
+    llio_err_e lerr = llio_destroy (&self->llio);
+    ASSERT_TEST(lerr == LLIO_SUCCESS, "Could not close LLIO",
+            err_llio_close, DEVIO_ERR_MOD_LLIO);
+    self->llio = llio;
+
+err_llio_close:
+err_llio_set:
+    return err;
+}
+
+llio_t *devio_get_llio (devio_t *self)
+{
+    assert (self);
+    return self->llio;
+}
+
 /************************************************************/
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
@@ -690,17 +737,9 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
     /* $TERM message means to selfdestruct */
     zmsg_pushstr (send_msg, "$TERM");
 
-    /* Try to send the message a few times and then give up */
-    uint32_t tries = 0;
-    for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
-        int zerr = zmsg_send (&send_msg, *actor);
-        if (zerr == 0) {
-            break;
-        }
-    }
-
-    ASSERT_TEST (tries < DEVIO_MAX_DESTRUCT_MSG_TRIES, "Could not send "
-            "self-destruct message to SMIO instance",
+    /* Send the $TERM message to the SMIO */
+    int zerr = zmsg_send (&send_msg, *actor);
+    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
             err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "

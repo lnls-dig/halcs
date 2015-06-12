@@ -11,10 +11,8 @@
  * Description: Software driver for AD9510 chip (clock distribution)
  */
 
-#include "sm_ch_ad9510.h"
-#include "sm_pr.h"
-#include "errhand.h"
-#include "chips/ad9510_regs.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "sm_ch_ad9510_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -45,6 +43,11 @@
 #define SMCH_AD9519_USECS_WAIT              1000
 #define SMCH_AD9510_WAIT(usecs)             usleep(usecs)
 #define SMCH_AD9510_WAIT_DFLT               SMCH_AD9510_WAIT(SMCH_AD9519_USECS_WAIT)
+
+struct _smch_ad9510_t {
+    smpr_t *spi;                    /* SPI protocol object */
+    uint32_t ss;                    /* Slave select line for this AD9510 chip */
+};
 
 static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
         const uint8_t *data);

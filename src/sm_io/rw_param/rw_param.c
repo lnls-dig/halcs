@@ -5,9 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "sm_io.h"
-#include "rw_param.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -38,4 +36,3 @@ uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max) {
     }
     return PARAM_OK;
 }
-

@@ -5,8 +5,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "sm_io_swap_exports.h"
-#include "sm_io_swap_codes.h"
+#include "sm_io_exports_helper.h"
+#include "sm_io_codes.h"
 
 /* Description SMIO SWAP functions */
 

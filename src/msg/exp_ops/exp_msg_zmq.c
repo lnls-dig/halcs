@@ -5,7 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "exp_msg_zmq.h"
+#include "bpm_server.h"
 
 bool exp_msg_zmq_is (void *self)
 {

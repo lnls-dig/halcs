@@ -13,8 +13,3 @@ ll_io_OBJS = $(ll_io_DIR)/ll_io.o \
 	     $(ll_io_DIR)/ll_io_err.o \
 	     $(ll_io_utils_OBJS) \
 	     $(ll_io_ops_OBJS)
-
-ll_io_ALL_DIRS = $(ll_io_DIR) $(ll_io_ops_DIR)
-
-# Add -I prefix to all include directories
-ll_io_INCLUDE_DIRS = $(addprefix -I, $(ll_io_ALL_DIRS))

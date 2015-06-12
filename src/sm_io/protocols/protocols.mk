@@ -8,5 +8,3 @@ sm_io_protocols_DIR = $(SRC_DIR)/sm_io/protocols
 sm_io_protocols_OBJS =  $(sm_io_protocols_DIR)/sm_pr.o \
 			$(sm_io_protocols_DIR)/sm_pr_err.o \
 			$(sm_io_protocols_ops_OBJS)
-
-sm_io_protocols_INCLUDE_DIRS = $(sm_io_protocols_DIR) $(sm_io_protocols_ops_INCLUDE_DIRS)

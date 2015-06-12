@@ -8,7 +8,6 @@
 #ifndef _SM_IO_SWAP_USEFUL_MACROS_H_
 #define _SM_IO_SWAP_USEFUL_MACROS_H_
 
-#include <inttypes.h>
 #include "hw/wb_bpm_swap_regs.h"
 
 /* Some useful macros */

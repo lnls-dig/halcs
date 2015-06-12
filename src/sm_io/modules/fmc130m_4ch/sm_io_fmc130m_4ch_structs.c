@@ -1,5 +1,11 @@
-#include <inttypes.h>
-#include "board.h"
+/*
+ * Copyright (C) 2015 LNLS (www.lnls.br)
+ * Author: Lucas Russo <lucas.russo@lnls.br>
+ *
+ * Released according to the GNU LGPL, version 3 or any later version.
+ */
+
+#include "bpm_server.h"
 
 #if defined (__BOARD_ML605__)
 

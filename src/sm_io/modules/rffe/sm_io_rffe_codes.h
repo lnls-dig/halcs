@@ -17,15 +17,11 @@ struct _smio_rffe_data_block_t {
     uint8_t data[RFFE_BLOCK_SIZE];              /* data buffer */
 };
 
-typedef struct _smio_rffe_data_block_t smio_rffe_data_block_t;
-
 #define RFFE_VERSION_SIZE                       8
 
 struct _smio_rffe_version_t {
     char data[RFFE_VERSION_SIZE];               /* data buffer */
 };
-
-typedef struct _smio_rffe_version_t smio_rffe_version_t;
 
 /* Messaging OPCODES */
 #define RFFE_OPCODE_TYPE                        uint32_t

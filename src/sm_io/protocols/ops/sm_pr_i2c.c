@@ -12,13 +12,9 @@
  *               (standard I2C Master Controller core from OpenCores)
  */
 
-#include "sm_io.h"
-#include "sm_pr_i2c.h"
+#include "bpm_server.h"
+/* private headers */
 #include "sm_pr_i2c_defaults.h"
-#include "hw/wb_i2c_regs.h"
-#include "rw_param.h"
-#include "rw_param_codes.h"
-#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -43,6 +39,18 @@
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr:i2c]",                    \
             smpr_err_str (err_type))
 
+#define SM_PR_I2C_MAX_TRIES                 10
+#define SM_PR_I2C_USLEEP                    1000
+
+/* Device endpoint */
+typedef struct {
+    uint64_t base;              /* Core base address */
+    uint32_t sys_freq;          /* System clock [Hz] */
+    uint32_t i2c_freq;          /* I2C clock [Hz] */
+    uint32_t init_config;       /* I2C initial config register */
+    i2c_mode_e mode;            /* I2C mode */
+} smpr_proto_i2c_t;
+
 static smpr_err_e _i2c_init (smpr_t *self);
 static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check);
 static smpr_err_e _i2c_set_mode (smpr_t *self, uint32_t flags);
@@ -55,7 +63,7 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
 /************ Our methods implementation **********/
 
 /* Creates a new instance of the proto_i2c */
-smpr_proto_i2c_t * smpr_proto_i2c_new (uint64_t base)
+static smpr_proto_i2c_t * smpr_proto_i2c_new (uint64_t base)
 {
     smpr_proto_i2c_t *self = (smpr_proto_i2c_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_i2c_alloc);
@@ -69,7 +77,7 @@ err_smpr_proto_i2c_alloc:
 }
 
 /* Destroy an instance of the proto_i2c */
-smpr_err_e smpr_proto_i2c_destroy (smpr_proto_i2c_t **self_p)
+static smpr_err_e smpr_proto_i2c_destroy (smpr_proto_i2c_t **self_p)
 {
     assert (self_p);
 
@@ -235,8 +243,10 @@ static smpr_err_e _i2c_init (smpr_t *self)
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:i2c] Inside _i2c_init\n");
     smpr_err_e err = SMPR_SUCCESS;
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr:i2c] Calculating I2C frequency\n");
     /* Set I2C clock */
@@ -313,6 +323,7 @@ static smpr_err_e _i2c_init (smpr_t *self)
     i2c_proto->mode = I2C_MODE_NORMAL;
 
 err_exit:
+err_proto_handler:
     return err;
 }
 
@@ -320,13 +331,15 @@ static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check)
 {
     assert (self);
 
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    ssize_t err = 0;
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     /* Check for completion */
     uint32_t tip = 0;
     uint32_t tries = 0;
-    ssize_t err = 0;
     RW_REPLY_TYPE rw_err = RW_OK;
 
     while (1) {
@@ -359,6 +372,7 @@ static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check)
     ASSERT_TEST(rxack == 0, "RX Ack should be 0", err_exit, -1);
 
 err_exit:
+err_proto_handler:
     return err;
 }
 
@@ -366,7 +380,11 @@ static smpr_err_e _i2c_set_mode (smpr_t *self, uint32_t flags)
 {
     assert (self);
 
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    smpr_err_e err = SMPR_SUCCESS;
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
+
     /* Check if we must send a stop after the last byte */
     if ((flags & SMPR_PROTO_I2C_REP_START) != 0) {
         i2c_proto->mode = I2C_MODE_REP_START;
@@ -375,7 +393,8 @@ static smpr_err_e _i2c_set_mode (smpr_t *self, uint32_t flags)
         i2c_proto->mode = I2C_MODE_NORMAL;
     }
 
-    return SMPR_SUCCESS;
+err_proto_handler:
+    return err;
 }
 
 static ssize_t _i2c_read_write_header (smpr_t *self, uint32_t flags, bool rw)
@@ -385,8 +404,10 @@ static ssize_t _i2c_read_write_header (smpr_t *self, uint32_t flags, bool rw)
     ssize_t err = 0;
     RW_REPLY_TYPE rw_err = RW_OK;
 
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     /* Decode flags */
     uint32_t i2c_addr = SMPR_PROTO_I2C_ADDR_FLAGS_R(flags);
@@ -432,6 +453,7 @@ static ssize_t _i2c_read_write_header (smpr_t *self, uint32_t flags, bool rw)
     err = sizeof (uint8_t);
 
 err_exit:
+err_proto_handler:
     return err;
 }
 
@@ -448,8 +470,10 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
             SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MAX+1, "Invalid size for I2C transfer",
             err_inv_size, -1);
 
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     err = _i2c_read_write_header (self, flags, false /* write mode*/);
     ASSERT_TEST(err > 0, "Could not write I2C header", err_exit, -1);
@@ -514,6 +538,7 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
 
 err_inv_size:
 err_exit:
+err_proto_handler:
     return err;
 }
 
@@ -530,8 +555,10 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
             SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_MAX+1, "Invalid size for I2C transfer",
             err_inv_size, -1);
 
-    smio_t *parent = SMPR_PARENT(self);
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    smio_t *parent = smpr_get_parent (self);
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     err = _i2c_read_write_header (self, flags, true /* read mode*/);
     ASSERT_TEST(err > 0, "Could not write I2C header", err_exit, -1);
@@ -597,6 +624,7 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
 
 err_inv_size:
 err_exit:
+err_proto_handler:
     return err;
 }
 

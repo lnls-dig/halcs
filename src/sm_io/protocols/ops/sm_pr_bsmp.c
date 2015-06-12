@@ -5,12 +5,10 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include "sm_io.h"
-#include "sm_pr_bsmp.h"
+#include "bpm_server.h"
+
+/* Private headers */
 #include "sm_pr_bsmp_defaults.h"
-#include "rw_param.h"
-#include "rw_param_codes.h"
-#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -35,17 +33,35 @@
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr:bsmp]",                       \
             smpr_err_str (err_type))
 
-static smpr_err_e _smpr_proto_bsmp_get_handlers (smpr_t *self);
-static int _smpr_proto_bsmp_send (uint8_t *data, uint32_t *count);
-static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count);
+#define SMPR_PROTO_BSMP_CLIENT(smpr_handler)         (smpr_handler->client)
+
+/* BSMP glue structure. Needed to overcome the need of global variables */
+typedef struct {
+    smio_t *parent;
+} smpr_proto_glue_bsmp_t;
 
 /* BSMP glue structure */
 smpr_proto_glue_bsmp_t bsmp_glue;
 
+/* Device endpoint */
+typedef struct {
+    uint64_t base;                                      /* Core base address */
+    bsmp_client_t *client;                              /* BSMP client instance */
+    struct bsmp_func_info_list *funcs_list;             /* BSMP function handler */
+    struct bsmp_var_info_list *vars_list;               /* BSMP variables handler */
+    struct bsmp_curve_info_list *curves_list;           /* BSMP curves handler */
+    /* Unused */
+    struct bsmp_group_list *groups_list;                /* BSMP groups handler */
+} smpr_proto_bsmp_t;
+
+static smpr_err_e _smpr_proto_bsmp_get_handlers (smpr_t *self);
+static int _smpr_proto_bsmp_send (uint8_t *data, uint32_t *count);
+static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count);
+
 /*************** Our methods implementation **********/
 
 /* Creates a new instance of the proto_bsmp */
-smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint64_t base)
+static smpr_proto_bsmp_t * smpr_proto_bsmp_new (uint64_t base)
 {
     smpr_proto_bsmp_t *self = (smpr_proto_bsmp_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_smpr_proto_bsmp_alloc);
@@ -64,7 +80,7 @@ err_smpr_proto_bsmp_alloc:
 }
 
 /* Destroy an instance of the proto_bsmp */
-smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p)
+static smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p)
 {
     assert (self_p);
 
@@ -94,7 +110,7 @@ int bsmp_open (smpr_t *self, uint64_t base, void *args)
 
     /* We need to initialize the BASMP protocol here, as we don't have access to
      * to parent pointer inside the smpr_proto_bsmp_new () */
-    smio_t *parent = SMPR_PARENT(self);
+    smio_t *parent = smpr_get_parent (self);
     /* Initialize global glue BSMP variable for usage with the send and recv
      * functions */
     bsmp_glue.parent = parent;
@@ -171,8 +187,10 @@ smpr_err_e smpr_bsmp_read_var_by_id (smpr_t *self, uint32_t id, uint8_t *data,
     assert (data);
 
     smpr_err_e err = SMPR_SUCCESS;
-    smpr_proto_bsmp_t *bsmp_proto = SMPR_PROTO_BSMP(self);
-    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(self);
+    smpr_proto_bsmp_t *bsmp_proto = smpr_get_handler (self);
+    ASSERT_TEST(bsmp_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
+    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(bsmp_proto);
 
     /* Check if the ID is valid */
     ASSERT_TEST(id < bsmp_proto->vars_list->count, "Invalid BSMP variable ID",
@@ -192,6 +210,7 @@ smpr_err_e smpr_bsmp_read_var_by_id (smpr_t *self, uint32_t id, uint8_t *data,
 err_bsmp:
 err_size_too_small:
 err_inv_id:
+err_proto_handler:
     return err;
 }
 
@@ -202,8 +221,10 @@ smpr_err_e smpr_bsmp_write_var_by_id (smpr_t *self, uint32_t id, uint8_t *data,
     assert (data);
 
     smpr_err_e err = SMPR_SUCCESS;
-    smpr_proto_bsmp_t *bsmp_proto = SMPR_PROTO_BSMP(self);
-    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(self);
+    smpr_proto_bsmp_t *bsmp_proto = smpr_get_handler (self);
+    ASSERT_TEST(bsmp_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
+    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(bsmp_proto);
 
     /* Check if the ID is valid */
     ASSERT_TEST(id < bsmp_proto->vars_list->count, "Invalid BSMP variable ID",
@@ -223,6 +244,7 @@ smpr_err_e smpr_bsmp_write_var_by_id (smpr_t *self, uint32_t id, uint8_t *data,
 err_bsmp:
 err_size_differs:
 err_inv_id:
+err_proto_handler:
     return err;
 }
 
@@ -235,8 +257,10 @@ smpr_err_e smpr_bsmp_func_exec_by_id (smpr_t *self, uint32_t id, uint8_t *write_
     assert (read_data);
 
     smpr_err_e err = SMPR_SUCCESS;
-    smpr_proto_bsmp_t *bsmp_proto = SMPR_PROTO_BSMP(self);
-    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(self);
+    smpr_proto_bsmp_t *bsmp_proto = smpr_get_handler (self);
+    ASSERT_TEST(bsmp_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
+    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(bsmp_proto);
 
     /* Check if the ID is valid */
     ASSERT_TEST(id < bsmp_proto->funcs_list->count, "Invalid BSMP function ID",
@@ -263,6 +287,7 @@ err_bsmp:
 err_in_size_differs:
 err_out_size_differs:
 err_inv_id:
+err_proto_handler:
     return err;
 }
 
@@ -274,8 +299,10 @@ smpr_err_e smpr_bsmp_read_curve_by_id (smpr_t *self, uint32_t id, uint8_t *read_
     assert (read_data);
 
     smpr_err_e err = SMPR_SUCCESS;
-    smpr_proto_bsmp_t *bsmp_proto = SMPR_PROTO_BSMP(self);
-    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(self);
+    smpr_proto_bsmp_t *bsmp_proto = smpr_get_handler (self);
+    ASSERT_TEST(bsmp_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
+    bsmp_client_t *bsmp_client = SMPR_PROTO_BSMP_CLIENT(bsmp_proto);
 
     /* Check if the ID is valid */
     ASSERT_TEST(id < bsmp_proto->curves_list->count, "Invalid BSMP curve ID",
@@ -303,6 +330,7 @@ smpr_err_e smpr_bsmp_read_curve_by_id (smpr_t *self, uint32_t id, uint8_t *read_
 err_bsmp:
 err_curve_size_small:
 err_inv_id:
+err_proto_handler:
     return err;
 }
 
@@ -312,7 +340,9 @@ err_inv_id:
 static smpr_err_e _smpr_proto_bsmp_get_handlers (smpr_t *self)
 {
     smpr_err_e err = SMPR_SUCCESS;
-    smpr_proto_bsmp_t *bsmp_proto = SMPR_PROTO_BSMP(self);
+    smpr_proto_bsmp_t *bsmp_proto = smpr_get_handler (self);
+    ASSERT_TEST(bsmp_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, SMPR_ERR_PROTO_INFO);
 
     /* Get all BSMP entities */
     enum bsmp_err berr = bsmp_get_funcs_list (bsmp_proto->client, &bsmp_proto->funcs_list);
@@ -381,6 +411,7 @@ err_ret_funcs:
 err_ret_vars:
 err_ret_curves:
 err_ret_groups:
+err_proto_handler:
     return err;
 }
 

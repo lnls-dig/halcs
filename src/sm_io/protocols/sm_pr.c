@@ -5,16 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "sm_pr.h"
-#include "sm_pr_err.h"
-#include "sm_pr_spi.h"
-#include "sm_pr_i2c.h"
-#include "sm_pr_bsmp.h"
-#include "errhand.h"
+#include "bpm_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -38,6 +29,21 @@
 #define CHECK_ERR(err, err_type)                            \
     CHECK_HAL_ERR(err, SM_PR, "[sm_pr]",                    \
             smpr_err_str (err_type))
+
+struct _smpr_t {
+    smpr_type_e type;                   /* Protocol type (SPI, I2C, 1-wire, GPIO, Bypass) */
+    void *proto_handler;                /* Generic pointer to a protocol handler. This
+                                            must be cast to a specific type by the
+                                            specific protocol functions */
+    char *name;                         /* Identification of this smpr instance */
+    int verbose;                        /* Print activity to stdout */
+
+    /* SMIO instance this SMPR belongs to. We need this, as
+     * all of the low-level operations must go through it */
+    smio_t *parent;
+    /* Protocol operations */
+    const smpr_proto_ops_t *ops;
+};
 
 static smpr_err_e _smpr_register_proto_ops (smpr_type_e type,
         const smpr_proto_ops_t **ops);
@@ -116,6 +122,13 @@ err_dup_handler:
     return err;
 }
 
+/* Get protocol handler */
+void *smpr_get_handler (smpr_t *self)
+{
+    assert (self);
+    return self->proto_handler;
+}
+
 /* Unregister Specific Protocol operations to smpr instance */
 void *smpr_unset_handler (smpr_t *self)
 {
@@ -127,6 +140,12 @@ void *smpr_unset_handler (smpr_t *self)
     self->proto_handler = NULL;
 
     return proto_handler;
+}
+
+smio_t *smpr_get_parent (smpr_t *self)
+{
+    assert (self);
+    return self->parent;
 }
 
 /**************** Helper Functions ***************/

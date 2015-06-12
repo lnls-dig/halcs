@@ -8,16 +8,9 @@
 #ifndef _SM_IO_DSP_CORE_H_
 #define _SM_IO_DSP_CORE_H_
 
-#include <inttypes.h>
-#include "sm_io_err.h"
-#include "sm_io.h"
-
-struct _smio_dsp_t {
+typedef struct {
     const uint32_t example;
-};
-
-/* Opaque class structure */
-typedef struct _smio_dsp_t smio_dsp_t;
+} smio_dsp_t;
 
 /***************** Our methods *****************/
 

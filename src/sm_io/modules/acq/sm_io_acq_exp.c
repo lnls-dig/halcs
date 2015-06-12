@@ -5,20 +5,14 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdlib.h>
-
-#include "sm_io_acq_exp.h"
-#include "sm_io_acq_codes.h"
-#include "sm_io.h"
-#include "sm_io_exports.h"
-#include "dev_io_core.h"
-#include "errhand.h"
+#include "bpm_server.h"
+/* Private headers */
 #include "ddr3_map.h"
-#include "board.h"
-#include "rw_param.h"
-#include "hw/wb_acq_core_regs.h"
+#include "sm_io_acq_codes.h"
 #include "sm_io_acq_exports.h"
-#include "hal_stddef.h"
+#include "sm_io_acq_core.h"
+#include "sm_io_acq_exp.h"
+#include "hw/wb_acq_core_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -43,7 +37,8 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
-#define SMIO_ACQ_HANDLER(self) ((smio_acq_t *) self->smio_handler)
+/* Forward smio_acq_data_block_t declaration structure */
+typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
@@ -58,6 +53,9 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_data_acquire\n");
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
+            err_get_acq_handler);
 
     /* Message is:
      * frame 0: operation code
@@ -75,7 +73,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     }
 
     /* number of samples required is out of the maximum limit */
-    if (num_samples > SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples) {
+    if (num_samples > acq->acq_buf[chan].max_samples) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Number of samples required is out of the maximum limit\n");
         return -ACQ_NUM_SAMPLES_OOR;
@@ -87,10 +85,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "\n\tPrevious acq params for channel #%u: number of samples = %u\n",
-            chan, SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples);
+            chan, acq->acq_params[chan].num_samples);
 
     /* Set the parameters: number of samples of this channel */
-    SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples = num_samples;
+    acq->acq_params[chan].num_samples = num_samples;
 
     /* Default SHOTS value is 1 */
     uint32_t acq_core_shots = ACQ_CORE_SHOTS_NB_W(1);
@@ -101,7 +99,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
     uint32_t num_samples_div_pre =
-        DDR3_PAYLOAD_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+        DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
     uint32_t num_samples_aligned_pre = num_samples + num_samples_div_pre -
         (num_samples % num_samples_div_pre);
     /* Pre trigger samples */
@@ -120,7 +118,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     /* DDR3 start address. Convert Byte address to Word address, as this address
      * is written to the DDR controller, which is 32-bit (word) addressed */
     uint32_t start_addr = (uint32_t)
-        SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr/DDR3_ADDR_WORD_2_BYTE;
+        acq->acq_buf[chan].start_addr/DDR3_ADDR_WORD_2_BYTE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "DDR3 start address: 0x%08x\n", start_addr);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_START_ADDR, &start_addr);
@@ -147,6 +145,9 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             "Acquisition Started!\n");
 
     return -ACQ_OK;
+
+err_get_acq_handler:
+    return -ACQ_ERR;
 }
 
 static int _acq_check_data_acquire (void *owner, void *args, void *ret)
@@ -159,6 +160,9 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
             "Calling _acq_check_data_acquire\n");
 
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
+            err_get_acq_handler);
 
     uint32_t status_done = 0;
     /* Check for completion */
@@ -175,6 +179,9 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
             "Acquisition is done\n");
     return -ACQ_OK;
+
+err_get_acq_handler:
+    return -ACQ_ERR;
 }
 
 static int _acq_get_data_block (void *owner, void *args, void *ret)
@@ -186,6 +193,9 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "Calling _acq_get_data_block\n");
 
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
+            err_get_acq_handler);
 
     /* Message is:
      * frame 0: channel
@@ -208,15 +218,15 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "\t[channel = %u], id = %u, start addr = 0x%08x\n"
             "\tend addr = 0x%08x, max samples = %u, sample size = %u\n",
             chan,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].id,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].max_samples,
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size);
+            acq->acq_buf[chan].id,
+            acq->acq_buf[chan].start_addr,
+            acq->acq_buf[chan].end_addr,
+            acq->acq_buf[chan].max_samples,
+            acq->acq_buf[chan].sample_size);
 
-    uint32_t block_n_max = ( SMIO_ACQ_HANDLER(self)->acq_buf[chan].end_addr -
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
-            SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size) / BLOCK_SIZE;
+    uint32_t block_n_max = ( acq->acq_buf[chan].end_addr -
+            acq->acq_buf[chan].start_addr +
+            acq->acq_buf[chan].sample_size) / BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
@@ -229,11 +239,11 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* Get number of samples */
     uint32_t num_samples =
-        SMIO_ACQ_HANDLER(self)->acq_params[chan].num_samples;
+        acq->acq_params[chan].num_samples;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "last num_samples = %u\n", num_samples);
 
-    uint32_t n_max_samples = BLOCK_SIZE/SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+    uint32_t n_max_samples = BLOCK_SIZE/acq->acq_buf[chan].sample_size;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
@@ -257,7 +267,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        reply_size = over_samples*SMIO_ACQ_HANDLER(self)->acq_buf[chan].sample_size;
+        reply_size = over_samples*acq->acq_buf[chan].sample_size;
     }
     else { /* if block_n < block_n_valid */
         reply_size = BLOCK_SIZE;
@@ -267,7 +277,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "Reading block %u of channel %u with %u valid samples\n",
             block_n, chan, reply_size);
 
-    uint32_t addr_i = SMIO_ACQ_HANDLER(self)->acq_buf[chan].start_addr +
+    uint32_t addr_i = acq->acq_buf[chan].start_addr +
         block_n * BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Block %u of channel %u start address = 0x%08x\n", block_n,
@@ -294,6 +304,9 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     }
 
     return retf;
+
+err_get_acq_handler:
+    return -ACQ_ERR;
 }
 
 /* Exported function pointers */
@@ -341,7 +354,6 @@ smio_err_e acq_unexport_ops (smio_t *self)
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
-
 /* Generic wrapper for receiving opcodes and arguments to specific funtions function pointer */
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _acq_do_op (void *owner, void *msg)
@@ -374,13 +386,18 @@ smio_err_e acq_init (smio_t * self)
 
     smio_err_e err = SMIO_SUCCESS;
 
-    self->id = ACQ_SDB_DEVID;
-    self->name = strdup (ACQ_SDB_NAME);
-    ASSERT_ALLOC(self->name, err_name_alloc, SMIO_ERR_ALLOC);
+    err = smio_set_id (self, ACQ_SDB_DEVID);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO id", err_set_id);
+    err = smio_set_name (self, ACQ_SDB_NAME);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO name", err_set_name);
 
     /* Set SMIO ops pointers */
-    self->ops = &acq_ops;
-    self->thsafe_client_ops = &smio_thsafe_client_zmq_ops;
+    err = smio_set_ops (self, &acq_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO operations",
+            err_smio_set_ops);
+    err = smio_set_thsafe_client_ops (self, &smio_thsafe_client_zmq_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO thsafe operations",
+            err_smio_set_thsafe_ops);
 
     /* Fill the disp_op_t description structure with the callbacks. */
 
@@ -392,18 +409,31 @@ smio_err_e acq_init (smio_t * self)
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not fill SMIO "
             "function descriptors with the callbacks", err_fill_desc);
 
-    self->exp_ops = acq_exp_ops;
+    err = smio_set_exp_ops (self, acq_exp_ops);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO exported operations",
+            err_smio_set_exp_ops);
 
     /* Initialize specific structure */
-    self->smio_handler = smio_acq_new (self, 0); /* Default: num_samples = 0 */
-    ASSERT_ALLOC(self->smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
+    smio_acq_t *smio_handler = smio_acq_new (self, 0); /* Default: num_samples = 0 */
+    ASSERT_ALLOC(smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
+    err = smio_set_handler (self, smio_handler);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO handler",
+            err_smio_set_handler);
 
     return err;
 
+err_smio_set_handler:
+    smio_acq_destroy (&smio_handler);
 err_smio_handler_alloc:
+    smio_set_exp_ops (self, NULL);
+err_smio_set_exp_ops:
 err_fill_desc:
-    free (self->name);
-err_name_alloc:
+    smio_set_thsafe_client_ops (self, NULL);
+err_smio_set_thsafe_ops:
+    smio_set_ops (self, NULL);
+err_smio_set_ops:
+err_set_name:
+err_set_id:
     return err;
 }
 
@@ -412,13 +442,20 @@ smio_err_e acq_shutdown (smio_t *self)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq_exp] Shutting down acq\n");
 
-    smio_acq_destroy ((smio_acq_t **)&self->smio_handler);
-    self->exp_ops = NULL;
-    self->thsafe_client_ops = NULL;
-    self->ops = NULL;
-    free (self->name);
+    smio_err_e err = SMIO_SUCCESS;
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get ACQ handler",
+            err_acq_handler, SMIO_ERR_ALLOC /* FIXME: improve return code */);
 
-    return SMIO_SUCCESS;
+    /* Destroy SMIO instance */
+    smio_acq_destroy (&acq);
+    /* Nullify operation pointers */
+    smio_set_exp_ops (self, NULL);
+    smio_set_thsafe_client_ops (self, NULL);
+    smio_set_ops (self, NULL);
+
+err_acq_handler:
+    return err;
 }
 
 const smio_bootstrap_ops_t acq_bootstrap_ops = {
