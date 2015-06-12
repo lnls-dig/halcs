@@ -11,6 +11,33 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+/******************* Configuration file property names ************************/
+
+#define HUTILS_FE_CFG_ENDP_MAX_PATH         256
+#define HUTILS_FE_CFG_ENDP_PATH_PATTERN     "/dev_io/board%u/bpm%u/afe/bind"
+
+/* We don't expect our hash key to be bigger than this */
+#define HUTILS_CFG_HASH_KEY_MAX_LEN         64
+/* Our config hash key is composed of this pattern: board%u/bpm%u/afe
+ * or board%u/bpm%u/dbe */
+#define HUTILS_CFG_BOARD_TYPE               "%s"
+#define HUTILS_CFG_BOARD_PATTERN            "board%u"
+#define HUTILS_CFG_BPM_TYPE                 "%s"
+#define HUTILS_CFG_BPM_PATTERN              "bpm%u"
+#define HUTILS_CFG_DEVIO_MODEL_TYPE         "%s"
+#define HUTILS_CFG_AFE                      "afe"
+#define HUTILS_CFG_DBE                      "dbe"
+
+//#define HUTILS_CFG_HASH_KEY_PATTERN  "%s/%s/%s"
+#define HUTILS_CFG_HASH_KEY_PATTERN         HUTILS_CFG_BOARD_TYPE \
+                                            "/" HUTILS_CFG_BPM_TYPE "/" \
+                                            HUTILS_CFG_DEVIO_MODEL_TYPE
+#define HUTILS_CFG_HASH_KEY_PATTERN_COMPL   HUTILS_CFG_BOARD_PATTERN \
+                                            "/" HUTILS_CFG_BPM_PATTERN "/" \
+                                            HUTILS_CFG_DEVIO_MODEL_TYPE
+
+/************************ Our methods *****************************/
+
 /* Returns the necessary string length including the termianting null character
  * for a number in a arbitrary base */
 uint32_t hutils_num_to_str_len (uint32_t key, uint32_t base);
@@ -73,5 +100,9 @@ char *hutils_clone_str (const char *str);
 /* Copies a src NULL terminated string into a dest pre-allocated buffer, up to
  * a maximum of size bytes */
 int hutils_copy_str (char *dest, const char *src, size_t size);
+
+/* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
+ * and store them in hash table in the form <property name / property value> */
+hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h);
 
 #endif
