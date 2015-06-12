@@ -19,6 +19,9 @@ if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
     exit 1
 fi
 
+# Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
+# This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
+SHRINK_AFCV3_DDR_SIZE=y
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG=n
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
@@ -52,6 +55,7 @@ COMMAND_DEPS="\
 
 COMMAND_HAL="\
     make BOARD=${BOARD} \
+    SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
     ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \

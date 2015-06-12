@@ -13,6 +13,9 @@ MAKE =		make
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
+# Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
+# This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
+SHRINK_AFCV3_DDR_SIZE ?= y
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG ?= n
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
@@ -64,6 +67,12 @@ LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
+
+ifeq ($(BOARD),afcv3)
+ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
+CFLAGS += -D__SHRINK_AFCV3_DDR_SIZE__
+endif
+endif
 
 # Board selection
 ifeq ($(BOARD),ml605)
