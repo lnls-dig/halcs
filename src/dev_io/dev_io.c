@@ -333,9 +333,6 @@ int main (int argc, char *argv[])
     str_p = &dev_entry;
     free (*str_p);
     dev_entry = NULL;
-    str_p = &broker_endp;
-    free (*str_p);
-    broker_endp = NULL;
 
     /* Print SDB devices */
     devio_print_info (devio);
@@ -376,6 +373,10 @@ int main (int argc, char *argv[])
                 "associated DEVIOs!\n");
         goto err_assoc_devio;
     }
+
+    str_p = &broker_endp;
+    free (*str_p);
+    broker_endp = NULL;
 
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (devio, devio_type, fe_smio_id);
@@ -439,6 +440,8 @@ static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
         zhash_t *hints)
 {
     assert (devio);
+    assert (broker_endp);
+    assert (hints);
 
     devio_err_e err = DEVIO_SUCCESS;
 
@@ -470,6 +473,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         char *broker_endp, char *log_file_name, zhash_t *hints)
 {
     assert (devio);
+    assert (broker_endp);
     assert (hints);
 
     devio_err_e err = DEVIO_SUCCESS;
