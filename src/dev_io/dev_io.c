@@ -479,6 +479,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
     devio_err_e err = DEVIO_SUCCESS;
     char *dev_id_c = NULL;
     char *smio_inst_id_c = NULL;
+    char *log_file_name_cpy = NULL;
 
     /* For each DEVIO, spawn up to 2 RFFE DEVIOs. Do a lookup in our
      * hints hash to look for endpoints to bind to */
@@ -505,9 +506,12 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
 
         /* Set up logdir */
         char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
-        /* Get dirname of the parent DEVIO. Don't free it as written in the
-         * manpage */
-        char *devio_log_prefix = dirname (log_file_name);
+        /* Get dirname of the parent DEVIO. This function modify the passed
+         * string. So, we copy it over first. Also, we should not free later it
+         * as the manpage says */
+        log_file_name_cpy = strdup (log_file_name);
+        ASSERT_ALLOC (log_file_name_cpy, err_log_file_cpy, DEVIO_ERR_ALLOC);
+        char *devio_log_prefix = dirname (log_file_name_cpy);
 
         /* TODO: Check for the validity of the log filename */
         if (devio_log_prefix != NULL) {
@@ -515,6 +519,10 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
                     "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
                     dev_id, FE_DEVIO_STR, smio_inst_id);
         }
+
+        /* Now, we don't need our copy string anymore */
+        free (log_file_name_cpy);
+        log_file_name_cpy = NULL;
 
         /* Stringify parameters */
         dev_id_c = hutils_stringify_dec_key (dev_id);
@@ -547,6 +555,8 @@ err_spawn:
 err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
+    free (log_file_name_cpy);
+err_log_file_cpy:
 err_cfg_exit:
     return err;
 }
