@@ -737,17 +737,9 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
     /* $TERM message means to selfdestruct */
     zmsg_pushstr (send_msg, "$TERM");
 
-    /* Try to send the message a few times and then give up */
-    uint32_t tries = 0;
-    for (tries = 0; tries < DEVIO_MAX_DESTRUCT_MSG_TRIES; ++tries) {
-        int zerr = zmsg_send (&send_msg, *actor);
-        if (zerr == 0) {
-            break;
-        }
-    }
-
-    ASSERT_TEST (tries < DEVIO_MAX_DESTRUCT_MSG_TRIES, "Could not send "
-            "self-destruct message to SMIO instance",
+    /* Send the $TERM message to the SMIO */
+    int zerr = zmsg_send (&send_msg, *actor);
+    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
             err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
