@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
+VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
 
 #######################################
 # All of our Makefile options
@@ -16,6 +17,13 @@ fi
 
 if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
     echo "Unsupported board. "$VALID_BOARDS_STR
+    exit 1
+fi
+
+WITH_EXAMPLES=$2
+
+if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WITH_EXAMPLES" != "without_examples" ]; then
+    echo "Wrong variable value. "$VALID_WITH_EXAMPLES_STR
     exit 1
 fi
 
@@ -76,10 +84,18 @@ COMMAND_LIBBPMCLIENT="\
     LOCAL_MSG_DBG=${LOCAL_MSG_DBG} && \
     sudo make libbpmclient_install"
 
+if [ "$WITH_EXAMPLES" = "with_examples" ]; then
+COMMAND_EXAMPLES="\
+    make examples"
+else
+COMMAND_EXAMPLES=""
+fi
+
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_HAL}"
     "${COMMAND_LIBBPMCLIENT}"
+    "${COMMAND_EXAMPLES}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
