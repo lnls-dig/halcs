@@ -125,13 +125,7 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 
 # Objects for each version of library
 $(LIBBPMCLIENT)_OBJS = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS_LIB)
-$(LIBBPMCLIENT)_CODE_HEADERS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../../sm_io/modules/acq/sm_io_acq_codes.h \
-	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
-	../../sm_io/modules/swap/sm_io_swap_codes.h \
-	../../sm_io/modules/rffe/sm_io_rffe_codes.h \
-	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
-	../../sm_io/modules/sm_io_codes.h \
+$(LIBBPMCLIENT)_CODE_HEADERS = \
 	../../../include/acq_chan_gen_defs.h \
 	../libdisptable/disp_table.h \
 	../libdisptable/disp_table_err.h \
@@ -140,25 +134,39 @@ $(LIBBPMCLIENT)_CODE_HEADERS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch
 	../libhutils/hutils_math.h \
 	../libhutils/hutils_utils.h
 
-$(LIBBPMCLIENT)_FUNC_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+$(LIBBPMCLIENT)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	../../sm_io/modules/acq/sm_io_acq_codes.h \
+	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
+	../../sm_io/modules/swap/sm_io_swap_codes.h \
+	../../sm_io/modules/rffe/sm_io_rffe_codes.h \
+	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
+	../../sm_io/modules/sm_io_codes.h
+
+$(LIBBPMCLIENT)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
 	../../sm_io/modules/acq/sm_io_acq_exports.h \
 	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
 	../../sm_io/modules/swap/sm_io_swap_exports.h \
 	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
 
-# Install only specific acq_chan.h defintions according to the BOARD MACRO
-$(LIBBPMCLIENT)_ACQ_HEADER_BASENAME = acq_chan
+# Copy specific acq_chan.h defintions according to the BOARD MACRO
+$(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBBPMCLIENT)_ACQ_HEADERS = \
-	../../../include/boards/$(BOARD)/priv_defs/$($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME)_$(BOARD).h
-$(LIBBPMCLIENT)_INST_ACQ_HEADERS = $($(LIBBPMCLIENT)_ACQ_HEADER_BASENAME).h
+	../../../include/boards/$(BOARD)/priv_defs/$($(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME)_$(BOARD).h
+$(LIBBPMCLIENT)_INST_ACQ_HEADERS = include/$($(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME).h
 
+# Copy non-standard headers
+$(LIBBPMCLIENT)_SMIO_HEADERS_BASENAME = $(basename $(notdir $($(LIBBPMCLIENT)_SMIO_CODES) $($(LIBBPMCLIENT)_SMIO_EXPORTS)))
+$(LIBBPMCLIENT)_SMIO_HEADERS = $($(LIBBPMCLIENT)_SMIO_CODES) $($(LIBBPMCLIENT)_SMIO_EXPORTS)
+$(LIBBPMCLIENT)_INST_SMIO_HEADERS = $(addprefix include/,$(addsuffix .h,$($(LIBBPMCLIENT)_SMIO_HEADERS_BASENAME)))
+
+# Our local library headers
 $(LIBBPMCLIENT)_HEADERS_LIB = include/bpm_client.h include/bpm_client_classes.h \
 	include/bpm_client_prelude.h include/bpm_client_codes.h \
 	$(subst src/,include/, $(patsubst %.o,%.h,$($(LIBBPMCLIENT)_OBJS_LIB)))
 
 $(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_HEADERS_LIB) $($(LIBBPMCLIENT)_CODE_HEADERS) \
-    $($(LIBBPMCLIENT)_FUNC_EXPORTS)
+	$($(LIBBPMCLIENT)_INST_SMIO_HEADERS)
 
 # Installation headers
 $(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS) $($(LIBBPMCLIENT)_INST_ACQ_HEADERS)
@@ -245,9 +253,13 @@ $(revision_OBJS): $(revision_SRCS)
 pre_inst:
 	$(foreach header,$($(LIBBPMCLIENT)_ACQ_HEADERS),cp -p $(header) \
 		$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS) $(CMDSEP))
+	$(foreach header,$($(LIBBPMCLIENT)_SMIO_HEADERS),cp -p $(header) \
+		$(PWD)/include/ $(CMDSEP))
 
 pre_clean:
 	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS), \
+		rm -f $(header) $(CMDSEP))
+	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_INST_SMIO_HEADERS), \
 		rm -f $(header) $(CMDSEP))
 
 install:
