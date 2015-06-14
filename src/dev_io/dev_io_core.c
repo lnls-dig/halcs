@@ -271,21 +271,26 @@ devio_err_e devio_destroy (devio_t **self_p)
     return DEVIO_SUCCESS;
 }
 
-
-static int __devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
+/* FIXME: Only valid for PCIe devices */
+#if 0
+static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
         int count)
 {
-    return llio_read_block (((devio_t *)fs->drvdata)->llio, BAR4_ADDR | (offset), count,
-            (uint32_t *) buf);
+    return llio_read_block (((devio_t *)fs->drvdata)->llio,
+            BAR4_ADDR | (offset), count, (uint32_t *) buf);
 }
-
-#define SDB_ADDRESS             0x00300000UL
+#endif
 
 /* Read specific information about the device. Typically,
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self)
 {
+    (void) self;
     devio_err_e err = DEVIO_SUCCESS;
+/* FIXME: Only valid for PCIe devices */
+#if 0
+    /* FIXME: Hardcoded non-default SDB address */
+#define SDB_ADDRESS             0x00300000UL
     /* The sdb filesystem itself */
     struct sdbfs bpm_fpga_sdb = {
         .name = "fpga-area",
@@ -294,7 +299,7 @@ devio_err_e devio_print_info (devio_t *self)
         .entrypoint = SDB_ADDRESS,
         .data = 0,
         .flags = 0,
-        .read = __devio_read_llio_block
+        .read = _devio_read_llio_block
     };
     struct sdb_device *d;
     int new = 1;
@@ -322,6 +327,7 @@ devio_err_e devio_print_info (devio_t *self)
 
     sdbfs_dev_destroy(&bpm_fpga_sdb);
 err_sdbfs_create:
+#endif
     return err;
 }
 
