@@ -276,6 +276,19 @@ int hutils_copy_str (char *dest, const char *src, size_t size)
     assert (src);
 
     int errs = snprintf (dest, size, "%s", src);
+    
+    ASSERT_TEST (errs >= 0,
+            "[hutils:utils] Could not clone string. Enconding error?\n",
+            err_copy_str);
+    /* This shouldn't happen. Only when the number of characters written is
+     * less than the whole buffer, it is guaranteed that the string was
+     * written successfully */
+    ASSERT_TEST ((size_t) errs < size,
+            "[hutils:utils] Cloned string was truncated\n", err_trunc_str);
+
+err_trunc_str:
+    return errs+1 /* \0 */;
+err_copy_str:
     return errs;
 }
 
