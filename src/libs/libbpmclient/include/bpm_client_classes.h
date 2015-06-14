@@ -18,6 +18,7 @@
 /* Internal libraries dependencies */
 #include "acq_chan.h"
 #include "disp_table.h"
+#include "sm_io_codes.h"
 
 /* BPM version macros for compile-time API detection */
 
