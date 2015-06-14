@@ -196,8 +196,8 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
                 "<payload> parameter size does not match size in <number of payload bytes> parameter",
                 err_msg_fmt);
 
-        /* We only accept one RW_REPLY_SIZE bytes of payload for now */
-        ASSERT_TEST(zframe_size (data_out_frm) == size,
+        /* We accept any payload that is less than the specified size */
+        ASSERT_TEST(zframe_size (data_out_frm) <= size,
                 "Wrong <payload> parameter size", err_msg_fmt);
 
         /* Copy the message contents to the user */
