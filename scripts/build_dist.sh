@@ -22,5 +22,5 @@ if [ "$BOARD_TYPE" != "afcv3" ] && [ "$BOARD_TYPE" != "ml605" ]; then
 fi
 
 ./deploy.sh ${USER} ${IP} ${PREFIX}/${DIR}
-~/makeself-2.2.0/makeself.sh --bzip2 ${PREFIX}/${DIR} ${DIST_NAME}.bz2.run "LNLS BPM Software Package" \
+makeself --bzip2  ${PREFIX}/${DIR} ${DIST_NAME}.bz2.run "LNLS BPM Software Package" \
     ./compile.sh ${BOARD_TYPE}
