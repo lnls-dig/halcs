@@ -1,12 +1,8 @@
 /*
- * Simple example demonstrating the communication between
- * a client and the FPGA device
+ * Controlling the Si571 in FMC 130 MSPS chip
  */
 
-#include <mdp.h>
-#include <czmq.h>
 #include <inttypes.h>
-
 #include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"

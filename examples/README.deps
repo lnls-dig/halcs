@@ -3,6 +3,6 @@ Project Dependencies:
     libbpmclient
 
 Foreign Dependencies:
-    libmdp
+    libmlm
     libczmq
     libzmq

@@ -1,10 +1,7 @@
 /*
- *  * Simple example demonstrating the communication between
- *   * a client and the FPGA device
- *    */
+ * Controlling the FMC 130 MSPS board
+ */
 
-#include <mdp.h>
-#include <czmq.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
