@@ -416,16 +416,6 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         devio_type_c = devio_type_to_str (devio_type);
         ASSERT_ALLOC (devio_type_c, err_devio_type_c_alloc, DMNGR_ERR_ALLOC);
 
-        /* Set up logdir. Defaulting it to stdout */
-        char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
-
-        /* TODO: Check for the validity of the log filename */
-        if (devio_log_prefix != NULL) {
-            snprintf (devio_log_filename, LOG_FILENAME_LEN,
-                    "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
-                    id, devio_type_c, smio_inst_id);
-        }
-
         /* Alloc and convert types */
         dev_type_c = llio_type_to_str (type);
         ASSERT_ALLOC (dev_type_c, err_dev_type_c_alloc, DMNGR_ERR_ALLOC);
@@ -439,10 +429,10 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEVIO worker"
                 " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
                 "logfile on %s ...\n", dev_type_c, dev_pathname, id,
-                broker_endp, devio_log_filename);
+                broker_endp, devio_log_prefix);
         char *argv_exec [] = {DEVIO_NAME, "-n", devio_type_c,"-t", dev_type_c,
             "-i", dev_id_c, "-e", dev_pathname, "-s", smio_inst_id_c,
-            "-b", broker_endp, "-l", devio_log_filename, NULL};
+            "-b", broker_endp, "-l", devio_log_prefix, NULL};
         int spawn_err = _dmngr_spawn_chld (self, DEVIO_NAME, argv_exec);
 
         free (dev_type_c);

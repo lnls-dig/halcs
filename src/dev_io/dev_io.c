@@ -68,10 +68,12 @@
 #define DEVIO_KILL_CFG_SIGNAL       SIGINT
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
-        devio_type_e devio_type, char *broker_endp, char *log_file_name,
+        devio_type_e devio_type, char *broker_endp, char *log_prefix,
         zhash_t *hints);
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *broker_endp, char *log_file_name, zhash_t *hints);
+        char *broker_endp, char *log_prefix, zhash_t *hints);
+static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
+        const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
         uint32_t smio_inst_id);
 static devio_err_e _spawn_be_platform_smios (devio_t *devio);
@@ -89,7 +91,7 @@ void print_help (char *program_name)
             "\t-e <dev_entry = [ip_addr|/dev entry]> Device entry\n"
             "\t-i <dev_id> Device ID\n"
             "\t-s <fe_smio_id> FE SMIO ID (only valid for devio_type = fe)\n"
-            "\t-l <log_filename> Log filename\n"
+            "\t-l <log_prefix> Log prefix filename\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
@@ -103,7 +105,7 @@ int main (int argc, char *argv[])
     char *dev_id_str = NULL;
     char *fe_smio_id_str = NULL;
     char *broker_endp = NULL;
-    char *log_file_name = NULL;
+    char *log_prefix = NULL;
     char **str_p = NULL;
     int i;
 
@@ -150,7 +152,7 @@ int main (int argc, char *argv[])
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set broker_endp parameter\n");
         }
         else if (streq (argv[i], "-l")) {
-            str_p = &log_file_name;
+            str_p = &log_prefix;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set log filename\n");
         }
         else if (streq (argv[i], "-h")) {
@@ -226,6 +228,9 @@ int main (int argc, char *argv[])
         dev_id = strtoul (dev_id_str, NULL, 10);
     }
 
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
+            dev_id);
+
     uint32_t fe_smio_id = 0;
     /* Check for FE SMIO ID */
     if (devio_type == FE_DEVIO && fe_smio_id_str == NULL) {
@@ -235,9 +240,6 @@ int main (int argc, char *argv[])
     else {
         fe_smio_id = strtoul (fe_smio_id_str, NULL, 10);
     }
-
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
-            dev_id);
 
     /* Spawn the Configure DEVIO to get the uTCA slot number. This is only
      * available in AFCv3 */
@@ -270,7 +272,7 @@ int main (int argc, char *argv[])
     bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
 
     bpm_client_t *client_cfg = bpm_client_new_log_mode (broker_endp, 0,
-            log_file_name, DEVIO_LIBBPMCLIENT_LOG_MODE);
+            "stdout", DEVIO_LIBBPMCLIENT_LOG_MODE);
 
     if (client_cfg == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
@@ -318,11 +320,16 @@ int main (int argc, char *argv[])
     /* Initilialize dev_io */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating DEVIO instance ...\n");
 
+    /* Create LOG filename path */
+    char *devio_log_filename = _create_log_filename (log_prefix, dev_id,
+            devio_type_str, fe_smio_id);
+    ASSERT_ALLOC (devio_log_filename, err_devio_log_filename_alloc);
+
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
-            broker_endp, verbose, log_file_name);
+            broker_endp, verbose, devio_log_filename);
 
     if (devio == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_new error!\n");
@@ -367,7 +374,7 @@ int main (int argc, char *argv[])
 
     /* Spawn associated DEVIOs */
     devio_err_e err = _spawn_assoc_devios (devio, dev_id, devio_type,
-            broker_endp, log_file_name, devio_hints);
+            broker_endp, log_prefix, devio_hints);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not spawn "
                 "associated DEVIOs!\n");
@@ -407,6 +414,8 @@ err_cfg_get_hints:
 err_cfg_load:
     zhash_destroy (&devio_hints);
 err_devio_hints_alloc:
+    free (devio_log_filename);
+err_devio_log_filename_alloc:
     /* wait child, if any */
     hutils_wait_chld ();
     devio_destroy (&devio);
@@ -418,7 +427,7 @@ err_client_cfg:
     kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
 #endif
 err_exit:
-    str_p = &log_file_name;
+    str_p = &log_prefix;
     free (*str_p);
     str_p = &fe_smio_id_str;
     free (*str_p);
@@ -436,7 +445,7 @@ err_exit:
 }
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
-        devio_type_e devio_type, char *broker_endp, char *log_file_name,
+        devio_type_e devio_type, char *broker_endp, char *log_prefix,
         zhash_t *hints)
 {
     assert (devio);
@@ -447,7 +456,7 @@ static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_rffe_devios (devio, dev_id, broker_endp, log_file_name,
+            err = _spawn_rffe_devios (devio, dev_id, broker_endp, log_prefix,
                     hints);
             break;
 
@@ -470,7 +479,7 @@ err_spwan_assoc_devios:
 }
 
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *broker_endp, char *log_file_name, zhash_t *hints)
+        char *broker_endp, char *log_prefix, zhash_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -479,7 +488,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
     devio_err_e err = DEVIO_SUCCESS;
     char *dev_id_c = NULL;
     char *smio_inst_id_c = NULL;
-    char *log_file_name_cpy = NULL;
+    char *devio_log_filename = NULL;
 
     /* For each DEVIO, spawn up to 2 RFFE DEVIOs. Do a lookup in our
      * hints hash to look for endpoints to bind to */
@@ -504,26 +513,6 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
             continue;
         }
 
-        /* Set up logdir */
-        char devio_log_filename[LOG_FILENAME_LEN] = "stdout";
-        /* Get dirname of the parent DEVIO. This function modify the passed
-         * string. So, we copy it over first. Also, we should not free later it
-         * as the manpage says */
-        log_file_name_cpy = strdup (log_file_name);
-        ASSERT_ALLOC (log_file_name_cpy, err_log_file_cpy, DEVIO_ERR_ALLOC);
-        char *devio_log_prefix = dirname (log_file_name_cpy);
-
-        /* TODO: Check for the validity of the log filename */
-        if (devio_log_prefix != NULL) {
-            snprintf (devio_log_filename, LOG_FILENAME_LEN,
-                    "%s/"DEVIO_LOG_FILENAME_PATTERN, devio_log_prefix,
-                    dev_id, FE_DEVIO_STR, smio_inst_id);
-        }
-
-        /* Now, we don't need our copy string anymore */
-        free (log_file_name_cpy);
-        log_file_name_cpy = NULL;
-
         /* Stringify parameters */
         dev_id_c = hutils_stringify_dec_key (dev_id);
         ASSERT_ALLOC (dev_id_c, err_dev_id_c_alloc, DEVIO_ERR_ALLOC);
@@ -534,7 +523,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO RFFE\n");
         char *argv_exec [] = {DEVIO_NAME, "-n", FE_DEVIO_STR,"-t", ETH_DEV_STR,
             "-i", dev_id_c, "-e", endpoint_fe, "-s", smio_inst_id_c,
-            "-b", broker_endp, "-l", devio_log_filename, NULL};
+            "-b", broker_endp, "-l", log_prefix, NULL};
         /* Spawn Config DEVIO */
         int child_devio_cfg_pid = hutils_spawn_chld (DEVIO_NAME, argv_exec);
 
@@ -548,6 +537,8 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         dev_id_c = NULL;
         free (smio_inst_id_c);
         smio_inst_id_c = NULL;
+        free (devio_log_filename);
+        devio_log_filename = NULL;
     }
 
 err_spawn:
@@ -555,10 +546,30 @@ err_spawn:
 err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
-    free (log_file_name_cpy);
-err_log_file_cpy:
 err_cfg_exit:
     return err;
+}
+
+static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
+        const char *devio_type, uint32_t smio_inst_id)
+{
+    /* Set up logdir */
+    char *devio_log_filename = zmalloc (LOG_FILENAME_LEN * sizeof (char));
+    ASSERT_ALLOC (devio_log_filename, err_devio_log_alloc);
+
+    /* TODO: Check for the validity of the log filename */
+    int errs = snprintf (devio_log_filename, LOG_FILENAME_LEN,
+            "%s/"DEVIO_LOG_FILENAME_PATTERN, log_prefix,
+            dev_id, devio_type, smio_inst_id);
+    ASSERT_TEST (errs >= 0 && errs < LOG_FILENAME_LEN,
+            "Could not generate DEVIO LOG filename", err_devio_log_gen);
+
+    return devio_log_filename;
+
+err_devio_log_gen:
+    free (devio_log_filename);
+err_devio_log_alloc:
+    return NULL;
 }
 
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
