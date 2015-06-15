@@ -332,7 +332,7 @@ dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawning Broker ...\n");
 
     /* Specify if broker is to be run in verbose mode or not */
-    char *argv_exec[] = {"malamute", "-f", DEVIO_MLM_PREFIX_CFG_DIR"/"
+    char *argv_exec[] = {"malamute", "-f", DEVIO_MLM_PREFIX_CFG_DIR ""
         DEVIO_MLM_CFG_DIR"/"DEVIO_MLM_CFG_FILENAME, NULL};
 
     int spawn_err = _dmngr_spawn_chld (self, "malamute", argv_exec);
