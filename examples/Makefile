@@ -30,7 +30,9 @@ endif
 CFLAGS_DEBUG += -g
 
 # Specific platform Flags
-CFLAGS_PLATFORM = -Wall -Wextra -Werror
+CFLAGS_PLATFORM = -Wall -Wextra -Werror \
+		  -Wno-missing-field-initializers \
+		  -Wno-missing-braces
 LDFLAGS_PLATFORM =
 
 # Libraries
