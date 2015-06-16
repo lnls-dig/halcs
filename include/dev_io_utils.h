@@ -16,7 +16,9 @@ extern "C" {
 enum _devio_type_e {
     BE_DEVIO = 0,                       /* Back-End DEVIO */
     FE_DEVIO,                           /* Front-End DEVIO */
-    INVALID_DEVIO
+    INVALID_DEVIO,
+    /* Give this enum the ability to represent CONVC_TYPE_END */
+    END_DEVIO = CONVC_TYPE_END
 };
 
 #define BE_DEVIO_STR                    "be"

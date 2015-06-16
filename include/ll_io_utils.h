@@ -17,7 +17,9 @@ enum _llio_type_e {
     GENERIC_DEV = 0,
     PCIE_DEV = 1,
     ETH_DEV,
-    INVALID_DEV
+    INVALID_DEV,
+    /* Give this enum the ability to represent CONVC_TYPE_END */
+    END_DEV = CONVC_TYPE_END
 };
 
 #define GENERIC_DEV_STR             "generic"
