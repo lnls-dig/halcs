@@ -3,13 +3,13 @@ CROSS_COMPILE ?=
 
 CMDSEP = ;
 
-CC =		$(CROSS_COMPILE)gcc
-AR =		$(CROSS_COMPILE)ar
-LD =		$(CROSS_COMPILE)ld
-OBJDUMP =	$(CROSS_COMPILE)objdump
-OBJCOPY =	$(CROSS_COMPILE)objcopy
-SIZE =		$(CROSS_COMPILE)size
-MAKE =		make
+CC ?=		$(CROSS_COMPILE)gcc
+AR ?=		$(CROSS_COMPILE)ar
+LD ?=		$(CROSS_COMPILE)ld
+OBJDUMP ?=	$(CROSS_COMPILE)objdump
+OBJCOPY ?=	$(CROSS_COMPILE)objcopy
+SIZE ?=		$(CROSS_COMPILE)size
+MAKE ?=		make
 
 PWD = 		$(shell pwd)
 
