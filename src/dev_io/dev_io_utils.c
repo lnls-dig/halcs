@@ -39,14 +39,14 @@ static const convc_types_t devio_types_map [] = {
     {.name = CONVC_TYPE_NAME_END,   .type = CONVC_TYPE_END}        /* End marker */
 };
 
+char *devio_type_to_str (devio_type_e type)
+{
+    return convc_gen_type_to_str (type, devio_types_map);
+}
+
 devio_type_e devio_str_to_type (const char *type_str)
 {
     devio_type_e ret = convc_str_to_gen_type (type_str, devio_types_map);
 
     return (ret == CONVC_TYPE_END)? INVALID_DEVIO: ret;
-}
-
-char *devio_type_to_str (devio_type_e type)
-{
-    return convc_gen_type_to_str (type, devio_types_map);
 }

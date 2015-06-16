@@ -53,4 +53,3 @@ llio_type_e llio_str_to_type (const char *type_str)
 
     return (ret == CONVC_TYPE_END)? INVALID_DEV : ret;
 }
-
