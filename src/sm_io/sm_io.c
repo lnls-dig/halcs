@@ -255,7 +255,7 @@ static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
     assert (disp_op);
     assert (args);
 
-    devio_err_e err = SMIO_SUCCESS;
+    smio_err_e err = SMIO_SUCCESS;
 
     /* Check if the message tis the correct one */
     ASSERT_TEST (msg_guess_type (args) == MSG_EXP_ZMQ, "Invalid message tag",
