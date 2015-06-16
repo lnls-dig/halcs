@@ -182,7 +182,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     disp_table_err_e disp_err = disp_table_insert_all (self->disp_table_thsafe_ops,
             self->thsafe_server_ops);
-    ASSERT_TEST(disp_err==HUTILS_SUCCESS, "Could not initialize dispatch table",
+    ASSERT_TEST(disp_err==DISP_TABLE_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
     /* Adjust linger time for our sockets */
