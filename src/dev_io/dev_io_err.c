@@ -25,7 +25,9 @@ static const char *devio_err [DEVIO_ERR_END] =
     [DEVIO_ERR_BAD_MSG]                 = "Malformed message received",
     [DEVIO_ERR_TERMINATED]              = "Terminated devio instance",
     [DEVIO_ERR_SMIO_DESTROY]            = "Could not destroy sm_io instance",
-    [DEVIO_ERR_MOD_LLIO]                = "Error modifying LLIO instance"
+    [DEVIO_ERR_INV_SOCKET]              = "Invalid socket reference",
+    [DEVIO_ERR_MOD_LLIO]                = "Error modifying LLIO instance",
+    [DEVIO_ERR_CFG]                     = "Could not get property from config file"
 };
 
 /* Convert enumeration type to string */

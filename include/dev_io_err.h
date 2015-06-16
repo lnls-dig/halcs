@@ -31,6 +31,7 @@ enum _devio_err_e {
     DEVIO_ERR_SMIO_DESTROY,         /* Could not destroy sm_io instance */
     DEVIO_ERR_INV_SOCKET,           /* Invalid socket reference */
     DEVIO_ERR_MOD_LLIO,             /* Error modifying LLIO instance */
+    DEVIO_ERR_CFG,                  /* Could not get property from config file */
     DEVIO_ERR_END                   /* End of enum marker */
 };
 
