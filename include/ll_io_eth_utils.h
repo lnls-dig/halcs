@@ -12,11 +12,13 @@
 extern "C" {
 #endif
 
-typedef enum {
+enum _llio_eth_type_e {
     TCP_ETH_SOCK = 0,
     UDP_ETH_SOCK = 1,
-    INVALID_ETH_SOCK
-} llio_eth_type_e;
+    INVALID_ETH_SOCK,
+    /* Give this enum the ability to represent CONVC_TYPE_END */
+    END_ETH_SOCK = CONVC_TYPE_END
+};
 
 #define TCP_ETH_SOCK_STR            "tcp"
 #define UDP_ETH_SOCK_STR            "udp"
