@@ -66,6 +66,8 @@ typedef struct _dmngr_t dmngr_t;
 typedef enum _llio_err_e llio_err_e;
 /* Forward llio_type_e declaration enumeration */
 typedef enum _llio_type_e llio_type_e;
+/* Forward llio_eth_type_e declaration enumeration */
+typedef enum _llio_eth_type_e llio_eth_type_e;
 /* Opaque llio_dev_info_t structure */
 typedef struct _llio_dev_info_t llio_dev_info_t;
 /* Opaque llio_endpoint_t structure */
