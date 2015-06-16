@@ -37,9 +37,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
-/* Forward smio_acq_data_block_t declaration structure */
-typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
-
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
 /************************************************************/
