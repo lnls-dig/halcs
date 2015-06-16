@@ -316,7 +316,7 @@ smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
     smio_err_e err = SMIO_SUCCESS;
 
     disp_table_err_e derr = disp_table_insert_all (self->exp_ops_dtable, smio_exp_ops);
-    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
+    ASSERT_TEST(derr == DISP_TABLE_SUCCESS, "smio_export_ops: Could not export"
             " SMIO ops", err_export_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
@@ -336,7 +336,7 @@ smio_err_e smio_unexport_ops (smio_t *self)
     smio_err_e err = SMIO_SUCCESS;
     disp_table_err_e derr = disp_table_remove_all (self->exp_ops_dtable);
 
-    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
+    ASSERT_TEST(derr == DISP_TABLE_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
             err_unexport_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
@@ -361,7 +361,7 @@ smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
     disp_table_err_e derr = DISP_TABLE_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
     derr = disp_table_fill_desc (self->exp_ops_dtable, smio_exp_ops, func_fps);
-    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
+    ASSERT_TEST(derr == DISP_TABLE_SUCCESS, "smio_export_ops: Could not export"
             " fill SMIO ops description", err_fill_desc_ops, SMIO_ERR_EXPORT_OP);
 
 err_fill_desc_ops:
