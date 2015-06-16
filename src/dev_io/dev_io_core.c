@@ -180,9 +180,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     self->disp_table_thsafe_ops = disp_table_new (&devio_disp_table_ops);
     ASSERT_ALLOC(self->disp_table_thsafe_ops, err_disp_table_thsafe_ops_alloc);
 
-    hutils_err_e hutils_err = disp_table_insert_all (self->disp_table_thsafe_ops,
+    disp_table_err_e disp_err = disp_table_insert_all (self->disp_table_thsafe_ops,
             self->thsafe_server_ops);
-    ASSERT_TEST(hutils_err==HUTILS_SUCCESS, "Could not initialize dispatch table",
+    ASSERT_TEST(disp_err==HUTILS_SUCCESS, "Could not initialize dispatch table",
             err_disp_table_init);
 
     /* Adjust linger time for our sockets */
@@ -675,14 +675,14 @@ static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
     assert (disp_op);
     assert (args);
 
-    devio_err_e err = DEVIO_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
 
-    /* Check if the message tis the correct one */
+    /* Check if the message is the correct one */
     ASSERT_TEST (msg_guess_type (args) == MSG_THSAFE_ZMQ, "Invalid message tag",
-            err_inv_msg, DEVIO_ERR_BAD_MSG);
+            err_inv_msg, DISP_TABLE_ERR_BAD_MSG);
     msg_err_e merr = msg_check_gen_zmq_args (disp_op, THSAFE_MSG_ZMQ(args));
     ASSERT_TEST (merr == MSG_SUCCESS, "Unrecognized message. Message arguments "
-            "checking failed", err_msg_args_check, DEVIO_ERR_BAD_MSG);
+            "checking failed", err_msg_args_check, DISP_TABLE_ERR_BAD_MSG);
 
 err_msg_args_check:
 err_inv_msg:
@@ -707,7 +707,7 @@ static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
     disp_table_t *disp_table = self->disp_table_thsafe_ops;
     msg_err_e merr = msg_handle_sock_request (self, msg, disp_table);
     ASSERT_TEST (merr == MSG_SUCCESS, "Error handling request", err_hand_req,
-            SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
+            DEVIO_ERR_SMIO_DO_OP /* returning a more meaningful error? */);
 
 err_hand_req:
     return err;

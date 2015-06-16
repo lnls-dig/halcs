@@ -103,7 +103,7 @@ smch_err_e smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 
 static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data)
 {
-    smpr_err_e err = SMPR_SUCCESS;
+    smch_err_e err = SMCH_SUCCESS;
     uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
     uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
         SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
@@ -118,7 +118,7 @@ static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *da
 
     ssize_t smpr_err = smpr_write_32 (self->i2c, 0, (uint32_t *) data, flags);
     ASSERT_TEST(smpr_err == PCA9547_DATA_TRANS_SIZE/SMPR_BYTE_2_BIT /* in bytes*/,
-            "Could not write data to I2C", err_exit, -1);
+            "Could not write data to I2C", err_exit, SMCH_ERR_RW_SMPR);
 
 err_exit:
     return err;
@@ -126,7 +126,7 @@ err_exit:
 
 static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 {
-    smpr_err_e err = SMPR_SUCCESS;
+    smch_err_e err = SMCH_SUCCESS;
     uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
     uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
         SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
@@ -139,7 +139,7 @@ static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 
     ssize_t smpr_err = smpr_read_32 (self->i2c, 0, (uint32_t *) data, flags);
     ASSERT_TEST(smpr_err == PCA9547_DATA_TRANS_SIZE/SMPR_BYTE_2_BIT /* in bytes*/,
-            "Could not read data to I2C", err_exit, -1);
+            "Could not read data to I2C", err_exit, SMCH_ERR_RW_SMPR);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:pca9547_read_8] data =  0x%02X\n",
             *data);

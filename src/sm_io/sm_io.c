@@ -255,14 +255,14 @@ static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
     assert (disp_op);
     assert (args);
 
-    smio_err_e err = SMIO_SUCCESS;
+    disp_table_err_e err = DISP_TABLE_SUCCESS;
 
     /* Check if the message tis the correct one */
     ASSERT_TEST (msg_guess_type (args) == MSG_EXP_ZMQ, "Invalid message tag",
-            err_inv_msg, SMIO_ERR_MSG_NOT_SUPP);
+            err_inv_msg, DISP_TABLE_ERR_BAD_MSG);
     msg_err_e merr = msg_check_gen_zmq_args (disp_op, EXP_MSG_ZMQ(args));
     ASSERT_TEST (merr == MSG_SUCCESS, "Unrecognized message. Message arguments "
-            "checking failed", err_msg_args_check, SMIO_ERR_MSG_NOT_SUPP);
+            "checking failed", err_msg_args_check, DISP_TABLE_ERR_BAD_MSG);
 
 err_msg_args_check:
 err_inv_msg:
@@ -315,8 +315,8 @@ smio_err_e smio_export_ops (smio_t *self, const disp_op_t** smio_exp_ops)
 
     smio_err_e err = SMIO_SUCCESS;
 
-    hutils_err_e herr = disp_table_insert_all (self->exp_ops_dtable, smio_exp_ops);
-    ASSERT_TEST(herr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
+    disp_table_err_e derr = disp_table_insert_all (self->exp_ops_dtable, smio_exp_ops);
+    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
             " SMIO ops", err_export_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, export_ops, smio_exp_ops);
@@ -334,9 +334,9 @@ smio_err_e smio_unexport_ops (smio_t *self)
     assert (self);
 
     smio_err_e err = SMIO_SUCCESS;
-    hutils_err_e herr = disp_table_remove_all (self->exp_ops_dtable);
+    disp_table_err_e derr = disp_table_remove_all (self->exp_ops_dtable);
 
-    ASSERT_TEST(herr == HUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
+    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not unexport SMIO ops",
             err_unexport_op, SMIO_ERR_EXPORT_OP);
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, unexport_ops);
@@ -358,10 +358,10 @@ smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
 {
     assert(self);
 
-    hutils_err_e herr = HUTILS_SUCCESS;
+    disp_table_err_e derr = DISP_TABLE_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
-    herr = disp_table_fill_desc (self->exp_ops_dtable, smio_exp_ops, func_fps);
-    ASSERT_TEST(herr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
+    derr = disp_table_fill_desc (self->exp_ops_dtable, smio_exp_ops, func_fps);
+    ASSERT_TEST(derr == HUTILS_SUCCESS, "smio_export_ops: Could not export"
             " fill SMIO ops description", err_fill_desc_ops, SMIO_ERR_EXPORT_OP);
 
 err_fill_desc_ops:
