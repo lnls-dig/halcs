@@ -17,6 +17,7 @@ enum _disp_table_err_e
     DISP_TABLE_ERR_ALLOC,                 /* Could not allocate memory */
     DISP_TABLE_ERR_NULL_POINTER,          /* Null pointer received */
     DISP_TABLE_ERR_NO_FUNC_REG,           /* No function registered */
+    DISP_TABLE_ERR_BAD_MSG,               /* Bad message detected */
     DISP_TABLE_ERR_END
 };
 
