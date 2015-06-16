@@ -504,7 +504,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
          * it is guaranteed that the string was written successfully */
         ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
                 "Could not generate AFE bind address from configuration "
-                "file", err_cfg_exit, DMNGR_ERR_CFG);
+                "file", err_cfg_exit, DEVIO_ERR_CFG);
 
         char *endpoint_fe = zhash_lookup (hints, hints_key);
         /* If key is not found, assume we don't have any more AFE to
