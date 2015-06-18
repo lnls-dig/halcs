@@ -132,6 +132,13 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
             " with broker address %s, with logfile on %s ...\n", broker_endp,
             (log_file_name == NULL) ? "NULL" : log_file_name);
 
+    /* Print Software info */
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] BPM Client version %s,"
+            " Build by: %s, %s\n",
+            revision_get_build_version (),
+            revision_get_build_user_name (),
+            revision_get_build_date ());
+
     bpm_client_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
