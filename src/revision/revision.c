@@ -11,8 +11,11 @@ const char *build_revision = GIT_REVISION;
 const char *build_date = __DATE__ " " __TIME__;
 const char *build_user_name = GIT_USER_NAME;
 const char *build_user_email = GIT_USER_EMAIL;
+const char *build_version = BPM_VERSION_MAJOR_STR"."BPM_VERSION_MINOR_STR"."BPM_VERSION_PATCH_STR;
 
-char *revision_clone_build_rev (void)
+/************************* Clone functions ***********************************/
+
+char *revision_clone_build_revision (void)
 {
     return hutils_clone_str (build_revision);
 }
@@ -32,6 +35,40 @@ char *revision_clone_build_user_email (void)
     return hutils_clone_str (build_user_email);
 }
 
+char *revision_clone_build_version (void)
+{
+    return hutils_clone_str (build_version);
+}
+
+/************************* Get Const functions ********************************/
+
+const char *revision_get_build_revision (void)
+{
+    return build_revision;
+}
+
+const char *revision_get_build_date (void)
+{
+    return build_date;
+}
+
+const char *revision_get_build_user_name (void)
+{
+    return build_user_name;
+}
+
+const char *revision_get_build_user_email (void)
+{
+    return build_user_email;
+}
+
+const char *revision_get_build_version (void)
+{
+    return build_version;
+}
+
+/*************************** Copy functions **********************************/
+
 int revision_copy_build_revision (char *dest, size_t size)
 {
     return hutils_copy_str (dest, build_revision, size);
@@ -50,4 +87,9 @@ int revision_copy_build_user_name (char *dest, size_t size)
 int revision_copy_build_user_email (char *dest, size_t size)
 {
     return hutils_copy_str (dest, build_user_email, size);
+}
+
+int revision_copy_build_version (char *dest, size_t size)
+{
+    return hutils_copy_str (dest, build_version, size);
 }
