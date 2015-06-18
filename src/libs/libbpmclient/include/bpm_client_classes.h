@@ -14,7 +14,6 @@
 /* External dependencies */
 #include <czmq.h>
 #include <malamute.h>
-#include <hutils.h>
 
 /* Internal libraries dependencies */
 #include "acq_chan.h"

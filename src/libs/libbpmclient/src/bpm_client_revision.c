@@ -8,6 +8,7 @@
 #include "bpm_client.h"
 /* Private headers */
 #include "bpm_client_revision.h"
+#include "hutils.h"
 
 /* Stringify MACRO */
 #define STRINGIFY(s) PRIMITIVE_STRINGIFY(s)
