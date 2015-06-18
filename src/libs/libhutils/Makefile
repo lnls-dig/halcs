@@ -15,8 +15,14 @@ PWD = 		$(shell pwd)
 
 LIBHUTILS = libhutils
 
+# Config variables suitable for creating shared libraries
+LIB_VER_MAJOR = 1
+LIB_VER_MINOR = 0
+LIB_VER_REVISION = 0
+LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
+
 # General C flags
-CFLAGS = -std=gnu99 -O2
+CFLAGS = -std=gnu99 -O2 -fPIC
 
 # To enable this option, use: make ERRHAND_DBG=y
 ifneq ($(ERRHAND_DBG),)
@@ -79,9 +85,13 @@ OBJS_all = $(common_OBJS) $($(LIBHUTILS)_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a
+LIB_SHARED_SUFFIX = .so
 
 # Generate suitable names for static libraries
+# Generate suitable names for static libraries
 TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
+TARGET_SHARED = $(addsuffix $(LIB_SHARED_SUFFIX), $(OUT))
+TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 
 .PHONY: all clean mrproper install uninstall
 
@@ -89,11 +99,15 @@ TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC)
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile static library
 %.a: $$($$*_OBJS)
 	$(AR) rcs $@ $^
+
+# Compile dynamic library
+%.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -127,8 +141,16 @@ all: $(TARGET_STATIC)
 	@rm -f $*.d.tmp
 
 install:
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
 
 uninstall:
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
