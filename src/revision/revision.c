@@ -7,11 +7,11 @@
 
 #include "bpm_server.h"
 
-const char *build_revision = GIT_REVISION;
-const char *build_date = __DATE__ " " __TIME__;
-const char *build_user_name = GIT_USER_NAME;
-const char *build_user_email = GIT_USER_EMAIL;
-const char *build_version = BPM_VERSION_MAJOR_STR"."BPM_VERSION_MINOR_STR"."BPM_VERSION_PATCH_STR;
+static const char *build_revision = GIT_REVISION;
+static const char *build_date = __DATE__ " " __TIME__;
+static const char *build_user_name = GIT_USER_NAME;
+static const char *build_user_email = GIT_USER_EMAIL;
+static const char *build_version = BPM_VERSION_MAJOR_STR"."BPM_VERSION_MINOR_STR"."BPM_VERSION_PATCH_STR;
 
 /************************* Clone functions ***********************************/
 

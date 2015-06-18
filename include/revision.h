@@ -12,12 +12,6 @@
 extern "C" {
 #endif
 
-extern const char *build_revision;
-extern const char *build_date;
-extern const char *build_user_name;
-extern const char *build_user_email;
-extern const char *build_version;
-
 /* Clone the build revision. Returns the cloned string is successfully or NULL
  * on error */
 char *revision_clone_build_revision (void);
