@@ -36,7 +36,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror \
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lbpmclient -lerrhand -lmlm -lczmq -lzmq
+LIBS = -lbpmclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 # General library flags -L<libdir>
 LFLAGS =
 
