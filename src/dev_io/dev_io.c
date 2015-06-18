@@ -83,6 +83,7 @@ void print_help (char *program_name)
 {
     printf( "BPM Device I/O\n"
             "Usage: %s [options]\n"
+            "Version %s\n, Build by: %s, %s\n"
             "\t-h This help message\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"
@@ -92,7 +93,9 @@ void print_help (char *program_name)
             "\t-i <dev_id> Device ID\n"
             "\t-s <fe_smio_id> FE SMIO ID (only valid for devio_type = fe)\n"
             "\t-l <log_prefix> Log prefix filename\n"
-            "\t-b <broker_endpoint> Broker endpoint\n", program_name);
+            "\t-b <broker_endpoint> Broker endpoint\n",
+            revision_get_build_version (), revision_get_build_user_name (),
+            revision_get_build_date (), program_name);
 }
 
 int main (int argc, char *argv[])
