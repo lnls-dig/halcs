@@ -7,7 +7,11 @@
 
 #include "bpm_client.h"
 /* Private headers */
-#include "errhand.h"
+#include "bpm_client_revision.h"
+
+/* Stringify MACRO */
+#define STRINGIFY(s) PRIMITIVE_STRINGIFY(s)
+#define PRIMITIVE_STRINGIFY(s) #s
 
 #define BPM_CLIENT_VERSION_MAJOR_STR STRINGIFY(BPM_CLIENT_VERSION_MAJOR)
 #define BPM_CLIENT_VERSION_MINOR_STR STRINGIFY(BPM_CLIENT_VERSION_MINOR)

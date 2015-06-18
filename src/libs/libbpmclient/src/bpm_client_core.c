@@ -11,6 +11,7 @@
 #include "bpm_client_rw_param_codes.h"
 #include "bpm_client_codes.h"
 #include "sm_io_swap_useful_macros.h"
+#include "bpm_client_revision.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
