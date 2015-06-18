@@ -7,6 +7,10 @@
 
 #include "bpm_server.h"
 
+#define BPM_VERSION_MAJOR_STR STRINGIFY(BPM_VERSION_MAJOR)
+#define BPM_VERSION_MINOR_STR STRINGIFY(BPM_VERSION_MINOR)
+#define BPM_VERSION_PATCH_STR STRINGIFY(BPM_VERSION_PATCH)
+
 static const char *build_revision = GIT_REVISION;
 static const char *build_date = __DATE__ " " __TIME__;
 static const char *build_user_name = GIT_USER_NAME;
