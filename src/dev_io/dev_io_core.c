@@ -109,8 +109,8 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     free (dev_type_c);
 
     /* Print Software info */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] BPM Device I/O version %s"
-            "Version %s\n, Build by: %s, %s\n",
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] BPM Device I/O version %s,"
+            " Build by: %s, %s\n",
             revision_get_build_version (),
             revision_get_build_user_name (),
             revision_get_build_date ());
