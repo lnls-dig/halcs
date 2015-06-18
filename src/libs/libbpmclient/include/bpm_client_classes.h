@@ -14,6 +14,7 @@
 /* External dependencies */
 #include <czmq.h>
 #include <malamute.h>
+#include <hutils.h>
 
 /* Internal libraries dependencies */
 #include "acq_chan.h"
@@ -54,6 +55,7 @@ typedef enum _bpm_client_err_e bpm_client_err_e;
 typedef struct _bpm_client_t bpm_client_t;
 
 /* BPM CLIENT */
+#include "bpm_client_revision.h"
 #include "bpm_client_err.h"
 #include "bpm_client_rw_param.h"
 #include "bpm_client_core.h"
