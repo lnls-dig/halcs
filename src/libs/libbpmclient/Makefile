@@ -22,10 +22,7 @@ export PREFIX
 LIBBPMCLIENT = libbpmclient
 
 # Config variables suitable for creating shared libraries
-LIB_VER_MAJOR = 1
-LIB_VER_MINOR = 0
-LIB_VER_REVISION = 0
-LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
+LIB_VER = $(shell ./version.sh bpm_client)
 
 # General C flags
 CFLAGS = -std=gnu99 -O2 -fPIC
