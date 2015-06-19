@@ -38,6 +38,9 @@ PREFIX ?= /usr/local
 export PREFIX
 CFG_DIR ?= ${PREFIX}/etc/bpm_sw
 export CFG_DIR
+# SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
+CFG ?= crude_defconfig
+export CFG
 
 # Config filename
 CFG_FILENAME = bpm_sw.cfg

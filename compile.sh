@@ -56,6 +56,9 @@ CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
 PREFIX=/usr/local
 CFG_DIR=${PREFIX}/etc/bpm_sw
+# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
+CFG=lnls_defconfig
+export CFG
 
 COMMAND_DEPS="\
     make deps && \
@@ -74,7 +77,7 @@ COMMAND_HAL="\
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
     WITH_DEVIO_CFG=${WITH_DEVIO_CFG} \
     CFG_DIR=${CFG_DIR} && \
-    sudo make install"
+    sudo make CFG=${CFG} install"
 
 COMMAND_LIBBPMCLIENT="\
     make BOARD=${BOARD} \
