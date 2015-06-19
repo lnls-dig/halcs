@@ -156,5 +156,5 @@ clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 mrproper: clean
-	rm -f *.a
+	rm -f *.a *.so.$(LIB_VER)
 
