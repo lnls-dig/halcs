@@ -1,10 +1,7 @@
 /*
- *  * Simple example demonstrating the communication between
- *   * a client and the FPGA device
- *    */
+ * Controlling the RFFE board
+ */
 
-#include <mdp.h>
-#include <czmq.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +15,6 @@
 #define MAX_BPM_NUMBER                          1
 
 #define DFLT_BOARD_NUMBER                       0
-#define MAX_BOARD_NUMBER                        5
 
 #define FUNC_RFFE_SW_IDX                        0
 #define FUNC_RFFE_ATT1_IDX                      1
@@ -198,12 +194,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:rffe]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
@@ -224,9 +214,13 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:RFFE%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:RFFE%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     for (i = 0; i < MAX_NUM_FUNCS; ++i) {
         if (func_call [i].call == 1) {
@@ -242,6 +236,7 @@ int main (int argc, char *argv [])
         }
     }
 
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     /* ugly... */

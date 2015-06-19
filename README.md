@@ -1,25 +1,41 @@
+[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
+
 # Beam Position Monitor Software
 
 Software for controlling the AFC BPM boards
 
 ## Prerequisites:
 
-Make sure you have the following libraries installed: 
+Make sure you have the following libraries installed, either by download
+the binaries or executing the instructions below:
 
-* zeromq-4.0.4 (http://zeromq.org/area:download)
-* czmq-2.2.0 (http://czmq.zeromq.org/page:get-the-software)
+* zeromq-4.2.0 (http://zeromq.org/area:download)
+* czmq-3.0.1 (http://czmq.zeromq.org/page:get-the-software)
+* mlm-0.1.0 (https://github.com/zeromq/malamute.git)
 
-Cloning this repository
+## Optional libraries:
 
-	git clone --recursive https://github.com/lerwys/bpm-software.git
+* uuid (distribution available):
 
-Install the Majordomo application from this repository (autotools-based)
+	sudo apt-get install uuid
 
-	cd majordomo/libmdp
+### Prerequisites Installation Instructions
 
-Execute the traditional sequence of autotools commands:
+	git clone git://github.com/zeromq/libzmq.git && \
+	git clone git://github.com/zeromq/czmq.git && \
+	git clone git://github.com/zeromq/malamute.git &&
+	for project in libsodium libzmq czmq malamute; do
+	    cd $project
+	    ./autogen.sh
+	    ./configure && make check
+	    sudo make install
+	    sudo ldconfig
+	    cd ..
+	done
 
-	./autogen.sh && make && sudo make install
+## Cloning this repository
+
+	git clone --recursive https://github.com/lerwys/bpm-sw.git
 
 ## PCIe Installation Instructions
 
@@ -47,28 +63,28 @@ Load the Driver module
 
 	sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
 
-After this the kernel should have found the FPGA board 
+After this the kernel should have found the FPGA board
 and initialized it. Run the following command and check its output
 
 	dmesg | tail
 
 You should see something like the excerpt below:
 
-	[267002.495109] pciDriver - pcidriver_init : 
+	[267002.495109] pciDriver - pcidriver_init :
 		Major 250 allocated to nodename 'fpga'
-	[267002.495130] pciDriver - pcidriver_probe : 
+	[267002.495130] pciDriver - pcidriver_probe :
 		Found ML605 board at 0000:01:00.0
-	[267002.495224] pciDriver - pcidriver_probe : 
+	[267002.495224] pciDriver - pcidriver_probe :
 		Device /dev/fpga0 added
-	[267002.495434] pciDriver - pcidriver_probe_irq : 
+	[267002.495434] pciDriver - pcidriver_probe_irq :
 		Registered Interrupt Handler at pin 1, line 11, IRQ 16
-	[267002.495450] pciDriver - pcidriver_init : 
+	[267002.495450] pciDriver - pcidriver_init :
 		Module loaded
 
 ## Running the PCIe self-test
 
-After the installation of the PCIe driver (see above) 
-it is possible to run a self test to check if 
+After the installation of the PCIe driver (see above)
+it is possible to run a self test to check if
 everything is setup properly. For this run the following:
 
 Change to the "compiled tests folder"
@@ -85,11 +101,11 @@ You should get an output like the following, if everythig is ok:
          Testing PCIDRIVER_IOC_MMAP_MODE... PASSED!
          Testing PCIDRIVER_IOC_MMAP_AREA... PASSED!
          Testing PCIDRIVER_IOC_PCI_INFO...  PASSED!
-         Testing PCI CONFIG... 
+         Testing PCI CONFIG...
            Reading PCI config area in byte mode ... PASSED!
            Reading PCI config area in word mode ... PASSED!
            Reading PCI config area in double-word mode ... PASSED!
-         Testing PCI mmap... 
+         Testing PCI mmap...
            Reading PCI info... PASSED!
            Setting mmap mode... PASSED!
            Setting mmap area... PASSED!
@@ -118,7 +134,7 @@ You should get an output like the following, if everythig is ok:
            Setting KMEM SYNC to read mode... PASSED!
            Setting KMEM SYNC to read/write mode... PASSED!
          Testing PCIDRIVER_IOC_KMEM_FREE... PASSED!
-         Testing Kernel Buffer mmap... 
+         Testing Kernel Buffer mmap...
            Setting MMAP mode to KMEM... PASSED!
              Allocing size    1024 : PASSED!
              MMAPing size     1024 : PASSED!
@@ -185,66 +201,52 @@ allocate more memory than the kernel has available.
 
 ### Server
 
-Compile everything with debug info. The superuser access 
-is necessary because it checks (and installs if needed) 
-the PCIe kernel driver. 
+Compile everything with debug info. The superuser access
+is necessary because it checks (and installs if needed)
+the PCIe kernel driver.
 
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	make DBE_DBG=y
+	./compile.sh <board type = [ml605|afcv3]>
 
 ### Client
 
 Change to the Client API folder
 
-	cd libclient
+	cd src/libs/libbpmclient
 
-Compile the library
+Compile the library, with debug info
 
-	make
+	make ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
+        ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
+        DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
 
 Install the library
-	
+
 	sudo make install
 
-## Running the example
+## Running the examples
+
+Change to the examples folder
+
+    cd examples
 
 Compile the examples
 
-	make examples
+	make
 
-Run the server components with the helper script, like shown below:
+Run an example application, for instance, the leds example
 
-	./init.sh <tranport type = [ipc|tcp]> <broker_endpoint>
+	./leds -v -b <broker_endpoint> -board <board_number> -bpm <bpm_number>
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./init.sh ipc /tmp/bpm
+	./leds -v -b ipc:///tmp/bpm -board <board_number> -bpm <bpm_number>
 
 If one would like to use TCP, it should call, for instance:
 
-	./init.sh tcp 127.0.0.1:8888
-
-Now we should be good to start making transactions.
-
-Change to the example applications folder
-
-	cd examples
-
-Run the Example application with verbose flag (-v)
-and specifying a broker endpoint (-b)
-
-	./client -v -b <broker_endpoint>
-
-Typically, one should choose the the IPC transport method
-for its faster than TCP. For instance:
-	
-	./client -v -b ipc:///tmp/bpm
-
-If one would like to use TCP, it should call, for instance:
-
-	./client -v -b tcp://127.0.0.1:8888
+	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -bpm <bpm_number>
 
 Leds should be blinking in the FMC ADC board

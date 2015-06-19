@@ -1,12 +1,8 @@
 /*
- * Simple example demonstrating the communication between
- * a client and the FPGA device
+ * Controlling the Si571 in FMC 130 MSPS chip
  */
 
-#include <mdp.h>
-#include <czmq.h>
 #include <inttypes.h>
-
 #include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
@@ -138,9 +134,13 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     bpm_client_err_e err = bpm_set_si571_set_freq (bpm_client, service, si571_freq);
     if (err != BPM_CLIENT_SUCCESS){
@@ -148,6 +148,7 @@ int main (int argc, char *argv [])
         goto err_bpm_set_freq;
     }
 
+err_bpm_client_new:
 err_bpm_set_freq:
     bpm_client_destroy (&bpm_client);
 

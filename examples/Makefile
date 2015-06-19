@@ -3,13 +3,13 @@ CROSS_COMPILE ?=
 
 CMDSEP = ;
 
-CC =		$(CROSS_COMPILE)gcc
-AR =		$(CROSS_COMPILE)ar
-LD =		$(CROSS_COMPILE)ld
-OBJDUMP =	$(CROSS_COMPILE)objdump
-OBJCOPY =	$(CROSS_COMPILE)objcopy
-SIZE =		$(CROSS_COMPILE)size
-MAKE =		make
+CC ?=		$(CROSS_COMPILE)gcc
+AR ?=		$(CROSS_COMPILE)ar
+LD ?=		$(CROSS_COMPILE)ld
+OBJDUMP ?=	$(CROSS_COMPILE)objdump
+OBJCOPY ?=	$(CROSS_COMPILE)objcopy
+SIZE ?=		$(CROSS_COMPILE)size
+MAKE ?=		make
 
 # General C flags
 CFLAGS = -std=gnu99 -O2
@@ -30,11 +30,13 @@ endif
 CFLAGS_DEBUG += -g
 
 # Specific platform Flags
-CFLAGS_PLATFORM = -Wall -Wextra -Werror
+CFLAGS_PLATFORM = -Wall -Wextra -Werror \
+		  -Wno-missing-field-initializers \
+		  -Wno-missing-braces
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lbpmclient -lmdp -lczmq -lzmq
+LIBS = -lbpmclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 # General library flags -L<libdir>
 LFLAGS =
 

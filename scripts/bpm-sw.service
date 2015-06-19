@@ -6,10 +6,8 @@ After=media-remote_logs.mount
 Requires=media-remote_logs.mount
 
 [Service]
-ExecStartPre=/usr/local/bin/bpm-sw-prepare-log.sh
 ExecStart=/usr/local/bin/dev_mngr
 WorkingDirectory=/usr/local/bin
-ExecStop=/usr/local/bin/bpm-sw-shutdown.sh
 
 [Install]
 WantedBy=multi-user.target

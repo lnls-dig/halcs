@@ -1,12 +1,8 @@
 /*
- * Simple example demonstrating the communication between
- * a client and the FPGA device
+ * Controlling the FMC 130 MSPS test functions
  */
 
-#include <mdp.h>
-#include <czmq.h>
 #include <inttypes.h>
-
 #include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
@@ -18,7 +14,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 void print_help (char *program_name)
 {
@@ -93,12 +88,6 @@ int main (int argc, char *argv [])
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:leds]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
@@ -136,14 +125,19 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:test_data_en]: test_data_en = %u\n", test_data_en);
 
     char service[50];
-    sprintf (service, "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    if (bpm_client == NULL) {
+        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
+        goto err_bpm_client_new;
+    }
 
     /* Test data enable */
     bpm_set_adc_test_data_en (bpm_client, service, test_data_en);
 
     /* Cleanup */
+err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     str_p = &board_number_str;
