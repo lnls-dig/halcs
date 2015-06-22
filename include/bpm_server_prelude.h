@@ -16,4 +16,26 @@
 #include <sys/types.h>
 #include <stdbool.h>
 
+/* zeroMQ libraries */
+#include <zmq.h>
+#include <czmq.h>
+#include <malamute.h>
+
+/* Check for library versions */
+
+/* ZMQ */
+#if ZMQ_VERSION < 40200
+#error "BPM-SW requires at least libzmq/4.2.0."
+#endif
+
+/* CZMQ */
+#if CZMQ_VERSION < 30001
+#error "BPM-SW requires at least czmq/3.0.1"
+#endif
+
+/* MLM */
+#if MALAMUTE_VERSION < 100
+#error "BPM-SW requires at least czmq/0.1.0"
+#endif
+
 #endif

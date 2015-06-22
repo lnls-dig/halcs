@@ -12,8 +12,6 @@
 #include "bpm_server_prelude.h"
 
 /* External dependencies */
-#include <czmq.h>
-#include <malamute.h>
 #include <bsmp/client.h>
 
 /* Internal libraries dependencies */
