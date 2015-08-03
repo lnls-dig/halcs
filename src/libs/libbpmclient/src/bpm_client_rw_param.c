@@ -152,11 +152,14 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    uint32_t param2 = 0;
     zmsg_t *report;
 
+    /* Even though we don't use the second parameter, we have the same
+     * message strucuture and the server will check for strict consistency
+     * (number of arguments and size) of all parameters. So, use the size of
+     * the passed parameter here */
     err = param_client_send_gen_rw (self, service, operation, param1,
-            &param2 /* in read mode this value will be ignored */, sizeof (param2));
+            param_out /* in read mode this value will be ignored */, size);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
