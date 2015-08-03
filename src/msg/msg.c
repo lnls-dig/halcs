@@ -388,7 +388,7 @@ static zmsg_t * _msg_create_client_response (RW_REPLY_TYPE reply_code, uint32_t 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[sm_io:rw_param] send_client_response: "
             "Sending message:\n");
 #ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (report);
+    errhand_log_print_zmq_msg (report);
 #endif
     return report;
 

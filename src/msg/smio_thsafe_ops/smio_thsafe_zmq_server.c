@@ -42,7 +42,7 @@ static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_open\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
 #ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
+    errhand_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
 #endif
     /* Message is:
      * frame null: OPEN opcode (removed by dev_io)
@@ -81,7 +81,7 @@ static int _thsafe_zmq_server_release (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_release\n");
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Received message:\n");
 #ifdef LOCAL_MSG_DBG
-    debug_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
+    errhand_log_print_zmq_msg (THSAFE_MSG_ZMQ(args));
 #endif
     /* Message is:
      * frame null: OPEN opcode (removed by dev_io)
