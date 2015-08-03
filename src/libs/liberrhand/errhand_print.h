@@ -41,7 +41,8 @@ void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
 #define ERRHAND_DBG_MSG DBG_MSG
 #endif
 
-#if (ERRHAND_SUBSYS_ON & ERRHAND_DBG_MSG)
+/* Only enable MSG if we are in trace level */
+#if ((ERRHAND_SUBSYS_ON & ERRHAND_DBG_MSG) && (ERRHAND_MIN_LEVEL <= DBG_LVL_TRACE))
 #define LOCAL_MSG_DBG
 /* For compatibility */
 #define ERRHAND_LOCAL_MSG_DBG
