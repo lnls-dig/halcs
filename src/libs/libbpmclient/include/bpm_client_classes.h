@@ -48,8 +48,6 @@
 
 /* Public API classes */
 
-/* Forward bpm_client_err_e declaration enumeration */
-typedef enum _bpm_client_err_e bpm_client_err_e;
 /* Opaque bpm_client_t structure */
 typedef struct _bpm_client_t bpm_client_t;
 

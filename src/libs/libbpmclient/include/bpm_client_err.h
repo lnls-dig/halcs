@@ -29,6 +29,8 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_END                    /* End of enum marker */
 };
 
+typedef enum _bpm_client_err_e bpm_client_err_e;
+
 /* Convert enumeration type to string */
 const char * bpm_client_err_str (bpm_client_err_e err);
 
