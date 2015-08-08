@@ -84,6 +84,9 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
 bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
         uint32_t operation, double *param_out);
 
+/* Utility functions */
+zmsg_t *param_client_recv_timeout (bpm_client_t *self);
+
 #ifdef __cplusplus
 }
 #endif

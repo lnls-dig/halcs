@@ -43,11 +43,13 @@
 struct _bpm_client_t {
     zuuid_t * uuid;                             /* Client UUID */
     mlm_client_t *mlm_client;                   /* Malamute client instance */
+    uint32_t timeout;                           /* Timeout in msec for send/recv */
+    zpoller_t *poller;                          /* Poller for receiving messages */
     const acq_chan_t *acq_chan;                 /* Acquisition buffer table */
 };
 
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode);
+        const char *log_file_name, const char *log_mode, uint32_t timeout);
 
 /* Acquisition channel definitions for user's application */
 #if defined(__BOARD_ML605__)
@@ -89,17 +91,17 @@ acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC0_CHAN_ID, .sample_
 /************************ Our API ***********************/
 /********************************************************/
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name)
+        const char *log_file_name, uint32_t timeout)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
-            BPMCLIENT_DFLT_LOG_MODE);
+            BPMCLIENT_DFLT_LOG_MODE, timeout);
 }
 
 bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode)
+        const char *log_file_name, const char *log_mode, uint32_t timeout)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
-            log_mode);
+            log_mode, timeout);
 }
 
 void bpm_client_destroy (bpm_client_t **self_p)
@@ -110,6 +112,7 @@ void bpm_client_destroy (bpm_client_t **self_p)
         bpm_client_t *self = *self_p;
 
         self->acq_chan = NULL;
+        zpoller_destroy (&self->poller);
         mlm_client_destroy (&self->mlm_client);
         zuuid_destroy (&self->uuid);
         free (self);
@@ -117,9 +120,28 @@ void bpm_client_destroy (bpm_client_t **self_p)
     }
 }
 
+/*************************** Acessor methods *****************************/
+
+zpoller_t *bpm_client_get_poller (bpm_client_t *self)
+{
+    return self->poller;
+}
+
+bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, uint32_t timeout)
+{
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    self->timeout = timeout;
+    return err;
+}
+
+uint32_t bpm_client_get_timeout (bpm_client_t *self)
+{
+    return self->timeout;
+}
+
 /**************** Static LIB Client Functions ****************/
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode)
+        const char *log_file_name, const char *log_mode, uint32_t timeout)
 {
     (void) verbose;
 
@@ -156,11 +178,24 @@ static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
             BPMCLIENT_MLM_CONNECT_TIMEOUT, zuuid_str_canonical (self->uuid));
     ASSERT_TEST(rc >= 0, "Could not connect MLM client to broker", err_mlm_connect);
 
+    /* Get MLM socket for use with poller */
+    zsock_t *msgpipe = mlm_client_msgpipe (self->mlm_client);
+    ASSERT_TEST (msgpipe != NULL, "Invalid MLM client socket reference",
+            err_mlm_inv_client_socket);
+    /* Initialize poller */
+    self->poller = zpoller_new (msgpipe, NULL);
+    ASSERT_TEST (self->poller != NULL, "Could not Initialize poller",
+            err_init_poller);
+
     /* Initialize acquisition table */
     self->acq_chan = acq_chan;
+    /* Initialize timeout */
+    self->timeout = timeout;
 
     return self;
 
+err_init_poller:
+err_mlm_inv_client_socket:
 err_mlm_connect:
     mlm_client_destroy (&self->mlm_client);
 err_mlm_client:
@@ -203,7 +238,7 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char 
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &msg);
 
     /* Receive report */
-    zmsg_t *report = mlm_client_recv (self->mlm_client);
+    zmsg_t *report = param_client_recv_timeout (self);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
 
     /* Message is:
@@ -893,7 +928,7 @@ static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mlm_client_recv (self->mlm_client);
+    zmsg_t *report = param_client_recv_timeout (self);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:
@@ -939,7 +974,7 @@ static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *servi
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mlm_client_recv (self->mlm_client);
+    zmsg_t *report = param_client_recv_timeout (self);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:
@@ -1037,7 +1072,7 @@ static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
 
     /* Receive report */
-    zmsg_t *report = mlm_client_recv (self->mlm_client);
+    zmsg_t *report = param_client_recv_timeout (self);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
 
     /* Message is:

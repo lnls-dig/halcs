@@ -24,14 +24,14 @@ struct _smio_afc_diag_revision_data_t;
  * before any operation involving communicating with the BPM
  * server. Return an instance of the bpm client */
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name);
+        const char *log_file_name, uint32_t timeout);
 
 /* Create an instance of the BPM client, with the log filemode specified
  * by "log_mode" as in fopen () call. This must be called before any operation
  * involving communicating with the BPM server. Return an instance of the bpm
  * client */
 bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode);
+        const char *log_file_name, const char *log_mode, uint32_t timeout);
 
 /* Destroy an instance of the BPM client. This must be called
  * after all operations involving the communication with the BPM
@@ -54,6 +54,15 @@ bpm_client_err_e bpm_func_trans_exec (bpm_client_t *self, char *name,
 
 /* Get MLM client handler from client */
 mlm_client_t *bpm_get_mlm_client (bpm_client_t *self);
+
+/* Returns the client poller */
+zpoller_t *bpm_client_get_poller (bpm_client_t *self);
+
+/* Set the timeout paramter to send;recv functions */
+bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, uint32_t timeout);
+
+/* Get the timeout parameter */
+uint32_t bpm_client_get_timeout (bpm_client_t *self);
 
 /******************** FMC130M SMIO Functions ******************/
 
