@@ -55,8 +55,8 @@ bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
     /* Get poller and timeout from client */
     uint32_t timeout = bpm_client_get_timeout (self);
 
-    err = mlm_client_sendto (client, service, NULL, NULL, timeout, &request);
-    ASSERT_TEST(err >= 0, "Could not send message", err_get_handler,
+    int rc = mlm_client_sendto (client, service, NULL, NULL, timeout, &request);
+    ASSERT_TEST(rc >= 0, "Could not send message", err_get_handler,
             BPM_CLIENT_ERR_SERVER);
 
 err_send_msg_alloc:
