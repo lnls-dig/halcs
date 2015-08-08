@@ -38,6 +38,7 @@
 
 #define BPMCLIENT_DFLT_LOG_MODE             "w"
 #define BPMCLIENT_MLM_CONNECT_TIMEOUT       1000        /* in ms */
+#define BPMCLIENT_DFLT_TIMEOUT              1000        /* in ms */
 
 /* Our structure */
 struct _bpm_client_t {
@@ -91,17 +92,31 @@ acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC0_CHAN_ID, .sample_
 /************************ Our API ***********************/
 /********************************************************/
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name, uint32_t timeout)
+        const char *log_file_name)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
-            BPMCLIENT_DFLT_LOG_MODE, timeout);
+            BPMCLIENT_DFLT_LOG_MODE, BPMCLIENT_DFLT_TIMEOUT);
 }
 
 bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode)
+{
+    return _bpm_client_new (broker_endp, verbose, log_file_name,
+            log_mode, BPMCLIENT_DFLT_TIMEOUT);
+}
+
+bpm_client_t *bpm_client_new_log_mode_time (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, uint32_t timeout)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
             log_mode, timeout);
+}
+
+bpm_client_t *bpm_client_new_time (char *broker_endp, int verbose,
+        const char *log_file_name, uint32_t timeout)
+{
+    return _bpm_client_new (broker_endp, verbose, log_file_name,
+            BPMCLIENT_DFLT_LOG_MODE, timeout);
 }
 
 void bpm_client_destroy (bpm_client_t **self_p)

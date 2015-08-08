@@ -20,10 +20,18 @@ struct _smio_afc_diag_revision_data_t;
 /************************ Our API ***********************/
 /********************************************************/
 
+
 /* Create an instance of the BPM client. This must be called
  * before any operation involving communicating with the BPM
  * server. Return an instance of the bpm client */
 bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
+        const char *log_file_name);
+
+/* Create an instance of the BPM client. This must be called
+ * before any operation involving communicating with the BPM
+ * server, specifying the send/recv timeout in ms.
+ * Return an instance of the bpm client */
+bpm_client_t *bpm_client_new_time (char *broker_endp, int verbose,
         const char *log_file_name, uint32_t timeout);
 
 /* Create an instance of the BPM client, with the log filemode specified
@@ -31,6 +39,13 @@ bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
  * involving communicating with the BPM server. Return an instance of the bpm
  * client */
 bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode);
+
+/* Create an instance of the BPM client, with the log filemode specified
+ * by "log_mode" as in fopen () call, and the send/recv timeout in ms.
+ * This must be called before any operation involving communicating with the
+ * BPM server. Return an instance of the bpm client */
+bpm_client_t *bpm_client_new_log_mode_time (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, uint32_t timeout);
 
 /* Destroy an instance of the BPM client. This must be called
