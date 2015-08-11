@@ -37,6 +37,27 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
+/* FIXME: Usage of reserved, undocumented bits */
+/* Acquisition can start if FSM is in IDLE state, if Flow Control FIFO
+ * is not FULL, dbg_source_pl_stall (RESERVED BIT, UNDOCUMENTED) is not asserted
+ * and there is no data in the FIFOs (ACQ_CORE_STA_RESERVED3_MASK)*/
+#define ACQ_CORE_IDLE_MASK      (ACQ_CORE_STA_FSM_STATE_MASK | ACQ_CORE_STA_FC_FULL | \
+                                    ACQ_CORE_STA_RESERVED2_W(1 << 3) | ACQ_CORE_STA_RESERVED3_MASK)
+
+#define ACQ_CORE_IDLE_VALUE     ACQ_CORE_STA_FSM_STATE_W(0x1)
+
+/* Acquisition is completed when FSM is in IDLE state, FSM is with DONE
+ * flag asserted, Flow Control FIFO is with DOME flag asserted and DDR3 has
+ * its DONE flag asserted */
+#define ACQ_CORE_COMPLETE_MASK  (ACQ_CORE_STA_FSM_STATE_MASK | ACQ_CORE_STA_FSM_ACQ_DONE | \
+                                    ACQ_CORE_STA_FC_TRANS_DONE | ACQ_CORE_STA_DDR3_TRANS_DONE)
+
+#define ACQ_CORE_COMPLETE_VALUE (ACQ_CORE_STA_FSM_STATE_W(0x1) | ACQ_CORE_STA_FSM_ACQ_DONE | \
+                                    ACQ_CORE_STA_FC_TRANS_DONE | ACQ_CORE_STA_DDR3_TRANS_DONE)
+
+static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
+        uint32_t status_value);
+
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
 /************************************************************/
@@ -46,13 +67,20 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     (void) ret;
     assert (owner);
     assert (args);
+    int err = -ACQ_OK;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_data_acquire\n");
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
-            err_get_acq_handler);
+            err_get_acq_handler, -ACQ_ERR);
+
+    /* First step is to check if the FPGA is already doing an acquisition. If it
+     * is, then return an error. Otherwise proceed normally. */
+    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+    ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
+            "New acquisition not started", err_acq_not_completed);
 
     /* Message is:
      * frame 0: operation code
@@ -143,8 +171,9 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     return -ACQ_OK;
 
+err_acq_not_completed:
 err_get_acq_handler:
-    return -ACQ_ERR;
+    return err;
 }
 
 static int _acq_check_data_acquire (void *owner, void *args, void *ret)
@@ -152,6 +181,7 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
     (void) ret;
     assert (owner);
     assert (args);
+    int err = -ACQ_OK;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_check_data_acquire\n");
@@ -159,26 +189,42 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
-            err_get_acq_handler);
+            err_get_acq_handler, -ACQ_ERR);
 
-    uint32_t status_done = 0;
-    /* Check for completion */
-    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_STA, &status_done );
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Status done = 0x%08x\n", status_done);
-
-    if (!(status_done & ACQ_CORE_STA_DDR3_TRANS_DONE)) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is not done\n");
-        return -ACQ_NOT_COMPLETED;
-    }
+    err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE);
+    ASSERT_TEST(err == -ACQ_OK, "Acquisition has not completed yet",
+            err_acq_not_completed);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
             "Acquisition is done\n");
-    return -ACQ_OK;
 
+err_acq_not_completed:
 err_get_acq_handler:
-    return -ACQ_ERR;
+    return err;
+}
+
+static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
+        uint32_t status_value)
+{
+    int err = -ACQ_OK;
+    uint32_t status_done = 0;
+
+    /* Check for completion */
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_STA, &status_done);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
+            "Status done = 0x%08x\n", status_done);
+
+    if ((status_done & status_mask) != status_value) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
+                "Acquisition is not done\n");
+        err = -ACQ_NOT_COMPLETED;
+        goto err_not_completed;
+    }
+
+    err = -ACQ_OK;
+
+err_not_completed:
+    return err;
 }
 
 static int _acq_get_data_block (void *owner, void *args, void *ret)
