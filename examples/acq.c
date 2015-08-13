@@ -19,6 +19,7 @@
 
 #define DFLT_BOARD_NUMBER           0
 
+#define MIN_NUM_SAMPLES             4
 /* Arbitrary hard limits */
 #define MAX_NUM_SAMPLES             (1 << 28)
 #define MAX_NUM_CHANS               (1 << 8)
@@ -135,7 +136,12 @@ int main (int argc, char *argv [])
     else {
         num_samples = strtoul (num_samples_str, NULL, 10);
 
-        if (num_samples > MAX_NUM_SAMPLES) {
+        if (num_samples < MIN_NUM_SAMPLES) {
+            fprintf (stderr, "[client:acq]: Number of samples too small! Defaulting to: %u\n",
+                    MIN_NUM_SAMPLES);
+            num_samples = MIN_NUM_SAMPLES;
+        }
+        else if (num_samples > MAX_NUM_SAMPLES) {
             fprintf (stderr, "[client:acq]: Number of samples too big! Defaulting to: %u\n",
                     MAX_NUM_SAMPLES);
             num_samples = MAX_NUM_SAMPLES;
