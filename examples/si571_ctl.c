@@ -11,7 +11,6 @@
 #define MAX_BPM_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
-#define MAX_BOARD_NUMBER            5
 
 #define DFLT_SI571_FREQ             100000000.000   /* 100 MHz */
 #define MAX_SI571_FREQ              1000000000.000  /* 1GHz */
@@ -85,18 +84,12 @@ int main (int argc, char *argv [])
     /* Set default board number */
     uint32_t board_number;
     if (board_number_str == NULL) {
-        fprintf (stderr, "[client:si571_ctl]: Setting default value to BOARD number: %u\n",
+        fprintf (stderr, "[client:acq]: Setting default value to BOARD number: %u\n",
                 DFLT_BOARD_NUMBER);
         board_number = DFLT_BOARD_NUMBER;
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
-
-        if (board_number > MAX_BOARD_NUMBER) {
-            fprintf (stderr, "[client:si571_ctl]: BOARD number too big! Defaulting to: %u\n",
-                    MAX_BOARD_NUMBER);
-            board_number = MAX_BOARD_NUMBER;
-        }
     }
 
     /* Set default bpm number */
