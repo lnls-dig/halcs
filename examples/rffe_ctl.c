@@ -96,6 +96,7 @@ typedef struct _func_call_t {
 int main (int argc, char *argv [])
 {
     int verbose = 0;
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *bpm_number_str = NULL;
@@ -226,7 +227,7 @@ int main (int argc, char *argv [])
         if (func_call [i].call == 1) {
             fprintf (stdout, "[client:rffe_ctl]: Calling function #%d\n", i);
             fprintf (stdout, "[client:rffe_ctl]: Argument: %f\n", strtod (*func_call [i].arg, NULL));
-            bpm_client_err_e err = bpm_rffe_funcs [i]
+            err = bpm_rffe_funcs [i]
                 (bpm_client, service, strtod (*func_call [i].arg, NULL));
 
             if (err != BPM_CLIENT_SUCCESS) {
@@ -235,6 +236,43 @@ int main (int argc, char *argv [])
             }
         }
     }
+
+    double temp;
+    err = bpm_get_rffe_temp1 (bpm_client, service, &temp);
+    if (err != BPM_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
+                "function: %s\n", bpm_client_err_str (err));
+    }
+    fprintf (stdout, "[client:rffe_ctl]: Temp1: %f\n", temp);
+
+    err = bpm_get_rffe_temp2 (bpm_client, service, &temp);
+    if (err != BPM_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
+                "function: %s\n", bpm_client_err_str (err));
+    }
+    fprintf (stdout, "[client:rffe_ctl]: Temp2: %f\n", temp);
+
+    err = bpm_get_rffe_temp3 (bpm_client, service, &temp);
+    if (err != BPM_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
+                "function: %s\n", bpm_client_err_str (err));
+    }
+    fprintf (stdout, "[client:rffe_ctl]: Temp3: %f\n", temp);
+
+    err = bpm_get_rffe_temp4 (bpm_client, service, &temp);
+    if (err != BPM_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
+                "function: %s\n", bpm_client_err_str (err));
+    }
+    fprintf (stdout, "[client:rffe_ctl]: Temp4: %f\n", temp);
+
+    double att;
+    err = bpm_get_rffe_att1 (bpm_client, service, &att);
+    if (err != BPM_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
+                "function: %s\n", bpm_client_err_str (err));
+    }
+    fprintf (stdout, "[client:rffe_ctl]: Att1: %f\n", att);
 
 err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
