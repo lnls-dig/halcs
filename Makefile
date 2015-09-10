@@ -505,11 +505,11 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: core_install deps_install liberrhand_install libconvc_install libhutils_install libbpmclient_install cfg_install
+install: core_install deps_install liberrhand_install libconvc_install libhutils_install libdisptable_install libbpmclient_install cfg_install
 
-uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libdisptable_uninstall libbpmclient_uninstall cfg_uninstall
 
-clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libdisptable_clean libbpmclient_clean examples_clean tests_clean cfg_clean
 
-mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libdisptable_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
 
