@@ -443,8 +443,8 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_dir) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_TRIG_TERM_MIN           0 /* Trigger direction input */
-#define BPM_FMC130M_4CH_TRIG_TERM_MAX           1 /* Trigger direction output */
+#define BPM_FMC130M_4CH_TRIG_TERM_MIN           0 /* Trigger termination disabled */
+#define BPM_FMC130M_4CH_TRIG_TERM_MAX           1 /* Trigger termination enabled */
 
 RW_PARAM_FUNC(fmc130m_4ch, trig_term) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -453,8 +453,8 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_term) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_TRIG_VAL_MIN            0 /* Trigger direction input */
-#define BPM_FMC130M_4CH_TRIG_VAL_MAX            1 /* Trigger direction output */
+#define BPM_FMC130M_4CH_TRIG_VAL_MIN            0 /* Trigger value 0 */
+#define BPM_FMC130M_4CH_TRIG_VAL_MAX            1 /* Trigger value 1 */
 
 RW_PARAM_FUNC(fmc130m_4ch, trig_val) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
