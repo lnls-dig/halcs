@@ -18,6 +18,8 @@ disp_op_t acq_data_acquire_exp = {
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
@@ -44,11 +46,89 @@ disp_op_t acq_get_data_block_exp = {
     }
 };
 
+disp_op_t acq_cfg_trig_exp = {
+    .name = ACQ_NAME_CFG_TRIG,
+    .opcode = ACQ_OPCODE_CFG_TRIG,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_hw_data_trig_pol_exp = {
+    .name = ACQ_NAME_HW_DATA_TRIG_POL,
+    .opcode = ACQ_OPCODE_HW_DATA_TRIG_POL,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_hw_data_trig_sel_exp = {
+    .name = ACQ_NAME_HW_DATA_TRIG_SEL,
+    .opcode = ACQ_OPCODE_HW_DATA_TRIG_SEL,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_hw_data_trig_filt_exp = {
+    .name = ACQ_NAME_HW_DATA_TRIG_FILT,
+    .opcode = ACQ_OPCODE_HW_DATA_TRIG_FILT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_hw_trig_dly_exp = {
+    .name = ACQ_NAME_HW_TRIG_DLY,
+    .opcode = ACQ_OPCODE_HW_TRIG_DLY,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_sw_trig_exp = {
+    .name = ACQ_NAME_SW_TRIG,
+    .opcode = ACQ_OPCODE_SW_TRIG,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *acq_exp_ops [] = {
     &acq_data_acquire_exp,
     &acq_check_data_acquire_exp,
     &acq_get_data_block_exp,
+    &acq_cfg_trig_exp,
+    &acq_hw_data_trig_pol_exp,
+    &acq_hw_data_trig_sel_exp,
+    &acq_hw_data_trig_filt_exp,
+    &acq_hw_trig_dly_exp,
+    &acq_sw_trig_exp,
     NULL
 };
 

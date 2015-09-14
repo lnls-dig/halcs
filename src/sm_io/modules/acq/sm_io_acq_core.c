@@ -34,7 +34,8 @@
             smio_err_str (err_type))
 
 /* Creates a new instance of Device Information */
-smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
+smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
+        uint32_t num_samples_post, uint32_t num_shots)
 {
     smio_acq_t *self = (smio_acq_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
@@ -42,7 +43,9 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples)
 
     /* Set default value for all channels */
     for (uint32_t i = 0; i < END_CHAN_ID; i++) {
-        self->acq_params[i].num_samples = num_samples;
+        self->acq_params[i].num_samples_pre = num_samples_pre;
+        self->acq_params[i].num_samples_post = num_samples_post;
+        self->acq_params[i].num_shots = num_shots;
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */

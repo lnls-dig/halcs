@@ -25,7 +25,19 @@ struct _smio_acq_data_block_t {
 #define ACQ_NAME_GET_DATA_BLOCK         "acq_get_data_block"
 #define ACQ_OPCODE_CHECK_DATA_ACQUIRE   2
 #define ACQ_NAME_CHECK_DATA_ACQUIRE     "acq_check_data_acquire"
-#define ACQ_OPCODE_END                  3
+#define ACQ_OPCODE_CFG_TRIG             3
+#define ACQ_NAME_CFG_TRIG               "acq_cfg_trig"
+#define ACQ_OPCODE_HW_DATA_TRIG_POL     4
+#define ACQ_NAME_HW_DATA_TRIG_POL       "acq_hw_data_trig_pol"
+#define ACQ_OPCODE_HW_DATA_TRIG_SEL     5
+#define ACQ_NAME_HW_DATA_TRIG_SEL       "acq_hw_data_trig_sel"
+#define ACQ_OPCODE_HW_DATA_TRIG_FILT    6
+#define ACQ_NAME_HW_DATA_TRIG_FILT      "acq_hw_data_filt"
+#define ACQ_OPCODE_HW_TRIG_DLY          7
+#define ACQ_NAME_HW_TRIG_DLY            "acq_hw_trig_dly"
+#define ACQ_OPCODE_SW_TRIG              8
+#define ACQ_NAME_SW_TRIG                "acq_sw_trig"
+#define ACQ_OPCODE_END                  9
 
 /* Messaging Reply OPCODES */
 #define ACQ_REPLY_TYPE                  uint32_t
