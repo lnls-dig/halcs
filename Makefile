@@ -38,6 +38,7 @@ PREFIX ?= /usr/local
 export PREFIX
 CFG_DIR ?= ${PREFIX}/etc/bpm_sw
 export CFG_DIR
+# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
 # SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
 CFG ?= crude_defconfig
 export CFG
@@ -333,10 +334,10 @@ lib_pcie_driver:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver
 
 lib_pcie_driver_install:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_install
+	$(MAKE) -C $(PCIE_DRIVER_DIR) PREFIX=${PREFIX} lib_driver_install
 
 lib_pcie_driver_uninstall:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_uninstall
+	$(MAKE) -C $(PCIE_DRIVER_DIR) PREFIX=${PREFIX} lib_driver_uninstall
 
 lib_pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_clean
@@ -347,10 +348,10 @@ libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
 
 libbsmp_install:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) install
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=${PREFIX} install
 
 libbsmp_uninstall:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) uninstall
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=${PREFIX} uninstall
 
 libbsmp_clean:
 	$(MAKE) -C $(LIBBSMP_DIR) clean
@@ -364,10 +365,10 @@ liberrhand:
 	$(MAKE) -C $(LIBERRHAND_DIR) all
 
 liberrhand_install:
-	$(MAKE) -C $(LIBERRHAND_DIR) install
+	$(MAKE) -C $(LIBERRHAND_DIR) PREFIX=${PREFIX} install
 
 liberrhand_uninstall:
-	$(MAKE) -C $(LIBERRHAND_DIR) uninstall
+	$(MAKE) -C $(LIBERRHAND_DIR) PREFIX=${PREFIX} uninstall
 
 liberrhand_clean:
 	$(MAKE) -C $(LIBERRHAND_DIR) clean
@@ -379,10 +380,10 @@ libconvc:
 	$(MAKE) -C $(LIBCONVC_DIR) all
 
 libconvc_install:
-	$(MAKE) -C $(LIBCONVC_DIR) install
+	$(MAKE) -C $(LIBCONVC_DIR) PREFIX=${PREFIX} install
 
 libconvc_uninstall:
-	$(MAKE) -C $(LIBCONVC_DIR) uninstall
+	$(MAKE) -C $(LIBCONVC_DIR) PREFIX=${PREFIX} uninstall
 
 libconvc_clean:
 	$(MAKE) -C $(LIBCONVC_DIR) clean
@@ -394,10 +395,10 @@ libhutils:
 	$(MAKE) -C $(LIBHUTILS_DIR) all
 
 libhutils_install:
-	$(MAKE) -C $(LIBHUTILS_DIR) install
+	$(MAKE) -C $(LIBHUTILS_DIR) PREFIX=${PREFIX} install
 
 libhutils_uninstall:
-	$(MAKE) -C $(LIBHUTILS_DIR) uninstall
+	$(MAKE) -C $(LIBHUTILS_DIR) PREFIX=${PREFIX} uninstall
 
 libhutils_clean:
 	$(MAKE) -C $(LIBHUTILS_DIR) clean
@@ -409,10 +410,10 @@ libdisptable:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) all
 
 libdisptable_install:
-	$(MAKE) -C $(LIBDISPTABLE_DIR) install
+	$(MAKE) -C $(LIBDISPTABLE_DIR) PREFIX=${PREFIX} install
 
 libdisptable_uninstall:
-	$(MAKE) -C $(LIBDISPTABLE_DIR) uninstall
+	$(MAKE) -C $(LIBDISPTABLE_DIR) PREFIX=${PREFIX} uninstall
 
 libdisptable_clean:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) clean
@@ -424,10 +425,10 @@ libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
 libbpmclient_install:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) install
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} install
 
 libbpmclient_uninstall:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) uninstall
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} uninstall
 
 libbpmclient_clean:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) clean
@@ -439,10 +440,10 @@ libsdbfs:
 	$(MAKE) -C $(LIBSDBFS_DIR) all
 
 libsdbfs_install:
-	$(MAKE) -C $(LIBSDBFS_DIR) install
+	$(MAKE) -C $(LIBSDBFS_DIR) PREFIX=${PREFIX} install
 
 libsdbfs_uninstall:
-	$(MAKE) -C $(LIBSDBFS_DIR) uninstall
+	$(MAKE) -C $(LIBSDBFS_DIR) PREFIX=${PREFIX} uninstall
 
 libsdbfs_clean:
 	$(MAKE) -C $(LIBSDBFS_DIR) clean
@@ -463,12 +464,12 @@ deps_clean: libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
-	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(PREFIX)/bin $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) $(PREFIX)/etc $(CMDSEP))
+	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) ${PREFIX}/etc $(CMDSEP))
 
 core_uninstall:
-	$(foreach core_bin,$(ALL_OUT),rm -f $(PREFIX)/bin/$(core_bin) $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),rm -f $(PREFIX)/etc/$(core_script) $(CMDSEP))
+	$(foreach core_bin,$(ALL_OUT),rm -f ${PREFIX}/bin/$(core_bin) $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),rm -f ${PREFIX}/etc/$(core_script) $(CMDSEP))
 
 core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
