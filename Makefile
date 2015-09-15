@@ -277,7 +277,7 @@ $(OUT): $$($$@_OBJS) $(revision_OBJS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
-	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
         -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
         -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
         -c $< -o $@
@@ -289,7 +289,7 @@ $(revision_OBJS): $(revision_SRCS)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
