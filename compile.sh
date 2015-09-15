@@ -27,6 +27,8 @@ if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WIT
     exit 1
 fi
 
+EXTRA_FLAGS=$3
+
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE=y
@@ -61,11 +63,13 @@ CFG=lnls_defconfig
 export CFG
 
 COMMAND_DEPS="\
-    make deps && \
+    make ${EXTRA_FLAGS} deps && \
     sudo make deps_install"
 
 COMMAND_HAL="\
-    make BOARD=${BOARD} \
+    make \
+    ${EXTRA_FLAGS} \
+    BOARD=${BOARD} \
     SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -80,7 +84,9 @@ COMMAND_HAL="\
     sudo make CFG=${CFG} install"
 
 COMMAND_LIBBPMCLIENT="\
-    make BOARD=${BOARD} \
+    make \
+    ${EXTRA_FLAGS} \
+    BOARD=${BOARD} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
     ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
@@ -89,7 +95,7 @@ COMMAND_LIBBPMCLIENT="\
 
 if [ "$WITH_EXAMPLES" = "with_examples" ]; then
 COMMAND_EXAMPLES="\
-    make examples"
+    make ${EXTRA_FLAGS} examples"
 else
 COMMAND_EXAMPLES=""
 fi
