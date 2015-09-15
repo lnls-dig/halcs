@@ -68,57 +68,61 @@ LIBDISPTABLE_DIR = src/libs/libdisptable
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
 LIBSDBFS_DIR = foreign/libsdbfs
 
-# General C flags
-CFLAGS = -std=gnu99 -O2
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 ifeq ($(BOARD),afcv3)
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
-CFLAGS += -D__SHRINK_AFCV3_DDR_SIZE__
+CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
 endif
 endif
 
 # Board selection
 ifeq ($(BOARD),ml605)
-CFLAGS += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
+CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
 ifeq ($(BOARD),afcv3)
-CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
+CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
 # Program FMC130M_4CH EEPROM
 ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),active)
-CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
+CFLAGS_USR += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
 endif
 
 ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
-CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
+CFLAGS_USR += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
 endif
 
 # Compile DEV MNGR or not
 ifeq ($(WITH_DEV_MNGR),y)
-CFLAGS += -D__WITH_DEV_MNGR__
+CFLAGS_USR += -D__WITH_DEV_MNGR__
 endif
 
 ifeq ($(AFE_RFFE_TYPE),1)
-CFLAGS += -D__AFE_RFFE_V1__
+CFLAGS_USR += -D__AFE_RFFE_V1__
 endif
 
 ifeq ($(AFE_RFFE_TYPE),2)
-CFLAGS += -D__AFE_RFFE_V2__
+CFLAGS_USR += -D__AFE_RFFE_V2__
 endif
 
 # Compile DEVIO Config or not
 ifeq ($(WITH_DEVIO_CFG),y)
-CFLAGS += -D__WITH_DEVIO_CFG__
+CFLAGS_USR += -D__WITH_DEVIO_CFG__
 endif
 
 ifneq ($(CFG_DIR),)
-CFLAGS += -D__CFG_DIR__=$(CFG_DIR)
+CFLAGS_USR += -D__CFG_DIR__=$(CFG_DIR)
 endif
 
 ifneq ($(CFG_FILENAME),)
-CFLAGS += -D__CFG_FILENAME__=$(CFG_FILENAME)
+CFLAGS_USR += -D__CFG_FILENAME__=$(CFG_FILENAME)
 endif
 
 # Debug conditional flags
@@ -194,10 +198,10 @@ INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Iforeign/libsdbfs \
 	       -I/usr/local/include
 
-# Merge all flags.
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output modules
 OUT = $(dev_mngr_OUT) $(dev_io_OUT)
@@ -268,14 +272,14 @@ all: $(PROJECT_LIBS_NAME) cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
         -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
         -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
-        -c $< -o $@
+        -c $< -o $@ $(LDFLAGS)
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -284,7 +288,7 @@ $(revision_OBJS): $(revision_SRCS)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d

@@ -15,8 +15,12 @@ PWD = 		$(shell pwd)
 
 LIBCONVC = libconvc
 
-# General C flags
-CFLAGS = -std=gnu99 -O2
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 # To enable this option, use: make ERRHAND_DBG=y
 ifneq ($(ERRHAND_DBG),)
@@ -53,10 +57,10 @@ LFLAGS =
 # Include directories
 INCLUDE_DIRS = -I. -I../liberrhand
 
-# Merge all flags. Optimize for size (-Os)
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
 OUT = $(LIBCONVC)
@@ -103,7 +107,7 @@ all: $(TARGET_STATIC)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d

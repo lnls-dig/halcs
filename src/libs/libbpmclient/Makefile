@@ -24,15 +24,19 @@ LIBBPMCLIENT = libbpmclient
 # Config variables suitable for creating shared libraries
 LIB_VER = $(shell ./version.sh bpm_client)
 
-# General C flags
-CFLAGS = -std=gnu99 -O2 -fPIC
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2 -fPIC
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 ifeq ($(BOARD),ml605)
-CFLAGS += -D__BOARD_ML605__
+CFLAGS_USR += -D__BOARD_ML605__
 endif
 
 ifeq ($(BOARD),afcv3)
-CFLAGS += -D__BOARD_AFCV3__
+CFLAGS_USR += -D__BOARD_AFCV3__
 endif
 
 CFLAGS_DEBUG =
@@ -103,10 +107,10 @@ INCLUDE_DIRS = -I. -Iinclude -I../liberrhand -I../libhutils -I../libdisptable \
 	       -I../../sm_io/modules/afc_diag \
 	       -I/usr/local/include
 
-# Merge all flags. Optimize for size (-Os)
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
 OUT = $(LIBBPMCLIENT)
@@ -209,7 +213,7 @@ $(revision_OBJS): $(revision_SRCS)
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
         -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
         -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
-        -c $< -o $@
+        -c $< -o $@ $(LDFLAGS)
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -219,7 +223,7 @@ $(revision_OBJS): $(revision_SRCS)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
