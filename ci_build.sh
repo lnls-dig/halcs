@@ -18,7 +18,18 @@ CONFIG_FLAGS+=("CFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_FLAGS+=("CPPFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_FLAGS+=("CXXFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_FLAGS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
-CONFIG_OPTS=($CONFIG_FLAGS)
+
+KERNEL_FLAGS=()
+KERNEL_FLAGS+=("INSTALLDIR=${BUILD_PREFIX}/lib/modules/$(shell uname -r)/extra")
+KERNEL_FLAGS+=("INSTALLHDRDIR=${BUILD_PREFIX}/include/pciDriver/driver")
+
+BPM_OPTS=()
+BPM_OPTS+=(${CONFIG_FLAGS[@]})
+BPM_OPTS+=(${KERNEL_FLAGS[@]})
+BPM_OPTS+=("PREFIX=${BUILD_PREFIX}")
+
+CONFIG_OPTS=()
+CONFIG_OPTS+=(${CONFIG_FLAGS[@]})
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
 
@@ -47,4 +58,4 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh $BOARD $WITH_EXAMPLES "${CONFIG_FLAGS[@]}"
+./compile.sh $BOARD $WITH_EXAMPLES "${BPM_OPTS[@]}"
