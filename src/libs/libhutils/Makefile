@@ -21,6 +21,9 @@ LIB_VER_MINOR = 0
 LIB_VER_REVISION = 0
 LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
 
+PREFIX ?= /usr/local
+export PREFIX
+
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2 -fPIC
 # We expect tghese variables to be appended to the possible
