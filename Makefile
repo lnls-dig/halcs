@@ -273,14 +273,14 @@ all: $(PROJECT_LIBS_NAME) cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -DGIT_REVISION="\"$(GIT_REVISION)\"" \
         -DGIT_USER_NAME="\"$(GIT_USER_NAME)\"" \
         -DGIT_USER_EMAIL="\"$(GIT_USER_EMAIL)\"" \
-        -c $< -o $@ $(LDFLAGS)
+        -c $< -o $@
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -289,7 +289,7 @@ $(revision_OBJS): $(revision_SRCS)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d

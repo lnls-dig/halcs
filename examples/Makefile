@@ -59,7 +59,7 @@ OUT = $(basename $(examples_SRC))
 all: $(OUT)
 
 %: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LDFLAGS) $(LIBS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD
 clean:

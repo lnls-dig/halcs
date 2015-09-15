@@ -107,7 +107,7 @@ all: $(TARGET_STATIC)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d

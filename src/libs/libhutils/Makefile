@@ -114,7 +114,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
+	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -124,7 +124,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 # Autodependencies generatation by Scott McPeak, November 2001,
 # from article "Autodependencies with GNU make"
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@ $(LDFLAGS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -c $*.c -o $@
 
 # create the dependency files "target: pre-requisites"
 	${CC} -MM $(CFLAGS) $(INCLUDE_DIRS) $*.c > $*.d
