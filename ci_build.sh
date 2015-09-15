@@ -7,6 +7,12 @@ set -x
 mkdir tmp
 BUILD_PREFIX=$PWD/tmp
 
+LIBSODIUM_VER=1.0.3
+LIBZMQ_VER=master
+LIBCZMQ_VER=v3.0.2
+MALAMUTE_VER=v0.1.1
+ZYRE_VER=v1.1.0
+
 CONFIG_FLAGS=()
 CONFIG_FLAGS+=("CFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_FLAGS+=("CPPFLAGS=-I${BUILD_PREFIX}/include")
@@ -17,27 +23,27 @@ CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
 
 #   libsodium
-git clone git://github.com/jedisct1/libsodium.git &&
+git clone --branch=${LIBSODIUM_VER} git://github.com/jedisct1/libsodium.git &&
 ( cd libsodium; ./autogen.sh && ./configure --prefix=$BUILD_PREFIX &&
     make check && make install ) || exit 1
 
 #   libzmq
-git clone git://github.com/zeromq/libzmq.git &&
+git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git &&
 ( cd libzmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
 #   CZMQ
-git clone git://github.com/zeromq/czmq.git &&
+git clone --branch=${LIBCZMQ_VER} git://github.com/zeromq/czmq.git &&
 ( cd czmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
 #   Zyre
-git clone git://github.com/zeromq/zyre.git &&
+git clone --branch=${ZYRE_VER} git://github.com/zeromq/zyre.git &&
 ( cd zyre; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
 #   Malamute
-git clone git://github.com/zeromq/malamute.git &&
+git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
