@@ -396,23 +396,23 @@ typedef struct {
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];
 
-/* Start acquisition on a specific channel with an spoecif number of samples,
+/* Start acquisition on a specific channel with an specific number of samples,
  * through the use of acq_req_t structure.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if the server
  * could not complete the request */
-bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service,
         acq_req_t *acq_req);
 
 /* Check if apreviouly started acquisition finished.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_AGAIN if the acquistion
  * did not complete */
-bpm_client_err_e bpm_check_data_acquire (bpm_client_t *self, char *service);
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
 
 /* Wait for the previouly started acquistion to complete with a maximum tolerated
  * wait.
  * Returns BPM_CLIENT_SUCCESS if the acquistion finished under the specified
  * timeout or BPM_CLIIENT_ERR_TIMEOUT if the acquistion did not completed in time */
-bpm_client_err_e bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_check_timed (bpm_client_t *self, char *service,
         int timeout);
 
 /* Get an specific data block from a previously completed acquisiton by setting
@@ -421,16 +421,36 @@ bpm_client_err_e bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
  * Returns BPM_CLIENT_SUCCESS if the block was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
 
-/* Get a complete curve from a previously completed acquisiton by setting
- * the the desired channel in acq_trans->req.channel.
+/* Get a whole curve a previously completed acquisition by setting
+ * the desired channel in acq_trans->req.channel.
+ * Returns BPM_CLIENT_SUCCESS if the block was read or BPM_CLIENT_ERR_SERVER
+ * otherwise. The data read is returned in acq_trans->block.data along with
+ * the number of bytes effectively read in acq_trans->block.bytes_read */
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans);
+
+/* Perform a full acquisition process (Acquisition request, checking if
+ * its done and receiving the full curve).
  * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout);
+
+/* Compatibility version of the old bpm_full_acq. Performs a full acquisition
+ * if new_acq = 1 and a curve readout if new_acq = 0*/
+bpm_client_err_e bpm_full_acq_compat (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq);
+
+/* Macros for compatibility */
+#define bpm_data_acquire bpm_acq_start
+#define bpm_check_data_acquire bpm_acq_check
+#define bpm_check_data_acquire_timed bpm_acq_check_timed
+#define bpm_get_data_block bpm_acq_get_data_block
+#define bpm_get_curve bpm_full_acq_compat
 
 /* Configure acquisition trigger. Trigger types are: 0 -> skip trigger,
  * 1 -> external trigger, 2 -> data-driven trigger, 3 -> software trigger.
@@ -489,29 +509,6 @@ bpm_client_err_e bpm_set_acq_sw_trig (bpm_client_t *self, char *service,
         uint32_t sw_trig);
 bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
         uint32_t *sw_trig);
-
-/* New version of bpm_data_acquire that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
-
-/* New version of bpm_check_data_acquire that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
-
-/* New version of bpm_get_data_block that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
-
-/* New version of bpm_get_curve that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
-
-/* Perform a full acquisition process (Acquisition request, checking if
- * its done and receiving the full curve).
- * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
- * otherwise. The data read is returned in acq_trans->block.data along with
- * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
 
 /********************** DSP Functions ********************/
 

@@ -51,6 +51,8 @@ struct _bpm_client_t {
 
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, uint32_t timeout);
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output, int timeout);
 
 /* Acquisition channel definitions for user's application */
 #if defined(__BOARD_ML605__)
@@ -223,7 +225,8 @@ err_self_alloc:
 
 /**************** General Function to call the others *********/
 
-bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func, char *service, uint32_t *input, uint32_t *output)
+bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
@@ -315,20 +318,17 @@ err_inv_param:
 
 const disp_op_t *bpm_func_translate (char *name)
 {
-    if (name != NULL)
-    {
-        /* Search the function table for a match in the 'name' field */
-        for (int i=0; smio_exp_ops[i] != NULL; i++)
-        {
-            for (int j=0; smio_exp_ops[i][j] != NULL; j++)
-            {
-                if (streq(name, smio_exp_ops[i][j]->name))
-                {
-                    return smio_exp_ops[i][j];
-                }
+    assert (name);
+
+    /* Search the function table for a match in the 'name' field */
+    for (int i=0; smio_exp_ops[i] != NULL; i++) {
+        for (int j=0; smio_exp_ops[i][j] != NULL; j++) {
+            if (streq(name, smio_exp_ops[i][j]->name)) {
+                return smio_exp_ops[i][j];
             }
         }
     }
+
     return 0;
 }
 
@@ -866,40 +866,19 @@ PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
 
-static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
+static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service,
         acq_req_t *acq_req);
-static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *service);
-static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
-        int timeout);
-static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans);
-static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
 static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service);
-static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
-static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
-static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
-
-bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service, acq_req_t *acq_req)
-{
-    return _bpm_data_acquire (self, service, acq_req);
-}
-
-bpm_client_err_e bpm_check_data_acquire (bpm_client_t *self, char *service)
-{
-    return _bpm_check_data_acquire (self, service);
-}
-
-bpm_client_err_e bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
-        int timeout)
-{
-    return _bpm_wait_data_acquire_timed (self, service, timeout);
-}
-
-bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans)
-{
-    return _bpm_get_data_block (self, service, acq_trans);
-}
+static bpm_client_err_e _bpm_acq_check_timed (bpm_client_t *self, char *service,
+        int timeout);
+static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self,
+        char *service, acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans);
+static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout);
+static bpm_client_err_e _bpm_full_acq_compat (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout, bool new_acq);
 
 bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
@@ -911,338 +890,41 @@ bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service)
     return _bpm_acq_check (self, service);
 }
 
-bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+bpm_client_err_e bpm_acq_check_timed (bpm_client_t *self, char *service,
+        int timeout)
+{
+    return _bpm_acq_check_timed (self, service, timeout);
+}
+
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans)
 {
     return _bpm_acq_get_data_block (self, service, acq_trans);
 }
 
-bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans)
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans)
 {
     return _bpm_acq_get_curve (self, service, acq_trans);
 }
 
-bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout)
+bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout)
 {
     return _bpm_full_acq (self, service, acq_trans, timeout);
 }
 
-static bpm_client_err_e _bpm_data_acquire (bpm_client_t *self, char *service,
-        acq_req_t *acq_req)
-{
-    assert (self);
-    assert (service);
-    assert (acq_req);
-
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_DATA_ACQUIRE;
-
-    /* Message is:
-     * frame 0: operation code
-     * frame 1: number of pre-trigger samples
-     * frame 2: number of post-trigger samples
-     * frame 3: number of shots
-     * frame 4: channel             */
-    zmsg_t *request = zmsg_new ();
-    zmsg_addmem (request, &operation, sizeof (operation));
-    zmsg_addmem (request, &acq_req->num_samples_pre, sizeof (acq_req->num_samples_pre));
-    zmsg_addmem (request, &acq_req->num_samples_post, sizeof (acq_req->num_samples_post));
-    zmsg_addmem (request, &acq_req->num_shots, sizeof (acq_req->num_shots));
-    zmsg_addmem (request, &acq_req->chan, sizeof (acq_req->chan));
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
-
-    /* Receive report */
-    zmsg_t *report = param_client_recv_timeout (self);
-    ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-
-    /* Message is:
-     * frame 0: error code      */
-
-    /* Handling malformed messages */
-    size_t msg_size = zmsg_size (report);
-    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
-
-    /* Get message contents */
-    zframe_t *err_code = zmsg_pop(report);
-    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-
-    /* Check for return code from server */
-    ASSERT_TEST(*(ACQ_REPLY_TYPE *) zframe_data(err_code) == ACQ_OK,
-            "bpm_data_acquire: Data acquire was not required correctly",
-            err_data_acquire, BPM_CLIENT_ERR_AGAIN);
-    /* If we are here, then the request was successfully acquired*/
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_data_acquire: "
-            "Data acquire was successfully required\n");
-
-err_data_acquire:
-    zframe_destroy (&err_code);
-err_null_code:
-err_msg:
-    zmsg_destroy (&report);
-err_null_report:
-    return err;
-}
-
-static bpm_client_err_e _bpm_check_data_acquire (bpm_client_t *self, char *service)
-{
-    assert (self);
-    assert (service);
-
-    int err = BPM_CLIENT_SUCCESS;
-    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_CHECK_DATA_ACQUIRE;
-
-    /* Message is:
-     * frame 0: operation code      */
-    zmsg_t *request = zmsg_new ();
-    zmsg_addmem (request, &operation, sizeof (operation));
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
-
-    /* Receive report */
-    zmsg_t *report = param_client_recv_timeout (self);
-    ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-
-    /* Message is:
-     * frame 0: error code      */
-
-    /* Handling malformed messages */
-    size_t msg_size = zmsg_size (report);
-    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
-
-    /* Get message contents */
-    zframe_t *err_code = zmsg_pop (report);
-    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-
-    /* Check for return code from server */
-    if (*(ACQ_REPLY_TYPE *) zframe_data (err_code) != ACQ_OK) {
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
-                "Check fail: data acquire was not completed\n");
-        err = BPM_CLIENT_ERR_AGAIN;
-        goto err_check_data_acquire;
-    }
-
-    /* If we are here, then the request was successfully acquired*/
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_check_data_acquire: "
-            "Check ok: data acquire was successfully completed\n");
-
-err_check_data_acquire:
-    zframe_destroy (&err_code);
-err_null_code:
-err_msg:
-    zmsg_destroy (&report);
-err_null_report:
-    return err;
-}
-
-static bpm_client_err_e _bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
-        int timeout)
-{
-    assert (self);
-    assert (service);
-
-    /* timeout < 0 means "infinite" wait */
-    if (timeout < 0) {
-        /* FIXME! Very unportable way! We assume that time_t is at least of
-         * size INT */
-        timeout = INT_MAX;
-    }
-
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    time_t start = time (NULL);
-    while ((time(NULL) - start)*1000 < timeout) {
-        if (zsys_interrupted) {
-            err = BPM_CLIENT_INT;
-            goto bpm_zsys_interrupted;
-        }
-
-        err = _bpm_check_data_acquire (self, service);
-        if (err == BPM_CLIENT_SUCCESS) {
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
-                    "bpm_wait_data_acquire_timed: finished waiting\n");
-            goto exit;
-        }
-
-        usleep (MSECS*MIN_WAIT_TIME);
-    }
-
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
-            "bpm_wait_data_acquire_timed: number of tries was exceeded\n");
-    /* timeout occured */
-    err = BPM_CLIENT_ERR_TIMEOUT;
-
-bpm_zsys_interrupted:
-exit:
-    return err;
-}
-
-static bpm_client_err_e _bpm_get_data_block (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans)
-{
-    assert (self);
-    assert (service);
-    assert (acq_trans);
-    assert (acq_trans->block.data);
-
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    ACQ_OPCODE_TYPE operation = ACQ_OPCODE_GET_DATA_BLOCK;
-
-    /* Message is:
-     * frame 0: operation code
-     * frame 1: channel
-     * frame 2: block required          */
-    zmsg_t *request = zmsg_new ();
-    zmsg_addmem (request, &operation, sizeof (operation));
-    zmsg_addmem (request, &acq_trans->req.chan, sizeof (acq_trans->req.chan));
-    zmsg_addmem (request, &acq_trans->block.idx, sizeof (acq_trans->block.idx));
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
-
-    /* Receive report */
-    zmsg_t *report = param_client_recv_timeout (self);
-    ASSERT_TEST(report != NULL, "Report received is NULL", err_null_report);
-
-    /* Message is:
-     * frame 0: error code
-     * frame 1: number of bytes read (optional)
-     * frame 2: data read (optional) */
-
-    /* Handling malformed messages */
-    size_t msg_size = zmsg_size (report);
-    ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
-            "Unexpected message received", err_msg);
-
-    /* Get message contents */
-    zframe_t *err_code = zmsg_pop (report);
-    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_null_code);
-
-    /* Check for return code from server */
-    ASSERT_TEST(*(RW_REPLY_TYPE *) zframe_data (err_code) == ACQ_OK,
-            "bpm_get_data_block: Data block was not acquired",
-            err_error_code, BPM_CLIENT_ERR_SERVER);
-
-    zframe_t *data_size_frm = NULL;
-    zframe_t *data_frm = NULL;
-    if (msg_size == MSG_FULL_SIZE) {
-        data_size_frm = zmsg_pop (report);
-        ASSERT_TEST(data_size_frm != NULL, "Could not receive data size", err_null_data_size);
-        data_frm = zmsg_pop (report);
-        ASSERT_TEST(data_frm != NULL, "Could not receive data", err_null_data);
-
-        ASSERT_TEST(zframe_size (data_size_frm) == RW_REPLY_SIZE,
-                "Wrong <number of payload bytes> parameter size", err_msg_fmt);
-
-        /* Size in the second frame must match the frame size of the third */
-        RW_REPLY_TYPE data_size = *(RW_REPLY_TYPE *) zframe_data(data_size_frm);
-        ASSERT_TEST(data_size == zframe_size (data_frm),
-                "<payload> parameter size does not match size in <number of payload bytes> parameter",
-                err_msg_fmt);
-
-        /* frame 2: data read (optional)
-         *          data read = data block
-         *                      valid bytes */
-        smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) zframe_data (data_frm);
-
-        /* Data size effectively returned */
-        uint32_t read_size = (acq_trans->block.data_size < data_block->valid_bytes) ?
-            acq_trans->block.data_size : data_block->valid_bytes;
-
-        /* Copy message contents to user */
-        memcpy (acq_trans->block.data, data_block->data, read_size);
-        /* Inform user about the number of bytes effectively copied*/
-        acq_trans->block.bytes_read = read_size;
-
-        /* Print some debug messages */
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-                "read_size: %u\n", read_size);
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_data_block: "
-                "acq_trans->block.data: %p\n", acq_trans->block.data);
-    }
-
-err_msg_fmt:
-    zframe_destroy (&data_frm);
-err_null_data:
-    zframe_destroy (&data_size_frm);
-err_null_data_size:
-err_error_code:
-    zframe_destroy (&err_code);
-err_null_code:
-err_msg:
-    zmsg_destroy (&report);
-err_null_report:
-    return err;
-}
-
-bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_full_acq_compat (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq)
 {
-    assert (self);
-    assert (service);
-    assert (acq_trans);
-    assert (acq_trans->block.data);
+    return _bpm_full_acq_compat (self, service, acq_trans, timeout, new_acq);
+}
 
-    /* Client requisition: data acquire */
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    if (new_acq) {
-        err = _bpm_data_acquire (self, service, &acq_trans->req);
-        ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not request acqusition\n",
-                err_bpm_data_acquire);
-
-        /* Client requisition: wait data acquire indefinetly */
-        err = _bpm_wait_data_acquire_timed (self, service, timeout);
-        ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Request acquisition timed out\n",
-                err_bpm_wait_data_acquire);
-    }
-
-    /* FIXME: When the last block is full 'block_n_valid exceeds by one */
-    uint32_t num_samples_shot = acq_trans->req.num_samples_pre +
-        acq_trans->req.num_samples_post;
-    uint32_t num_samples_multishot = num_samples_shot*acq_trans->req.num_shots;
-    uint32_t n_max_samples = BLOCK_SIZE/self->acq_chan[acq_trans->req.chan].sample_size;
-    uint32_t block_n_valid = num_samples_multishot / n_max_samples;
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-            "block_n_valid = %u\n", block_n_valid);
-
-    uint32_t total_bread = 0;   /* Total bytes read */
-    uint32_t data_size = acq_trans->block.data_size;  /* Save the original buffer size for later */
-    uint32_t *original_data_pt = acq_trans->block.data;
-    /* Client requisition: get data block */
-    for (uint32_t block_n = 0; block_n <= block_n_valid; block_n++) {
-        if (zsys_interrupted) {
-            err = BPM_CLIENT_INT;
-            goto bpm_zsys_interrupted;
-        }
-
-        acq_trans->block.idx = block_n;
-        err = _bpm_get_data_block (self, service, acq_trans);
-
-        /* Check for return code */
-        ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
-                "_bpm_get_data_block failed. block_n is probably out of range",
-                err_bpm_get_data_block);
-
-        total_bread += acq_trans->block.bytes_read;
-        acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
-        acq_trans->block.data_size -= acq_trans->block.bytes_read;
-
-        /* Print some debug messages */
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                "Total bytes read up to now: %u\n", total_bread);
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                "Data pointer addr: %p\n", acq_trans->block.data);
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-                "Data buffer size: %u\n", acq_trans->block.data_size);
-    }
-
-    /* Return to client the total number of bytes read */
-    acq_trans->block.bytes_read = total_bread;
-    acq_trans->block.data_size = data_size;
-    acq_trans->block.data = original_data_pt;
-
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_get_curve: "
-        "Data curve of %u bytes was successfully acquired\n", total_bread);
-
-err_bpm_get_data_block:
-bpm_zsys_interrupted:
-err_bpm_wait_data_acquire:
-err_bpm_data_acquire:
-    return err;
+static bpm_client_err_e _bpm_acq_check_timed (bpm_client_t *self, char *service,
+        int timeout)
+{
+    return func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE, service, NULL,
+            NULL, timeout);
 }
 
 bpm_client_err_e bpm_set_acq_trig (bpm_client_t *self, char *service,
@@ -1328,6 +1010,10 @@ bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
 
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
+    assert (self);
+    assert (service);
+    assert (acq_req);
+
     uint32_t write_val[sizeof(uint32_t)*4] = {0};
     *write_val = acq_req->num_samples_pre;
     *(write_val+4) = acq_req->num_samples_post;
@@ -1351,6 +1037,9 @@ err_data_acquire:
 
 static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
 {
+    assert (self);
+    assert (service);
+
     const disp_op_t* func = bpm_func_translate(ACQ_NAME_CHECK_DATA_ACQUIRE);
     bpm_client_err_e err = bpm_func_exec(self, func, service, NULL, NULL);
 
@@ -1374,6 +1063,8 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
     assert (acq_trans);
     assert (acq_trans->block.data);
 
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+
     uint32_t write_val[sizeof(uint32_t)*2] = {0};
     *write_val = acq_trans->req.chan;
     *(write_val+4) = acq_trans->block.idx;
@@ -1386,14 +1077,14 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
      * frame 2: block required */
 
     const disp_op_t* func = bpm_func_translate(ACQ_NAME_GET_DATA_BLOCK);
-    bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, (uint32_t *) read_val);
+    err = bpm_func_exec(self, func, service, write_val, (uint32_t *) read_val);
 
-    /* Received Message is:
+    /* Message is:
      * frame 0: error code
-     * frame 1: data size
-     * frame 2: data block */
+     * frame 1: number of bytes read (optional)
+     * frame 2: data read (optional) */
 
-    /* Check if any error ocurred */
+    /* Check if any error occurred */
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
             "bpm_get_data_block: Data block was not acquired",
             err_get_data_block, BPM_CLIENT_ERR_SERVER);
@@ -1449,7 +1140,7 @@ static bpm_client_err_e _bpm_acq_get_curve (bpm_client_t *self, char *service, a
         }
 
         acq_trans->block.idx = block_n;
-        err = bpm_acq_get_data_block(self, service, acq_trans);
+        err = _bpm_acq_get_data_block (self, service, acq_trans);
 
         /* Check for return code */
         ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
@@ -1491,10 +1182,10 @@ static bpm_client_err_e _bpm_full_acq (bpm_client_t *self, char *service,
     assert (acq_trans->block.data);
 
     /* Send Acquisition Request */
-    bpm_acq_start (self, service, &acq_trans->req);
+    _bpm_acq_start (self, service, &acq_trans->req);
 
     /* Wait until the acquisition is finished */
-    bpm_client_err_e err = func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE,
+    bpm_client_err_e err = _func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE,
             service, NULL, NULL, timeout);
 
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
@@ -1513,6 +1204,19 @@ err_get_curve:
 err_check_data_acquire:
     return err;
 }
+
+/* Wrapper to be compatible with old function behavior */
+static bpm_client_err_e _bpm_full_acq_compat (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout, bool new_acq)
+{
+    if (new_acq) {
+        return _bpm_full_acq (self, service, acq_trans, timeout);
+    }
+    else {
+        return _bpm_acq_get_curve (self, service, acq_trans);
+    }
+}
+
 /**************** DSP SMIO Functions ****************/
 
 /* Kx functions */
@@ -2073,37 +1777,49 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
 
 /**************** Helper Function ****************/
 
-static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout);
-
-bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
+bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service,
+        uint32_t *input, uint32_t *output, int timeout)
 {
     return _func_polling (self, name, service, input, output, timeout);
 }
 
 /* Polling Function */
-
-static bpm_client_err_e _func_polling (bpm_client_t *self, char *name, char *service, uint32_t *input, uint32_t *output, int timeout)
+static bpm_client_err_e _func_polling (bpm_client_t *self, char *name,
+        char *service, uint32_t *input, uint32_t *output, int timeout)
 {
+    assert (self);
+    assert (name);
+    assert (service);
+
+    /* timeout < 0 means "infinite" wait */
     if (timeout < 0) {
+        /* FIXME! Very unportable way! We assume that time_t is at least of
+         * size INT */
         timeout = INT_MAX;
     }
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    time_t start = time(NULL);
-    while (time(NULL) - start < timeout) {
+    time_t start = time (NULL);
+    while ((time(NULL) - start)*1000 < timeout) {
         if (zsys_interrupted) {
             err = BPM_CLIENT_INT;
             goto bpm_zsys_interrupted;
         }
+
         const disp_op_t* func = bpm_func_translate(name);
-        err = bpm_func_exec(self, func, service, input, output);
-        if (err == BPM_CLIENT_SUCCESS)
-        {
+        err = bpm_func_exec (self, func, service, input, output);
+
+        if (err == BPM_CLIENT_SUCCESS) {
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
+                    "func_polling: finished waiting\n");
             goto exit;
         }
-        usleep (1000);
+
+        usleep (MSECS*MIN_WAIT_TIME);
     }
 
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] "
+            "func_polling: number of tries was exceeded\n");
     /* timeout occured */
     err = BPM_CLIENT_ERR_TIMEOUT;
 
