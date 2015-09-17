@@ -108,8 +108,16 @@ int main (int argc, char *argv [])
         goto err_bpm_client_new;
     }
 
+    uint32_t monit_updt = 1;
+    bpm_client_err_e err = bpm_set_monit_updt (bpm_client, service,
+            monit_updt);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: bpm_set_monit_updt failed\n");
+        goto err_set_monit_updt;
+    }
+
     uint32_t monit_pos;
-    bpm_client_err_e err = bpm_get_monit_pos_x (bpm_client, service,
+    err = bpm_get_monit_pos_x (bpm_client, service,
             &monit_pos);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_monit_pos_x failed\n");
@@ -144,6 +152,7 @@ int main (int argc, char *argv [])
 
 err_bpm_client_new:
 err_get_monit_pos:
+err_set_monit_updt:
     bpm_client_destroy (&bpm_client);
     str_p = &board_number_str;
     free (*str_p);
