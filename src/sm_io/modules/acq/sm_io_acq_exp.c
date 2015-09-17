@@ -454,7 +454,7 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
         ASSERT_TEST(err == -ACQ_OK, "Trigger type is not valid", err_acq_inv_trig);
     }
 
-    return -ACQ_OK;
+    return err;
 
 err_acq_inv_trig:
 err_acq_get_trig:
