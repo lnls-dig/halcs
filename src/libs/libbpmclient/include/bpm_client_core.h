@@ -364,13 +364,15 @@ bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
 
 /********************** ACQ SMIO Functions ********************/
 
-/* Acquistion request */
+/* Acquisition request */
 typedef struct {
-    uint32_t num_samples;                       /* Number of samples */
+    uint32_t num_samples_pre;                   /* Number of pre-trigger samples */
+    uint32_t num_samples_post;                  /* Number of post-trigger samples */
+    uint32_t num_shots;                         /* Number of shots */
     uint32_t chan;                              /* Acquisition channel number */
 } acq_req_t;
 
-/* Acquistion data block */
+/* Acquisition data block */
 typedef struct {
     uint32_t idx;                               /* Block index */
 
@@ -379,7 +381,7 @@ typedef struct {
     uint32_t bytes_read;                        /* Number of bytes effectively read */
 } acq_block_t;
 
-/* Acquistion transaction */
+/* Acquisition transaction */
 typedef struct {
     acq_req_t req;                              /* Request */
     acq_block_t block;                          /* Block or whole curve read */
@@ -429,6 +431,64 @@ bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
 bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq);
+
+/* Configure acquisition trigger. Trigger types are: 0 -> skip trigger,
+ * 1 -> external trigger, 2 -> data-driven trigger, 3 -> software trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_trig (bpm_client_t *self, char *service,
+        uint32_t trig);
+bpm_client_err_e bpm_get_acq_trig (bpm_client_t *self, char *service,
+        uint32_t *trig);
+
+/* Configure data-driven trigger polarity. Options are: 0 -> positive slope (
+ * 0 -> 1), 1 -> negative slope (1 -> 0).
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_pol (bpm_client_t *self, char *service,
+        uint32_t data_trig_pol);
+bpm_client_err_e bpm_get_acq_data_trig_pol (bpm_client_t *self, char *service,
+        uint32_t *data_trig_pol);
+
+/* Configure data-driven trigger selection. Options are: 0 -> channel data
+ * sample 0, 1 -> channel data sample 1, 2 -> channel data sample 2, 3 -> channel
+ * data sample 3
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_sel (bpm_client_t *self, char *service,
+        uint32_t data_trig_sel);
+bpm_client_err_e bpm_get_acq_data_trig_sel (bpm_client_t *self, char *service,
+        uint32_t *data_trig_sel);
+
+/* Configure data-driven trigger hysteresis filter. data_trig_filt is an integer
+ * number from 0 to 2^8-1, meaning the number of steady counts after the data
+ * sample goes above or below the data threshold. This is only valid for
+ * data-driven trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_filt (bpm_client_t *self, char *service,
+        uint32_t data_trig_filt);
+bpm_client_err_e bpm_get_acq_data_trig_filt (bpm_client_t *self, char *service,
+        uint32_t *data_trig_filt);
+
+/* Configure trigger delay. hw_trig_dly is an integer number from 0 to 2^32-1,
+ * meaning the number of ADC clock cycles after which the detected trigger
+ * will be used. This is only valid for external or data-driven trigger types.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_hw_trig_dly (bpm_client_t *self, char *service,
+        uint32_t hw_trig_dly);
+bpm_client_err_e bpm_get_acq_hw_trig_dly (bpm_client_t *self, char *service,
+        uint32_t *hw_trig_dly);
+
+/* Generate software trigger. Options are: 1 generates a software trigger, 0
+ * generates nothing.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_sw_trig (bpm_client_t *self, char *service,
+        uint32_t sw_trig);
+bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
+        uint32_t *sw_trig);
 
 /* New version of bpm_data_acquire that uses the general function caller
  * bpm_func_exec */
