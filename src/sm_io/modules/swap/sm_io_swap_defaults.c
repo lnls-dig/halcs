@@ -55,6 +55,10 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_SWAP_LIBBPMCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
+    bpm_set_div_clk (config_client, service, SWAP_DFLT_DIV_CLK);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching clock",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
     client_err = bpm_set_sw (config_client, service, SWAP_DFLT_SW);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching state",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
