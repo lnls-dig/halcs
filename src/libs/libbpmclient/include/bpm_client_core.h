@@ -593,6 +593,19 @@ bpm_client_err_e bpm_set_monit_amp_ch3 (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
         uint32_t *monit_amp_ch3);
 
+/* Monitoring Update values */
+/* These set of functions read (get) the Monitoring update value, which
+ * effectively updates the AMP/POS values in the FPGA. After this,
+ * reading AMP/POS values are guaranteed to stay fixed until the next
+ * update.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_updt (bpm_client_t *self, char *service,
+        uint32_t monit_updt);
+bpm_client_err_e bpm_get_monit_updt (bpm_client_t *self, char *service,
+        uint32_t *monit_updt);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */

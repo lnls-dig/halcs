@@ -1373,6 +1373,17 @@ PARAM_FUNC_CLIENT_READ(monit_pos_sum)
      return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POS_SUM, monit_pos_sum);
 }
 
+/* Monitoring Update value */
+PARAM_FUNC_CLIENT_WRITE(monit_updt)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_UPDT, monit_updt);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_updt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_UPDT, monit_updt);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */
