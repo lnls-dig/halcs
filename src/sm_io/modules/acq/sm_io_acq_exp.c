@@ -383,8 +383,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "\tTrigger address = 0x%08x,\n"
             "\tAcquisition read start address\n"
             "\t\t(trig_addr - ((num_samples_pre+num_samples_post)*(num_shots-1)\n"
-            "\t\t+ num_samples_pre)*sample_size = 0x%08x,\n",
-            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%08x,\n",
+            "\t\t+ num_samples_pre)*sample_size = 0x%08x,\n"
+            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%08x\n",
             block_n, chan,
             acq->acq_buf[chan].start_addr,
             acq_core_trig_addr,
