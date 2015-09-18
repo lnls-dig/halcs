@@ -132,11 +132,6 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             acq->acq_params[chan].num_samples_post,
             acq->acq_params[chan].num_shots);
 
-    /* Set the parameters: number of samples of this channel */
-    acq->acq_params[chan].num_samples_pre = num_samples_pre;
-    acq->acq_params[chan].num_samples_post = num_samples_post;
-    acq->acq_params[chan].num_shots = num_shots;
-
     /* Setting the number of shots */
     uint32_t acq_core_shots = ACQ_CORE_SHOTS_NB_W(num_shots);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -147,10 +142,13 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
      * acquisition channel sample size */
     uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
-    uint32_t num_samples_pre_aligned = num_samples_pre + samples_alignment -
-        (num_samples_pre % samples_alignment);
-    uint32_t num_samples_post_aligned = num_samples_post + samples_alignment -
-        (num_samples_post % samples_alignment);
+    uint32_t num_samples_pre_aligned = num_samples_pre + (num_samples_pre % samples_alignment);
+    uint32_t num_samples_post_aligned = num_samples_post + (num_samples_post % samples_alignment);
+
+    /* Set the parameters: number of samples of this channel */
+    acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
+    acq->acq_params[chan].num_samples_post = num_samples_post_aligned;
+    acq->acq_params[chan].num_shots = num_shots;
 
     /* Pre trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -364,20 +362,31 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * contain the correct address offset (end of acquisition addrress) */
     uint32_t acq_core_trig_addr = 0;
     smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
+    /* Convert to byte address */
+    acq_core_trig_addr *= DDR3_ADDR_WORD_2_BYTE;
 
     /* For all modes the start valid address is given by:
-     * start_addr = trigger_addr - (num_samples_pre+num_samples_post)*(num_shots-1) - num_samples_pre
+     * start_addr = trigger_addr*DDR3_ADDR_WORD_2_BYTE -
+     * ((num_samples_pre+num_samples_post)*(num_shots-1) + num_samples_pre)*
+     *      sample_size
      * */
-    uint32_t start_addr = acq_core_trig_addr - num_samples_shot*(num_shots-1) -
-        num_samples_pre;
+    uint32_t start_addr = acq_core_trig_addr -
+        (num_samples_shot*(num_shots-1) + num_samples_pre)*
+        acq->acq_buf[chan].sample_size;
     uint32_t addr_i = start_addr + block_n * BLOCK_SIZE;
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "Block %u of channel %u, channel start address = 0x%08x\n"
-            "\ttrigger address 0x%08x, acquisition start address = 0x%08x\n"
-            "\teffectively block start address (trig_addr - (num_samples_pre+\n"
-            "\tnum_samples_post)*(num_shots-1) - num_samples_pre) = 0x%08x\n",
-            block_n, chan, acq->acq_buf[chan].start_addr, acq_core_trig_addr,
-            start_addr, addr_i);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block:\n"
+            "\tBlock %u of channel %u:\n"
+            "\tChannel start address = 0x%08x,\n"
+            "\tTrigger address = 0x%08x,\n"
+            "\tAcquisition read start address\n"
+            "\t\t(trig_addr - ((num_samples_pre+num_samples_post)*(num_shots-1)\n"
+            "\t\t+ num_samples_pre)*sample_size = 0x%08x,\n",
+            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%08x,\n",
+            block_n, chan,
+            acq->acq_buf[chan].start_addr,
+            acq_core_trig_addr,
+            start_addr,
+            addr_i);
 
     smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) ret;
 
