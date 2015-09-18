@@ -229,15 +229,17 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
         char *service, uint32_t *input, uint32_t *output)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    uint8_t *input8 = (uint8_t *) input;
+    uint8_t *output8 = (uint8_t *) output;
 
     /* Check input arguments */
     ASSERT_TEST(self != NULL, "Bpm_client is NULL", err_null_exp,
             BPM_CLIENT_ERR_INV_FUNCTION);
     ASSERT_TEST(func != NULL, "Function structure is NULL", err_null_exp,
             BPM_CLIENT_ERR_INV_FUNCTION);
-    ASSERT_TEST(!(func->args[0] != DISP_ARG_END && input == NULL),
+    ASSERT_TEST(!(func->args[0] != DISP_ARG_END && input8 == NULL),
             "Invalid input arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
-    ASSERT_TEST(!(func->retval != DISP_ARG_END && output == NULL),
+    ASSERT_TEST(!(func->retval != DISP_ARG_END && output8 == NULL),
             "Invalid output arguments!", err_inv_param, BPM_CLIENT_ERR_INV_PARAM);
 
     /* Create the message */
@@ -252,9 +254,9 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
         /* Get the size of the message being sent */
         uint32_t in_size = DISP_GET_ASIZE(func->args[i]);
         /* Create a frame to compose the message */
-        zmsg_addmem (msg, input, in_size);
+        zmsg_addmem (msg, input8, in_size);
         /* Moves along the pointer */
-        input += in_size;
+        input8 += in_size;
     }
 
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &msg);
@@ -298,7 +300,7 @@ bpm_client_err_e bpm_func_exec (bpm_client_t *self, const disp_op_t *func,
 
         uint32_t *data_out = (uint32_t *)zframe_data(data_frm);
         /* Copy message contents to user */
-        memcpy (output, data_out, data_size);
+        memcpy (output8, data_out, data_size);
     }
 
 err_msg_fmt:
@@ -1014,11 +1016,11 @@ static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_r
     assert (service);
     assert (acq_req);
 
-    uint32_t write_val[sizeof(uint32_t)*4] = {0};
-    *write_val = acq_req->num_samples_pre;
-    *(write_val+4) = acq_req->num_samples_post;
-    *(write_val+8) = acq_req->num_shots;
-    *(write_val+12) = acq_req->chan;
+    uint32_t write_val[4] = {0};
+    write_val[0] = acq_req->num_samples_pre;
+    write_val[1] = acq_req->num_samples_post;
+    write_val[2] = acq_req->num_shots;
+    write_val[3] = acq_req->chan;
 
     const disp_op_t* func = bpm_func_translate(ACQ_NAME_DATA_ACQUIRE);
     bpm_client_err_e err = bpm_func_exec(self, func, service, write_val, NULL);
@@ -1065,9 +1067,9 @@ static bpm_client_err_e _bpm_acq_get_data_block (bpm_client_t *self, char *servi
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
 
-    uint32_t write_val[sizeof(uint32_t)*2] = {0};
-    *write_val = acq_trans->req.chan;
-    *(write_val+4) = acq_trans->block.idx;
+    uint32_t write_val[2] = {0};
+    write_val[0] = acq_trans->req.chan;
+    write_val[1] = acq_trans->block.idx;
 
     smio_acq_data_block_t read_val[1];
 
