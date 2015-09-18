@@ -166,13 +166,11 @@ RW_PARAM_FUNC(dsp, monit_pos_sum) {
 #define POS_CALC_DSP_MONIT_UPDT_R(val)          (val)
 #define POS_CALC_DSP_MONIT_UPDT_W(val)          (val)
 #define POS_CALC_DSP_MONIT_UPDT_MASK            ((1ULL<<32)-1)
-#define POS_CALC_DSP_MONIT_UPDT_MIN             0
-#define POS_CALC_DSP_MONIT_UPDT_MAX             1
 
 RW_PARAM_FUNC(dsp, monit_updt) {
     SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_UPDT, /* No field */,
-            MULT_BIT_PARAM, POS_CALC_DSP_MONIT_UPDT_MIN,
-            POS_CALC_DSP_MONIT_UPDT_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 /* Exported function pointers */
