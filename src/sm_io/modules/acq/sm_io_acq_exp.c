@@ -111,12 +111,15 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     /* number of samples required is out of the maximum limit */
     uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE/acq->acq_buf[chan].sample_size;
-    if (((num_shots > ACQ_CORE_MIN_NUM_SHOTS) &&
+    if (((num_shots == ACQ_CORE_MIN_NUM_SHOTS) &&
             (num_samples_pre + num_samples_post > acq->acq_buf[chan].max_samples)) ||
-            ((num_shots == ACQ_CORE_MIN_NUM_SHOTS) &&
+            ((num_shots > ACQ_CORE_MIN_NUM_SHOTS) &&
             (num_samples_pre + num_samples_post > max_samples_multishot))) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
-                "Number of samples required is out of the maximum limit\n");
+                "Number of samples required (%u) is out of the maximum limit (%u)\n"
+                 "for shots = %u\n",
+                 num_samples_pre + num_samples_post, (num_shots == ACQ_CORE_MIN_NUM_SHOTS) ?
+                 acq->acq_buf[chan].max_samples : max_samples_multishot, num_shots);
         return -ACQ_NUM_SAMPLES_OOR;
     }
 
