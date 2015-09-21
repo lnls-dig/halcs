@@ -59,6 +59,11 @@ static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
         uint32_t status_value);
 static int _acq_set_trigger_type (SMIO_OWNER_TYPE *self, uint32_t trigger_type);
 static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type);
+static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
+        uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
+        uint64_t end_mem_space_addr);
+uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+        uint64_t channel_start_addr, uint64_t end_mem_space_addr);
 
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
@@ -289,19 +294,22 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     }
 
     /* Channel features */
+    uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
+    uint32_t channel_start_addr = acq->acq_buf[chan].start_addr;
+    uint32_t channel_end_addr = acq->acq_buf[chan].end_addr;
+    uint32_t channel_max_samples = acq->acq_buf[chan].max_samples;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "\t[channel = %u], id = %u, start addr = 0x%08x\n"
             "\tend addr = 0x%08x, max samples = %u, sample size = %u\n",
             chan,
             acq->acq_buf[chan].id,
-            acq->acq_buf[chan].start_addr,
-            acq->acq_buf[chan].end_addr,
-            acq->acq_buf[chan].max_samples,
-            acq->acq_buf[chan].sample_size);
+            channel_start_addr,
+            channel_end_addr,
+            channel_max_samples,
+            channel_sample_size);
 
-    uint32_t block_n_max = ( acq->acq_buf[chan].end_addr -
-            acq->acq_buf[chan].start_addr +
-            acq->acq_buf[chan].sample_size) / BLOCK_SIZE;
+    uint32_t block_n_max = (channel_max_samples +
+            channel_sample_size) / BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
@@ -328,7 +336,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "last num_shots = %u\n", num_shots);
 
-    uint32_t n_max_samples = BLOCK_SIZE/acq->acq_buf[chan].sample_size;
+    uint32_t n_max_samples = BLOCK_SIZE/channel_sample_size;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
@@ -351,7 +359,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        reply_size = over_samples*acq->acq_buf[chan].sample_size;
+        reply_size = over_samples*channel_sample_size;
     }
     else { /* if block_n < block_n_valid */
         reply_size = BLOCK_SIZE;
@@ -361,32 +369,46 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "Reading block %u of channel %u with %u valid samples\n",
             block_n, chan, reply_size);
 
-    /* Read trigger address. Even on skip trigger mode, this register will
-     * contain the correct address offset (end of acquisition addrress) */
-    uint32_t acq_core_trig_addr = 0;
-    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
-    /* Convert to byte address */
-    acq_core_trig_addr *= DDR3_ADDR_WORD_2_BYTE;
-
     /* For all modes the start valid address is given by:
      * start_addr = trigger_addr*DDR3_ADDR_WORD_2_BYTE -
      * ((num_samples_pre+num_samples_post)*(num_shots-1) + num_samples_pre)*
      *      sample_size
      * */
-    uint32_t start_addr = acq_core_trig_addr -
-        (num_samples_shot*(num_shots-1) + num_samples_pre)*
-        acq->acq_buf[chan].sample_size;
-    uint32_t addr_i = start_addr + block_n * BLOCK_SIZE;
+
+    /* First step if to read trigger address. Even on skip trigger mode,
+     * this register will contain the address after the last valid sample
+     * (end of acquisition address) */
+    uint32_t acq_core_trig_addr = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
+    /* Convert to byte address */
+    acq_core_trig_addr *= DDR3_ADDR_WORD_2_BYTE;
+
+    /* Second step is to calculate the size of the whole acquisition in bytes */
+    uint32_t acq_size_bytes = (num_samples_shot*(num_shots-1) +
+            num_samples_pre)*channel_sample_size;
+    /* Our "end address" is the start of the last valid address available for a
+     * sample. So, our "end address" needs to be accounted for one sample more */
+    uint32_t end_mem_space_addr = channel_end_addr + channel_sample_size;
+
+    /* Third step is to get the absolute start address of the acquisition, taking
+     * care for wraps in the beginning of the current memory space */
+    uint64_t start_addr = _acq_get_start_address (acq_core_trig_addr,
+            acq_size_bytes, channel_start_addr, end_mem_space_addr);
+
+    /* Forth step is to calculate the offset from the start_addr, taking care
+     * for wraps in the end of the current memory space */
+    uint64_t addr_i = _acq_get_read_block_addr (start_addr, block_n * BLOCK_SIZE,
+            channel_start_addr, end_mem_space_addr);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block:\n"
             "\tBlock %u of channel %u:\n"
             "\tChannel start address = 0x%08x,\n"
             "\tTrigger address = 0x%08x,\n"
             "\tAcquisition read start address\n"
             "\t\t(trig_addr - ((num_samples_pre+num_samples_post)*(num_shots-1)\n"
-            "\t\t+ num_samples_pre)*sample_size = 0x%08x,\n"
-            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%08x\n",
+            "\t\t+ num_samples_pre)*sample_size = 0x%"PRIx64 ",\n"
+            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%"PRIx64 "\n",
             block_n, chan,
-            acq->acq_buf[chan].start_addr,
+            channel_start_addr,
             acq_core_trig_addr,
             start_addr,
             addr_i);
@@ -415,6 +437,43 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
 err_get_acq_handler:
     return -ACQ_ERR;
+}
+
+static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
+        uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
+        uint64_t end_mem_space_addr)
+{
+    uint64_t addr = 0;
+
+    /* Trigger address relative to the start of the memory space */
+    uint64_t rel_start_trig_addr = acq_core_trig_addr - start_mem_space_addr;
+    /* Check if an address wrap can occur */
+    if (rel_start_trig_addr >= acq_size_bytes) {
+        addr = acq_core_trig_addr - acq_size_bytes;
+    }
+    else {
+        addr = end_mem_space_addr - (acq_size_bytes - rel_start_trig_addr);
+    }
+
+    return addr;
+}
+
+uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+        uint64_t channel_start_addr, uint64_t end_mem_space_addr)
+{
+    uint64_t addr = 0;
+
+    /* Memory space last address relative to the start address */
+    uint64_t rel_end_mem_space_addr = end_mem_space_addr - start_addr;
+    /* Check if an address wrap can occur */
+    if (offset <= rel_end_mem_space_addr) {
+        addr = start_addr + offset;
+    }
+    else {
+        addr = channel_start_addr + (offset - rel_end_mem_space_addr);
+    }
+
+    return addr;
 }
 
 static int _acq_cfg_trigger (void *owner, void *args, void *ret)
