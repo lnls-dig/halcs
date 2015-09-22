@@ -62,7 +62,7 @@ static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type)
 static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
         uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
         uint64_t end_mem_space_addr);
-uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
         uint64_t channel_start_addr, uint64_t end_mem_space_addr);
 
 /************************************************************/
@@ -458,7 +458,7 @@ static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
     return addr;
 }
 
-uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
         uint64_t channel_start_addr, uint64_t end_mem_space_addr)
 {
     uint64_t addr = 0;
