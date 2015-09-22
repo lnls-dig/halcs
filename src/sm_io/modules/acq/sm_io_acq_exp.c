@@ -671,6 +671,15 @@ RW_PARAM_FUNC(acq, hw_data_trig_filt) {
             ACQ_HW_DATA_TRIG_FILT_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define ACQ_CORE_TRIG_DATA_THRES_R(val)             (val)
+#define ACQ_CORE_TRIG_DATA_THRES_W(val)             (val)
+#define ACQ_CORE_TRIG_DATA_THRES_MASK               ((1ULL<<32)-1)
+RW_PARAM_FUNC(acq, hw_data_trig_thres) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_THRES,
+            /* No field */, MULT_BIT_PARAM, /* No minimum check*/,
+            /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* */
 #define ACQ_CORE_TRIG_DLY_R(val)                    (val)
 #define ACQ_CORE_TRIG_DLY_W(val)                    (val)
@@ -701,6 +710,7 @@ const disp_table_func_fp acq_exp_fp [] = {
     RW_PARAM_FUNC_NAME(acq, hw_data_trig_pol),
     RW_PARAM_FUNC_NAME(acq, hw_data_trig_sel),
     RW_PARAM_FUNC_NAME(acq, hw_data_trig_filt),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_thres),
     RW_PARAM_FUNC_NAME(acq, hw_trig_dly),
     RW_PARAM_FUNC_NAME(acq, sw_trig),
     NULL

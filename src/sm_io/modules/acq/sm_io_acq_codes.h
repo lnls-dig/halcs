@@ -33,11 +33,13 @@ struct _smio_acq_data_block_t {
 #define ACQ_NAME_HW_DATA_TRIG_SEL       "acq_hw_data_trig_sel"
 #define ACQ_OPCODE_HW_DATA_TRIG_FILT    6
 #define ACQ_NAME_HW_DATA_TRIG_FILT      "acq_hw_data_filt"
-#define ACQ_OPCODE_HW_TRIG_DLY          7
+#define ACQ_OPCODE_HW_DATA_TRIG_THRES   7
+#define ACQ_NAME_HW_DATA_TRIG_THRES     "acq_hw_data_thres"
+#define ACQ_OPCODE_HW_TRIG_DLY          8
 #define ACQ_NAME_HW_TRIG_DLY            "acq_hw_trig_dly"
-#define ACQ_OPCODE_SW_TRIG              8
+#define ACQ_OPCODE_SW_TRIG              9
 #define ACQ_NAME_SW_TRIG                "acq_sw_trig"
-#define ACQ_OPCODE_END                  9
+#define ACQ_OPCODE_END                  10
 
 /* Messaging Reply OPCODES */
 #define ACQ_REPLY_TYPE                  uint32_t

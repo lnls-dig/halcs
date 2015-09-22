@@ -94,6 +94,18 @@ disp_op_t acq_hw_data_trig_filt_exp = {
     }
 };
 
+disp_op_t acq_hw_data_trig_thres_exp = {
+    .name = ACQ_NAME_HW_DATA_TRIG_THRES,
+    .opcode = ACQ_OPCODE_HW_DATA_TRIG_THRES,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t acq_hw_trig_dly_exp = {
     .name = ACQ_NAME_HW_TRIG_DLY,
     .opcode = ACQ_OPCODE_HW_TRIG_DLY,
@@ -127,6 +139,7 @@ const disp_op_t *acq_exp_ops [] = {
     &acq_hw_data_trig_pol_exp,
     &acq_hw_data_trig_sel_exp,
     &acq_hw_data_trig_filt_exp,
+    &acq_hw_data_trig_thres_exp,
     &acq_hw_trig_dly_exp,
     &acq_sw_trig_exp,
     NULL

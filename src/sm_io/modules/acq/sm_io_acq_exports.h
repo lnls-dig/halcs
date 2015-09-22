@@ -17,6 +17,7 @@ extern disp_op_t acq_cfg_trig_exp;
 extern disp_op_t acq_hw_data_trig_pol_exp;
 extern disp_op_t acq_hw_data_trig_sel_exp;
 extern disp_op_t acq_hw_data_trig_filt_exp;
+extern disp_op_t acq_hw_data_trig_thres_exp;
 extern disp_op_t acq_hw_trig_dly_exp;
 extern disp_op_t acq_sw_trig_exp;
 
