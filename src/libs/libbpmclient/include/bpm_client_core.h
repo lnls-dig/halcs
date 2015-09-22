@@ -491,6 +491,17 @@ bpm_client_err_e bpm_set_acq_data_trig_filt (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_acq_data_trig_filt (bpm_client_t *self, char *service,
         uint32_t *data_trig_filt);
 
+/* Configure data-driven signed threshold. data_trig_thres is signed integer
+ * number from -2^31 to 2^31-1, meaning the number to be compared on which the
+ * data-driven trigger will be detected. This is only valid for
+ * data-driven trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t data_trig_thres);
+bpm_client_err_e bpm_get_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t *data_trig_thres);
+
 /* Configure trigger delay. hw_trig_dly is an integer number from 0 to 2^32-1,
  * meaning the number of ADC clock cycles after which the detected trigger
  * will be used. This is only valid for external or data-driven trigger types.

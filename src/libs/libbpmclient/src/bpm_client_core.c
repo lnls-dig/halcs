@@ -982,6 +982,20 @@ bpm_client_err_e bpm_get_acq_data_trig_filt (bpm_client_t *self, char *service,
             data_trig_filt);
 }
 
+bpm_client_err_e bpm_set_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t data_trig_thres)
+{
+    return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_THRES,
+            data_trig_thres);
+}
+
+bpm_client_err_e bpm_get_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t *data_trig_thres)
+{
+    return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_THRES,
+            data_trig_thres);
+}
+
 bpm_client_err_e bpm_set_acq_hw_trig_dly (bpm_client_t *self, char *service,
         uint32_t hw_trig_dly)
 {
