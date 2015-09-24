@@ -128,6 +128,17 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         return -ACQ_NUM_SAMPLES_OOR;
     }
 
+    /* If skip trigger is set, we must set post_trigger_samples to 0 */
+    uint32_t trigger_type = 0;
+    err = _acq_get_trigger_type (self, &trigger_type);
+    ASSERT_TEST(err == -ACQ_OK, "Could not check for trigger type",
+            err_acq_get_trig);
+    if (trigger_type == TYPE_ACQ_CORE_SKIP && num_samples_post > 0) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+                "Incompatible trigger type. Post trigger samples is greater than 0\n");
+        return -ACQ_TRIG_TYPE;
+    }
+
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire:\n"
             "\tCurrent acq params for channel #%u: number of pre-trigger samples = %u\n"
             "\tnumber of post-trigger samples = %u, number of shots = %u\n",
@@ -205,6 +216,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     return -ACQ_OK;
 
+err_acq_get_trig:
 err_acq_not_completed:
 err_get_acq_handler:
     return err;
