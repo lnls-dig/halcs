@@ -1059,16 +1059,15 @@ static bpm_client_err_e _bpm_acq_check (bpm_client_t *self, char *service)
     const disp_op_t* func = bpm_func_translate(ACQ_NAME_CHECK_DATA_ACQUIRE);
     bpm_client_err_e err = bpm_func_exec(self, func, service, NULL, NULL);
 
-    /* Check if any error ocurred */
-    ASSERT_TEST(err == BPM_CLIENT_SUCCESS,
-            "bpm_check_data_acquire: Check fail: data acquire was not completed",
-            err_check_data_acquire, BPM_CLIENT_ERR_SERVER);
+    if (err != BPM_CLIENT_SUCCESS) {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] data acquisition "
+                "was not completed\n");
+    }
+    else {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] data acquisition "
+                "was completed\n");
+    }
 
-    /* If we are here, then the request was successfully acquired*/
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] bpm_acq_check: "
-            "Check ok: data acquire was successfully completed\n");
-
-err_check_data_acquire:
     return err;
 }
 
