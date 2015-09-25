@@ -241,13 +241,15 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
             err_get_acq_handler, -ACQ_ERR);
 
     err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE);
-    ASSERT_TEST(err == -ACQ_OK, "Acquisition has not completed yet",
-            err_acq_not_completed);
+    if (err != -ACQ_OK) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
+                "Acquisition is not done\n");
+    }
+    else {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
+                "Acquisition is done\n");
+    }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-            "Acquisition is done\n");
-
-err_acq_not_completed:
 err_get_acq_handler:
     return err;
 }
@@ -264,8 +266,6 @@ static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
             "Status done = 0x%08x\n", status_done);
 
     if ((status_done & status_mask) != status_value) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is not done\n");
         err = -ACQ_NOT_COMPLETED;
         goto err_not_completed;
     }
@@ -377,7 +377,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
         reply_size = BLOCK_SIZE;
     }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Reading block %u of channel %u with %u valid samples\n",
             block_n, chan, reply_size);
 
