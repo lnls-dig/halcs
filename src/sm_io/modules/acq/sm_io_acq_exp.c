@@ -713,6 +713,14 @@ RW_PARAM_FUNC(acq, sw_trig) {
             ACQ_SW_TRIG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define ACQ_FSM_STOP_MIN                            0
+#define ACQ_FSM_STOP_MAX                            1
+RW_PARAM_FUNC(acq, fsm_stop) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, CTL,
+            FSM_STOP_ACQ, SINGLE_BIT_PARAM, ACQ_FSM_STOP_MIN,
+            ACQ_FSM_STOP_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp acq_exp_fp [] = {
     _acq_data_acquire,
@@ -725,6 +733,7 @@ const disp_table_func_fp acq_exp_fp [] = {
     RW_PARAM_FUNC_NAME(acq, hw_data_trig_thres),
     RW_PARAM_FUNC_NAME(acq, hw_trig_dly),
     RW_PARAM_FUNC_NAME(acq, sw_trig),
+    RW_PARAM_FUNC_NAME(acq, fsm_stop),
     NULL
 };
 

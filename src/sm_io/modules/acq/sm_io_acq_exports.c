@@ -130,6 +130,18 @@ disp_op_t acq_sw_trig_exp = {
     }
 };
 
+disp_op_t acq_fsm_stop_exp = {
+    .name = ACQ_NAME_FSM_STOP,
+    .opcode = ACQ_OPCODE_FSM_STOP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *acq_exp_ops [] = {
     &acq_data_acquire_exp,
@@ -142,6 +154,7 @@ const disp_op_t *acq_exp_ops [] = {
     &acq_hw_data_trig_thres_exp,
     &acq_hw_trig_dly_exp,
     &acq_sw_trig_exp,
+    &acq_fsm_stop_exp,
     NULL
 };
 
