@@ -521,6 +521,15 @@ bpm_client_err_e bpm_set_acq_sw_trig (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
         uint32_t *sw_trig);
 
+/* Stops the acquisition FSM. Options are: 1 stop the FSM, 0
+ * generates nothing.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t fsm_stop);
+bpm_client_err_e bpm_get_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t *fsm_stop);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */

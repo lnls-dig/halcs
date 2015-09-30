@@ -1024,6 +1024,20 @@ bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
             sw_trig);
 }
 
+bpm_client_err_e bpm_set_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t fsm_stop)
+{
+    return param_client_write (self, service, ACQ_OPCODE_FSM_STOP,
+            fsm_stop);
+}
+
+bpm_client_err_e bpm_get_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t *fsm_stop)
+{
+    return param_client_read (self, service, ACQ_OPCODE_FSM_STOP,
+            fsm_stop);
+}
+
 static bpm_client_err_e _bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req)
 {
     assert (self);
