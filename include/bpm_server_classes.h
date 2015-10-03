@@ -22,6 +22,7 @@
 #include "hutils.h"
 #include "hal_stddef.h"
 #include "hutils_math.h"
+#include "varg_macros.h"
 
 /* General dependencies */
 #include "board.h"
