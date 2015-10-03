@@ -67,7 +67,7 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC TRIG DIR function",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_ad9510_cfg_defaults (config_client, service);
+    client_err = bpm_ad9510_cfg_defaults (config_client, service, 0);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS ||
             client_err == BPM_CLIENT_ERR_AGAIN, "Could not configure AD9510",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
