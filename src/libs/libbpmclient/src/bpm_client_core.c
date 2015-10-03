@@ -44,13 +44,13 @@
 struct _bpm_client_t {
     zuuid_t * uuid;                             /* Client UUID */
     mlm_client_t *mlm_client;                   /* Malamute client instance */
-    uint32_t timeout;                           /* Timeout in msec for send/recv */
+    int timeout;                                /* Timeout in msec for send/recv */
     zpoller_t *poller;                          /* Poller for receiving messages */
     const acq_chan_t *acq_chan;                 /* Acquisition buffer table */
 };
 
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode, uint32_t timeout);
+        const char *log_file_name, const char *log_mode, int timeout);
 static bpm_client_err_e _func_polling (bpm_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output, int timeout);
 
@@ -108,14 +108,14 @@ bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
 }
 
 bpm_client_t *bpm_client_new_log_mode_time (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode, uint32_t timeout)
+        const char *log_file_name, const char *log_mode, int timeout)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
             log_mode, timeout);
 }
 
 bpm_client_t *bpm_client_new_time (char *broker_endp, int verbose,
-        const char *log_file_name, uint32_t timeout)
+        const char *log_file_name, int timeout)
 {
     return _bpm_client_new (broker_endp, verbose, log_file_name,
             BPMCLIENT_DFLT_LOG_MODE, timeout);
@@ -144,7 +144,7 @@ zpoller_t *bpm_client_get_poller (bpm_client_t *self)
     return self->poller;
 }
 
-bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, uint32_t timeout)
+bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, int timeout)
 {
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
     self->timeout = timeout;
@@ -158,7 +158,7 @@ uint32_t bpm_client_get_timeout (bpm_client_t *self)
 
 /**************** Static LIB Client Functions ****************/
 static bpm_client_t *_bpm_client_new (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode, uint32_t timeout)
+        const char *log_file_name, const char *log_mode, int timeout)
 {
     (void) verbose;
 
