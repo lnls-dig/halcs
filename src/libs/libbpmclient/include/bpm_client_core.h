@@ -85,12 +85,24 @@ uint32_t bpm_client_get_timeout (bpm_client_t *self);
  * purposes.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
+bpm_client_err_e bpm_set_fmc_leds (bpm_client_t *self, char *service,
+        uint32_t fmc_leds);
+bpm_client_err_e bpm_get_fmc_leds (bpm_client_t *self, char *service,
+        uint32_t *fmc_leds);
+
+/* Macros for compatibility */
+#define bpm_blink_leds bpm_set_fmc_leds
 
 /* Simple AD9510 Config test.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service);
+bpm_client_err_e bpm_set_ad9510_defaults (bpm_client_t *self, char *service,
+        uint32_t ad9510_defaults);
+bpm_client_err_e bpm_get_ad9510_defaults (bpm_client_t *self, char *service,
+        uint32_t *ad9510_defaults);
+
+/* Macros for compatibility */
+#define bpm_ad9510_cfg_defaults bpm_set_ad9510_defaults
 
 /* FMC PLL FUNCTION pin. Sets or clears the FMC PLL FUNCTION pin. This pin
  * has a general purpose based on the 0x59 SPI AD9510 register.

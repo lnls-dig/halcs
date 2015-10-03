@@ -350,22 +350,17 @@ mlm_client_t *bpm_get_mlm_client (bpm_client_t *self)
 }
 
 /**************** FMC130M SMIO Functions ****************/
-bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds)
+
+PARAM_FUNC_CLIENT_WRITE(fmc_leds)
 {
-    assert (self);
-    assert (service);
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_LEDS,
+            fmc_leds);
+}
 
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_LEDS;
-
-    zmsg_t *request = zmsg_new ();
-    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
-    zmsg_addmem (request, &operation, sizeof (operation));
-    zmsg_addmem (request, &leds, sizeof (leds));
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
-
-err_send_msg_alloc:
-    return err;
+PARAM_FUNC_CLIENT_READ(fmc_leds)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_LEDS,
+            fmc_leds);
 }
 
 /* FUNCTION pin functions */
@@ -407,21 +402,16 @@ PARAM_FUNC_CLIENT_READ(fmc_clk_sel)
             fmc_clk_sel);
 }
 
-bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service)
+PARAM_FUNC_CLIENT_WRITE(ad9510_defaults)
 {
-    assert (self);
-    assert (service);
+    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+            ad9510_defaults);
+}
 
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    FMC130M_4CH_REPLY_TYPE operation = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS;
-
-    zmsg_t *request = zmsg_new ();
-    ASSERT_ALLOC(request, err_send_msg_alloc, BPM_CLIENT_ERR_ALLOC);
-    zmsg_addmem (request, &operation, sizeof (operation));
-    mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &request);
-
-err_send_msg_alloc:
-    return err;
+PARAM_FUNC_CLIENT_READ(ad9510_defaults)
+{
+    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+            ad9510_defaults);
 }
 
 /* ADC LTC2208 RAND */
