@@ -320,8 +320,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             channel_max_samples,
             channel_sample_size);
 
-    uint32_t block_n_max = (channel_max_samples +
-            channel_sample_size) / BLOCK_SIZE;
+    uint32_t block_n_max = (channel_max_samples*channel_sample_size) /
+        BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
