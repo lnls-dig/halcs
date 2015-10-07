@@ -180,28 +180,6 @@ int main (int argc, char *argv[])
         goto err_cfg_exit;
     }
 
-    /* Check for field not found */
-    if (dmngr_daemonize_str== NULL) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not find "
-                "daemonize in configuration file\n");
-        goto err_cfg_exit;
-    }
-    else {
-        if (streq (dmngr_daemonize_str, "yes")) {
-            dmngr_daemonize = 1;
-        }
-        else if (streq (dmngr_daemonize_str, "no")) {
-            dmngr_daemonize = 0;
-        }
-        else {
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Invalid option "
-                    "for daemonize configuration variable\n");
-            goto err_cfg_exit;
-        }
-    }
-
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
-            "[dev_mngr] Daemonize set to \"%d\"\n", dmngr_daemonize);
 
     /**************************************************************************/
     /********************** END of configuration variables ********************/
