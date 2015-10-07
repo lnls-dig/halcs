@@ -171,6 +171,32 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
             "[dev_mngr] Daemonize set to \"%d\"\n", dmngr_daemonize);
 
+    /* Read spawn broker parameter */
+    dmngr_spawn_broker_cfg_str = zconfig_resolve (root_cfg, "/dev_mngr/spawn_broker", NULL);
+
+    /* Check for field not found */
+    if (dmngr_spawn_broker_cfg_str== NULL) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not find "
+                "spawn_broker in configuration file\n");
+        goto err_cfg_exit;
+    }
+    else {
+        if (streq (dmngr_spawn_broker_cfg_str, "yes")) {
+            dmngr_spawn_broker_cfg = 1;
+        }
+        else if (streq (dmngr_spawn_broker_cfg_str, "no")) {
+            dmngr_spawn_broker_cfg = 0;
+        }
+        else {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Invalid option "
+                    "for spawn_broker configuration variable\n");
+            goto err_cfg_exit;
+        }
+    }
+
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+            "[dev_mngr] spawn_broker set to \"%d\"\n", dmngr_spawn_broker_cfg);
+
     /* Read DEVIO suggested bind endpoints and fill the hash table with
      * the corresponding keys */
     hutils_err_e herr = hutils_get_hints (root_cfg, dmngr_hints);
@@ -179,7 +205,6 @@ int main (int argc, char *argv[])
                 "from configuration file\n");
         goto err_cfg_exit;
     }
-
 
     /**************************************************************************/
     /********************** END of configuration variables ********************/
@@ -248,10 +273,12 @@ int main (int argc, char *argv[])
         /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] ., PID: %d\n", getpid()); */
 
         /* Spawn the broker if not running */
-        err = dmngr_spawn_broker (dmngr, dmngr_broker_endp);
-        if (err != DMNGR_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not spwan broker!\n");
-            goto err_spawn_broker;
+        if (dmngr_spawn_broker_cfg == 1) {
+            err = dmngr_spawn_broker (dmngr, dmngr_broker_endp);
+            if (err != DMNGR_SUCCESS) {
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not spwan broker!\n");
+                goto err_spawn_broker;
+            }
         }
 
         /* Search for new devices */

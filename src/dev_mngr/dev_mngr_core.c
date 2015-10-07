@@ -92,6 +92,8 @@ char *dmngr_verbose_str = NULL;
 int dmngr_verbose = 0;
 char *dmngr_daemonize_str = NULL;
 int dmngr_daemonize = 0;
+char *dmngr_spawn_broker_cfg_str = NULL;
+int dmngr_spawn_broker_cfg = 0;
 
 static void _devio_hash_free_item (void *data);
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);

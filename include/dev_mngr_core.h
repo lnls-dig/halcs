@@ -20,6 +20,8 @@ extern char *dmngr_verbose_str;
 extern int dmngr_verbose;
 extern char *dmngr_daemonize_str;
 extern int dmngr_daemonize;
+extern char *dmngr_spawn_broker_cfg_str;
+extern int dmngr_spawn_broker_cfg;
 
 /* Signal handler function pointer */
 typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
