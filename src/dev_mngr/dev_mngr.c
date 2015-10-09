@@ -36,21 +36,10 @@
 
 #define DFLT_LOG_DIR                "stdout"
 
-#ifdef __CFG_DIR__
-#define CFG_DIR                     STRINGIFY(__CFG_DIR__)
-#else
-#error "Config directory not defined!"
-#endif
-
-#ifdef __CFG_FILENAME__
-#define CFG_FILENAME                STRINGIFY(__CFG_FILENAME__)
-#else
-#error "Config filename not defined!"
-#endif
-
 void print_help (char *program_name)
 {
     printf( "Usage: %s [options]\n"
+            "\t-f Configuration file\n"
             "\t-h This help message\n"
             "\n\t Most of the options resides at the bpm_sw configuration file,\n"
             "typically located in /etc/bpm_sw", program_name);
@@ -58,15 +47,33 @@ void print_help (char *program_name)
 
 int main (int argc, char *argv[])
 {
+    char *cfg_file = NULL;
+    char **str_p = NULL;
+    int i;
+
+    if (argc < 2) {
+        print_help (argv[0]);
+        exit (1);
+    }
+
     /* Simple handling of command-line options. This should be done
      * with getopt, for instance*/
-    int i;
     for (i = 1; i < argc; i++)
     {
-        if (streq(argv[i], "-h"))
-        {
+        if (streq (argv[i], "-f")) {
+            str_p = &cfg_file;
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set cfg_file parameter\n");
+        }
+        else if (streq(argv[i], "-h")) {
             print_help (argv [0]);
             exit (1);
+        }
+        /* Fallout for options with parameters */
+        else {
+            if (str_p) {
+                *str_p = strdup (argv[i]);
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Parameter set to \"%s\"\n", *str_p);
+            }
         }
     }
 
@@ -82,7 +89,7 @@ int main (int argc, char *argv[])
     /**************************************************************************/
 
     /* Check for field not found */
-    zconfig_t *root_cfg = zconfig_load (CFG_DIR "/" CFG_FILENAME);
+    zconfig_t *root_cfg = zconfig_load (cfg_file);
     if (root_cfg == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not load "
                 "configuration file\n");
@@ -245,6 +252,12 @@ int main (int argc, char *argv[])
         goto err_dmngr_alloc;
     }
 
+    dmngr_err_e err = dmngr_set_cfg_file (dmngr, cfg_file);
+    if (err != DMNGR_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Fail set configuration file\n");
+        goto err_dmngr_set_cfg_file;
+    }
+
 #if 0
     dmngr_sig_handler_t dmngr_sigkill_handler =
     {   .signal = SIGKILL,
@@ -269,7 +282,7 @@ int main (int argc, char *argv[])
     dmngr_set_wait_clhd_handler (dmngr, &hutils_wait_chld);
     dmngr_set_spawn_clhd_handler (dmngr, &hutils_spawn_chld);
 
-    dmngr_err_e err = dmngr_register_sig_handlers (dmngr);
+    err = dmngr_register_sig_handlers (dmngr);
     if (err != DMNGR_SUCCESS) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] dmngr_register_sig_handler error!\n");
         goto err_sig_handlers;
@@ -334,6 +347,7 @@ err_scan_devs:
 err_spawn_broker:
 err_sig_handlers:
     dmngr_destroy (&dmngr);
+err_dmngr_set_cfg_file:
 err_dmngr_alloc:
 err_daemonize:
     zconfig_destroy (&root_cfg);

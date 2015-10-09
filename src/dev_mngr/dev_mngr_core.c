@@ -71,6 +71,7 @@ struct _dmngr_t {
     zsock_t *dealer;            /* zeroMQ Dealer socket */
     char *name;                 /* Identification of this dmngr instance */
     char *endpoint;             /* Endpoint to connect to */
+    char *cfg_file;             /* Configuration file location */
     int verbose;                /* Print activity to stdout */
 
     /* General management operations */
@@ -302,6 +303,40 @@ dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops)
     self->ops = dmngr_ops;
 
     return DMNGR_SUCCESS;
+}
+
+dmngr_err_e dmngr_set_cfg_file (dmngr_t *self, char *cfg_file)
+{
+    assert (self);
+    assert (cfg_file);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Free previously allocated file */
+    if (self->cfg_file != NULL) {
+        free (self->cfg_file);
+        self->cfg_file = NULL;
+    }
+
+    self->cfg_file = strdup (cfg_file);
+    ASSERT_ALLOC(self->cfg_file, err_set_cfg_file);
+
+err_set_cfg_file:
+    return err;
+}
+
+const char * dmngr_get_cfg_file (dmngr_t *self)
+{
+    assert (self);
+    return self->cfg_file;
+}
+
+char * dmngr_clone_cfg_file (dmngr_t *self)
+{
+    assert (self);
+
+    char *cfg_file_cpy = strdup (self->cfg_file);
+    return cfg_file_cpy;
 }
 
 static bool _dmngr_is_broker_running (dmngr_t *self)
