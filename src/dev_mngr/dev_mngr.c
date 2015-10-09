@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
     char **str_p = NULL;
     int i;
 
-    if (argc < 2) {
+    if (argc < 3) {
         print_help (argv[0]);
         exit (1);
     }
@@ -354,7 +354,8 @@ err_daemonize:
 err_cfg_exit:
     zhash_destroy (&dmngr_hints);
 err_dmngr_hints_alloc:
-
+    str_p = &cfg_file;
+    free (*str_p);
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Exiting ...\n");
 
     return 0;
