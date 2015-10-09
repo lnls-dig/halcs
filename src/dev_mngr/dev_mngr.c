@@ -171,6 +171,21 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
             "[dev_mngr] Daemonize set to \"%d\"\n", dmngr_daemonize);
 
+    /* Read the work directory for daemon only */
+    if (dmngr_daemonize == 1) {
+        dmngr_work_dir = zconfig_resolve (root_cfg, "/dev_mngr/workdir", NULL);
+
+        /* Set default logfile. We accept NULL as stdout */
+        if (dmngr_work_dir == NULL) {
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL,
+                    "[dev_mngr] Could not find workdir in configuration "
+                    "file\n");
+            goto err_cfg_exit;
+        }
+
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
+                "[dev_mngr] Work directory set to \"%s\"\n", dmngr_work_dir);
+    }
     /* Read spawn broker parameter */
     dmngr_spawn_broker_cfg_str = zconfig_resolve (root_cfg, "/dev_mngr/spawn_broker", NULL);
 

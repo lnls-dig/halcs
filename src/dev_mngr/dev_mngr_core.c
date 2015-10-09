@@ -92,6 +92,7 @@ char *dmngr_verbose_str = NULL;
 int dmngr_verbose = 0;
 char *dmngr_daemonize_str = NULL;
 int dmngr_daemonize = 0;
+char *dmngr_work_dir = NULL;
 char *dmngr_spawn_broker_cfg_str = NULL;
 int dmngr_spawn_broker_cfg = 0;
 
