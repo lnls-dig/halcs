@@ -31,18 +31,6 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io]",                          \
             devio_err_str (err_type))
 
-#ifdef __CFG_DIR__
-#define CFG_DIR                     STRINGIFY(__CFG_DIR__)
-#else
-#error "Config directory not defined!"
-#endif
-
-#ifdef __CFG_FILENAME__
-#define CFG_FILENAME                STRINGIFY(__CFG_FILENAME__)
-#else
-#error "Config filename not defined!"
-#endif
-
 #define LOG_FILENAME_LEN            50
 /* This composes the log filename as "dev_io%u_fe%u.log" or
  * "dev_io%u_be%u.log" */
@@ -85,6 +73,7 @@ void print_help (char *program_name)
             "Usage: %s [options]\n"
             "Version %s\n, Build by: %s, %s\n"
             "\t-h This help message\n"
+            "\t-f Configuration file\n"
             "\t-d Daemon mode.\n"
             "\t-v Verbose output\n"
             "\t-n <devio_type = [be|fe]> Devio type\n"
@@ -109,6 +98,7 @@ int main (int argc, char *argv[])
     char *fe_smio_id_str = NULL;
     char *broker_endp = NULL;
     char *log_prefix = NULL;
+    char *cfg_file = NULL;
     char **str_p = NULL;
     int i;
 
@@ -157,6 +147,10 @@ int main (int argc, char *argv[])
         else if (streq (argv[i], "-l")) {
             str_p = &log_prefix;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set log filename\n");
+        }
+        else if (streq (argv[i], "-f")) {
+            str_p = &cfg_file;
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set cfg_file parameter\n");
         }
         else if (streq (argv[i], "-h")) {
             print_help (argv[0]);
@@ -359,7 +353,7 @@ int main (int argc, char *argv[])
     /**************************************************************************/
 
     /* Check for field not found */
-    zconfig_t *root_cfg = zconfig_load (CFG_DIR "/" CFG_FILENAME);
+    zconfig_t *root_cfg = zconfig_load (cfg_file);
     if (root_cfg == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not load "
                 "configuration file\n");
@@ -443,6 +437,8 @@ err_exit:
     str_p = &dev_type;
     free (*str_p);
     str_p = &devio_type_str;
+    free (*str_p);
+    str_p = &cfg_file;
     free (*str_p);
     return 0;
 }
