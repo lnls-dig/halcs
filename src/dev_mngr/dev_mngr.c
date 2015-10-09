@@ -186,6 +186,7 @@ int main (int argc, char *argv[])
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
                 "[dev_mngr] Work directory set to \"%s\"\n", dmngr_work_dir);
     }
+
     /* Read spawn broker parameter */
     dmngr_spawn_broker_cfg_str = zconfig_resolve (root_cfg, "/dev_mngr/spawn_broker", NULL);
 
@@ -227,10 +228,10 @@ int main (int argc, char *argv[])
 
     /* Daemonize dev_mngr */
     if (dmngr_daemonize != 0) {
-        int rc = daemon(0, 0);
+        int rc = zsys_daemonize (dmngr_work_dir);
 
         if (rc != 0) {
-            perror ("[dev_mngr] daemon");
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Fail to daemonize\n");
             goto err_daemonize;
         }
     }
