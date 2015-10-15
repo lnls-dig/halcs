@@ -25,16 +25,16 @@
 #define HUTILS_CFG_BPM_TYPE                 "%s"
 #define HUTILS_CFG_BPM_PATTERN              "bpm%u"
 #define HUTILS_CFG_DEVIO_MODEL_TYPE         "%s"
-#define HUTILS_CFG_AFE                      "afe"
-#define HUTILS_CFG_DBE                      "dbe"
 
-//#define HUTILS_CFG_HASH_KEY_PATTERN  "%s/%s/%s"
 #define HUTILS_CFG_HASH_KEY_PATTERN         HUTILS_CFG_BOARD_TYPE \
-                                            "/" HUTILS_CFG_BPM_TYPE "/" \
-                                            HUTILS_CFG_DEVIO_MODEL_TYPE
+                                            "/" HUTILS_CFG_BPM_TYPE
 #define HUTILS_CFG_HASH_KEY_PATTERN_COMPL   HUTILS_CFG_BOARD_PATTERN \
-                                            "/" HUTILS_CFG_BPM_PATTERN "/" \
-                                            HUTILS_CFG_DEVIO_MODEL_TYPE
+                                            "/" HUTILS_CFG_BPM_PATTERN
+
+typedef struct {
+    char *bind;                 /* AFE Endpoint address to bind to */
+    bool spawn_epics_ioc;       /* DBE IOC spawn selection */
+} hutils_hints_t;
 
 /************************ Our methods *****************************/
 
