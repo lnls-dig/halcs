@@ -542,8 +542,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 
         /* This follows the hierarchy found in the config file */
         int errs = snprintf (key, sizeof (key), HUTILS_CFG_HASH_KEY_PATTERN_COMPL,
-                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0,
-                HUTILS_CFG_DBE);
+                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0);
 
         /* Only when the number of characters written is less than the whole buffer,
          * it is guaranteed that the string was written successfully */
