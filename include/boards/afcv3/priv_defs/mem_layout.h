@@ -4,6 +4,10 @@
 #include "hw/pcie_regs.h"
 #include "acq_chan_afcv3.h"
 
+#define NUM_MAX_SLOTS                               12
+#define NUM_MAX_BPM_PER_SLOT                        2
+#define NUM_MAX_BPMS                                (NUM_MAX_SLOTS * NUM_MAX_BPM_PER_SLOT)
+
 #define NUM_FMC130M_4CH_SMIOS                       2
 
 /*********************** Static AFCv3 FPGA layout ***********************/
