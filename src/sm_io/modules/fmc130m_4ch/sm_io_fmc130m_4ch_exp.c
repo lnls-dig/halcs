@@ -53,25 +53,24 @@
         }                                                       \
     })
 
+static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self,
+        uint32_t *param);
+
 /************************************************************/
 /************ Specific FMC_130M_4CH Operations **************/
 /************************************************************/
-static int _fmc130m_4ch_leds (void *owner, void *args, void *ret)
-{
-    (void) ret;
-    assert (owner);
-    assert (args);
 
-    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
-    uint32_t leds = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+#define BPM_FMC130M_4CH_LEDS_MIN                0       /* LED 0 = 0, LED 1 = 0, LED 3 = 0*/
+#define BPM_FMC130M_4CH_LEDS_MAX                7       /* LED 0 = 1, LED 1 = 1, LED 2 = 1*/
+#define WB_FMC_130M_4CH_CSR_MONITOR_GLOBAL_MASK    WBGEN2_GEN_MASK(1, 3)
+#define WB_FMC_130M_4CH_CSR_MONITOR_GLOBAL_W(val)  WBGEN2_GEN_WRITE(val, 1, 3)
+#define WB_FMC_130M_4CH_CSR_MONITOR_GLOBAL_R(reg)  WBGEN2_GEN_READ(reg, 1, 3)
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling _fmc130m_4ch_leds\n");
-    smio_thsafe_client_write_32 (self, FMC_130M_CTRL_REGS_OFFS |
-            WB_FMC_130M_4CH_CSR_REG_MONITOR , &leds);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Led write: 0x%08x\n",
-            leds);
-
-    return -FMC130M_4CH_OK;
+RW_PARAM_FUNC(fmc130m_4ch, leds) {
+    SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
+            MONITOR, GLOBAL, MULT_BIT_PARAM,
+            BPM_FMC130M_4CH_LEDS_MIN, BPM_FMC130M_4CH_LEDS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_FMC130M_4CH_SI571_OE_MIN            0 /* SI571 Output disable */
@@ -83,7 +82,6 @@ RW_PARAM_FUNC(fmc130m_4ch, si571_oe) {
             BPM_FMC130M_4CH_SI571_OE_MIN, BPM_FMC130M_4CH_SI571_OE_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
-
 
 #define BPM_FMC130M_4CH_PLL_FUNC_MIN            0 /* PLL FUNCTION pin 0 */
 #define BPM_FMC130M_4CH_PLL_FUNC_MAX            1 /* PLL FUNCTION pin 1 */
@@ -443,8 +441,8 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_dir) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_TRIG_TERM_MIN           0 /* Trigger direction input */
-#define BPM_FMC130M_4CH_TRIG_TERM_MAX           1 /* Trigger direction output */
+#define BPM_FMC130M_4CH_TRIG_TERM_MIN           0 /* Trigger termination disabled */
+#define BPM_FMC130M_4CH_TRIG_TERM_MAX           1 /* Trigger termination enabled */
 
 RW_PARAM_FUNC(fmc130m_4ch, trig_term) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -453,8 +451,8 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_term) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_TRIG_VAL_MIN            0 /* Trigger direction input */
-#define BPM_FMC130M_4CH_TRIG_VAL_MAX            1 /* Trigger direction output */
+#define BPM_FMC130M_4CH_TRIG_VAL_MIN            0 /* Trigger value 0 */
+#define BPM_FMC130M_4CH_TRIG_VAL_MAX            1 /* Trigger value 1 */
 
 RW_PARAM_FUNC(fmc130m_4ch, trig_val) {
     SET_GET_PARAM(fmc130m_4ch, FMC_130M_CTRL_REGS_OFFS, WB_FMC_130M_4CH_CSR,
@@ -464,33 +462,6 @@ RW_PARAM_FUNC(fmc130m_4ch, trig_val) {
 }
 
 /******************************** Chips Export functions *************************/
-
-static int _fmc130m_4ch_ad9510_cfg_defaults (void *owner, void *args, void *ret)
-{
-    (void) ret;
-    assert (owner);
-    assert (args);
-
-    int err = -FMC130M_4CH_OK;
-    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
-    smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);
-    ASSERT_TEST(fmc130m != NULL, "Could not get SMIO FMC130M handler",
-            err_get_fmc130m_handler, -FMC130M_4CH_ERR);
-    smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(fmc130m);
-
-    FMC130M_4CH_CHECK_ACTIVE(self);
-
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch] Calling "
-            "_fmc130m_4ch_ad9510_cfg_defaults\n");
-    smch_err_e serr = smch_ad9510_cfg_defaults (smch_ad9510);
-    ASSERT_TEST(serr == SMCH_SUCCESS, "Could not config AD9510 defaults",
-            err_smpr_write, -FMC130M_4CH_ERR);
-
-err_smpr_write:
-err_get_fmc130m_handler:
-    return err;
-}
-
 
 /* Macros to avoid repetition of the function body AD9510 */
 typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param);
@@ -504,7 +475,6 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
 #define FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, read_func, write_func,   \
             error_msg)                                                          \
     do {                                                                        \
-        (void) ret;                                                             \
         assert (owner);                                                         \
         assert (args);                                                          \
                                                                                 \
@@ -523,35 +493,64 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
         FMC130M_4CH_CHECK_ACTIVE(self);                                         \
                                                                                 \
         smch_err_e serr = SMCH_SUCCESS;                                         \
-        uint32_t value = 0;                                                     \
         /* Call specific function */                                            \
         if (rw) {                                                               \
-            serr = ((smch_ad9510_func_fp) read_func) (smch_ad9510,              \
-                    &value);                                                    \
-            if (serr != SMCH_SUCCESS) {                                         \
-                err = -FMC130M_4CH_ERR;                                         \
-            }                                                                   \
-            else {                                                              \
-                *((uint32_t *) ret) = value;                                    \
-                err = sizeof (value);                                           \
+            WHEN(ISEMPTY(read_func))(                                           \
+                (void) ret;                                                     \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
-                        "AD9510 function read value = 0x%08X\n", value);        \
-            }                                                                   \
+                        "AD9510 read function not implemented\n");              \
+                err = -FMC130M_4CH_UNINPL;                                      \
+                return err;                                                     \
+            )                                                                   \
+            WHENNOT(ISEMPTY(read_func))(                                        \
+                uint32_t value = 0;                                             \
+                serr = ((smch_ad9510_func_fp) read_func) (smch_ad9510,          \
+                        &value);                                                \
+                if (serr != SMCH_SUCCESS) {                                     \
+                    err = -FMC130M_4CH_ERR;                                     \
+                }                                                               \
+                else {                                                          \
+                    *((uint32_t *) ret) = value;                                \
+                    err = sizeof (value);                                       \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
+                            "AD9510 function read value = 0x%08X\n", value);    \
+                }                                                               \
+            )                                                                   \
         }                                                                       \
         else {                                                                  \
-            serr = ((smch_ad9510_func_fp) write_func) (smch_ad9510,             \
-                    &param);                                                    \
-            if (serr != SMCH_SUCCESS) {                                         \
-                err = -FMC130M_4CH_ERR;                                         \
-            }                                                                   \
-            else {                                                              \
-                err = -FMC130M_4CH_OK;                                          \
-            }                                                                   \
+            WHEN(ISEMPTY(write_func))(                                          \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
+                        "AD9510 write function not implemented\n");             \
+                err = -FMC130M_4CH_UNINPL;                                      \
+                return err;                                                     \
+            )                                                                   \
+            WHENNOT(ISEMPTY(write_func))(                                       \
+                serr = ((smch_ad9510_func_fp) write_func) (smch_ad9510,         \
+                        &param);                                                \
+                if (serr != SMCH_SUCCESS) {                                     \
+                    err = -FMC130M_4CH_ERR;                                     \
+                }                                                               \
+                else {                                                          \
+                    err = -FMC130M_4CH_OK;                                      \
+                }                                                               \
+            )                                                                   \
         }                                                                       \
                                                                                 \
 err_get_fmc130m_handler:                                                        \
         return err;                                                             \
     } while(0)
+
+static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self, uint32_t *param)
+{
+    (void) param;
+    return smch_ad9510_cfg_defaults (self);
+}
+
+FMC130M_4CH_AD9510_FUNC_NAME_HEADER(cfg_defaults)
+{
+    FMC130M_4CH_AD9510_FUNC_BODY(owner, args, ret, /* No read function */,
+            smch_ad9510_cfg_defaults_compat, "Could not set/get AD9510 defaults");
+}
 
 FMC130M_4CH_AD9510_FUNC_NAME_HEADER(pll_a_div)
 {
@@ -660,7 +659,7 @@ FMC130M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
 
 /* Exported function pointers */
 const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
-    _fmc130m_4ch_leds,
+    RW_PARAM_FUNC_NAME(fmc130m_4ch, leds),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, si571_oe),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_func),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, pll_status),
@@ -693,7 +692,7 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_dir),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_term),
     RW_PARAM_FUNC_NAME(fmc130m_4ch, trig_val),
-    _fmc130m_4ch_ad9510_cfg_defaults,
+    FMC130M_4CH_AD9510_FUNC_NAME(cfg_defaults),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_a_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_b_div),
     FMC130M_4CH_AD9510_FUNC_NAME(pll_prescaler),

@@ -22,9 +22,11 @@
 #include "hutils.h"
 #include "hal_stddef.h"
 #include "hutils_math.h"
+#include "varg_macros.h"
 
 /* General dependencies */
 #include "board.h"
+#include "epics_mapping.h"
 #include "revision.h"
 #include "acq_chan_gen_defs.h"
 

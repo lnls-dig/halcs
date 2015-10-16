@@ -20,6 +20,9 @@ extern char *dmngr_verbose_str;
 extern int dmngr_verbose;
 extern char *dmngr_daemonize_str;
 extern int dmngr_daemonize;
+extern char *dmngr_work_dir;
+extern char *dmngr_spawn_broker_cfg_str;
+extern int dmngr_spawn_broker_cfg;
 
 /* Signal handler function pointer */
 typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
@@ -68,6 +71,12 @@ dmngr_err_e dmngr_spawn_chld (dmngr_t *self, const char *program, char *const ar
 
 /* Setting all operations at once */
 dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops);
+/* Set configuration filename */
+dmngr_err_e dmngr_set_cfg_file (dmngr_t *self, char *cfg_file);
+/* Get const reference to configuration filename */
+const char * dmngr_get_cfg_file (dmngr_t *self);
+/* Clone configuration filename */
+char * dmngr_clone_cfg_file (dmngr_t *self);
 /* Is broker Running? */
 bool dmngr_is_broker_running (dmngr_t *self);
 /* Spawn broker if not running */

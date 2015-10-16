@@ -203,11 +203,21 @@ int main (int argc, char *argv [])
         goto err_bpm_client_new;
     }
 
+    /* Set trigger to skip */
+    uint32_t acq_trig = 0;
+    bpm_client_err_e err = bpm_set_acq_trig (bpm_client, service, acq_trig);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: bpm_acq_set_trig failed\n");
+        goto err_bpm_set_acq_trig;
+    }
+
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
     bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
-                                        .num_samples = num_samples,
+                                        .num_samples_pre = num_samples,
+                                        .num_samples_post = 0,
+                                        .num_shots = 1,
                                         .chan = chan,
                                       },
                              .block = {
@@ -215,7 +225,7 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    bpm_client_err_e err = bpm_get_curve (bpm_client, service, &acq_trans,
+    err = bpm_get_curve (bpm_client, service, &acq_trans,
             50000, new_acq);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
@@ -227,6 +237,7 @@ int main (int argc, char *argv [])
     print_data (chan, data, acq_trans.block.bytes_read);
 
 err_bpm_client_new:
+err_bpm_set_acq_trig:
 err_bpm_get_curve:
     str_p = &chan_str;
     free (*str_p);

@@ -184,6 +184,7 @@ include $(SRC_DIR)/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
+include $(SRC_DIR)/boards/$(BOARD)/board.mk
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
@@ -216,10 +217,10 @@ dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
                  $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
 
 dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-               $(sm_io_OBJS) $(msg_OBJS)
+               $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
 dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-                   $(sm_io_OBJS) $(msg_OBJS)
+                   $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
 # Specific libraries for OUT targets
 dev_mngr_LIBS =

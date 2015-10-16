@@ -39,6 +39,7 @@
 
 static char *_hutils_concat_strings_raw (const char *str1, const char* str2,
         const char *str3, bool with_sep, char sep);
+static void _hutils_hints_free_item (void *data);
 
 /*******************************************************************/
 /*****************  String manipulation functions ******************/
@@ -73,13 +74,25 @@ char *hutils_stringify_key (uint32_t key, uint32_t base)
     char *key_c = zmalloc (key_len * sizeof (char));
     ASSERT_ALLOC (key_c, err_key_c_alloc);
 
-    snprintf(key_c, key_len, "%x", key);
-    /* DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[hutils:stringify_key] key = %s, key_len = %u\n",
-            key_c, key_len); */
+    switch (base) {
+        case 10:
+            snprintf(key_c, key_len, "%u", key);
+        break;
+
+        case 16:
+            snprintf(key_c, key_len, "%x", key);
+        break;
+
+        default:
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_ERR,
+                    "[hutils:stringify_key] invalid base = %u\n",
+                    base);
+            goto err_inv_base;
+    }
 
     return key_c;
 
+err_inv_base:
 err_key_c_alloc:
     return NULL;
 }
@@ -276,7 +289,7 @@ int hutils_copy_str (char *dest, const char *src, size_t size)
     assert (src);
 
     int errs = snprintf (dest, size, "%s", src);
-    
+
     ASSERT_TEST (errs >= 0,
             "[hutils:utils] Could not clone string. Enconding error?\n",
             err_copy_str);
@@ -296,6 +309,13 @@ err_copy_str:
 /********************* ZCONFIG read functions  *********************/
 /*******************************************************************/
 
+/* Hash free function */
+static void _hutils_hints_free_item (void *data)
+{
+    hutils_hints_t *item = data;
+    free (item->bind);
+}
+
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
  * and store them in hash table in the form <property name / property value> */
 hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
@@ -304,6 +324,7 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
     assert (hints_h);
 
     hutils_err_e err = HUTILS_SUCCESS;
+    hutils_hints_t *item = NULL;
 
     /* Read DEVIO suggested bind endpoints and fill the hash table with
      * the corresponding keys */
@@ -335,13 +356,41 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE, "Config file: "
                     "bpm_cfg name: %s\n", zconfig_name (bpm_cfg));
 
+            /* Create hash item */
+            item = (hutils_hints_t *) zmalloc (sizeof *item);
+            ASSERT_ALLOC(item, err_hash_item_alloc, HUTILS_ERR_ALLOC);
+
             /* Now, we expect to find the bind address of this bpm/board instance
              * in the configuration file */
-            char *hints_value = zconfig_resolve (bpm_cfg, "/afe/bind",
+            char *afe_bind = zconfig_resolve (bpm_cfg, "/afe/bind",
                     NULL);
-            ASSERT_TEST (hints_value != NULL, "[dev_mngr] Could not find "
-                    "AFE bind address in configuration file", err_cfg_exit,
+            ASSERT_TEST (afe_bind != NULL, "[hutils:utils] Could not find "
+                    "AFE bind address (bind = <value>) in configuration file", err_afe_bind,
                     HUTILS_ERR_CFG);
+
+            item->bind = strdup (afe_bind);
+            ASSERT_ALLOC(item->bind, err_hash_bind_alloc, HUTILS_ERR_ALLOC);
+
+            /* Read if the user ask us to spawn the EPICS IOC in the
+             * configuration file */
+            char *spawn_epics_ioc = zconfig_resolve (bpm_cfg, "/spawn_epics_ioc",
+                    NULL);
+            ASSERT_TEST (spawn_epics_ioc != NULL, "[hutils:utils] Could not find "
+                    "EPICS IOC (spwan_epics_ioc = <value>) in configuration file", 
+                    err_spawn_epics_ioc, HUTILS_ERR_CFG);
+
+            /* Convert yes/no to bool */
+            if (streq (spawn_epics_ioc, "yes")) {
+                item->spawn_epics_ioc = 1;
+            }
+            else if (streq (spawn_epics_ioc, "no")) {
+                item->spawn_epics_ioc = 0;
+            }
+            else {
+                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[dev_mngr] Invalid option "
+                        "for spawn_epics_ioc configuration variable\n");
+                goto err_inv_spawn_epics_ioc;
+            }
 
             /* Now, we only need to generate a valid key to insert in the hash.
              * we choose the combination of the type "board%u/bpm%u/afe" or
@@ -349,24 +398,39 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
             char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
             int errs = snprintf (hints_key, sizeof (hints_key),
                     HUTILS_CFG_HASH_KEY_PATTERN, zconfig_name (board_cfg),
-                    zconfig_name (bpm_cfg), HUTILS_CFG_AFE);
+                    zconfig_name (bpm_cfg));
 
             /* Only when the number of characters written is less than the whole buffer,
              * it is guaranteed that the string was written successfully */
             ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
-                    "[dev_mngr] Could not generate AFE bind address from "
+                    "[hutils:utils] Could not generate AFE bind address from "
                     "configuration file\n", err_cfg_exit, HUTILS_ERR_CFG);
 
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[dev_mngr_core] AFE hint endpoint "
-                    "hash key: \"%s\", value: \"%s\"\n", hints_key, hints_value);
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[hutils:utils] AFE hint endpoint "
+                    "hash key: \"%s\", bind: \"%s\", spawn_epics_ioc: %s\n",
+                    hints_key, afe_bind, spawn_epics_ioc);
 
             /* Insert this value in the hash table */
-            errs = zhash_insert (hints_h, hints_key, hints_value);
+            errs = zhash_insert (hints_h, hints_key, item);
             ASSERT_TEST (errs == 0, "Could not find insert AFE endpoint to "
                     "hash table", err_cfg_exit, HUTILS_ERR_CFG);
+
+            /* Setup free function */
+            zhash_freefn (hints_h, hints_key, _hutils_hints_free_item);
         }
     }
 
+    return err;
+
+    /* Free only the last item on error. The other ones will be freed by the hash table,
+     * on destruction */
+err_inv_spawn_epics_ioc:
+err_spawn_epics_ioc:
+    free (item->bind);
+err_hash_bind_alloc:
+err_afe_bind:
+    free (item);
+err_hash_item_alloc:
 err_cfg_exit:
     return err;
 }

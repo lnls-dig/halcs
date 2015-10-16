@@ -40,6 +40,8 @@
 #define DSP_NAME_SET_GET_MONIT_POS_Q        "dsp_set_get_monit_pos_q"
 #define DSP_OPCODE_SET_GET_MONIT_POS_SUM    13
 #define DSP_NAME_SET_GET_MONIT_POS_SUM      "dsp_set_get_monit_pos_sum"
-#define DSP_OPCODE_END                      14
+#define DSP_OPCODE_SET_GET_MONIT_UPDT       14
+#define DSP_NAME_SET_GET_MONIT_UPDT         "dsp_set_get_monit_updt"
+#define DSP_OPCODE_END                      15
 
 #endif

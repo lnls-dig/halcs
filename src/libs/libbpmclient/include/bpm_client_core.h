@@ -32,7 +32,7 @@ bpm_client_t *bpm_client_new (char *broker_endp, int verbose,
  * server, specifying the send/recv timeout in ms.
  * Return an instance of the bpm client */
 bpm_client_t *bpm_client_new_time (char *broker_endp, int verbose,
-        const char *log_file_name, uint32_t timeout);
+        const char *log_file_name, int timeout);
 
 /* Create an instance of the BPM client, with the log filemode specified
  * by "log_mode" as in fopen () call. This must be called before any operation
@@ -46,7 +46,7 @@ bpm_client_t *bpm_client_new_log_mode (char *broker_endp, int verbose,
  * This must be called before any operation involving communicating with the
  * BPM server. Return an instance of the bpm client */
 bpm_client_t *bpm_client_new_log_mode_time (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode, uint32_t timeout);
+        const char *log_file_name, const char *log_mode, int timeout);
 
 /* Destroy an instance of the BPM client. This must be called
  * after all operations involving the communication with the BPM
@@ -74,7 +74,7 @@ mlm_client_t *bpm_get_mlm_client (bpm_client_t *self);
 zpoller_t *bpm_client_get_poller (bpm_client_t *self);
 
 /* Set the timeout paramter to send;recv functions */
-bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, uint32_t timeout);
+bpm_client_err_e bpm_client_set_timeout (bpm_client_t *self, int timeout);
 
 /* Get the timeout parameter */
 uint32_t bpm_client_get_timeout (bpm_client_t *self);
@@ -85,12 +85,24 @@ uint32_t bpm_client_get_timeout (bpm_client_t *self);
  * purposes.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_blink_leds (bpm_client_t *self, char *service, uint32_t leds);
+bpm_client_err_e bpm_set_fmc_leds (bpm_client_t *self, char *service,
+        uint32_t fmc_leds);
+bpm_client_err_e bpm_get_fmc_leds (bpm_client_t *self, char *service,
+        uint32_t *fmc_leds);
+
+/* Macros for compatibility */
+#define bpm_blink_leds bpm_set_fmc_leds
 
 /* Simple AD9510 Config test.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_ad9510_cfg_defaults (bpm_client_t *self, char *service);
+bpm_client_err_e bpm_set_ad9510_defaults (bpm_client_t *self, char *service,
+        uint32_t ad9510_defaults);
+bpm_client_err_e bpm_get_ad9510_defaults (bpm_client_t *self, char *service,
+        uint32_t *ad9510_defaults);
+
+/* Macros for compatibility */
+#define bpm_ad9510_cfg_defaults bpm_set_ad9510_defaults
 
 /* FMC PLL FUNCTION pin. Sets or clears the FMC PLL FUNCTION pin. This pin
  * has a general purpose based on the 0x59 SPI AD9510 register.
@@ -364,13 +376,15 @@ bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
 
 /********************** ACQ SMIO Functions ********************/
 
-/* Acquistion request */
+/* Acquisition request */
 typedef struct {
-    uint32_t num_samples;                       /* Number of samples */
+    uint32_t num_samples_pre;                   /* Number of pre-trigger samples */
+    uint32_t num_samples_post;                  /* Number of post-trigger samples */
+    uint32_t num_shots;                         /* Number of shots */
     uint32_t chan;                              /* Acquisition channel number */
 } acq_req_t;
 
-/* Acquistion data block */
+/* Acquisition data block */
 typedef struct {
     uint32_t idx;                               /* Block index */
 
@@ -379,7 +393,7 @@ typedef struct {
     uint32_t bytes_read;                        /* Number of bytes effectively read */
 } acq_block_t;
 
-/* Acquistion transaction */
+/* Acquisition transaction */
 typedef struct {
     acq_req_t req;                              /* Request */
     acq_block_t block;                          /* Block or whole curve read */
@@ -394,23 +408,23 @@ typedef struct {
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];
 
-/* Start acquisition on a specific channel with an spoecif number of samples,
+/* Start acquisition on a specific channel with an specific number of samples,
  * through the use of acq_req_t structure.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if the server
  * could not complete the request */
-bpm_client_err_e bpm_data_acquire (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service,
         acq_req_t *acq_req);
 
 /* Check if apreviouly started acquisition finished.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_AGAIN if the acquistion
  * did not complete */
-bpm_client_err_e bpm_check_data_acquire (bpm_client_t *self, char *service);
+bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
 
 /* Wait for the previouly started acquistion to complete with a maximum tolerated
  * wait.
  * Returns BPM_CLIENT_SUCCESS if the acquistion finished under the specified
  * timeout or BPM_CLIIENT_ERR_TIMEOUT if the acquistion did not completed in time */
-bpm_client_err_e bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_check_timed (bpm_client_t *self, char *service,
         int timeout);
 
 /* Get an specific data block from a previously completed acquisiton by setting
@@ -419,39 +433,114 @@ bpm_client_err_e bpm_wait_data_acquire_timed (bpm_client_t *self, char *service,
  * Returns BPM_CLIENT_SUCCESS if the block was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_get_data_block (bpm_client_t *self, char *service,
+bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service,
         acq_trans_t *acq_trans);
 
-/* Get a complete curve from a previously completed acquisiton by setting
- * the the desired channel in acq_trans->req.channel.
- * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
+/* Get a whole curve a previously completed acquisition by setting
+ * the desired channel in acq_trans->req.channel.
+ * Returns BPM_CLIENT_SUCCESS if the block was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with
- * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_get_curve (bpm_client_t *self, char *service,
-        acq_trans_t *acq_trans, int timeout, bool new_acq);
-
-/* New version of bpm_data_acquire that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_start (bpm_client_t *self, char *service, acq_req_t *acq_req);
-
-/* New version of bpm_check_data_acquire that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_check (bpm_client_t *self, char *service);
-
-/* New version of bpm_get_data_block that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_get_data_block (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
-
-/* New version of bpm_get_curve that uses the general function caller
- * bpm_func_exec */
-bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service, acq_trans_t *acq_trans);
+ * the number of bytes effectively read in acq_trans->block.bytes_read */
+bpm_client_err_e bpm_acq_get_curve (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans);
 
 /* Perform a full acquisition process (Acquisition request, checking if
  * its done and receiving the full curve).
  * Returns BPM_CLIENT_SUCCESS if the curve was read or BPM_CLIENT_ERR_SERVER
  * otherwise. The data read is returned in acq_trans->block.data along with
  * the number of bytes effectivly read in acq_trans->block.bytes_read */
-bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service, acq_trans_t *acq_trans, int timeout);
+bpm_client_err_e bpm_full_acq (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout);
+
+/* Compatibility version of the old bpm_full_acq. Performs a full acquisition
+ * if new_acq = 1 and a curve readout if new_acq = 0*/
+bpm_client_err_e bpm_full_acq_compat (bpm_client_t *self, char *service,
+        acq_trans_t *acq_trans, int timeout, bool new_acq);
+
+/* Macros for compatibility */
+#define bpm_data_acquire bpm_acq_start
+#define bpm_check_data_acquire bpm_acq_check
+#define bpm_check_data_acquire_timed bpm_acq_check_timed
+#define bpm_get_data_block bpm_acq_get_data_block
+#define bpm_get_curve bpm_full_acq_compat
+
+/* Configure acquisition trigger. Trigger types are: 0 -> skip trigger,
+ * 1 -> external trigger, 2 -> data-driven trigger, 3 -> software trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_trig (bpm_client_t *self, char *service,
+        uint32_t trig);
+bpm_client_err_e bpm_get_acq_trig (bpm_client_t *self, char *service,
+        uint32_t *trig);
+
+/* Configure data-driven trigger polarity. Options are: 0 -> positive slope (
+ * 0 -> 1), 1 -> negative slope (1 -> 0).
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_pol (bpm_client_t *self, char *service,
+        uint32_t data_trig_pol);
+bpm_client_err_e bpm_get_acq_data_trig_pol (bpm_client_t *self, char *service,
+        uint32_t *data_trig_pol);
+
+/* Configure data-driven trigger selection. Options are: 0 -> channel data
+ * sample 0, 1 -> channel data sample 1, 2 -> channel data sample 2, 3 -> channel
+ * data sample 3
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_sel (bpm_client_t *self, char *service,
+        uint32_t data_trig_sel);
+bpm_client_err_e bpm_get_acq_data_trig_sel (bpm_client_t *self, char *service,
+        uint32_t *data_trig_sel);
+
+/* Configure data-driven trigger hysteresis filter. data_trig_filt is an integer
+ * number from 0 to 2^8-1, meaning the number of steady counts after the data
+ * sample goes above or below the data threshold. This is only valid for
+ * data-driven trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_filt (bpm_client_t *self, char *service,
+        uint32_t data_trig_filt);
+bpm_client_err_e bpm_get_acq_data_trig_filt (bpm_client_t *self, char *service,
+        uint32_t *data_trig_filt);
+
+/* Configure data-driven signed threshold. data_trig_thres is signed integer
+ * number from -2^31 to 2^31-1, meaning the number to be compared on which the
+ * data-driven trigger will be detected. This is only valid for
+ * data-driven trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t data_trig_thres);
+bpm_client_err_e bpm_get_acq_data_trig_thres (bpm_client_t *self, char *service,
+        uint32_t *data_trig_thres);
+
+/* Configure trigger delay. hw_trig_dly is an integer number from 0 to 2^32-1,
+ * meaning the number of ADC clock cycles after which the detected trigger
+ * will be used. This is only valid for external or data-driven trigger types.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_hw_trig_dly (bpm_client_t *self, char *service,
+        uint32_t hw_trig_dly);
+bpm_client_err_e bpm_get_acq_hw_trig_dly (bpm_client_t *self, char *service,
+        uint32_t *hw_trig_dly);
+
+/* Generate software trigger. Options are: 1 generates a software trigger, 0
+ * generates nothing.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_sw_trig (bpm_client_t *self, char *service,
+        uint32_t sw_trig);
+bpm_client_err_e bpm_get_acq_sw_trig (bpm_client_t *self, char *service,
+        uint32_t *sw_trig);
+
+/* Stops the acquisition FSM. Options are: 1 stop the FSM, 0
+ * generates nothing.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t fsm_stop);
+bpm_client_err_e bpm_get_acq_fsm_stop (bpm_client_t *self, char *service,
+        uint32_t *fsm_stop);
 
 /********************** DSP Functions ********************/
 
@@ -535,6 +624,19 @@ bpm_client_err_e bpm_set_monit_amp_ch3 (bpm_client_t *self, char *service,
         uint32_t monit_amp_ch3);
 bpm_client_err_e bpm_get_monit_amp_ch3 (bpm_client_t *self, char *service,
         uint32_t *monit_amp_ch3);
+
+/* Monitoring Update values */
+/* These set of functions read (get) the Monitoring update value, which
+ * effectively updates the AMP/POS values in the FPGA. After this,
+ * reading AMP/POS values are guaranteed to stay fixed until the next
+ * update.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_monit_updt (bpm_client_t *self, char *service,
+        uint32_t monit_updt);
+bpm_client_err_e bpm_get_monit_updt (bpm_client_t *self, char *service,
+        uint32_t *monit_updt);
 
 /********************** SWAP Functions ********************/
 

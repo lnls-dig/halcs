@@ -71,6 +71,7 @@ struct _dmngr_t {
     zsock_t *dealer;            /* zeroMQ Dealer socket */
     char *name;                 /* Identification of this dmngr instance */
     char *endpoint;             /* Endpoint to connect to */
+    char *cfg_file;             /* Configuration file location */
     int verbose;                /* Print activity to stdout */
 
     /* General management operations */
@@ -92,6 +93,9 @@ char *dmngr_verbose_str = NULL;
 int dmngr_verbose = 0;
 char *dmngr_daemonize_str = NULL;
 int dmngr_daemonize = 0;
+char *dmngr_work_dir = NULL;
+char *dmngr_spawn_broker_cfg_str = NULL;
+int dmngr_spawn_broker_cfg = 0;
 
 static void _devio_hash_free_item (void *data);
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
@@ -301,6 +305,40 @@ dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops)
     return DMNGR_SUCCESS;
 }
 
+dmngr_err_e dmngr_set_cfg_file (dmngr_t *self, char *cfg_file)
+{
+    assert (self);
+    assert (cfg_file);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Free previously allocated file */
+    if (self->cfg_file != NULL) {
+        free (self->cfg_file);
+        self->cfg_file = NULL;
+    }
+
+    self->cfg_file = strdup (cfg_file);
+    ASSERT_ALLOC(self->cfg_file, err_set_cfg_file);
+
+err_set_cfg_file:
+    return err;
+}
+
+const char * dmngr_get_cfg_file (dmngr_t *self)
+{
+    assert (self);
+    return self->cfg_file;
+}
+
+char * dmngr_clone_cfg_file (dmngr_t *self)
+{
+    assert (self);
+
+    char *cfg_file_cpy = strdup (self->cfg_file);
+    return cfg_file_cpy;
+}
+
 static bool _dmngr_is_broker_running (dmngr_t *self)
 {
     assert (self);
@@ -360,6 +398,7 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
     assert (broker_endp);
 
     dmngr_err_e err = DMNGR_SUCCESS;
+    char *cfg_file = self->cfg_file;
     char *dev_type_c = NULL;
     char *devio_type_c = NULL;
     char *dev_id_c = NULL;
@@ -430,7 +469,7 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
                 " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
                 "logfile on %s ...\n", dev_type_c, dev_pathname, id,
                 broker_endp, devio_log_prefix);
-        char *argv_exec [] = {DEVIO_NAME, "-n", devio_type_c,"-t", dev_type_c,
+        char *argv_exec [] = {DEVIO_NAME, "-f", cfg_file, "-n", devio_type_c,"-t", dev_type_c,
             "-i", dev_id_c, "-e", dev_pathname, "-s", smio_inst_id_c,
             "-b", broker_endp, "-l", devio_log_prefix, NULL};
         int spawn_err = _dmngr_spawn_chld (self, DEVIO_NAME, argv_exec);
@@ -503,8 +542,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 
         /* This follows the hierarchy found in the config file */
         int errs = snprintf (key, sizeof (key), HUTILS_CFG_HASH_KEY_PATTERN_COMPL,
-                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0,
-                HUTILS_CFG_DBE);
+                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0);
 
         /* Only when the number of characters written is less than the whole buffer,
          * it is guaranteed that the string was written successfully */

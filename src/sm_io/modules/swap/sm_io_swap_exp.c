@@ -93,7 +93,7 @@ RW_PARAM_FUNC(swap, wdw_en) {
             BPM_SWAP_WDW_EN_MIN, BPM_SWAP_WDW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_SWAP_WDW_DLY_MIN                    1
+#define BPM_SWAP_WDW_DLY_MIN                    0
 #define BPM_SWAP_WDW_DLY_MAX                    ((1<<16)-1)
 RW_PARAM_FUNC(swap, wdw_dly) {
     SET_GET_PARAM(swap, DSP_BPM_SWAP_OFFS, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,

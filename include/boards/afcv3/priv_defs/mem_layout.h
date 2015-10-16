@@ -4,6 +4,10 @@
 #include "hw/pcie_regs.h"
 #include "acq_chan_afcv3.h"
 
+#define NUM_MAX_SLOTS                               12
+#define NUM_MAX_BPM_PER_SLOT                        2
+#define NUM_MAX_BPMS                                (NUM_MAX_SLOTS * NUM_MAX_BPM_PER_SLOT)
+
 #define NUM_FMC130M_4CH_SMIOS                       2
 
 /*********************** Static AFCv3 FPGA layout ***********************/
@@ -20,6 +24,9 @@
 
 /* AFC DIAG Components */
 #define WB_AFC_DIAG_CTRL_RAW_REGS_OFFS              0x0000
+
+/* ACQ Components */
+#define WB_ACQ_CORE_CTRL_RAW_REGS_OFFS              0x0000
 
 /* Should be autodiscovered by SDB */
 
@@ -109,6 +116,9 @@
 /* DSP Components */
 #define DSP_CTRL_REGS_OFFS                          (BAR4_ADDR | DSP_CTRL_RAW_REGS_OFFS)
 #define DSP_BPM_SWAP_OFFS                           (BAR4_ADDR | DSP_BPM_RAW_SWAP_OFFS)
+
+/* ACQ Components */
+#define WB_ACQ_CORE_CTRL_REGS_OFFS                  (BAR4_ADDR | WB_ACQ_CORE_CTRL_RAW_REGS_OFFS)
 
 /* Wishbone Addresses */
 #define FMC1_130M_BASE_ADDR                         (BAR4_ADDR | FMC1_130M_BASE_RAW_ADDR)

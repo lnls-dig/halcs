@@ -163,6 +163,16 @@ RW_PARAM_FUNC(dsp, monit_pos_sum) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define POS_CALC_DSP_MONIT_UPDT_R(val)          (val)
+#define POS_CALC_DSP_MONIT_UPDT_W(val)          (val)
+#define POS_CALC_DSP_MONIT_UPDT_MASK            ((1ULL<<32)-1)
+
+RW_PARAM_FUNC(dsp, monit_updt) {
+    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_UPDT, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -179,6 +189,7 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_pos_y),
     RW_PARAM_FUNC_NAME(dsp, monit_pos_q),
     RW_PARAM_FUNC_NAME(dsp, monit_pos_sum),
+    RW_PARAM_FUNC_NAME(dsp, monit_updt),
     NULL
 };
 

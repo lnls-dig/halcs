@@ -1,8 +1,12 @@
 /*
- * Controlling the Monitoring data
- */
+ *  * Simple example demonstrating the communication between
+ *   * a client and the FPGA device
+ *    */
 
+#include <czmq.h>
 #include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
 #include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/bpm"
@@ -38,7 +42,7 @@ int main (int argc, char *argv [])
 
     /* FIXME: This is rather buggy! */
     /* Simple handling of command-line options. This should be done
-     * with getopt, for instance*/
+     *      * with getopt, for instance*/
     int i;
     for (i = 1; i < argc; i++)
     {
@@ -100,7 +104,7 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {
@@ -108,52 +112,17 @@ int main (int argc, char *argv [])
         goto err_bpm_client_new;
     }
 
-    uint32_t monit_updt = 1;
-    bpm_client_err_e err = bpm_set_monit_updt (bpm_client, service,
-            monit_updt);
+    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    /* Generate trigger */
+    uint32_t sw_trig = 1;
+    err = bpm_set_acq_sw_trig (bpm_client, service, sw_trig);
     if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_monit_updt failed\n");
-        goto err_set_monit_updt;
+        fprintf (stderr, "[client:acq]: bpm_acq_set_trig failed\n");
+        goto err_bpm_set_acq_sw_trig;
     }
 
-    uint32_t monit_amp;
-    err = bpm_get_monit_amp_ch0 (bpm_client, service,
-            &monit_amp);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_monit_amp_ch0 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch0 = %u\n", monit_amp);
-
-    err = bpm_get_monit_amp_ch1 (bpm_client, service, &monit_amp);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_monit_amp_ch1 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch1 = %u\n", monit_amp);
-
-    err = bpm_get_monit_amp_ch2 (bpm_client, service, &monit_amp);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_monit_amp_ch2 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch2 = %u\n", monit_amp);
-
-    err = bpm_get_monit_amp_ch3 (bpm_client, service, &monit_amp);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_monit_amp_ch3 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch3 = %u\n", monit_amp);
-
+err_bpm_set_acq_sw_trig:
 err_bpm_client_new:
-err_get_monit_amp:
-err_set_monit_updt:
-    bpm_client_destroy (&bpm_client);
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
@@ -163,5 +132,7 @@ err_set_monit_updt:
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
+    bpm_client_destroy (&bpm_client);
+
     return 0;
 }

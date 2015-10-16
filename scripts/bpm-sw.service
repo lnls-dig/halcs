@@ -6,7 +6,8 @@ After=media-remote_logs.mount
 Requires=media-remote_logs.mount
 
 [Service]
-ExecStart=/usr/local/bin/dev_mngr
+EnvironmentFile=/etc/sysconfig/bpm-sw
+ExecStart=/usr/local/bin/dev_mngr -f /usr/local/etc/bpm_sw/bpm_sw.cfg
 WorkingDirectory=/usr/local/bin
 
 [Install]

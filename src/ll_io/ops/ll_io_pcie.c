@@ -67,6 +67,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
 static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size,
         uint32_t *data, int rw);
 static ssize_t _pcie_timeout_reset (llio_t *self);
+static ssize_t _pcie_reset_fpga (llio_t *self);
 
 /************ Our methods implementation **********/
 
@@ -179,12 +180,17 @@ static int pcie_open (llio_t *self, llio_endpoint_t *endpoint)
     SET_SDRAM_PG(dev_pcie->bar0, 0);
     SET_WB_PG(dev_pcie->bar0, 0);
 
+    /* Attach this PCIe device to LLIO instance */
     llio_set_dev_handler (self, dev_pcie);
+
     /* Signal that the endpoint is opened and ready to work */
     llio_set_endpoint_open (self, true);
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
             "[ll_io_pcie] Opened PCIe device located at %s\n",
             llio_get_endpoint_name (self));
+
+    /* Reset FPGA */
+    _pcie_reset_fpga (self);
 
     return err;
 
@@ -394,6 +400,7 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_
     /* Number of bytes read/written, for faster comparison */
     uint32_t num_bytes_rw = 0;
     ssize_t err = 0;
+    uint32_t *datap = data;
 
     llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
     ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
@@ -408,17 +415,22 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_
             pg < (pg_start + (pg_offs+size)/bar_size + 1);
             ++pg) {
         SET_SDRAM_PG (dev_pcie->bar0, pg);
-        uint32_t num_bytes_page = (num_bytes_rem > bar_size) ?
+        uint32_t num_bytes_page = (offs + num_bytes_rem > bar_size) ?
             (bar_size-offs) : (num_bytes_rem);
         num_bytes_rem -= num_bytes_page;
         num_bytes_rw += num_bytes_page;
 
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_rw_bar2_block_raw] offs = %u, num_bytes_rem = %u,\n"
+            "bar_size = %u, num_byte_page = %u\n", offs, num_bytes_rem, bar_size,
+            num_bytes_page);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                 "[ll_io_pcie:_pcie_rw_bar2_block_raw] Reading %u bytes from addr: %p\n"
                 "-------------------------------------------------------------------------------------\n",
                 num_bytes_page, dev_pcie->bar2);
         BAR2_RW_BLOCK(dev_pcie->bar2, offs, num_bytes_page,
-                (uint32_t *)((uint8_t *)data + (pg-pg_start)*bar_size), rw);
+                datap, rw);
+        datap = (uint32_t *)((uint8_t *)datap + num_bytes_page);
 
         /* Always 0 after the first page */
         offs = 0;
@@ -621,6 +633,16 @@ static ssize_t _pcie_timeout_reset (llio_t *self)
             "[ll_io_pcie:_pcie_timeout_reset] Reseting timeout\n");
 
     uint64_t offs = BAR0_ADDR | PCIE_CFG_REG_TX_CTRL;
+    uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
+    return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
+}
+
+static ssize_t _pcie_reset_fpga (llio_t *self)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_reset_fpga] Reseting FPGA\n");
+
+    uint64_t offs = BAR0_ADDR | PCIE_CFG_REG_EB_STACON;
     uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
     return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
 }

@@ -11,12 +11,12 @@ fi
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
-	echo "Usage: `basename $0` {broker endpoint}"
+	echo "Usage: `basename $0` {cfg file}"
 	exit 1;
 fi
 
-broker_endp=$1
+cfg_file=$1
 
 valgrind --leak-check=yes --trace-children=yes \
-	--suppressions=valgrind.supp ./dev_mngr "ipc://"$broker_endp > \
+	--suppressions=valgrind.supp ./dev_mngr -f $cfg_file > \
 	valgrind_report.txt 2>&1
