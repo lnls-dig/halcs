@@ -11,7 +11,6 @@ After=dev-fpga%i.device
 EnvironmentFile=/etc/sysconfig/bpm-sw
 ExecStart=/usr/local/bin/dev_io -f /usr/local/etc/bpm_sw/bpm_sw.cfg -n be -t pcie -i %i -e /dev/fpga%i -s 0 -b tcp://127.0.0.1:8978 -l /media/remote_logs
 WorkingDirectory=/usr/local/bin
-ExecStop=/usr/local/bin/bpm-sw-shutdown.sh
 
 #[Install]
 #WantedBy=multi-user.target
