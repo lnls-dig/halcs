@@ -314,6 +314,7 @@ static void _hutils_hints_free_item (void *data)
 {
     hutils_hints_t *item = data;
     free (item->bind);
+    free (item);
 }
 
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
