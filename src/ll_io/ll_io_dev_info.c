@@ -34,7 +34,7 @@
 struct _llio_dev_info_t {
     uint64_t sdb_addr;                  /* Location of the SDB structures in device */
     bool parsed;                        /* True if device was already parsed */
-    zlist_t *sdb;                       /* List holding the SDB structures of the device */
+    zlistx_t *sdb;                       /* List holding the SDB structures of the device */
 };
 
 /* Creates a new instance of Device Information */
@@ -48,7 +48,7 @@ llio_dev_info_t * llio_dev_info_new ()
        later by read_dev_info() */
     self->sdb_addr = 0x0;
     self->parsed = false;
-    self->sdb = zlist_new (); /* HASH!? */
+    self->sdb = zlistx_new (); /* HASH!? */
     ASSERT_ALLOC(self->sdb, err_sdb_alloc);
 
     return self;
@@ -68,7 +68,7 @@ llio_err_e llio_dev_info_destroy (llio_dev_info_t **self_p)
         llio_dev_info_t *self = *self_p;
 
         /* Starting destructing by the last resource */
-        zlist_destroy (&self->sdb);
+        zlistx_destroy (&self->sdb);
         free (self);
         *self_p = NULL;
     }

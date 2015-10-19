@@ -44,7 +44,7 @@ struct _disp_table_t {
     /* Hash containg all the sm_io thsafe operations
      * that we need to handle. It is composed
      * of key (4-char ID) / value (pointer to funtion) */
-    zhash_t *table_h;
+    zhashx_t *table_h;
     /* Dispatch table operations */
     const disp_table_ops_t *ops;
 };
@@ -53,7 +53,7 @@ static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t*
 static disp_table_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops);
 static disp_table_err_e _disp_table_remove (disp_table_t *self, uint32_t key);
 static disp_table_err_e _disp_table_remove_all (disp_table_t *self);
-static void _disp_table_free_item (void *data);
+static void _disp_table_free_item (void **data);
 static disp_table_err_e _disp_table_check_args (disp_table_t *self, uint32_t key,
         void *args, void **ret);
 static int _disp_table_call (disp_table_t *self, uint32_t key, void *owner, void *args,
@@ -72,10 +72,9 @@ disp_table_t *disp_table_new (const disp_table_ops_t *ops)
 
     disp_table_t *self = zmalloc (sizeof *self);
     ASSERT_ALLOC (self, err_self_alloc);
-    self->table_h = zhash_new ();
+    self->table_h = zhashx_new ();
     ASSERT_ALLOC (self->table_h, err_table_h_alloc);
-    /* Only work for strings
-    zhash_autofree (self->table_h);*/
+    zhashx_set_destructor (self->table_h, _disp_table_free_item);
     self->ops = ops;
 
     return self;
@@ -95,7 +94,7 @@ disp_table_err_e disp_table_destroy (disp_table_t **self_p)
 
         _disp_table_remove_all (self);
         self->ops = NULL;
-        zhash_destroy (&self->table_h);
+        zhashx_destroy (&self->table_h);
         free (self);
         *self_p = NULL;
     }
@@ -232,11 +231,9 @@ static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t 
 
     char *key_c = hutils_stringify_hex_key (disp_op_handler->op->opcode);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
-    int zerr = zhash_insert (self->table_h, key_c, disp_op_handler);
+    int zerr = zhashx_insert (self->table_h, key_c, disp_op_handler);
     ASSERT_TEST(zerr == 0, "Could not insert item into dispatch table",
             err_insert_hash);
-    /* Setup free function */
-    zhash_freefn (self->table_h, key_c, _disp_table_free_item);
 
     free (key_c);
     return DISP_TABLE_SUCCESS;
@@ -251,10 +248,10 @@ err_disp_op_handler_new:
     return DISP_TABLE_ERR_ALLOC;
 }
 
-static void _disp_table_free_item (void *data)
+static void _disp_table_free_item (void **data)
 {
-    disp_op_handler_t *disp_op_handler = (disp_op_handler_t *) data;
-    disp_op_handler_destroy (&disp_op_handler);
+    disp_op_handler_t **disp_op_handler = (disp_op_handler_t **) data;
+    disp_op_handler_destroy (disp_op_handler);
 }
 
 static disp_table_err_e _disp_table_insert_all (disp_table_t *self, const disp_op_t **disp_ops)
@@ -298,7 +295,7 @@ static disp_table_err_e _disp_table_remove (disp_table_t *self, uint32_t key)
         "[disp_table] Removing function (key = %u) into dispatch table\n",
         key);
     /* This will trigger the free function previously registered */
-    zhash_delete (self->table_h, key_c);
+    zhashx_delete (self->table_h, key_c);
 
     free (key_c);
     return DISP_TABLE_SUCCESS;
@@ -313,14 +310,14 @@ static disp_table_err_e _disp_table_remove_all (disp_table_t *self)
 {
     assert (self);
 
-    zlist_t *hash_keys = zhash_keys (self->table_h);
-    void * table_item = zlist_first (hash_keys);
+    zlistx_t *hash_keys = zhashx_keys (self->table_h);
+    void * table_item = zlistx_first (hash_keys);
 
-    for ( ; table_item; table_item = zlist_next (hash_keys)) {
+    for ( ; table_item; table_item = zlistx_next (hash_keys)) {
         _disp_table_remove (self, hutils_numerify_hex_key ((char *) table_item));
     }
 
-    zlist_destroy (&hash_keys);
+    zlistx_destroy (&hash_keys);
     return DISP_TABLE_SUCCESS;
 }
 
@@ -454,7 +451,7 @@ static disp_op_handler_t *_disp_table_lookup (disp_table_t *self, uint32_t key)
     char *key_c = hutils_stringify_hex_key (key);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
 
-    disp_op_handler = zhash_lookup (self->table_h, key_c);
+    disp_op_handler = zhashx_lookup (self->table_h, key_c);
     ASSERT_TEST (disp_op_handler != NULL, "Could not find registered function",
             err_func_p_wrapper_null);
 

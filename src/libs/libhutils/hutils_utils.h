@@ -103,6 +103,6 @@ int hutils_copy_str (char *dest, const char *src, size_t size);
 
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
  * and store them in hash table in the form <property name / property value> */
-hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h);
+hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h);
 
 #endif

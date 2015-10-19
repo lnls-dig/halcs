@@ -61,11 +61,11 @@
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
         devio_type_e devio_type, char *cfg_file, char *broker_endp,
-        char *log_prefix, zhash_t *hints);
+        char *log_prefix, zhashx_t *hints);
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *cfg_file, char *broker_endp, char *log_prefix, zhash_t *hints);
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints);
 static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
-        char *cfg_file, char *broker_endp, char *log_prefix, zhash_t *hints);
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints);
 static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
         const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
@@ -347,7 +347,7 @@ int main (int argc, char *argv[])
     /* Print SDB devices */
     devio_print_info (devio);
 
-    zhash_t *devio_hints = zhash_new ();
+    zhashx_t *devio_hints = zhashx_new ();
     if (devio_hints == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could allocate "
                 "hints hash table\n");
@@ -420,7 +420,7 @@ err_assoc_devio:
 err_cfg_get_hints:
     zconfig_destroy (&root_cfg);
 err_cfg_load:
-    zhash_destroy (&devio_hints);
+    zhashx_destroy (&devio_hints);
 err_devio_hints_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
@@ -456,7 +456,7 @@ err_exit:
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
         devio_type_e devio_type, char *cfg_file, char *broker_endp,
-        char *log_prefix, zhash_t *hints)
+        char *log_prefix, zhashx_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -493,7 +493,7 @@ err_spwan_assoc_devios:
 }
 
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *cfg_file, char *broker_endp, char *log_prefix, zhash_t *hints)
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -519,7 +519,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
                 "Could not generate configuration hash key for configuration "
                 "file", err_cfg_exit, DEVIO_ERR_CFG);
 
-        hutils_hints_t *cfg_item = zhash_lookup (hints, hints_key);
+        hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
         /* If key is not found, assume we don't have any more AFE to
          * prepare */
         if (cfg_item == NULL || cfg_item->bind == NULL ||
@@ -566,7 +566,7 @@ err_cfg_exit:
 }
 
 static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
-        char *cfg_file, char *broker_endp, char *log_prefix, zhash_t *hints)
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -594,7 +594,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
                 "Could not generate configuration hash key for configuration "
                 "file", err_cfg_exit, DEVIO_ERR_CFG);
 
-        hutils_hints_t *cfg_item = zhash_lookup (hints, hints_key);
+        hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
         /* If key is not found or we were asked not to spawn EPICS IOC,
          * assume we don't have any more DBE to prepare */
         if (cfg_item == NULL || cfg_item->spawn_epics_ioc == false) {

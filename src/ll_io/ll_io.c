@@ -93,7 +93,7 @@ llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
     return self;
 
     /*err_ops_alloc:
-      zlist_destroy(&self->dev_info->sdb); */
+      zlistx_destroy(&self->dev_info->sdb); */
 /* err_dev_info_alloc:
     llio_endpoint_destroy (&self->endpoint); */
 err_endpoint_alloc:

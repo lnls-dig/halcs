@@ -45,14 +45,14 @@ typedef struct {
     spawn_broker_handler_fp dmngr_spawn_broker; /* Called to spawn (or respawn a zeroMQ broker */
 
     /* List of dmngr_sig_handler_t */
-    zlist_t *sig_ops;
+    zlistx_t *sig_ops;
 } dmngr_ops_t;
 
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Device Manager */
 dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
-        const char *log_prefix, zhash_t *hints_h);
+        const char *log_prefix, zhashx_t *hints_h);
 /* Destroy an instance of the Device Manager */
 dmngr_err_e dmngr_destroy (dmngr_t **self_p);
 

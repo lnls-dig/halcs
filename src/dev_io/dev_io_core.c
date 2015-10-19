@@ -63,11 +63,11 @@ struct _devio_t {
     /* Hash containing all the sm_io objects that
      * this dev_io can handle. It is composed
      * of key (10-char ID) / value (sm_io instance) */
-    zhash_t *sm_io_h;
+    zhashx_t *sm_io_h;
     /* Hash containing all the Config sm_io objects that
      * this dev_io can handle. It is composed
      * of key (10-char ID) / value (sm_io instance) */
-    zhash_t *sm_io_cfg_h;
+    zhashx_t *sm_io_cfg_h;
     /* Dispatch table containing all the sm_io thsafe operations
      * that we need to handle. It is composed
      * of key (4-char ID) / value (pointer to function) */
@@ -85,8 +85,8 @@ static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor);
-static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const char *smio_key);
-static devio_err_e _devio_destroy_smio_all (devio_t *self, zhash_t *smio_h);
+static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const char *smio_key);
+static devio_err_e _devio_destroy_smio_all (devio_t *self, zhashx_t *smio_h);
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
@@ -176,11 +176,11 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     self->thsafe_server_ops = smio_thsafe_zmq_server_ops;
 
     /* Init sm_io_h hash */
-    self->sm_io_h = zhash_new ();
+    self->sm_io_h = zhashx_new ();
     ASSERT_ALLOC(self->sm_io_h, err_sm_io_h_alloc);
 
     /* Init sm_io_cfg_h hash */
-    self->sm_io_cfg_h = zhash_new ();
+    self->sm_io_cfg_h = zhashx_new ();
     ASSERT_ALLOC(self->sm_io_cfg_h, err_sm_io_cfg_h_alloc);
 
     /* Init sm_io_thsafe_ops_h dispatch table */
@@ -203,9 +203,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 err_disp_table_init:
     disp_table_destroy (&self->disp_table_thsafe_ops);
 err_disp_table_thsafe_ops_alloc:
-    zhash_destroy (&self->sm_io_cfg_h);
+    zhashx_destroy (&self->sm_io_cfg_h);
 err_sm_io_cfg_h_alloc:
-    zhash_destroy (&self->sm_io_h);
+    zhashx_destroy (&self->sm_io_h);
 err_sm_io_h_alloc:
     llio_release (self->llio, NULL);
 err_llio_open:
@@ -251,8 +251,8 @@ devio_err_e devio_destroy (devio_t **self_p)
          * unregister from broker as soon as possible to avoid
          * loosing requests from clients */
         disp_table_destroy (&self->disp_table_thsafe_ops);
-        zhash_destroy (&self->sm_io_cfg_h);
-        zhash_destroy (&self->sm_io_h);
+        zhashx_destroy (&self->sm_io_cfg_h);
+        zhashx_destroy (&self->sm_io_h);
         self->thsafe_server_ops = NULL;
         llio_release (self->llio, NULL);
         llio_destroy (&self->llio);
@@ -423,7 +423,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
-        int zerr = zhash_insert (self->sm_io_h, key, &self->pipes_mgmt [pipe_mgmt_idx]);
+        int zerr = zhashx_insert (self->sm_io_h, key, &self->pipes_mgmt [pipe_mgmt_idx]);
         /* We must not fail here, as we will loose our reference to the SMIO
          * thread otherwise */
         ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
@@ -460,7 +460,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
                 "[dev_io_core:register_sm] Inserting config hash with key: %s\n", key);
-        zerr = zhash_insert (self->sm_io_cfg_h, key, &self->pipes_config [pipe_config_idx]);
+        zerr = zhashx_insert (self->sm_io_cfg_h, key, &self->pipes_config [pipe_config_idx]);
         /* We must not fail here, as we will loose our reference to the SMIO
          * thread otherwise */
         ASSERT_TEST (zerr == 0, "Could not insert Config PIPE hash key. Duplicated value?",
@@ -484,7 +484,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     return DEVIO_SUCCESS;
 
 err_poller_config_insert:
-    zhash_delete (self->sm_io_cfg_h, key);
+    zhashx_delete (self->sm_io_cfg_h, key);
 err_cfg_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
@@ -495,7 +495,7 @@ err_spawn_config_thread:
 err_th_config_args_alloc:
     zpoller_remove (self->poller, self->pipes_msg [pipe_msg_idx]);
 err_poller_insert:
-    zhash_delete (self->sm_io_h, key);
+    zhashx_delete (self->sm_io_h, key);
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
@@ -720,25 +720,25 @@ err_hand_req:
     return err;
 }
 
-static devio_err_e _devio_destroy_smio_all (devio_t *self, zhash_t *smio_h)
+static devio_err_e _devio_destroy_smio_all (devio_t *self, zhashx_t *smio_h)
 {
     assert (self);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Get all hash keys */
-    zlist_t *hash_keys = zhash_keys (smio_h);
+    zlistx_t *hash_keys = zhashx_keys (smio_h);
     ASSERT_ALLOC (hash_keys, err_hash_keys_alloc, DEVIO_ERR_ALLOC);
-    char *hash_item = zlist_first (hash_keys);
+    char *hash_item = zlistx_first (hash_keys);
 
     /* Iterate over all keys removing each of one */
-    for (; hash_item != NULL; hash_item = zlist_next (hash_keys)) {
+    for (; hash_item != NULL; hash_item = zlistx_next (hash_keys)) {
         err = _devio_destroy_smio (self, smio_h, hash_item);
         ASSERT_TEST (err == DEVIO_SUCCESS, "Could not destroy SMIO "
                 "instance", err_smio_destroy, DEVIO_ERR_SMIO_DESTROY);
     }
 
 err_smio_destroy:
-    zlist_destroy (&hash_keys);
+    zlistx_destroy (&hash_keys);
 err_hash_keys_alloc:
     return err;
 }
@@ -776,13 +776,13 @@ err_msg_alloc:
 
 /* smio_key is the name of the SMIO + instance number, e.g.,
  * FMC130M_4CH0*/
-static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const char *smio_key)
+static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const char *smio_key)
 {
     assert (self);
 
     devio_err_e err = DEVIO_SUCCESS;
     /* Lookup SMIO reference in hash table */
-    zactor_t **actor = (zactor_t **) zhash_lookup (smio_h, smio_key);
+    zactor_t **actor = (zactor_t **) zhashx_lookup (smio_h, smio_key);
     ASSERT_TEST (actor != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
 
@@ -792,7 +792,7 @@ static devio_err_e _devio_destroy_smio (devio_t *self, zhash_t *smio_h, const ch
 
     /* Finally, remove the pipe from hash. FIXME: What if the SMIO does not
      * exit? We will loose its reference ...*/
-    zhash_delete (smio_h, smio_key);
+    zhashx_delete (smio_h, smio_key);
 
 err_send_msg:
 err_hash_lookup:

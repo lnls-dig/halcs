@@ -39,7 +39,7 @@
 
 static char *_hutils_concat_strings_raw (const char *str1, const char* str2,
         const char *str3, bool with_sep, char sep);
-static void _hutils_hints_free_item (void *data);
+static void _hutils_hints_free_item (void **data);
 
 /*******************************************************************/
 /*****************  String manipulation functions ******************/
@@ -310,22 +310,30 @@ err_copy_str:
 /*******************************************************************/
 
 /* Hash free function */
-static void _hutils_hints_free_item (void *data)
+static void _hutils_hints_free_item (void **data)
 {
-    hutils_hints_t *item = data;
-    free (item->bind);
-    free (item);
+    assert (data);
+
+    if (*data) {
+        hutils_hints_t *item = *data;
+        free (item->bind);
+        free (item);
+        *data = NULL;
+    }
 }
 
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
  * and store them in hash table in the form <property name / property value> */
-hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
+hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
 {
     assert (root_cfg);
     assert (hints_h);
 
     hutils_err_e err = HUTILS_SUCCESS;
     hutils_hints_t *item = NULL;
+
+    /* Set destruction function */
+    zhashx_set_destructor (hints_h, _hutils_hints_free_item);
 
     /* Read DEVIO suggested bind endpoints and fill the hash table with
      * the corresponding keys */
@@ -377,7 +385,7 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
             char *spawn_epics_ioc = zconfig_resolve (bpm_cfg, "/spawn_epics_ioc",
                     NULL);
             ASSERT_TEST (spawn_epics_ioc != NULL, "[hutils:utils] Could not find "
-                    "EPICS IOC (spwan_epics_ioc = <value>) in configuration file", 
+                    "EPICS IOC (spwan_epics_ioc = <value>) in configuration file",
                     err_spawn_epics_ioc, HUTILS_ERR_CFG);
 
             /* Convert yes/no to bool */
@@ -412,12 +420,9 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhash_t *hints_h)
                     hints_key, afe_bind, spawn_epics_ioc);
 
             /* Insert this value in the hash table */
-            errs = zhash_insert (hints_h, hints_key, item);
+            errs = zhashx_insert (hints_h, hints_key, item);
             ASSERT_TEST (errs == 0, "Could not find insert AFE endpoint to "
                     "hash table", err_cfg_exit, HUTILS_ERR_CFG);
-
-            /* Setup free function */
-            zhash_freefn (hints_h, hints_key, _hutils_hints_free_item);
         }
     }
 

@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
         }
     }
 
-    zhash_t *dmngr_hints = zhash_new ();
+    zhashx_t *dmngr_hints = zhashx_new ();
     if (dmngr_hints == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could allocate "
                 "hints hash table\n");
@@ -352,7 +352,7 @@ err_dmngr_alloc:
 err_daemonize:
     zconfig_destroy (&root_cfg);
 err_cfg_exit:
-    zhash_destroy (&dmngr_hints);
+    zhashx_destroy (&dmngr_hints);
 err_dmngr_hints_alloc:
     str_p = &cfg_file;
     free (*str_p);
