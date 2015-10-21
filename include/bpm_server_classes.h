@@ -13,16 +13,14 @@
 
 /* External dependencies */
 #include <bsmp/client.h>
+#include <convc.h>
+#include <disptable.h>
+#include <errhand.h>
+#include <hutils.h>
 
 /* Internal libraries dependencies */
 #include "libsdbfs.h"
-#include "convc.h"
-#include "disp_table.h"
-#include "errhand.h"
-#include "hutils.h"
 #include "hal_stddef.h"
-#include "hutils_math.h"
-#include "varg_macros.h"
 
 /* General dependencies */
 #include "board.h"
