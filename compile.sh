@@ -105,11 +105,14 @@ else
 COMMAND_EXAMPLES=""
 fi
 
+COMMAND_LIBS_LINK="ldconfig"
+
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_LIBS}"
     "${COMMAND_HAL}"
     "${COMMAND_EXAMPLES}"
+    "${COMMAND_LIBS_LINK}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
