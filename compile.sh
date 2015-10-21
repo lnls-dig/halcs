@@ -71,6 +71,13 @@ COMMAND_DEPS="\
     make ${EXTRA_FLAGS[@]} deps && \
     make ${EXTRA_FLAGS[@]} deps_install"
 
+COMMAND_LIBS="\
+    make ${EXTRA_FLAGS[@]} \
+    ERRHAND_DBG=${ERRHAND_DBG} \
+    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+    libs_compile_install"
+
 COMMAND_HAL="\
     make \
     ${EXTRA_FLAGS[@]} \
@@ -107,6 +114,7 @@ fi
 
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
+    "${COMMAND_LIBS}"
     "${COMMAND_HAL}"
     "${COMMAND_LIBBPMCLIENT}"
     "${COMMAND_EXAMPLES}"
