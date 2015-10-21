@@ -113,7 +113,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I../../sm_io/modules/dsp \
 	       -I../../sm_io/modules/rffe \
 	       -I../../sm_io/modules/afc_diag \
-	       -I/usr/local/include
+	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

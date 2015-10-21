@@ -70,7 +70,7 @@ SRC_DIR = src
 INCLUDE_DIR = include
 
 # Include directories
-INCLUDE_DIRS = -Iinclude -I/usr/local/include
+INCLUDE_DIRS = -Iinclude -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
