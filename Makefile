@@ -194,7 +194,7 @@ boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Iinclude \
 	       -Iforeign/libsdbfs \
-	       -I/usr/local/include
+	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
