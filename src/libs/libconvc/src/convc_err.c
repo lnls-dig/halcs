@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "convc_err.h"
+#include "convc.h"
 
 static const char *convc_err [CONVC_ERR_END] =
 {

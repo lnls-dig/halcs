@@ -13,10 +13,20 @@ MAKE ?=		make
 
 PWD = 		$(shell pwd)
 
-LIBCONVC = libconvc
+LIBNAME_RAW = convc
+LIBNAME = lib$(LIBNAME_RAW)
+
+# Config variables suitable for creating shared libraries
+LIB_VER = $(shell ./version.sh $(LIBNAME_RAW))
+LIB_VER_MAJOR = $(shell echo $(LIB_VER)| cut -d'.' -f1)
+LIB_VER_MINOR = $(shell echo $(LIB_VER)| cut -d'.' -f2)
+LIB_VER_REVESION = $(shell echo $(LIB_VER)| cut -d'.' -f3)
+
+PREFIX ?= /usr/local
+export PREFIX
 
 # General C/CPP flags
-CFLAGS_USR = -std=gnu99 -O2
+CFLAGS_USR = -std=gnu99 -O2 -fPIC
 # We expect tghese variables to be appended to the possible
 # command-line options
 override CPPFLAGS +=
@@ -54,8 +64,13 @@ LIBS =
 # General library flags -L<libdir>
 LFLAGS =
 
+# Source directory
+SRC_DIR = src
+# Include directory
+INCLUDE_DIR = include
+
 # Include directories
-INCLUDE_DIRS = -I. -I../liberrhand
+INCLUDE_DIRS = -Iinclude -I/usr/local/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
@@ -63,29 +78,37 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
-OUT = $(LIBCONVC)
+OUT = $(LIBNAME)
 
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBCONVC)_OBJS_LIB = convc.o convc_err.o
+$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/convc_core.o $(SRC_DIR)/convc_err.o
 
 # Objects common for this library
 common_OBJS =
 
 # Objects for each version of library
-$(LIBCONVC)_OBJS = $(common_OBJS) $($(LIBCONVC)_OBJS_LIB)
-$(LIBCONVC)_CODE_HEADERS =
+$(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
+$(LIBNAME)_CODE_HEADERS = \
+	$(INCLUDE_DIR)/convc_classes.h \
+	$(INCLUDE_DIR)/convc_prelude.h \
+	$(INCLUDE_DIR)/convc.h \
+	$(INCLUDE_DIR)/convc_core.h \
+	$(INCLUDE_DIR)/convc_err.h
 
-$(LIBCONVC)_HEADERS = $($(LIBCONVC)_OBJS_LIB:.o=.h) $($(LIBCONVC)_CODE_HEADERS)
+$(LIBNAME)_HEADERS = $($(LIBNAME)_CODE_HEADERS)
 
-OBJS_all = $(common_OBJS) $($(LIBCONVC)_OBJS)
+OBJS_all = $(common_OBJS) $($(LIBNAME)_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a
+LIB_SHARED_SUFFIX = .so
 
-# Generate suitable names for static libraries
+# Generate suitable names for libraries
 TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
+TARGET_SHARED = $(addsuffix $(LIB_SHARED_SUFFIX), $(OUT))
+TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
 
 .PHONY: all clean mrproper install uninstall
 
@@ -93,11 +116,15 @@ TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(TARGET_STATIC)
+all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile static library
 %.a: $$($$*_OBJS)
 	$(AR) rcs $@ $^
+
+# Compile dynamic library
+%.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
+	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -131,12 +158,23 @@ all: $(TARGET_STATIC)
 	@rm -f $*.d.tmp
 
 install:
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
+		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 mrproper: clean
-	rm -f *.a
+	rm -f *.a *.so.$(LIB_VER)
 

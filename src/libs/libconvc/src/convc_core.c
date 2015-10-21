@@ -5,14 +5,6 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <czmq.h>
-
-#include "errhand.h"
 #include "convc.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

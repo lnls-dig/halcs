@@ -11,6 +11,10 @@
 #ifndef _CONVC_ERR_H_
 #define _CONVC_ERR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum _convc_err_e
 {
     CONVC_SUCCESS = 0,              /* No error */
@@ -22,5 +26,9 @@ typedef enum _convc_err_e convc_err_e;
 
 /* Convert enumeration type to string */
 const char * convc_err_str (convc_err_e err);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
