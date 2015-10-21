@@ -14,10 +14,12 @@
 /* External dependencies */
 #include <czmq.h>
 #include <malamute.h>
+#include <errhand.h>
+#include <hutils.h>
+#include <disptable.h>
 
 /* Internal libraries dependencies */
 #include "acq_chan.h"
-#include "disptable.h"
 #include "sm_io_codes.h"
 
 /* BPM version macros for compile-time API detection */

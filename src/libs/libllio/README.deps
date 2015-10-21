@@ -1,5 +1,7 @@
 Project Dependencies:
     liberrhand
+    libconvc
 
 Foreign Dependencies:
-    libPciDriver
+    czmq
+    libPciDriver # For PCIe devices only

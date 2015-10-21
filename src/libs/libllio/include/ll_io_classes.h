@@ -12,8 +12,9 @@
 #include "ll_io_prelude.h"
 
 /* External dependencies */
-#include <convc.h>
 #include <czmq.h>
+#include <errhand.h>
+#include <convc.h>
 
 /* BPM version macros for compile-time API detection */
 
