@@ -66,6 +66,7 @@ LIBERRHAND_DIR = src/libs/liberrhand
 LIBCONVC_DIR = src/libs/libconvc
 LIBHUTILS_DIR = src/libs/libhutils
 LIBDISPTABLE_DIR = src/libs/libdisptable
+LIBLLIO_DIR = src/libs/libllio
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
 LIBSDBFS_DIR = foreign/libsdbfs
 
@@ -160,16 +161,17 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lm -lzmq -lczmq -lmlm -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmlm
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient libsdbfs
-PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient -lsdbfs
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libbpmclient \
+                    libsdbfs libpcidriver
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lbpmclient \
+               -lsdbfs -lpcidriver
 
 # General library flags -L<libdir>
-LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
-         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient -Lforeign/libsdbfs
+LFLAGS = -Lforeign/libsdbfs
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -178,7 +180,6 @@ OBJS_PLATFORM =
 SRC_DIR = src
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/ll_io/ll_io.mk
 include $(SRC_DIR)/sm_io/sm_io.mk
 include $(SRC_DIR)/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/dev_io/dev_io.mk
@@ -192,11 +193,6 @@ boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Iinclude \
-	       -Isrc/libs/liberrhand \
-	       -Isrc/libs/libconvc \
-	       -Isrc/libs/libhutils \
-	       -Isrc/libs/libdisptable \
-	       -Isrc/libs/libbpmclient/include \
 	       -Iforeign/libsdbfs \
 	       -I/usr/local/include
 
@@ -258,6 +254,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
+	libllio libllio_install libllio_uninstall libllio_clean libllio_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
@@ -270,7 +267,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(PROJECT_LIBS_NAME) cfg $(OUT)
+all: cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
@@ -422,6 +419,21 @@ libdisptable_clean:
 libdisptable_mrproper:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) mrproper
 
+libllio:
+	$(MAKE) -C $(LIBLLIO_DIR) all
+
+libllio_install:
+	$(MAKE) -C $(LIBLLIO_DIR) PREFIX=${PREFIX} install
+
+libllio_uninstall:
+	$(MAKE) -C $(LIBLLIO_DIR) PREFIX=${PREFIX} uninstall
+
+libllio_clean:
+	$(MAKE) -C $(LIBLLIO_DIR) clean
+
+libllio_mrproper:
+	$(MAKE) -C $(LIBLLIO_DIR) mrproper
+
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
@@ -451,6 +463,25 @@ libsdbfs_clean:
 
 libsdbfs_mrproper:
 	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
+
+libs: liberrhand libconvc libhutils \
+    libdisptable libllio libbpmclient
+
+libs_install: liberrhand_install libconvc_install libhutils_install \
+    libdisptable_install libllio_install libbpmclient_install
+
+libs_compile_install: liberrhand liberrhand_install libconvc libconvc_install \
+    libhutils libhutils_install libdisptable libdisptable_install libllio libllio_install \
+    libbpmclient libbpmclient_install
+
+libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
+    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall
+
+libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean
+
+libs_mrproper: liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean
 
 # External project dependencies
 
@@ -511,11 +542,19 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: core_install deps_install liberrhand_install libconvc_install libhutils_install libdisptable_install libbpmclient_install cfg_install
+install: core_install deps_install liberrhand_install libconvc_install \
+    libhutils_install libdisptable_install libllio_install libbpmclient_install \
+    cfg_install
 
-uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libdisptable_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
+    libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
+    cfg_uninstall
 
-clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libdisptable_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
+    cfg_clean
 
-mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libdisptable_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
+    libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
+    examples_mrproper tests_mrproper cfg_mrproper
 
