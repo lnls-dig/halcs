@@ -3,3 +3,4 @@ Project Dependencies:
     libhutils
 
 Foreign Dependencies:
+    czmq

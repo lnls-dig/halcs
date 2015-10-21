@@ -11,11 +11,12 @@
  * In the end, I changed much of the original code and only the main
  * idea with a couple of the original structures remain */
 
-#ifndef _DISPATCH_TABLE_H_
-#define _DISPATCH_TABLE_H_
+#ifndef _DISPTABLE_CORE_H_
+#define _DISPTABLE_CORE_H_
 
-#include <czmq.h>
-#include "disp_table_err.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Opaque class structure */
 typedef struct _disp_table_t disp_table_t;
@@ -122,6 +123,10 @@ disp_table_err_e disp_table_set_ret (disp_table_t *self, uint32_t key, void **re
 
 disp_op_handler_t *disp_op_handler_new (void);
 disp_table_err_e disp_op_handler_destroy (disp_op_handler_t **self_p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

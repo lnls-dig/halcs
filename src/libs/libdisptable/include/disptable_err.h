@@ -8,8 +8,12 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#ifndef _DISP_TABLE_ERR_H_
-#define _DISP_TABLE_ERR_H_
+#ifndef _DISPTABLE_ERR_H_
+#define _DISPTABLE_ERR_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum _disp_table_err_e
 {
@@ -25,5 +29,9 @@ typedef enum _disp_table_err_e disp_table_err_e;
 
 /* Convert enumeration type to string */
 const char * disp_table_err_str (disp_table_err_e err);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

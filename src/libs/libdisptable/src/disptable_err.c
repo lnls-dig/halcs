@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "disp_table_err.h"
+#include "disptable.h"
 
 static const char *disp_table_err [DISP_TABLE_ERR_END] =
 {

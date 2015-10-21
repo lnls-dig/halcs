@@ -11,11 +11,7 @@
  * In the end, I changed much of the original code and only the main
  * idea with a couple of the original structures remain */
 
-#include <inttypes.h>
-
-#include "disp_table.h"
-#include "hutils.h"
-#include "errhand.h"
+#include "disptable.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
