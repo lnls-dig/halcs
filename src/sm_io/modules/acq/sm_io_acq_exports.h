@@ -8,7 +8,7 @@
 #ifndef _SM_IO_ACQ_EXPORTS_H_
 #define _SM_IO_ACQ_EXPORTS_H_
 
-#include "disp_table.h"
+#include "disptable.h"
 
 extern disp_op_t acq_data_acquire_exp;
 extern disp_op_t acq_check_data_acquire_exp;

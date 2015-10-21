@@ -8,7 +8,7 @@
 #ifndef _SM_IO_FMC130M_4CH_EXPORTS_H_
 #define _SM_IO_FMC130M_4CH_EXPORTS_H_
 
-#include "disp_table.h"
+#include "disptable.h"
 
 extern disp_op_t fmc130m_4ch_leds_exp;
 extern disp_op_t fmc130m_4ch_si571_oe_exp;

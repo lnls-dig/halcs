@@ -8,7 +8,7 @@
 #ifndef _SM_IO_RFFE_EXPORTS_H_
 #define _SM_IO_RFFE_EXPORTS_H_
 
-#include "disp_table.h"
+#include "disptable.h"
 
 extern disp_op_t rffe_set_get_sw_exp;
 extern disp_op_t rffe_set_get_att1_exp;

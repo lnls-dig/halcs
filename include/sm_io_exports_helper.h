@@ -8,6 +8,6 @@
 #ifndef _SM_IO_EXPORTS_HELPER_H_
 #define _SM_IO_EXPORTS_HELPER_H_
 
-#include "disp_table.h"
+#include "disptable.h"
 
 #endif
