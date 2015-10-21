@@ -9,16 +9,26 @@ STRIP           = $(CROSS_COMPILE)strip
 OBJCOPY         = $(CROSS_COMPILE)objcopy
 OBJDUMP         = $(CROSS_COMPILE)objdump
 
+ERRHAND_DBG ?= y
+ERRHAND_MIN_LEVEL ?= DBG_LVL_ERR
+ERRHAND_SUBSYS_ON ?= "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+
 CFLAGS = -Wall -ggdb
 CFLAGS += -I.. -I../../../include
+CFLAGS_LNLS = -DERRHAND_DBG=$(ERRHAND_DBG) -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL) \
+	-DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 LDFLAGS = -L.. -lsdbfs
+LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
-PROG = gensdbfs sdb-read sdb-extract
+PROG = gensdbfs sdb-read sdb-read-lnls sdb-extract
 
 all: $(PROG)
 
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $*.c $(LDFLAGS)
+
+sdb-read-lnls: sdb-read-lnls.c
+	$(CC) $(CFLAGS) $(CFLAGS_LNLS) -o $@ $< $(LDFLAGS) $(LDFLAGS_LNLS)
 
 $(PROG): ../libsdbfs.a
 
