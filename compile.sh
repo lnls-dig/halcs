@@ -72,11 +72,13 @@ COMMAND_DEPS="\
     make ${EXTRA_FLAGS[@]} deps_install"
 
 COMMAND_LIBS="\
-    make ${EXTRA_FLAGS[@]} \
+    make \
+    ${EXTRA_FLAGS[@]} \
     BOARD=${BOARD} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
     ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+    LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
     libs_compile_install"
 
 COMMAND_HAL="\
@@ -96,16 +98,6 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
-COMMAND_LIBBPMCLIENT="\
-    make \
-    ${EXTRA_FLAGS[@]} \
-    BOARD=${BOARD} \
-    ERRHAND_DBG=${ERRHAND_DBG} \
-    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
-    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} && \
-    make ${EXTRA_FLAGS[@]} libbpmclient_install"
-
 if [ "$WITH_EXAMPLES" = "with_examples" ]; then
 COMMAND_EXAMPLES="\
     make ${EXTRA_FLAGS[@]} examples"
@@ -117,7 +109,6 @@ COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_LIBS}"
     "${COMMAND_HAL}"
-    "${COMMAND_LIBBPMCLIENT}"
     "${COMMAND_EXAMPLES}"
 )
 
