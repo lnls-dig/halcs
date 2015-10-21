@@ -16,13 +16,20 @@ PWD = 		$(shell pwd)
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
 
-PREFIX ?= /usr/local
-export PREFIX
+LIBNAME_RAW = bpmclient
+LIBNAME = lib$(LIBNAME_RAW)
 
-LIBBPMCLIENT = libbpmclient
+# Special variable for version.h script only
+LIBNAME_FILES = bpm_client
 
 # Config variables suitable for creating shared libraries
-LIB_VER = $(shell ./version.sh bpm_client)
+LIB_VER = $(shell ./version.sh $(LIBNAME_FILES))
+LIB_VER_MAJOR = $(shell echo $(LIB_VER)| cut -d'.' -f1)
+LIB_VER_MINOR = $(shell echo $(LIB_VER)| cut -d'.' -f2)
+LIB_VER_REVESION = $(shell echo $(LIB_VER)| cut -d'.' -f3)
+
+PREFIX ?= /usr/local
+export PREFIX
 
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2 -fPIC
@@ -68,13 +75,15 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lzmq -lczmq -lmlm -luuid
+LIBS =
 
 # General library flags -L<libdir>
 LFLAGS =
 
 # Source directory
 SRC_DIR = src
+# Include directory
+INCLUDE_DIR = include
 
 # Specific board objects
 OBJS_BOARD =
@@ -94,8 +103,7 @@ OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 
 # Include directories
-INCLUDE_DIRS = -I. -Iinclude -I../liberrhand -I../libhutils -I../libdisptable \
-		   -I../libconvc \
+INCLUDE_DIRS = -I. -Iinclude \
 	       $(boards_INCLUDE_DIRS) \
 	       -I../../../include \
 	       -I../../sm_io/modules \
@@ -113,29 +121,23 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
-OUT = $(LIBBPMCLIENT)
+OUT = $(LIBNAME)
 
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBBPMCLIENT)_OBJS_LIB = $(SRC_DIR)/bpm_client_core.o $(SRC_DIR)/bpm_client_err.o \
+$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/bpm_client_core.o $(SRC_DIR)/bpm_client_err.o \
 	$(SRC_DIR)/bpm_client_rw_param.o
 
 # Objects common for both server and client libraries.
 common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 
 # Objects for each version of library
-$(LIBBPMCLIENT)_OBJS = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS_LIB)
-$(LIBBPMCLIENT)_CODE_HEADERS = \
-	../../../include/acq_chan_gen_defs.h \
-	../libdisptable/disp_table.h \
-	../libdisptable/disp_table_err.h \
-	../libhutils/hutils.h \
-	../libhutils/hutils_err.h \
-	../libhutils/hutils_math.h \
-	../libhutils/hutils_utils.h
+$(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
+$(LIBNAME)_CODE_HEADERS = \
+	../../../include/acq_chan_gen_defs.h
 
-$(LIBBPMCLIENT)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+$(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
 	../../sm_io/modules/acq/sm_io_acq_codes.h \
 	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
 	../../sm_io/modules/swap/sm_io_swap_codes.h \
@@ -143,7 +145,7 @@ $(LIBBPMCLIENT)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_c
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
 	../../sm_io/modules/sm_io_codes.h
 
-$(LIBBPMCLIENT)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+$(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
 	../../sm_io/modules/acq/sm_io_acq_exports.h \
 	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
 	../../sm_io/modules/swap/sm_io_swap_exports.h \
@@ -151,26 +153,26 @@ $(LIBBPMCLIENT)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
-$(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME = acq_chan
-$(LIBBPMCLIENT)_ACQ_HEADERS = \
-	../../../include/boards/$(BOARD)/priv_defs/$($(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME)_$(BOARD).h
-$(LIBBPMCLIENT)_INST_ACQ_HEADERS = include/$($(LIBBPMCLIENT)_ACQ_HEADERS_BASENAME).h
+$(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
+$(LIBNAME)_ACQ_HEADERS = \
+	../../../include/boards/$(BOARD)/priv_defs/$($(LIBNAME)_ACQ_HEADERS_BASENAME)_$(BOARD).h
+$(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers
-$(LIBBPMCLIENT)_SMIO_HEADERS_BASENAME = $(basename $(notdir $($(LIBBPMCLIENT)_SMIO_CODES) $($(LIBBPMCLIENT)_SMIO_EXPORTS)))
-$(LIBBPMCLIENT)_SMIO_HEADERS = $($(LIBBPMCLIENT)_SMIO_CODES) $($(LIBBPMCLIENT)_SMIO_EXPORTS)
-$(LIBBPMCLIENT)_INST_SMIO_HEADERS = $(addprefix include/,$(addsuffix .h,$($(LIBBPMCLIENT)_SMIO_HEADERS_BASENAME)))
+$(LIBNAME)_SMIO_HEADERS_BASENAME = $(basename $(notdir $($(LIBNAME)_SMIO_CODES) $($(LIBNAME)_SMIO_EXPORTS)))
+$(LIBNAME)_SMIO_HEADERS = $($(LIBNAME)_SMIO_CODES) $($(LIBNAME)_SMIO_EXPORTS)
+$(LIBNAME)_INST_SMIO_HEADERS = $(addprefix include/,$(addsuffix .h,$($(LIBNAME)_SMIO_HEADERS_BASENAME)))
 
 # Our local library headers
-$(LIBBPMCLIENT)_HEADERS_LIB = include/bpm_client.h include/bpm_client_classes.h \
-	include/bpm_client_prelude.h include/bpm_client_codes.h \
-	$(subst src/,include/, $(patsubst %.o,%.h,$($(LIBBPMCLIENT)_OBJS_LIB)))
+$(LIBNAME)_HEADERS_LIB = $(INCLUDE_DIR)/bpm_client.h $(INCLUDE_DIR)/bpm_client_classes.h \
+	$(INCLUDE_DIR)/bpm_client_prelude.h $(INCLUDE_DIR)/bpm_client_codes.h \
+	$(subst src/,include/, $(patsubst %.o,%.h,$($(LIBNAME)_OBJS_LIB)))
 
-$(LIBBPMCLIENT)_HEADERS = $($(LIBBPMCLIENT)_HEADERS_LIB) $($(LIBBPMCLIENT)_CODE_HEADERS) \
-	$($(LIBBPMCLIENT)_INST_SMIO_HEADERS)
+$(LIBNAME)_HEADERS = $($(LIBNAME)_HEADERS_LIB) $($(LIBNAME)_CODE_HEADERS) \
+	$($(LIBNAME)_INST_SMIO_HEADERS)
 
 # Installation headers
-$(LIBBPMCLIENT)_INST_HEADERS = $($(LIBBPMCLIENT)_HEADERS) $($(LIBBPMCLIENT)_INST_ACQ_HEADERS)
+$(LIBNAME)_INST_HEADERS = $($(LIBNAME)_HEADERS) $($(LIBNAME)_INST_ACQ_HEADERS)
 
 # Save a git repository description
 GIT_REVISION = $(shell git describe --dirty --always)
@@ -180,7 +182,7 @@ GIT_USER_EMAIL = $(shell git config --get user.email)
 revision_OBJS = $(SRC_DIR)/bpm_client_revision.o
 revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 
-OBJS_all = $(common_OBJS) $($(LIBBPMCLIENT)_OBJS) \
+OBJS_all = $(common_OBJS) $($(LIBNAME)_OBJS) \
 	   $(revision_OBJS)
 
 # Libraries suffixes
@@ -252,15 +254,15 @@ $(revision_OBJS): $(revision_SRCS)
 
 # Prepare the environment for install rule
 pre_inst:
-	$(foreach header,$($(LIBBPMCLIENT)_ACQ_HEADERS),cp -p $(header) \
-		$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS) $(CMDSEP))
-	$(foreach header,$($(LIBBPMCLIENT)_SMIO_HEADERS),cp -p $(header) \
+	$(foreach header,$($(LIBNAME)_ACQ_HEADERS),cp -p $(header) \
+		$(PWD)/$($(LIBNAME)_INST_ACQ_HEADERS) $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_SMIO_HEADERS),cp -p $(header) \
 		$(PWD)/include/ $(CMDSEP))
 
 pre_clean:
-	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_INST_ACQ_HEADERS), \
+	$(foreach header,$(PWD)/$($(LIBNAME)_INST_ACQ_HEADERS), \
 		rm -f $(header) $(CMDSEP))
-	$(foreach header,$(PWD)/$($(LIBBPMCLIENT)_INST_SMIO_HEADERS), \
+	$(foreach header,$(PWD)/$($(LIBNAME)_INST_SMIO_HEADERS), \
 		rm -f $(header) $(CMDSEP))
 
 install:
@@ -268,14 +270,14 @@ install:
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
-	$(foreach header,$($(LIBBPMCLIENT)_INST_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_INST_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
-	$(foreach header,$(notdir $($(LIBBPMCLIENT)_INST_HEADERS)),rm -f \
+	$(foreach header,$(notdir $($(LIBNAME)_INST_HEADERS)),rm -f \
 		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean: pre_clean
