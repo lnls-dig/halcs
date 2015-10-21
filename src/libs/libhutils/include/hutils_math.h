@@ -8,8 +8,9 @@
 #ifndef _HUTILS_MATH_H_
 #define _HUTILS_MATH_H_
 
-#include <math.h>
-#include <inttypes.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define POW_2_28                268435456.0
 
@@ -24,5 +25,9 @@ uint64_t hutils_div_u64_rem (uint64_t dividend, uint32_t divisor,
 uint64_t hutils_div_u64 (uint64_t dividend, uint32_t divisor);
 uint64_t hutils_div64_u64 (uint64_t dividend, uint64_t divisor);
 int64_t hutils_div64_s64 (int64_t dividend, int64_t divisor);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,17 +1,16 @@
 /*
  * Copyright (C) 2015 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
- * Parts taken from lwIP debug system
  *
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _HUTILS_
-#define _HUTILS_
+#ifndef _HUTILS_PRELUDE_H_
+#define _HUTILS_PRELUDE_H_
 
-#include "hutils_err.h"
-#include "hutils_math.h"
-#include "hutils_utils.h"
+/* External dependencies */
+#include <inttypes.h>
+#include <sys/types.h>
+#include <stdbool.h>
 
 #endif
-

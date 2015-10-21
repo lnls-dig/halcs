@@ -5,11 +5,12 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _HUTILS_H_
-#define _HUTILS_H_
+#ifndef _HUTILS_UTILS_H_
+#define _HUTILS_UTILS_H_
 
-#include <inttypes.h>
-#include <stddef.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /******************* Configuration file property names ************************/
 
@@ -104,5 +105,9 @@ int hutils_copy_str (char *dest, const char *src, size_t size);
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
  * and store them in hash table in the form <property name / property value> */
 hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

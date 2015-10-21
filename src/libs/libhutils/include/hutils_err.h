@@ -11,6 +11,10 @@
 #ifndef _HUTILS_ERR_H_
 #define _HUTILS_ERR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum _hutils_err_e
 {
     HUTILS_SUCCESS = 0,               /* No error */
@@ -23,5 +27,9 @@ typedef enum _hutils_err_e hutils_err_e;
 
 /* Convert enumeration type to string */
 const char * hutils_err_str (hutils_err_e err);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

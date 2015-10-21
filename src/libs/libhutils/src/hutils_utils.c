@@ -5,14 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdio.h>
-#include <sys/wait.h>       /* waitpid */
-#include <errno.h>          /* perror */
-#include <czmq.h>
-
 #include "hutils.h"
-#include "hutils_err.h"
-#include "errhand.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
