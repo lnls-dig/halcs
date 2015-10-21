@@ -465,23 +465,23 @@ libsdbfs_mrproper:
 	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
 
 libs: liberrhand libconvc libhutils \
-    libdisptable libllio libbpmclient
+    libdisptable libllio libbpmclient libsdbfs
 
 libs_install: liberrhand_install libconvc_install libhutils_install \
-    libdisptable_install libllio_install libbpmclient_install
+    libdisptable_install libllio_install libbpmclient_install libsdbfs_install
 
 libs_compile_install: liberrhand liberrhand_install libconvc libconvc_install \
     libhutils libhutils_install libdisptable libdisptable_install libllio libllio_install \
-    libbpmclient libbpmclient_install
+    libbpmclient libbpmclient_install libsdbfs libsdbfs_install
 
 libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
-    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall
+    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall libsdbfs_uninstall
 
 libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean
+    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
 
 libs_mrproper: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean
+    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_mrproper
 
 # External project dependencies
 
