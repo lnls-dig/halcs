@@ -9,10 +9,9 @@
 #ifndef _ERRHAND_PRINT_H_
 #define _ERRHAND_PRINT_H_
 
-#include <stdarg.h>
-#include <stdio.h>
-#include "errhand_subsys.h"       /* This must come before "errhand_opts.h" */
-#include "errhand_opts.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _zmsg_t;
 
@@ -100,5 +99,9 @@ void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
 #define DBE_DEBUG               ERRHAND_DEBUG
 #define DBE_DEBUG_ARRAY         ERRHAND_DEBUG_ARRAY
 #define DBE_ERR                 ERRHAND_ERR
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

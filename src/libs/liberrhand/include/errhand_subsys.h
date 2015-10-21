@@ -8,6 +8,10 @@
 #ifndef _ERRHAND_SUBSYS_H_
 #define _ERRHAND_SUBSYS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /****************** Debug subsys macros ******************/
 /*
  * ERRHAND_SUBSYS variable is one-hot encoded between
@@ -133,6 +137,10 @@ char *errhand_lvl_to_str (int errhand_lvl);
 
 /* For compatibility */
 #define DBG_LVL_HALT                ERRHAND_LVL_HALT
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

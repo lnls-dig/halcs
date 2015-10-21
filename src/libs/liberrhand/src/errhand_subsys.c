@@ -5,8 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <czmq.h>
-#include "errhand_subsys.h"
+#include "errhand.h"
 
 const char *errhand_lvl_str [ERRHAND_LVL_NUM] = {
     [0] = ERRHAND_LVL_TRACE_STR,

@@ -9,6 +9,10 @@
 #ifndef _ERRHAND_OPTS_
 #define _ERRHAND_OPTS_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Defaults to sensible values if DBG_MIN_LEVEL and DBG_SUBSYS_ON
  * are not specified previously */
 
@@ -66,5 +70,9 @@
 #define ERRHAND_SUBSYS_ON DBG_SUBSYS_ON
 
 #endif /* ERRHAND_SUBSYS_ON */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -9,7 +9,15 @@
 #ifndef _ERRHAND_LOCAL_PRINT_H_
 #define _ERRHAND_LOCAL_PRINT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 char *errhand_lprint_vprintf (const char *format, va_list argptr);
 void errhand_lprint_zmq_msg (zmsg_t *msg, FILE *file);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

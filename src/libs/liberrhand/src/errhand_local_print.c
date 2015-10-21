@@ -5,7 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <czmq.h>
+#include "errhand.h"
 
 char *errhand_lprint_vprintf (const char *format, va_list argptr)
 {

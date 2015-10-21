@@ -5,14 +5,7 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <czmq.h>
-
-#include "errhand_print.h"
-#include "errhand_local_print.h"
-#include "errhand_subsys.h"
+#include "errhand.h"
 
 #define ERRHAND_PRINT_PAD_FMT           "-5"
 

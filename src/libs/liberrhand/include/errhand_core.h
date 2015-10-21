@@ -6,13 +6,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _ERRHAND_
-#define _ERRHAND_
-
-#include "errhand_assert.h"
-#include "errhand_subsys.h"
-#include "errhand_opts.h"
-#include "errhand_print.h"
+#ifndef _ERRHAND_CORE_H_
+#define _ERRHAND_CORE_H_
 
 #endif
 

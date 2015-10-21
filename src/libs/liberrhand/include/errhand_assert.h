@@ -8,8 +8,9 @@
 #ifndef _ERRHAND_ASSERT_H_
 #define _ERRHAND_ASSERT_H_
 
-#include "errhand_print.h"
-#include "varg_macros.h" /* Point the -I to somewhere visible */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* TODO: find a way avoid modifying the "global" err variable */
 #define SET_ERR_VAR(err_code)  WHENNOT(ISEMPTY(err_code))(  \
@@ -49,5 +50,9 @@
 #define ASSERT_HAL_TEST ERRHAND_TEST
 #define ASSERT_HAL_ALLOC ERRHAND_TEST_ALLOC
 #define CHECK_HAL_ERR ERRHAND_CHECK_ERR
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
