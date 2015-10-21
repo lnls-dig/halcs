@@ -22,6 +22,8 @@ enum _llio_type_e {
     END_DEV = CONVC_TYPE_END
 };
 
+typedef enum _llio_type_e llio_type_e;
+
 #define GENERIC_DEV_STR             "generic"
 #define PCIE_DEV_STR                "pcie"
 #define ETH_DEV_STR                 "eth"

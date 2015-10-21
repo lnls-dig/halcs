@@ -5,8 +5,8 @@
  * Released according to the GNU LGPL, version 3 or any later version.
  */
 
-#ifndef _LL_IO_H_
-#define _LL_IO_H_
+#ifndef _LL_IO_CORE_H_
+#define _LL_IO_CORE_H_
 
 #ifdef __cplusplus
 extern "C" {

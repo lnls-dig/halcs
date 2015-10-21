@@ -20,6 +20,8 @@ enum _llio_eth_type_e {
     END_ETH_SOCK = CONVC_TYPE_END
 };
 
+typedef enum _llio_eth_type_e llio_eth_type_e;
+
 #define TCP_ETH_SOCK_STR            "tcp"
 #define UDP_ETH_SOCK_STR            "udp"
 #define INVALID_ETH_SOCK_STR        "invalid"

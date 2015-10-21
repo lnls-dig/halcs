@@ -26,6 +26,8 @@ enum _llio_err_e {
     LLIO_ERR_END                    /* End of enum marker */
 };
 
+typedef enum _llio_err_e llio_err_e;
+
 /* Convert enumeration type to string */
 const char * llio_err_str (llio_err_e err);
 
