@@ -17,6 +17,7 @@
 #include <disptable.h>
 #include <errhand.h>
 #include <hutils.h>
+#include <ll_io.h>
 
 /* Internal libraries dependencies */
 #include "libsdbfs.h"
@@ -59,19 +60,6 @@ typedef enum _dmngr_err_e dmngr_err_e;
 typedef struct _devio_info_t devio_info_t;
 /* Opaque dmngr_t class structure */
 typedef struct _dmngr_t dmngr_t;
-
-/* Forward llio_err_e declaration enumeration */
-typedef enum _llio_err_e llio_err_e;
-/* Forward llio_type_e declaration enumeration */
-typedef enum _llio_type_e llio_type_e;
-/* Forward llio_eth_type_e declaration enumeration */
-typedef enum _llio_eth_type_e llio_eth_type_e;
-/* Opaque llio_dev_info_t structure */
-typedef struct _llio_dev_info_t llio_dev_info_t;
-/* Opaque llio_endpoint_t structure */
-typedef struct _llio_endpoint_t llio_endpoint_t;
-/* Opaque llio_t structure */
-typedef struct _llio_t llio_t;
 
 /* Forward devio_err_e declaration enumeration */
 typedef enum _devio_err_e devio_err_e;
@@ -116,16 +104,6 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "dev_mngr_err.h"
 #include "dev_mngr_dev_info.h"
 #include "dev_mngr_core.h"
-
-/* LL_IO */
-#include "ll_io_err.h"
-#include "ll_io_utils.h"
-#include "ll_io_dev_info.h"
-#include "ll_io_endpoint.h"
-#include "ll_io.h"
-#include "ll_io_pcie.h"
-#include "ll_io_eth_utils.h"
-#include "ll_io_eth.h"
 
 /* DEV_IO */
 #include "dev_io_err.h"
