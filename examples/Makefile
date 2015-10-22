@@ -36,8 +36,16 @@ CFLAGS_DEBUG += -g
 # Specific platform Flags
 CFLAGS_PLATFORM = -Wall -Wextra -Werror \
 		  -Wno-missing-field-initializers \
-		  -Wno-missing-braces \
-		  -Wno-cpp
+		  -Wno-missing-braces
+
+ifeq ($(CC),$(filter $(CC),gcc cc))
+CFLAGS_PLATFORM += -Wno-cpp
+endif
+
+ifeq ($(CC),clang)
+CFLAGS_PLATFORM += -Wno-error=\#warnings
+endif
+
 LDFLAGS_PLATFORM =
 
 # Libraries
