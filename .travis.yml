@@ -8,8 +8,8 @@ compiler:
 sudo: false
 
 env:
-- BOARD=ml605 WITH_EXAMPLES=with_examples
-- BOARD=afcv3 WITH_EXAMPLES=with_examples
+- BOARD=ml605 EXAMPLES=with_examples LIBS_LINK=without_libs_link
+- BOARD=afcv3 EXAMPLES=with_examples LIBS_LINK=without_libs_link
 
 addons:
   apt:

@@ -58,4 +58,4 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh $BOARD $WITH_EXAMPLES "${BPM_OPTS[@]}"
+./compile.sh $BOARD $EXAMPLES $LIBS_LINK "${BPM_OPTS[@]}"
