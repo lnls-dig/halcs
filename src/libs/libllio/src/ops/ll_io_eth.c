@@ -200,8 +200,6 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
             "[ll_io_eth] Opened ETH device located at %s\n",
             llio_get_endpoint_name (self));
 
-    return err;
-
 err_eth_conn:
 err_dev_handler_alloc:
 err_endp_port_retrieve:
