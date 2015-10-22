@@ -106,7 +106,7 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
-if [ "$WITH_EXAMPLES" == "with_examples" ]; then
+if [ "$WITH_EXAMPLES" = "with_examples" ]; then
 COMMAND_EXAMPLES="\
     make ${EXTRA_FLAGS[@]} examples"
 else
