@@ -3,7 +3,7 @@
  * Author: Lucas Russo <lucas.russo@lnls.br>
  * Parts taken from lwIP debug system
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _ERRHAND_OPTS_
