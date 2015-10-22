@@ -240,6 +240,8 @@ devio_err_e devio_destroy (devio_t **self_p)
     assert (self_p);
 
     if (*self_p) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:destroy] Destroying DEVIO instance\n");
         devio_t *self = *self_p;
 
         /* Destroy children threads before proceeding */
@@ -251,8 +253,14 @@ devio_err_e devio_destroy (devio_t **self_p)
          * unregister from broker as soon as possible to avoid
          * loosing requests from clients */
         disp_table_destroy (&self->disp_table_thsafe_ops);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:destroy] Destroying sm_io_cfg_h hash\n");
         zhashx_destroy (&self->sm_io_cfg_h);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:destroy] Destroying sm_io_h hash\n");
         zhashx_destroy (&self->sm_io_h);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:destroy] All hashes destroyed\n");
         self->thsafe_server_ops = NULL;
         llio_release (self->llio, NULL);
         llio_destroy (&self->llio);
@@ -471,15 +479,13 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
         ASSERT_TEST (zerr == 0, "Could not insert PIPE into Config poller",
                 err_poller_config_insert);
 
+        /* key is not needed anymore, as all the hashes have taken a copy of it */
+        free (key);
+        key = NULL;
+
         /* stop on first match */
         break;
     }
-
-    /* On success, just "key"" is not deallocated. All of the other
-     * allocated parameters are either free'd or its ownership
-     * is transfered to the calling function/thread */
-    free (key);
-    key = NULL;
 
     return DEVIO_SUCCESS;
 
@@ -759,17 +765,21 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
 
     /* Send the $TERM message to the SMIO */
     int zerr = zmsg_send (&send_msg, *actor);
-    ASSERT_TEST (zerr == 0, "Could not send self-destruct message to SMIO instance",
-            err_send_msg, DEVIO_ERR_SMIO_DESTROY);
+    if (zerr != 0) {
+        /* Try to proceed anyway to destroy actor */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Could not send "
+                "self-destruct message to SMIO instance. \n"
+                "\tProceeding to destroy zactor anyway\n");
+    }
+    else {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
+                "to SMIO sent\n");
+    }
 
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
-            "to SMIO sent\n");
-
-    /* Lastly, destroy the actor */
+    /* Lastly, destroy the message and actor */
+    zmsg_destroy (&send_msg);
     zactor_destroy (actor);
 
-err_send_msg:
-    zmsg_destroy (&send_msg);
 err_msg_alloc:
     return err;
 }
