@@ -239,6 +239,7 @@ err_pipe_mgmt_bad_msg:
     }
 
 err_poller_interrupted:
+    zpoller_destroy (&poller);
 err_init_poller:
 err_inv_worker_socket:
     return err;
