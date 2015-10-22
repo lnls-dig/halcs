@@ -2,6 +2,7 @@
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
+VALID_WITH_LIBS_LINK_STR="Valid values are: \"with_libs_link\" or \"without_libs_link\"."
 
 #######################################
 # All of our Makefile options
@@ -27,9 +28,16 @@ if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WIT
     exit 1
 fi
 
+WITH_LIBS_LINK=$3
+
+if [ -n "$WITH_LIBS_LINK" ] && [ "$WITH_LIBS_LINK" != "with_libs_link" ] && [ "$WITH_LIBS_LINK" != "without_libs_link" ]; then
+    echo "Wrong variable value. "$VALID_WITH_LIBS_LINK_STR
+    exit 1
+fi
+
 EXTRA_FLAGS=()
 # Get all other arguments
-for item in "${@:3}"
+for item in "${@:4}"
 do
     EXTRA_FLAGS+=("${item}")
 done
@@ -98,14 +106,18 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
-if [ "$WITH_EXAMPLES" = "with_examples" ]; then
+if [ "$WITH_EXAMPLES" == "with_examples" ]; then
 COMMAND_EXAMPLES="\
     make ${EXTRA_FLAGS[@]} examples"
 else
 COMMAND_EXAMPLES=""
 fi
 
+if [ "$WITH_LIBS_LINK" == "with_libs_link" ] || [ "$WITH_LIBS_LINK" == "" ]; then
 COMMAND_LIBS_LINK="ldconfig"
+else
+COMMAND_LIBS_LINK=""
+fi
 
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
