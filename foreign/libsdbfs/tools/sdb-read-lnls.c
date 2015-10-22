@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2012,2014 CERN (www.cern.ch)
+ * Copyright (C) 2015 LNLS (www.lnls.br)
  * Author: Alessandro Rubini <rubini@gnudd.com>
+ * Author: Lucas Russo <lucas.russo@lnls.br>
  *
  * Released according to the GNU GPL, version 2 or any later version.
  *
