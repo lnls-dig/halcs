@@ -780,28 +780,7 @@ static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
     assert (*actor);
 
     devio_err_e err = DEVIO_SUCCESS;
-    /* Send message to SMIO informing it to destroy itself */
-    /* This cannot fail at this point... but it can */
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC (send_msg, err_msg_alloc, DEVIO_ERR_ALLOC);
-    /* $TERM message means to selfdestruct */
-    zmsg_pushstr (send_msg, "$TERM");
-
-    /* Send the $TERM message to the SMIO */
-    int zerr = zmsg_send (&send_msg, *actor);
-    if (zerr != 0) {
-        /* Try to proceed anyway to destroy actor */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Could not send "
-                "self-destruct message to SMIO instance. \n"
-                "\tProceeding to destroy zactor anyway\n");
-    }
-    else {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Self-destruct message "
-                "to SMIO sent\n");
-    }
-
-    /* Lastly, destroy the message and actor */
-    zmsg_destroy (&send_msg);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Destroying actor %p\n", *actor);
     zactor_destroy (actor);
 
 err_msg_alloc:
