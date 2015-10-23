@@ -84,7 +84,7 @@ static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
 
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
-static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor);
+static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor);
 static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const char *smio_key);
 static devio_err_e _devio_destroy_smio_all (devio_t *self, zhashx_t *smio_h);
 
@@ -518,7 +518,7 @@ err_poller_config_insert:
 err_cfg_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
-    _devio_send_destruct_msg (self, &self->pipes_config [pipe_config_idx]);
+    _devio_destroy_actor (self, &self->pipes_config [pipe_config_idx]);
 err_spawn_config_thread:
     /* FIXME: Destroy SMIO thread as we could configure it? */
     free (th_config_args);
@@ -529,7 +529,7 @@ err_poller_insert:
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
-    _devio_send_destruct_msg (self, &self->pipes_mgmt [pipe_mgmt_idx]);
+    _devio_destroy_actor (self, &self->pipes_mgmt [pipe_mgmt_idx]);
 err_spawn_smio_thread:
     zsock_destroy (&self->pipes_msg [pipe_msg_idx]);
 err_create_pipe_msg:
@@ -773,7 +773,7 @@ err_hash_keys_alloc:
     return err;
 }
 
-static devio_err_e _devio_send_destruct_msg (devio_t *self, zactor_t **actor)
+static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor)
 {
     assert (self);
     assert (actor);
@@ -799,7 +799,7 @@ static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const c
     ASSERT_TEST (actor != NULL, "Could not find SMIO registered with this ID",
             err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
 
-    err = _devio_send_destruct_msg (self, actor);
+    err = _devio_destroy_actor (self, actor);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
             "PIPE management", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
 
