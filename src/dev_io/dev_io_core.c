@@ -240,41 +240,65 @@ devio_err_e devio_destroy (devio_t **self_p)
     assert (self_p);
 
     if (*self_p) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying DEVIO instance\n");
         devio_t *self = *self_p;
 
         /* Destroy children threads before proceeding */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying sm_io_cfg_h\n");
         _devio_destroy_smio_all (self, self->sm_io_cfg_h);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying sm_io_h\n");
         _devio_destroy_smio_all (self, self->sm_io_h);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] All SMIOs destroyed\n");
 
         /* Starting destructing by the last resource */
         /* Notice that we destroy the worker first, as to
          * unregister from broker as soon as possible to avoid
          * loosing requests from clients */
         disp_table_destroy (&self->disp_table_thsafe_ops);
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying sm_io_cfg_h hash\n");
         zhashx_destroy (&self->sm_io_cfg_h);
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying sm_io_h hash\n");
         zhashx_destroy (&self->sm_io_h);
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] All hashes destroyed\n");
         self->thsafe_server_ops = NULL;
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Releasing LLIO\n");
         llio_release (self->llio, NULL);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying LLIO\n");
         llio_destroy (&self->llio);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] LLIO destroyed\n");
         free (self->endpoint_broker);
         free (self->name);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying poller_config\n");
         zpoller_destroy (&self->poller_config);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Derstroying poller\n");
         zpoller_destroy (&self->poller);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] All pollers destroyed\n");
         /* Destroy all remamining sockets if any */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying all actors\n");
         uint32_t i;
         for (i = 0; i < NODES_MAX_LEN; ++i) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                    "[dev_io_core:destroy] Destroying possible remaining actors, instance #%u\n", i);
             zactor_destroy (&self->pipes_config [i]);
             zsock_destroy (&self->pipes_msg [i]);
             zactor_destroy (&self->pipes_mgmt [i]);
         }
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] All actors destroyed\n");
         free (self->pipes_config);
         free (self->pipes_msg);
         free (self->pipes_mgmt);
