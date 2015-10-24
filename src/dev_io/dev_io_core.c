@@ -783,7 +783,6 @@ static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Destroying actor %p\n", *actor);
     zactor_destroy (actor);
 
-err_msg_alloc:
     return err;
 }
 
