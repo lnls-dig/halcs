@@ -41,7 +41,9 @@ struct _smio_acq_data_block_t {
 #define ACQ_NAME_SW_TRIG                "acq_sw_trig"
 #define ACQ_OPCODE_FSM_STOP             10
 #define ACQ_NAME_FSM_STOP               "acq_fsm_stop"
-#define ACQ_OPCODE_END                  11
+#define ACQ_OPCODE_HW_DATA_TRIG_CHAN    11
+#define ACQ_NAME_HW_DATA_TRIG_CHAN      "acq_hw_data_trig_chan"
+#define ACQ_OPCODE_END                  12
 
 /* Messaging Reply OPCODES */
 #define ACQ_REPLY_TYPE                  uint32_t

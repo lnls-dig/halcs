@@ -721,6 +721,14 @@ RW_PARAM_FUNC(acq, fsm_stop) {
             ACQ_FSM_STOP_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define ACQ_DATA_DRIVEN_CHAN_MIN                    0
+#define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
+RW_PARAM_FUNC(acq, hw_data_trig_chan) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, ACQ_CHAN_CTL,
+            DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,
+            ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp acq_exp_fp [] = {
     _acq_data_acquire,
@@ -734,6 +742,7 @@ const disp_table_func_fp acq_exp_fp [] = {
     RW_PARAM_FUNC_NAME(acq, hw_trig_dly),
     RW_PARAM_FUNC_NAME(acq, sw_trig),
     RW_PARAM_FUNC_NAME(acq, fsm_stop),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_chan),
     NULL
 };
 
