@@ -542,6 +542,14 @@ bpm_client_err_e bpm_set_acq_fsm_stop (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_acq_fsm_stop (bpm_client_t *self, char *service,
         uint32_t *fsm_stop);
 
+/* Selects which channel to look for a data trigger.
+ * Returns BPM_CLIENT_SUCCESS if the trigger was correctly set or
+ * or an error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_acq_data_trig_chan (bpm_client_t *self, char *service,
+        uint32_t data_trig_chan);
+bpm_client_err_e bpm_get_acq_data_trig_chan (bpm_client_t *self, char *service,
+        uint32_t *data_trig_chan);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */
