@@ -81,6 +81,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-f Configuration file\n"
             "\t-d Daemon mode.\n"
+            "\t-w Daemon working directory.\n"
             "\t-v Verbose output\n"
             "\t-n <devio_type = [be|fe]> Devio type\n"
             "\t-t <device_type = [eth|pcie]> Device type\n"
@@ -96,7 +97,8 @@ void print_help (char *program_name)
 int main (int argc, char *argv[])
 {
     int verbose = 0;
-    int daemonize = 0;
+    int devio_daemonize = 0;
+    char *devio_work_dir = NULL;
     char *devio_type_str = NULL;
     char *dev_type = NULL;
     char *dev_entry = NULL;
@@ -123,8 +125,12 @@ int main (int argc, char *argv[])
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Verbose mode set\n");
         }
         else if (streq (argv[i], "-d")) {
-            daemonize = 1;
+            devio_daemonize = 1;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Demonize mode set\n");
+        }
+        else if (streq (argv[i], "-w")) {
+            str_p = &devio_work_dir;
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set devio_work_dir\n");
         }
         else if (streq (argv[i], "-n")) {
             str_p = &devio_type_str;
@@ -172,11 +178,15 @@ int main (int argc, char *argv[])
     }
 
     /* Daemonize dev_io */
-    if (daemonize != 0) {
-        int rc = daemon(0, 0);
+    if (devio_daemonize != 0) {
+        if (devio_work_dir == NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Daemon working directory not specified\n");
+            goto err_exit;
+        }
 
+        int rc = zsys_daemonize (devio_work_dir);
         if (rc != 0) {
-            perror ("[dev_io] daemon");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Fail to daemonize\n");
             goto err_exit;
         }
     }
@@ -448,6 +458,8 @@ err_exit:
     str_p = &dev_type;
     free (*str_p);
     str_p = &devio_type_str;
+    free (*str_p);
+    str_p = &devio_work_dir;
     free (*str_p);
     str_p = &cfg_file;
     free (*str_p);
