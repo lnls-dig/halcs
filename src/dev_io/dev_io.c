@@ -49,8 +49,8 @@
 #define DEVIO_MAX_FE_DEVIOS         16
 
 #define DEVIO_SERVICE_LEN           50
-#define DEVIO_NAME                  "dev_io"
-#define DEVIO_CFG_NAME              "dev_io_cfg"
+#define DEVIO_NAME                  "/usr/local/bin/dev_io"
+#define DEVIO_CFG_NAME              "/usr/local/bin/dev_io_cfg"
 #define EPICS_PROCSERV_NAME         "/usr/local/bin/procServ"
 #define EPICS_BPM_NAME              "BPM"
 #define EPICS_BPM_RUN_SCRIPT_NAME   "./run.sh"
