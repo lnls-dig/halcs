@@ -37,8 +37,8 @@
 
 #define DEVIO_DEV_NAME_LEN          40
 
-#define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
-#define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
+#define DEVIO_BE_DEV_PATTERN        "/dev/fpga/%d"
+#define DEVIO_BE_DEV_GLOB           "/dev/fpga/*"
 
 #define DEVIO_NAME                  "dev_io"
 
