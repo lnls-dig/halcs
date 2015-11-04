@@ -199,7 +199,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_END_ADDR, &end_addr);
 
     /* Prepare acquisition channel control */
-    uint32_t acq_chan_ctl = ACQ_CORE_ACQ_CHAN_CTL_WHICH_W(chan);
+    uint32_t acq_chan_ctl = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_ACQ_CHAN_CTL, &acq_chan_ctl);
+    acq_chan_ctl = (acq_chan_ctl & ~ACQ_CORE_ACQ_CHAN_CTL_WHICH_MASK) |
+         ACQ_CORE_ACQ_CHAN_CTL_WHICH_W(chan);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Channel control register is: 0x%08x\n",
             acq_chan_ctl);
