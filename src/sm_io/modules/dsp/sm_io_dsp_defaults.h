@@ -9,10 +9,9 @@
 #define _DSP_DEFAULTS_H_
 
 /********************** K Default Values ***************************/
-#define DSP_DFLT_KX_VAL                 1000000    /* nm */
-#define DSP_DFLT_KY_VAL                 1000000    /* nm */
-#define DSP_DFLT_KSUM_VAL               0x0FFFFFF   /* 1.0 in FIX25_24 notation */
-
+#define DSP_DFLT_KX_VAL                 10000000    /* nm */
+#define DSP_DFLT_KY_VAL                 10000000    /* nm */
+#define DSP_DFLT_KSUM_VAL               1           /* 1 in FIX25_0 notation */
 
 /************ Delta Sigma Minimum Calculation Threshold ***********/
 #define DSP_DFLT_DS_TBT_THRES           0           /* No minimum threslhold */
