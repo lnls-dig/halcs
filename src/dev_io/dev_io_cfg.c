@@ -139,12 +139,13 @@ int main (int argc, char *argv[])
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
                     "\tDefaulting it to the /dev file number ...\n");
 
-                int matches = sscanf (dev_entry, "/dev/fpga%u", &dev_id);
+                int matches = sscanf (dev_entry, "/dev/fpga-%u", &dev_id);
                 if (matches == 0) {
                     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
-                            "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
+                            "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
+                break;
 
             default:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
