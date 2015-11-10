@@ -163,7 +163,8 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
     uint32_t num_samples_pre_aligned = num_samples_pre + samples_alignment -
         (num_samples_pre % samples_alignment);
-    uint32_t num_samples_post_aligned = num_samples_post + samples_alignment -
+    uint32_t num_samples_post_aligned = (num_samples_post==0) ? 0 :
+        num_samples_post + samples_alignment -
         (num_samples_post % samples_alignment);
 
     /* Set the parameters: number of samples of this channel */
