@@ -30,6 +30,9 @@
     CHECK_HAL_ERR(err, HAL_UTILS, "[hutils:utils]",                     \
             hutils_err_str (err_type))
 
+#define MIN_WAIT_TIME           1                           /* in ms */
+#define MSECS                   1000                        /* in seconds */
+
 static char *_hutils_concat_strings_raw (const char *str1, const char* str2,
         const char *str3, bool with_sep, char sep);
 static void _hutils_hints_free_item (void **data);
@@ -243,6 +246,32 @@ int hutils_wait_chld (void)
     }
 
     return 0;
+}
+
+int hutils_wait_chld_timed (int timeout)
+{
+    int err = 0;
+
+    time_t start = time (NULL);
+    while ((time(NULL) - start)*1000 < timeout) {
+        if (zsys_interrupted) {
+            err = -1;
+            goto bpm_zsys_interrupted;
+        }
+
+        err = hutils_wait_chld ();
+        if (err == 0) {
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "[hutils:utils] "
+                    "hutils_wait_chld_timed: finished waiting\n");
+            goto exit;
+        }
+
+        usleep (MSECS*MIN_WAIT_TIME);
+    }
+
+exit:
+bpm_zsys_interrupted:
+    return err;
 }
 
 /*******************************************************************/

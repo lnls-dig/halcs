@@ -94,6 +94,11 @@ int hutils_spawn_chld (const char *program, char *const argv[]);
  * in the global LOG. Returns 0 in case of success and -1 in case of error */
 int hutils_wait_chld (void);
 
+/* Wait for a child process with a looped timeout, printing the exit status
+ * and possible errors in the global LOG. Returns 0 in case of success and
+ * -1 in case of error */
+int hutils_wait_chld_timed (int timeout);
+
 /* Clones a str NULL terminated string and return it to the called. Returns NULL
  * in case of error */
 char *hutils_clone_str (const char *str);
