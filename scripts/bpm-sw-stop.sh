@@ -13,6 +13,6 @@ if [ -z "$BIN_INSTANCE" ]; then
 fi
 
 # FIXME: Find correct dev_io instance looking at all running processes
-TARGET_PID=$(ps aux | grep -Ei "dev_io.*/dev/fpga${BIN_INSTANCE}.*" | head -1 | awk '{print $2}')
+TARGET_PID=$(ps aux | grep -Ei "dev_io.*/dev/fpga-${BIN_INSTANCE}.*" | head -1 | awk '{print $2}')
 
 kill ${TARGET_PID}
