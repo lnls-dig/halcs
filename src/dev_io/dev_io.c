@@ -313,8 +313,8 @@ int main (int argc, char *argv[])
         if (child_devio_cfg_pid > 0) {
             kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
         }
-        /* Wait child */
-        hutils_wait_chld ();
+        /* Wait child up to 5 seconds before giving up waiting */
+        hutils_wait_chld_timed (5000);
     }
     /* Destroy libclient */
     bpm_client_destroy (&client_cfg);
