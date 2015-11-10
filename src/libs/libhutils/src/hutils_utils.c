@@ -245,7 +245,7 @@ int hutils_wait_chld (void)
                 WTERMSIG(chld_status));
     }
 
-    return 0;
+    return chld_pid;
 }
 
 int hutils_wait_chld_timed (int timeout)
@@ -260,7 +260,7 @@ int hutils_wait_chld_timed (int timeout)
         }
 
         err = hutils_wait_chld ();
-        if (err == 0) {
+        if (err > 0) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "[hutils:utils] "
                     "hutils_wait_chld_timed: finished waiting\n");
             goto exit;
