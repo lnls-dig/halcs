@@ -184,12 +184,9 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             num_samples_post_aligned);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_POST_SAMPLES, &num_samples_post_aligned);
 
-    /* DDR3 start address. Convert Byte address to Word address, as this address
-     * is written to the DDR controller, which is 32-bit (word) addressed */
-    uint32_t start_addr = (uint32_t)
-        acq->acq_buf[chan].start_addr/DDR3_ADDR_WORD_2_BYTE;
-    uint32_t end_addr = (uint32_t)
-        acq->acq_buf[chan].end_addr/DDR3_ADDR_WORD_2_BYTE;
+    /* DDR3 start address. Byte addressed */
+    uint32_t start_addr = (uint32_t) acq->acq_buf[chan].start_addr;
+    uint32_t end_addr = (uint32_t) acq->acq_buf[chan].end_addr;
 
     /* Start address */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
@@ -388,9 +385,9 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             block_n, chan, reply_size);
 
     /* For all modes the start valid address is given by:
-     * start_addr = trigger_addr*DDR3_ADDR_WORD_2_BYTE -
+     * start_addr = trigger_addr -
      * ((num_samples_pre+num_samples_post)*(num_shots-1) + num_samples_pre)*
-     *      sample_size
+     * sample_size
      * */
 
     /* First step if to read trigger address. Even on skip trigger mode,
@@ -398,8 +395,6 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * (end of acquisition address) */
     uint32_t acq_core_trig_addr = 0;
     smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
-    /* Convert to byte address */
-    acq_core_trig_addr *= DDR3_ADDR_WORD_2_BYTE;
 
     /* Second step is to calculate the size of the whole acquisition in bytes */
     uint32_t acq_size_bytes = (num_samples_shot*(num_shots-1) +
