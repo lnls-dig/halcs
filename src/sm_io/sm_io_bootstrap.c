@@ -51,7 +51,7 @@ void smio_startup (zsock_t *pipe, void *args)
     char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
     ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
     char *smio_service = hutils_concat_strings3 (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
+            _smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
@@ -125,7 +125,7 @@ void smio_config_defaults (zsock_t *pipe, void *args)
     char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
     ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
     char *smio_service = hutils_concat_strings3 (th_args->service,
-            smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
+            _smio_mod_dispatch[th_args->smio_id].name, inst_id_str, ':');
     ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
@@ -138,7 +138,7 @@ void smio_config_defaults (zsock_t *pipe, void *args)
 
     /* We've finished configuring the SMIO. Tell DEVIO we are done */
     char *smio_service_suffix = hutils_concat_strings_no_sep (
-            smio_mod_dispatch[th_args->smio_id].name, inst_id_str);
+            _smio_mod_dispatch[th_args->smio_id].name, inst_id_str);
     ASSERT_ALLOC(smio_service_suffix, err_smio_service_suffix_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Sending CONFIG DONE message over PIPE\n");
