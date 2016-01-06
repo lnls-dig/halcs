@@ -389,3 +389,5 @@ const smio_bootstrap_ops_t rffe_bootstrap_ops = {
     .shutdown = rffe_shutdown,
     .config_defaults = rffe_config_defaults
 };
+
+SMIO_MOD_DECLARE(RFFE_DEVID, RFFE_NAME, rffe_bootstrap_ops)

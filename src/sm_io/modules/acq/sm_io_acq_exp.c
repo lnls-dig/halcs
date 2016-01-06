@@ -892,3 +892,5 @@ const smio_bootstrap_ops_t acq_bootstrap_ops = {
     .init = acq_init,
     .shutdown = acq_shutdown
 };
+
+SMIO_MOD_DECLARE(ACQ_SDB_DEVID, ACQ_SDB_NAME, acq_bootstrap_ops)
