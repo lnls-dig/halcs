@@ -46,6 +46,9 @@ export CFG
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
 
+# Linker script
+LD_SCRIPT = linker/bpm-sw.ld
+
 # Init sripts
 INIT_SCRIPTS =
 
@@ -158,7 +161,7 @@ CFLAGS_DEBUG += -g
 
 # Specific platform Flags
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
-LDFLAGS_PLATFORM =
+LDFLAGS_PLATFORM = -T $(LD_SCRIPT)
 
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmlm
