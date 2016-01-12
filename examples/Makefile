@@ -38,11 +38,11 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror \
 		  -Wno-missing-field-initializers \
 		  -Wno-missing-braces
 
-ifeq ($(CC),$(filter $(CC),gcc cc))
+ifeq ($(notdir $(CC)),$(filter $(notdir $(CC)),gcc cc))
 CFLAGS_PLATFORM += -Wno-cpp
 endif
 
-ifeq ($(CC),clang)
+ifeq ($(notdir $(CC)),clang)
 CFLAGS_PLATFORM += -Wno-error=\#warnings
 endif
 
