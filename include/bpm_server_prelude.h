@@ -35,7 +35,7 @@
 
 /* MLM */
 #if MALAMUTE_VERSION < 100
-#error "BPM-SW requires at least czmq/0.1.0"
+#error "BPM-SW requires at least malamute/0.1.0"
 #endif
 
 #endif
