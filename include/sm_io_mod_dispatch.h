@@ -18,7 +18,7 @@ typedef struct {
     uint32_t id;
     const char *name;
     const smio_bootstrap_ops_t *bootstrap_ops;
-} smio_mod_dispatch_t;
+} __attribute__ ((aligned (16))) smio_mod_dispatch_t;
 
 /*
  * WARNING! Using SMIO_MOD_DECLARE requires .smio_mod_dispatch section in linker script
