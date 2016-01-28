@@ -389,8 +389,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     uint32_t pipe_mgmt_idx = 0;
     uint32_t pipe_msg_idx = 0;
     uint32_t pipe_config_idx = 0;
-    volatile const smio_mod_dispatch_t *smio_mod_dispatch_start = _smio_mod_dispatch;
-    volatile const smio_mod_dispatch_t *smio_mod_dispatch_end = _esmio_mod_dispatch;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch_start = &_smio_mod_dispatch;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch_end = &_esmio_mod_dispatch;
     smio_mod_dispatch_t *smio_mod_handler = (smio_mod_dispatch_t *) smio_mod_dispatch_start;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,

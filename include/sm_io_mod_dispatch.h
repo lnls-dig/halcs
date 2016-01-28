@@ -30,8 +30,8 @@ typedef struct {
  * }
 */
 
-extern const smio_mod_dispatch_t *_smio_mod_dispatch;
-extern const smio_mod_dispatch_t *_esmio_mod_dispatch;
+extern const smio_mod_dispatch_t _smio_mod_dispatch;
+extern const smio_mod_dispatch_t _esmio_mod_dispatch;
 
 #define SMIO_MOD_DECLARE(mod_id, mod_name, mod_bootstrap_ops)                   \
     const smio_mod_dispatch_t __attribute__ ((section (".smio_mod_dispatch")))  \

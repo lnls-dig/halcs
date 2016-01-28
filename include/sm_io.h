@@ -30,10 +30,11 @@ extern "C" {
 
 #define SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, ...)      \
     ({                                                      \
+        volatile const smio_mod_dispatch_t *smio_mod_dispatch = &_smio_mod_dispatch; \
         smio_err_e local_err = SMIO_ERR_FUNC_NOT_IMPL;      \
-        if (_smio_mod_dispatch[th_args->smio_id].bootstrap_ops && \
-                _smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name) { \
-            local_err = _smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name (__VA_ARGS__);  \
+        if (smio_mod_dispatch[th_args->smio_id].bootstrap_ops && \
+                smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name) { \
+            local_err = smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name (__VA_ARGS__);  \
         }                                                   \
         local_err;                                          \
     })
