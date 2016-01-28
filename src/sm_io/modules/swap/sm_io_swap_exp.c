@@ -325,3 +325,5 @@ const smio_bootstrap_ops_t swap_bootstrap_ops = {
     .shutdown = swap_shutdown,
     .config_defaults = swap_config_defaults
 };
+
+SMIO_MOD_DECLARE(SWAP_SDB_DEVID, SWAP_SDB_NAME, swap_bootstrap_ops)

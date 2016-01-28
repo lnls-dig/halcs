@@ -389,6 +389,9 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     uint32_t pipe_mgmt_idx = 0;
     uint32_t pipe_msg_idx = 0;
     uint32_t pipe_config_idx = 0;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch_start = &_smio_mod_dispatch;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch_end = &_esmio_mod_dispatch;
+    smio_mod_dispatch_t *smio_mod_handler = (smio_mod_dispatch_t *) smio_mod_dispatch_start;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] searching for SMIO ID match\n");
@@ -396,8 +399,8 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     /* For now, just do a simple linear search. We can afford this, as
      * we don't expect to insert new sm_io modules often */
     unsigned int i;
-    for (i = 0; smio_mod_dispatch[i].id != SMIO_DISPATCH_END_ID; ++i) {
-        if (smio_mod_dispatch[i].id != smio_id) {
+    for (i = 0; smio_mod_handler < smio_mod_dispatch_end; ++i, ++smio_mod_handler) {
+        if (smio_mod_handler->id != smio_id) {
             continue;
         }
 
@@ -410,7 +413,7 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
                 "[dev_io_core:register_sm] Stringify hash ID\n");
         char *inst_id_str = hutils_stringify_dec_key (inst_id);
         ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-        char *key = hutils_concat_strings_no_sep (smio_mod_dispatch[i].name,
+        char *key = hutils_concat_strings_no_sep (smio_mod_handler->name,
                 inst_id_str);
         /* We don't need this anymore */
         free (inst_id_str);

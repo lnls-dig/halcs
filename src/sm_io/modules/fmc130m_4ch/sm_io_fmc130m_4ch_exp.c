@@ -855,3 +855,5 @@ const smio_bootstrap_ops_t fmc130m_4ch_bootstrap_ops = {
     .shutdown = fmc130m_4ch_shutdown,
     .config_defaults = fmc130m_4ch_config_defaults
 };
+
+SMIO_MOD_DECLARE(FMC130M_4CH_SDB_DEVID, FMC130M_4CH_SDB_NAME, fmc130m_4ch_bootstrap_ops)

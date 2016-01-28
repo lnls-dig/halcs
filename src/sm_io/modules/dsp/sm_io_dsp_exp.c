@@ -337,3 +337,5 @@ const smio_bootstrap_ops_t dsp_bootstrap_ops = {
     .shutdown = dsp_shutdown,
     .config_defaults = dsp_config_defaults
 };
+
+SMIO_MOD_DECLARE(DSP_SDB_DEVID, DSP_SDB_NAME, dsp_bootstrap_ops)

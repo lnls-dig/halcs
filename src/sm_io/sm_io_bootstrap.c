@@ -42,6 +42,7 @@ void smio_startup (zsock_t *pipe, void *args)
     th_boot_args_t *th_args = (th_boot_args_t *) args;
     zsock_t *pipe_mgmt = pipe;
     zsock_t *pipe_msg = th_args->pipe_msg;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch = &_smio_mod_dispatch;
     /* Signal parent we are initializing */
     zsock_signal (pipe_mgmt, 0);
 
@@ -116,6 +117,7 @@ err_inst_id_str_alloc:
 void smio_config_defaults (zsock_t *pipe, void *args)
 {
     th_config_args_t *th_args = (th_config_args_t *) args;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch = &_smio_mod_dispatch;
     /* Signal parent we are initializing */
     zsock_signal (pipe, 0);
 
