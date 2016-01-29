@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _BPM_CLIENT_RW_PARAM_H_
@@ -83,6 +83,9 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, void *param_out, size_t size);
 bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
         uint32_t operation, double *param_out);
+
+/* Utility functions */
+zmsg_t *param_client_recv_timeout (bpm_client_t *self);
 
 #ifdef __cplusplus
 }

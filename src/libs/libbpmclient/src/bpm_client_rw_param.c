@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_client.h"
@@ -52,7 +52,12 @@ bpm_client_err_e param_client_send_gen_rw (bpm_client_t *self, char *service,
     zmsg_addmem (request, &rw, sizeof (rw));
     zmsg_addmem (request, param, size);
 
-    mlm_client_sendto (client, service, NULL, NULL, 0, &request);
+    /* Get poller and timeout from client */
+    uint32_t timeout = bpm_client_get_timeout (self);
+
+    int rc = mlm_client_sendto (client, service, NULL, NULL, timeout, &request);
+    ASSERT_TEST(rc >= 0, "Could not send message", err_get_handler,
+            BPM_CLIENT_ERR_SERVER);
 
 err_send_msg_alloc:
 err_get_handler:
@@ -72,7 +77,7 @@ bpm_client_err_e param_client_recv_rw (bpm_client_t *self, char *service,
     mlm_client_t *client = bpm_get_mlm_client (self);
     ASSERT_TEST(client != NULL, "Could not get BPM client handler", err_get_handler,
             BPM_CLIENT_ERR_SERVER);
-    *report = mlm_client_recv (client);
+    *report = param_client_recv_timeout (self);
     ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg,
             BPM_CLIENT_ERR_SERVER);
 
@@ -152,11 +157,14 @@ bpm_client_err_e param_client_read_gen (bpm_client_t *self, char *service,
     assert (service);
 
     bpm_client_err_e err = BPM_CLIENT_SUCCESS;
-    uint32_t param2 = 0;
     zmsg_t *report;
 
+    /* Even though we don't use the second parameter, we have the same
+     * message strucuture and the server will check for strict consistency
+     * (number of arguments and size) of all parameters. So, use the size of
+     * the passed parameter here */
     err = param_client_send_gen_rw (self, service, operation, param1,
-            &param2 /* in read mode this value will be ignored */, sizeof (param2));
+            param_out /* in read mode this value will be ignored */, size);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == BPM_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -235,3 +243,40 @@ bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
             sizeof (*param_out));
 }
 
+
+/********************* Utility functions ************************************/
+/* Wait for message to arrive up to timeout msecs */
+zmsg_t *param_client_recv_timeout (bpm_client_t *self)
+{
+    zmsg_t *msg = NULL;
+
+    /* Get poller and timeout from client */
+    uint32_t timeout = bpm_client_get_timeout (self);
+    zpoller_t *poller = bpm_client_get_poller (self);
+
+    /* Get MLM socket for use with poller */
+    zsock_t *msgpipe = mlm_client_msgpipe (bpm_get_mlm_client (self));
+    ASSERT_TEST (msgpipe != NULL, "Invalid MLM client socket reference",
+            err_mlm_inv_client_socket);
+
+    zsock_t *which = zpoller_wait (poller, timeout);
+    /* Check if poller expired */
+    ASSERT_TEST(!zpoller_expired (poller),
+            "Server took too long too respond", err_poller_timeout);
+    /* If not we should have a valid message */
+    ASSERT_TEST(!zpoller_terminated (poller),
+            "Poller terminated", err_poller_terminated);
+    ASSERT_TEST(which != NULL, "Could not poll on sockets",
+            err_poller_invalid);
+
+    /* Check for activity socket */
+    if (which == msgpipe) {
+        msg = mlm_client_recv (bpm_get_mlm_client (self));
+    }
+
+err_poller_invalid:
+err_poller_terminated:
+err_poller_timeout:
+err_mlm_inv_client_socket:
+    return msg;
+}

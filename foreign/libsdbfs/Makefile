@@ -19,11 +19,11 @@ OBJDUMP         = $(CROSS_COMPILE)objdump
 # calculate endianness at compile time
 ENDIAN := $(shell ./check-endian $(CC))
 
-CFLAGS = -Wall -ggdb -O2
-CFLAGS += -I../../include # for <sdb.h>
-CFLAGS += -ffunction-sections -fdata-sections
-CFLAGS += -Wno-pointer-sign
-CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
+override CFLAGS += -Wall -ggdb -O2
+override CFLAGS += -I../../include # for <sdb.h>
+override CFLAGS += -ffunction-sections -fdata-sections
+override CFLAGS += -Wno-pointer-sign
+override CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
 
 
 LIB = libsdbfs.a

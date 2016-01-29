@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "sm_io_exports_helper.h"
@@ -178,6 +178,18 @@ disp_op_t dsp_set_get_monit_pos_sum_exp = {
     }
 };
 
+disp_op_t dsp_set_get_monit_updt_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_UPDT,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_UPDT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -194,6 +206,7 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_monit_pos_y_exp,
     &dsp_set_get_monit_pos_q_exp,
     &dsp_set_get_monit_pos_sum_exp,
+    &dsp_set_get_monit_updt_exp,
     NULL
 };
 

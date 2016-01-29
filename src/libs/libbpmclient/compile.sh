@@ -1,9 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
+
+#######################################
 # All of our Makefile options
+#######################################
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD=afcv3
+BOARD=$1
+
+if [ -z "$BOARD" ]; then
+    echo "\"BOARD\" variable unset. "$VALID_BOARDS_STR
+    exit 1
+fi
+
+if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
+    echo "Unsupported board. "$VALID_BOARDS_STR
+    exit 1
+fi
+
+EXTRA_FLAGS=$2
+
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
 ERRHAND_DBG=y
 # Select the minimum debug verbosity. See liberrhand file errhand_opts.h for more info.
@@ -13,7 +30,9 @@ ERRHAND_SUBSYS_ON='"(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DB
 # Select the FMC ADC board type. Options are: passive or active
 
 COMMAND_LIBBPMCLIENT="\
-    make BOARD=${BOARD} \
+    make \
+    ${EXTRA_FLAGS} \
+    BOARD=${BOARD} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
     ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' && \

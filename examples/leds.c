@@ -109,7 +109,7 @@ int main (int argc, char *argv [])
     }
 
     for (i = 0; i < 32768; ++i) {
-        uint32_t leds = (1 << 1);
+        uint32_t leds = 1;
         unsigned int j;
         for (j = 0; j < 3; ++j) {
             if (zctx_interrupted) {

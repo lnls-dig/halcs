@@ -38,12 +38,16 @@ PREFIX ?= /usr/local
 export PREFIX
 CFG_DIR ?= ${PREFIX}/etc/bpm_sw
 export CFG_DIR
+# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
 # SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
 CFG ?= crude_defconfig
 export CFG
 
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
+
+# Linker script
+LD_SCRIPT = linker/bpm-sw.ld
 
 # Init sripts
 INIT_SCRIPTS =
@@ -65,60 +69,65 @@ LIBERRHAND_DIR = src/libs/liberrhand
 LIBCONVC_DIR = src/libs/libconvc
 LIBHUTILS_DIR = src/libs/libhutils
 LIBDISPTABLE_DIR = src/libs/libdisptable
+LIBLLIO_DIR = src/libs/libllio
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
 LIBSDBFS_DIR = foreign/libsdbfs
 
-# General C flags
-CFLAGS = -std=gnu99 -O2
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 ifeq ($(BOARD),afcv3)
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
-CFLAGS += -D__SHRINK_AFCV3_DDR_SIZE__
+CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
 endif
 endif
 
 # Board selection
 ifeq ($(BOARD),ml605)
-CFLAGS += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
+CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
 ifeq ($(BOARD),afcv3)
-CFLAGS += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
+CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
 # Program FMC130M_4CH EEPROM
 ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),active)
-CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
+CFLAGS_USR += -D__FMC130M_4CH_EEPROM_PROGRAM__=1
 endif
 
 ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
-CFLAGS += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
+CFLAGS_USR += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
 endif
 
 # Compile DEV MNGR or not
 ifeq ($(WITH_DEV_MNGR),y)
-CFLAGS += -D__WITH_DEV_MNGR__
+CFLAGS_USR += -D__WITH_DEV_MNGR__
 endif
 
 ifeq ($(AFE_RFFE_TYPE),1)
-CFLAGS += -D__AFE_RFFE_V1__
+CFLAGS_USR += -D__AFE_RFFE_V1__
 endif
 
 ifeq ($(AFE_RFFE_TYPE),2)
-CFLAGS += -D__AFE_RFFE_V2__
+CFLAGS_USR += -D__AFE_RFFE_V2__
 endif
 
 # Compile DEVIO Config or not
 ifeq ($(WITH_DEVIO_CFG),y)
-CFLAGS += -D__WITH_DEVIO_CFG__
+CFLAGS_USR += -D__WITH_DEVIO_CFG__
 endif
 
 ifneq ($(CFG_DIR),)
-CFLAGS += -D__CFG_DIR__=$(CFG_DIR)
+CFLAGS_USR += -D__CFG_DIR__=$(CFG_DIR)
 endif
 
 ifneq ($(CFG_FILENAME),)
-CFLAGS += -D__CFG_FILENAME__=$(CFG_FILENAME)
+CFLAGS_USR += -D__CFG_FILENAME__=$(CFG_FILENAME)
 endif
 
 # Debug conditional flags
@@ -152,19 +161,20 @@ CFLAGS_DEBUG += -g
 
 # Specific platform Flags
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
-LDFLAGS_PLATFORM =
+LDFLAGS_PLATFORM = -T $(LD_SCRIPT)
 
 # Libraries
-LIBS = -lm -lzmq -lczmq -lmlm -lpcidriver
+LIBS = -lm -lzmq -lczmq -lmlm
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libbpmclient libsdbfs
-PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lbpmclient -lsdbfs
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libbpmclient \
+                    libsdbfs libpcidriver
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lbpmclient \
+               -lsdbfs -lpcidriver
 
 # General library flags -L<libdir>
-LFLAGS = -Lsrc/libs/liberrhand -Lsrc/libs/libconvc -Lsrc/libs/libhutils \
-         -Lsrc/libs/libdisptable -Lsrc/libs/libbpmclient -Lforeign/libsdbfs
+LFLAGS = -Lforeign/libsdbfs
 
 # Specific platform objects
 OBJS_PLATFORM =
@@ -173,12 +183,12 @@ OBJS_PLATFORM =
 SRC_DIR = src
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/ll_io/ll_io.mk
 include $(SRC_DIR)/sm_io/sm_io.mk
 include $(SRC_DIR)/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
+include $(SRC_DIR)/boards/$(BOARD)/board.mk
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
@@ -186,18 +196,13 @@ boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Iinclude \
-	       -Isrc/libs/liberrhand \
-	       -Isrc/libs/libconvc \
-	       -Isrc/libs/libhutils \
-	       -Isrc/libs/libdisptable \
-	       -Isrc/libs/libbpmclient/include \
 	       -Iforeign/libsdbfs \
-	       -I/usr/local/include
+	       -I${PREFIX}/include
 
-# Merge all flags.
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output modules
 OUT = $(dev_mngr_OUT) $(dev_io_OUT)
@@ -211,10 +216,10 @@ dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
                  $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
 
 dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-               $(sm_io_OBJS) $(msg_OBJS)
+               $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
 dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-                   $(sm_io_OBJS) $(msg_OBJS)
+                   $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
 # Specific libraries for OUT targets
 dev_mngr_LIBS =
@@ -252,6 +257,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libconvc libconvc_install libconvc_uninstall libconvc_clean libconvc_mrproper \
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
+	libllio libllio_install libllio_uninstall libllio_clean libllio_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
@@ -264,11 +270,11 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(PROJECT_LIBS_NAME) cfg $(OUT)
+all: cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LDFLAGS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
@@ -329,10 +335,10 @@ lib_pcie_driver:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver
 
 lib_pcie_driver_install:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_install
+	$(MAKE) -C $(PCIE_DRIVER_DIR) PREFIX=${PREFIX} lib_driver_install
 
 lib_pcie_driver_uninstall:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_uninstall
+	$(MAKE) -C $(PCIE_DRIVER_DIR) PREFIX=${PREFIX} lib_driver_uninstall
 
 lib_pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) lib_driver_clean
@@ -343,10 +349,10 @@ libbsmp:
 	$(MAKE) -C $(LIBBSMP_DIR) all
 
 libbsmp_install:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) install
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=${PREFIX} install
 
 libbsmp_uninstall:
-	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=$(PREFIX) uninstall
+	$(MAKE) -C $(LIBBSMP_DIR) PREFIX=${PREFIX} uninstall
 
 libbsmp_clean:
 	$(MAKE) -C $(LIBBSMP_DIR) clean
@@ -360,10 +366,10 @@ liberrhand:
 	$(MAKE) -C $(LIBERRHAND_DIR) all
 
 liberrhand_install:
-	$(MAKE) -C $(LIBERRHAND_DIR) install
+	$(MAKE) -C $(LIBERRHAND_DIR) PREFIX=${PREFIX} install
 
 liberrhand_uninstall:
-	$(MAKE) -C $(LIBERRHAND_DIR) uninstall
+	$(MAKE) -C $(LIBERRHAND_DIR) PREFIX=${PREFIX} uninstall
 
 liberrhand_clean:
 	$(MAKE) -C $(LIBERRHAND_DIR) clean
@@ -375,10 +381,10 @@ libconvc:
 	$(MAKE) -C $(LIBCONVC_DIR) all
 
 libconvc_install:
-	$(MAKE) -C $(LIBCONVC_DIR) install
+	$(MAKE) -C $(LIBCONVC_DIR) PREFIX=${PREFIX} install
 
 libconvc_uninstall:
-	$(MAKE) -C $(LIBCONVC_DIR) uninstall
+	$(MAKE) -C $(LIBCONVC_DIR) PREFIX=${PREFIX} uninstall
 
 libconvc_clean:
 	$(MAKE) -C $(LIBCONVC_DIR) clean
@@ -390,10 +396,10 @@ libhutils:
 	$(MAKE) -C $(LIBHUTILS_DIR) all
 
 libhutils_install:
-	$(MAKE) -C $(LIBHUTILS_DIR) install
+	$(MAKE) -C $(LIBHUTILS_DIR) PREFIX=${PREFIX} install
 
 libhutils_uninstall:
-	$(MAKE) -C $(LIBHUTILS_DIR) uninstall
+	$(MAKE) -C $(LIBHUTILS_DIR) PREFIX=${PREFIX} uninstall
 
 libhutils_clean:
 	$(MAKE) -C $(LIBHUTILS_DIR) clean
@@ -405,10 +411,10 @@ libdisptable:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) all
 
 libdisptable_install:
-	$(MAKE) -C $(LIBDISPTABLE_DIR) install
+	$(MAKE) -C $(LIBDISPTABLE_DIR) PREFIX=${PREFIX} install
 
 libdisptable_uninstall:
-	$(MAKE) -C $(LIBDISPTABLE_DIR) uninstall
+	$(MAKE) -C $(LIBDISPTABLE_DIR) PREFIX=${PREFIX} uninstall
 
 libdisptable_clean:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) clean
@@ -416,14 +422,29 @@ libdisptable_clean:
 libdisptable_mrproper:
 	$(MAKE) -C $(LIBDISPTABLE_DIR) mrproper
 
+libllio:
+	$(MAKE) -C $(LIBLLIO_DIR) all
+
+libllio_install:
+	$(MAKE) -C $(LIBLLIO_DIR) PREFIX=${PREFIX} install
+
+libllio_uninstall:
+	$(MAKE) -C $(LIBLLIO_DIR) PREFIX=${PREFIX} uninstall
+
+libllio_clean:
+	$(MAKE) -C $(LIBLLIO_DIR) clean
+
+libllio_mrproper:
+	$(MAKE) -C $(LIBLLIO_DIR) mrproper
+
 libbpmclient:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
 
 libbpmclient_install:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) install
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} install
 
 libbpmclient_uninstall:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) uninstall
+	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} uninstall
 
 libbpmclient_clean:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) clean
@@ -435,16 +456,35 @@ libsdbfs:
 	$(MAKE) -C $(LIBSDBFS_DIR) all
 
 libsdbfs_install:
-	$(MAKE) -C $(LIBSDBFS_DIR) install
+	$(MAKE) -C $(LIBSDBFS_DIR) PREFIX=${PREFIX} install
 
 libsdbfs_uninstall:
-	$(MAKE) -C $(LIBSDBFS_DIR) uninstall
+	$(MAKE) -C $(LIBSDBFS_DIR) PREFIX=${PREFIX} uninstall
 
 libsdbfs_clean:
 	$(MAKE) -C $(LIBSDBFS_DIR) clean
 
 libsdbfs_mrproper:
 	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
+
+libs: liberrhand libconvc libhutils \
+    libdisptable libllio libbpmclient libsdbfs
+
+libs_install: liberrhand_install libconvc_install libhutils_install \
+    libdisptable_install libllio_install libbpmclient_install libsdbfs_install
+
+libs_compile_install: liberrhand liberrhand_install libconvc libconvc_install \
+    libhutils libhutils_install libdisptable libdisptable_install libllio libllio_install \
+    libbpmclient libbpmclient_install libsdbfs libsdbfs_install
+
+libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
+    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall libsdbfs_uninstall
+
+libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
+
+libs_mrproper: liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_mrproper
 
 # External project dependencies
 
@@ -459,12 +499,12 @@ deps_clean: libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
-	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) $(PREFIX)/bin $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) $(PREFIX)/etc $(CMDSEP))
+	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) ${PREFIX}/etc $(CMDSEP))
 
 core_uninstall:
-	$(foreach core_bin,$(ALL_OUT),rm -f $(PREFIX)/bin/$(core_bin) $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),rm -f $(PREFIX)/etc/$(core_script) $(CMDSEP))
+	$(foreach core_bin,$(ALL_OUT),rm -f ${PREFIX}/bin/$(core_bin) $(CMDSEP))
+	$(foreach core_script,$(INIT_SCRIPTS),rm -f ${PREFIX}/etc/$(core_script) $(CMDSEP))
 
 core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
@@ -505,11 +545,19 @@ cfg_clean:
 cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
-install: core_install deps_install liberrhand_install libconvc_install libhutils_install libbpmclient_install cfg_install
+install: core_install deps_install liberrhand_install libconvc_install \
+    libhutils_install libdisptable_install libllio_install libbpmclient_install \
+    cfg_install
 
-uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall libhutils_uninstall libbpmclient_uninstall cfg_uninstall
+uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
+    libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
+    cfg_uninstall
 
-clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean libbpmclient_clean examples_clean tests_clean cfg_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
+    libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
+    cfg_clean
 
-mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper libhutils_mrproper libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper
+mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
+    libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
+    examples_mrproper tests_mrproper cfg_mrproper
 

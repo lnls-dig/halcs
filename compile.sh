@@ -2,6 +2,7 @@
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
+VALID_WITH_LIBS_LINK_STR="Valid values are: \"with_libs_link\" or \"without_libs_link\"."
 
 #######################################
 # All of our Makefile options
@@ -26,6 +27,20 @@ if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WIT
     echo "Wrong variable value. "$VALID_WITH_EXAMPLES_STR
     exit 1
 fi
+
+WITH_LIBS_LINK=$3
+
+if [ -n "$WITH_LIBS_LINK" ] && [ "$WITH_LIBS_LINK" != "with_libs_link" ] && [ "$WITH_LIBS_LINK" != "without_libs_link" ]; then
+    echo "Wrong variable value. "$VALID_WITH_LIBS_LINK_STR
+    exit 1
+fi
+
+EXTRA_FLAGS=()
+# Get all other arguments
+for item in "${@:4}"
+do
+    EXTRA_FLAGS+=("${item}")
+done
 
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
@@ -61,11 +76,23 @@ CFG=lnls_defconfig
 export CFG
 
 COMMAND_DEPS="\
-    make deps && \
-    sudo make deps_install"
+    make ${EXTRA_FLAGS[@]} deps && \
+    make ${EXTRA_FLAGS[@]} deps_install"
+
+COMMAND_LIBS="\
+    make \
+    ${EXTRA_FLAGS[@]} \
+    BOARD=${BOARD} \
+    ERRHAND_DBG=${ERRHAND_DBG} \
+    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+    LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
+    libs_compile_install"
 
 COMMAND_HAL="\
-    make BOARD=${BOARD} \
+    make \
+    ${EXTRA_FLAGS[@]} \
+    BOARD=${BOARD} \
     SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -77,28 +104,27 @@ COMMAND_HAL="\
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
     WITH_DEVIO_CFG=${WITH_DEVIO_CFG} \
     CFG_DIR=${CFG_DIR} && \
-    sudo make CFG=${CFG} install"
-
-COMMAND_LIBBPMCLIENT="\
-    make BOARD=${BOARD} \
-    ERRHAND_DBG=${ERRHAND_DBG} \
-    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
-    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} && \
-    sudo make libbpmclient_install"
+    make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
 if [ "$WITH_EXAMPLES" = "with_examples" ]; then
 COMMAND_EXAMPLES="\
-    make examples"
+    make ${EXTRA_FLAGS[@]} examples"
 else
 COMMAND_EXAMPLES=""
 fi
 
+if [ "$WITH_LIBS_LINK" == "with_libs_link" ] || [ "$WITH_LIBS_LINK" == "" ]; then
+COMMAND_LIBS_LINK="ldconfig"
+else
+COMMAND_LIBS_LINK=""
+fi
+
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
+    "${COMMAND_LIBS}"
     "${COMMAND_HAL}"
-    "${COMMAND_LIBBPMCLIENT}"
     "${COMMAND_EXAMPLES}"
+    "${COMMAND_LIBS_LINK}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"

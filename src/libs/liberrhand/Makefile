@@ -13,19 +13,24 @@ MAKE ?=		make
 
 PWD = 		$(shell pwd)
 
-LIBERRHAND = liberrhand
+LIBNAME_RAW = errhand
+LIBNAME = lib$(LIBNAME_RAW)
 
 # Config variables suitable for creating shared libraries
-LIB_VER_MAJOR = 1
-LIB_VER_MINOR = 0
-LIB_VER_REVISION = 0
-LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
+LIB_VER = $(shell ./version.sh $(LIBNAME_RAW))
+LIB_VER_MAJOR = $(shell echo $(LIB_VER)| cut -d'.' -f1)
+LIB_VER_MINOR = $(shell echo $(LIB_VER)| cut -d'.' -f2)
+LIB_VER_REVESION = $(shell echo $(LIB_VER)| cut -d'.' -f3)
 
 PREFIX ?= /usr/local
 export PREFIX
 
-# General C flags
-CFLAGS = -std=gnu99 -O2 -fPIC
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2 -fPIC
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 # To enable this option, use: make ERRHAND_DBG=y
 ifneq ($(ERRHAND_DBG),)
@@ -72,38 +77,54 @@ LIBS =
 # General library flags -L<libdir>
 LFLAGS =
 
+# Source directory
+SRC_DIR = src
+# Include directory
+INCLUDE_DIR = include
+
 # Include directories
-INCLUDE_DIRS = -I.
+INCLUDE_DIRS = -Iinclude -I${PREFIX}/include
 
-# Merge all flags. Optimize for size (-Os)
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
-OUT = $(LIBERRHAND)
+OUT = $(LIBNAME)
 
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBERRHAND)_OBJS_LIB = errhand_print.o errhand_subsys.o errhand_local_print.o
+$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/errhand_print.o $(SRC_DIR)/errhand_subsys.o \
+	$(SRC_DIR)/errhand_local_print.o
 
 # Objects common for this library
 common_OBJS =
 
 # Objects for each version of library
-$(LIBERRHAND)_OBJS = $(common_OBJS) $($(LIBERRHAND)_OBJS_LIB)
-$(LIBERRHAND)_CODE_HEADERS = errhand_opts.h errhand.h varg_macros.h
+$(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
+$(LIBNAME)_CODE_HEADERS = \
+	$(INCLUDE_DIR)/errhand_classes.h \
+	$(INCLUDE_DIR)/errhand_prelude.h \
+	$(INCLUDE_DIR)/errhand.h \
+	$(INCLUDE_DIR)/errhand_core.h \
+	$(INCLUDE_DIR)/errhand_assert.h \
+	$(INCLUDE_DIR)/errhand_opts.h \
+	$(INCLUDE_DIR)/varg_macros.h \
+	$(INCLUDE_DIR)/errhand_print.h \
+	$(INCLUDE_DIR)/errhand_subsys.h \
+	$(INCLUDE_DIR)/errhand_local_print.h
 
-$(LIBERRHAND)_HEADERS = $($(LIBERRHAND)_OBJS_LIB:.o=.h) $($(LIBERRHAND)_CODE_HEADERS)
+$(LIBNAME)_HEADERS = $($(LIBNAME)_CODE_HEADERS)
 
-OBJS_all = $(common_OBJS) $($(LIBERRHAND)_OBJS)
+OBJS_all = $(common_OBJS) $($(LIBNAME)_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a
 LIB_SHARED_SUFFIX = .so
 
-# Generate suitable names for static libraries
+# Generate suitable names for libraries
 TARGET_STATIC = $(addsuffix $(LIB_STATIC_SUFFIX), $(OUT))
 TARGET_SHARED = $(addsuffix $(LIB_SHARED_SUFFIX), $(OUT))
 TARGET_SHARED_VER = $(addsuffix $(LIB_SHARED_SUFFIX).$(LIB_VER), $(OUT))
@@ -122,7 +143,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
+	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -160,12 +181,15 @@ install:
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
+		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

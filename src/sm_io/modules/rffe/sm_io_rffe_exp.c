@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_server.h"
@@ -389,3 +389,5 @@ const smio_bootstrap_ops_t rffe_bootstrap_ops = {
     .shutdown = rffe_shutdown,
     .config_defaults = rffe_config_defaults
 };
+
+SMIO_MOD_DECLARE(RFFE_DEVID, RFFE_NAME, rffe_bootstrap_ops)

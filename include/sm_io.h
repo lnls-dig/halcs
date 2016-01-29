@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _SM_IO_H_
@@ -30,6 +30,7 @@ extern "C" {
 
 #define SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, ...)      \
     ({                                                      \
+        volatile const smio_mod_dispatch_t *smio_mod_dispatch = &_smio_mod_dispatch; \
         smio_err_e local_err = SMIO_ERR_FUNC_NOT_IMPL;      \
         if (smio_mod_dispatch[th_args->smio_id].bootstrap_ops && \
                 smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name) { \

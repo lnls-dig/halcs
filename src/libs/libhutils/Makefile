@@ -13,16 +13,24 @@ MAKE ?=		make
 
 PWD = 		$(shell pwd)
 
-LIBHUTILS = libhutils
+LIBNAME_RAW = hutils
+LIBNAME = lib$(LIBNAME_RAW)
 
 # Config variables suitable for creating shared libraries
-LIB_VER_MAJOR = 1
-LIB_VER_MINOR = 0
-LIB_VER_REVISION = 0
-LIB_VER = $(LIB_VER_MAJOR).$(LIB_VER_MINOR).$(LIB_VER_REVISION)
+LIB_VER = $(shell ./version.sh $(LIBNAME_RAW))
+LIB_VER_MAJOR = $(shell echo $(LIB_VER)| cut -d'.' -f1)
+LIB_VER_MINOR = $(shell echo $(LIB_VER)| cut -d'.' -f2)
+LIB_VER_REVESION = $(shell echo $(LIB_VER)| cut -d'.' -f3)
 
-# General C flags
-CFLAGS = -std=gnu99 -O2 -fPIC
+PREFIX ?= /usr/local
+export PREFIX
+
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2 -fPIC
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 # To enable this option, use: make ERRHAND_DBG=y
 ifneq ($(ERRHAND_DBG),)
@@ -56,32 +64,45 @@ LIBS =
 # General library flags -L<libdir>
 LFLAGS =
 
+# Source directory
+SRC_DIR = src
+# Include directory
+INCLUDE_DIR = include
+
 # Include directories
-INCLUDE_DIRS = -I. -I../liberrhand
+INCLUDE_DIRS = -Iinclude -I${PREFIX}/include
 
-# Merge all flags. Optimize for size (-Os)
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Output library names
-OUT = $(LIBHUTILS)
+OUT = $(LIBNAME)
 
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBHUTILS)_OBJS_LIB = hutils_utils.o hutils_math.o hutils_err.o
+$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/hutils_utils.o $(SRC_DIR)/hutils_math.o \
+	$(SRC_DIR)/hutils_err.o
 
 # Objects common for this library
 common_OBJS =
 
 # Objects for each version of library
-$(LIBHUTILS)_OBJS = $(common_OBJS) $($(LIBHUTILS)_OBJS_LIB)
-$(LIBHUTILS)_CODE_HEADERS = hutils.h
+$(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
+$(LIBNAME)_CODE_HEADERS = \
+	$(INCLUDE_DIR)/hutils_classes.h \
+	$(INCLUDE_DIR)/hutils_prelude.h \
+	$(INCLUDE_DIR)/hutils.h \
+	$(INCLUDE_DIR)/hutils_core.h \
+	$(INCLUDE_DIR)/hutils_err.h \
+	$(INCLUDE_DIR)/hutils_math.h \
+	$(INCLUDE_DIR)/hutils_utils.h
 
-$(LIBHUTILS)_HEADERS = $($(LIBHUTILS)_OBJS_LIB:.o=.h) $($(LIBHUTILS)_CODE_HEADERS)
+$(LIBNAME)_HEADERS = $($(LIBNAME)_CODE_HEADERS)
 
-OBJS_all = $(common_OBJS) $($(LIBHUTILS)_OBJS)
+OBJS_all = $(common_OBJS) $($(LIBNAME)_OBJS)
 
 # Libraries suffixes
 LIB_STATIC_SUFFIX = .a
@@ -107,7 +128,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LDFLAGS)
+	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found
@@ -145,12 +166,15 @@ install:
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
+		$(PREFIX)/include/$(header) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

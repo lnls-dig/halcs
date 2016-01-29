@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include <glob.h>
@@ -37,8 +37,8 @@
 
 #define DEVIO_DEV_NAME_LEN          40
 
-#define DEVIO_BE_DEV_PATTERN        "/dev/fpga%d"
-#define DEVIO_BE_DEV_GLOB           "/dev/fpga*"
+#define DEVIO_BE_DEV_PATTERN        "/dev/fpga/%d"
+#define DEVIO_BE_DEV_GLOB           "/dev/fpga/*"
 
 #define DEVIO_NAME                  "dev_io"
 
@@ -71,6 +71,7 @@ struct _dmngr_t {
     zsock_t *dealer;            /* zeroMQ Dealer socket */
     char *name;                 /* Identification of this dmngr instance */
     char *endpoint;             /* Endpoint to connect to */
+    char *cfg_file;             /* Configuration file location */
     int verbose;                /* Print activity to stdout */
 
     /* General management operations */
@@ -80,8 +81,8 @@ struct _dmngr_t {
     bool broker_running;        /* true if broker is already running */
 
     /* Device managment */
-    zhash_t *devio_info_h;
-    zhash_t *hints_h;           /* Config hints from configuration file */
+    zhashx_t *devio_info_h;
+    zhashx_t *hints_h;           /* Config hints from configuration file */
 };
 
 /* Configuration variables. To be filled by dev_mngr */
@@ -92,8 +93,11 @@ char *dmngr_verbose_str = NULL;
 int dmngr_verbose = 0;
 char *dmngr_daemonize_str = NULL;
 int dmngr_daemonize = 0;
+char *dmngr_work_dir = NULL;
+char *dmngr_spawn_broker_cfg_str = NULL;
+int dmngr_spawn_broker_cfg = 0;
 
-static void _devio_hash_free_item (void *data);
+static void _devio_hash_free_item (void **data);
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found);
 static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
         char *dev_pathname, uint32_t id, llio_type_e type,
@@ -101,7 +105,7 @@ static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
 
 /* Creates a new instance of the Device Manager */
 dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
-        const char *log_prefix, zhash_t *hints_h)
+        const char *log_prefix, zhashx_t *hints_h)
 {
     assert (name);
     assert (endpoint);
@@ -134,14 +138,18 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     self->ops = (dmngr_ops_t *) zmalloc (sizeof *self->ops);
     ASSERT_ALLOC(self->ops, err_ops_alloc);
-    self->ops->sig_ops = zlist_new ();
+    self->ops->sig_ops = zlistx_new ();
     ASSERT_ALLOC(self->ops->sig_ops, err_list_alloc);
 
     /* Init devio_info hash */
-    self->devio_info_h = zhash_new ();
+    self->devio_info_h = zhashx_new ();
     ASSERT_ALLOC(self->devio_info_h, err_devio_info_h_alloc);
+    zhashx_set_destructor (self->devio_info_h, _devio_hash_free_item);
 
-    self->hints_h = zhash_dup (hints_h);
+    /* FIXME: set duplicator in hints_h before calling dup method. Without a
+     * duplicator method set, zhashx_dup () does not duplicate the item and
+     * just points to the same reference */
+    self->hints_h = zhashx_dup (hints_h);
     ASSERT_ALLOC(self->hints_h, err_hints_h_alloc);
 
     self->broker_running = false;
@@ -171,9 +179,9 @@ err_dealer_bind:
     zsock_destroy (&self->dealer);
 err_dealer_alloc:
 err_hints_h_alloc:
-    zhash_destroy (&self->devio_info_h);
+    zhashx_destroy (&self->devio_info_h);
 err_devio_info_h_alloc:
-    zlist_destroy (&self->ops->sig_ops);
+    zlistx_destroy (&self->ops->sig_ops);
 err_list_alloc:
     free (self->ops);
 err_ops_alloc:
@@ -197,9 +205,9 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
         /* Starting destructing by the last resource */
         zsock_unbind (self->dealer, "%s", self->endpoint);
         zsock_destroy (&self->dealer);
-        zhash_destroy (&self->hints_h);
-        zhash_destroy (&self->devio_info_h);
-        zlist_destroy (&self->ops->sig_ops);
+        zhashx_destroy (&self->hints_h);
+        zhashx_destroy (&self->devio_info_h);
+        zlistx_destroy (&self->ops->sig_ops);
         free (self->ops);
         free (self->endpoint);
         free (self->name);
@@ -214,16 +222,16 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
 dmngr_err_e dmngr_set_sig_handler (dmngr_t *self, dmngr_sig_handler_t *sig_handler)
 {
     assert (self);
-    int err = zlist_append (self->ops->sig_ops, sig_handler);
+    void *handle = zlistx_add_end (self->ops->sig_ops, sig_handler);
 
-    return (err == -1) ? DMNGR_ERR_ALLOC : DMNGR_SUCCESS;
+    return (handle == NULL) ? DMNGR_ERR_ALLOC : DMNGR_SUCCESS;
 }
 
 dmngr_err_e dmngr_register_sig_handlers (dmngr_t *self)
 {
     assert (self);
     dmngr_sig_handler_t *sig_handler =
-        (dmngr_sig_handler_t *) zlist_first (self->ops->sig_ops);
+        (dmngr_sig_handler_t *) zlistx_first (self->ops->sig_ops);
 
     /* Register all signal handlers in list*/
     while (sig_handler) {
@@ -240,7 +248,7 @@ dmngr_err_e dmngr_register_sig_handlers (dmngr_t *self)
                 sig_handler->signal);
 
         sig_handler = (dmngr_sig_handler_t *)
-            zlist_next (self->ops->sig_ops);
+            zlistx_next (self->ops->sig_ops);
     }
 
     return DMNGR_SUCCESS;
@@ -299,6 +307,40 @@ dmngr_err_e dmngr_set_ops (dmngr_t *self, dmngr_ops_t *dmngr_ops)
     self->ops = dmngr_ops;
 
     return DMNGR_SUCCESS;
+}
+
+dmngr_err_e dmngr_set_cfg_file (dmngr_t *self, char *cfg_file)
+{
+    assert (self);
+    assert (cfg_file);
+
+    dmngr_err_e err = DMNGR_SUCCESS;
+
+    /* Free previously allocated file */
+    if (self->cfg_file != NULL) {
+        free (self->cfg_file);
+        self->cfg_file = NULL;
+    }
+
+    self->cfg_file = strdup (cfg_file);
+    ASSERT_ALLOC(self->cfg_file, err_set_cfg_file);
+
+err_set_cfg_file:
+    return err;
+}
+
+const char * dmngr_get_cfg_file (dmngr_t *self)
+{
+    assert (self);
+    return self->cfg_file;
+}
+
+char * dmngr_clone_cfg_file (dmngr_t *self)
+{
+    assert (self);
+
+    char *cfg_file_cpy = strdup (self->cfg_file);
+    return cfg_file_cpy;
 }
 
 static bool _dmngr_is_broker_running (dmngr_t *self)
@@ -360,6 +402,7 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
     assert (broker_endp);
 
     dmngr_err_e err = DMNGR_SUCCESS;
+    char *cfg_file = self->cfg_file;
     char *dev_type_c = NULL;
     char *devio_type_c = NULL;
     char *dev_id_c = NULL;
@@ -369,19 +412,19 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
     /* DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr_core] Spawing all DEVIO workers\n");*/
 
     /* Get all hash keys*/
-    zlist_t *devio_info_key_list = zhash_keys (self->devio_info_h);
+    zlistx_t *devio_info_key_list = zhashx_keys (self->devio_info_h);
     ASSERT_ALLOC (devio_info_key_list, err_hash_keys_alloc, DMNGR_ERR_ALLOC);
 
-    char *devio_info_key = zlist_first (devio_info_key_list);
+    char *devio_info_key = zlistx_first (devio_info_key_list);
 
     /* Iterate over all keys spawning the DEVIOs */
-    for (; devio_info_key != NULL; devio_info_key = zlist_next (devio_info_key_list)) {
+    for (; devio_info_key != NULL; devio_info_key = zlistx_next (devio_info_key_list)) {
         /* Free any possibly dev_pathname allocated but not free'd */
         free (dev_pathname);
         dev_pathname = NULL;
 
         /* Look for DEVIO */
-        devio_info_t *devio_info = zhash_lookup (self->devio_info_h,
+        devio_info_t *devio_info = zhashx_lookup (self->devio_info_h,
                 devio_info_key);
 
         /* Get all devio_info properties */
@@ -430,7 +473,7 @@ dmngr_err_e dmngr_spawn_all_devios (dmngr_t *self, char *broker_endp,
                 " for a %s device \n\tlocated on %s, ID %u, broker address %s, with "
                 "logfile on %s ...\n", dev_type_c, dev_pathname, id,
                 broker_endp, devio_log_prefix);
-        char *argv_exec [] = {DEVIO_NAME, "-n", devio_type_c,"-t", dev_type_c,
+        char *argv_exec [] = {DEVIO_NAME, "-f", cfg_file, "-n", devio_type_c,"-t", dev_type_c,
             "-i", dev_id_c, "-e", dev_pathname, "-s", smio_inst_id_c,
             "-b", broker_endp, "-l", devio_log_prefix, NULL};
         int spawn_err = _dmngr_spawn_chld (self, DEVIO_NAME, argv_exec);
@@ -464,16 +507,16 @@ err_dev_type_c_alloc:
 err_devio_type_c_alloc:
     free (dev_pathname);
 err_dev_pathname_alloc:
-    zlist_destroy (&devio_info_key_list);
+    zlistx_destroy (&devio_info_key_list);
 err_hash_keys_alloc:
     return err;
 }
 
 /************************ Local helper functions ******************/
 /* Hash free function */
-static void _devio_hash_free_item (void *data)
+static void _devio_hash_free_item (void **data)
 {
-    devio_info_destroy ((devio_info_t **) &data);
+    devio_info_destroy ((devio_info_t **) data);
 }
 
 static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
@@ -503,8 +546,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
 
         /* This follows the hierarchy found in the config file */
         int errs = snprintf (key, sizeof (key), HUTILS_CFG_HASH_KEY_PATTERN_COMPL,
-                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0,
-                HUTILS_CFG_DBE);
+                devio_info_id, /* BPM ID does not matter for DBE DEVIOs */ 0);
 
         /* Only when the number of characters written is less than the whole buffer,
          * it is guaranteed that the string was written successfully */
@@ -512,7 +554,7 @@ static dmngr_err_e _dmngr_scan_devs (dmngr_t *self, uint32_t *num_devs_found)
                 "Could not generate DBE config path", err_cfg_key,
                 DMNGR_ERR_CFG);
 
-        const devio_info_t *devio_info_lookup = zhash_lookup (self->devio_info_h,
+        const devio_info_t *devio_info_lookup = zhashx_lookup (self->devio_info_h,
                 key);
 
         /* If device is already registered, do nothing */
@@ -561,10 +603,7 @@ static dmngr_err_e _dmngr_prepare_devio (dmngr_t *self, const char *key,
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO,
             "[dev_mngr_core:prepare_devio] Inserting device with key: %s\n", key);
-    zhash_insert (self->devio_info_h, key, devio_info);
-
-    /* Setup free function */
-    zhash_freefn (self->devio_info_h, key, _devio_hash_free_item);
+    zhashx_insert (self->devio_info_h, key, devio_info);
 
 err_devio_info_alloc:
     return err;

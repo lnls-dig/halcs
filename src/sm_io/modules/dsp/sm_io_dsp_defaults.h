@@ -2,17 +2,16 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _DSP_DEFAULTS_H_
 #define _DSP_DEFAULTS_H_
 
 /********************** K Default Values ***************************/
-#define DSP_DFLT_KX_VAL                 1000000    /* nm */
-#define DSP_DFLT_KY_VAL                 1000000    /* nm */
-#define DSP_DFLT_KSUM_VAL               0x0FFFFFF   /* 1.0 in FIX25_24 notation */
-
+#define DSP_DFLT_KX_VAL                 10000000    /* nm */
+#define DSP_DFLT_KY_VAL                 10000000    /* nm */
+#define DSP_DFLT_KSUM_VAL               1           /* 1 in FIX25_0 notation */
 
 /************ Delta Sigma Minimum Calculation Threshold ***********/
 #define DSP_DFLT_DS_TBT_THRES           0           /* No minimum threslhold */

@@ -2,7 +2,7 @@
  * Copyright (C) 2015 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include <libgen.h>
@@ -31,18 +31,6 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io]",                          \
             devio_err_str (err_type))
 
-#ifdef __CFG_DIR__
-#define CFG_DIR                     STRINGIFY(__CFG_DIR__)
-#else
-#error "Config directory not defined!"
-#endif
-
-#ifdef __CFG_FILENAME__
-#define CFG_FILENAME                STRINGIFY(__CFG_FILENAME__)
-#else
-#error "Config filename not defined!"
-#endif
-
 #define LOG_FILENAME_LEN            50
 /* This composes the log filename as "dev_io%u_fe%u.log" or
  * "dev_io%u_be%u.log" */
@@ -61,17 +49,24 @@
 #define DEVIO_MAX_FE_DEVIOS         16
 
 #define DEVIO_SERVICE_LEN           50
-#define DEVIO_NAME                  "dev_io"
-#define DEVIO_CFG_NAME              "dev_io_cfg"
+#define DEVIO_NAME                  "/usr/local/bin/dev_io"
+#define DEVIO_CFG_NAME              "/usr/local/bin/dev_io_cfg"
+#define DEVIO_CFG_TIMEOUT           5000       /* in ms */
+#define EPICS_PROCSERV_NAME         "/usr/local/bin/procServ"
+#define EPICS_BPM_NAME              "BPM"
+#define EPICS_BPM_RUN_SCRIPT_NAME   "./run.sh"
+#define EPICS_BPM_TELNET_BASE_PORT  20000
 
 #define DEVIO_LIBBPMCLIENT_LOG_MODE    "a"
 #define DEVIO_KILL_CFG_SIGNAL       SIGINT
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
-        devio_type_e devio_type, char *broker_endp, char *log_prefix,
-        zhash_t *hints);
+        devio_type_e devio_type, char *cfg_file, char *broker_endp,
+        char *log_prefix, zhashx_t *hints);
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *broker_endp, char *log_prefix, zhash_t *hints);
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints);
+static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints);
 static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
         const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
@@ -85,7 +80,9 @@ void print_help (char *program_name)
             "Usage: %s [options]\n"
             "Version %s\n, Build by: %s, %s\n"
             "\t-h This help message\n"
+            "\t-f Configuration file\n"
             "\t-d Daemon mode.\n"
+            "\t-w Daemon working directory.\n"
             "\t-v Verbose output\n"
             "\t-n <devio_type = [be|fe]> Devio type\n"
             "\t-t <device_type = [eth|pcie]> Device type\n"
@@ -94,14 +91,16 @@ void print_help (char *program_name)
             "\t-s <fe_smio_id> FE SMIO ID (only valid for devio_type = fe)\n"
             "\t-l <log_prefix> Log prefix filename\n"
             "\t-b <broker_endpoint> Broker endpoint\n",
-            revision_get_build_version (), revision_get_build_user_name (),
-            revision_get_build_date (), program_name);
+            program_name,
+            revision_get_build_version (),
+            revision_get_build_user_name (), revision_get_build_date ());
 }
 
 int main (int argc, char *argv[])
 {
     int verbose = 0;
-    int daemonize = 0;
+    int devio_daemonize = 0;
+    char *devio_work_dir = NULL;
     char *devio_type_str = NULL;
     char *dev_type = NULL;
     char *dev_entry = NULL;
@@ -109,6 +108,7 @@ int main (int argc, char *argv[])
     char *fe_smio_id_str = NULL;
     char *broker_endp = NULL;
     char *log_prefix = NULL;
+    char *cfg_file = NULL;
     char **str_p = NULL;
     int i;
 
@@ -127,8 +127,12 @@ int main (int argc, char *argv[])
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Verbose mode set\n");
         }
         else if (streq (argv[i], "-d")) {
-            daemonize = 1;
+            devio_daemonize = 1;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Demonize mode set\n");
+        }
+        else if (streq (argv[i], "-w")) {
+            str_p = &devio_work_dir;
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set devio_work_dir\n");
         }
         else if (streq (argv[i], "-n")) {
             str_p = &devio_type_str;
@@ -158,6 +162,10 @@ int main (int argc, char *argv[])
             str_p = &log_prefix;
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set log filename\n");
         }
+        else if (streq (argv[i], "-f")) {
+            str_p = &cfg_file;
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_io] Will set cfg_file parameter\n");
+        }
         else if (streq (argv[i], "-h")) {
             print_help (argv[0]);
             exit (1);
@@ -172,11 +180,15 @@ int main (int argc, char *argv[])
     }
 
     /* Daemonize dev_io */
-    if (daemonize != 0) {
-        int rc = daemon(0, 0);
+    if (devio_daemonize != 0) {
+        if (devio_work_dir == NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Daemon working directory not specified\n");
+            goto err_exit;
+        }
 
+        int rc = zsys_daemonize (devio_work_dir);
         if (rc != 0) {
-            perror ("[dev_io] daemon");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Fail to daemonize\n");
             goto err_exit;
         }
     }
@@ -214,25 +226,28 @@ int main (int argc, char *argv[])
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
                         "\tDefaulting it to the /dev file number ...\n");
 
-                int matches = sscanf (dev_entry, "/dev/fpga%u", &dev_id);
+                /* Our device follows the convention of having the ID in hexadecimal
+                 * code. For instance, /dev/fpga-0c00 would be a valid ID */
+                int matches = sscanf (dev_entry, "/dev/fpga-%X", &dev_id);
                 if (matches == 0) {
                     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
-                            "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
+                            "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
+                break;
 
             default:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
                 goto err_exit;
         }
     }
-    /* Use the passed ID */
+    /* Use the passed ID, interpret it as hexadecimal number */
     else {
-        dev_id = strtoul (dev_id_str, NULL, 10);
+        dev_id = strtoul (dev_id_str, NULL, 16);
     }
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
-            dev_id);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u/%X.\n",
+            dev_id, dev_id);
 
     uint32_t fe_smio_id = 0;
     /* Check for FE SMIO ID */
@@ -246,7 +261,7 @@ int main (int argc, char *argv[])
 
     /* Spawn the Configure DEVIO to get the uTCA slot number. This is only
      * available in AFCv3 */
-
+    bpm_client_t *client_cfg = NULL;
 #if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
     int child_devio_cfg_pid = 0;
     if (llio_type == PCIE_DEV) {
@@ -263,50 +278,62 @@ int main (int argc, char *argv[])
                     "DEVIO Config instance\n");
             goto err_exit;
         }
+
+        /* FIXME: Wait for DEVIO CFG initialization. If we try to create a client instance
+         * prior to DEVIO CFG creation, Malamute does not transmit the message (To be investigated) */
+        sleep (2);
     }
 
-    /* At this point, the Config DEVIO is ready to receive our commands */
-    char devio_config_service_str [DEVIO_SERVICE_LEN];
-    snprintf (devio_config_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO:AFC_DIAG%u",
-            dev_id, 0);
-    devio_config_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
+    /* FE DEVIO is expected to have a correct dev_id. So, we don't need to get it
+     * from Hardware */
+    if (devio_type == BE_DEVIO) {
+        /* At this point, the Config DEVIO is ready to receive our commands */
+        char devio_config_service_str [DEVIO_SERVICE_LEN];
+        snprintf (devio_config_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO_CFG:AFC_DIAG%u",
+                dev_id, 0);
+        devio_config_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Creating libclient for DEVIO config\n");
-    bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Creating libclient for DEVIO config\n");
+        bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
 
-    bpm_client_t *client_cfg = bpm_client_new_log_mode (broker_endp, 0,
-            "stdout", DEVIO_LIBBPMCLIENT_LOG_MODE);
+        /* Give DEVIO CFG some time more to answer (DEVIO_CFG_TIMEOUT) as it was just spawned... */
+        client_cfg = bpm_client_new_log_mode_time (broker_endp, 0,
+                "stdout", DEVIO_LIBBPMCLIENT_LOG_MODE, DEVIO_CFG_TIMEOUT);
 
-    if (client_cfg == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
-                "DEVIO Config libclient instance\n");
-        goto err_client_cfg;
-    }
-
-    /* Get uTCA card slot number */
-    client_err = bpm_get_afc_diag_card_slot (client_cfg, devio_config_service_str,
-            &dev_id);
-
-    if (client_err != BPM_CLIENT_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not retrieve "
-                "slot number. Unsupported board?\n");
-        goto err_card_slot;
-    }
-
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
-
-    if (llio_type == PCIE_DEV) {
-        /* FIXME: give some time for the process to terminate gracefully */
-        sleep (5);
-        /* Kill DEVIO cfg as we've already got our slot number */
-        if (child_devio_cfg_pid > 0) {
-            kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
+        if (client_cfg == NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+                    "DEVIO Config libclient instance\n");
+            goto err_client_cfg;
         }
-        /* Wait child */
-        hutils_wait_chld ();
+
+        /* Get uTCA card slot number */
+        client_err = bpm_get_afc_diag_card_slot (client_cfg, devio_config_service_str,
+                &dev_id);
+
+        if (client_err != BPM_CLIENT_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not retrieve "
+                    "slot number. Unsupported board?\n");
+            goto err_card_slot;
+        }
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
+
+/* We could just leave DEVIO CFG arounf and not kill it. We do it just
+ * for the sake not having unnecessary things running, as the regular
+ * DEVIO already spwan the same service (i.e., AFC DIAG) as DEVIO CFG */
+#if 1
+        if (llio_type == PCIE_DEV) {
+            /* Kill DEVIO cfg as we've already got our slot number */
+            if (child_devio_cfg_pid > 0) {
+                kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
+            }
+            /* Wait child up to 5 seconds before giving up waiting */
+            hutils_wait_chld_timed (5000);
+        }
+        /* Destroy libclient */
+        bpm_client_destroy (&client_cfg);
     }
-    /* Destroy libclient */
-    bpm_client_destroy (&client_cfg);
+#endif
 #endif
 
     /* We don't need it anymore */
@@ -347,7 +374,7 @@ int main (int argc, char *argv[])
     /* Print SDB devices */
     devio_print_info (devio);
 
-    zhash_t *devio_hints = zhash_new ();
+    zhashx_t *devio_hints = zhashx_new ();
     if (devio_hints == NULL) {
         DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could allocate "
                 "hints hash table\n");
@@ -359,7 +386,12 @@ int main (int argc, char *argv[])
     /**************************************************************************/
 
     /* Check for field not found */
-    zconfig_t *root_cfg = zconfig_load (CFG_DIR "/" CFG_FILENAME);
+    if (cfg_file == NULL) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Configuration file not set\n");
+        goto err_cfg_load;
+    }
+
+    zconfig_t *root_cfg = zconfig_load (cfg_file);
     if (root_cfg == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not load "
                 "configuration file\n");
@@ -370,14 +402,14 @@ int main (int argc, char *argv[])
      * the corresponding keys */
     hutils_err_e herr = hutils_get_hints (root_cfg, devio_hints);
     if (herr != HUTILS_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not get hints "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could not get hints "
                 "from configuration file\n");
         goto err_cfg_get_hints;
     }
 
     /* Spawn associated DEVIOs */
     devio_err_e err = _spawn_assoc_devios (devio, dev_id, devio_type,
-            broker_endp, log_prefix, devio_hints);
+            cfg_file, broker_endp, log_prefix, devio_hints);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not spawn "
                 "associated DEVIOs!\n");
@@ -415,7 +447,7 @@ err_assoc_devio:
 err_cfg_get_hints:
     zconfig_destroy (&root_cfg);
 err_cfg_load:
-    zhash_destroy (&devio_hints);
+    zhashx_destroy (&devio_hints);
 err_devio_hints_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
@@ -444,12 +476,16 @@ err_exit:
     free (*str_p);
     str_p = &devio_type_str;
     free (*str_p);
+    str_p = &devio_work_dir;
+    free (*str_p);
+    str_p = &cfg_file;
+    free (*str_p);
     return 0;
 }
 
 static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
-        devio_type_e devio_type, char *broker_endp, char *log_prefix,
-        zhash_t *hints)
+        devio_type_e devio_type, char *cfg_file, char *broker_endp,
+        char *log_prefix, zhashx_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -459,7 +495,11 @@ static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_rffe_devios (devio, dev_id, broker_endp, log_prefix,
+            /* Spawn RFFE devios */
+            err = _spawn_rffe_devios (devio, dev_id, cfg_file, broker_endp, log_prefix,
+                    hints);
+            /* Spawn EPICS IOC */
+            err |= _spawn_epics_iocs (devio, dev_id, cfg_file, broker_endp, log_prefix,
                     hints);
             break;
 
@@ -482,7 +522,7 @@ err_spwan_assoc_devios:
 }
 
 static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
-        char *broker_endp, char *log_prefix, zhash_t *hints)
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints)
 {
     assert (devio);
     assert (broker_endp);
@@ -500,19 +540,19 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
         uint32_t smio_inst_id = j;
         int errs = snprintf (hints_key, sizeof (hints_key),
-                HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, smio_inst_id,
-                HUTILS_CFG_AFE);
+                HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, smio_inst_id);
 
         /* Only when the number of characters written is less than the whole buffer,
          * it is guaranteed that the string was written successfully */
         ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
-                "Could not generate AFE bind address from configuration "
+                "Could not generate configuration hash key for configuration "
                 "file", err_cfg_exit, DEVIO_ERR_CFG);
 
-        char *endpoint_fe = zhash_lookup (hints, hints_key);
+        hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
         /* If key is not found, assume we don't have any more AFE to
          * prepare */
-        if (endpoint_fe == NULL || streq (endpoint_fe, "")) {
+        if (cfg_item == NULL || cfg_item->bind == NULL ||
+                streq (cfg_item->bind, "")) {
             continue;
         }
 
@@ -523,9 +563,10 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DEVIO_ERR_ALLOC);
 
         /* Spawn DEVIO RFFE */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO RFFE\n");
-        char *argv_exec [] = {DEVIO_NAME, "-n", FE_DEVIO_STR,"-t", ETH_DEV_STR,
-            "-i", dev_id_c, "-e", endpoint_fe, "-s", smio_inst_id_c,
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO RFFE for "
+                "board %u, bpm %u\n", dev_id, j);
+        char *argv_exec [] = {DEVIO_NAME, "-f", cfg_file, "-n", FE_DEVIO_STR, "-t",
+            ETH_DEV_STR, "-i", dev_id_c, "-e", cfg_item->bind, "-s", smio_inst_id_c,
             "-b", broker_endp, "-l", log_prefix, NULL};
         /* Spawn Config DEVIO */
         int child_devio_cfg_pid = hutils_spawn_chld (DEVIO_NAME, argv_exec);
@@ -549,6 +590,105 @@ err_spawn:
 err_smio_inst_id_c_alloc:
     free (dev_id_c);
 err_dev_id_c_alloc:
+err_cfg_exit:
+    return err;
+}
+
+static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
+        char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints)
+{
+    assert (devio);
+    assert (broker_endp);
+    assert (hints);
+    (void) log_prefix;
+    (void) cfg_file;
+
+    devio_err_e err = DEVIO_SUCCESS;
+    char *bpm_id_c = NULL;
+    char *smio_inst_id_c = NULL;
+    char *telnet_port_c = NULL;
+
+    /* For each DEVIO, spawn up to 2 EPICS IOCs. Do a lookup in our
+     * hints hash to look we we were indeed asked to do that */
+    uint32_t j;
+    for (j = 0; j < DEVIO_MAX_FE_DEVIOS; ++j) {
+        char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
+        uint32_t smio_inst_id = j;
+        int errs = snprintf (hints_key, sizeof (hints_key),
+                HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, smio_inst_id);
+
+        /* Only when the number of characters written is less than the whole buffer,
+         * it is guaranteed that the string was written successfully */
+        ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
+                "Could not generate configuration hash key for configuration "
+                "file", err_cfg_exit, DEVIO_ERR_CFG);
+
+        hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
+        /* If key is not found or we were asked not to spawn EPICS IOC,
+         * assume we don't have any more DBE to prepare */
+        if (cfg_item == NULL || cfg_item->spawn_epics_ioc == false) {
+            continue;
+        }
+
+        /* Get EPICS environment variables as IOCs require different system
+         * behavior */
+        char *epics_hostname = getenv("EPICS_HOSTNAME");
+        ASSERT_TEST (epics_hostname != NULL,
+                "Could not get EPICS_HOSTNAME environment variable",
+                err_cfg_exit, DEVIO_ERR_CFG);
+        char *epics_startup = getenv("BPM_EPICS_STARTUP");
+        ASSERT_TEST (epics_startup != NULL,
+                "Could not get EPICS_STARTUP environment variable",
+                err_cfg_exit, DEVIO_ERR_CFG);
+
+        /* Check if we are withing range */
+        ASSERT_TEST (dev_id < NUM_MAX_SLOTS+1, "Device ID is out of range",
+                err_cfg_exit, DEVIO_ERR_CFG);
+        ASSERT_TEST (smio_inst_id < NUM_MAX_BPM_PER_SLOT, "SMIO instance ID is out of range",
+                err_cfg_exit, DEVIO_ERR_CFG);
+
+        /* Stringify parameters */
+        bpm_id_c = hutils_stringify_dec_key (board_epics_rev_map [dev_id][smio_inst_id].bpm_id);
+        ASSERT_ALLOC (bpm_id_c, err_bpm_id_c_alloc, DEVIO_ERR_ALLOC);
+        smio_inst_id_c = hutils_stringify_dec_key (smio_inst_id);
+        ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DEVIO_ERR_ALLOC);
+        telnet_port_c = hutils_stringify_dec_key (board_epics_opts [dev_id][smio_inst_id].telnet_port);
+        ASSERT_ALLOC (telnet_port_c, err_telnet_port_c_alloc, DEVIO_ERR_ALLOC);
+
+        /* Change working directory as EPICS startup files are located in a
+         * non-default directory */
+        zsys_dir_change (epics_startup);
+
+        /* Spawn EPICS IOCs */
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO EPICS IOC for "
+                "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
+        char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
+            "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
+            NULL};
+        /* Spawn Config DEVIO */
+        int child_devio_cfg_pid = hutils_spawn_chld (EPICS_PROCSERV_NAME, argv_exec);
+
+        if (child_devio_cfg_pid < 0) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+                    "EPICS instance for board %u, bpm %u\n", dev_id, j);
+            goto err_spawn;
+        }
+
+        free (bpm_id_c);
+        bpm_id_c = NULL;
+        free (smio_inst_id_c);
+        smio_inst_id_c = NULL;
+        free (telnet_port_c);
+        telnet_port_c = NULL;
+    }
+
+err_spawn:
+    free (telnet_port_c);
+err_telnet_port_c_alloc:
+    free (smio_inst_id_c);
+err_smio_inst_id_c_alloc:
+    free (bpm_id_c);
+err_bpm_id_c_alloc:
 err_cfg_exit:
     return err;
 }

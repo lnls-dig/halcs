@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_server.h"
@@ -54,6 +54,10 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
     bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
             log_file_name, SMIO_SWAP_LIBBPMCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
+
+    bpm_set_div_clk (config_client, service, SWAP_DFLT_DIV_CLK);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching clock",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     client_err = bpm_set_sw (config_client, service, SWAP_DFLT_SW);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set switching state",

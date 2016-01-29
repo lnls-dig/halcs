@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 /* Error definitions and output stringification based on the work available
@@ -28,6 +28,8 @@ enum _bpm_client_err_e
     BPM_CLIENT_ERR_INV_FUNCTION,          /* Invalid function */
     BPM_CLIENT_ERR_END                    /* End of enum marker */
 };
+
+typedef enum _bpm_client_err_e bpm_client_err_e;
 
 /* Convert enumeration type to string */
 const char * bpm_client_err_str (bpm_client_err_e err);

@@ -2,3 +2,4 @@ Project Dependencies:
     liberrhand
 
 Foreign Dependencies:
+    czmq

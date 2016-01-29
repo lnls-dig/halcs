@@ -11,8 +11,12 @@ OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 
-# General C flags
-CFLAGS = -std=gnu99 -O2
+# General C/CPP flags
+CFLAGS_USR = -std=gnu99 -O2
+# We expect tghese variables to be appended to the possible
+# command-line options
+override CPPFLAGS +=
+override CXXFLAGS +=
 
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
@@ -33,6 +37,15 @@ CFLAGS_DEBUG += -g
 CFLAGS_PLATFORM = -Wall -Wextra -Werror \
 		  -Wno-missing-field-initializers \
 		  -Wno-missing-braces
+
+ifeq ($(notdir $(CC)),$(filter $(notdir $(CC)),gcc cc))
+CFLAGS_PLATFORM += -Wno-cpp
+endif
+
+ifeq ($(notdir $(CC)),clang)
+CFLAGS_PLATFORM += -Wno-error=\#warnings
+endif
+
 LDFLAGS_PLATFORM =
 
 # Libraries
@@ -43,12 +56,10 @@ LFLAGS =
 # Include directories
 INCLUDE_DIRS = -I. -I/usr/local/lib
 
-# Merge all flags. Optimize for size (-Os)
-CFLAGS += $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG)
-#-Os
-
-LDFLAGS = $(LDFLAGS_PLATFORM)
-#-ffunction-sections -fdata-sections -Wl,--gc-sections
+# Merge all flags. We expect tghese variables to be appended to the possible
+# command-line options
+override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
+override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Every .c file will must be a separate example
 examples_SRC = $(wildcard *.c)
@@ -57,7 +68,7 @@ OUT = $(basename $(examples_SRC))
 all: $(OUT)
 
 %: %.c
-	$(CC) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
+	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 #BAD
 clean:

@@ -2,13 +2,13 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _SM_IO_DSP_EXPORTS_H_
 #define _SM_IO_DSP_EXPORTS_H_
 
-#include "disp_table.h"
+#include "disptable.h"
 
 extern disp_op_t dsp_set_get_kx_exp;
 extern disp_op_t dsp_set_get_ky_exp;
@@ -24,6 +24,7 @@ extern disp_op_t dsp_set_get_monit_pos_x_exp;
 extern disp_op_t dsp_set_get_monit_pos_y_exp;
 extern disp_op_t dsp_set_get_monit_pos_q_exp;
 extern disp_op_t dsp_set_get_monit_pos_sum_exp;
+extern disp_op_t dsp_set_get_monit_updt_exp;
 
 extern const disp_op_t *dsp_exp_ops [];
 

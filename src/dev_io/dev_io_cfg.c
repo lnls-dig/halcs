@@ -2,7 +2,7 @@
  * Copyright (C) 2015 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_server.h"
@@ -139,25 +139,28 @@ int main (int argc, char *argv[])
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
                     "\tDefaulting it to the /dev file number ...\n");
 
-                int matches = sscanf (dev_entry, "/dev/fpga%u", &dev_id);
+                /* Our device follows the convention of having the ID in hexadecimal
+                 * code. For instance, /dev/fpga-0c00 would be a valid ID */
+                int matches = sscanf (dev_entry, "/dev/fpga-%X", &dev_id);
                 if (matches == 0) {
                     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
-                            "\tIt must be in the format \"/dev/fpga<device_number>\". Exiting ...\n");
+                            "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
+                break;
 
             default:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
                 goto err_exit;
         }
     }
-    /* Use the passed ID */
+    /* Use the passed ID, interpret it as hexadecimal number */
     else {
-        dev_id = strtoul (dev_id_str, NULL, 10);
+        dev_id = strtoul (dev_id_str, NULL, 16);
     }
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u.\n",
-            dev_id);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u/%X.\n",
+            dev_id, dev_id);
 
     /* We don't need it anymore */
     str_p = &dev_type;
@@ -171,7 +174,7 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating DEVIO instance ...\n");
 
     char devio_service_str [DEVIO_SERVICE_LEN];
-    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO", dev_id);
+    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO_CFG", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
             broker_endp, verbose, log_file_name);

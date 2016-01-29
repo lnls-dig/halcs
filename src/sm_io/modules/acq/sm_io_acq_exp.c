@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_server.h"
@@ -37,6 +37,34 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:acq_exp]",    \
             smio_err_str (err_type))
 
+/* FIXME: Usage of reserved, undocumented bits */
+/* Acquisition can start if FSM is in IDLE state, if Flow Control FIFO
+ * is not FULL, dbg_source_pl_stall (RESERVED BIT, UNDOCUMENTED) is not asserted
+ * and there is no data in the FIFOs (ACQ_CORE_STA_RESERVED3_MASK)*/
+#define ACQ_CORE_IDLE_MASK      (ACQ_CORE_STA_FSM_STATE_MASK | ACQ_CORE_STA_FC_FULL | \
+                                    ACQ_CORE_STA_RESERVED2_W(1 << 3) | ACQ_CORE_STA_RESERVED3_MASK)
+
+#define ACQ_CORE_IDLE_VALUE     ACQ_CORE_STA_FSM_STATE_W(0x1)
+
+/* Acquisition is completed when FSM is in IDLE state, FSM is with DONE
+ * flag asserted, Flow Control FIFO is with DOME flag asserted and DDR3 has
+ * its DONE flag asserted */
+#define ACQ_CORE_COMPLETE_MASK  (ACQ_CORE_STA_FSM_STATE_MASK | ACQ_CORE_STA_FSM_ACQ_DONE | \
+                                    ACQ_CORE_STA_FC_TRANS_DONE | ACQ_CORE_STA_DDR3_TRANS_DONE)
+
+#define ACQ_CORE_COMPLETE_VALUE (ACQ_CORE_STA_FSM_STATE_W(0x1) | ACQ_CORE_STA_FSM_ACQ_DONE | \
+                                    ACQ_CORE_STA_FC_TRANS_DONE | ACQ_CORE_STA_DDR3_TRANS_DONE)
+
+static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
+        uint32_t status_value);
+static int _acq_set_trigger_type (SMIO_OWNER_TYPE *self, uint32_t trigger_type);
+static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type);
+static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
+        uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
+        uint64_t end_mem_space_addr);
+static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+        uint64_t channel_start_addr, uint64_t end_mem_space_addr);
+
 /************************************************************/
 /***************** Specific ACQ Operations ******************/
 /************************************************************/
@@ -46,95 +74,143 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     (void) ret;
     assert (owner);
     assert (args);
+    int err = -ACQ_OK;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_data_acquire\n");
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
-            err_get_acq_handler);
+            err_get_acq_handler, -ACQ_ERR);
+
+    /* First step is to check if the FPGA is already doing an acquisition. If it
+     * is, then return an error. Otherwise proceed normally. */
+    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+    ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
+            "New acquisition not started", err_acq_not_completed);
 
     /* Message is:
      * frame 0: operation code
-     * frame 1: number of samples
-     * frame 2: channel                 */
-    uint32_t num_samples = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     * frame 1: number of pre-trigger samples
+     * frame 2: number of post-trigger samples
+     * frame 3: number of shots
+     * frame 4: channel                 */
+    uint32_t num_samples_pre = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t num_samples_post = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    uint32_t num_shots = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
     uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     /* channel required is out of the limit */
     if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
+        return -ACQ_NUM_CHAN_OOR;
+    }
 
+    /* channel required is out of the limit */
+    if (num_shots < ACQ_CORE_MIN_NUM_SHOTS) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+                "Number of shots required is below the minimum limit\n");
         return -ACQ_NUM_CHAN_OOR;
     }
 
     /* number of samples required is out of the maximum limit */
-    if (num_samples > acq->acq_buf[chan].max_samples) {
+    uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE/acq->acq_buf[chan].sample_size;
+    if (((num_shots == ACQ_CORE_MIN_NUM_SHOTS) &&
+            (num_samples_pre + num_samples_post > acq->acq_buf[chan].max_samples)) ||
+            ((num_shots > ACQ_CORE_MIN_NUM_SHOTS) &&
+            (num_samples_pre + num_samples_post > max_samples_multishot))) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
-                "Number of samples required is out of the maximum limit\n");
+                "Number of samples required (%u) is out of the maximum limit (%u)\n"
+                 "for shots = %u\n",
+                 num_samples_pre + num_samples_post, (num_shots == ACQ_CORE_MIN_NUM_SHOTS) ?
+                 acq->acq_buf[chan].max_samples : max_samples_multishot, num_shots);
         return -ACQ_NUM_SAMPLES_OOR;
     }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "\n\tCurrent acq params for channel #%u: number of samples = %u\n",
-            chan, num_samples);
+    /* If skip trigger is set, we must set post_trigger_samples to 0 */
+    uint32_t trigger_type = 0;
+    err = _acq_get_trigger_type (self, &trigger_type);
+    ASSERT_TEST(err == -ACQ_OK, "Could not check for trigger type",
+            err_acq_get_trig);
+    if (trigger_type == TYPE_ACQ_CORE_SKIP && num_samples_post > 0) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+                "Incompatible trigger type. Post trigger samples is greater than 0\n");
+        return -ACQ_TRIG_TYPE;
+    }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "\n\tPrevious acq params for channel #%u: number of samples = %u\n",
-            chan, acq->acq_params[chan].num_samples);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire:\n"
+            "\tCurrent acq params for channel #%u: number of pre-trigger samples = %u\n"
+            "\tnumber of post-trigger samples = %u, number of shots = %u\n",
+            chan, num_samples_pre, num_samples_post, num_shots);
 
-    /* Set the parameters: number of samples of this channel */
-    acq->acq_params[chan].num_samples = num_samples;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire:\n"
+            "\tPrevious acq params for channel #%u: number of pre-trigger samples = %u\n"
+            "\tnumber of post-trigger samples = %u, number of shots = %u\n",
+            chan, acq->acq_params[chan].num_samples_pre,
+            acq->acq_params[chan].num_samples_post,
+            acq->acq_params[chan].num_shots);
 
-    /* Default SHOTS value is 1 */
-    uint32_t acq_core_shots = ACQ_CORE_SHOTS_NB_W(1);
+    /* Setting the number of shots */
+    uint32_t acq_core_shots = ACQ_CORE_SHOTS_NB_W(num_shots);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Number of shots = %u\n", acq_core_shots);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
-    uint32_t num_samples_div_pre =
+    uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
-    uint32_t num_samples_aligned_pre = num_samples + num_samples_div_pre -
-        (num_samples % num_samples_div_pre);
+    uint32_t num_samples_pre_aligned = num_samples_pre + samples_alignment -
+        (num_samples_pre % samples_alignment);
+    uint32_t num_samples_post_aligned = (num_samples_post==0) ? 0 :
+        num_samples_post + samples_alignment -
+        (num_samples_post % samples_alignment);
+
+    /* Set the parameters: number of samples of this channel */
+    acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
+    acq->acq_params[chan].num_samples_post = num_samples_post_aligned;
+    acq->acq_params[chan].num_shots = num_shots;
+
     /* Pre trigger samples */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Number of pre-trigger samples (aligned to sample size) = %u\n",
-            num_samples_aligned_pre);
-    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_PRE_SAMPLES, &num_samples_aligned_pre);
+            num_samples_pre_aligned);
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_PRE_SAMPLES, &num_samples_pre_aligned);
 
     /* Post trigger samples */
-    uint32_t num_samples_post = 0;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Number of post-trigger samples = %u\n",
-            num_samples_post);
-    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_POST_SAMPLES, &num_samples_post);
+            num_samples_post_aligned);
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_POST_SAMPLES, &num_samples_post_aligned);
 
-    /* DDR3 start address. Convert Byte address to Word address, as this address
-     * is written to the DDR controller, which is 32-bit (word) addressed */
-    uint32_t start_addr = (uint32_t)
-        acq->acq_buf[chan].start_addr/DDR3_ADDR_WORD_2_BYTE;
+    /* DDR3 start address. Byte addressed */
+    uint32_t start_addr = (uint32_t) acq->acq_buf[chan].start_addr;
+    uint32_t end_addr = (uint32_t) acq->acq_buf[chan].end_addr;
+
+    /* Start address */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "DDR3 start address: 0x%08x\n", start_addr);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_START_ADDR, &start_addr);
 
-    /* Prepare core_ctl register */
-    uint32_t acq_core_ctl_reg = ACQ_CORE_CTL_FSM_ACQ_NOW;
+    /* End address */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
-            "Control register is: 0x%08x\n",
-            acq_core_ctl_reg);
-    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
+            "DDR3 end address: 0x%08x\n", end_addr);
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_DDR3_END_ADDR, &end_addr);
 
     /* Prepare acquisition channel control */
-    uint32_t acq_chan_ctl = ACQ_CORE_ACQ_CHAN_CTL_WHICH_W(chan);
+    uint32_t acq_chan_ctl = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_ACQ_CHAN_CTL, &acq_chan_ctl);
+    acq_chan_ctl = (acq_chan_ctl & ~ACQ_CORE_ACQ_CHAN_CTL_WHICH_MASK) |
+         ACQ_CORE_ACQ_CHAN_CTL_WHICH_W(chan);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Channel control register is: 0x%08x\n",
             acq_chan_ctl);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_ACQ_CHAN_CTL, &acq_chan_ctl);
 
     /* Starting acquisition... */
+    uint32_t acq_core_ctl_reg = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
     acq_core_ctl_reg |= ACQ_CORE_CTL_FSM_START_ACQ;
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
 
@@ -143,8 +219,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     return -ACQ_OK;
 
+err_acq_get_trig:
+err_acq_not_completed:
 err_get_acq_handler:
-    return -ACQ_ERR;
+    return err;
 }
 
 static int _acq_check_data_acquire (void *owner, void *args, void *ret)
@@ -152,33 +230,53 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
     (void) ret;
     assert (owner);
     assert (args);
+    int err = -ACQ_OK;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_check_data_acquire\n");
 
+    /* Message is:
+     * frame 0: operation code
+     */
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
-            err_get_acq_handler);
+            err_get_acq_handler, -ACQ_ERR);
 
+    err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE);
+    if (err != -ACQ_OK) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
+                "Acquisition is not done\n");
+    }
+    else {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
+                "Acquisition is done\n");
+    }
+
+err_get_acq_handler:
+    return err;
+}
+
+static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
+        uint32_t status_value)
+{
+    int err = -ACQ_OK;
     uint32_t status_done = 0;
+
     /* Check for completion */
-    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_STA, &status_done );
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_STA, &status_done);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Status done = 0x%08x\n", status_done);
 
-    if (!(status_done & ACQ_CORE_STA_DDR3_TRANS_DONE)) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is not done\n");
-        return -ACQ_NOT_COMPLETED;
+    if ((status_done & status_mask) != status_value) {
+        err = -ACQ_NOT_COMPLETED;
+        goto err_not_completed;
     }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-            "Acquisition is done\n");
-    return -ACQ_OK;
+    err = -ACQ_OK;
 
-err_get_acq_handler:
-    return -ACQ_ERR;
+err_not_completed:
+    return err;
 }
 
 static int _acq_get_data_block (void *owner, void *args, void *ret)
@@ -211,19 +309,22 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     }
 
     /* Channel features */
+    uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
+    uint32_t channel_start_addr = acq->acq_buf[chan].start_addr;
+    uint32_t channel_end_addr = acq->acq_buf[chan].end_addr;
+    uint32_t channel_max_samples = acq->acq_buf[chan].max_samples;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "\t[channel = %u], id = %u, start addr = 0x%08x\n"
             "\tend addr = 0x%08x, max samples = %u, sample size = %u\n",
             chan,
             acq->acq_buf[chan].id,
-            acq->acq_buf[chan].start_addr,
-            acq->acq_buf[chan].end_addr,
-            acq->acq_buf[chan].max_samples,
-            acq->acq_buf[chan].sample_size);
+            channel_start_addr,
+            channel_end_addr,
+            channel_max_samples,
+            channel_sample_size);
 
-    uint32_t block_n_max = ( acq->acq_buf[chan].end_addr -
-            acq->acq_buf[chan].start_addr +
-            acq->acq_buf[chan].sample_size) / BLOCK_SIZE;
+    uint32_t block_n_max = (channel_max_samples*channel_sample_size) /
+        BLOCK_SIZE;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "block_n_max = %u\n", block_n_max);
 
@@ -234,18 +335,28 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
         return -ACQ_BLOCK_OOR;
     }
 
-    /* Get number of samples */
-    uint32_t num_samples =
-        acq->acq_params[chan].num_samples;
+    /* Get number of samples and shots */
+    uint32_t num_samples_pre =
+        acq->acq_params[chan].num_samples_pre;
+    uint32_t num_samples_post =
+        acq->acq_params[chan].num_samples_post;
+    uint32_t num_samples_shot = num_samples_pre + num_samples_post;
+    uint32_t num_shots =
+        acq->acq_params[chan].num_shots;
+    uint32_t num_samples_multishot = num_samples_shot*num_shots;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "last num_samples = %u\n", num_samples);
+            "last num_samples_pre = %u\n", num_samples_pre);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+            "last num_samples_post = %u\n", num_samples_post);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+            "last num_shots = %u\n", num_shots);
 
-    uint32_t n_max_samples = BLOCK_SIZE/acq->acq_buf[chan].sample_size;
+    uint32_t n_max_samples = BLOCK_SIZE/channel_sample_size;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
-    uint32_t over_samples = num_samples % n_max_samples;
-    uint32_t block_n_valid = num_samples / n_max_samples;
+    uint32_t over_samples = num_samples_multishot % n_max_samples;
+    uint32_t block_n_valid = num_samples_multishot / n_max_samples;
     /* When the last block is full 'block_n_valid' exceeds by one */
     if (block_n_valid != 0 && over_samples == 0) {
         block_n_valid--;
@@ -256,7 +367,6 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* check if block required is valid and if it is full or not */
     if (block_n > block_n_valid) {
-        /* TODO error level in this case */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq] get_data_block: "
                 "Block %u of channel %u is not valid\n", block_n, chan);
         return -ACQ_BLOCK_OOR;
@@ -264,21 +374,57 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     uint32_t reply_size;
     if (block_n == block_n_valid && over_samples > 0){
-        reply_size = over_samples*acq->acq_buf[chan].sample_size;
+        reply_size = over_samples*channel_sample_size;
     }
     else { /* if block_n < block_n_valid */
         reply_size = BLOCK_SIZE;
     }
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq] get_data_block: "
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Reading block %u of channel %u with %u valid samples\n",
             block_n, chan, reply_size);
 
-    uint32_t addr_i = acq->acq_buf[chan].start_addr +
-        block_n * BLOCK_SIZE;
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "Block %u of channel %u start address = 0x%08x\n", block_n,
-            chan, addr_i);
+    /* For all modes the start valid address is given by:
+     * start_addr = trigger_addr -
+     * ((num_samples_pre+num_samples_post)*(num_shots-1) + num_samples_pre)*
+     * sample_size
+     * */
+
+    /* First step if to read trigger address. Even on skip trigger mode,
+     * this register will contain the address after the last valid sample
+     * (end of acquisition address) */
+    uint32_t acq_core_trig_addr = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
+
+    /* Second step is to calculate the size of the whole acquisition in bytes */
+    uint32_t acq_size_bytes = (num_samples_shot*(num_shots-1) +
+            num_samples_pre)*channel_sample_size;
+    /* Our "end address" is the start of the last valid address available for a
+     * sample. So, our "end address" needs to be accounted for one sample more */
+    uint32_t end_mem_space_addr = channel_end_addr + channel_sample_size;
+
+    /* Third step is to get the absolute start address of the acquisition, taking
+     * care for wraps in the beginning of the current memory space */
+    uint64_t start_addr = _acq_get_start_address (acq_core_trig_addr,
+            acq_size_bytes, channel_start_addr, end_mem_space_addr);
+
+    /* Forth step is to calculate the offset from the start_addr, taking care
+     * for wraps in the end of the current memory space */
+    uint64_t addr_i = _acq_get_read_block_addr (start_addr, block_n * BLOCK_SIZE,
+            channel_start_addr, end_mem_space_addr);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block:\n"
+            "\tBlock %u of channel %u:\n"
+            "\tChannel start address = 0x%08x,\n"
+            "\tTrigger address = 0x%08x,\n"
+            "\tAcquisition read start address\n"
+            "\t\t(trig_addr - ((num_samples_pre+num_samples_post)*(num_shots-1)\n"
+            "\t\t+ num_samples_pre)*sample_size = 0x%"PRIx64 ",\n"
+            "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%"PRIx64 "\n",
+            block_n, chan,
+            channel_start_addr,
+            acq_core_trig_addr,
+            start_addr,
+            addr_i);
 
     smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) ret;
 
@@ -306,11 +452,298 @@ err_get_acq_handler:
     return -ACQ_ERR;
 }
 
+static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
+        uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
+        uint64_t end_mem_space_addr)
+{
+    uint64_t addr = 0;
+
+    /* Trigger address relative to the start of the memory space */
+    uint64_t rel_start_trig_addr = acq_core_trig_addr - start_mem_space_addr;
+    /* Check if an address wrap can occur */
+    if (rel_start_trig_addr >= acq_size_bytes) {
+        addr = acq_core_trig_addr - acq_size_bytes;
+    }
+    else {
+        addr = end_mem_space_addr - (acq_size_bytes - rel_start_trig_addr);
+    }
+
+    return addr;
+}
+
+static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+        uint64_t channel_start_addr, uint64_t end_mem_space_addr)
+{
+    uint64_t addr = 0;
+
+    /* Memory space last address relative to the start address */
+    uint64_t rel_end_mem_space_addr = end_mem_space_addr - start_addr;
+    /* Check if an address wrap can occur */
+    if (offset <= rel_end_mem_space_addr) {
+        addr = start_addr + offset;
+    }
+    else {
+        addr = channel_start_addr + (offset - rel_end_mem_space_addr);
+    }
+
+    return addr;
+}
+
+static int _acq_cfg_trigger (void *owner, void *args, void *ret)
+{
+    (void) ret;
+    assert (owner);
+    assert (args);
+    int err = -ACQ_OK;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
+            "Calling _acq_cfg_trigger\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
+            err_get_acq_handler, -ACQ_ERR);
+
+    /* First step is to check if the FPGA is already doing an acquisition. If it
+     * is, then return an error. Otherwise proceed normally. */
+    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+    ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
+            "Cannot change trigger type", err_acq_not_completed);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw
+     * frame 2: trigger type (0 -> skip trigger, 1 -> external trigger,
+     *                          2 -> data-driven trigger, 3 -> software trigger)
+     */
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t trigger_type = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    /* channel required is out of the limit */
+    ASSERT_TEST(trigger_type < ACQ_CORE_NUM_TRIGGERS, "Trigger type is not valid",
+            err_acq_not_completed, -ACQ_NUM_CHAN_OOR);
+
+    uint32_t trigger_type_ret = 0;
+    if (rw) {
+        err = _acq_get_trigger_type (self, &trigger_type_ret);
+        ASSERT_TEST(err == -ACQ_OK, "Trigger type is not valid", err_acq_get_trig);
+
+        /* Return value to caller */
+        *((uint32_t *) ret) = trigger_type_ret;
+        err = sizeof (trigger_type_ret);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
+                "Trigger type = 0x%08X\n", trigger_type_ret);
+    }
+    else {
+        err = _acq_set_trigger_type (self, trigger_type);
+        ASSERT_TEST(err == -ACQ_OK, "Trigger type is not valid", err_acq_inv_trig);
+    }
+
+    return err;
+
+err_acq_inv_trig:
+err_acq_get_trig:
+err_acq_not_completed:
+err_get_acq_handler:
+    return err;
+}
+
+static int _acq_set_trigger_type (SMIO_OWNER_TYPE *self, uint32_t trigger_type)
+{
+    int err = -ACQ_OK;
+
+    /* Read control registers so we don't overwrite previous configs */
+    uint32_t acq_core_ctl_reg = 0;
+    uint32_t acq_core_trig_cfg_reg = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_CFG, &acq_core_trig_cfg_reg);
+
+    /* Select between our trigger types */
+    switch (trigger_type) {
+        case TYPE_ACQ_CORE_SKIP:
+            /* Enable skip trigger */
+            acq_core_ctl_reg |= ACQ_CORE_CTL_FSM_ACQ_NOW;
+            /* Disable hardware trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_HW_TRIG_EN;
+            /* Disable software trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_SW_TRIG_EN;
+        break;
+
+        /* Set HW_TRIG_SEL bit (1 is HW pulse trigger) */
+        case TYPE_ACQ_CORE_HW_PULSE:
+            /* Disable skip trigger */
+            acq_core_ctl_reg &= ~ACQ_CORE_CTL_FSM_ACQ_NOW;
+            /* Enable hardware trigger */
+            acq_core_trig_cfg_reg |= ACQ_CORE_TRIG_CFG_HW_TRIG_EN;
+            /* Disable software trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_SW_TRIG_EN;
+            /* Select external pulse trigger */
+            acq_core_trig_cfg_reg |= ACQ_CORE_TRIG_CFG_HW_TRIG_SEL;
+        break;
+
+        /* Clear HW_TRIG_SEL bit (0 is HW data-driven trigger) */
+        case TYPE_ACQ_CORE_HW_DATA_DRIVEN:
+            /* Disable skip trigger */
+            acq_core_ctl_reg &= ~ACQ_CORE_CTL_FSM_ACQ_NOW;
+            /* Enable hardware trigger */
+            acq_core_trig_cfg_reg |= ACQ_CORE_TRIG_CFG_HW_TRIG_EN;
+            /* Disable software trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_SW_TRIG_EN;
+            /* Enable data-driven trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_HW_TRIG_SEL;
+        break;
+
+        case TYPE_ACQ_CORE_SW:
+            /* Disable skip trigger */
+            acq_core_ctl_reg &= ~ACQ_CORE_CTL_FSM_ACQ_NOW;
+            /* Disable hardware trigger */
+            acq_core_trig_cfg_reg &= ~ACQ_CORE_TRIG_CFG_HW_TRIG_EN;
+            /* Enable software trigger */
+            acq_core_trig_cfg_reg |= ACQ_CORE_TRIG_CFG_SW_TRIG_EN;
+        break;
+
+        default:
+            return -ACQ_ERR;
+    }
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] cfg_trigger: "
+            "Control register is: 0x%08x\n",
+            acq_core_ctl_reg);
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] cfg_trigger: "
+            "Trigger config register is: 0x%08x\n",
+            acq_core_trig_cfg_reg);
+    smio_thsafe_client_write_32 (self, ACQ_CORE_REG_TRIG_CFG, &acq_core_trig_cfg_reg);
+
+    return err;
+}
+
+static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type)
+{
+    int err = -ACQ_OK;
+
+    uint32_t acq_core_ctl_reg = 0;
+    uint32_t acq_core_trig_cfg_reg = 0;
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
+    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_CFG, &acq_core_trig_cfg_reg);
+
+    /* Check for SKIP trigger */
+    if (acq_core_ctl_reg & ACQ_CORE_CTL_FSM_ACQ_NOW) {
+        *trigger_type = (int) TYPE_ACQ_CORE_SKIP;
+        /* Check if other trigger types are also set */
+        ASSERT_TEST(!(acq_core_trig_cfg_reg & (ACQ_CORE_TRIG_CFG_HW_TRIG_EN |
+                        ACQ_CORE_TRIG_CFG_SW_TRIG_EN)), "Invalid skip trigger type",
+                err_inv_skip_trig, -ACQ_ERR);
+        return -ACQ_OK;
+    }
+
+    /* We don't have the SKIP trigger flag set. Check for HW trigger */
+    if (acq_core_trig_cfg_reg & ACQ_CORE_TRIG_CFG_HW_TRIG_EN) {
+        /* We can have SW trigger enable and it isn't an error */
+        if (acq_core_trig_cfg_reg & ACQ_CORE_TRIG_CFG_HW_TRIG_SEL) {
+            *trigger_type = (int) TYPE_ACQ_CORE_HW_PULSE;
+        }
+        else {
+            *trigger_type = (int) TYPE_ACQ_CORE_HW_DATA_DRIVEN;
+        }
+        return -ACQ_OK;
+    }
+
+    /* We don't have SKIP nor HW flags set. Check for SW trigger */
+    if (acq_core_trig_cfg_reg & ACQ_CORE_TRIG_CFG_SW_TRIG_EN) {
+        /* We can have SW trigger enable and it isn't an error */
+        *trigger_type = (int) TYPE_ACQ_CORE_SW;
+        return -ACQ_OK;
+    }
+
+err_inv_skip_trig:
+    return err;
+}
+
+
+#define ACQ_HW_DATA_TRIG_POL_MIN                    0       /* positive slope: 0 -> 1 */
+#define ACQ_HW_DATA_TRIG_POL_MAX                    1       /* negative slope: 1 -> 0 */
+RW_PARAM_FUNC(acq, hw_data_trig_pol) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+            HW_TRIG_POL, SINGLE_BIT_PARAM, ACQ_HW_DATA_TRIG_POL_MIN,
+            ACQ_HW_DATA_TRIG_POL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_HW_DATA_TRIG_SEL_MIN                    0
+#define ACQ_HW_DATA_TRIG_SEL_MAX                    3
+RW_PARAM_FUNC(acq, hw_data_trig_sel) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+            INT_TRIG_SEL, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_SEL_MIN,
+            ACQ_HW_DATA_TRIG_SEL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_HW_DATA_TRIG_FILT_MIN                   0
+#define ACQ_HW_DATA_TRIG_FILT_MAX                   ((1 << 8)-1)
+RW_PARAM_FUNC(acq, hw_data_trig_filt) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_CFG,
+            THRES_FILT, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_FILT_MIN,
+            ACQ_HW_DATA_TRIG_FILT_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_CORE_TRIG_DATA_THRES_R(val)             (val)
+#define ACQ_CORE_TRIG_DATA_THRES_W(val)             (val)
+#define ACQ_CORE_TRIG_DATA_THRES_MASK               ((1ULL<<32)-1)
+RW_PARAM_FUNC(acq, hw_data_trig_thres) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_THRES,
+            /* No field */, MULT_BIT_PARAM, /* No minimum check*/,
+            /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+/* */
+#define ACQ_CORE_TRIG_DLY_R(val)                    (val)
+#define ACQ_CORE_TRIG_DLY_W(val)                    (val)
+#define ACQ_CORE_TRIG_DLY_MASK                      ((1ULL<<32)-1)
+RW_PARAM_FUNC(acq, hw_trig_dly) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DLY,
+            /* No field*/, MULT_BIT_PARAM, /* No minimum check */,
+            /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_CORE_SW_TRIG_R(val)                     (val)
+#define ACQ_CORE_SW_TRIG_W(val)                     (val)
+#define ACQ_CORE_SW_TRIG_MASK                       ((1ULL<<32)-1)
+#define ACQ_SW_TRIG_MIN                             0
+#define ACQ_SW_TRIG_MAX                             1
+RW_PARAM_FUNC(acq, sw_trig) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, SW_TRIG,
+            /* No field*/, MULT_BIT_PARAM, ACQ_SW_TRIG_MIN,
+            ACQ_SW_TRIG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_FSM_STOP_MIN                            0
+#define ACQ_FSM_STOP_MAX                            1
+RW_PARAM_FUNC(acq, fsm_stop) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, CTL,
+            FSM_STOP_ACQ, SINGLE_BIT_PARAM, ACQ_FSM_STOP_MIN,
+            ACQ_FSM_STOP_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_DATA_DRIVEN_CHAN_MIN                    0
+#define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
+RW_PARAM_FUNC(acq, hw_data_trig_chan) {
+    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, ACQ_CHAN_CTL,
+            DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,
+            ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp acq_exp_fp [] = {
     _acq_data_acquire,
     _acq_check_data_acquire,
     _acq_get_data_block,
+    _acq_cfg_trigger,
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_pol),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_sel),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_filt),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_thres),
+    RW_PARAM_FUNC_NAME(acq, hw_trig_dly),
+    RW_PARAM_FUNC_NAME(acq, sw_trig),
+    RW_PARAM_FUNC_NAME(acq, fsm_stop),
+    RW_PARAM_FUNC_NAME(acq, hw_data_trig_chan),
     NULL
 };
 
@@ -411,7 +844,7 @@ smio_err_e acq_init (smio_t * self)
             err_smio_set_exp_ops);
 
     /* Initialize specific structure */
-    smio_acq_t *smio_handler = smio_acq_new (self, 0); /* Default: num_samples = 0 */
+    smio_acq_t *smio_handler = smio_acq_new (self, 0, 0, 1);
     ASSERT_ALLOC(smio_handler, err_smio_handler_alloc, SMIO_ERR_ALLOC);
     err = smio_set_handler (self, smio_handler);
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not set SMIO handler",
@@ -459,3 +892,5 @@ const smio_bootstrap_ops_t acq_bootstrap_ops = {
     .init = acq_init,
     .shutdown = acq_shutdown
 };
+
+SMIO_MOD_DECLARE(ACQ_SDB_DEVID, ACQ_SDB_NAME, acq_bootstrap_ops)

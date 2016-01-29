@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "sm_io_exports_helper.h"
@@ -13,9 +13,10 @@
 disp_op_t fmc130m_4ch_leds_exp = {
     .name = FMC130M_4CH_NAME_LEDS,
     .opcode = FMC130M_4CH_OPCODE_LEDS,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
@@ -410,9 +411,11 @@ disp_op_t fmc130m_4ch_trig_val_exp = {
 disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp = {
     .name = FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS,
     .opcode = FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };

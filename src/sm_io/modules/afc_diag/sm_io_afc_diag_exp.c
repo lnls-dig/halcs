@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #include "bpm_server.h"
@@ -283,3 +283,5 @@ const smio_bootstrap_ops_t afc_diag_bootstrap_ops = {
     .shutdown = afc_diag_shutdown,
     .config_defaults = afc_diag_config_defaults
 };
+
+SMIO_MOD_DECLARE(AFC_DIAG_DEVID, AFC_DIAG_NAME, afc_diag_bootstrap_ops)

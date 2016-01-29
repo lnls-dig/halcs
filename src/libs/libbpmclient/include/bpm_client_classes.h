@@ -2,7 +2,7 @@
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Lucas Russo <lucas.russo@lnls.br>
  *
- * Released according to the GNU LGPL, version 3 or any later version.
+ * Released according to the GNU GPL, version 3 or any later version.
  */
 
 #ifndef _BPM_CLIENT_CLASSES_H_
@@ -14,10 +14,12 @@
 /* External dependencies */
 #include <czmq.h>
 #include <malamute.h>
+#include <errhand.h>
+#include <hutils.h>
+#include <disptable.h>
 
 /* Internal libraries dependencies */
 #include "acq_chan.h"
-#include "disp_table.h"
 #include "sm_io_codes.h"
 
 /* BPM version macros for compile-time API detection */
@@ -48,8 +50,6 @@
 
 /* Public API classes */
 
-/* Forward bpm_client_err_e declaration enumeration */
-typedef enum _bpm_client_err_e bpm_client_err_e;
 /* Opaque bpm_client_t structure */
 typedef struct _bpm_client_t bpm_client_t;
 
