@@ -163,7 +163,7 @@ int main (int argc, char *argv[])
         }
         else if (streq (argv[i], "-f")) {
             str_p = &cfg_file;
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set cfg_file parameter\n");
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_io] Will set cfg_file parameter\n");
         }
         else if (streq (argv[i], "-h")) {
             print_help (argv[0]);
@@ -389,7 +389,7 @@ int main (int argc, char *argv[])
      * the corresponding keys */
     hutils_err_e herr = hutils_get_hints (root_cfg, devio_hints);
     if (herr != HUTILS_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not get hints "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could not get hints "
                 "from configuration file\n");
         goto err_cfg_get_hints;
     }
