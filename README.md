@@ -9,9 +9,9 @@ Software for controlling the AFC BPM boards
 Make sure you have the following libraries installed, either by download
 the binaries or executing the instructions below:
 
-* zeromq-4.2.0 (http://zeromq.org/area:download)
-* czmq-3.0.1 (http://czmq.zeromq.org/page:get-the-software)
-* mlm-0.1.0 (https://github.com/zeromq/malamute.git)
+* zeromq-4.2.0 (https://github.com/lnls-dig/libzmq/tree/v4.2.0-pre)
+* czmq-3.0.2 (https://github.com/zeromq/czmq/tree/v3.0.2)
+* mlm-0.1.2 (https://github.com/lnls-dig/malamute/tree/v0.1.2)
 
 ## Optional libraries:
 
