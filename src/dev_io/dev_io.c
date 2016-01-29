@@ -278,9 +278,11 @@ int main (int argc, char *argv[])
                     "DEVIO Config instance\n");
             goto err_exit;
         }
+
+        /* FIXME: Wait for DEVIO CFG initialization. If we try to create a client instance
+         * prior to DEVIO CFG creation, Malamute does not transmit the message (To be investigated) */
+        sleep (2);
     }
-
-
 
     /* FE DEVIO is expected to have a correct dev_id. So, we don't need to get it
      * from Hardware */
