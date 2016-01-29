@@ -174,7 +174,7 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating DEVIO instance ...\n");
 
     char devio_service_str [DEVIO_SERVICE_LEN];
-    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO", dev_id);
+    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO_CFG", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
             broker_endp, verbose, log_file_name);

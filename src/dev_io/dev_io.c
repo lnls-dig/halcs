@@ -281,7 +281,7 @@ int main (int argc, char *argv[])
 
     /* At this point, the Config DEVIO is ready to receive our commands */
     char devio_config_service_str [DEVIO_SERVICE_LEN];
-    snprintf (devio_config_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO:AFC_DIAG%u",
+    snprintf (devio_config_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO_CFG:AFC_DIAG%u",
             dev_id, 0);
     devio_config_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
 
