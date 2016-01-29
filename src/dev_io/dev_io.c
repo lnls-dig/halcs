@@ -292,32 +292,32 @@ int main (int argc, char *argv[])
         snprintf (devio_config_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO_CFG:AFC_DIAG%u",
                 dev_id, 0);
         devio_config_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    
+
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Creating libclient for DEVIO config\n");
         bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
-    
+
         /* Give DEVIO CFG some time more to answer (DEVIO_CFG_TIMEOUT) as it was just spawned... */
         client_cfg = bpm_client_new_log_mode_time (broker_endp, 0,
                 "stdout", DEVIO_LIBBPMCLIENT_LOG_MODE, DEVIO_CFG_TIMEOUT);
-    
+
         if (client_cfg == NULL) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
                     "DEVIO Config libclient instance\n");
             goto err_client_cfg;
         }
-    
+
         /* Get uTCA card slot number */
         client_err = bpm_get_afc_diag_card_slot (client_cfg, devio_config_service_str,
                 &dev_id);
-    
+
         if (client_err != BPM_CLIENT_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not retrieve "
                     "slot number. Unsupported board?\n");
             goto err_card_slot;
         }
-    
+
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
-    
+
 /* We could just leave DEVIO CFG arounf and not kill it. We do it just
  * for the sake not having unnecessary things running, as the regular
  * DEVIO already spwan the same service (i.e., AFC DIAG) as DEVIO CFG */
