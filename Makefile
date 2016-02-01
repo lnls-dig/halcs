@@ -161,7 +161,7 @@ CFLAGS_DEBUG += -g
 
 # Specific platform Flags
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
-LDFLAGS_PLATFORM = -T $(LD_SCRIPT)
+LDFLAGS_PLATFORM = -Wl,-T,$(LD_SCRIPT)
 
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmlm
