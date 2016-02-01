@@ -261,7 +261,6 @@ int main (int argc, char *argv[])
 
     /* Spawn the Configure DEVIO to get the uTCA slot number. This is only
      * available in AFCv3 */
-    bpm_client_t *client_cfg = NULL;
 #if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
     int child_devio_cfg_pid = 0;
     if (llio_type == PCIE_DEV) {
@@ -286,6 +285,7 @@ int main (int argc, char *argv[])
 
     /* FE DEVIO is expected to have a correct dev_id. So, we don't need to get it
      * from Hardware */
+    bpm_client_t *client_cfg = NULL;
     if (devio_type == BE_DEVIO) {
         /* At this point, the Config DEVIO is ready to receive our commands */
         char devio_config_service_str [DEVIO_SERVICE_LEN];
@@ -456,7 +456,9 @@ err_devio_log_filename_alloc:
     devio_destroy (&devio);
 err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
-    bpm_client_destroy (&client_cfg);
+    if (client_cfg != NULL) {
+        bpm_client_destroy (&client_cfg);
+    }
 err_client_cfg:
     /* Kill DEVIO Config process */
     kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
