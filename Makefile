@@ -161,7 +161,7 @@ CFLAGS_DEBUG += -g
 
 # Specific platform Flags
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
-LDFLAGS_PLATFORM = -T $(LD_SCRIPT)
+LDFLAGS_PLATFORM = -Wl,-T,$(LD_SCRIPT)
 
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmlm
@@ -202,7 +202,7 @@ INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
 override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) $(CXXFLAGS)
-override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
+override LDFLAGS += $(LDFLAGS_PLATFORM)
 
 # Output modules
 OUT = $(dev_mngr_OUT) $(dev_io_OUT)
@@ -274,7 +274,7 @@ all: cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(revision_OBJS)
-	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
+	$(CC) $(LDFLAGS) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
 $(revision_OBJS): $(revision_SRCS)
