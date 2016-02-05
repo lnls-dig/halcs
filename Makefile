@@ -322,11 +322,12 @@ ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
 endif
 
+# Install just the driver and lib, not udev rules
 pcie_driver_install:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) install
+	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_install lib_driver_install
 
 pcie_driver_uninstall:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) uninstall
+	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_uninstall lib_driver_uninstall
 
 pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
