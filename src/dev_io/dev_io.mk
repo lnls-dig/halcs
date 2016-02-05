@@ -9,18 +9,3 @@ dev_io_core_OBJS = $(dev_io_DIR)/dev_io_core.o \
 		   $(dev_io_DIR)/dev_io_err.o \
 		   $(dev_io_core_utils_OBJS)
 
-dev_io_OBJS = $(dev_io_DIR)/dev_io.o
-
-dev_io_OUT = dev_io
-
-ifeq ($(WITH_DEVIO_CFG),y)
-dev_io_cfg_OBJS = $(dev_io_DIR)/dev_io_cfg.o
-dev_io_cfg_OUT = dev_io_cfg
-else
-dev_io_cfg_OBJS =
-dev_io_cfg_OUT =
-endif
-
-dev_io_OUT += $(dev_io_cfg_OUT)
-
-dev_io_all_OUT = dev_io dev_io_cfg

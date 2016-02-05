@@ -261,7 +261,7 @@ int main (int argc, char *argv[])
 
     /* Spawn the Configure DEVIO to get the uTCA slot number. This is only
      * available in AFCv3 */
-#if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
+#if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
     int child_devio_cfg_pid = 0;
     if (llio_type == PCIE_DEV) {
         /* Argument options are "process name", "device type" and
@@ -455,7 +455,7 @@ err_devio_log_filename_alloc:
     hutils_wait_chld ();
     devio_destroy (&devio);
 err_card_slot:
-#if defined (__BOARD_AFCV3__) && (__WITH_DEVIO_CFG__)
+#if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
     if (client_cfg != NULL) {
         bpm_client_destroy (&client_cfg);
     }

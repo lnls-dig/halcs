@@ -13,6 +13,8 @@ MAKE ?=		make
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
+# Select which application we want to generate. Options are: ebpm
+APP ?= ebpm
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE ?= y
@@ -29,10 +31,10 @@ FMC130M_4CH_EEPROM_PROGRAM ?=
 WITH_DEV_MNGR ?= y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE ?= 2
-# Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
+# Selects if we want to compile specfic APP Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_DEVIO_CFG ?= y
+WITH_APP_CFG ?= y
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -117,9 +119,9 @@ ifeq ($(AFE_RFFE_TYPE),2)
 CFLAGS_USR += -D__AFE_RFFE_V2__
 endif
 
-# Compile DEVIO Config or not
-ifeq ($(WITH_DEVIO_CFG),y)
-CFLAGS_USR += -D__WITH_DEVIO_CFG__
+# Compile APP Config or not
+ifeq ($(WITH_APP_CFG),y)
+CFLAGS_USR += -D__WITH_APP_CFG__
 endif
 
 ifneq ($(CFG_DIR),)
@@ -189,6 +191,7 @@ include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/apps/$(APP)/$(APP).mk
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
@@ -205,31 +208,25 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LDFLAGS_PLATFORM)
 
 # Output modules
-OUT = $(dev_mngr_OUT) $(dev_io_OUT)
+OUT = $(dev_mngr_OUT) $($(APP)_OUT)
 
 # All possible output modules
-ALL_OUT = $(dev_mngr_all_OUT) $(dev_io_all_OUT)
+ALL_OUT = $(dev_mngr_all_OUT) $($(APP)_all_OUT)
 
 # Out objects
 dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
                  $(exp_ops_OBJS) $(thsafe_msg_zmq_OBJS) \
                  $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
 
-dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+$(APP)_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
                $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
-dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-                   $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
+$(APP)_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
+               $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
 # Specific libraries for OUT targets
 dev_mngr_LIBS =
 dev_mngr_STATIC_LIBS =
-
-dev_io_LIBS = -lbsmp
-dev_io_STATIC_LIBS =
-
-dev_io_cfg_LIBS = -lbsmp
-dev_io_cfg_STATIC_LIBS =
 
 .SECONDEXPANSION:
 
@@ -242,8 +239,8 @@ OBJS_all = $(ll_io_OBJS) \
 	   $(sm_io_OBJS) \
 	   $(msg_OBJS) \
 	   $(dev_mngr_OBJS) \
-	   $(dev_io_OBJS) \
-	   $(dev_io_cfg_OBJS) \
+	   $($(APP)_OBJS) \
+	   $($(APP)_cfg_OBJS) \
 	   $(revision_OBJS)
 
 # Sources

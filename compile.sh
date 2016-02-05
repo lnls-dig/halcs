@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
+VALID_APPS_STR="Valid values are: \"ebpm\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
 VALID_WITH_LIBS_LINK_STR="Valid values are: \"with_libs_link\" or \"without_libs_link\"."
 
@@ -21,14 +22,27 @@ if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
     exit 1
 fi
 
-WITH_EXAMPLES=$2
+# Select board in which we will work. Options are: ml605 or afcv3
+APP=$2
+
+if [ -z "$APP" ]; then
+    echo "\"APP\" variable unset. "$VALID_APPS_STR
+    exit 1
+fi
+
+if [ "$APP" != "ebpm" ]; then
+    echo "Unsupported application. "$VALID_APPS_STR
+    exit 1
+fi
+
+WITH_EXAMPLES=$3
 
 if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WITH_EXAMPLES" != "without_examples" ]; then
     echo "Wrong variable value. "$VALID_WITH_EXAMPLES_STR
     exit 1
 fi
 
-WITH_LIBS_LINK=$3
+WITH_LIBS_LINK=$4
 
 if [ -n "$WITH_LIBS_LINK" ] && [ "$WITH_LIBS_LINK" != "with_libs_link" ] && [ "$WITH_LIBS_LINK" != "without_libs_link" ]; then
     echo "Wrong variable value. "$VALID_WITH_LIBS_LINK_STR
@@ -37,7 +51,7 @@ fi
 
 EXTRA_FLAGS=()
 # Get all other arguments
-for item in "${@:4}"
+for item in "${@:5}"
 do
     EXTRA_FLAGS+=("${item}")
 done
@@ -65,7 +79,7 @@ AFE_RFFE_TYPE=2
 # Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_DEVIO_CFG=y
+WITH_APP_CFG=y
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
@@ -93,6 +107,7 @@ COMMAND_HAL="\
     make \
     ${EXTRA_FLAGS[@]} \
     BOARD=${BOARD} \
+    APP=${APP} \
     SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -102,7 +117,7 @@ COMMAND_HAL="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-    WITH_DEVIO_CFG=${WITH_DEVIO_CFG} \
+    WITH_APP_CFG=${WITH_APP_CFG} \
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
