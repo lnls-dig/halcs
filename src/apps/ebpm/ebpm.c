@@ -13,14 +13,14 @@
 #undef ASSERT_TEST
 #endif
 #define ASSERT_TEST(test_boolean, err_str, err_goto_label, /* err_core */ ...)  \
-    ASSERT_HAL_TEST(test_boolean, DEV_IO, "[dev_io]",               \
+    ASSERT_HAL_TEST(test_boolean, DEV_IO, "[ebpm]",               \
             err_str, err_goto_label, /* err_core */ __VA_ARGS__)
 
 #ifdef ASSERT_ALLOC
 #undef ASSERT_ALLOC
 #endif
 #define ASSERT_ALLOC(ptr, err_goto_label, /* err_core */ ...)       \
-    ASSERT_HAL_ALLOC(ptr, DEV_IO, "[dev_io]",                       \
+    ASSERT_HAL_ALLOC(ptr, DEV_IO, "[ebpm]",                       \
             devio_err_str (DEVIO_ERR_ALLOC),                        \
             err_goto_label, /* err_core */ __VA_ARGS__)
 
@@ -28,13 +28,13 @@
 #undef CHECK_ERR
 #endif
 #define CHECK_ERR(err, err_type)                                    \
-    CHECK_HAL_ERR(err, DEV_IO, "[dev_io]",                          \
+    CHECK_HAL_ERR(err, DEV_IO, "[ebpm]",                          \
             devio_err_str (err_type))
 
 #define LOG_FILENAME_LEN            50
-/* This composes the log filename as "dev_io%u_fe%u.log" or
- * "dev_io%u_be%u.log" */
-#define DEVIO_LOG_RADICAL_PATTERN   "dev_io%u"
+/* This composes the log filename as "ebpm%u_fe%u.log" or
+ * "ebpm%u_be%u.log" */
+#define DEVIO_LOG_RADICAL_PATTERN   "ebpm%u"
 #define DEVIO_LOG_DEVIO_MODEL_TYPE  "%s"
 #define DEVIO_LOG_INST_TYPE         "%u"
 #define DEVIO_LOG_SUFFIX            "log"
@@ -49,8 +49,8 @@
 #define DEVIO_MAX_FE_DEVIOS         16
 
 #define DEVIO_SERVICE_LEN           50
-#define DEVIO_NAME                  "/usr/local/bin/dev_io"
-#define DEVIO_CFG_NAME              "/usr/local/bin/dev_io_cfg"
+#define DEVIO_NAME                  "/usr/local/bin/ebpm"
+#define DEVIO_CFG_NAME              "/usr/local/bin/ebpm_cfg"
 #define DEVIO_CFG_TIMEOUT           5000       /* in ms */
 #define EPICS_PROCSERV_NAME         "/usr/local/bin/procServ"
 #define EPICS_BPM_NAME              "BPM"
@@ -76,7 +76,7 @@ static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_
 
 void print_help (char *program_name)
 {
-    printf( "BPM Device I/O\n"
+    printf( "EBPM Device I/O\n"
             "Usage: %s [options]\n"
             "Version %s\n, Build by: %s, %s\n"
             "\t-h This help message\n"
@@ -124,47 +124,47 @@ int main (int argc, char *argv[])
     {
         if (streq (argv[i], "-v")) {
             verbose = 1;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Verbose mode set\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Verbose mode set\n");
         }
         else if (streq (argv[i], "-d")) {
             devio_daemonize = 1;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Demonize mode set\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Demonize mode set\n");
         }
         else if (streq (argv[i], "-w")) {
             str_p = &devio_work_dir;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set devio_work_dir\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_work_dir\n");
         }
         else if (streq (argv[i], "-n")) {
             str_p = &devio_type_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set devio_type parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_type parameter\n");
         }
         else if (streq (argv[i], "-t")) {
             str_p = &dev_type;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set dev_type parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_type parameter\n");
         }
         else if (streq (argv[i], "-e")) {
             str_p = &dev_entry;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set dev_entry parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_entry parameter\n");
         }
         else if (streq (argv[i], "-i")) {
             str_p = &dev_id_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set dev_id_str parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_id_str parameter\n");
         }
         else if (streq (argv[i], "-s")) {
             str_p = &fe_smio_id_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set fe_smio_id_str parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set fe_smio_id_str parameter\n");
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set broker_endp parameter\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set broker_endp parameter\n");
         }
         else if (streq (argv[i], "-l")) {
             str_p = &log_prefix;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Will set log filename\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set log filename\n");
         }
         else if (streq (argv[i], "-f")) {
             str_p = &cfg_file;
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_io] Will set cfg_file parameter\n");
+            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[ebpm] Will set cfg_file parameter\n");
         }
         else if (streq (argv[i], "-h")) {
             print_help (argv[0]);
@@ -174,7 +174,7 @@ int main (int argc, char *argv[])
         else {
             if (str_p) {
                 *str_p = strdup (argv[i]);
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Parameter set to \"%s\"\n", *str_p);
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Parameter set to \"%s\"\n", *str_p);
             }
         }
     }
@@ -182,13 +182,13 @@ int main (int argc, char *argv[])
     /* Daemonize dev_io */
     if (devio_daemonize != 0) {
         if (devio_work_dir == NULL) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Daemon working directory not specified\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Daemon working directory not specified\n");
             goto err_exit;
         }
 
         int rc = zsys_daemonize (devio_work_dir);
         if (rc != 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Fail to daemonize\n");
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Fail to daemonize\n");
             goto err_exit;
         }
     }
@@ -196,20 +196,20 @@ int main (int argc, char *argv[])
     llio_type_e llio_type = llio_str_to_type (dev_type);
     /* Parse command-line options */
     if (llio_type == INVALID_DEV) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_type parameter is invalid\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Dev_type parameter is invalid\n");
         goto err_exit;
     }
 
     devio_type_e devio_type = devio_str_to_type (devio_type_str);
     /* Parse command-line options */
     if (devio_type == INVALID_DEVIO) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Devio_type parameter is invalid\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Devio_type parameter is invalid\n");
         goto err_exit;
     }
 
     /* Check for device entry */
     if (dev_entry == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_entry parameter was not set. Exiting ...\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_entry parameter was not set. Exiting ...\n");
         goto err_exit;
     }
 
@@ -218,26 +218,26 @@ int main (int argc, char *argv[])
     if (dev_id_str == NULL) {
         switch (llio_type) {
             case ETH_DEV:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was not set. Exiting ...\n");
                 goto err_exit;
                 break;
 
             case PCIE_DEV:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set.\n"
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was not set.\n"
                         "\tDefaulting it to the /dev file number ...\n");
 
                 /* Our device follows the convention of having the ID in hexadecimal
                  * code. For instance, /dev/fpga-0c00 would be a valid ID */
                 int matches = sscanf (dev_entry, "/dev/fpga-%X", &dev_id);
                 if (matches == 0) {
-                    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Dev_entry parameter is invalid.\n"
+                    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Dev_entry parameter is invalid.\n"
                             "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
                 break;
 
             default:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was not set. Exiting ...\n");
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was not set. Exiting ...\n");
                 goto err_exit;
         }
     }
@@ -246,13 +246,13 @@ int main (int argc, char *argv[])
         dev_id = strtoul (dev_id_str, NULL, 16);
     }
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Dev_id parameter was set to %u/%X.\n",
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was set to %u/%X.\n",
             dev_id, dev_id);
 
     uint32_t fe_smio_id = 0;
     /* Check for FE SMIO ID */
     if (devio_type == FE_DEVIO && fe_smio_id_str == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Fe_smio_id parameter was not set. Exiting ...\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Fe_smio_id parameter was not set. Exiting ...\n");
         goto err_exit;
     }
     else {
@@ -266,14 +266,14 @@ int main (int argc, char *argv[])
     if (llio_type == PCIE_DEV) {
         /* Argument options are "process name", "device type" and
          *"dev entry" */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO Config\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO Config\n");
         char *argv_exec [] = {DEVIO_CFG_NAME, "-n", devio_type_str,"-t", dev_type,
             "-i", dev_id_str, "-e", dev_entry, "-b", broker_endp, NULL};
         /* Spawn Config DEVIO */
         child_devio_cfg_pid = hutils_spawn_chld (DEVIO_CFG_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
                     "DEVIO Config instance\n");
             goto err_exit;
         }
@@ -293,7 +293,7 @@ int main (int argc, char *argv[])
                 dev_id, 0);
         devio_config_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
 
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Creating libclient for DEVIO config\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Creating libclient for DEVIO config\n");
         bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
 
         /* Give DEVIO CFG some time more to answer (DEVIO_CFG_TIMEOUT) as it was just spawned... */
@@ -301,7 +301,7 @@ int main (int argc, char *argv[])
                 "stdout", DEVIO_LIBBPMCLIENT_LOG_MODE, DEVIO_CFG_TIMEOUT);
 
         if (client_cfg == NULL) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
                     "DEVIO Config libclient instance\n");
             goto err_client_cfg;
         }
@@ -311,12 +311,12 @@ int main (int argc, char *argv[])
                 &dev_id);
 
         if (client_err != BPM_CLIENT_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not retrieve "
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not retrieve "
                     "slot number. Unsupported board?\n");
             goto err_card_slot;
         }
 
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Slot number: 0x%08X\n", dev_id);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Slot number: 0x%08X\n", dev_id);
 
 /* We could just leave DEVIO CFG arounf and not kill it. We do it just
  * for the sake not having unnecessary things running, as the regular
@@ -348,7 +348,7 @@ int main (int argc, char *argv[])
     dev_id_str = NULL;
 
     /* Initilialize dev_io */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Creating DEVIO instance ...\n");
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Creating DEVIO instance ...\n");
 
     /* Create LOG filename path */
     char *devio_log_filename = _create_log_filename (log_prefix, dev_id,
@@ -362,7 +362,7 @@ int main (int argc, char *argv[])
             broker_endp, verbose, devio_log_filename);
 
     if (devio == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_new error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_new error!\n");
         goto err_card_slot;
     }
 
@@ -376,7 +376,7 @@ int main (int argc, char *argv[])
 
     zhashx_t *devio_hints = zhashx_new ();
     if (devio_hints == NULL) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could allocate "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[ebpm] Could allocate "
                 "hints hash table\n");
         goto err_devio_hints_alloc;
     }
@@ -387,13 +387,13 @@ int main (int argc, char *argv[])
 
     /* Check for field not found */
     if (cfg_file == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Configuration file not set\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Configuration file not set\n");
         goto err_cfg_load;
     }
 
     zconfig_t *root_cfg = zconfig_load (cfg_file);
     if (root_cfg == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not load "
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not load "
                 "configuration file\n");
         goto err_cfg_load;
     }
@@ -402,7 +402,7 @@ int main (int argc, char *argv[])
      * the corresponding keys */
     hutils_err_e herr = hutils_get_hints (root_cfg, devio_hints);
     if (herr != HUTILS_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_io] Could not get hints "
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[ebpm] Could not get hints "
                 "from configuration file\n");
         goto err_cfg_get_hints;
     }
@@ -411,7 +411,7 @@ int main (int argc, char *argv[])
     devio_err_e err = _spawn_assoc_devios (devio, dev_id, devio_type,
             cfg_file, broker_endp, log_prefix, devio_hints);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not spawn "
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not spawn "
                 "associated DEVIOs!\n");
         goto err_assoc_devio;
     }
@@ -423,7 +423,7 @@ int main (int argc, char *argv[])
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (devio, devio_type, fe_smio_id);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] _spawn_platform_smios error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] _spawn_platform_smios error!\n");
         goto err_devio;
     }
 
@@ -437,7 +437,7 @@ int main (int argc, char *argv[])
      *      request as appropriate */
     err = devio_loop (devio);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_loop error: %s\n",
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_loop error: %s\n",
                 devio_err_str (err));
         goto err_devio;
     }
@@ -515,7 +515,7 @@ static devio_err_e _spawn_assoc_devios (devio_t *devio, uint32_t dev_id,
     }
 
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] spawn_assoc_devios error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] spawn_assoc_devios error!\n");
         goto err_spwan_assoc_devios;
     }
 
@@ -565,7 +565,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DEVIO_ERR_ALLOC);
 
         /* Spawn DEVIO RFFE */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO RFFE for "
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO RFFE for "
                 "board %u, bpm %u\n", dev_id, j);
         char *argv_exec [] = {DEVIO_NAME, "-f", cfg_file, "-n", FE_DEVIO_STR, "-t",
             ETH_DEV_STR, "-i", dev_id_c, "-e", cfg_item->bind, "-s", smio_inst_id_c,
@@ -574,7 +574,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
         int child_devio_cfg_pid = hutils_spawn_chld (DEVIO_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
                     "DEVIO RFFE instance\n");
             goto err_spawn;
         }
@@ -662,7 +662,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         zsys_dir_change (epics_startup);
 
         /* Spawn EPICS IOCs */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawing DEVIO EPICS IOC for "
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO EPICS IOC for "
                 "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
         char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
             "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
@@ -671,7 +671,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         int child_devio_cfg_pid = hutils_spawn_chld (EPICS_PROCSERV_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] Could not create "
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
                     "EPICS instance for board %u, bpm %u\n", dev_id, j);
             goto err_spawn;
         }
@@ -739,7 +739,7 @@ static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_typ
     }
 
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
@@ -757,63 +757,63 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
 
     /* ML605 or AFCv3 */
 #if defined (__BOARD_ML605__) || (__BOARD_AFCV3__)
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning default SMIOs ...\n");
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning default SMIOs ...\n");
     err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, dsp_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, swap_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
     /* AFCv3 spefific */
 #if defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io] Spawning AFCv3 specific SMIOs ...\n");
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning AFCv3 specific SMIOs ...\n");
 
     err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, dsp_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, swap_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 
     err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io] devio_register_sm error!\n");
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         goto err_register_sm;
     }
 #endif

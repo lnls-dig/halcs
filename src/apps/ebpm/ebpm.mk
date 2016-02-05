@@ -1,11 +1,11 @@
 ebpm_DIR = $(SRC_DIR)/apps/ebpm
 
-ebpm_OBJS = $(ebpm_DIR)/dev_io.o
+ebpm_OBJS = $(ebpm_DIR)/ebpm.o
 
 ebpm_OUT = ebpm
 
 ifeq ($(WITH_APP_CFG),y)
-ebpm_cfg_OBJS = $(ebpm_DIR)/dev_io_cfg.o
+ebpm_cfg_OBJS = $(ebpm_DIR)/ebpm_cfg.o
 ebpm_cfg_OUT = ebpm_cfg
 else
 ebpm_cfg_OBJS =
