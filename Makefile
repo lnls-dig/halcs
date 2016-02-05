@@ -509,6 +509,18 @@ core_clean:
 core_mrproper:
 	rm -f $(ALL_OUT)
 
+scripts_install:
+	$(MAKE) -C scripts install
+
+scripts_uninstall:
+	$(MAKE) -C scripts uninstall
+
+scripts_clean:
+	$(MAKE) -C scripts clean
+
+scripts_mrproper:
+	$(MAKE) -C scripts mrproper
+
 tests:
 	$(MAKE) -C tests all
 
@@ -544,17 +556,17 @@ cfg_mrproper:
 
 install: core_install deps_install liberrhand_install libconvc_install \
     libhutils_install libdisptable_install libllio_install libbpmclient_install \
-    cfg_install
+    cfg_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
     libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
-    cfg_uninstall
+    cfg_uninstall scripts_uninstall
 
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
     libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
-    cfg_clean
+    cfg_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper cfg_mrproper
+    examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
 
