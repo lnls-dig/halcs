@@ -1,4 +1,4 @@
 # Permissions for the fpga devices
 
-ACTION=="add", KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", RUN+="/sbin/service start bpm-sw %c"
-ACTION=="remove", KERNEL=="fpga*", PROGRAM="/usr/local/bin/eat-dashes.sh %k", RUN+="/sbin/service stop bpm-sw %c"
+ACTION=="add", KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", RUN+="/sbin/service bpm-sw start %c"
+ACTION=="remove", KERNEL=="fpga*", PROGRAM="/usr/local/bin/eat-dashes.sh %k", RUN+="/sbin/service bpm-sw stop %c"
