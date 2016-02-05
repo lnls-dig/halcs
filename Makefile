@@ -35,6 +35,9 @@ AFE_RFFE_TYPE ?= 2
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
 WITH_APP_CFG ?= y
+# Installation prefix for the scripts. This is mainly used for testing the build
+# system. Usually this is empty
+SCRIPTS_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -510,10 +513,10 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
-	$(MAKE) -C scripts install
+	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
 
 scripts_uninstall:
-	$(MAKE) -C scripts uninstall
+	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
 
 scripts_clean:
 	$(MAKE) -C scripts clean
