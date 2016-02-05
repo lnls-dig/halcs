@@ -45,7 +45,7 @@ CONFIG_DIR=/usr/local/etc/bpm_sw
 PIDDIR=/var/run/bpm_sw
 DAEMONDIR=/usr/local/bin
 WORKDIR=/usr/local/bin
-DAEMON_NAME=dev_io
+DAEMON_NAME=ebpm
 LOGDIR=/media/remote_logs
 ENVFILE=/etc/sysconfig/bpm-sw-board
 INSTANCES=()
@@ -198,7 +198,7 @@ do_stop()
     fi
 }
 # Not implemented in BPM-SW
-# 
+#
 #do_reload() {
 #    if [ -f $PIDFILE ]; then
 #        #signal_to_childprocesses `cat $PIDFILE` USR2
