@@ -28,6 +28,7 @@
 #include "epics_mapping.h"
 #include "revision.h"
 #include "acq_chan_gen_defs.h"
+#include "ddr3_map_structs.h"
 
 /* BPM version macros for compile-time API detection */
 

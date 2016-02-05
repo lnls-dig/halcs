@@ -2,7 +2,7 @@
 #define _MEM_LAYOUT_H_
 
 #include "pcie_regs.h"
-#include "acq_chan_afcv3.h"
+#include "acq_chan.h"
 
 #define NUM_MAX_SLOTS                               12
 #define NUM_MAX_BPM_PER_SLOT                        2

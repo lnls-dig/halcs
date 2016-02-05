@@ -155,7 +155,7 @@ $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_expo
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBNAME)_ACQ_HEADERS = \
-	../../../include/boards/$(BOARD)/priv_defs/$($(LIBNAME)_ACQ_HEADERS_BASENAME)_$(BOARD).h
+	../../../include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 $(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers

@@ -1,5 +1,5 @@
-#ifndef _ACQ_CHAN_ML605_H_
-#define _ACQ_CHAN_ML605_H_
+#ifndef _ACQ_CHAN_H_
+#define _ACQ_CHAN_H_
 
 #include <acq_chan_gen_defs.h>
 

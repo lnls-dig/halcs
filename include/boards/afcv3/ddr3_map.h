@@ -1,7 +1,7 @@
-#ifndef _DDR3_MAP_AFCV3_H_
-#define _DDR3_MAP_AFCV3_H_
+#ifndef _DDR3_MAP_H_
+#define _DDR3_MAP_H_
 
-#include "acq_chan_afcv3.h"
+#include "acq_chan.h"
 #include "varg_macros.h"
 
 /* Does the acquisition channel gets a memory region? */

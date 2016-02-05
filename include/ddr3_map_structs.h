@@ -1,5 +1,5 @@
-#ifndef _DDR3_MAP_H_
-#define _DDR3_MAP_H_
+#ifndef _DDR3_MAP_STRUCTS_H_
+#define _DDR3_MAP_STRUCTS_H_
 
 typedef struct {
   uint32_t id;
