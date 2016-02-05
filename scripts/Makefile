@@ -10,7 +10,10 @@ OBJDUMP ?=	$(CROSS_COMPILE)objdump
 OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
-PREFIX ?=
+# This SCRIPTS_PREFIX could be different than PREFIX, as SCRIPTS_PREFIX
+# is defined as the location of init scripts and must be placed in a specific
+# place. The main use of thuis variable is for testing the build system
+SCRIPTS_PREFIX ?=
 
 PWD = 		$(shell pwd)
 
@@ -28,12 +31,13 @@ all:
 
 # Makefile rules
 install:
-	$(foreach script,$(SCRIPTS),cp --preserve=mode $(INIT_SYSTEM)/$(script) ${PREFIX}/$(script) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(script)) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),cp --preserve=mode $(INIT_SYSTEM)/$(script) ${SCRIPTS_PREFIX}/$(script) $(CMDSEP))
 	./enable-service.sh $(SERVICE_NAME)
 
 uninstall:
 	./disable-service.sh $(SERVICE_NAME)
-	$(foreach script,$(SCRIPTS),rm -f ${PREFIX}/$(script) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),rm -f ${SCRITS_PREFIX}/$(script) $(CMDSEP))
 
 clean:
 
