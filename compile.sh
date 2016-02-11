@@ -22,7 +22,6 @@ if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
     exit 1
 fi
 
-# Select board in which we will work. Options are: ml605 or afcv3
 APP=$2
 
 if [ -z "$APP" ]; then
