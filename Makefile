@@ -135,6 +135,10 @@ ifneq ($(CFG_FILENAME),)
 CFLAGS_USR += -D__CFG_FILENAME__=$(CFG_FILENAME)
 endif
 
+# Malamute 1.0.0 requires this to be defined
+# as all of its API is in DRAFT state
+CFLAGS_USR += -DMLM_BUILD_DRAFT_API
+
 # Debug conditional flags
 CFLAGS_DEBUG =
 
