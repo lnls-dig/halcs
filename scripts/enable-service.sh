@@ -9,7 +9,7 @@ SERVICE=
 # Get command line options
 while getopts ":s:" opt; do
     case $opt in
-        d)
+        s)
             SERVICE=$OPTARG
             ;;
         \?)
