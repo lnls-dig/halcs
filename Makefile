@@ -227,10 +227,6 @@ $(APP)_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
 $(APP)_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
                $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
-# Specific libraries for OUT targets
-dev_mngr_LIBS =
-dev_mngr_STATIC_LIBS =
-
 .SECONDEXPANSION:
 
 # Save a git repository description
