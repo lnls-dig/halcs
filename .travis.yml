@@ -10,6 +10,7 @@ sudo: false
 env:
 - BOARD=ml605 EXAMPLES=with_examples LIBS_LINK=without_libs_link APP=ebpm
 - BOARD=afcv3 EXAMPLES=with_examples LIBS_LINK=without_libs_link APP=ebpm
+- BOARD=afcv3_1 EXAMPLES=with_examples LIBS_LINK=without_libs_link APP=ebpm
 
 addons:
   apt:
