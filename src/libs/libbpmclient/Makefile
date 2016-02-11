@@ -46,6 +46,10 @@ ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
 CFLAGS_USR += -D__BOARD_AFCV3__
 endif
 
+# Malamute 1.0.0 requires this to be defined
+# as all of its API is in DRAFT state
+CFLAGS_USR += -DMLM_BUILD_DRAFT_API
+
 CFLAGS_DEBUG =
 
 # To enable this option, use: make ERRHAND_DBG=y
