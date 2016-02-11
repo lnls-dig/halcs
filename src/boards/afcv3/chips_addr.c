@@ -12,7 +12,6 @@ const uint32_t fmc130m_4ch_ad9510_addr[NUM_FMC130M_4CH_SMIOS] = {0x01, 0x01};
 
 /* The FMC EEPROM was supposed to have address 0x50 and 0x52, but GA1 and GA0
  * are all grounded on hardware */
-/* const uint32_t fmc130m_4ch_24aa64_addr[NUM_FMC130M_4CH_SMIOS] = {0x50, 0x52}; */
 const uint32_t fmc130m_4ch_24aa64_addr[NUM_FMC130M_4CH_SMIOS] = {0x50, 0x50};
 const uint32_t fmc130m_4ch_lm75a_addr[NUM_FMC130M_4CH_SMIOS][NUM_FMC130M_4CH_LM75A] = {
         {0x48, 0x49},
