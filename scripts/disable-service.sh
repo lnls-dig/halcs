@@ -25,6 +25,12 @@ while getopts ":s:" opt; do
     esac
 done
 
+if [ -z "$SERVICE" ]; then
+    echo "\"SERVICE\" variable unset."
+    usage
+    exit 1
+fi
+
 INIT_SYSTEM=$(./get-init-system.sh)
 
 # Enable service depending on which init system we are
