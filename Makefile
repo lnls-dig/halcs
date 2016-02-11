@@ -85,7 +85,7 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
-ifeq ($(BOARD),afcv3)
+ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
 CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
 endif
@@ -96,7 +96,7 @@ ifeq ($(BOARD),ml605)
 CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
-ifeq ($(BOARD),afcv3)
+ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
 CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
