@@ -34,8 +34,8 @@
 #endif
 
 /* MLM */
-#if MLM_VERSION < 100
-#error "BPM-SW requires at least malamute/0.1.0"
+#if MLM_VERSION < 10000
+#error "BPM-SW requires at least malamute/1.0.0"
 #endif
 
 #endif
