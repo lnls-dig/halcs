@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
-VALID_APPS_STR="Valid values are: \"ebpm\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
 VALID_WITH_LIBS_LINK_STR="Valid values are: \"with_libs_link\" or \"without_libs_link\"."
 
@@ -22,15 +21,10 @@ if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
     exit 1
 fi
 
-APP=$2
+APPS=$2
 
-if [ -z "$APP" ]; then
-    echo "\"APP\" variable unset. "$VALID_APPS_STR
-    exit 1
-fi
-
-if [ "$APP" != "ebpm" ]; then
-    echo "Unsupported application. "$VALID_APPS_STR
+if [ -z "$APPS" ]; then
+    echo "\"APPS\" variable unset."
     exit 1
 fi
 
@@ -106,7 +100,7 @@ COMMAND_HAL="\
     make \
     ${EXTRA_FLAGS[@]} \
     BOARD=${BOARD} \
-    APP=${APP} \
+    APPS=${APPS} \
     SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
