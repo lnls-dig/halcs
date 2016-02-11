@@ -42,7 +42,7 @@ ifeq ($(BOARD),ml605)
 CFLAGS_USR += -D__BOARD_ML605__
 endif
 
-ifeq ($(BOARD),afcv3)
+ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
 CFLAGS_USR += -D__BOARD_AFCV3__
 endif
 
