@@ -38,7 +38,6 @@ INIT_SYSTEM=$(./get-init-system.sh)
 case ${INIT_SYSTEM} in
     "systemd")
         echo "Enabling systemd service "${SERVICE}
-        systemctl enable ${SERVICE}
         ;;
     "upstart")
         echo "Enabling upstart service "${SERVICE}
