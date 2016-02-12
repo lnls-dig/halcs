@@ -18,6 +18,10 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
+# Malamute 1.0.0 requires this to be defined
+# as all of its API is in DRAFT state
+CFLAGS_USR += -DMLM_BUILD_DRAFT_API
+
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
 CFLAGS_DEBUG =
