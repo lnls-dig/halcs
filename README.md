@@ -9,9 +9,10 @@ Software for controlling the AFC BPM boards
 Make sure you have the following libraries installed, either by download
 the binaries or executing the instructions below:
 
+* libsodium-stable (https://github.com/jedisct1/libsodium/tree/stable)
 * zeromq-4.2.0 (https://github.com/lnls-dig/libzmq/tree/v4.2.0-pre)
 * czmq-3.0.2 (https://github.com/zeromq/czmq/tree/v3.0.2)
-* mlm-0.1.2 (https://github.com/lnls-dig/malamute/tree/v0.1.2)
+* mlm-1.0 (https://github.com/lnls-dig/malamute/tree/v1.0)
 
 ## Optional libraries:
 
@@ -20,10 +21,11 @@ the binaries or executing the instructions below:
 	sudo apt-get install uuid
 
 ### Prerequisites Installation Instructions
-
-	git clone git://github.com/zeromq/libzmq.git && \
-	git clone git://github.com/zeromq/czmq.git && \
-	git clone git://github.com/zeromq/malamute.git &&
+    
+    git clone --branch=stable https://github.com/jedisct1/libsodium.git && \
+	git clone --branch=v4.2.0-pre https://github.com/lnls-dig/libzmq.git && \
+	git clone --branch=v3.0.2 https://github.com/zeromq/czmq.git && \
+	git clone --branch=v1.0 https://github.com/lnls-dig/malamute.git &&
 	for project in libsodium libzmq czmq malamute; do
 	    cd $project
 	    ./autogen.sh
