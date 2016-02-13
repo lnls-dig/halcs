@@ -48,6 +48,12 @@ export CFG_DIR
 CFG ?= crude_defconfig
 export CFG
 
+# All of our supported boards
+SUPPORTED_ML605_BOARDS = ml605
+export SUPPORTED_ML605_BOARDS
+SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
+export SUPPORTED_AFCV3_BOARDS
+
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
 
@@ -85,7 +91,7 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
-ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
+ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
 CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
 endif
@@ -96,7 +102,7 @@ ifeq ($(BOARD),ml605)
 CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
-ifeq ($(BOARD),$(filter $(BOARD),afcv3 afcv3_1))
+ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
 CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
