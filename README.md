@@ -9,7 +9,7 @@ Software for controlling the AFC BPM boards
 Make sure you have the following libraries installed, either by download
 the binaries or executing the instructions below:
 
-* libsodium-stable (https://github.com/jedisct1/libsodium/tree/stable)
+* libsodium-1.0.8 (https://github.com/jedisct1/libsodium/tree/1.0.8)
 * zeromq-4.2.0 (https://github.com/lnls-dig/libzmq/tree/v4.2.0-pre)
 * czmq-3.0.2 (https://github.com/zeromq/czmq/tree/v3.0.2)
 * mlm-1.0 (https://github.com/lnls-dig/malamute/tree/v1.0)
@@ -21,8 +21,8 @@ the binaries or executing the instructions below:
 	sudo apt-get install uuid
 
 ### Prerequisites Installation Instructions
-    
-    git clone --branch=stable https://github.com/jedisct1/libsodium.git && \
+
+	git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
 	git clone --branch=v4.2.0-pre https://github.com/lnls-dig/libzmq.git && \
 	git clone --branch=v3.0.2 https://github.com/zeromq/czmq.git && \
 	git clone --branch=v1.0 https://github.com/lnls-dig/malamute.git &&
