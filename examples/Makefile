@@ -58,7 +58,7 @@ LIBS = -lbpmclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 LFLAGS =
 
 # Include directories
-INCLUDE_DIRS = -I. -I/usr/local/lib
+INCLUDE_DIRS = -I. -I/usr/local/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
