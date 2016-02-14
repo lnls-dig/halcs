@@ -2,18 +2,57 @@
 
 VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
 VALID_APPS_STR="Valid values are: \"ebpm\"."
-VALID_WITH_EXAMPLES_STR="Valid values are: \"with_examples\" or \"without_examples\"."
-VALID_WITH_LIBS_LINK_STR="Valid values are: \"with_libs_link\" or \"without_libs_link\"."
+VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
+VALID_WITH_LIBS_LINK_STR="Valid values are: \"yes\" or \"no\"."
+
+function usage() {
+    echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>] [-l <with library linking = yes/no>] [-x <extra flags>]"
+}
 
 #######################################
 # All of our Makefile options
 #######################################
 
-# Select board in which we will work. Options are: ml605 or afcv3
-BOARD=$1
+BOARD=
+APPS=
+WITH_EXAMPLES=
+WITH_LIBS_LINK=
+EXTRA_FLAGS=
 
-if [ -z "$BOARD" ]; then
-    echo "\"BOARD\" variable unset. "$VALID_BOARDS_STR
+# Get command line options
+while getopts ":b:a:e:l:x:" opt; do
+    case $opt in
+        b)
+            BOARD=$OPTARG
+            ;;
+        a)
+            APPS=$OPTARG
+            ;;
+        e)
+            WITH_EXAMPLES=$OPTARG
+            ;;
+        l)
+            WITH_LIBS_LINK=$OPTARG
+            ;;
+        x)
+            EXTRA_FLAGS=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            usage
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$BOARD"  ]; then
+    echo "\"board\" variable unset."
+    usage
     exit 1
 fi
 
@@ -22,33 +61,40 @@ if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "afcv3_1" ] && [ "$BOARD" != "ml605"
     exit 1
 fi
 
-APPS=$2
-
-if [ -z "$APPS" ]; then
-    echo "\"APPS\" variable unset."
+if [ -z "$APPS"  ]; then
+    echo "\"applications\" variable unset."
+    usage
     exit 1
 fi
 
-WITH_EXAMPLES=$3
-
-if [ -n "$WITH_EXAMPLES" ] && [ "$WITH_EXAMPLES" != "with_examples" ] && [ "$WITH_EXAMPLES" != "without_examples" ]; then
-    echo "Wrong variable value. "$VALID_WITH_EXAMPLES_STR
+if [ -z "$WITH_EXAMPLES"  ]; then
+    echo "\"examples\" variable unset."
+    usage
     exit 1
 fi
 
-WITH_LIBS_LINK=$4
-
-if [ -n "$WITH_LIBS_LINK" ] && [ "$WITH_LIBS_LINK" != "with_libs_link" ] && [ "$WITH_LIBS_LINK" != "without_libs_link" ]; then
-    echo "Wrong variable value. "$VALID_WITH_LIBS_LINK_STR
+if [ "$WITH_EXAMPLES" != "yes" ] && [ "$WITH_EXAMPLES" != "no" ]; then
+    echo "Unsupported examples. "$VALID_WITH_EXAMPLES_STR
     exit 1
 fi
 
-EXTRA_FLAGS=()
-# Get all other arguments
-for item in "${@:5}"
-do
-    EXTRA_FLAGS+=("${item}")
-done
+if [ -z "$WITH_LIBS_LINK"  ]; then
+    echo "\"library linking\" variable unset."
+    usage
+    exit 1
+fi
+
+if [ "$WITH_LIBS_LINK" != "yes" ] && [ "$WITH_LIBS_LINK" != "no" ]; then
+    echo "Unsupported library linking. "$VALID_WITH_LIBS_LINK_STR
+    exit 1
+fi
+
+#EXTRA_FLAGS=()
+## Get all other arguments
+#for item in "${@:5}"
+#do
+#    EXTRA_FLAGS+=("${item}")
+#done
 
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
@@ -115,14 +161,14 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
 
-if [ "$WITH_EXAMPLES" = "with_examples" ]; then
+if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
     make ${EXTRA_FLAGS[@]} examples"
 else
 COMMAND_EXAMPLES=""
 fi
 
-if [ "$WITH_LIBS_LINK" == "with_libs_link" ] || [ "$WITH_LIBS_LINK" == "" ]; then
+if [ "$WITH_LIBS_LINK" = "yes" ]; then
 COMMAND_LIBS_LINK="ldconfig"
 else
 COMMAND_LIBS_LINK=""
