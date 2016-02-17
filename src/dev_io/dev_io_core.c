@@ -96,6 +96,15 @@ static devio_err_e _devio_set_wait_clhd_timed_handler (devio_t *self, wait_chld_
 static devio_err_e _devio_set_spawn_clhd_handler (devio_t *self, spawn_chld_handler_fp fp);
 static devio_err_e _devio_register_sig_handlers (devio_t *self);
 
+/* Default signal handlers */
+void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
+{
+    (void) sig;
+    (void) siginfo;
+    (void) context;
+    while (hutils_wait_chld () > 0);
+}
+
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
         llio_type_e type, char *endpoint_broker, int verbose,
@@ -173,8 +182,16 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     _devio_set_wait_clhd_timed_handler (self, &hutils_wait_chld_timed);
     _devio_set_spawn_clhd_handler (self, &hutils_spawn_chld);
 
-    devio_err_e derr = _devio_register_sig_handlers (self);
-    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting up signal handlers", err_sig_handlers);
+    /* Setup SIGCHLD default handler */
+    devio_sig_handler_t devio_sigchld_handler =
+    {   .signal = SIGCHLD,
+        .devio_sig_h = devio_sigchld_h};
+
+    devio_err_e derr = devio_set_sig_handler (self, &devio_sigchld_handler);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting signal handlers", err_set_sig_handlers);
+
+    derr = _devio_register_sig_handlers (self);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
 
     /* Concatenate recv'ed name with a llio identifier */
     char *llio_name = zmalloc (sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1));
@@ -237,6 +254,8 @@ err_llio_alloc:
 err_llio_name_alloc:
     /* Nothing to undo */
 err_sig_handlers:
+    /* Nothing to undo */
+err_set_sig_handlers:
     zlistx_destroy (&self->ops->sig_ops);
 err_list_alloc:
     free (self->ops);
