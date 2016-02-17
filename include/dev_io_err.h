@@ -32,6 +32,9 @@ enum _devio_err_e {
     DEVIO_ERR_INV_SOCKET,           /* Invalid socket reference */
     DEVIO_ERR_MOD_LLIO,             /* Error modifying LLIO instance */
     DEVIO_ERR_CFG,                  /* Could not get property from config file */
+    DEVIO_ERR_SIGACTION,            /* Could not register signal */
+    DEVIO_ERR_WAITCHLD,             /* Wait child routine error */
+    DEVIO_ERR_SPAWNCHLD,            /* Spawn child routine error */
     DEVIO_ERR_END                   /* End of enum marker */
 };
 

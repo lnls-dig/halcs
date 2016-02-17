@@ -54,6 +54,8 @@ struct _devio_t {
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
 
+    /* General management operations */
+    devio_ops_t *ops;
     /* ll_io instance for Low-Level operations*/
     llio_t *llio;
     /* Server part of the llio operations. This is the bridge between the
@@ -87,6 +89,12 @@ static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor);
 static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const char *smio_key);
 static devio_err_e _devio_destroy_smio_all (devio_t *self, zhashx_t *smio_h);
+
+/* General operations set handlers */
+static devio_err_e _devio_set_wait_clhd_handler (devio_t *self, wait_chld_handler_fp fp);
+static devio_err_e _devio_set_wait_clhd_timed_handler (devio_t *self, wait_chld_timed_handler_fp fp);
+static devio_err_e _devio_set_spawn_clhd_handler (devio_t *self, spawn_chld_handler_fp fp);
+static devio_err_e _devio_register_sig_handlers (devio_t *self);
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
@@ -154,6 +162,20 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     ASSERT_ALLOC(self->endpoint_broker, err_endp_broker_alloc);
     self->verbose = verbose;
 
+    /* Create General operations structures */
+    self->ops = (devio_ops_t *) zmalloc (sizeof *self->ops);
+    ASSERT_ALLOC(self->ops, err_ops_alloc);
+    self->ops->sig_ops = zlistx_new ();
+    ASSERT_ALLOC(self->ops->sig_ops, err_list_alloc);
+
+    /* Setup default general operations */
+    _devio_set_wait_clhd_handler (self, &hutils_wait_chld);
+    _devio_set_wait_clhd_timed_handler (self, &hutils_wait_chld_timed);
+    _devio_set_spawn_clhd_handler (self, &hutils_spawn_chld);
+
+    devio_err_e derr = _devio_register_sig_handlers (self);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting up signal handlers", err_sig_handlers);
+
     /* Concatenate recv'ed name with a llio identifier */
     char *llio_name = zmalloc (sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1));
     ASSERT_ALLOC(llio_name, err_llio_name_alloc);
@@ -213,6 +235,12 @@ err_llio_open:
 err_llio_alloc:
     free (llio_name);
 err_llio_name_alloc:
+    /* Nothing to undo */
+err_sig_handlers:
+    zlistx_destroy (&self->ops->sig_ops);
+err_list_alloc:
+    free (self->ops);
+err_ops_alloc:
     free (self->endpoint_broker);
 err_endp_broker_alloc:
     free (self->name);
@@ -276,6 +304,14 @@ devio_err_e devio_destroy (devio_t **self_p)
         llio_destroy (&self->llio);
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] LLIO destroyed\n");
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying general operation handlers\n");
+        zlistx_destroy (&self->ops->sig_ops);
+        free (self->ops);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] General operation handlers destroyed\n");
+
         free (self->endpoint_broker);
         free (self->name);
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
@@ -702,6 +738,132 @@ llio_t *devio_get_llio (devio_t *self)
 {
     assert (self);
     return self->llio;
+}
+
+devio_err_e devio_set_sig_handler (devio_t *self, devio_sig_handler_t *sig_handler)
+{
+    assert (self);
+    void *handle = zlistx_add_end (self->ops->sig_ops, sig_handler);
+
+    return (handle == NULL) ? DEVIO_ERR_ALLOC : DEVIO_SUCCESS;
+}
+
+static devio_err_e _devio_register_sig_handlers (devio_t *self)
+{
+    assert (self);
+    devio_sig_handler_t *sig_handler =
+        (devio_sig_handler_t *) zlistx_first (self->ops->sig_ops);
+
+    /* Register all signal handlers in list*/
+    while (sig_handler) {
+        struct sigaction act;
+
+        memset (&act, 0, sizeof(act));
+        act.sa_sigaction = sig_handler->devio_sig_h;
+        act.sa_flags = SA_SIGINFO;
+
+        int err = sigaction (sig_handler->signal, &act, NULL);
+        CHECK_ERR(err, DEVIO_ERR_SIGACTION);
+
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n",
+                sig_handler->signal);
+
+        sig_handler = (devio_sig_handler_t *)
+            zlistx_next (self->ops->sig_ops);
+    }
+
+    return DEVIO_SUCCESS;
+}
+
+devio_err_e devio_register_sig_handlers (devio_t *self)
+{
+    return _devio_register_sig_handlers (self);
+}
+
+/* Declare wrapper for all DEVIO functions API */
+#define DEVIO_FUNC_WRAPPER(func_name, ops_err, ...)     \
+{                                                       \
+    assert (self);                                      \
+    CHECK_ERR(((self->ops->func_name == NULL) ? -1 : 0),\
+        DEVIO_ERR_FUNC_NOT_IMPL);                       \
+    int err = self->ops->func_name (__VA_ARGS__);       \
+    CHECK_ERR (err, ops_err);                           \
+    return DEVIO_SUCCESS;                               \
+}
+
+static devio_err_e _devio_set_wait_clhd_handler (devio_t *self, wait_chld_handler_fp fp)
+{
+    assert (self);
+    self->ops->devio_wait_chld = fp;
+
+    return DEVIO_SUCCESS;
+}
+
+devio_err_e devio_set_wait_clhd_handler (devio_t *self, wait_chld_handler_fp fp)
+{
+    return _devio_set_wait_clhd_handler (self, fp);
+}
+
+static devio_err_e _devio_set_wait_clhd_timed_handler (devio_t *self, wait_chld_timed_handler_fp fp)
+{
+    assert (self);
+    self->ops->devio_wait_chld_timed = fp;
+
+    return DEVIO_SUCCESS;
+}
+
+devio_err_e devio_set_wait_clhd_timed_handler (devio_t *self, wait_chld_timed_handler_fp fp)
+{
+    return _devio_set_wait_clhd_timed_handler (self, fp);
+}
+
+static devio_err_e _devio_wait_chld (devio_t *self)
+    DEVIO_FUNC_WRAPPER(devio_wait_chld, DEVIO_ERR_WAITCHLD)
+
+devio_err_e devio_wait_chld (devio_t *self)
+{
+    return _devio_wait_chld (self);
+}
+
+static devio_err_e _devio_wait_chld_timed (devio_t *self, int timeout)
+    DEVIO_FUNC_WRAPPER(devio_wait_chld_timed, DEVIO_ERR_WAITCHLD, timeout)
+
+devio_err_e devio_wait_chld_timed (devio_t *self, int timeout)
+{
+    return _devio_wait_chld_timed (self, timeout);
+}
+
+static devio_err_e _devio_set_spawn_clhd_handler (devio_t *self, spawn_chld_handler_fp fp)
+{
+    assert (self);
+    self->ops->devio_spawn_chld = fp;
+
+    return DEVIO_SUCCESS;
+}
+
+devio_err_e devio_set_spawn_clhd_handler (devio_t *self, spawn_chld_handler_fp fp)
+{
+    return _devio_set_spawn_clhd_handler (self, fp);
+}
+
+static devio_err_e _devio_spawn_chld (devio_t *self, const char *program,
+        char *const argv[])
+    DEVIO_FUNC_WRAPPER(devio_spawn_chld, DEVIO_ERR_SPAWNCHLD, program, argv)
+
+devio_err_e devio_spawn_chld (devio_t *self, const char *program,
+        char *const argv[])
+{
+    return _devio_spawn_chld (self, program, argv);
+}
+
+devio_err_e devio_set_ops (devio_t *self, devio_ops_t *devio_ops)
+{
+    assert (self);
+    assert (devio_ops);
+
+    self->ops = devio_ops;
+
+    return DEVIO_SUCCESS;
 }
 
 /************************************************************/

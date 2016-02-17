@@ -269,7 +269,9 @@ int main (int argc, char *argv[])
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO Config\n");
         char *argv_exec [] = {DEVIO_CFG_NAME, "-n", devio_type_str,"-t", dev_type,
             "-i", dev_id_str, "-e", dev_entry, "-b", broker_endp, NULL};
-        /* Spawn Config DEVIO */
+        /* Spawn Config DEVIO. */
+        /* We can't use devio_spawn_chld as DEVIO does not exist
+         * just yet. So, we stick with "hutils" implementation */
         child_devio_cfg_pid = hutils_spawn_chld (DEVIO_CFG_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
@@ -328,6 +330,8 @@ int main (int argc, char *argv[])
                 kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
             }
             /* Wait child up to 5 seconds before giving up waiting */
+            /* We can't use devio_spawn_chld as DEVIO does not exist
+             * just yet. So, we stick with "hutils" implementation */
             hutils_wait_chld_timed (5000);
         }
         /* Destroy libclient */
@@ -452,7 +456,7 @@ err_devio_hints_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
     /* wait child, if any */
-    hutils_wait_chld ();
+    devio_wait_chld (devio);
     devio_destroy (&devio);
 err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
@@ -571,7 +575,7 @@ static devio_err_e _spawn_rffe_devios (devio_t *devio, uint32_t dev_id,
             ETH_DEV_STR, "-i", dev_id_c, "-e", cfg_item->bind, "-s", smio_inst_id_c,
             "-b", broker_endp, "-l", log_prefix, NULL};
         /* Spawn Config DEVIO */
-        int child_devio_cfg_pid = hutils_spawn_chld (DEVIO_NAME, argv_exec);
+        int child_devio_cfg_pid = devio_spawn_chld (devio, DEVIO_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
@@ -668,7 +672,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
             "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
             NULL};
         /* Spawn Config DEVIO */
-        int child_devio_cfg_pid = hutils_spawn_chld (EPICS_PROCSERV_NAME, argv_exec);
+        int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
 
         if (child_devio_cfg_pid < 0) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
