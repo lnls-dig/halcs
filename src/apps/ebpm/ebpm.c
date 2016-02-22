@@ -360,11 +360,7 @@ int main (int argc, char *argv[])
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
             broker_endp, verbose, devio_log_filename);
-
-    if (devio == NULL) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_new error!\n");
-        goto err_card_slot;
-    }
+    ASSERT_ALLOC (devio, err_devio_alloc);
 
     /* We don't need it anymore */
     str_p = &dev_entry;
@@ -449,11 +445,10 @@ err_cfg_get_hints:
 err_cfg_load:
     zhashx_destroy (&devio_hints);
 err_devio_hints_alloc:
+    devio_destroy (&devio);
+err_devio_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
-    /* wait child, if any */
-    devio_wait_chld (devio);
-    devio_destroy (&devio);
 err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
     if (client_cfg != NULL) {
