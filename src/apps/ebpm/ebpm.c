@@ -449,8 +449,8 @@ err_devio_hints_alloc:
 err_devio_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
-err_card_slot:
 #if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
+err_card_slot:
     if (client_cfg != NULL) {
         bpm_client_destroy (&client_cfg);
     }
