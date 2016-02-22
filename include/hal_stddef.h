@@ -40,6 +40,8 @@
 typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
 /* Wait child handler function pointer */
 typedef int (*wait_chld_handler_fp)(void);
+/* Wait child with timeout handler function pointer */
+typedef int (*wait_chld_timed_handler_fp)(int timeout);
 /* Spawn child handler function pointer */
 typedef int (*spawn_chld_handler_fp)(const char *program, char *const argv[]);
 /* Spawn broker handler function pointer */
