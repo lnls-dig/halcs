@@ -16,15 +16,6 @@ extern "C" {
 #define SMIO_HKEY_LEN                   8
 #define NODES_MAX_LEN                   20
 
-/* Signal handler function pointer */
-typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
-/* Wait child handler function pointer */
-typedef int (*wait_chld_handler_fp)(void);
-/* Wait child with timeout handler function pointer */
-typedef int (*wait_chld_timed_handler_fp)(int timeout);
-/* Spawn child handler function pointer */
-typedef int (*spawn_chld_handler_fp)(const char *program, char *const argv[]);
-
 /* Node of sig_ops list */
 typedef struct {
     int signal;         /* Signal identifier, e.g., SIGINT, SIGKILL, etc... */

@@ -36,4 +36,13 @@
 
 #define ARRAY_SIZE(ARRAY) (sizeof(ARRAY)/sizeof((ARRAY)[0]))
 
+/* Signal handler function pointer */
+typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
+/* Wait child handler function pointer */
+typedef int (*wait_chld_handler_fp)(void);
+/* Spawn child handler function pointer */
+typedef int (*spawn_chld_handler_fp)(const char *program, char *const argv[]);
+/* Spawn broker handler function pointer */
+typedef int (*spawn_broker_handler_fp)(const char *program, char *const argv[]);
+
 #endif
