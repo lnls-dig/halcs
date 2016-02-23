@@ -99,6 +99,7 @@ OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
                 ../../sm_io/modules/acq/sm_io_acq_exports.o \
                 ../../sm_io/modules/dsp/sm_io_dsp_exports.o \
                 ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
+                ../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.o \
                 ../../sm_io/modules/swap/sm_io_swap_exports.o \
                 ../../sm_io/modules/rffe/sm_io_rffe_exports.o \
                 ../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.o
@@ -112,6 +113,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I../../../include \
 	       -I../../sm_io/modules \
 	       -I../../sm_io/modules/fmc130m_4ch \
+	       -I../../sm_io/modules/fmc250m_4ch \
 	       -I../../sm_io/modules/acq \
 	       -I../../sm_io/modules/swap \
 	       -I../../sm_io/modules/dsp \
@@ -142,6 +144,7 @@ $(LIBNAME)_CODE_HEADERS = \
 	../../../include/acq_chan_gen_defs.h
 
 $(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_codes.h \
 	../../sm_io/modules/acq/sm_io_acq_codes.h \
 	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
 	../../sm_io/modules/swap/sm_io_swap_codes.h \
@@ -150,6 +153,7 @@ $(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.
 	../../sm_io/modules/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+	../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.h \
 	../../sm_io/modules/acq/sm_io_acq_exports.h \
 	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
 	../../sm_io/modules/swap/sm_io_swap_exports.h \
