@@ -34,6 +34,7 @@ extern "C" {
 
 typedef struct {
     char *bind;                 /* AFE Endpoint address to bind to */
+    char *fmc_board;            /* FMC board type */
     bool spawn_epics_ioc;       /* DBE IOC spawn selection */
 } hutils_hints_t;
 

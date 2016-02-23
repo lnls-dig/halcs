@@ -391,6 +391,17 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
             item = (hutils_hints_t *) zmalloc (sizeof *item);
             ASSERT_ALLOC(item, err_hash_item_alloc, HUTILS_ERR_ALLOC);
 
+            /* We expect to the FMC board type of this bpm/board instance
+             * in the configuration file */
+            char *fmc_board = zconfig_resolve (bpm_cfg, "/dbe/fmc_board",
+                    NULL);
+            ASSERT_TEST (fmc_board != NULL, "[hutils:utils] Could not find "
+                    "FMC Board type (fmc_board = <value>) in configuration file", err_fmc_board,
+                    HUTILS_ERR_CFG);
+
+            item->fmc_board = strdup (fmc_board);
+            ASSERT_ALLOC(item->fmc_board, err_hash_fmc_board, HUTILS_ERR_ALLOC);
+
             /* Now, we expect to find the bind address of this bpm/board instance
              * in the configuration file */
             char *afe_bind = zconfig_resolve (bpm_cfg, "/afe/bind",
@@ -457,6 +468,9 @@ err_spawn_epics_ioc:
     free (item->bind);
 err_hash_bind_alloc:
 err_afe_bind:
+    free (item->fmc_board);
+err_hash_fmc_board:
+err_fmc_board:
     free (item);
 err_hash_item_alloc:
 err_cfg_exit:
