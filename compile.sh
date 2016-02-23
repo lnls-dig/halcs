@@ -112,6 +112,11 @@ FMC130M_4CH_TYPE=passive
 # Select if we should program FMC EEPROM with some code or not. Option are:
 # active, passive or nothing (dont' program EEPROM)
 FMC130M_4CH_EEPROM_PROGRAM=
+# Select the FMC ADC board type. Options are: passive or active
+FMC250M_4CH_TYPE=passive
+# Select if we should program FMC EEPROM with some code or not. Option are:
+# active, passive or nothing (dont' program EEPROM)
+FMC250M_4CH_EEPROM_PROGRAM=
 # Selects if we want to compile DEV_MNGR. Options are: y(es) or n(o)
 WITH_DEV_MNGR=y
 # Selects the AFE RFFE version. Options are: 2
