@@ -84,6 +84,14 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not enable SI571 Output",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    client_err = bpm_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not reset ADCs",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = bpm_set_rst_div_adcs (config_client, service, FMC250M_4CH_DFLT_RST_DIV_ADCS);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not reset DIV CLK ADCs",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     bpm_client_destroy (&config_client);
 err_alloc_client:

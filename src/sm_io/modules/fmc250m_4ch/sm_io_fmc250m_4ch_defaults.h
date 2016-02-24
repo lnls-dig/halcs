@@ -21,6 +21,9 @@
 #define FMC250M_4CH_DFLT_SI57X_FOUT_FACTORY         SI57X_FOUT_FACTORY_DFLT
 #define FMC250M_4CH_DFLT_SI57X_FOUT                 113040445   /* 113.040445 MHz default */
 
+#define FMC250M_4CH_DFLT_RST_ADCS                   0x1
+#define FMC250M_4CH_DFLT_RST_DIV_ADCS               0x1
+
 smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);
 
