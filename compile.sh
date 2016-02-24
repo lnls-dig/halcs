@@ -157,7 +157,9 @@ COMMAND_HAL="\
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
     WITH_APP_CFG=${WITH_APP_CFG} \
     CFG_DIR=${CFG_DIR} && \
-    make CFG=${CFG} ${EXTRA_FLAGS} install"
+    make CFG=${CFG} \
+    WITH_APP_CFG=${WITH_APP_CFG} \
+    ${EXTRA_FLAGS} install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
