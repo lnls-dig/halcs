@@ -124,7 +124,7 @@ AFE_RFFE_TYPE=2
 # Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_APP_CFG=y
+WITH_APP_CFG=n
 # Selects the install location of the config file
 CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
 # Selects the install location of the config file
