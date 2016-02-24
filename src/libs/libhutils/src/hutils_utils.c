@@ -448,13 +448,14 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
                     "[hutils:utils] Could not generate AFE bind address from "
                     "configuration file\n", err_cfg_exit, HUTILS_ERR_CFG);
 
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[hutils:utils] AFE hint endpoint "
-                    "hash key: \"%s\", bind: \"%s\", spawn_epics_ioc: %s\n",
-                    hints_key, afe_bind, spawn_epics_ioc);
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[hutils:utils] CFG hints "
+                    "hash key: \"%s\", fmc_board: \"%s\", bind: \"%s\", "
+                    "spawn_epics_ioc: %s\n",
+                    hints_key, fmc_board, afe_bind, spawn_epics_ioc);
 
             /* Insert this value in the hash table */
             errs = zhashx_insert (hints_h, hints_key, item);
-            ASSERT_TEST (errs == 0, "Could not find insert AFE endpoint to "
+            ASSERT_TEST (errs == 0, "Could not insert CFG item to hints "
                     "hash table", err_cfg_exit, HUTILS_ERR_CFG);
         }
     }
