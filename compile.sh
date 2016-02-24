@@ -89,13 +89,6 @@ if [ "$WITH_LIBS_LINK" != "yes" ] && [ "$WITH_LIBS_LINK" != "no" ]; then
     exit 1
 fi
 
-#EXTRA_FLAGS=()
-## Get all other arguments
-#for item in "${@:5}"
-#do
-#    EXTRA_FLAGS+=("${item}")
-#done
-
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE=y
@@ -135,12 +128,12 @@ CFG=lnls_defconfig
 export CFG
 
 COMMAND_DEPS="\
-    make ${EXTRA_FLAGS[@]} deps && \
-    make ${EXTRA_FLAGS[@]} deps_install"
+    make ${EXTRA_FLAGS} deps && \
+    make ${EXTRA_FLAGS} deps_install"
 
 COMMAND_LIBS="\
     make \
-    ${EXTRA_FLAGS[@]} \
+    ${EXTRA_FLAGS} \
     BOARD=${BOARD} \
     ERRHAND_DBG=${ERRHAND_DBG} \
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -150,7 +143,7 @@ COMMAND_LIBS="\
 
 COMMAND_HAL="\
     make \
-    ${EXTRA_FLAGS[@]} \
+    ${EXTRA_FLAGS} \
     BOARD=${BOARD} \
     APPS=${APPS} \
     SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
@@ -164,11 +157,11 @@ COMMAND_HAL="\
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
     WITH_APP_CFG=${WITH_APP_CFG} \
     CFG_DIR=${CFG_DIR} && \
-    make CFG=${CFG} ${EXTRA_FLAGS[@]} install"
+    make CFG=${CFG} ${EXTRA_FLAGS} install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
-    make ${EXTRA_FLAGS[@]} examples"
+    make ${EXTRA_FLAGS} examples"
 else
 COMMAND_EXAMPLES=""
 fi
