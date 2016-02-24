@@ -502,8 +502,8 @@ libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
 libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
     libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
 
-libs_mrproper: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_mrproper
+libs_mrproper: liberrhand_mrproper libconvc_mrproper libhutils_mrproper \
+    libdisptable_mrproper libllio_mrproper libbpmclient_mrproper libsdbfs_mrproper
 
 # External project dependencies
 
