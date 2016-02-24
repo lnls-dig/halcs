@@ -228,7 +228,7 @@ int main (int argc, char *argv[])
 
                 /* Our device follows the convention of having the ID in hexadecimal
                  * code. For instance, /dev/fpga-0c00 would be a valid ID */
-                int matches = sscanf (dev_entry, "/dev/fpga-%X", &dev_id);
+                int matches = sscanf (dev_entry, "/dev/fpga-%u", &dev_id);
                 if (matches == 0) {
                     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Dev_entry parameter is invalid.\n"
                             "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
@@ -243,11 +243,11 @@ int main (int argc, char *argv[])
     }
     /* Use the passed ID, interpret it as hexadecimal number */
     else {
-        dev_id = strtoul (dev_id_str, NULL, 16);
+        dev_id = strtoul (dev_id_str, NULL, 10);
     }
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was set to %u/%X.\n",
-            dev_id, dev_id);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was set to %u.\n",
+            dev_id);
 
     uint32_t fe_smio_id = 0;
     /* Check for FE SMIO ID */
