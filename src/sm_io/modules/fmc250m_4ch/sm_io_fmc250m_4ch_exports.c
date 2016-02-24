@@ -71,6 +71,30 @@ disp_op_t fmc250m_4ch_clk_sel_exp = {
     }
 };
 
+disp_op_t fmc250m_4ch_rst_adcs_exp = {
+    .name = FMC250M_4CH_NAME_RST_ADCS,
+    .opcode = FMC250M_4CH_OPCODE_RST_ADCS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_rst_div_adcs_exp = {
+    .name = FMC250M_4CH_NAME_RST_DIV_ADCS,
+    .opcode = FMC250M_4CH_OPCODE_RST_DIV_ADCS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 #if 0
 disp_op_t fmc250m_4ch_adc_rand_exp = {
     .name = FMC250M_4CH_NAME_ADC_RAND,
@@ -607,6 +631,8 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_ad9510_pll_clk_sel_exp,
     &fmc250m_4ch_si571_set_freq_exp,
     &fmc250m_4ch_si571_get_defaults_exp,
+    &fmc250m_4ch_rst_adcs_exp,
+    &fmc250m_4ch_rst_div_adcs_exp,
     NULL
 };
 

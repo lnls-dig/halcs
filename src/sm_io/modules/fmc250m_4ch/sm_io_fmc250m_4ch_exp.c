@@ -114,12 +114,6 @@ RW_PARAM_FUNC(fmc250m_4ch, clk_sel) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-
-/***************************** ADC ISLA216P Control ***************************/
-#if 0
-
-#endif
-
 /********************* ADC RAW Data registers (for simple debug) **************/
 
 /* FIXME: Override DATA<channel_number>_VAL macros with the DATA_GLOBAL ones.
@@ -611,6 +605,29 @@ FMC250M_4CH_SI571_FUNC_NAME_HEADER(get_defaults)
             "Could not restart SI571 to its defaults");
 }
 
+/***************************** ADC ISLA216P Control ***************************/
+
+#define BPM_FMC250M_4CH_RST_ADCS_MIN            0 /* Do nothing on RST_ADCS pin */
+#define BPM_FMC250M_4CH_RST_ADCS_MAX            1 /* Pulse RST_ADCS pin */
+
+RW_PARAM_FUNC(fmc250m_4ch, rst_adcs) {
+    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+            ADC_CTL, RST_ADCS, SINGLE_BIT_PARAM,
+            BPM_FMC250M_4CH_RST_ADCS_MIN, BPM_FMC250M_4CH_RST_ADCS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define BPM_FMC250M_4CH_RST_DIV_ADCS_MIN        0  /* Do nothing on RST_DIV_ADCS pin */
+#define BPM_FMC250M_4CH_RST_DIV_ADCS_MAX        1  /* Pulse RST_DIV_ADCS pin */
+
+RW_PARAM_FUNC(fmc250m_4ch, rst_div_adcs) {
+    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+            ADC_CTL, RST_DIV_ADCS, SINGLE_BIT_PARAM,
+            BPM_FMC250M_4CH_RST_DIV_ADCS_MIN, BPM_FMC250M_4CH_RST_DIV_ADCS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+
 /* Exported function pointers */
 const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc250m_4ch, leds),
@@ -662,6 +679,8 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     FMC250M_4CH_AD9510_FUNC_NAME(pll_clk_sel),
     FMC250M_4CH_SI571_FUNC_NAME(set_freq),
     FMC250M_4CH_SI571_FUNC_NAME(get_defaults),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_adcs),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_div_adcs),
     NULL
 };
 

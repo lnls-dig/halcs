@@ -106,7 +106,11 @@
 #define FMC250M_4CH_NAME_SI571_SET_FREQ                 "fmc250m_4ch_si571_set_freq"
 #define FMC250M_4CH_OPCODE_SI571_GET_DEFAULTS           44
 #define FMC250M_4CH_NAME_SI571_GET_DEFAULTS             "fmc250m_4ch_si571_get_defaults"
-#define FMC250M_4CH_OPCODE_END                          45
+#define FMC250M_4CH_OPCODE_RST_ADCS                     45
+#define FMC250M_4CH_NAME_RST_ADCS                       "fmc250m_4ch_rst_adcs"
+#define FMC250M_4CH_OPCODE_RST_DIV_ADCS                 46
+#define FMC250M_4CH_NAME_RST_DIV_ADCS                   "fmc250m_4ch_rst_div_adcs"
+#define FMC250M_4CH_OPCODE_END                          47
 
 /* Messaging Reply OPCODES */
 #define FMC250M_4CH_REPLY_TYPE                          uint32_t
