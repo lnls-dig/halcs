@@ -854,6 +854,34 @@ PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
             si571_defaults);
 }
 
+/*************************** FMC250M Chips Functions *************************/
+
+/* ISLA216P RST ADCs */
+PARAM_FUNC_CLIENT_WRITE(rst_adcs)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_RST_ADCS,
+            rst_adcs);
+}
+
+PARAM_FUNC_CLIENT_READ(rst_adcs)
+{
+    return param_client_read (self, service, FMC250M_4CH_OPCODE_RST_ADCS,
+            rst_adcs);
+}
+
+/* ISLA216P RST ADCs */
+PARAM_FUNC_CLIENT_WRITE(rst_div_adcs)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_RST_DIV_ADCS,
+            rst_div_adcs);
+}
+
+PARAM_FUNC_CLIENT_READ(rst_div_adcs)
+{
+    return param_client_read (self, service, FMC250M_4CH_OPCODE_RST_DIV_ADCS,
+            rst_div_adcs);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
