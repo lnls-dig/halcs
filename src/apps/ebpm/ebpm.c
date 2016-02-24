@@ -318,8 +318,6 @@ int main (int argc, char *argv[])
             goto err_card_slot;
         }
 
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Slot number: 0x%08X\n", dev_id);
-
 /* We could just leave DEVIO CFG arounf and not kill it. We do it just
  * for the sake not having unnecessary things running, as the regular
  * DEVIO already spwan the same service (i.e., AFC DIAG) as DEVIO CFG */
@@ -335,6 +333,8 @@ int main (int argc, char *argv[])
     }
 #endif
 #endif
+
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Slot number: 0x%08X\n", dev_id);
 
     /* We don't need it anymore */
     str_p = &fe_smio_id_str;
