@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <stdbool.h>
+#include <getopt.h>
 
 /* zeroMQ libraries */
 #include <zmq.h>
