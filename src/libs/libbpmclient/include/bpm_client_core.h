@@ -374,6 +374,23 @@ bpm_client_err_e bpm_set_si571_set_freq (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
         double si571_defaults);
 
+/******************** FMC250M SMIO Functions ******************/
+
+/* ADC ISLA216P Control */
+/* These set of functions read (get) or write (set) some ADC ISLA216P
+ * functionalities. Check ISLA216P datasheet for details.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see bpm_client_err.h
+ * for all possible errors)*/
+bpm_client_err_e bpm_set_rst_adcs (bpm_client_t *self, char *service,
+        uint32_t rst_adcs);
+bpm_client_err_e bpm_get_rst_adcs (bpm_client_t *self, char *service,
+        uint32_t *rst_adcs);
+bpm_client_err_e bpm_set_rst_div_adcs (bpm_client_t *self, char *service,
+        uint32_t rst_div_adcs);
+bpm_client_err_e bpm_get_rst_div_adcs (bpm_client_t *self, char *service,
+        uint32_t *rst_div_adcs);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquisition request */

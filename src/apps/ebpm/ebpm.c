@@ -70,27 +70,49 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
 static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
         const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
-        uint32_t smio_inst_id);
-static devio_err_e _spawn_be_platform_smios (devio_t *devio);
+        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
+static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, uint32_t dev_id);
 static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_id);
+
+static struct option long_options[] =
+{
+    {"help",                no_argument,         NULL, 'h'},
+    {"brokerendp",          required_argument,   NULL, 'b'},
+    {"cfgfile",             required_argument,   NULL, 'f'},
+    {"daemon",              no_argument,         NULL, 'd'},
+    {"daemonworkdir",       required_argument,   NULL, 'w'},
+    {"verbose",             no_argument,         NULL, 'v'},
+    {"deviotype",           required_argument,   NULL, 'n'},
+    {"devicetype",          required_argument,   NULL, 't'},
+    {"deviceentry",         required_argument,   NULL, 'e'},
+    {"deviceid",            required_argument,   NULL, 'i'},
+    {"fesmioid",            required_argument,   NULL, 's'},
+    {"logprefix",           required_argument,   NULL, 'l'},
+    {NULL, 0, NULL, 0}
+};
+
+static const char* shortopt = "hb:f:dw:vn:t:e:i:s:l:";
 
 void print_help (char *program_name)
 {
-    printf( "EBPM Device I/O\n"
+    fprintf (stdout, "EBPM Device I/O\n"
             "Usage: %s [options]\n"
             "Version %s\n, Build by: %s, %s\n"
-            "\t-h This help message\n"
-            "\t-f Configuration file\n"
-            "\t-d Daemon mode.\n"
-            "\t-w Daemon working directory.\n"
-            "\t-v Verbose output\n"
-            "\t-n <devio_type = [be|fe]> Devio type\n"
-            "\t-t <device_type = [eth|pcie]> Device type\n"
-            "\t-e <dev_entry = [ip_addr|/dev entry]> Device entry\n"
-            "\t-i <dev_id> Device ID\n"
-            "\t-s <fe_smio_id> FE SMIO ID (only valid for devio_type = fe)\n"
-            "\t-l <log_prefix> Log prefix filename\n"
-            "\t-b <broker_endpoint> Broker endpoint\n",
+            "\n"
+            "  -h  --help                           Display this usage information\n"
+            "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
+            "  -f  --cfgfile <Configuration File>   Specify configuration file\n"
+            "  -d  --daemon                         Run as system daemon.\n"
+            "  -w  --daemonworkdir <Work Directory> Daemon working directory.\n"
+            "  -v  --verbose                        Verbose output\n"
+            "  -n  --deviotype <[be|fe]>            Devio type\n"
+            "  -t  --devicetype <[eth|pcie]>        Device type\n"
+            "  -e  --deviceentry <[ip_addr|/dev entry]>\n"
+            "                                       Device entry\n"
+            "  -i  --deviceid <Device ID>           Device ID\n"
+            "  -s  --fesmioid <FE SMIO ID> (only valid with --deviotype = fe)\n"
+            "                                       FE SMIO ID\n"
+            "  -l  --logprefix <Log prefix>         Log prefix filename\n",
             program_name,
             revision_get_build_version (),
             revision_get_build_user_name (), revision_get_build_date ());
@@ -109,74 +131,91 @@ int main (int argc, char *argv[])
     char *broker_endp = NULL;
     char *log_prefix = NULL;
     char *cfg_file = NULL;
-    char **str_p = NULL;
-    int i;
+    int opt;
 
-    if (argc < 5) {
-        print_help (argv[0]);
-        exit (1);
+    while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
+        /* Get the user selected options */
+        switch (opt) {
+            /* Display Help */
+            case 'h':
+                print_help (argv [0]);
+                exit (1);
+                break;
+
+            case 'b':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set broker_endp parameter\n");
+                broker_endp = strdup (optarg);
+                break;
+
+            case 'f':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[ebpm] Will set cfg_file parameter\n");
+                cfg_file = strdup (optarg);
+                break;
+
+            case 'd':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[ebpm] Will set daemon parameter\n");
+                devio_daemonize = 1;
+                break;
+
+            case 'w':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_work_dir parameter\n");
+                devio_work_dir = strdup (optarg);
+                break;
+
+            case 'v':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[ebpm] Will set verbose parameter\n");
+                verbose = 1;
+                break;
+
+            case 'n':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_type parameter\n");
+                devio_type_str = strdup (optarg);
+                break;
+
+            case 't':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_type parameter\n");
+                dev_type = strdup (optarg);
+                break;
+
+            case 'e':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_type parameter\n");
+                dev_type = strdup (optarg);
+                break;
+
+            case 'i':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_id_str parameter\n");
+                dev_id_str = strdup (optarg);
+                break;
+
+            case 's':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set fe_smio_id_str parameter\n");
+                fe_smio_id_str = strdup (optarg);
+                break;
+
+            case 'l':
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set log filename\n");
+                log_prefix = strdup (optarg);
+                break;
+
+            case '?':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[ebpm] Option not recognized or missing argument\n");
+                print_help (argv [0]);
+                exit (1);
+                break;
+
+            default:
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[ebpm] Could not parse options\n");
+                print_help (argv [0]);
+                exit (1);
+        }
     }
 
-    /* FIXME: This is rather buggy! */
-    /* Simple handling of command-line options. This should be done
-     * with getopt, for instance*/
-    for (i = 1; i < argc; i++)
-    {
-        if (streq (argv[i], "-v")) {
-            verbose = 1;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Verbose mode set\n");
-        }
-        else if (streq (argv[i], "-d")) {
-            devio_daemonize = 1;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Demonize mode set\n");
-        }
-        else if (streq (argv[i], "-w")) {
-            str_p = &devio_work_dir;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_work_dir\n");
-        }
-        else if (streq (argv[i], "-n")) {
-            str_p = &devio_type_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set devio_type parameter\n");
-        }
-        else if (streq (argv[i], "-t")) {
-            str_p = &dev_type;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_type parameter\n");
-        }
-        else if (streq (argv[i], "-e")) {
-            str_p = &dev_entry;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_entry parameter\n");
-        }
-        else if (streq (argv[i], "-i")) {
-            str_p = &dev_id_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set dev_id_str parameter\n");
-        }
-        else if (streq (argv[i], "-s")) {
-            str_p = &fe_smio_id_str;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set fe_smio_id_str parameter\n");
-        }
-        else if (streq (argv[i], "-b")) {
-            str_p = &broker_endp;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set broker_endp parameter\n");
-        }
-        else if (streq (argv[i], "-l")) {
-            str_p = &log_prefix;
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Will set log filename\n");
-        }
-        else if (streq (argv[i], "-f")) {
-            str_p = &cfg_file;
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[ebpm] Will set cfg_file parameter\n");
-        }
-        else if (streq (argv[i], "-h")) {
-            print_help (argv[0]);
-            exit (1);
-        }
-        /* Fallout for options with parameters */
-        else {
-            if (str_p) {
-                *str_p = strdup (argv[i]);
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Parameter set to \"%s\"\n", *str_p);
-            }
-        }
+    /* Check command-line parse options */
+    if (cfg_file == NULL) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[ebpm] Config file was "
+                "not specified\n");
+        print_help (argv [0]);
+        goto err_parse_cfg;
     }
 
     /* Daemonize dev_io */
@@ -228,7 +267,7 @@ int main (int argc, char *argv[])
 
                 /* Our device follows the convention of having the ID in hexadecimal
                  * code. For instance, /dev/fpga-0c00 would be a valid ID */
-                int matches = sscanf (dev_entry, "/dev/fpga-%X", &dev_id);
+                int matches = sscanf (dev_entry, "/dev/fpga-%u", &dev_id);
                 if (matches == 0) {
                     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Dev_entry parameter is invalid.\n"
                             "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
@@ -243,11 +282,11 @@ int main (int argc, char *argv[])
     }
     /* Use the passed ID, interpret it as hexadecimal number */
     else {
-        dev_id = strtoul (dev_id_str, NULL, 16);
+        dev_id = strtoul (dev_id_str, NULL, 10);
     }
 
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was set to %u/%X.\n",
-            dev_id, dev_id);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Dev_id parameter was set to %u.\n",
+            dev_id);
 
     uint32_t fe_smio_id = 0;
     /* Check for FE SMIO ID */
@@ -337,14 +376,11 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Slot number: 0x%08X\n", dev_id);
 
     /* We don't need it anymore */
-    str_p = &fe_smio_id_str;
-    free (*str_p);
+    free (fe_smio_id_str);
     fe_smio_id_str = NULL;
-    str_p = &dev_type;
-    free (*str_p);
+    free (dev_type);
     dev_type = NULL;
-    str_p = &dev_id_str;
-    free (*str_p);
+    free (dev_id_str);
     dev_id_str = NULL;
 
     /* Initilialize dev_io */
@@ -363,8 +399,7 @@ int main (int argc, char *argv[])
     ASSERT_ALLOC (devio, err_devio_alloc);
 
     /* We don't need it anymore */
-    str_p = &dev_entry;
-    free (*str_p);
+    free (dev_entry);
     dev_entry = NULL;
 
     /* Print SDB devices */
@@ -412,12 +447,12 @@ int main (int argc, char *argv[])
         goto err_assoc_devio;
     }
 
-    str_p = &broker_endp;
-    free (*str_p);
+    free (broker_endp);
     broker_endp = NULL;
 
     /* Spawn platform SMIOSs */
-    err = _spawn_platform_smios (devio, devio_type, fe_smio_id);
+    err = _spawn_platform_smios (devio, devio_type, fe_smio_id, devio_hints,
+            dev_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] _spawn_platform_smios error!\n");
         goto err_devio;
@@ -459,24 +494,17 @@ err_client_cfg:
     kill (child_devio_cfg_pid, DEVIO_KILL_CFG_SIGNAL);
 #endif
 err_exit:
-    str_p = &log_prefix;
-    free (*str_p);
-    str_p = &fe_smio_id_str;
-    free (*str_p);
-    str_p = &broker_endp;
-    free (*str_p);
-    str_p = &dev_id_str;
-    free (*str_p);
-    str_p = &dev_entry;
-    free (*str_p);
-    str_p = &dev_type;
-    free (*str_p);
-    str_p = &devio_type_str;
-    free (*str_p);
-    str_p = &devio_work_dir;
-    free (*str_p);
-    str_p = &cfg_file;
-    free (*str_p);
+    free (log_prefix);
+    free (fe_smio_id_str);
+    free (broker_endp);
+    free (dev_id_str);
+    free (dev_entry);
+    free (dev_type);
+    free (devio_type_str);
+    free (devio_work_dir);
+    free (cfg_file);
+err_parse_cfg:
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Exiting ...\n");
     return 0;
 }
 
@@ -713,7 +741,7 @@ err_devio_log_alloc:
 }
 
 static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
-        uint32_t smio_inst_id)
+        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
     assert (devio);
 
@@ -721,7 +749,7 @@ static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_typ
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_be_platform_smios (devio);
+            err = _spawn_be_platform_smios (devio, hints, dev_id);
             break;
 
         case FE_DEVIO:
@@ -742,9 +770,12 @@ err_register_sm:
     return err;
 }
 
-static devio_err_e _spawn_be_platform_smios (devio_t *devio)
+static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, uint32_t dev_id)
 {
+    const char *fmc_board_130m_4ch = "fmc130m_4ch";
+    const char *fmc_board_250m_4ch = "fmc250m_4ch";
     uint32_t fmc130m_4ch_id = 0x7085ef15;
+    uint32_t fmc250m_4ch_id = 0x68e3b1af;
     uint32_t acq_id = 0x4519a0ad;
     uint32_t dsp_id = 0x1bafbf1e;
     uint32_t swap_id = 0x12897592;
@@ -753,10 +784,31 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     /* ML605 or AFCv3 */
 #if defined (__BOARD_ML605__) || (__BOARD_AFCV3__)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning default SMIOs ...\n");
-    err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
+
+    /* Look for which FMC board to spawn */
+    char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
+    snprintf (hints_key, sizeof (hints_key),
+            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
+
+    hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
+    /* If key is not found, assume the fmc130m default FMC board */
+    if (cfg_item == NULL || cfg_item->fmc_board == NULL ||
+            streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
+                fmc_board_130m_4ch)) {
+        /* Default FMC Board */
+        err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
+        if (err != DEVIO_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+            goto err_register_sm;
+        }
+    }
+    else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
+        /* FMC250m Board */
+        err = devio_register_sm (devio, fmc250m_4ch_id, FMC1_250M_BASE_ADDR, 0);
+        if (err != DEVIO_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+            goto err_register_sm;
+        }
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
@@ -782,10 +834,28 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning AFCv3 specific SMIOs ...\n");
 
-    err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
+    snprintf (hints_key, sizeof (hints_key),
+            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
+
+    cfg_item = zhashx_lookup (hints, hints_key);
+    /* If key is not found, assume the fmc130m default FMC board */
+    if (cfg_item == NULL || cfg_item->fmc_board == NULL ||
+            streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
+                fmc_board_130m_4ch)) {
+        /* Default FMC Board */
+        err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
+        if (err != DEVIO_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+            goto err_register_sm;
+        }
+    }
+    else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
+        /* FMC250m Board */
+        err = devio_register_sm (devio, fmc250m_4ch_id, FMC2_250M_BASE_ADDR, 1);
+        if (err != DEVIO_SUCCESS) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+            goto err_register_sm;
+        }
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);

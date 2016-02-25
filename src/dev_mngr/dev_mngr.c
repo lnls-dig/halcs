@@ -36,45 +36,68 @@
 
 #define DFLT_LOG_DIR                "stdout"
 
+static struct option long_options[] =
+{
+    {"help",                no_argument,         NULL, 'h'},
+    {"cfgfile",             required_argument,   NULL, 'f'},
+    {NULL, 0, NULL, 0}
+};
+
+static const char* shortopt = "hf:";
+
 void print_help (char *program_name)
 {
-    printf( "Usage: %s [options]\n"
-            "\t-f Configuration file\n"
-            "\t-h This help message\n"
+    fprintf (stdout, "EBPM Device Manager\n"
+            "Usage: %s [options]\n"
+            "Version %s\n, Build by: %s, %s\n"
+            "\n"
+            "  -h  --help                           Display this usage information\n"
+            "  -f  --cfgfile <Configuration File>   Specify configuration file\n"
+            "\n"
             "\n\t Most of the options resides at the bpm_sw configuration file,\n"
-            "typically located in /etc/bpm_sw", program_name);
+            "typically located in /etc/bpm_sw", program_name,
+            revision_get_build_version (),
+            revision_get_build_user_name (), revision_get_build_date ());
 }
 
 int main (int argc, char *argv[])
 {
     char *cfg_file = NULL;
-    char **str_p = NULL;
-    int i;
+    int opt;
 
-    if (argc < 3) {
-        print_help (argv[0]);
-        exit (1);
+    while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
+        /* Get the user selected options */
+        switch (opt) {
+            /* Display Help */
+            case 'h':
+                print_help (argv [0]);
+                exit (1);
+                break;
+
+            case 'f':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set cfg_file parameter\n");
+                cfg_file = strdup (optarg);
+                break;
+
+            case '?':
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Option not recognized or missing argument\n");
+                print_help (argv [0]);
+                exit (1);
+                break;
+
+            default:
+                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Could not parse options\n");
+                print_help (argv [0]);
+                exit (1);
+        }
     }
 
-    /* Simple handling of command-line options. This should be done
-     * with getopt, for instance*/
-    for (i = 1; i < argc; i++)
-    {
-        if (streq (argv[i], "-f")) {
-            str_p = &cfg_file;
-            DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Will set cfg_file parameter\n");
-        }
-        else if (streq(argv[i], "-h")) {
-            print_help (argv [0]);
-            exit (1);
-        }
-        /* Fallout for options with parameters */
-        else {
-            if (str_p) {
-                *str_p = strdup (argv[i]);
-                DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE, "[dev_mngr] Parameter set to \"%s\"\n", *str_p);
-            }
-        }
+    /* Check command-line parse options */
+    if (cfg_file == NULL) {
+        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Config file was "
+                "not specified\n");
+        print_help (argv [0]);
+        goto err_parse_cfg;
     }
 
     zhashx_t *dmngr_hints = zhashx_new ();
@@ -354,9 +377,9 @@ err_daemonize:
 err_cfg_exit:
     zhashx_destroy (&dmngr_hints);
 err_dmngr_hints_alloc:
-    str_p = &cfg_file;
-    free (*str_p);
-    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_FATAL, "[dev_mngr] Exiting ...\n");
+    free (cfg_file);
+err_parse_cfg:
+    DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr] Exiting ...\n");
 
     return 0;
 }
