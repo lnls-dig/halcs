@@ -1,0 +1,14 @@
+EPICS_HOST_ARCH="linux-x86_64"
+EPICS_FOLDER="/opt/epics"
+EPICS_BASE="${EPICS_FOLDER}/base"
+EPICS_TOPDIR="${EPICS_BASE}"
+EPICS_BIN="${EPICS_BASE}/bin/${EPICS_HOST_ARCH}"
+#export EPICS_CA_ADDR_LIST="127.0.0.1 10.2.117.255 10.2.105.255 10.0.17.255"
+#export EPICS_CA_AUTO_ADDR_LIST="YES"
+#LINUX_HOSTNAME=$(hostname)
+EPICS_HOSTNAME="SIDI-BPM-01"
+BPM_EPICS_STARTUP="/opt/epics/startup/ioc/bpm-epics-ioc/iocBoot/iocBPM"
+EPICS_EXTENSIONS="/opt/epics/extensions"
+EPICS_EXTENSIONS_BIN="/opt/epics/extensions/bin/${EPICS_HOST_ARCH}"
+EPICS_CA_MAX_ARRAY_BYTES="50000000"
+PATH=${PATH}:/usr/local/bin
