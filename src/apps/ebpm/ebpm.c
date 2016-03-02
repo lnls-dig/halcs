@@ -46,16 +46,19 @@
 
 /* Arbitrary hard limit for the maximum number of AFE DEVIOs
  * for each DBE DEVIO */
-#define DEVIO_MAX_FE_DEVIOS         16
+#define DEVIO_MAX_FE_DEVIOS             16
 
-#define DEVIO_SERVICE_LEN           50
-#define DEVIO_NAME                  "/usr/local/bin/ebpm"
-#define DEVIO_CFG_NAME              "/usr/local/bin/ebpm_cfg"
-#define DEVIO_CFG_TIMEOUT           5000       /* in ms */
-#define EPICS_PROCSERV_NAME         "/usr/local/bin/procServ"
-#define EPICS_BPM_NAME              "BPM"
-#define EPICS_BPM_RUN_SCRIPT_NAME   "./run.sh"
-#define EPICS_BPM_TELNET_BASE_PORT  20000
+#define DEVIO_SERVICE_LEN               50
+#define DEVIO_NAME                      "/usr/local/bin/ebpm"
+#define DEVIO_CFG_NAME                  "/usr/local/bin/ebpm_cfg"
+#define DEVIO_CFG_TIMEOUT               5000       /* in ms */
+#define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
+#define EPICS_BPM_NAME                  "BPM"
+#define EPICS_BPM_RUN_SCRIPT_NAME       "./iocBPM/run.sh"
+#define EPICS_BPM_TELNET_BASE_PORT      20000
+#define EPICS_AFE_BPM_NAME              "BPMRFFE"
+#define EPICS_AFE_BPM_RUN_SCRIPT_NAME   "./iocBPMRFFE/run.sh"
+#define EPICS_AFE_BPM_TELNET_BASE_PORT  20100
 
 #define DEVIO_LIBBPMCLIENT_LOG_MODE    "a"
 #define DEVIO_KILL_CFG_SIGNAL       SIGINT
@@ -651,7 +654,8 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
         /* If key is not found or we were asked not to spawn EPICS IOC,
          * assume we don't have any more DBE to prepare */
-        if (cfg_item == NULL || cfg_item->spawn_epics_ioc == false) {
+        if (cfg_item == NULL || (cfg_item->spawn_dbe_epics_ioc == false &&
+                    cfg_item->spawn_afe_epics_ioc == false)) {
             continue;
         }
 
@@ -685,18 +689,36 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         zsys_dir_change (epics_startup);
 
         /* Spawn EPICS IOCs */
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO EPICS IOC for "
-                "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
-        char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
-            "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
-            NULL};
-        /* Spawn Config DEVIO */
-        int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
+        /* Check if we want DBE EPICS IOC */
+        if (cfg_item->spawn_dbe_epics_ioc == true) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO DBE EPICS IOC for "
+                    "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
+            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
+                "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
+                NULL};
+            int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
 
-        if (child_devio_cfg_pid < 0) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
-                    "EPICS instance for board %u, bpm %u\n", dev_id, j);
-            goto err_spawn;
+            if (child_devio_cfg_pid < 0) {
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
+                        "DBE EPICS instance for board %u, bpm %u\n", dev_id, j);
+                goto err_spawn_dbe_epics;
+            }
+        }
+
+        /* Check if we want DBE EPICS IOC */
+        if (cfg_item->spawn_afe_epics_ioc == true) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO AFE EPICS IOC for "
+                    "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
+            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
+                "^D^C", telnet_port_c, EPICS_AFE_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
+                NULL};
+            int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
+
+            if (child_devio_cfg_pid < 0) {
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not create "
+                        "AFE EPICS instance for board %u, bpm %u\n", dev_id, j);
+                goto err_spawn_afe_epics;
+            }
         }
 
         free (bpm_id_c);
@@ -707,7 +729,8 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         telnet_port_c = NULL;
     }
 
-err_spawn:
+err_spawn_afe_epics:
+err_spawn_dbe_epics:
     free (telnet_port_c);
 err_telnet_port_c_alloc:
     free (smio_inst_id_c);
