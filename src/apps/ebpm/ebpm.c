@@ -53,12 +53,8 @@
 #define DEVIO_CFG_NAME                  "/usr/local/bin/ebpm_cfg"
 #define DEVIO_CFG_TIMEOUT               5000       /* in ms */
 #define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
-#define EPICS_BPM_NAME                  "BPM"
 #define EPICS_BPM_RUN_SCRIPT_NAME       "./iocBPM/run.sh"
-#define EPICS_BPM_TELNET_BASE_PORT      20000
-#define EPICS_AFE_BPM_NAME              "BPMRFFE"
 #define EPICS_AFE_BPM_RUN_SCRIPT_NAME   "./iocBPMRFFE/run.sh"
-#define EPICS_AFE_BPM_TELNET_BASE_PORT  20100
 
 #define DEVIO_LIBBPMCLIENT_LOG_MODE    "a"
 #define DEVIO_KILL_CFG_SIGNAL       SIGINT
