@@ -53,8 +53,7 @@
 #define DEVIO_CFG_NAME                  "/usr/local/bin/ebpm_cfg"
 #define DEVIO_CFG_TIMEOUT               5000       /* in ms */
 #define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
-#define EPICS_BPM_RUN_SCRIPT_NAME       "./iocBPM/run.sh"
-#define EPICS_AFE_BPM_RUN_SCRIPT_NAME   "./iocBPMRFFE/run.sh"
+#define EPICS_BPM_RUN_SCRIPT_NAME       "./run.sh"
 
 #define DEVIO_LIBBPMCLIENT_LOG_MODE    "a"
 #define DEVIO_KILL_CFG_SIGNAL       SIGINT
@@ -666,6 +665,10 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         ASSERT_TEST (epics_startup != NULL,
                 "Could not get EPICS_STARTUP environment variable",
                 err_cfg_exit, DEVIO_ERR_CFG);
+        char *epics_afe_startup = getenv("BPM_AFE_EPICS_STARTUP");
+        ASSERT_TEST (epics_afe_startup != NULL,
+                "Could not get AFE_EPICS_STARTUP environment variable",
+                err_cfg_exit, DEVIO_ERR_CFG);
 
         /* Check if we are withing range */
         ASSERT_TEST (dev_id < NUM_MAX_SLOTS+1, "Device ID is out of range",
@@ -683,13 +686,13 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         telnet_afe_port_c = hutils_stringify_dec_key (board_epics_opts [dev_id][smio_inst_id].telnet_afe_port);
         ASSERT_ALLOC (telnet_afe_port_c, err_telnet_afe_port_c_alloc, DEVIO_ERR_ALLOC);
 
-        /* Change working directory as EPICS startup files are located in a
-         * non-default directory */
-        zsys_dir_change (epics_startup);
-
         /* Spawn EPICS IOCs */
         /* Check if we want DBE EPICS IOC */
         if (cfg_item->spawn_dbe_epics_ioc == true) {
+            /* Change working directory as EPICS startup files are located in a
+             * non-default directory */
+            zsys_dir_change (epics_startup);
+
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO DBE EPICS IOC for "
                     "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
             char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
@@ -706,10 +709,14 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
 
         /* Check if we want DBE EPICS IOC */
         if (cfg_item->spawn_afe_epics_ioc == true) {
+            /* Change working directory as EPICS startup files are located in a
+             * non-default directory */
+            zsys_dir_change (epics_afe_startup);
+
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO AFE EPICS IOC for "
-                    "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
+                    "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_afe_port_c);
             char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
-                "^D^C", telnet_afe_port_c, EPICS_AFE_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
+                "^D^C", telnet_afe_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
                 NULL};
             int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
 
