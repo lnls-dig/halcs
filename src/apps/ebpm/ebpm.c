@@ -631,6 +631,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
     char *bpm_id_c = NULL;
     char *smio_inst_id_c = NULL;
     char *telnet_port_c = NULL;
+    char *telnet_afe_port_c = NULL;
 
     /* For each DEVIO, spawn up to 2 EPICS IOCs. Do a lookup in our
      * hints hash to look we we were indeed asked to do that */
@@ -679,6 +680,8 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         ASSERT_ALLOC (smio_inst_id_c, err_smio_inst_id_c_alloc, DEVIO_ERR_ALLOC);
         telnet_port_c = hutils_stringify_dec_key (board_epics_opts [dev_id][smio_inst_id].telnet_port);
         ASSERT_ALLOC (telnet_port_c, err_telnet_port_c_alloc, DEVIO_ERR_ALLOC);
+        telnet_afe_port_c = hutils_stringify_dec_key (board_epics_opts [dev_id][smio_inst_id].telnet_afe_port);
+        ASSERT_ALLOC (telnet_afe_port_c, err_telnet_afe_port_c_alloc, DEVIO_ERR_ALLOC);
 
         /* Change working directory as EPICS startup files are located in a
          * non-default directory */
@@ -706,7 +709,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO AFE EPICS IOC for "
                     "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
             char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
-                "^D^C", telnet_port_c, EPICS_AFE_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
+                "^D^C", telnet_afe_port_c, EPICS_AFE_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
                 NULL};
             int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
 
@@ -723,10 +726,14 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         smio_inst_id_c = NULL;
         free (telnet_port_c);
         telnet_port_c = NULL;
+        free (telnet_afe_port_c);
+        telnet_afe_port_c = NULL;
     }
 
 err_spawn_afe_epics:
 err_spawn_dbe_epics:
+    free (telnet_afe_port_c);
+err_telnet_afe_port_c_alloc:
     free (telnet_port_c);
 err_telnet_port_c_alloc:
     free (smio_inst_id_c);
