@@ -19,6 +19,7 @@ typedef struct {
 
 typedef struct {
     int telnet_port;
+    int telnet_afe_port;
 } board_epics_opts_t;
 
 

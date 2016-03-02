@@ -106,7 +106,7 @@ int main (int argc, char *argv[])
 
             case 'e':
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm_cfg] Will set dev_type parameter\n");
-                dev_type = strdup (optarg);
+                dev_entry = strdup (optarg);
                 break;
 
             case 'i':

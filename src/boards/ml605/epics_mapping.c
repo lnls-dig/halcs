@@ -40,9 +40,13 @@ const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER
 };
 
 const board_epics_opts_t board_epics_opts[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT] = {
-     /* board, bpm */    /* bpm_id */
-    /* 0, 0 (INVALID) */ {{-1},
-    /* 0, 1 (INVALID) */  {-1}},
-    /* 1, 0           */ {{20000 + 0},
-    /* 1, 1           */  {20000 + 1}}
+    /* board, bpm */    /* bpm_id */
+    /* 0, 0 (INVALID) */ {{.telnet_port = -1,
+                           .telnet_afe_port = -1},
+    /* 0, 1 (INVALID) */  {.telnet_port = -1,
+                           .telnet_afe_port = -1}},
+    /* 1, 0           */ {{.telnet_port = 20000 + 0,
+                           .telnet_afe_port = 20100 + 0},
+    /* 1, 1           */  {.telnet_port = 20000 + 1,
+                           .telnet_afe_port = 20100 + 1}},
 };
