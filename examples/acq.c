@@ -85,6 +85,7 @@ void print_help (char *program_name)
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
             "\t-bpm <BPM number = [0|1]>\n"
             "\t-ch <chan_str> Acquisition channel\n"
+            "\t-filefmt <File format = [0 = {text} |1 = {binary}]> File Format\n"
             , program_name);
 }
 
