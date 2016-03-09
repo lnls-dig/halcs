@@ -204,7 +204,6 @@ int main (int argc, char *argv [])
             num_samples = MAX_NUM_SAMPLES;
         }
     }
-    //fprintf (stdout, "[client:acq]: num_samples = %u\n", num_samples);
 
     /* Set default channel */
     uint32_t chan;
@@ -221,7 +220,6 @@ int main (int argc, char *argv [])
             chan = END_CHAN_ID-1;
         }
     }
-    //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
 
     /* Set default board number */
     uint32_t board_number;
@@ -305,8 +303,6 @@ int main (int argc, char *argv [])
         goto err_bpm_get_curve;
     }
 
-    //fprintf (stdout, "[client:acq]: bpm_get_curve was successfully executed\n");
-    //fprintf (stdout, "clear\n");
     if (!freopen (NULL, "wb", stdout)) {
         fprintf (stderr, "[client:acq]: Could not set output mode to binary\n");
         goto err_set_file_mode;
