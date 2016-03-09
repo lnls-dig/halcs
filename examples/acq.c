@@ -24,35 +24,53 @@
 #define MAX_NUM_SAMPLES             (1 << 28)
 #define MAX_NUM_CHANS               (1 << 8)
 
-void print_data (uint32_t chan, uint32_t *data, uint32_t size)
+#define DFLT_FILE_FMT               0
+
+typedef enum {
+    TEXT = 0,
+    BINARY,
+    END_FILE_FMT
+} file_fmt_e;
+
+void print_data (uint32_t chan, uint32_t *data, uint32_t size, file_fmt_e file_fmt)
 {
     /* FIXME: Make it more generic */
     if (chan == 0 || chan == 1 /* Only ADC and ADC SWAP */ ) {
         int16_t *raw_data16 = (int16_t *) data;
-        for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
-            if (zctx_interrupted) {
-                break;
+        if (file_fmt == TEXT) {
+            for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
+                if (zctx_interrupted) {
+                    break;
+                }
+    
+                printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
+                        raw_data16[(i*4)],
+                        raw_data16[(i*4)+1],
+                        raw_data16[(i*4)+2],
+                        raw_data16[(i*4)+3]);
             }
-
-            printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
-                    raw_data16[(i*4)],
-                    raw_data16[(i*4)+1],
-                    raw_data16[(i*4)+2],
-                    raw_data16[(i*4)+3]);
+        }
+        else if (file_fmt == BINARY) {
+            fwrite (raw_data16, 2, size/2, stdout);
         }
     }
     else {
         int32_t *raw_data32 = (int32_t *) data;
-        for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 4; i++) {
-            if (zctx_interrupted) {
-                break;
-            }
+        if (file_fmt == TEXT) {
+            for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 4; i++) {
+                if (zctx_interrupted) {
+                    break;
+                }
 
-            printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
-                    raw_data32[(i*4)],
-                    raw_data32[(i*4)+1],
-                    raw_data32[(i*4)+2],
-                    raw_data32[(i*4)+3]);
+                printf ("%6u\t %8d\t %8d\t %8d\t %8d\n", i,
+                        raw_data32[(i*4)],
+                        raw_data32[(i*4)+1],
+                        raw_data32[(i*4)+2],
+                        raw_data32[(i*4)+3]);
+            }
+        }
+        else if (file_fmt == BINARY) {
+            fwrite (raw_data32, 4, size/4, stdout);
         }
     }
 }
@@ -78,6 +96,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *bpm_number_str = NULL;
     char *chan_str = NULL;
+    char *file_fmt_str = NULL;
     char **str_p = NULL;
 
     if (argc < 3) {
@@ -114,6 +133,10 @@ int main (int argc, char *argv [])
         else if (streq(argv[i], "-bpm"))
         {
             str_p = &bpm_number_str;
+        }
+        else if (streq(argv[i], "-filefmt"))
+        {
+            str_p = &file_fmt_str;
         }
         /* Fallout for options with parameters */
         else {
@@ -194,6 +217,22 @@ int main (int argc, char *argv [])
         }
     }
 
+    /* Set default file format */
+    file_fmt_e file_fmt;
+    if (file_fmt_str == NULL) {
+        fprintf (stderr, "[client:acq]: Setting default value to 'file_fmt'\n");
+        file_fmt = DFLT_FILE_FMT;
+    }
+    else {
+        file_fmt = strtoul (file_fmt_str, NULL, 10);
+
+        if (file_fmt > END_FILE_FMT-1) {
+            fprintf (stderr, "[client:acq]: Invalid file format (-file_fmt) Defaulting to:: %u\n",
+                    0);
+            file_fmt = 0;
+        }
+    }
+
     char service[50];
     snprintf (service, sizeof (service), "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
 
@@ -233,12 +272,20 @@ int main (int argc, char *argv [])
     }
 
     //fprintf (stdout, "[client:acq]: bpm_get_curve was successfully executed\n");
-    fprintf (stdout, "clear\n");
-    print_data (chan, data, acq_trans.block.bytes_read);
+    //fprintf (stdout, "clear\n");
+    if (!freopen (NULL, "wb", stdout)) {
+        fprintf (stderr, "[client:acq]: Could not set output mode to binary\n");
+        goto err_set_file_mode;
+    }
+    print_data (chan, data, acq_trans.block.bytes_read, file_fmt);
 
-err_bpm_client_new:
-err_bpm_set_acq_trig:
+err_set_file_mode:
 err_bpm_get_curve:
+err_bpm_set_acq_trig:
+err_bpm_client_new:
+    str_p = &file_fmt_str;
+    free (*str_p);
+    file_fmt_str = NULL;
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;
