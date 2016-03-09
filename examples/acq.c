@@ -3,6 +3,7 @@
  *   * a client and the FPGA device
  *    */
 
+#include <getopt.h>
 #include <czmq.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -75,18 +76,43 @@ void print_data (uint32_t chan, uint32_t *data, uint32_t size, file_fmt_e file_f
     }
 }
 
+static struct option long_options[] =
+{
+    {"help",                no_argument,         NULL, 'h'},
+    {"brokerendp",          required_argument,   NULL, 'b'},
+    {"verbose",             no_argument,         NULL, 'v'},
+    {"bpmnumber",           required_argument,   NULL, 's'},
+    {"boardslot",           required_argument,   NULL, 'o'},
+    {"channumber",          required_argument,   NULL, 'c'},
+    {"numsamples",          required_argument,   NULL, 'n'},
+    {"filefmt",             required_argument,   NULL, 'f'},
+    {NULL, 0, NULL, 0}
+};
+
+static const char* shortopt = "hb:vo:s:c:n:f:";
+
 void print_help (char *program_name)
 {
-    printf( "Usage: %s [options]\n"
-            "\t-h This help message\n"
-            "\t-v Verbose output\n"
-            "\t-b <broker_endpoint> Broker endpoint\n"
-            "\t-s <num_samples_str> Number of samples\n"
-            "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
-            "\t-ch <chan_str> Acquisition channel\n"
-            "\t-filefmt <File format = [0 = {text} |1 = {binary}]> File Format\n"
-            , program_name);
+    fprintf (stdout, "EBPM Acquisition Utility\n"
+            "Usage: %s [options]\n"
+            "\n"
+            "  -h  --help                           Display this usage information\n"
+            "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
+            "  -v  --verbose                        Verbose output\n"
+            "  -o  --boardslot <Board slot number = [1-12]> \n"
+	    "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
+            "                                       Board slot number\n"
+            "  -c  --channumber <Channel>           Channel number\n"
+            "                                     <Channel> must be one of the following:\n"
+            "                                     0 -> ADC; 1 -> ADC_SWAP; 2 -> Mixer IQ120; 3 -> Mixer IQ340;\n"
+            "                                     4 -> TBT Decim IQ120; 5 -> TBT Decim IQ340; 6 -> TBT Amp;\n"
+            "                                     7 -> TBT Phase; 8 -> TBT Pos; 9 -> FOFB Decim IQ120;\n"
+            "                                     10 -> FOFB Decim IQ340; 11 -> FOFB Amp; 12 -> FOFB Pha;\n"
+            "                                     13 -> FOFB Pos; 14 -> Monit Amp; 15 -> Monit Pha; 16 -> Monit Pos]\n"
+            "  -n  --numsamples <Number of samples> Number of samples\n"
+            "  -f  --filefmt <Output format = [0 = text | 1=binary]>\n"
+            "                                       Output format\n",
+            program_name);
 }
 
 int main (int argc, char *argv [])
@@ -98,55 +124,62 @@ int main (int argc, char *argv [])
     char *bpm_number_str = NULL;
     char *chan_str = NULL;
     char *file_fmt_str = NULL;
-    char **str_p = NULL;
+    int opt;
+    
+    while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
+        /* Get the user selected options */
+        switch (opt) {
+            /* Display Help */
+            case 'h':
+                print_help (argv [0]);
+                exit (1);
+                break;
 
-    if (argc < 3) {
-        print_help (argv[0]);
-        exit (1);
-    }
+            case 'b':
+                broker_endp = strdup (optarg);
+                break;
+            
+            case 'v':
+                verbose = 1;
+                break;
 
-    /* FIXME: This is rather buggy! */
-    /* Simple handling of command-line options. This should be done
-     *      * with getopt, for instance*/
-    int i;
-    for (i = 1; i < argc; i++)
-    {
-        if (streq(argv[i], "-v")) {
-            verbose = 1;
-        }
-        else if (streq(argv[i], "-h"))
-        {
-            print_help (argv [0]);
-            exit (1);
-        }
-        else if (streq (argv[i], "-b")) {
-            str_p = &broker_endp;
-        }
-        else if (streq (argv[i], "-s")) { /* s: samples */
-            str_p = &num_samples_str;
-        }
-        else if (streq (argv[i], "-ch")) { /* ch: channel */
-            str_p = &chan_str;
-        }
-        else if (streq (argv[i], "-board")) { /* board_number: board number */
-            str_p = &board_number_str;
-        }
-        else if (streq(argv[i], "-bpm"))
-        {
-            str_p = &bpm_number_str;
-        }
-        else if (streq(argv[i], "-filefmt"))
-        {
-            str_p = &file_fmt_str;
-        }
-        /* Fallout for options with parameters */
-        else {
-            *str_p = strdup (argv[i]);
-        }
+            case 'o':
+                board_number_str = strdup (optarg);
+                break;
+
+            case 's':
+                bpm_number_str = strdup (optarg);
+                break;
+
+            case 'c':
+                chan_str = strdup (optarg);
+                break;
+
+            case 'n':
+                num_samples_str = strdup (optarg);
+                break;
+
+            case 'f':
+                file_fmt_str = strdup (optarg);
+                break;
+            
+            case '?':
+                fprintf (stderr, "[client:acq] Option not recognized or missing argument\n");
+                print_help (argv [0]);
+                exit (1);
+                break;
+
+            default:
+                fprintf (stderr, "[client:acq] Could not parse options\n");
+                print_help (argv [0]);
+                exit (1);
+         }
     }
 
     /* Set default broker address */
     if (broker_endp == NULL) {
+        fprintf (stderr, "[client:acq]: Setting default broker endpoint: %s\n",
+                "ipc://"DFLT_BIND_FOLDER);
         broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
     }
 
@@ -204,7 +237,7 @@ int main (int argc, char *argv [])
     /* Set default bpm number */
     uint32_t bpm_number;
     if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
+        fprintf (stderr, "[client:acq]: Setting default value to BPM number: %u\n",
                 DFLT_BPM_NUMBER);
         bpm_number = DFLT_BPM_NUMBER;
     }
@@ -212,7 +245,7 @@ int main (int argc, char *argv [])
         bpm_number = strtoul (bpm_number_str, NULL, 10);
 
         if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq]: BPM number too big! Defaulting to: %u\n",
                     MAX_BPM_NUMBER);
             bpm_number = MAX_BPM_NUMBER;
         }
@@ -284,23 +317,17 @@ err_set_file_mode:
 err_bpm_get_curve:
 err_bpm_set_acq_trig:
 err_bpm_client_new:
-    str_p = &file_fmt_str;
-    free (*str_p);
+    free (file_fmt_str);
     file_fmt_str = NULL;
-    str_p = &chan_str;
-    free (*str_p);
+    free (chan_str);
     chan_str = NULL;
-    str_p = &board_number_str;
-    free (*str_p);
+    free (board_number_str);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
-    free (*str_p);
+    free (bpm_number_str);
     bpm_number_str = NULL;
-    str_p = &num_samples_str;
-    free (*str_p);
+    free (num_samples_str);
     num_samples_str = NULL;
-    str_p = &broker_endp;
-    free (*str_p);
+    free (broker_endp);
     broker_endp = NULL;
     bpm_client_destroy (&bpm_client);
 
