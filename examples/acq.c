@@ -43,7 +43,7 @@ void print_data (uint32_t chan, uint32_t *data, uint32_t size, file_fmt_e file_f
                 if (zctx_interrupted) {
                     break;
                 }
-    
+
                 printf ("%8d\t %8d\t %8d\t %8d\n",
                         raw_data16[(i*4)],
                         raw_data16[(i*4)+1],
@@ -125,7 +125,7 @@ int main (int argc, char *argv [])
     char *chan_str = NULL;
     char *file_fmt_str = NULL;
     int opt;
-    
+
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
         /* Get the user selected options */
         switch (opt) {
@@ -138,7 +138,7 @@ int main (int argc, char *argv [])
             case 'b':
                 broker_endp = strdup (optarg);
                 break;
-            
+
             case 'v':
                 verbose = 1;
                 break;
@@ -162,7 +162,7 @@ int main (int argc, char *argv [])
             case 'f':
                 file_fmt_str = strdup (optarg);
                 break;
-            
+
             case '?':
                 fprintf (stderr, "[client:acq] Option not recognized or missing argument\n");
                 print_help (argv [0]);
