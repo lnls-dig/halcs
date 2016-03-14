@@ -10,6 +10,7 @@ OBJDUMP ?=	$(CROSS_COMPILE)objdump
 OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
+MAKE ?=		depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
@@ -343,6 +344,7 @@ endif
 # Install just the driver and lib, not udev rules
 pcie_driver_install:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_install lib_driver_install
+	$(DEPMOD) -a
 
 pcie_driver_uninstall:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_uninstall lib_driver_uninstall
