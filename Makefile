@@ -10,7 +10,7 @@ OBJDUMP ?=	$(CROSS_COMPILE)objdump
 OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
-MAKE ?=		depmod
+DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
