@@ -99,6 +99,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t num_samples_post = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
     uint32_t num_shots = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
     uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    const char *sender = (const char *) EXP_REPLYTO_ZMQ(args);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
+            "Sender: %s\n", sender);
 
     /* channel required is out of the limit */
     if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
