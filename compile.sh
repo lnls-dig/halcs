@@ -4,9 +4,11 @@ VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
 VALID_APPS_STR="Valid values are: \"ebpm\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_LIBS_LINK_STR="Valid values are: \"yes\" or \"no\"."
+VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
-    echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>] [-l <with library linking = yes/no>] [-x <extra flags>]"
+    echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
+    echo "    [-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
 }
 
 #######################################
@@ -17,10 +19,11 @@ BOARD=
 APPS=
 WITH_EXAMPLES=
 WITH_LIBS_LINK=
+WITH_DRIVER=
 EXTRA_FLAGS=
 
 # Get command line options
-while getopts ":b:a:e:l:x:" opt; do
+while getopts ":b:a:e:l:x:d:" opt; do
     case $opt in
         b)
             BOARD=$OPTARG
@@ -36,6 +39,9 @@ while getopts ":b:a:e:l:x:" opt; do
             ;;
         x)
             EXTRA_FLAGS=$OPTARG
+            ;;
+        d)
+            WITH_DRIVER=$OPTARG
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -89,6 +95,11 @@ if [ "$WITH_LIBS_LINK" != "yes" ] && [ "$WITH_LIBS_LINK" != "no" ]; then
     exit 1
 fi
 
+if [ "$WITH_DRIVER" != "yes" ] && [ "$WITH_DRIVER" != "no" ]; then
+    echo "Unsupported driver option. "$VALID_WITH_DRIVER_STR
+    exit 1
+fi
+
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE=y
@@ -131,10 +142,6 @@ COMMAND_DEPS="\
     make ${EXTRA_FLAGS} deps && \
     make ${EXTRA_FLAGS} deps_install"
 
-COMMAND_DRIVER="\
-    make ${EXTRA_FLAGS} pcie_driver && \
-    make ${EXTRA_FLAGS} pcie_driver_install"
-
 COMMAND_LIBS="\
     make \
     ${EXTRA_FLAGS} \
@@ -176,6 +183,15 @@ if [ "$WITH_LIBS_LINK" = "yes" ]; then
 COMMAND_LIBS_LINK="ldconfig"
 else
 COMMAND_LIBS_LINK=""
+fi
+
+if [ "$WITH_DRIVER" = "yes" ]; then
+COMMAND_DRIVER="\
+    make ${EXTRA_FLAGS} pcie_driver && \
+    make ${EXTRA_FLAGS} pcie_driver_install"
+
+else
+COMMAND_DRIVER=""
 fi
 
 COMMAND_ARRAY=(
