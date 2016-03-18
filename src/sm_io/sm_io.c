@@ -190,7 +190,7 @@ smio_err_e smio_loop (smio_t *self)
             exp_msg_zmq_t smio_args = {
                 .tag = EXP_MSG_ZMQ_TAG,
                 .msg = &request,
-                .reply_to = NULL /* Unused field in MLM protocol */
+                .reply_to = (void *) mlm_client_sender (self->worker)
             };
             err = smio_do_op (self, &smio_args);
 
