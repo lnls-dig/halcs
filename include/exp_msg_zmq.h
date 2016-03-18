@@ -20,7 +20,7 @@ struct _exp_msg_zmq_t {
      * CZMQ 3.0.0 available at https://github.com/zeromq/czmq/blob/master/src/zmsg.c */
     uint32_t tag;
     zmsg_t **msg;
-    zframe_t *reply_to;
+    void *reply_to;
 };
 
 /* SMIO THSAFE ZMQ server function arguments macros */
