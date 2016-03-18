@@ -27,6 +27,8 @@ struct _exp_msg_zmq_t {
 #define __EXP_MSG_ZMQ_ARGS_2_MSG(args)                 ((exp_msg_zmq_t *) args)
 #define EXP_MSG_ZMQ(args)                              (*__EXP_MSG_ZMQ_ARGS_2_MSG(args)->msg)
 
+#define EXP_REPLYTO_ZMQ(args)                           (__EXP_MSG_ZMQ_ARGS_2_MSG(args)->reply_to)
+
 #define EXP_MSG_ZMQ_POP_NEXT_ARG(args)                  GEN_MSG_ZMQ_POP_NEXT_ARG(EXP_MSG_ZMQ(args))
 #define EXP_MSG_CLENUP_ARG(arg_p)                       GEN_MSG_ZMQ_CLENUP_ARG(arg_p)
 #define EXP_MSG_ZMQ_PEEK_NEXT_ARG(args)                 GEN_MSG_ZMQ_PEEK_NEXT_ARG(EXP_MSG_ZMQ(args))
