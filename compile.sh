@@ -17,9 +17,9 @@ function usage() {
 
 BOARD=
 APPS=
-WITH_EXAMPLES=
-WITH_LIBS_LINK=
-WITH_DRIVER=
+WITH_EXAMPLES="no"
+WITH_LIBS_LINK="no"
+WITH_DRIVER="no"
 EXTRA_FLAGS=
 
 # Get command line options
