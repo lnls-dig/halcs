@@ -521,11 +521,9 @@ deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) ${PREFIX}/etc $(CMDSEP))
 
 core_uninstall:
 	$(foreach core_bin,$(ALL_OUT),rm -f ${PREFIX}/bin/$(core_bin) $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),rm -f ${PREFIX}/etc/$(core_script) $(CMDSEP))
 
 core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
