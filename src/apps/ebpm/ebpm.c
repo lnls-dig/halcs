@@ -648,6 +648,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
                 "file", err_cfg_exit, DEVIO_ERR_CFG);
 
         hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
+
         /* If key is not found or we were asked not to spawn EPICS IOC,
          * assume we don't have any more DBE to prepare */
         if (cfg_item == NULL || (cfg_item->spawn_dbe_epics_ioc == false &&
@@ -709,6 +710,11 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
 
         /* Check if we want DBE EPICS IOC */
         if (cfg_item->spawn_afe_epics_ioc == true) {
+            /* Only spawn IOC if we spawn RFFE DEVIO */
+            if (cfg_item->bind == NULL || streq (cfg_item->bind, "")) {
+                continue;
+            }
+
             /* Change working directory as EPICS startup files are located in a
              * non-default directory */
             zsys_dir_change (epics_afe_startup);
