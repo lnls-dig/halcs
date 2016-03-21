@@ -3,7 +3,7 @@
 VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
 VALID_APPS_STR="Valid values are: \"ebpm\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
-VALID_WITH_LIBS_LINK_STR="Valid values are: \"yes\" or \"no\"."
+VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
@@ -18,7 +18,7 @@ function usage() {
 BOARD=
 APPS=
 WITH_EXAMPLES="no"
-WITH_LIBS_LINK="no"
+WITH_SYSTEM_INTEGRATION="no"
 WITH_DRIVER="no"
 EXTRA_FLAGS=
 
@@ -35,7 +35,7 @@ while getopts ":b:a:e:l:x:d:" opt; do
             WITH_EXAMPLES=$OPTARG
             ;;
         l)
-            WITH_LIBS_LINK=$OPTARG
+            WITH_SYSTEM_INTEGRATION=$OPTARG
             ;;
         x)
             EXTRA_FLAGS=$OPTARG
@@ -84,14 +84,14 @@ if [ "$WITH_EXAMPLES" != "yes" ] && [ "$WITH_EXAMPLES" != "no" ]; then
     exit 1
 fi
 
-if [ -z "$WITH_LIBS_LINK"  ]; then
-    echo "\"library linking\" variable unset."
+if [ -z "$WITH_SYSTEM_INTEGRATION"  ]; then
+    echo "\"system integration\" variable unset."
     usage
     exit 1
 fi
 
-if [ "$WITH_LIBS_LINK" != "yes" ] && [ "$WITH_LIBS_LINK" != "no" ]; then
-    echo "Unsupported library linking. "$VALID_WITH_LIBS_LINK_STR
+if [ "$WITH_SYSTEM_INTEGRATION" != "yes" ] && [ "$WITH_SYSTEM_INTEGRATION" != "no" ]; then
+    echo "Unsupported system integration option. "$VALID_WITH_SYSTEM_INTEGRATION_STR
     exit 1
 fi
 
@@ -152,7 +152,7 @@ COMMAND_LIBS="\
     LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
     libs_compile_install"
 
-COMMAND_HAL="\
+COMMAND_CORE="\
     make \
     ${EXTRA_FLAGS} \
     BOARD=${BOARD} \
@@ -170,7 +170,7 @@ COMMAND_HAL="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} \
     WITH_APP_CFG=${WITH_APP_CFG} \
-    ${EXTRA_FLAGS} install"
+    ${EXTRA_FLAGS} core_install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
@@ -179,10 +179,12 @@ else
 COMMAND_EXAMPLES=""
 fi
 
-if [ "$WITH_LIBS_LINK" = "yes" ]; then
-COMMAND_LIBS_LINK="ldconfig"
+if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
+COMMAND_SYSTEM_INTEGRATION="\
+    make scripts_install && \
+    ldconfig"
 else
-COMMAND_LIBS_LINK=""
+COMMAND_SYSTEM_INTEGRATION=""
 fi
 
 if [ "$WITH_DRIVER" = "yes" ]; then
@@ -198,9 +200,9 @@ COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_DRIVER}"
     "${COMMAND_LIBS}"
-    "${COMMAND_HAL}"
+    "${COMMAND_CORE}"
     "${COMMAND_EXAMPLES}"
-    "${COMMAND_LIBS_LINK}"
+    "${COMMAND_SYSTEM_INTEGRATION}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
