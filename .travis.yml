@@ -8,9 +8,9 @@ compiler:
 sudo: false
 
 env:
-- BOARD=ml605 EXAMPLES=yes LIBS_LINK=no APP=ebpm
-- BOARD=afcv3 EXAMPLES=yes LIBS_LINK=no APP=ebpm
-- BOARD=afcv3_1 EXAMPLES=yes LIBS_LINK=no APP=ebpm
+- BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=ebpm
+- BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=ebpm
+- BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=ebpm
 
 addons:
   apt:
