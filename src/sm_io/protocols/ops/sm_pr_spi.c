@@ -50,6 +50,7 @@ typedef struct {
     uint32_t sys_freq;          /* System clock [Hz] */
     uint32_t spi_freq;          /* SPI clock [Hz] */
     uint32_t init_config;       /* SPI initial config register */
+    bool bidir;                 /* SPI bidirectional control enable */
 } smpr_proto_spi_t;
 
 static smpr_err_e _spi_init (smpr_t *self);
@@ -106,6 +107,7 @@ int spi_open (smpr_t *self, uint64_t base, void *args)
         spi_proto->sys_freq = spi_proto_args->sys_freq;
         spi_proto->spi_freq = spi_proto_args->spi_freq;
         spi_proto->init_config = spi_proto_args->init_config;
+        spi_proto->bidir = spi_proto_args->bidir;
     }
     else {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO,
@@ -113,6 +115,7 @@ int spi_open (smpr_t *self, uint64_t base, void *args)
         spi_proto->sys_freq = SM_PR_SPI_DFLT_SYS_FREQ;
         spi_proto->spi_freq = SM_PR_SPI_DFLT_SPI_FREQ;
         spi_proto->init_config = SM_PR_SPI_DFLT_SPI_CONFIG;
+        spi_proto->bidir = SM_PR_SPI_DFLT_BIDIR;
     }
 
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO,
@@ -292,7 +295,7 @@ static smpr_err_e _spi_init (smpr_t *self)
             err_exit, SMPR_ERR_RW_SMIO);
 #endif
 
-    uint32_t bidir = SM_PR_SPI_DFLT_BIDIR;
+    uint32_t bidir = spi_proto->bidir;
     /* Configure BIDIR register */
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] SPI bidir register = 0x%08X\n", bidir);
