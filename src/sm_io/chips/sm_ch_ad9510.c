@@ -40,9 +40,9 @@
 
 #define SMCH_AD9510_WAIT_TRIES              10
 #define SMCH_AD9510_NAME                    "SPI_AD9510"
-#define SMCH_AD9519_USECS_WAIT              1000
+#define SMCH_AD9510_USECS_WAIT              1000
 #define SMCH_AD9510_WAIT(usecs)             usleep(usecs)
-#define SMCH_AD9510_WAIT_DFLT               SMCH_AD9510_WAIT(SMCH_AD9519_USECS_WAIT)
+#define SMCH_AD9510_WAIT_DFLT               SMCH_AD9510_WAIT(SMCH_AD9510_USECS_WAIT)
 
 struct _smch_ad9510_t {
     smpr_t *spi;                    /* SPI protocol object */
