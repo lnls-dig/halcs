@@ -423,15 +423,19 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     /* Read data from RX regsiters */
     uint32_t i;
     uint8_t data_read[SPI_PROTO_REG_RXTX_NUM * SMPR_WB_REG_2_BYTE] = {0};
+    /* If we are using Bidirectional SPI, the receved data is located on base address 
+     * SPI_PROTO_REG_RX0. Otherwise, the data is on a different register 
+     * SPI_PROTO_REG_RX0_SINGLE */
+    uint32_t read_base_addr = (spi_proto->bidir) ? SPI_PROTO_REG_RX0 : SPI_PROTO_REG_RX0_SINGLE;
     /* We read 32-bit at a time */
     for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Reading from RX%u\n", i);
         /* As the RXs are just a single register, we write using the SMIO
          * functions directly */
-        num_bytes = smio_thsafe_client_read_32 (parent,
-                (spi_proto->base | SPI_PROTO_REG_RX0_SINGLE) + SMPR_WB_REG_2_BYTE*i,
-                (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
+            num_bytes = smio_thsafe_client_read_32 (parent,
+                    (spi_proto->base | read_base_addr) + SMPR_WB_REG_2_BYTE*i,
+                    (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Read 0x%08X from RX%u\n",
                 *((uint32_t *) (data_read + SMPR_WB_REG_2_BYTE*i)), i);
