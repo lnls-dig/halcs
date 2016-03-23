@@ -75,8 +75,15 @@ smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
     self->ss = ss;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:ad9510] Created instance of SMCH\n");
+
+    smch_err_e err = _smch_ad9510_init (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not initialize AD9510",
+            err_smch_init);
+
     return self;
 
+err_smch_init:
+    smpr_release (self->spi);
 err_smpr_init:
     smpr_destroy (&self->spi);
 err_spi_alloc:
