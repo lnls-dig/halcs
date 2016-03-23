@@ -61,6 +61,7 @@ extern disp_op_t fmc250m_4ch_si571_set_freq_exp;
 extern disp_op_t fmc250m_4ch_si571_get_defaults_exp;
 extern disp_op_t fmc250m_4ch_rst_adcs_exp;
 extern disp_op_t fmc250m_4ch_rst_div_adcs_exp;
+extern disp_op_t fmc250m_4ch_test_mode_exp;
 
 extern const disp_op_t *fmc250m_4ch_exp_ops [];
 

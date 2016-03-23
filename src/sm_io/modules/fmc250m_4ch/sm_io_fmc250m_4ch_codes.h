@@ -110,7 +110,9 @@
 #define FMC250M_4CH_NAME_RST_ADCS                       "fmc250m_4ch_rst_adcs"
 #define FMC250M_4CH_OPCODE_RST_DIV_ADCS                 46
 #define FMC250M_4CH_NAME_RST_DIV_ADCS                   "fmc250m_4ch_rst_div_adcs"
-#define FMC250M_4CH_OPCODE_END                          47
+#define FMC250M_4CH_OPCODE_TESTMODE                     47
+#define FMC250M_4CH_NAME_TESTMODE                       "fmc250m_4ch_test_mode"
+#define FMC250M_4CH_OPCODE_END                          48
 
 /* Messaging Reply OPCODES */
 #define FMC250M_4CH_REPLY_TYPE                          uint32_t

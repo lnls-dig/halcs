@@ -49,6 +49,16 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     ASSERT_TEST(inst_id < NUM_FMC250M_4CH_SMIOS, "Number of FMC250M_4CH SMIOs instances exceeded",
             err_num_fmc250m_4ch_smios);
 
+    /* Setup ISLA216P ADC SPI communication */
+    self->smch_isla216p_adc0 = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 0, 0);
+    ASSERT_ALLOC(self->smch_isla216p_adc0, err_smch_isla216p_adc0);
+    self->smch_isla216p_adc1 = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 1, 0);
+    ASSERT_ALLOC(self->smch_isla216p_adc1, err_smch_isla216p_adc1);
+    self->smch_isla216p_adc2 = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 2, 0);
+    ASSERT_ALLOC(self->smch_isla216p_adc2, err_smch_isla216p_adc2);
+    self->smch_isla216p_adc3 = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 3, 0);
+    ASSERT_ALLOC(self->smch_isla216p_adc3, err_smch_isla216p_adc3);
+
     /* FMC250M_4CH isntance 0 is the one controlling this CI */
     /* FIXME: This breaks generality for this class */
     if (inst_id == 0) {
@@ -150,6 +160,14 @@ err_smch_24aa64_alloc:
         smch_pca9547_destroy (&self->smch_pca9547);
     }
 err_smch_pca9547_alloc:
+    smch_isla216p_destroy (&self->smch_isla216p_adc3);
+err_smch_isla216p_adc3:
+    smch_isla216p_destroy (&self->smch_isla216p_adc2);
+err_smch_isla216p_adc2:
+    smch_isla216p_destroy (&self->smch_isla216p_adc1);
+err_smch_isla216p_adc1:
+    smch_isla216p_destroy (&self->smch_isla216p_adc0);
+err_smch_isla216p_adc0:
 err_num_fmc250m_4ch_smios:
     free (self);
 err_self_alloc:
