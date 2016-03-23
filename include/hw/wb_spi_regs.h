@@ -57,14 +57,14 @@
 #define SPI_PROTO_CTRL_GO_BSY                       WBGEN2_GEN_MASK(8, 1)
 #define SPI_PROTO_CTRL_BSY                          WBGEN2_GEN_MASK(8, 1)
 
-#define SPI_PROTO_CTRL_CHAR_LEN_SIZE                7
-#define SPI_PROTO_CTRL_CHAR_LEN_SHIFT               0
-#define SPI_PROTO_CTRL_CHAR_LEN_MASK                WBGEN2_GEN_MASK(SPI_PROTO_CTRL_CHAR_LEN_SHIFT, \
-                                                                    SPI_PROTO_CTRL_CHAR_LEN_SIZE)
-#define SPI_PROTO_CTRL_CHAR_LEN_W(value)            WBGEN2_GEN_WRITE(value, SPI_PROTO_CTRL_CHAR_LEN_SHIFT, \
-                                                                            SPI_PROTO_CTRL_CHAR_LEN_SIZE)
-#define SPI_PROTO_CTRL_CHAR_LEN_R(reg)              WBGEN2_GEN_READ(reg, SPI_PROTO_CTRL_CHAR_LEN_SHIFT, \
-                                                                            SPI_PROTO_CTRL_CHAR_LEN_SIZE)
+#define SPI_PROTO_CTRL_CHARLEN_SIZE                 7
+#define SPI_PROTO_CTRL_CHARLEN_SHIFT                0
+#define SPI_PROTO_CTRL_CHARLEN_MASK                 WBGEN2_GEN_MASK(SPI_PROTO_CTRL_CHARLEN_SHIFT, \
+                                                                     SPI_PROTO_CTRL_CHARLEN_SIZE)
+#define SPI_PROTO_CTRL_CHARLEN_W(value)             WBGEN2_GEN_WRITE(value, SPI_PROTO_CTRL_CHARLEN_SHIFT, \
+                                                                             SPI_PROTO_CTRL_CHARLEN_SIZE)
+#define SPI_PROTO_CTRL_CHARLEN_R(reg)               WBGEN2_GEN_READ(reg, SPI_PROTO_CTRL_CHARLEN_SHIFT, \
+                                                                             SPI_PROTO_CTRL_CHARLEN_SIZE)
 
 /* read-write whole register */
 #define SPI_PROTO_CTRL_SIZE                         16
@@ -101,14 +101,19 @@
 #define SPI_PROTO_REG_CFG_BIDIR                     0x0000001C
 
 /* Definitions for SPI_PROTO_REG_CFG_BIDIR */
-#define SPI_PROTO_CFG_BIDIR_SIZE                    1
-#define SPI_PROTO_CFG_BIDIR_SHIFT                   0
-#define SPI_PROTO_CFG_BIDIR_MASK                    WBGEN2_GEN_MASK(SPI_PROTO_CFG_BIDIR_SHIFT, \
-                                                                  SPI_PROTO_CFG_BIDIR_SIZE)
-#define SPI_PROTO_CFG_BIDIR_W(value)                WBGEN2_GEN_WRITE(value, SPI_PROTO_CFG_BIDIR_SHIFT, \
-                                                                          SPI_PROTO_CFG_BIDIR_SIZE)
-#define SPI_PROTO_CFG_BIDIR_R(reg)                  WBGEN2_GEN_READ(reg, SPI_PROTO_CFG_BIDIR_SHIFT, \
-                                                                          SPI_PROTO_CFG_BIDIR_SIZE)
+#define SPI_PROTO_CFG_BIDIR_CHARLEN_SIZE            7
+#define SPI_PROTO_CFG_BIDIR_CHARLEN_SHIFT           0
+#define SPI_PROTO_CFG_BIDIR_CHARLEN_MASK            WBGEN2_GEN_MASK(SPI_PROTO_CFG_BIDIR_CHARLEN_SHIFT, \
+                                                          SPI_PROTO_CFG_BIDIR_CHARLEN_SIZE)
+#define SPI_PROTO_CFG_BIDIR_CHARLEN_W(value)        WBGEN2_GEN_WRITE(value, SPI_PROTO_CFG_BIDIR_CHARLEN_SHIFT, \
+                                                                  SPI_PROTO_CFG_BIDIR_CHARLEN_SIZE)
+#define SPI_PROTO_CFG_BIDIR_CHARLEN_R(reg)          WBGEN2_GEN_READ(reg, SPI_PROTO_CFG_BIDIR_CHARLEN_SHIFT, \
+                                                                  SPI_PROTO_CFG_BIDIR_CHARLEN_SIZE)
+
+#define SPI_PROTO_CFG_BIDIR_EN_SIZE                 1
+#define SPI_PROTO_CFG_BIDIR_EN_SHIFT                7
+#define SPI_PROTO_CFG_BIDIR_EN                      WBGEN2_GEN_MASK(SPI_PROTO_CFG_BIDIR_EN_SHIFT, \
+                                                               SPI_PROTO_CFG_BIDIR_EN_SIZE)
 
 /* For RX data from MISO (single line) */
 #define SPI_PROTO_REG_RX0_SINGLE                    0x00000020
