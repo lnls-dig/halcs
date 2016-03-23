@@ -124,15 +124,16 @@ smch_err_e smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 smch_err_e smch_isla216p_set_test_mode (smch_isla216p_t *self, uint8_t mode)
 {
     smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
 
     uint8_t data = 0;
-    err = _smch_isla216p_read_8 (self, ISLA216P_REG_TESTIO, &data);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not read from TESTIO register",
+    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_TESTIO, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not read from TESTIO register",
             err_smpr_read, SMCH_ERR_RW_SMPR);
 
     data = (data & ~ISLA216P_TESTIO_OUTMODE_MASK) | ISLA216P_TESTIO_OUTMODE_W(mode);
-    err = _smch_isla216p_write_8 (self, ISLA216P_REG_TESTIO, &data);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not write to TESTIO register",
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TESTIO, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to TESTIO register",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
 err_smpr_write:
