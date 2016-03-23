@@ -882,6 +882,13 @@ PARAM_FUNC_CLIENT_READ(rst_div_adcs)
             rst_div_adcs);
 }
 
+/* ISLA216P Test modes */
+PARAM_FUNC_CLIENT_WRITE(test_mode)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE,
+            test_mode);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */

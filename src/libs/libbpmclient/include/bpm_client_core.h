@@ -391,6 +391,9 @@ bpm_client_err_e bpm_set_rst_div_adcs (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_rst_div_adcs (bpm_client_t *self, char *service,
         uint32_t *rst_div_adcs);
 
+bpm_client_err_e bpm_set_test_mode (bpm_client_t *self, char *service,
+        uint32_t test_mode);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquisition request */
