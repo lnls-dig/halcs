@@ -12,8 +12,6 @@
  */
 
 #include "bpm_server.h"
-/* Private headers */
-#include "sm_ch_ad9510_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
