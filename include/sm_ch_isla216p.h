@@ -29,6 +29,11 @@ smch_err_e smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 /* ISLA216P Test functions */
 smch_err_e smch_isla216p_set_test_mode (smch_isla216p_t *self, uint8_t mode);
 
+/* Chid ID */
+smch_err_e smch_isla216p_get_chipid (smch_isla216p_t *self, uint8_t *chipid);
+/* CHIP Version */
+smch_err_e smch_isla216p_get_chipver (smch_isla216p_t *self, uint8_t *chipver);
+
 #ifdef __cplusplus
 }
 #endif
