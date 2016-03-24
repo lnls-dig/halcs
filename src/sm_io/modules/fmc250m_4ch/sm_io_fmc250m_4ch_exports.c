@@ -580,9 +580,45 @@ disp_op_t fmc250m_4ch_si571_get_defaults_exp = {
     }
 };
 
-disp_op_t fmc250m_4ch_test_mode_exp = {
-    .name = FMC250M_4CH_NAME_TESTMODE,
-    .opcode = FMC250M_4CH_OPCODE_TESTMODE,
+disp_op_t fmc250m_4ch_test_mode0_exp = {
+    .name = FMC250M_4CH_NAME_TESTMODE0,
+    .opcode = FMC250M_4CH_OPCODE_TESTMODE0,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_test_mode1_exp = {
+    .name = FMC250M_4CH_NAME_TESTMODE1,
+    .opcode = FMC250M_4CH_OPCODE_TESTMODE1,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_test_mode2_exp = {
+    .name = FMC250M_4CH_NAME_TESTMODE2,
+    .opcode = FMC250M_4CH_OPCODE_TESTMODE2,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_test_mode3_exp = {
+    .name = FMC250M_4CH_NAME_TESTMODE3,
+    .opcode = FMC250M_4CH_OPCODE_TESTMODE3,
     .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -645,7 +681,10 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_si571_get_defaults_exp,
     &fmc250m_4ch_rst_adcs_exp,
     &fmc250m_4ch_rst_div_adcs_exp,
-    &fmc250m_4ch_test_mode_exp,
+    &fmc250m_4ch_test_mode0_exp,
+    &fmc250m_4ch_test_mode1_exp,
+    &fmc250m_4ch_test_mode2_exp,
+    &fmc250m_4ch_test_mode3_exp,
     NULL
 };
 

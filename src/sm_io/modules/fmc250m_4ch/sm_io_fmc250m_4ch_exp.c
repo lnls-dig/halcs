@@ -638,7 +638,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
 #define FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(func_name)                          \
         static int FMC250M_4CH_ISLA216P_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-#define FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, read_func, write_func,   \
+#define FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, inst, read_func, write_func,   \
                 error_msg)                                                        \
         do {                                                                      \
             assert (owner);                                                       \
@@ -649,10 +649,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
             smio_fmc250m_4ch_t *fmc250m = smio_get_handler (self);                \
             ASSERT_TEST(fmc250m != NULL, "Could not get SMIO FMC250M handler",    \
                     err_get_fmc250m_handler, -FMC250M_4CH_ERR);                   \
-            smch_isla216p_t *smch_isla216p0 = SMIO_ISLA216P_HANDLER0(fmc250m);    \
-            smch_isla216p_t *smch_isla216p1 = SMIO_ISLA216P_HANDLER1(fmc250m);    \
-            smch_isla216p_t *smch_isla216p2 = SMIO_ISLA216P_HANDLER2(fmc250m);    \
-            smch_isla216p_t *smch_isla216p3 = SMIO_ISLA216P_HANDLER3(fmc250m);    \
+            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, inst); \
             uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);              \
             (void) rw;                                                            \
             uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);            \
@@ -672,13 +669,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
                 )                                                                  \
                 WHENNOT(ISEMPTY(read_func))(                                       \
                     uint32_t value = 0;                                            \
-                    serr = ((smch_isla216p_func_fp) read_func) (smch_isla216p0,    \
-                            &value);                                               \
-                    serr |= ((smch_isla216p_func_fp) read_func) (smch_isla216p1,   \
-                            &value);                                               \
-                    serr |= ((smch_isla216p_func_fp) read_func) (smch_isla216p2,   \
-                            &value);                                               \
-                    serr |= ((smch_isla216p_func_fp) read_func) (smch_isla216p3,   \
+                    serr = ((smch_isla216p_func_fp) read_func) (smch_isla216p, \
                             &value);                                               \
                     if (serr != SMCH_SUCCESS) {                                    \
                         err = -FMC250M_4CH_ERR;                                    \
@@ -699,13 +690,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
                     return err;                                                    \
                 )                                                                  \
                 WHENNOT(ISEMPTY(write_func))(                                      \
-                    serr = ((smch_isla216p_func_fp) write_func) (smch_isla216p0,   \
-                            &param);                                               \
-                    serr |= ((smch_isla216p_func_fp) write_func) (smch_isla216p1,  \
-                            &param);                                               \
-                    serr |= ((smch_isla216p_func_fp) write_func) (smch_isla216p2,  \
-                            &param);                                               \
-                    serr |= ((smch_isla216p_func_fp) write_func) (smch_isla216p3,  \
+                    serr = ((smch_isla216p_func_fp) write_func) (smch_isla216p, \
                             &param);                                               \
                     if (serr != SMCH_SUCCESS) {                                    \
                         err = -FMC250M_4CH_ERR;                                    \
@@ -727,9 +712,27 @@ static smch_err_e smch_isla216p_test_mode_compat (smch_isla216p_t *self,
     return smch_isla216p_set_test_mode (self, test_mode);
 }
 
-FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode)
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode0)
 {
-    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, /* No read function */,
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 0, /* No read function */,
+            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode1)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 1, /* No read function */,
+            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode2)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 2, /* No read function */,
+            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode3)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 3, /* No read function */,
             smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
 }
 
@@ -786,7 +789,10 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     FMC250M_4CH_SI571_FUNC_NAME(get_defaults),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_div_adcs),
-    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode0),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode1),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode2),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode3),
     NULL
 };
 
