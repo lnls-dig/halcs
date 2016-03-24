@@ -61,15 +61,8 @@ smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
     self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, SMPR_SPI, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
-    spi_proto_args_t spi_args = {
-        .sys_freq = SM_PR_SPI_DFLT_SYS_FREQ,
-        .spi_freq = SM_PR_SPI_DFLT_SPI_FREQ,
-        .init_config = SM_PR_SPI_DFLT_SPI_CONFIG,
-        .bidir = true
-    };
-
     /* Initalize the SPI protocol */
-    int smpr_err = smpr_open (self->spi, base, &spi_args);
+    int smpr_err = smpr_open (self->spi, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
     self->ss = ss;
 
@@ -136,7 +129,39 @@ smch_err_e smch_isla216p_set_test_mode (smch_isla216p_t *self, uint8_t mode)
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to TESTIO register",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
+    SMCH_ISLA216P_WAIT_DFLT;
+
 err_smpr_write:
+err_smpr_read:
+    return err;
+}
+
+smch_err_e smch_isla216p_get_chipid (smch_isla216p_t *self, uint8_t *chipid)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_CHIPID, chipid);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not read from CHIPID register",
+            err_smpr_read, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+err_smpr_read:
+    return err;
+}
+
+smch_err_e smch_isla216p_get_chipver (smch_isla216p_t *self, uint8_t *chipver)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_CHIPVER, chipver);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not read from CHIPVER register",
+            err_smpr_read, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
 err_smpr_read:
     return err;
 }
@@ -148,9 +173,19 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
 
-    /* Reset registers,
-     * Turn on Long Instruction bit */
-    uint8_t data = ISLA216P_PORTCONFIG_SOFT_RESET;
+    /* Turn on Bidirectional SPI */
+    uint8_t data = ISLA216P_PORTCONFIG_SDO_ACTIVE;
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+#if 0
+    /* Reset registers */
+    data |= ISLA216P_PORTCONFIG_SOFT_RESET;
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
@@ -162,6 +197,7 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
+#endif
 
 err_smpr_write:
     return err;
