@@ -696,7 +696,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
 
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO DBE EPICS IOC for "
                     "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_port_c);
-            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
+            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-f", "-n", epics_hostname, "-i",
                 "^D^C", telnet_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
                 NULL};
             int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);
@@ -721,7 +721,7 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
 
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawing DEVIO AFE EPICS IOC for "
                     "board %u, bpm %u, telnet port %s\n", dev_id, j, telnet_afe_port_c);
-            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-n", epics_hostname, "-i",
+            char *argv_exec [] = {EPICS_PROCSERV_NAME, "-f", "-n", epics_hostname, "-i",
                 "^D^C", telnet_afe_port_c, EPICS_BPM_RUN_SCRIPT_NAME, broker_endp, bpm_id_c,
                 NULL};
             int child_devio_cfg_pid = devio_spawn_chld (devio, EPICS_PROCSERV_NAME, argv_exec);

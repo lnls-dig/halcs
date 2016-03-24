@@ -10,6 +10,7 @@
 
 #define SMIO_AD9510_HANDLER(smio_handler) ((smch_ad9510_t *) smio_handler->smch_ad9510)
 #define SMIO_SI57X_HANDLER(smio_handler) ((smch_si57x_t *) smio_handler->smch_si571)
+#define SMIO_ISLA216P_HANDLER(smio_handler, inst) ((smch_isla216p_t *) smio_handler->smch_isla216p_adc[inst])
 
 /* The follosing codes were generated via the following command:
  * > echo FMC250M_4CH_ACTIVE | md5sum | cut -c 1-8
@@ -33,8 +34,8 @@ typedef struct {
     fmc250m_4ch_type_e type;                /* FMC250M_4CH type */
 #if 0
     smch_amc7823_t *smch_amc7823;           /* AMC7823 chip handler */
-    smch_isla216p_t *smch_isla216p;         /* ISLA216P chip handler */
 #endif
+    smch_isla216p_t *smch_isla216p_adc[NUM_FMC250M_4CH_ISLA216P];    /* ISLA216P chip handlers */
     smch_ad9510_t *smch_ad9510;             /* AD9510 chip handler */
     smch_si57x_t *smch_si571;               /* SI571 chip handler */
     smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */

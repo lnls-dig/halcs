@@ -13,8 +13,6 @@
  */
 
 #include "bpm_server.h"
-/* private headers */
-#include "sm_pr_i2c_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

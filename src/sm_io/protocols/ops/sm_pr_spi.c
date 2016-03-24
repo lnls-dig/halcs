@@ -15,8 +15,6 @@
  */
 
 #include "bpm_server.h"
-/* private headers */
-#include "sm_pr_spi_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -295,27 +293,6 @@ static smpr_err_e _spi_init (smpr_t *self)
             err_exit, SMPR_ERR_RW_SMIO);
 #endif
 
-    uint32_t bidir = spi_proto->bidir;
-    /* Configure BIDIR register */
-    DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] SPI bidir register = 0x%08X\n", bidir);
-    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CFG_BIDIR, /* field = NULL */,
-            MULT_BIT_PARAM, /* value */ bidir, /* min */, /* max */,
-            NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_OK, "Could not set bidir parameter", err_exit,
-            SMPR_ERR_RW_SMIO);
-
-#ifdef SM_PR_READBACK
-    /* Readback test */
-    uint32_t bidir_rb;
-    smio_thsafe_client_read_32 (parent, spi_proto->base | SPI_PROTO_REG_CFG_BIDIR,
-            &bidir_rb);
-    DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] SPI bidir readback value = 0x%08X\n", bidir_rb);
-    ASSERT_TEST(bidir_rb == bidir, "[sm_pr:spi] SPI Bidirectional readback failed",
-            err_exit, SMPR_ERR_RW_SMIO);
-#endif
-
 err_exit:
 err_proto_handler:
     return err;
@@ -331,7 +308,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     ssize_t num_bytes = 0;
     RW_REPLY_TYPE rw_err = RW_OK;
     ASSERT_TEST(size > 0 && size*SMPR_BYTE_2_BIT /* bits */ <
-            SPI_PROTO_CTRL_CHAR_LEN_MASK+1+1, "Invalid size for spi transfer",
+            SPI_PROTO_CTRL_CHARLEN_MASK+1+1, "Invalid size for spi transfer",
             err_inv_size, -1);
 
     smio_t *parent = smpr_get_parent (self);
@@ -364,13 +341,26 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         charlen = 0;
     }
 
-    rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, CHAR_LEN,
-            MULT_BIT_PARAM, /* value */ charlen, /* min */ , /* max */,
-            NO_CHK_FUNC, SET_FIELD);
-    ASSERT_TEST(rw_err == RW_OK, "Could not set CHAR_LEN parameter", err_exit, -1);
+    /* If we are using the reguler four-mode SPI, the character length register
+     * used if the regular SPI_PROTO_REG_CTRL. Otherwise, it is the 7 LSB of
+     * SPI_PROTO_REG_CFG_BIDIR */
+    if (!spi_proto->bidir) {
+        rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CTRL, CHARLEN,
+                MULT_BIT_PARAM, /* value */ charlen, /* min */ , /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+    }
+    else {
+        rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CFG_BIDIR, CHARLEN,
+                MULT_BIT_PARAM, /* value */ charlen, /* min */ , /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+        rw_err |= SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, CFG_BIDIR, EN,
+                SINGLE_BIT_PARAM, /* value */ 0x1, /* min */ , /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+    }
+    ASSERT_TEST(rw_err == RW_OK, "Could not set CHARLEN/BIDIR parameter", err_exit, -1);
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:spi] _spi_rw_generic: Charecter Length = 0x%08X\n",
-            charlen);
+            "[sm_pr:spi] _spi_rw_generic: Charecter Length = 0x%08X, Bidir = 0x%08X\n",
+            charlen, spi_proto->bidir);
 
     /* Write data to TX regs */
     if (mode == SPI_MODE_WRITE || mode == SPI_MODE_WRITE_READ) {
@@ -433,15 +423,19 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     /* Read data from RX regsiters */
     uint32_t i;
     uint8_t data_read[SPI_PROTO_REG_RXTX_NUM * SMPR_WB_REG_2_BYTE] = {0};
+    /* If we are using Bidirectional SPI, the receved data is located on base address 
+     * SPI_PROTO_REG_RX0. Otherwise, the data is on a different register 
+     * SPI_PROTO_REG_RX0_SINGLE */
+    uint32_t read_base_addr = (spi_proto->bidir) ? SPI_PROTO_REG_RX0 : SPI_PROTO_REG_RX0_SINGLE;
     /* We read 32-bit at a time */
     for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Reading from RX%u\n", i);
         /* As the RXs are just a single register, we write using the SMIO
          * functions directly */
-        num_bytes = smio_thsafe_client_read_32 (parent,
-                (spi_proto->base | SPI_PROTO_REG_RX0_SINGLE) + SMPR_WB_REG_2_BYTE*i,
-                (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
+            num_bytes = smio_thsafe_client_read_32 (parent,
+                    (spi_proto->base | read_base_addr) + SMPR_WB_REG_2_BYTE*i,
+                    (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Read 0x%08X from RX%u\n",
                 *((uint32_t *) (data_read + SMPR_WB_REG_2_BYTE*i)), i);

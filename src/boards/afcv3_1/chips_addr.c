@@ -29,8 +29,8 @@ const uint32_t fmc250m_4ch_24aa64_addr[NUM_FMC250M_4CH_SMIOS] = {0x50, 0x52};
 
 const uint32_t fmc250m_4ch_amc7823_addr[NUM_FMC250M_4CH_SMIOS] = {0x01, 0x01};
 const uint32_t fmc250m_4ch_isla216p_addr[NUM_FMC250M_4CH_SMIOS][NUM_FMC250M_4CH_ISLA216P] = {
-        {0x01, 0x02, 0x03, 0x04},
-        {0x01, 0x02, 0x03, 0x04},
+        {0x01, 0x02, 0x04, 0x08},
+        {0x01, 0x02, 0x04, 0x08},
 };
 /* This CI PCA9547 is located on the carrier, but it's controlled by the FMC250M_4CH */
 const uint32_t fmc250m_4ch_pca9547_addr[NUM_FMC250M_4CH_SMIOS] = {0x70, 0x70};

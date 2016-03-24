@@ -49,6 +49,25 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     ASSERT_TEST(inst_id < NUM_FMC250M_4CH_SMIOS, "Number of FMC250M_4CH SMIOs instances exceeded",
             err_num_fmc250m_4ch_smios);
 
+    /* Setup ISLA216P ADC SPI communication */
+    uint32_t i;
+    for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        self->smch_isla216p_adc[i] = NULL;
+        self->smch_isla216p_adc[i] = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 
+            fmc250m_4ch_isla216p_addr[inst_id][i], 0);
+        ASSERT_ALLOC(self->smch_isla216p_adc[i], err_smch_isla216p_adc);
+    
+        uint8_t chipid = 0;
+        uint8_t chipver = 0;
+    
+        /* Read ISLA216P ID */
+        smch_isla216p_get_chipid (self->smch_isla216p_adc[i], &chipid);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPID: 0x%02X\n", chipid);
+        /* Read ISLA216P Version */
+        smch_isla216p_get_chipver (self->smch_isla216p_adc[i], &chipver);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPVER: 0x%02X\n", chipver);
+    }
+
     /* FMC250M_4CH isntance 0 is the one controlling this CI */
     /* FIXME: This breaks generality for this class */
     if (inst_id == 0) {
@@ -56,6 +75,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
                 " addr: 0x%08X, Inst ID: %u\n", fmc250m_4ch_pca9547_addr[inst_id],
                 inst_id);
         /* FPGA I2C Switch */
+#if 0
         self->smch_pca9547 = smch_pca9547_new (parent, FMC_250M_EEPROM_I2C_OFFS,
                 fmc250m_4ch_pca9547_addr[inst_id], 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
@@ -64,15 +84,21 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
         smch_pca9547_en_chan (self->smch_pca9547, FMC250M_4CH_DFLT_PCA9547_CFG);
     }
     else {
+#endif
         self->smch_pca9547 = NULL;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_core] 24AA64 initializing, "
             "addr: 0x%08X, Inst ID: %u\n", fmc250m_4ch_24aa64_addr[inst_id],
             inst_id);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
+            "[sm_io:fmc250m_4ch_core] pre new EEPROM 24AA64 data: 0x%08X\n", 0);
+#if 0
     /* EEPROM  is on the same I2C bus as the LM75A */
     self->smch_24aa64 = smch_24aa64_new (parent, FMC_250M_EEPROM_I2C_OFFS,
             fmc250m_4ch_24aa64_addr[inst_id], 0);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
+            "[sm_io:fmc250m_4ch_core] post new 24AA64 data: 0x%08X\n", 0);
     ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
 
     uint32_t data_24aa64;
@@ -98,16 +124,19 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     ASSERT_TEST(data_24aa64_rb == data_24aa64, "[sm_io:fmc250m_4ch_core] EEPROM 24AA64 readback failed",
             err_smch_ad9510_alloc);
 #endif
-
     /* Read EEPROM */
     data_24aa64 = 0x0;
     smch_24aa64_read_block (self->smch_24aa64, FMC250M_4CH_EEPROM_START_ADDR,
             &data_24aa64, sizeof (data_24aa64));
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
             "[sm_io:fmc250m_4ch_core] EEPROM 24AA64 data: 0x%08X\n", data_24aa64);
+#endif
 
     /* Determine the type of the FMC250M_4CH board */
+#if 0
     _smio_fmc250m_4ch_set_type (self, data_24aa64);
+#endif
+    _smio_fmc250m_4ch_set_type (self, 0x0);
 
     /* Now, initialize the FMC250M_4CH with the appropriate structures*/
     if (self->type == TYPE_FMC250M_4CH_ACTIVE) {
@@ -145,11 +174,19 @@ err_smch_si571_alloc:
     }
 err_smch_ad9510_alloc:
     smch_24aa64_destroy (&self->smch_24aa64);
+#if 0
 err_smch_24aa64_alloc:
+#endif
     if (self->smch_pca9547 != NULL) {
         smch_pca9547_destroy (&self->smch_pca9547);
     }
+#if 0
 err_smch_pca9547_alloc:
+#endif
+err_smch_isla216p_adc:
+    for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        smch_isla216p_destroy (&self->smch_isla216p_adc[i]);
+    }
 err_num_fmc250m_4ch_smios:
     free (self);
 err_self_alloc:
@@ -203,7 +240,8 @@ static smio_err_e _smio_fmc250m_4ch_set_type (smio_fmc250m_4ch_t *self,
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
                 "[sm_io:fmc250m_4ch_core] Found Undefined FMC250M_4CH board\n");
             err = SMIO_ERR_WRONG_PARAM;
-            type = TYPE_FMC250M_4CH_UNDEF;
+//            type = TYPE_FMC250M_4CH_UNDEF;
+            type = TYPE_FMC250M_4CH_ACTIVE;
     }
 
     self->type = type;

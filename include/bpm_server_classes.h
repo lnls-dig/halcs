@@ -86,6 +86,8 @@ typedef struct _smch_pca9547_t smch_pca9547_t;
 typedef struct _smch_si57x_t smch_si57x_t;
 /* Opaque sm_ch_rffe_t structure */
 typedef struct _smch_rffe_t smch_rffe_t;
+/* Opaque sm_ch_isla216p_t structure */
+typedef struct _smch_isla216p_t smch_isla216p_t;
 
 /* Forward smio_err_e declaration enumeration */
 typedef enum _smio_err_e smio_err_e;
@@ -119,10 +121,13 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "sm_pr_spi.h"
 #include "hw/wb_spi_regs.h"
 #include "protocols/smpr_spi_regs.h"
+#include "protocols/sm_pr_spi_defaults.h"
 #include "sm_pr_i2c.h"
 #include "hw/wb_i2c_regs.h"
 #include "protocols/smpr_i2c_regs.h"
+#include "protocols/sm_pr_i2c_defaults.h"
 #include "sm_pr_bsmp.h"
+#include "protocols/sm_pr_bsmp_defaults.h"
 
 /* SM_CH */
 #include "sm_ch_err.h"
@@ -130,11 +135,17 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "chips/e24aa64_regs.h"
 #include "sm_ch_ad9510.h"
 #include "chips/ad9510_regs.h"
+#include "chips/sm_ch_ad9510_defaults.h"
 #include "sm_ch_pca9547.h"
 #include "chips/pca9547_regs.h"
 #include "sm_ch_si57x.h"
 #include "chips/si57x_regs.h"
+#include "chips/sm_ch_si57x_defaults.h"
+#include "sm_ch_isla216p.h"
+#include "chips/isla216p_regs.h"
+#include "chips/sm_ch_isla216p_defaults.h"
 #include "sm_ch_rffe.h"
+#include "chips/sm_ch_rffe_defaults.h"
 
 /* SM_IO */
 #include "sm_io_err.h"
