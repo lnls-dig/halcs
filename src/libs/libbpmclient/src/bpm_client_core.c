@@ -883,10 +883,28 @@ PARAM_FUNC_CLIENT_READ(rst_div_adcs)
 }
 
 /* ISLA216P Test modes */
-PARAM_FUNC_CLIENT_WRITE(test_mode)
+PARAM_FUNC_CLIENT_WRITE(test_mode0)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE,
-            test_mode);
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE0,
+            test_mode0);
+}
+
+PARAM_FUNC_CLIENT_WRITE(test_mode1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE1,
+            test_mode1);
+}
+
+PARAM_FUNC_CLIENT_WRITE(test_mode2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE2,
+            test_mode2);
+}
+
+PARAM_FUNC_CLIENT_WRITE(test_mode3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE3,
+            test_mode3);
 }
 
 /****************** ACQ SMIO Functions ****************/
