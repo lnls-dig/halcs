@@ -30,6 +30,9 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
+#define SMIO_POLLER_TIMEOUT                100        /* in msec */
+#define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
+
 /* Main class object that every sm_io must implement */
 struct _smio_t {
     uint32_t id;                        /* Unique identifier for this sm_io type. This must be
@@ -48,6 +51,7 @@ struct _smio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
+    int timer_id;                       /* Timer ID */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -76,6 +80,7 @@ static char *_smio_clone_name (smio_t *self);
 
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
+static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
@@ -105,6 +110,12 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
 
+    /* Set loop timeout. This is needed to ensure zloop will
+     * frequently check for rebuilding its poll set */
+    self->timer_id = zloop_timer (self->loop, SMIO_POLLER_TIMEOUT, SMIO_POLLER_NTIMES, 
+        _smio_handle_timer, NULL);
+    ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
+
     /* Initialize SMIO base address */
     self->base = args->base;
 
@@ -123,6 +134,8 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
+    zloop_timer_end (self->loop, self->timer_id);
+err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
     zsock_destroy (&self->pipe_msg);
@@ -143,6 +156,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
+        zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_msg);
         zsock_destroy (&self->pipe_mgmt);
@@ -200,6 +214,16 @@ static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
 err_zloop_reader:
 err_zsock_is:
     return err;
+}
+
+/* zloop handler for timer */
+static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
+{
+    (void) loop;
+    (void) timer_id;
+    (void) arg;
+
+    return 0;
 }
 
 /* zloop handler for CFG PIPE */
