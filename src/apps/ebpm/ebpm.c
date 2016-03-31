@@ -436,6 +436,25 @@ int main (int argc, char *argv[])
         goto err_cfg_get_hints;
     }
 
+    /*  Start DEVIO loop */
+
+    /* Step 1: Loop though all the SDB records and intialize (boot) the
+     * smio modules*/
+    /* Step 2: Optionally, register the necessary smio modules specifying
+     * its ID and calling devio_register_sm */
+    /* Step 3: Poll all PIPE's sockets to determine if we have something to
+     * handle, like messages from smios */
+    /*      Step 3.5: If we do, call devio_handle_smio () and treat its
+     *      request as appropriate */
+    zactor_t *server = zactor_new (devio_loop, devio);
+    if (server == NULL) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not spawn "
+                "server\n");
+        goto err_server;
+    }
+
+    /* TODO: Implement and Send SPAWN messages to spawn SMIOs */
+
     /* Spawn associated DEVIOs */
     devio_err_e err = _spawn_assoc_devios (devio, dev_id, devio_type,
             cfg_file, broker_endp, log_prefix, devio_hints);
@@ -456,23 +475,23 @@ int main (int argc, char *argv[])
         goto err_devio;
     }
 
-    /* Step 1: Loop though all the SDB records and intialize (boot) the
-     * smio modules*/
-    /* Step 2: Optionally, register the necessary smio modules specifying
-     * its ID and calling devio_register_sm */
-    /* Step 3: Poll all PIPE's sockets to determine if we have something to
-     * handle, like messages from smios */
-    /*      Step 3.5: If we do, call devio_handle_smio () and treat its
-     *      request as appropriate */
-    err = devio_loop (devio);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_loop error: %s\n",
-                devio_err_str (err));
-        goto err_devio;
+    /*  Accept and print any message back from server */
+    while (true) {
+        char *message = zstr_recv (server);
+        if (message) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] %s\n", message);
+            free (message);
+        }
+        else {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[ebpm] Interrupted\n");
+            break;
+        }
     }
 
 err_devio:
 err_assoc_devio:
+    zactor_destroy (&server);
+err_server:
 err_cfg_get_hints:
     zconfig_destroy (&root_cfg);
 err_cfg_load:
