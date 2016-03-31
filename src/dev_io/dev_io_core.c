@@ -34,6 +34,7 @@
 
 #define LLIO_STR                            ":LLIO\0"
 #define DEVIO_POLLER_TIMEOUT                100        /* in msec */
+#define DEVIO_POLLER_NTIMES                 0          /* 0 for infinte */
 #define DEVIO_POLLER_CONFIG_TIMEOUT         0          /* in msec */
 #define DEVIO_DFLT_LOG_MODE                 "w"
 
@@ -53,6 +54,7 @@ struct _devio_t {
     char *log_file;                     /* Log filename for tracing and debugging */
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
+    int timer_id;                       /* Timer ID */
 
     /* General management operations */
     devio_ops_t *ops;
@@ -101,6 +103,7 @@ static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self
         uint32_t smio_id);
 static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
         zloop_reader_fn handler);
+static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
@@ -163,6 +166,12 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     /* Setup loop */
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
+
+    /* Set loop timeout. This is needed to ensure zloop will
+     * frequently check for rebuilding its poll set */
+    self->timer_id = zloop_timer (self->loop, DEVIO_POLLER_TIMEOUT, DEVIO_POLLER_NTIMES, 
+        _devio_handle_timer, NULL);
+    ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
 
     /* Setup strings/options */
     self->name = strdup (name);
@@ -269,6 +278,8 @@ err_ops_alloc:
 err_endp_broker_alloc:
     free (self->name);
 err_name_alloc:
+    zloop_timer_end (self->loop, self->timer_id);
+err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
     free (self->pipes_config);
@@ -338,6 +349,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->name);
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying loop\n");
+        zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
 
         if (self->pipe) {
@@ -492,6 +504,16 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
 err_zloop_reader:
 err_zsock_is:
     return err;
+}
+
+/* zloop handler for timer */
+static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
+{
+    (void) loop;
+    (void) timer_id;
+    (void) arg;
+
+    return 0;
 }
 
 /* zloop handler for MSG PIPE */
