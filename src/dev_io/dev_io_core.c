@@ -729,13 +729,6 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
             err_pipe_hash_insert);
 
-#if 0
-    /* Add actor to message poll */
-    zerr = zpoller_add (self->poller, self->pipes_msg [pipe_msg_idx]);
-    ASSERT_TEST (zerr == 0, "Could not insert PIPE into poller",
-            err_poller_insert);
-#endif
-
     /* Register socket handlers */
     err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx],
         _devio_handle_pipe_msg);
@@ -772,13 +765,6 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
      * thread otherwise */
     ASSERT_TEST (zerr == 0, "Could not insert Config PIPE hash key. Duplicated value?",
             err_cfg_pipe_hash_insert);
-
-#if 0
-    /* Add actor to config poll */
-    zerr = zpoller_add (self->poller_config, self->pipes_config [pipe_config_idx]);
-    ASSERT_TEST (zerr == 0, "Could not insert PIPE into Config poller",
-            err_poller_config_insert);
-#endif
 
     /* Register socket handlers */
     err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
