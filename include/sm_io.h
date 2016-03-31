@@ -28,19 +28,19 @@ extern "C" {
         (local_err != SMIO_ERR_FUNC_NOT_IMPL) ? local_err : SMIO_SUCCESS; \
     })
 
-#define SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, ...)      \
+#define SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, smio_mod_handler, ...)      \
     ({                                                      \
         volatile const smio_mod_dispatch_t *smio_mod_dispatch = &_smio_mod_dispatch; \
         smio_err_e local_err = SMIO_ERR_FUNC_NOT_IMPL;      \
-        if (smio_mod_dispatch[th_args->smio_id].bootstrap_ops && \
-                smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name) { \
-            local_err = smio_mod_dispatch[th_args->smio_id].bootstrap_ops->func_name (__VA_ARGS__);  \
+        if (smio_mod_handler->bootstrap_ops && \
+                smio_mod_handler->bootstrap_ops->func_name) { \
+            local_err = smio_mod_handler->bootstrap_ops->func_name (__VA_ARGS__);  \
         }                                                   \
         local_err;                                          \
     })
 
-#define SMIO_DISPATCH_FUNC_WRAPPER(func_name, ...)          \
-    SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, self, ## __VA_ARGS__)
+#define SMIO_DISPATCH_FUNC_WRAPPER(func_name, smio_mod_handler, ...)          \
+    SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, smio_mod_handler, self, ## __VA_ARGS__)
 
 /* Attach an instance of sm_io to dev_io function pointer */
 typedef smio_err_e (*attach_fp)(smio_t *self, devio_t *parent);
@@ -106,14 +106,14 @@ typedef struct {
 
 /* Thread boot args structure */
 typedef struct {
-    struct _devio_t *parent;        /* Pointer back to devo parent */
-    uint32_t smio_id;               /* ID of the SMIO instance */
-    zsock_t *pipe_msg;              /* Message PIPE to actor */
-    char *broker;                   /* Endpoint to connect to broker */
-    char *service;                  /* (part of) the service name to be exported */
-    int verbose;                    /* Print trace information to stdout*/
-    uint64_t base;                  /* SMIO base address */
-    uint32_t inst_id;               /* SMIO instance ID */
+    struct _devio_t *parent;                                    /* Pointer back to devo parent */
+    volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
+    zsock_t *pipe_msg;                                          /* Message PIPE to actor */
+    char *broker;                                               /* Endpoint to connect to broker */
+    char *service;                                              /* (part of) the service name to be exported */
+    int verbose;                                                /* Print trace information to stdout*/
+    uint64_t base;                                              /* SMIO base address */
+    uint32_t inst_id;                                           /* SMIO instance ID */
 } th_boot_args_t;
 
 /***************** Our methods *****************/
