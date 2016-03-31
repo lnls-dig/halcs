@@ -30,8 +30,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
-#define SMIO_POLLER_TIMEOUT         100        /* in msec */
-
 /* Main class object that every sm_io must implement */
 struct _smio_t {
     uint32_t id;                        /* Unique identifier for this sm_io type. This must be
@@ -47,8 +45,10 @@ struct _smio_t {
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
+    zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
+    zsock_t *pipe;                      /* Pipe back to smio_bootstrap */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -75,6 +75,9 @@ static smio_err_e _smio_set_name (smio_t *self, const char *name);
 static const char *_smio_get_name (smio_t *self);
 static char *_smio_clone_name (smio_t *self);
 
+static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
+        zloop_reader_fn handler);
+
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
         zsock_t *pipe_msg, char *service)
@@ -97,7 +100,12 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->pipe_mgmt = pipe_mgmt;
     self->pipe_msg = pipe_msg;
+    self->pipe = NULL;
     self->inst_id = args->inst_id;
+
+    /* Setup loop */
+    self->loop = zloop_new ();
+    ASSERT_ALLOC(self->loop, err_loop_alloc);
 
     /* Initialize SMIO base address */
     self->base = args->base;
@@ -117,6 +125,8 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
+    zloop_destroy (&self->loop);
+err_loop_alloc:
     zsock_destroy (&self->pipe_msg);
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
@@ -135,7 +145,14 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
+        zloop_destroy (&self->loop);
+
+        if (self->pipe) {
+            zsock_destroy (&self->pipe);
+        }
+
         zsock_destroy (&self->pipe_msg);
+        zsock_destroy (&self->pipe_mgmt);
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
@@ -150,98 +167,128 @@ smio_err_e smio_destroy (smio_t **self_p)
     return SMIO_SUCCESS;
 }
 
-smio_err_e smio_loop (smio_t *self)
+/* From Malamute https://github.com/zeromq/malamute/blob/master/src/mlm_server_engine.inc
+ *
+ * Poll actor or zsock for activity, invoke handler on any received
+ * message. Handler must be a CZMQ zloop_fn function; receives server
+ * as arg. */
+
+static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
+        zloop_reader_fn handler)
 {
-    assert (self);
-
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-            "[sm_io_bootstrap] Main loop starting\n");
-
     smio_err_e err = SMIO_SUCCESS;
 
-    /* We send/recv messages through MLM msgpipe */
-    zsock_t *worker_msgpipe = mlm_client_msgpipe (self->worker);
-    ASSERT_TEST (worker_msgpipe != NULL, "Invalid WORKER socket reference",
-            err_inv_worker_socket, SMIO_ERR_INV_SOCKET);
-    zpoller_t *poller = zpoller_new (worker_msgpipe, self->pipe_mgmt, NULL);
-    ASSERT_TEST (poller != NULL, "Could not Initialize poller",
-            err_init_poller, SMIO_ERR_INV_SOCKET);
+    if (smio) {
+        smio_t *self = (smio_t *) smio;
 
-    /* Begin infinite polling on Malamute/PIPE socket
-     * and exit if the parent send a message through
-     * the pipe socket */
-    bool terminated = false;
-    while (!zsys_interrupted && !terminated) {
-        /* Poll Message sockets */
-        zsock_t *which = zpoller_wait (poller, SMIO_POLLER_TIMEOUT);
-        ASSERT_TEST(which != NULL || zpoller_expired (poller),
-                "_smio_loop: poller interrupted", err_poller_interrupted,
-                SMIO_ERR_INTERRUPTED_POLLER);
-
-            /* Check for activity on WORKER socket */
-        if (which == worker_msgpipe) {
-            zmsg_t *request = mlm_client_recv (self->worker);
-
-            if (request == NULL) {
-                err = SMIO_ERR_INTERRUPTED_POLLER;
-                break;                          /* Worker has been interrupted */
-            }
-
-            exp_msg_zmq_t smio_args = {
-                .tag = EXP_MSG_ZMQ_TAG,
-                .msg = &request,
-                .reply_to = NULL /* Unused field in MLM protocol */
-            };
-            err = smio_do_op (self, &smio_args);
-
-            /* What can I do in case of error ?*/
-            if (err != SMIO_SUCCESS) {
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                        "[sm_io_bootstrap] smio_do_op: %s\n",
-                        smio_err_str (err));
-            }
-
-            /* Cleanup */
-            zmsg_destroy (&request);
+        /*  Resolve zactor_t -> zsock_t */
+        if (zactor_is (sock)) {
+            sock = zactor_sock ((zactor_t *) sock);
         }
-        /* Check for activity on PIPE socket */
-        else if (which == self->pipe_mgmt) {
-            zmsg_t *request = zmsg_recv (self->pipe_mgmt);
+        else {
+            /* Socket reference must be of type zsock */
+            ASSERT_TEST(zsock_is (sock), "Invalid socket reference",
+                    err_zsock_is, SMIO_ERR_INV_SOCKET);
+        }
 
-            if (request == NULL) {
-                err = SMIO_ERR_INTERRUPTED_POLLER;
-                break;                          /* Worker has been interrupted */
-            }
-
-            char *command = zmsg_popstr (request);
-            /* A $TERM message on this means to self-destruct */
-            if (streq (command, "$TERM")) {
-                /* Destroy SMIO instance. As we already do this on the main
-                 * smio_startup (), we just need to exit this cleanly */
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
-                        "[sm_io_bootstrap] Received shutdown message on "
-                        "PIPE socket. Exiting.\n");
-                terminated = true;
-            }
-            /* Invalid message received. Log the error, but continue normally */
-            else {
-                DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
-                        "[sm_io_bootstrap]  Invalid message received on PIPE "
-                        "socket.\n");
-                err = SMIO_ERR_BAD_MSG;
-                goto err_pipe_mgmt_bad_msg;
-            }
-
-err_pipe_mgmt_bad_msg:
-            free (command);
-            zmsg_destroy (&request);
+        if (handler != NULL) {
+            /* Register handler "handler "to socket "sock" and pass argument
+             * "self" to the handler */
+            int rc = zloop_reader (self->loop, (zsock_t *) sock, handler, self);
+            ASSERT_TEST(rc == 0, "Could not register zloop_reader",
+                    err_zloop_reader, SMIO_ERR_ALLOC);
+            zloop_reader_set_tolerant (self->loop, (zsock_t *) sock);
+        }
+        else {
+            zloop_reader_end (self->loop, (zsock_t *) sock);
         }
     }
 
-err_poller_interrupted:
-    zpoller_destroy (&poller);
-err_init_poller:
-err_inv_worker_socket:
+err_zloop_reader:
+err_zsock_is:
+    return err;
+}
+
+/* zloop handler for CFG PIPE */
+static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
+{
+    (void) loop;
+
+    char *command = NULL;
+    /* We expect a smio instance e as reference */
+    smio_t *smio = (smio_t *) args;
+    (void) smio;
+
+    /* Receive message */
+    zmsg_t *recv_msg = zmsg_recv (reader);
+    if (recv_msg == NULL) {
+        return -1; /* Interrupted */
+    }
+
+    command = zmsg_popstr (recv_msg);
+    if (streq (command, "$TERM")) {
+        /* Shutdown the engine */
+        free (command);
+        zmsg_destroy (&recv_msg);
+        return -1;
+    }
+
+    /* Invalid message received. Discard message and continue normally */
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
+            "received an invalid command\n");
+    zmsg_destroy (&recv_msg);
+    return 0;
+}
+
+/* zloop handler for MSG PIPE */
+static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
+{
+    (void) loop;
+    smio_err_e err = SMIO_SUCCESS;
+    /* We expect a smio instance e as reference */
+    smio_t *smio = (smio_t *) args;
+
+    /* We process as many messages as we can, to reduce the overhead
+     * of polling and the reactor */
+    while (zsock_events (reader) & ZMQ_POLLIN) {
+        zmsg_t *recv_msg = mlm_client_recv (smio->worker);
+        if (recv_msg == NULL) {
+            return -1; /* Interrupted */
+        }
+
+        exp_msg_zmq_t smio_args = {
+            .tag = EXP_MSG_ZMQ_TAG,
+            .msg = &recv_msg,
+            .reply_to = NULL /* Unused field in MLM protocol */
+        };
+        err = smio_do_op (smio, &smio_args);
+
+        /* What can I do in case of error ?*/
+        if (err != SMIO_SUCCESS) {
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                    "[sm_io_bootstrap] smio_do_op: %s\n",
+                    smio_err_str (err));
+        }
+
+        /* Cleanup */
+        zmsg_destroy (&recv_msg);
+    }
+
+    return 0;
+}
+
+smio_err_e smio_loop (smio_t *self)
+{
+    assert (self);
+    smio_err_e err = SMIO_SUCCESS;
+
+    /* Set-up server register commands handler */
+    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
+    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_pipe_msg);
+
+    /* Run reactor until there's a termination signal */
+    zloop_start (self->loop);
+
     return err;
 }
 
