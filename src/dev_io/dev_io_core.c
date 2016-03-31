@@ -169,7 +169,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     /* Set loop timeout. This is needed to ensure zloop will
      * frequently check for rebuilding its poll set */
-    self->timer_id = zloop_timer (self->loop, DEVIO_POLLER_TIMEOUT, DEVIO_POLLER_NTIMES, 
+    self->timer_id = zloop_timer (self->loop, DEVIO_POLLER_TIMEOUT, DEVIO_POLLER_NTIMES,
         _devio_handle_timer, NULL);
     ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
 
@@ -700,6 +700,12 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     ASSERT_TEST (self->pipes_msg [pipe_msg_idx] != NULL, "Could not create message PIPE",
             err_create_pipe_msg);
 
+    /* Register socket handlers */
+    err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx],
+        _devio_handle_pipe_msg);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
+            err_pipes_msg_handle);
+
     /* Alloacate thread arguments struct and pass it to the
      * thread. It is the responsability of the calling thread
      * to clear this structure after using it! */
@@ -729,14 +735,14 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     ASSERT_TEST (zerr == 0, "Could not insert PIPE hash key. Duplicated value?",
             err_pipe_hash_insert);
 
-    /* Register socket handlers */
-    err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx],
-        _devio_handle_pipe_msg);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
-            err_pipes_msg_handle);
-
     /* Configure default values of the recently created SMIO using the
      * bootstrap registered function config_defaults () */
+
+    /* Register socket handlers */
+    err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
+        _devio_handle_pipe_cfg);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
+            err_pipes_cfg_handle);
 
     /* Now, we create a short lived thread just to configure our SMIO */
     /* Allocate config thread arguments struct and pass it to the
@@ -766,20 +772,12 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     ASSERT_TEST (zerr == 0, "Could not insert Config PIPE hash key. Duplicated value?",
             err_cfg_pipe_hash_insert);
 
-    /* Register socket handlers */
-    err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
-        _devio_handle_pipe_cfg);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
-            err_pipes_cfg_handle);
-
     /* key is not needed anymore, as all the hashes have taken a copy of it */
     free (key);
     key = NULL;
 
     return DEVIO_SUCCESS;
 
-err_pipes_cfg_handle:
-    zhashx_delete (self->sm_io_cfg_h, key);
 err_cfg_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
@@ -789,7 +787,7 @@ err_spawn_config_thread:
     free (th_config_args);
 err_th_config_args_alloc:
     _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx], NULL);
-err_pipes_msg_handle:
+err_pipes_cfg_handle:
     zhashx_delete (self->sm_io_h, key);
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
@@ -798,6 +796,8 @@ err_pipe_hash_insert:
 err_spawn_smio_thread:
     free (th_args);
 err_th_args_alloc:
+    _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx], NULL);
+err_pipes_msg_handle:
     zsock_destroy (&self->pipes_msg [pipe_msg_idx]);
     zsock_destroy (&pipe_msg_backend);
 err_create_pipe_msg:
