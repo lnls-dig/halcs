@@ -251,6 +251,8 @@ dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
 common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
                $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
 
+apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
+
 .SECONDEXPANSION:
 
 # Save a git repository description
@@ -263,6 +265,7 @@ OBJS_all = $(ll_io_OBJS) \
 	   $(msg_OBJS) \
 	   $(dev_mngr_OBJS) \
 	   $(common_app_OBJS) \
+	   $(apps_OBJS) \
 	   $(revision_OBJS)
 
 # Sources

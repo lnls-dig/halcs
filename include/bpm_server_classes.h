@@ -89,6 +89,9 @@ typedef struct _smch_rffe_t smch_rffe_t;
 /* Opaque sm_ch_isla216p_t structure */
 typedef struct _smch_isla216p_t smch_isla216p_t;
 
+
+/* Forward declaration smio_mod_dispatch_t declaration structure */
+typedef struct _smio_mod_dispatch_t smio_mod_dispatch_t;
 /* Forward smio_err_e declaration enumeration */
 typedef enum _smio_err_e smio_err_e;
 /* Opaque smio_t structure */

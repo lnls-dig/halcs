@@ -53,19 +53,19 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     uint32_t i;
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         self->smch_isla216p_adc[i] = NULL;
-        self->smch_isla216p_adc[i] = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS, 
+        self->smch_isla216p_adc[i] = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS,
             fmc250m_4ch_isla216p_addr[inst_id][i], 0);
         ASSERT_ALLOC(self->smch_isla216p_adc[i], err_smch_isla216p_adc);
-    
+
         uint8_t chipid = 0;
         uint8_t chipver = 0;
-    
+
         /* Read ISLA216P ID */
         smch_isla216p_get_chipid (self->smch_isla216p_adc[i], &chipid);
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPID: 0x%02X\n", chipid);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPID: 0x%02X\n", chipid);
         /* Read ISLA216P Version */
         smch_isla216p_get_chipver (self->smch_isla216p_adc[i], &chipver);
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPVER: 0x%02X\n", chipver);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPVER: 0x%02X\n", chipver);
     }
 
     /* FMC250M_4CH isntance 0 is the one controlling this CI */

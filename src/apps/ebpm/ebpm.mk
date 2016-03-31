@@ -15,6 +15,7 @@ endif
 ebpm_OUT += $(ebpm_cfg_OUT)
 
 ebpm_all_OUT = ebpm ebpm_cfg
+ebpm_all_OBJS = $(ebpm_OBJS) $(ebpm_cfg_OBJS)
 
 ebpm_LIBS = -lbsmp
 ebpm_STATIC_LIBS =
