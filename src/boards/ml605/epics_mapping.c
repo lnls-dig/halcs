@@ -35,8 +35,8 @@ const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER
      /* board, bpm */    /* bpm_id */
     /* 0, 0 (INVALID) */ {{-1},
     /* 0, 1 (INVALID) */  {-1}},
-    /* 1, 0           */ {{0},
-    /* 1, 1           */  {1}}
+    /* 1, 0           */ {{1},
+    /* 1, 1           */  {2}}
 };
 
 const board_epics_opts_t board_epics_opts[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT] = {
