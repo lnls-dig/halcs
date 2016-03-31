@@ -48,7 +48,6 @@ struct _smio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
-    zsock_t *pipe;                      /* Pipe back to smio_bootstrap */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -100,7 +99,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->pipe_mgmt = pipe_mgmt;
     self->pipe_msg = pipe_msg;
-    self->pipe = NULL;
     self->inst_id = args->inst_id;
 
     /* Setup loop */
@@ -146,11 +144,6 @@ smio_err_e smio_destroy (smio_t **self_p)
 
         mlm_client_destroy (&self->worker);
         zloop_destroy (&self->loop);
-
-        if (self->pipe) {
-            zsock_destroy (&self->pipe);
-        }
-
         zsock_destroy (&self->pipe_msg);
         zsock_destroy (&self->pipe_mgmt);
         disp_table_destroy (&self->exp_ops_dtable);
