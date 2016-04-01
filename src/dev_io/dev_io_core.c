@@ -796,12 +796,6 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     /* Configure default values of the recently created SMIO using the
      * bootstrap registered function config_defaults () */
 
-    /* Register socket handlers */
-    err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
-        _devio_handle_pipe_cfg);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
-            err_pipes_cfg_handle);
-
     /* Now, we create a short lived thread just to configure our SMIO */
     /* Allocate config thread arguments struct and pass it to the
      * thread. It is the responsability of the calling thread
@@ -834,8 +828,16 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     free (key);
     key = NULL;
 
+    /* Register socket handlers */
+    err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
+        _devio_handle_pipe_cfg);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
+            err_pipes_cfg_handle);
+
     return DEVIO_SUCCESS;
 
+err_pipes_cfg_handle:
+    zhashx_delete (self->sm_io_cfg_h, key);
 err_cfg_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
@@ -844,8 +846,6 @@ err_spawn_config_thread:
     /* FIXME: Destroy SMIO thread as we could configure it? */
     free (th_config_args);
 err_th_config_args_alloc:
-    _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx], NULL);
-err_pipes_cfg_handle:
     zhashx_delete (self->sm_io_h, key);
 err_pipe_hash_insert:
     /* If we can't insert the SMIO thread key in hash,
