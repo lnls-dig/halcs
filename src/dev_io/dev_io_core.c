@@ -33,7 +33,7 @@
             devio_err_str (err_type))
 
 #define LLIO_STR                            ":LLIO\0"
-#define DEVIO_POLLER_TIMEOUT                100        /* in msec */
+#define DEVIO_POLLER_TIMEOUT                100000     /* in msec */
 #define DEVIO_POLLER_NTIMES                 0          /* 0 for infinte */
 #define DEVIO_POLLER_CONFIG_TIMEOUT         0          /* in msec */
 #define DEVIO_DFLT_LOG_MODE                 "w"
@@ -47,6 +47,8 @@ struct _devio_t {
     zsock_t **pipes_msg;                /* Address nodes using this array of actors (Message PIPES) */
     zactor_t **pipes_config;            /* Address config actors using this array of actors (Config PIPES) */
     zsock_t *pipe;                      /* Address the DEVIO instance using this sock */
+    zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
+    zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     zloop_t *loop;                      /* Reactor for server sockets */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
@@ -104,6 +106,7 @@ static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self
 static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
         zloop_reader_fn handler);
 static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg);
+static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
@@ -163,6 +166,10 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     /* 0 nodes for now... */
     self->nnodes = 0;
 
+    /* Setup pipes for zloop interrupting */
+    self->pipe_frontend = zsys_create_pipe (&self->pipe_backend);
+    ASSERT_ALLOC(self->pipe_frontend, err_pipe_frontend_alloc);
+
     /* Setup loop */
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
@@ -172,6 +179,11 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     self->timer_id = zloop_timer (self->loop, DEVIO_POLLER_TIMEOUT, DEVIO_POLLER_NTIMES,
         _devio_handle_timer, NULL);
     ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
+
+    /* Set-up backend handler for forcing interrupting the zloop and rebuild
+     * the poll set. This avoids having to setup a short timer to periodically
+     * interrupting the loop to check for rebuilds */
+    _devio_engine_handle_socket (self, self->pipe_backend, _devio_handle_pipe_backend);
 
     /* Setup strings/options */
     self->name = strdup (name);
@@ -282,6 +294,9 @@ err_name_alloc:
 err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
+    zsock_destroy (&self->pipe_backend);
+    zsock_destroy (&self->pipe_frontend);
+err_pipe_frontend_alloc:
     free (self->pipes_config);
 err_pipes_config_alloc:
     free (self->pipes_msg);
@@ -351,6 +366,11 @@ devio_err_e devio_destroy (devio_t **self_p)
                 "[dev_io_core:destroy] Destroying loop\n");
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying front/back end PIPEs\n");
+        zsock_destroy (&self->pipe_backend);
+        zsock_destroy (&self->pipe_frontend);
 
         if (self->pipe) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
@@ -495,6 +515,9 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
             ASSERT_TEST(rc == 0, "Could not register zloop_reader",
                     err_zloop_reader, DEVIO_ERR_ALLOC);
             zloop_reader_set_tolerant (self->loop, (zsock_t *) sock);
+
+            /* Send message to pipe_backend to force zloop to rebuild poll_set */
+            zstr_sendx (devio->pipe_frontend, "$REBUILD_POLL", NULL);
         }
         else {
             zloop_reader_end (self->loop, (zsock_t *) sock);
@@ -637,6 +660,41 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     else {
         /* Invalid message received. Discard message and continue normally */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
+                "received an invalid command\n");
+    }
+
+    zmsg_destroy (&recv_msg);
+    return 0;
+}
+
+/* zloop handler for PIPE backend */
+static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args)
+{
+    (void) loop;
+
+    char *command = NULL;
+    /* We expect a devio instance e as reference */
+    devio_t *devio = (devio_t *) args;
+    (void) devio;
+
+    /* Receive message */
+    zmsg_t *recv_msg = zmsg_recv (reader);
+    if (recv_msg == NULL) {
+        return -1; /* Interrupted */
+    }
+
+    command = zmsg_popstr (recv_msg);
+    if (streq (command, "$REBUILD_POLL")) {
+        /* If we are executing this is because zloop interrupted and will rebuild the poll
+         * set as soon as this handler exits. So, we don't actually need to do anything
+         * here */
+        free (command);
+        zmsg_destroy (&recv_msg);
+        return 0;
+    }
+    else {
+        /* Invalid message received. Discard message and continue normally */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe_backend] PIPE "
                 "received an invalid command\n");
     }
 

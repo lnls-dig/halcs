@@ -30,7 +30,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
-#define SMIO_POLLER_TIMEOUT                100        /* in msec */
+#define SMIO_POLLER_TIMEOUT                100000     /* in msec */
 #define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
 
 /* Main class object that every sm_io must implement */
@@ -51,6 +51,8 @@ struct _smio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
+    zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
+    zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
 
     /* Specific SMIO operations dispatch table for exported operations */
@@ -81,6 +83,7 @@ static char *_smio_clone_name (smio_t *self);
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
 static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg);
+static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
@@ -106,15 +109,24 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->pipe_msg = pipe_msg;
     self->inst_id = args->inst_id;
 
+    /* Setup pipes for zloop interrupting */
+    self->pipe_frontend = zsys_create_pipe (&self->pipe_backend);
+    ASSERT_ALLOC(self->pipe_frontend, err_pipe_frontend_alloc);
+
     /* Setup loop */
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
 
     /* Set loop timeout. This is needed to ensure zloop will
      * frequently check for rebuilding its poll set */
-    self->timer_id = zloop_timer (self->loop, SMIO_POLLER_TIMEOUT, SMIO_POLLER_NTIMES, 
+    self->timer_id = zloop_timer (self->loop, SMIO_POLLER_TIMEOUT, SMIO_POLLER_NTIMES,
         _smio_handle_timer, NULL);
     ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
+
+    /* Set-up backend handler for forcing interrupting the zloop and rebuild
+     * the poll set. This avoids having to setup a short timer to periodically
+     * interrupting the loop to check for rebuilds */
+    _smio_engine_handle_socket (self, self->pipe_backend, _smio_handle_pipe_backend);
 
     /* Initialize SMIO base address */
     self->base = args->base;
@@ -138,6 +150,9 @@ err_worker_alloc:
 err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
+    zsock_destroy (&self->pipe_backend);
+    zsock_destroy (&self->pipe_frontend);
+err_pipe_frontend_alloc:
     zsock_destroy (&self->pipe_msg);
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
@@ -158,6 +173,8 @@ smio_err_e smio_destroy (smio_t **self_p)
         mlm_client_destroy (&self->worker);
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
+        zsock_destroy (&self->pipe_backend);
+        zsock_destroy (&self->pipe_frontend);
         zsock_destroy (&self->pipe_msg);
         zsock_destroy (&self->pipe_mgmt);
         disp_table_destroy (&self->exp_ops_dtable);
@@ -205,6 +222,9 @@ static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
             ASSERT_TEST(rc == 0, "Could not register zloop_reader",
                     err_zloop_reader, SMIO_ERR_ALLOC);
             zloop_reader_set_tolerant (self->loop, (zsock_t *) sock);
+
+            /* Send message to pipe_backend to force zloop to rebuild poll_set */
+            zstr_sendx (smio->pipe_frontend, "$REBUILD_POLL", NULL);
         }
         else {
             zloop_reader_end (self->loop, (zsock_t *) sock);
@@ -291,6 +311,41 @@ static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
         zmsg_destroy (&recv_msg);
     }
 
+    return 0;
+}
+
+/* zloop handler for PIPE backend */
+static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args)
+{
+    (void) loop;
+
+    char *command = NULL;
+    /* We expect a smio instance e as reference */
+    smio_t *smio = (smio_t *) args;
+    (void) smio;
+
+    /* Receive message */
+    zmsg_t *recv_msg = zmsg_recv (reader);
+    if (recv_msg == NULL) {
+        return -1; /* Interrupted */
+    }
+
+    command = zmsg_popstr (recv_msg);
+    if (streq (command, "$REBUILD_POLL")) {
+        /* If we are executing this is because zloop interrupted and will rebuild the poll
+         * set as soon as this handler exits. So, we don't actually need to do anything
+         * here */
+        free (command);
+        zmsg_destroy (&recv_msg);
+        return 0;
+    }
+    else {
+        /* Invalid message received. Discard message and continue normally */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_smio_handle_pipe_backend] PIPE "
+                "received an invalid command\n");
+    }
+
+    zmsg_destroy (&recv_msg);
     return 0;
 }
 
