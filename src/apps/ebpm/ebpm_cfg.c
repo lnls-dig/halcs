@@ -228,12 +228,6 @@ int main (int argc, char *argv[])
     free (broker_endp);
     broker_endp = NULL;
 
-    devio_err_e err = _spawn_platform_smios (devio, devio_type, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] _spawn_platform_smios error!\n");
-        goto err_devio;
-    }
-
     /* Step 1: Loop though all the SDB records and intialize (boot) the
      * smio modules*/
     /* Step 2: Optionally, register the necessary smio modules specifying
@@ -242,15 +236,24 @@ int main (int argc, char *argv[])
      * handle, like messages from smios */
     /*      Step 3.5: If we do, call devio_handle_smio () and treat its
      *      request as appropriate */
-    err = devio_loop (devio);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] devio_loop error: %s\n",
-                devio_err_str (err));
-        goto err_devio;
+    zactor_t *server = zactor_new (devio_loop, devio);
+    if (server == NULL) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] Could not spawn "
+                "server\n");
+        goto err_server;
     }
 
-err_devio:
+    /* TODO: Implement and Send SPAWN messages to spawn SMIOs */
+
+    devio_err_e err = _spawn_platform_smios (devio, devio_type, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] _spawn_platform_smios error!\n");
+        goto err_plat_devio;
+    }
+
+err_plat_devio_devio:
     devio_destroy (&devio);
+err_server:
 err_exit:
     free (log_filename);
     free (broker_endp);
