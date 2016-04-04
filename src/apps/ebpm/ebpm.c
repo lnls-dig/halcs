@@ -472,7 +472,7 @@ int main (int argc, char *argv[])
             dev_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] _spawn_platform_smios error!\n");
-        goto err_devio;
+        goto err_plat_devio;
     }
 
     /*  Accept and print any message back from server */
@@ -488,7 +488,7 @@ int main (int argc, char *argv[])
         }
     }
 
-err_devio:
+err_plat_devio_devio:
 err_assoc_devio:
     zactor_destroy (&server);
 err_server:
