@@ -488,7 +488,7 @@ int main (int argc, char *argv[])
         }
     }
 
-err_plat_devio_devio:
+err_plat_devio:
 err_assoc_devio:
     zactor_destroy (&server);
 err_server:
