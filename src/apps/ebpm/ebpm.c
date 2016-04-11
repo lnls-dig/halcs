@@ -857,7 +857,6 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
         err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-            goto err_register_sm;
         }
     }
     else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
@@ -865,26 +864,22 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
         err = devio_register_sm (devio, fmc250m_4ch_id, FMC1_250M_BASE_ADDR, 0);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-            goto err_register_sm;
         }
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
     err = devio_register_sm (devio, dsp_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
     err = devio_register_sm (devio, swap_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
     /* AFCv3 spefific */
 #if defined (__BOARD_AFCV3__)
@@ -904,7 +899,6 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
         err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-            goto err_register_sm;
         }
     }
     else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
@@ -912,39 +906,33 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
         err = devio_register_sm (devio, fmc250m_4ch_id, FMC2_250M_BASE_ADDR, 1);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-            goto err_register_sm;
         }
     }
 
     err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
     err = devio_register_sm (devio, dsp_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
     err = devio_register_sm (devio, swap_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
     err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 #endif
 #else
 #error "BE FPGA Board not supported!"
 #endif
 
-err_register_sm:
     return err;
 }
 
@@ -960,12 +948,10 @@ static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_
     err = devio_register_sm (devio, rffe_id, 0, smio_inst_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io_fe] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 #else
 #error "FE RFFE Board not supported!"
 #endif
 
-err_register_sm:
     return err;
 }

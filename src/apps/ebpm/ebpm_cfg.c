@@ -301,8 +301,6 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     /* ML605 specific */
 #if defined (__BOARD_ML605__)
     (void) devio;
-    goto err_register_sm;
-
     /* AFCv3 spefific */
 #elif defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
@@ -312,14 +310,12 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio)
     err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] devio_register_sm error!\n");
-        goto err_register_sm;
     }
 
 #else
 #error "BE FPGA Board not supported!"
 #endif
 
-err_register_sm:
     return err;
 }
 
