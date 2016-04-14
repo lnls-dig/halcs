@@ -170,7 +170,7 @@ COMMAND_CORE="\
     CFG_DIR=${CFG_DIR} && \
     make CFG=${CFG} \
     WITH_APP_CFG=${WITH_APP_CFG} \
-    ${EXTRA_FLAGS} core_install"
+    ${EXTRA_FLAGS} core_install cfg_install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
