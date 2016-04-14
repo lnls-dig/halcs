@@ -9,9 +9,8 @@ After=dev-fpga-%i.device
 
 [Service]
 EnvironmentFile=/etc/sysconfig/bpm-sw-board
-#ExecStart=/usr/local/bin/dev_mngr -f /usr/local/etc/bpm_sw/bpm_sw.cfg
 ExecStart=/usr/local/bin/ebpm -f /usr/local/etc/bpm_sw/bpm_sw.cfg -n be -t pcie -i %i -e /dev/fpga/%i -s 0 -b tcp://127.0.0.1:8978 -l /media/remote_logs
 WorkingDirectory=/usr/local/bin
 
-#[Install]
-#WantedBy=multi-user.target
+[Install]
+RequiredBy=bpm-sw-be-ioc@%i.service bpm-sw-fe-ioc@%i.service
