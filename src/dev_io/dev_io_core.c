@@ -584,49 +584,45 @@ static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
 
     /* We process as many messages as we can, to reduce the overhead
      * of polling and the reactor */
-    while (zsock_events (reader) & ZMQ_POLLIN) {
-        /* Remove config actor from loop */
-        _devio_engine_handle_socket (devio, reader, NULL);
-        /* Receive message */
-        zmsg_t *recv_msg = zmsg_recv (reader);
-        if (recv_msg == NULL) {
-            return -1; /* Interrupted */
-        }
+    /* Receive message */
+    zmsg_t *recv_msg = zmsg_recv (reader);
+    if (recv_msg == NULL) {
+        return -1; /* Interrupted */
+    }
 
-        service_id = zmsg_popstr (recv_msg);
-        ASSERT_TEST(service_id != NULL, "devio_loop: received NULL service_id string",
-                err_poller_config_null_service, -1);
-        command = zmsg_popstr (recv_msg);
-        ASSERT_TEST(command != NULL, "devio_loop: poller_config received NULL command string",
-                err_poller_config_null_command, -1);
+    service_id = zmsg_popstr (recv_msg);
+    ASSERT_TEST(service_id != NULL, "devio_loop: received NULL service_id string",
+            err_poller_config_null_service, -1);
+    command = zmsg_popstr (recv_msg);
+    ASSERT_TEST(command != NULL, "devio_loop: poller_config received NULL command string",
+            err_poller_config_null_command, -1);
 
-        /* CONFIG DONE means the config thread is finished and should
-         * be destroyed */
-        if (streq (command, "CONFIG DONE")) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-                    "[dev_io_core:poll_all_sm] Config thread signalled "
-                    "CONFIG DONE. Terminating thread\n");
-            /* Terminate config thread */
-            zstr_sendx (reader, "$TERM", NULL);
-            /* Lastly, destroy the actor */
-            err = _devio_destroy_smio (devio, devio->sm_io_cfg_h, service_id);
-            ASSERT_TEST(err == DEVIO_SUCCESS, "devio_loop: Could not destroy SMIO",
-                    err_poller_destroy_cfg_smio, -1);
-        }
+    /* CONFIG DONE means the config thread is finished and should
+     * be destroyed */
+    if (streq (command, "CONFIG DONE")) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:poll_all_sm] Config thread signalled "
+                "CONFIG DONE. Terminating thread\n");
+        /* Terminate config thread */
+        zstr_sendx (reader, "$TERM", NULL);
+        /* Lastly, destroy the actor */
+        err = _devio_destroy_smio (devio, devio->sm_io_cfg_h, service_id);
+        ASSERT_TEST(err == DEVIO_SUCCESS, "devio_loop: Could not destroy SMIO",
+                err_poller_destroy_cfg_smio, -1);
+    }
 
 err_poller_destroy_cfg_smio:
 err_poller_config_null_command:
 err_poller_config_null_service:
-        free (command);
-        command = NULL;
-        free (service_id);
-        service_id = NULL;
-        zmsg_destroy (&recv_msg);
+    free (command);
+    command = NULL;
+    free (service_id);
+    service_id = NULL;
+    zmsg_destroy (&recv_msg);
 
-        /* TODO. Do we really need to exit on error? */
-        if (err != 0) {
-            return err;
-        }
+    /* TODO. Do we really need to exit on error? */
+    if (err != 0) {
+        return err;
     }
 
     return err;
