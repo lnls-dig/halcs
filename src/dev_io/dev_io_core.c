@@ -529,6 +529,10 @@ err_zsock_is:
     return err;
 }
 
+/************************************************************/
+/********************** zloop handlers **********************/
+/************************************************************/
+
 /* zloop handler for timer */
 static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 {
@@ -697,6 +701,10 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
     zmsg_destroy (&recv_msg);
     return 0;
 }
+
+/************************************************************/
+/*********************** API methods ************************/
+/************************************************************/
 
 /* Register an specific sm_io modules to this device */
 devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
