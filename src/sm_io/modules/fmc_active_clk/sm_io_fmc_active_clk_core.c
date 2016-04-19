@@ -63,13 +63,6 @@ err_smch_si571_alloc:
         smch_ad9510_destroy (&self->smch_ad9510);
     }
 err_smch_ad9510_alloc:
-    smch_24aa64_destroy (&self->smch_24aa64);
-err_smch_24aa64_alloc:
-    if (self->smch_pca9547 != NULL) {
-        smch_pca9547_destroy (&self->smch_pca9547);
-    }
-err_smch_pca9547_alloc:
-err_num_fmc_active_clk_smios:
     free (self);
 err_self_alloc:
     return NULL;
