@@ -9,9 +9,9 @@
 
 #define DEVIO_SERVICE_LEN       50
 
-static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id);
-static devio_err_e _spawn_be_platform_smios (devio_t *devio);
+static devio_err_e _spawn_be_platform_smios (void *pipe);
 
 static struct option long_options[] =
 {
@@ -245,7 +245,7 @@ int main (int argc, char *argv[])
 
     /* TODO: Implement and Send SPAWN messages to spawn SMIOs */
 
-    devio_err_e err = _spawn_platform_smios (devio, devio_type, 0);
+    devio_err_e err = _spawn_platform_smios (server, devio_type, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] _spawn_platform_smios error!\n");
         goto err_plat_devio;
@@ -266,18 +266,18 @@ err_exit:
     return 0;
 }
 
-static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id)
 {
     (void) smio_inst_id;
 
-    assert (devio);
+    assert (pipe);
 
     devio_err_e err = DEVIO_SUCCESS;
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_be_platform_smios (devio);
+            err = _spawn_be_platform_smios (pipe);
             break;
 
         default:
@@ -294,20 +294,20 @@ err_register_sm:
     return err;
 }
 
-static devio_err_e _spawn_be_platform_smios (devio_t *devio)
+static devio_err_e _spawn_be_platform_smios (void *pipe)
 {
     devio_err_e err = DEVIO_SUCCESS;
 
     /* ML605 specific */
 #if defined (__BOARD_ML605__)
-    (void) devio;
+    (void) pipe;
     /* AFCv3 spefific */
 #elif defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm_cfg] Spawning AFCv3 specific SMIOs ...\n");
 
-    err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
+    err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm_cfg] devio_register_sm error!\n");
     }
