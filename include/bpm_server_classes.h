@@ -25,6 +25,7 @@
 
 /* General dependencies */
 #include "board.h"
+#include "mem_layout_common.h"
 #include "epics_mapping.h"
 #include "revision.h"
 #include "acq_chan_gen_defs.h"
