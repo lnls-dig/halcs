@@ -704,7 +704,6 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
         free (command);
-        zmsg_destroy (&recv_msg);
         return -1;
     }
     else if (streq (command, "$REGISTER_SMIO")) {
