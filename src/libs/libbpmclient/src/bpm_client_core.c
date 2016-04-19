@@ -349,70 +349,255 @@ mlm_client_t *bpm_get_mlm_client (bpm_client_t *self)
     return self->mlm_client;
 }
 
-/**************** FMC130M SMIO Functions ****************/
+/**************** FMC ADC COMMON SMIO Functions ****************/
 
 PARAM_FUNC_CLIENT_WRITE(fmc_leds)
 {
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_LEDS,
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_LEDS,
             fmc_leds);
 }
 
 PARAM_FUNC_CLIENT_READ(fmc_leds)
 {
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_LEDS,
+    return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_LEDS,
             fmc_leds);
 }
+
+PARAM_FUNC_CLIENT_WRITE(adc_test_data_en)
+{
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_TEST_DATA_EN, adc_test_data_en);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_test_data_en)
+{
+     return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_TEST_DATA_EN, adc_test_data_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_dir)
+{
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_dir)
+{
+    return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_TRIG_DIR, trig_dir);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_term)
+{
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_term)
+{
+    return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_TRIG_TERM, trig_term);
+}
+
+PARAM_FUNC_CLIENT_WRITE(trig_val)
+{
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_TRIG_VAL, trig_val);
+}
+
+PARAM_FUNC_CLIENT_READ(trig_val)
+{
+    return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_TRIG_VAL, trig_val);
+}
+
+/**************** FMC ACTIVE CLOCK SMIO Functions ****************/
 
 /* FUNCTION pin functions */
 PARAM_FUNC_CLIENT_WRITE(fmc_pll_function)
 {
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_PLL_FUNCTION,
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_PLL_FUNCTION,
             fmc_pll_function);
 }
 
 PARAM_FUNC_CLIENT_READ(fmc_pll_function)
 {
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_PLL_FUNCTION,
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_PLL_FUNCTION,
             fmc_pll_function);
 }
 
 /* STATUS pin functions */
 PARAM_FUNC_CLIENT_WRITE(fmc_pll_status)
 {
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_PLL_STATUS,
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_PLL_STATUS,
             fmc_pll_status);
 }
 
 PARAM_FUNC_CLIENT_READ(fmc_pll_status)
 {
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_PLL_STATUS,
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_PLL_STATUS,
             fmc_pll_status);
 }
 
 /* CLK_SEL pin functions */
 PARAM_FUNC_CLIENT_WRITE(fmc_clk_sel)
 {
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_CLK_SEL,
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_CLK_SEL,
             fmc_clk_sel);
 }
 
 PARAM_FUNC_CLIENT_READ(fmc_clk_sel)
 {
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_CLK_SEL,
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_CLK_SEL,
             fmc_clk_sel);
+}
+
+PARAM_FUNC_CLIENT_WRITE(si571_oe)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_OE, si571_oe);
+}
+
+PARAM_FUNC_CLIENT_READ(si571_oe)
+{
+     return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_OE, si571_oe);
 }
 
 PARAM_FUNC_CLIENT_WRITE(ad9510_defaults)
 {
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_CFG_DEFAULTS,
             ad9510_defaults);
 }
 
 PARAM_FUNC_CLIENT_READ(ad9510_defaults)
 {
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS,
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_CFG_DEFAULTS,
             ad9510_defaults);
 }
+
+/* AD9510 PLL A divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_a_div)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_A_DIV,
+            ad9510_pll_a_div);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_a_div)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_A_DIV,
+            ad9510_pll_a_div);
+}
+
+/* AD9510 PLL B divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_b_div)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_B_DIV,
+            ad9510_pll_b_div);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_b_div)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_B_DIV,
+            ad9510_pll_b_div);
+}
+
+/* AD9510 PLL Prescaler */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_prescaler)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_PRESCALER,
+            ad9510_pll_prescaler);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_prescaler)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_PRESCALER,
+            ad9510_pll_prescaler);
+}
+
+/* AD9510 R divider */
+PARAM_FUNC_CLIENT_WRITE(ad9510_r_div)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_R_DIV,
+            ad9510_r_div);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_r_div)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_R_DIV,
+            ad9510_r_div);
+}
+
+/* AD9510 PLL Power Down */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_pdown)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_PDOWN,
+            ad9510_pll_pdown);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_pdown)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_PDOWN,
+            ad9510_pll_pdown);
+}
+
+/* AD9510 Mux Status */
+PARAM_FUNC_CLIENT_WRITE(ad9510_mux_status)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_MUX_STATUS,
+            ad9510_mux_status);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_mux_status)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_MUX_STATUS,
+            ad9510_mux_status);
+}
+
+/* AD9510 CP current */
+PARAM_FUNC_CLIENT_WRITE(ad9510_cp_current)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_CP_CURRENT,
+            ad9510_cp_current);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_cp_current)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_CP_CURRENT,
+            ad9510_cp_current);
+}
+
+/* AD9510 Outputs */
+PARAM_FUNC_CLIENT_WRITE(ad9510_outputs)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_OUTPUTS,
+            ad9510_outputs);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_outputs)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_OUTPUTS,
+            ad9510_outputs);
+}
+
+/* AD9510 PLL CLK Selection */
+PARAM_FUNC_CLIENT_WRITE(ad9510_pll_clk_sel)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_CLK_SEL,
+            ad9510_pll_clk_sel);
+}
+
+PARAM_FUNC_CLIENT_READ(ad9510_pll_clk_sel)
+{
+    return param_client_read (self, service, FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_CLK_SEL,
+            ad9510_pll_clk_sel);
+}
+
+/* SI571 Set frequency */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_set_freq)
+{
+    return param_client_write_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_SET_FREQ,
+            si571_set_freq);
+}
+
+/* SI571 Get defaults */
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
+{
+    return param_client_write_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_GET_DEFAULTS,
+            si571_defaults);
+}
+
+/**************** FMC 130M SMIO Functions ****************/
 
 /* ADC LTC2208 RAND */
 PARAM_FUNC_CLIENT_WRITE(adc_rand)
@@ -667,191 +852,6 @@ PARAM_FUNC_CLIENT_WRITE2(adc_dly3, type, val)
 {
     return param_client_write_raw (self, service, FMC130M_4CH_OPCODE_ADC_DLY3,
             type, val);
-}
-
-/****************** FMC130M Control functions ****************/
-
-PARAM_FUNC_CLIENT_WRITE(adc_test_data_en)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_TEST_DATA_EN, adc_test_data_en);
-}
-
-PARAM_FUNC_CLIENT_READ(adc_test_data_en)
-{
-     return param_client_read (self, service, FMC130M_4CH_OPCODE_TEST_DATA_EN, adc_test_data_en);
-}
-
-PARAM_FUNC_CLIENT_WRITE(si571_oe)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
-}
-
-PARAM_FUNC_CLIENT_READ(si571_oe)
-{
-     return param_client_read (self, service, FMC130M_4CH_OPCODE_SI571_OE, si571_oe);
-}
-
-PARAM_FUNC_CLIENT_WRITE(trig_dir)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
-}
-
-PARAM_FUNC_CLIENT_READ(trig_dir)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_DIR, trig_dir);
-}
-
-PARAM_FUNC_CLIENT_WRITE(trig_term)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
-}
-
-PARAM_FUNC_CLIENT_READ(trig_term)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_TERM, trig_term);
-}
-
-PARAM_FUNC_CLIENT_WRITE(trig_val)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
-}
-
-PARAM_FUNC_CLIENT_READ(trig_val)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_TRIG_VAL, trig_val);
-}
-
-/*************************** FMC130M Chips Functions *************************/
-
-/* AD9510 PLL A divider */
-PARAM_FUNC_CLIENT_WRITE(ad9510_pll_a_div)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
-            ad9510_pll_a_div);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_pll_a_div)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV,
-            ad9510_pll_a_div);
-}
-
-/* AD9510 PLL B divider */
-PARAM_FUNC_CLIENT_WRITE(ad9510_pll_b_div)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
-            ad9510_pll_b_div);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_pll_b_div)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV,
-            ad9510_pll_b_div);
-}
-
-/* AD9510 PLL Prescaler */
-PARAM_FUNC_CLIENT_WRITE(ad9510_pll_prescaler)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
-            ad9510_pll_prescaler);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_pll_prescaler)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER,
-            ad9510_pll_prescaler);
-}
-
-/* AD9510 R divider */
-PARAM_FUNC_CLIENT_WRITE(ad9510_r_div)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_R_DIV,
-            ad9510_r_div);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_r_div)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_R_DIV,
-            ad9510_r_div);
-}
-
-/* AD9510 PLL Power Down */
-PARAM_FUNC_CLIENT_WRITE(ad9510_pll_pdown)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
-            ad9510_pll_pdown);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_pll_pdown)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN,
-            ad9510_pll_pdown);
-}
-
-/* AD9510 Mux Status */
-PARAM_FUNC_CLIENT_WRITE(ad9510_mux_status)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
-            ad9510_mux_status);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_mux_status)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_MUX_STATUS,
-            ad9510_mux_status);
-}
-
-/* AD9510 CP current */
-PARAM_FUNC_CLIENT_WRITE(ad9510_cp_current)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
-            ad9510_cp_current);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_cp_current)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_CP_CURRENT,
-            ad9510_cp_current);
-}
-
-/* AD9510 Outputs */
-PARAM_FUNC_CLIENT_WRITE(ad9510_outputs)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
-            ad9510_outputs);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_outputs)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_OUTPUTS,
-            ad9510_outputs);
-}
-
-/* AD9510 PLL CLK Selection */
-PARAM_FUNC_CLIENT_WRITE(ad9510_pll_clk_sel)
-{
-    return param_client_write (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
-            ad9510_pll_clk_sel);
-}
-
-PARAM_FUNC_CLIENT_READ(ad9510_pll_clk_sel)
-{
-    return param_client_read (self, service, FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL,
-            ad9510_pll_clk_sel);
-}
-
-/* SI571 Set frequency */
-PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_set_freq)
-{
-    return param_client_write_double (self, service, FMC130M_4CH_OPCODE_SI571_SET_FREQ,
-            si571_set_freq);
-}
-
-/* SI571 Get defaults */
-PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
-{
-    return param_client_write_double (self, service, FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS,
-            si571_defaults);
 }
 
 /*************************** FMC250M Chips Functions *************************/
