@@ -61,6 +61,11 @@ extern "C" {
  * the correct one to read or write
  */
 
+/* FMC_ACTIVE_CLK Component */
+#define FMC_ACTIVE_CLK_CTRL_REGS_OFFS               (BAR4_ADDR | FMC_ACTIVE_CLK_CTRL_RAW_REGS_OFFS)
+#define FMC_ACTIVE_CLK_SI571_I2C_OFFS               (BAR4_ADDR | FMC_ACTIVE_CLK_SI571_RAW_I2C_OFFS)
+#define FMC_ACTIVE_CLK_AD9510_SPI_OFFS              (BAR4_ADDR | FMC_ACTIVE_CLK_AD9510_RAW_SPI_OFFS)
+
 /* FMC_130M Components */
 #define FMC_130M_CTRL_REGS_OFFS                     (BAR4_ADDR | FMC_130M_CTRL_RAW_REGS_OFFS)
 #define FMC_130M_FMC_ADC_COMMON_OFFS                (BAR4_ADDR | FMC_130M_FMC_ADC_COMMON_RAW_REGS_OFFS)
