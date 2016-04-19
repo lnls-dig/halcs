@@ -24,7 +24,8 @@ static const char *smio_err [SMIO_ERR_END] =
     [SMIO_ERR_BAD_MSG]              = "Malformed message received",
     [SMIO_ERR_INTERRUPTED_POLLER]   = "Poller interrupted. zeroMQ context was "
         "terminated or received interrupt signal",
-    [SMIO_ERR_INV_SOCKET]           = "Invalid socket reference"
+    [SMIO_ERR_INV_SOCKET]           = "Invalid socket reference",
+    [SMIO_ERR_REGISTER_SM]          = "Could not register SMIO"
 };
 
 /* Convert enumeration type to string */

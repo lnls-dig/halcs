@@ -29,6 +29,7 @@ enum _smio_err_e {
     SMIO_ERR_INTERRUPTED_POLLER,    /* SMIO Poller interrupted. zeroMQ context was
                                        terminated or received interrupt signal */
     SMIO_ERR_INV_SOCKET,            /* Invalid socket reference */
+    SMIO_ERR_REGISTER_SM,           /* Could not register SMIO */
     SMIO_ERR_END                    /* End of enum marker */
 };
 
