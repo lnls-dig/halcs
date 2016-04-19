@@ -217,6 +217,7 @@ include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
