@@ -55,36 +55,8 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_FMC130M_4CH_LIBBPMCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
-    client_err = bpm_set_fmc_pll_function (config_client, service, FMC130M_4CH_DFLT_PLL_FUNC);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC PLL function",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
+    /* Configure defaults here */
 
-    client_err = bpm_set_fmc_clk_sel (config_client, service, FMC130M_4CH_DFLT_CLK_SEL);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC CLK SEL function",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_trig_dir (config_client, service, FMC130M_4CH_DFLT_TRIG_DIR);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set FMC TRIG DIR function",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_ad9510_cfg_defaults (config_client, service, 0);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS ||
-            client_err == BPM_CLIENT_ERR_AGAIN, "Could not configure AD9510",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_si571_defaults (config_client, service, FMC130M_4CH_DFLT_SI57X_FOUT_FACTORY);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not get Si571 defaults",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_si571_set_freq (config_client, service, FMC130M_4CH_DFLT_SI57X_FOUT);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set Si571 frequency",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_si571_oe (config_client, service, FMC130M_4CH_DFLT_SI571_OE);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not enable SI571 Output",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-err_param_set:
     bpm_client_destroy (&config_client);
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_defaults] Exiting Config thread %s\n",

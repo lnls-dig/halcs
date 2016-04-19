@@ -8,9 +8,6 @@
 #ifndef _SM_IO_FMC130M_4CH_CORE_H_
 #define _SM_IO_FMC130M_4CH_CORE_H_
 
-#define SMIO_AD9510_HANDLER(smio_handler) ((smch_ad9510_t *) smio_handler->smch_ad9510)
-#define SMIO_SI57X_HANDLER(smio_handler) ((smch_si57x_t *) smio_handler->smch_si571)
-
 /* The follosing codes were generated via the following command:
  * > echo FMC130M_4CH_ACTIVE | md5sum | cut -c 1-8
  * > cb04db4d
@@ -31,8 +28,6 @@ typedef enum {
 
 typedef struct {
     fmc130m_4ch_type_e type;                /* FMC130M_4CH type */
-    smch_ad9510_t *smch_ad9510;             /* AD9510 chip handler */
-    smch_si57x_t *smch_si571;               /* SI571 chip handler */
     smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */
     smch_pca9547_t *smch_pca9547;           /* FPGA I2C Switch */
 } smio_fmc130m_4ch_t;
