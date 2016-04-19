@@ -575,6 +575,43 @@ static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
     return 0;
 }
 
+static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
+{
+    (void) loop;
+
+    /* We expect a devio instance e as reference */
+    devio_t *devio = (devio_t *) args;
+    /* Arguments for command */
+    char *command = NULL;
+    uint32_t smio_id;
+    uint64_t base;
+    uint32_t inst_id;
+
+    /* This command expects the following */
+    /* Command: (string) $REGISTER_SMIO
+     * Arg1:    (uint32_t) smio_id
+     * Arg2:    (uint64_t) base
+     * Arg3:    (uint32_t) inst_id
+     * */
+    int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
+    if (zerr == -1) {
+        return -1; /* Interrupted */
+    }
+
+    if (streq (command, "$REGISTER_SMIO")) {
+        /* Register new SMIO */
+        devio_register_sm (devio, smio_id, base, inst_id);
+    }
+    else {
+        /* Invalid message received. Discard message and continue normally */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe_mgmt] PIPE "
+                "received an invalid command\n");
+    }
+
+    free (command);
+    return 0;
+}
+
 /* zloop handler for CFG PIPE */
 static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
 {
@@ -789,6 +826,11 @@ devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
     ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
             err_spawn_smio_thread);
 
+    err = _devio_engine_handle_socket (self, self->pipes_mgmt [pipe_mgmt_idx],
+        _devio_handle_pipe_mgmt);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register management socket handler",
+            err_pipes_mgmt_handle);
+
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] Inserting hash with key: %s\n", key);
     int zerr = zhashx_insert (self->sm_io_h, key, &self->pipes_mgmt [pipe_mgmt_idx]);
@@ -852,6 +894,8 @@ err_spawn_config_thread:
 err_th_config_args_alloc:
     zhashx_delete (self->sm_io_h, key);
 err_pipe_hash_insert:
+    _devio_engine_handle_socket (self, self->pipes_mgmt [pipe_mgmt_idx], NULL);
+err_pipes_mgmt_handle:
     /* If we can't insert the SMIO thread key in hash,
      * destroy it as we won't have a reference to it later! */
     _devio_destroy_actor (self, &self->pipes_mgmt [pipe_mgmt_idx]);
