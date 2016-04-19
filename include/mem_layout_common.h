@@ -1,6 +1,10 @@
 #ifndef _MEM_LAYOUT_COMMON_
 #define _MEM_LAYOUT_COMMON_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "pcie_regs.h"
 
 /* FMC_ACTIVE_CLK Component */
@@ -81,5 +85,9 @@
 
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
