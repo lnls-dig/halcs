@@ -108,6 +108,12 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
 static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
+static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
+        uint32_t inst_id);
+static devio_err_e _devio_register_all_sm_raw (devio_t *self);
+static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
+static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
+
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
 {
@@ -595,12 +601,12 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
      * */
     int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
     if (zerr == -1) {
-        return -1; /* Interrupted */
+        return 0; /* Malformed message */
     }
 
     if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        devio_register_sm (devio, smio_id, base, inst_id);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -669,9 +675,7 @@ err_poller_config_null_service:
     return err;
 }
 
-/* zloop handler for PIPE.
- *
- * TODO: This does nothing for now */
+/* zloop handler for PIPE. */
 static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 {
     (void) loop;
@@ -698,7 +702,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 
     int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
     if (zerr == -1) {
-        return -1; /* Interrupted */
+        return 0; /* Malformed message */
     }
 
     if (streq (command, "$TERM")) {
@@ -706,9 +710,23 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         free (command);
         return -1;
     }
+    else if (streq (command, "$REGISTER_SMIO_ALL")) {
+        /* Register all SMIOs */
+        _devio_register_all_sm_raw (devio);
+    }
     else if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        devio_register_sm (devio, smio_id, base, inst_id);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id);
+    }
+    else if (streq (command, "$UNREGISTER_SMIO_ALL")) {
+        /* Unregister all SMIOs */
+        _devio_unregister_all_sm_raw (devio);
+    }
+    /* FIXME: Will not work, as the second parameter is a string and we expect
+     * something different */
+    else if (streq (command, "$UNREGISTER_SMIO")) {
+        /* Unregister SMIO */
+        _devio_unregister_sm_raw (devio, NULL);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -760,7 +778,7 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 /************************************************************/
 
 /* Register an specific sm_io modules to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id, uint64_t base,
+static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id)
 {
     assert (self);
@@ -931,15 +949,43 @@ err_max_smios_reached:
     return err;
 }
 
+devio_err_e devio_register_sm (void *pipe, uint32_t smio_id, uint64_t base,
+        uint32_t inst_id)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s484", "$REGISTER_SMIO", smio_id, base,
+            inst_id);
+    ASSERT_TEST(zerr == 0, "Could not register SMIO", err_register_sm,
+           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_register_sm:
+    return err;
+}
+
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
-devio_err_e devio_register_all_sm (devio_t *self)
+static devio_err_e _devio_register_all_sm_raw (devio_t *self)
 {
     (void) self;
     return DEVIO_ERR_FUNC_NOT_IMPL;
 }
 
-devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key)
+devio_err_e devio_register_all_sm (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$REGISTER_SMIO_ALL");
+    ASSERT_TEST(zerr == 0, "Could not register all SMIOs", err_register_sm_all,
+           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_register_sm_all:
+    return err;
+}
+
+static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key)
 {
     /* Don't care for errors here, as the Config actor is probably already
      * gone */
@@ -952,7 +998,20 @@ err_destroy_smio:
     return err;
 }
 
-devio_err_e devio_unregister_all_sm (devio_t *self)
+devio_err_e devio_unregister_sm (void *pipe, const char *smio_key)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "ss", "$UNREGISTER_SMIO", smio_key);
+    ASSERT_TEST(zerr == 0, "Could not unregister SMIOs", err_unregister_sm,
+           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_unregister_sm:
+    return err;
+}
+
+static devio_err_e _devio_unregister_all_sm_raw (devio_t *self)
 {
     devio_err_e err = _devio_destroy_smio_all (self, self->sm_io_cfg_h);
     ASSERT_TEST(err == DEVIO_SUCCESS, "Could not destroy Config SMIOs",
@@ -963,6 +1022,19 @@ devio_err_e devio_unregister_all_sm (devio_t *self)
 
 err_destroy_cfg_smios:
 err_destroy_smios:
+    return err;
+}
+
+devio_err_e devio_unregister_all_sm (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$UNREGISTER_SMIO_ALL");
+    ASSERT_TEST(zerr == 0, "Could not unregister all SMIOs", err_unregister_sm_all,
+           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_unregister_sm_all:
     return err;
 }
 
