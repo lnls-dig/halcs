@@ -53,7 +53,7 @@ smio_fmc_active_clk_t * smio_fmc_active_clk_new (smio_t *parent)
             "addr: 0x%08X, Inst ID: %u\n", fmc_active_clk_si571_addr,
             inst_id);
     self->smch_si571 = smch_si57x_new (parent, FMC_ACTIVE_CLK_SI571_I2C_OFFS,
-            fmc_active_clk_si571_addr[inst_id], 0);
+            fmc_active_clk_si571_addr, 0);
     ASSERT_ALLOC(self->smch_si571, err_smch_si571_alloc);
 
     return self;
