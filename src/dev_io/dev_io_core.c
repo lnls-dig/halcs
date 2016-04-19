@@ -676,23 +676,40 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 {
     (void) loop;
 
-    char *command = NULL;
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
-    (void) devio;
+    char *command = NULL;
+    uint32_t smio_id;
+    uint64_t base;
+    uint32_t inst_id;
 
-    /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    /* This command expects one of the following */
+    /* Command: (string) $REGISTER_SMIO
+     * Arg1:    (uint32_t) smio_id
+     * Arg2:    (uint64_t) base
+     * Arg3:    (uint32_t) inst_id
+     *
+     * Command: (string) $TERM
+     *
+     * Either way, the following zsock_recv is able to handle both cases. In
+     * case of the received message is shorter than the first command, the
+     * additional pointers are zeroed.
+     * */
+
+    int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
+    if (zerr == -1) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
         free (command);
         zmsg_destroy (&recv_msg);
         return -1;
+    }
+    else if (streq (command, "$REGISTER_SMIO")) {
+        /* Register new SMIO */
+        devio_register_sm (devio, smio_id, base, inst_id);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -700,7 +717,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
                 "received an invalid command\n");
     }
 
-    zmsg_destroy (&recv_msg);
+    free (command);
     return 0;
 }
 
