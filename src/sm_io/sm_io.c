@@ -364,6 +364,21 @@ smio_err_e smio_loop (smio_t *self)
     return err;
 }
 
+smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
+        uint32_t inst_id)
+{
+    assert (self);
+    smio_err_e err = SMIO_SUCCESS;
+
+    int zerr = zsock_send (self->pipe_mgmt, "s484", "$REGISTER_SMIO", smio_id, base,
+            inst_id);
+    ASSERT_TEST(zerr == 0, "Could not register SMIO", err_register_sm,
+           SMIO_ERR_REGISTER_SM);
+
+err_register_sm:
+    return err;
+}
+
 /************************************************************/
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
