@@ -139,7 +139,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_core] Registering FMC_ADC_COMMON SMIO\n");
-    smio_register_sm (parent, 0x2403f569, FMC_250M_FMC_ADC_COMMON_REGS_OFFS, inst_id);
+    smio_register_sm (parent, 0x2403f569, FMC_250M_FMC_ADC_COMMON_OFFS, inst_id);
 
     /* Now, initialize the FMC250M_4CH with the appropriate structures*/
     if (self->type == TYPE_FMC250M_4CH_ACTIVE) {
