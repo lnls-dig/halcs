@@ -63,12 +63,13 @@ void smio_startup (zsock_t *pipe, void *args)
     smio_t *self = smio_new (th_args, pipe_mgmt, pipe_msg, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    /* Call SMIO init function to finish initializing its internal strucutres */
-    smio_err_e err = SMIO_DISPATCH_FUNC_WRAPPER (init, smio_mod_dispatch);
-    ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
     /* Atach this SMIO instance to its parent */
-    err = smio_attach (self, th_args->parent);
+    smio_err_e err = smio_attach (self, th_args->parent);
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
+
+    /* Call SMIO init function to finish initializing its internal strucutres */
+    err = SMIO_DISPATCH_FUNC_WRAPPER (init, smio_mod_dispatch);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
 
     /* Export SMIO specific operations */
     const disp_op_t **smio_exp_ops = smio_get_exp_ops (self);
@@ -88,13 +89,14 @@ err_smio_loop:
     /* Unexport SMIO specific operations */
     smio_unexport_ops (self);
 err_smio_export:
-    /* Deattach this SMIO instance to its parent */
-    smio_deattach (self);
+    /* Nullify exp ops */
+    smio_set_exp_ops (self, NULL);
 err_smio_get_exp_ops:
-err_call_attach:
     /* FIXME: Poll PIPE sockets and on receiving any message calls shutdown () */
     SMIO_DISPATCH_FUNC_WRAPPER (shutdown, smio_mod_dispatch);
 err_call_init:
+    smio_deattach (self);
+err_call_attach:
     /* Destroy what we did in _smio_new */
     smio_destroy (&self);
 err_self_alloc:
