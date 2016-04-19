@@ -48,7 +48,6 @@ smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_defaults] Configuring SMIO "
             "FMC130M_4CH with default values ...\n");
-    bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
     bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
