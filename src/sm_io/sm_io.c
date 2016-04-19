@@ -364,20 +364,6 @@ smio_err_e smio_loop (smio_t *self)
     return err;
 }
 
-smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
-        uint32_t inst_id)
-{
-    assert (self);
-    smio_err_e err = SMIO_SUCCESS;
-
-    devio_err_e derr = devio_register_sm (self->parent, smio_id, base, inst_id);
-    ASSERT_TEST(derr == DEVIO_SUCCESS, "Could not register SM", err_register_sm,
-           SMIO_ERR_REGISTER_SM);
-
-err_register_sm:
-    return err;
-}
-
 /************************************************************/
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
