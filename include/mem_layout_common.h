@@ -13,19 +13,19 @@ extern "C" {
 #define FMC_ACTIVE_CLK_AD9510_RAW_SPI_OFFS          0x0200
 
 /* FMC_130M Components */
-#define FMC_130M_CTRL_RAW_REGS_OFFS                 0x0000
-#define FMC_130M_FMC_ADC_COMMON_RAW_REGS_OFFS       0x0100
-#define FMC_130M_FMC_ACTIVE_CLK_RAW_OFFS            0x0200
-#define FMC_130M_EEPROM_RAW_I2C_OFFS                0x0600
-#define FMC_130M_LM75A_RAW_I2C_OFFS                 0x0700
+#define FMC_130M_CTRL_RAW_REGS_OFFS                 0x00000
+#define FMC_130M_FMC_ADC_COMMON_RAW_REGS_OFFS       0x01000
+#define FMC_130M_FMC_ACTIVE_CLK_RAW_OFFS            0x02000
+#define FMC_130M_EEPROM_RAW_I2C_OFFS                0x03000
+#define FMC_130M_LM75A_RAW_I2C_OFFS                 0x04000
 
 /* FMC_250M Components */
-#define FMC_250M_CTRL_RAW_REGS_OFFS                 0x0000
-#define FMC_250M_FMC_ADC_COMMON_RAW_REGS_OFFS       0x0100
-#define FMC_250M_FMC_ACTIVE_CLK_RAW_OFFS            0x0200
-#define FMC_250M_EEPROM_RAW_I2C_OFFS                0x0600
-#define FMC_250M_AMC7823_RAW_SPI_OFFS               0x0700
-#define FMC_250M_ISLA216P_RAW_SPI_OFFS              0x0800
+#define FMC_250M_CTRL_RAW_REGS_OFFS                 0x00000
+#define FMC_250M_FMC_ADC_COMMON_RAW_REGS_OFFS       0x01000
+#define FMC_250M_FMC_ACTIVE_CLK_RAW_OFFS            0x02000
+#define FMC_250M_EEPROM_RAW_I2C_OFFS                0x03000
+#define FMC_250M_AMC7823_RAW_SPI_OFFS               0x04000
+#define FMC_250M_ISLA216P_RAW_SPI_OFFS              0x05000
 
 /* DSP Components */
 #define DSP_CTRL_RAW_REGS_OFFS                      0x0000
