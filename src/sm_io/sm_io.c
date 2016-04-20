@@ -176,7 +176,11 @@ smio_err_e smio_destroy (smio_t **self_p)
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
         zsock_destroy (&self->pipe_msg);
-        zsock_destroy (&self->pipe_mgmt);
+        /* Don't destroy pipe_mgmt as this is taken care of by the
+         * zactor infrastructure, s_thread_shim (void *args) on CZMQ 
+         * 3.0.2 src/zactor.c 
+         * zsock_destroy (&self->pipe_mgmt);
+         */
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
