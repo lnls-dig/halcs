@@ -44,6 +44,7 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
+    uint64_t base = smio_get_base (parent);
 
     /* Check if Instance ID is within our expected limits */
     ASSERT_TEST(inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
@@ -110,13 +111,13 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     _smio_fmc130m_4ch_set_type (self, data_24aa64);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] Registering FMC_ADC_COMMON SMIO\n");
-    smio_register_sm (parent, 0x2403f569, FMC_130M_FMC_ADC_COMMON_OFFS, inst_id);
+    smio_register_sm (parent, 0x2403f569, base | FMC_130M_FMC_ADC_COMMON_OFFS, inst_id);
 
     /* Now, initialize the FMC130M_4CH with the appropriate structures*/
     if (self->type == TYPE_FMC130M_4CH_ACTIVE) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] Active Board detected. "
                 "Registering FMC_ADC_ACTIVE SMIO\n");
-        smio_register_sm (parent, 0x88c67d9c, FMC_130M_FMC_ACTIVE_CLK_OFFS, inst_id);
+        smio_register_sm (parent, 0x88c67d9c, base | FMC_130M_FMC_ACTIVE_CLK_OFFS, inst_id);
     }
     else { /* PASSIVE or Unsupported*/
         if (self->type != TYPE_FMC130M_4CH_PASSIVE) {
