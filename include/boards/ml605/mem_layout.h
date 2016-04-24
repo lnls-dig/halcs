@@ -16,6 +16,13 @@
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
+#define DSP1_BASE_RAW_ADDR                          0x00308000
+
+#define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_CTRL_RAW_REGS_OFFS)
+#define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_BPM_RAW_SWAP_OFFS)
+
 #define FMC1_130M_BASE_RAW_ADDR                     0x00310000
 
 #define FMC1_130M_CTRL_RAW_REGS                     (FMC1_130M_BASE_RAW_ADDR +  \
@@ -44,13 +51,6 @@
 #define FMC1_250M_EEPROM_RAW_I2C                    (FMC1_250M_BASE_RAW_ADDR + \
                                                         FMC_250M_EEPROM_RAW_I2C_OFFS)
 
-#define DSP1_BASE_RAW_ADDR                          0x00308000
-
-#define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
-                                                        DSP_CTRL_RAW_REGS_OFFS)
-#define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
-                                                        DSP_BPM_RAW_SWAP_OFFS)
-
 #define WB_ACQ1_BASE_RAW_ADDR                       0x00330000
 
 /* Large Memory RAW Addresses. It lives at address 0 */
@@ -78,6 +78,11 @@
  */
 
 /* Wishbone Addresses */
+#define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
+
+#define DSP1_CTRL_REGS                              (BAR4_ADDR | DSP1_CTRL_RAW_REGS)
+#define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
+
 #define FMC1_130M_BASE_ADDR                         (BAR4_ADDR | FMC1_130M_BASE_RAW_ADDR)
 
 #define FMC1_130M_CTRL_REGS                         (BAR4_ADDR | FMC1_130M_CTRL_RAW_REGS)
@@ -94,11 +99,6 @@
 #define FMC1_250M_EEPROM_I2C                        (BAR4_ADDR | FMC1_250M_EEPROM_RAW_I2C)
 #define FMC1_250M_AMC7823_SPI                       (BAR4_ADDR | FMC1_250M_AMC7823_RAW_SPI)
 #define FMC1_250M_ISLA216P_SPI                      (BAR4_ADDR | FMC1_250M_ISLA216P_RAW_SPI)
-
-#define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
-
-#define DSP1_CTRL_REGS                              (BAR4_ADDR | DSP1_CTRL_RAW_REGS)
-#define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
 
 #define WB_ACQ1_BASE_ADDR                           (BAR4_ADDR | WB_ACQ1_BASE_RAW_ADDR)
 
