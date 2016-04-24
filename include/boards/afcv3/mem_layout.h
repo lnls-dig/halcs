@@ -16,7 +16,7 @@
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
-#define FMC1_130M_BASE_RAW_ADDR                     0x00310000
+#define FMC1_130M_BASE_RAW_ADDR                     0x00320000
 
 #define FMC1_130M_CTRL_RAW_REGS                     (FMC1_130M_BASE_RAW_ADDR +  \
                                                         FMC_130M_CTRL_RAW_REGS_OFFS)
@@ -29,7 +29,7 @@
 #define FMC1_130M_LM75A_RAW_I2C                     (FMC1_130M_BASE_RAW_ADDR + \
                                                         FMC_130M_LM75A_RAW_I2C_OFFS)
 
-#define FMC1_250M_BASE_RAW_ADDR                     0x00310000
+#define FMC1_250M_BASE_RAW_ADDR                     0x00320000
 
 #define FMC1_250M_CTRL_RAW_REGS                     (FMC1_250M_BASE_RAW_ADDR +  \
                                                         FMC_250M_CTRL_RAW_REGS_OFFS)
@@ -44,7 +44,7 @@
 #define FMC1_250M_ISLA216P_RAW_SPI                  (FMC1_250M_BASE_RAW_ADDR +  \
                                                         FMC_250M_ISLA216P_RAW_SPI_OFFS)
 
-#define DSP1_BASE_RAW_ADDR                          0x00308000
+#define DSP1_BASE_RAW_ADDR                          0x00310000
 
 #define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
                                                         DSP_CTRL_RAW_REGS_OFFS)
