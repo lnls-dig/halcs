@@ -40,7 +40,7 @@ smch_err_e smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
 smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout);
 
 /* Setup new frequency */
-smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency);
+smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq);
 /* Get current frequency */
 smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq);
 

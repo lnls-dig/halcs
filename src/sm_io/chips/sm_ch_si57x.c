@@ -164,10 +164,13 @@ smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     return _smch_si57x_get_defaults (self, fout);
 }
 
-smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency)
+smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
 {
     assert (self);
+    assert (freq);
+
     smch_err_e err = SMCH_SUCCESS;
+    double frequency = *freq;
 
     ASSERT_TEST(frequency > 0, "Invalid frequency (0 Hz)", err_exit);
 
