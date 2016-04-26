@@ -200,6 +200,24 @@ err_exit:
     return err;
 }
 
+smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
+{
+    assert (self);
+    assert (freq);
+    smch_err_e err = SMCH_SUCCESS;
+    double frequency = 0;
+
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Getting current "
+            "frequency\n");
+
+    /* rfreq is usually a large value. So we divide it first */
+    frequency = (double) self->rfreq / (self->hs_div * self->n1);
+    frequency *= self->fxtal;
+
+    *freq = frequency;
+    return err;
+}
+
 /***************** Static functions *****************/
 
 static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
