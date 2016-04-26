@@ -178,9 +178,9 @@ disp_op_t fmc_active_clk_ad9510_pll_clk_sel_exp = {
     }
 };
 
-disp_op_t fmc_active_clk_si571_set_freq_exp = {
-    .name = FMC_ACTIVE_CLK_NAME_SI571_SET_FREQ,
-    .opcode = FMC_ACTIVE_CLK_OPCODE_SI571_SET_FREQ,
+disp_op_t fmc_active_clk_si571_freq_exp = {
+    .name = FMC_ACTIVE_CLK_NAME_SI571_FREQ,
+    .opcode = FMC_ACTIVE_CLK_OPCODE_SI571_FREQ,
     .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -218,7 +218,7 @@ const disp_op_t *fmc_active_clk_exp_ops [] = {
     &fmc_active_clk_ad9510_cp_current_exp,
     &fmc_active_clk_ad9510_outputs_exp,
     &fmc_active_clk_ad9510_pll_clk_sel_exp,
-    &fmc_active_clk_si571_set_freq_exp,
+    &fmc_active_clk_si571_freq_exp,
     &fmc_active_clk_si571_get_defaults_exp,
     NULL
 };

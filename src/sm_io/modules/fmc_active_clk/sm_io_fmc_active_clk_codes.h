@@ -40,8 +40,8 @@
 #define FMC_ACTIVE_CLK_NAME_AD9510_OUTPUTS                 "fmc_active_clk_ad9510_outputs"
 #define FMC_ACTIVE_CLK_OPCODE_AD9510_PLL_CLK_SEL           13
 #define FMC_ACTIVE_CLK_NAME_AD9510_PLL_CLK_SEL             "fmc_active_clk_ad9510_pll_clk_sel"
-#define FMC_ACTIVE_CLK_OPCODE_SI571_SET_FREQ               14
-#define FMC_ACTIVE_CLK_NAME_SI571_SET_FREQ                 "fmc_active_clk_si571_set_freq"
+#define FMC_ACTIVE_CLK_OPCODE_SI571_FREQ                   14
+#define FMC_ACTIVE_CLK_NAME_SI571_FREQ                     "fmc_active_clk_si571_freq"
 #define FMC_ACTIVE_CLK_OPCODE_SI571_GET_DEFAULTS           15
 #define FMC_ACTIVE_CLK_NAME_SI571_GET_DEFAULTS             "fmc_active_clk_si571_get_defaults"
 #define FMC_ACTIVE_CLK_OPCODE_END                          16

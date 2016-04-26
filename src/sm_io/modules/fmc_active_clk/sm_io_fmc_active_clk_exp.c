@@ -230,7 +230,7 @@ FMC_ACTIVE_CLK_AD9510_FUNC_NAME_HEADER(pll_clk_sel)
 }
 
 /* Macros to avoid repetition of the function body Si57X */
-typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
+typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double *param);
 
 #define FMC_ACTIVE_CLK_SI571_FUNC_NAME(func_name)                               \
     _fmc_active_clk_si571_ ## func_name
@@ -238,7 +238,8 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
 #define FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(func_name)                        \
     static int FMC_ACTIVE_CLK_SI571_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-#define FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, func, error_msg)       \
+#define FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, read_func, write_func, \
+        error_msg)                                                              \
     do {                                                                        \
         (void) ret;                                                             \
         assert (owner);                                                         \
@@ -251,30 +252,72 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double param);
                 err_get_fmcaclk_handler, -FMC_ACTIVE_CLK_ERR);                  \
         smch_si57x_t *smch_si57x = SMIO_SI57X_HANDLER(fmcaclk);                 \
         uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
-        (void) rw;  /* Ignored for now */                                       \
         double param = *(double *) EXP_MSG_ZMQ_NEXT_ARG(args);                  \
                                                                                 \
+        smch_err_e serr = SMCH_SUCCESS;                                         \
         /* Call specific function */                                            \
-        smch_err_e serr = ((smch_si57x_func_fp) func) (smch_si57x, param);      \
-        ASSERT_TEST(serr == SMCH_SUCCESS, error_msg,                            \
-                err_smpr_write, -FMC_ACTIVE_CLK_ERR);                           \
+        if (rw) {                                                               \
+            WHEN(ISEMPTY(read_func))(                                           \
+                (void) ret;                                                     \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                        "SI57x read function not implemented\n");               \
+                err = -FMC_ACTIVE_CLK_UNINPL;                                   \
+                return err;                                                     \
+            )                                                                   \
+            WHENNOT(ISEMPTY(read_func))(                                        \
+                double value = 0;                                               \
+                serr = ((smch_si57x_func_fp) read_func) (smch_si57x,            \
+                        &value);                                                \
+                if (serr != SMCH_SUCCESS) {                                     \
+                    err = -FMC_ACTIVE_CLK_ERR;                                  \
+                }                                                               \
+                else {                                                          \
+                    *((double *) ret) = value;                                  \
+                    err = sizeof (value);                                       \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                            "SI57x function read value = 0x%f\n", value);       \
+                }                                                               \
+            )                                                                   \
+        }                                                                       \
+        else {                                                                  \
+            WHEN(ISEMPTY(write_func))(                                          \
+                DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                        "SI57x write function not implemented\n");              \
+                err = -FMC_ACTIVE_CLK_UNINPL;                                   \
+                return err;                                                     \
+            )                                                                   \
+            WHENNOT(ISEMPTY(write_func))(                                       \
+                serr = ((smch_si57x_func_fp) write_func) (smch_si57x,           \
+                        &param);                                                \
+                if (serr != SMCH_SUCCESS) {                                     \
+                    err = -FMC_ACTIVE_CLK_ERR;                                  \
+                }                                                               \
+                else {                                                          \
+                    err = -FMC_ACTIVE_CLK_OK;                                   \
+                }                                                               \
+            )                                                                   \
+        }                                                                       \
                                                                                 \
-err_smpr_write:                                                                 \
 err_get_fmcaclk_handler:                                                        \
         return err;                                                             \
                                                                                 \
     } while(0)
 
-FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(set_freq)
+FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(freq)
 {
-    FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, smch_si57x_set_freq,
-            "Could not set SI571 frequency");
+    FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_freq,
+            smch_si57x_set_freq, "Could not set SI571 frequency");
+}
+
+static smch_err_e smch_si57x_get_defaults_compat (smch_si57x_t *self, double *param)
+{
+    return smch_si57x_get_defaults (self, *param);
 }
 
 FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(get_defaults)
 {
-    FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_defaults,
-            "Could not restart SI571 to its defaults");
+    FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, /* No read func*/,
+            smch_si57x_get_defaults_compat, "Could not restart SI571 to its defaults");
 }
 
 /* Exported function pointers */
@@ -293,7 +336,7 @@ const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(cp_current),
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(outputs),
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(pll_clk_sel),
-    FMC_ACTIVE_CLK_SI571_FUNC_NAME(set_freq),
+    FMC_ACTIVE_CLK_SI571_FUNC_NAME(freq),
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(get_defaults),
     NULL
 };

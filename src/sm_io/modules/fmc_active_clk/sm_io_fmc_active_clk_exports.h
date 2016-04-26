@@ -24,7 +24,7 @@ extern disp_op_t fmc_active_clk_ad9510_mux_status_exp;
 extern disp_op_t fmc_active_clk_ad9510_cp_current_exp;
 extern disp_op_t fmc_active_clk_ad9510_outputs_exp;
 extern disp_op_t fmc_active_clk_ad9510_pll_clk_sel_exp;
-extern disp_op_t fmc_active_clk_si571_set_freq_exp;
+extern disp_op_t fmc_active_clk_si571_freq_exp;
 extern disp_op_t fmc_active_clk_si571_get_defaults_exp;
 
 extern const disp_op_t *fmc_active_clk_exp_ops [];
