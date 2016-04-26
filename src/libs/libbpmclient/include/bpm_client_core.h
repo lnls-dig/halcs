@@ -369,8 +369,10 @@ bpm_client_err_e bpm_get_ad9510_pll_clk_sel (bpm_client_t *self, char *service,
 /* FMC SI571 Control.
  * Returns BPM_CLIENT_SUCCESS if ok and BPM_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
-bpm_client_err_e bpm_set_si571_set_freq (bpm_client_t *self, char *service,
-        double si571_set_freq);
+bpm_client_err_e bpm_set_si571_freq (bpm_client_t *self, char *service,
+        double si571_freq);
+bpm_client_err_e bpm_get_si571_freq (bpm_client_t *self, char *service,
+        double *si571_freq);
 bpm_client_err_e bpm_set_si571_defaults (bpm_client_t *self, char *service,
         double si571_defaults);
 

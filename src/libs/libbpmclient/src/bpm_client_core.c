@@ -584,10 +584,16 @@ PARAM_FUNC_CLIENT_READ(ad9510_pll_clk_sel)
 }
 
 /* SI571 Set frequency */
-PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_set_freq)
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_freq)
 {
-    return param_client_write_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_SET_FREQ,
-            si571_set_freq);
+    return param_client_write_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_FREQ,
+            si571_freq);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(si571_freq)
+{
+    return param_client_read_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_FREQ,
+            si571_freq);
 }
 
 /* SI571 Get defaults */
