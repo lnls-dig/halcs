@@ -127,7 +127,7 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {
@@ -135,7 +135,7 @@ int main (int argc, char *argv [])
         goto err_bpm_client_new;
     }
 
-    bpm_client_err_e err = bpm_set_si571_set_freq (bpm_client, service, si571_freq);
+    bpm_client_err_e err = bpm_set_si571_freq (bpm_client, service, si571_freq);
     if (err != BPM_CLIENT_SUCCESS){
         fprintf (stderr, "[client:si571_ctl]: Si571 Set frequency failed\n");
         goto err_bpm_set_freq;
