@@ -9,17 +9,7 @@
 #define _FMC250M_4CH_DEFAULTS_H_
 
 #include "sm_io_err.h"
-#include "chips/si57x_regs.h"
 #include "sm_ch_pca9547.h"
-
-#define FMC250M_4CH_DFLT_PLL_FUNC                   0x1
-#define FMC250M_4CH_DFLT_CLK_SEL                    0x0                         /* Clock from FMC front panel */
-#define FMC250M_4CH_DFLT_TRIG_DIR                   0x0                         /* Output direction */
-#define FMC250M_4CH_DFLT_PCA9547_CFG                SMCH_PCA9547_NO_CHANNEL     /* No channel selected */
-#define FMC250M_4CH_DFLT_SI571_OE                   0x1
-
-#define FMC250M_4CH_DFLT_SI57X_FOUT_FACTORY         SI57X_FOUT_FACTORY_DFLT
-#define FMC250M_4CH_DFLT_SI57X_FOUT                 113040445   /* 113.040445 MHz default */
 
 #define FMC250M_4CH_DFLT_RST_ADCS                   0x1
 #define FMC250M_4CH_DFLT_RST_DIV_ADCS               0x1

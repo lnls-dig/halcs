@@ -10,11 +10,6 @@
 
 #include "disptable.h"
 
-extern disp_op_t fmc130m_4ch_leds_exp;
-extern disp_op_t fmc130m_4ch_si571_oe_exp;
-extern disp_op_t fmc130m_4ch_pll_func_exp;
-extern disp_op_t fmc130m_4ch_pll_status_exp;
-extern disp_op_t fmc130m_4ch_clk_sel_exp;
 extern disp_op_t fmc130m_4ch_adc_rand_exp;
 extern disp_op_t fmc130m_4ch_adc_dith_exp;
 extern disp_op_t fmc130m_4ch_adc_shdn_exp;
@@ -39,22 +34,6 @@ extern disp_op_t fmc130m_4ch_adc_dly0_exp;
 extern disp_op_t fmc130m_4ch_adc_dly1_exp;
 extern disp_op_t fmc130m_4ch_adc_dly2_exp;
 extern disp_op_t fmc130m_4ch_adc_dly3_exp;
-extern disp_op_t fmc130m_4ch_test_data_en_exp;
-extern disp_op_t fmc130m_4ch_trig_dir_exp;
-extern disp_op_t fmc130m_4ch_trig_term_exp;
-extern disp_op_t fmc130m_4ch_trig_val_exp;
-extern disp_op_t fmc130m_4ch_ad9510_cfg_defaults_exp;
-extern disp_op_t fmc130m_4ch_ad9510_pll_a_div_exp;
-extern disp_op_t fmc130m_4ch_ad9510_pll_b_div_exp;
-extern disp_op_t fmc130m_4ch_ad9510_pll_prescaler_exp;
-extern disp_op_t fmc130m_4ch_ad9510_r_div_exp;
-extern disp_op_t fmc130m_4ch_ad9510_pll_pdown_exp;
-extern disp_op_t fmc130m_4ch_ad9510_mux_status_exp;
-extern disp_op_t fmc130m_4ch_ad9510_cp_current_exp;
-extern disp_op_t fmc130m_4ch_ad9510_outputs_exp;
-extern disp_op_t fmc130m_4ch_ad9510_pll_clk_sel_exp;
-extern disp_op_t fmc130m_4ch_si571_set_freq_exp;
-extern disp_op_t fmc130m_4ch_si571_get_defaults_exp;
 
 extern const disp_op_t *fmc130m_4ch_exp_ops [];
 

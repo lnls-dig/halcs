@@ -1,7 +1,7 @@
 #ifndef _MEM_LAYOUT_H_
 #define _MEM_LAYOUT_H_
 
-#include "pcie_regs.h"
+#include "mem_layout_common.h"
 #include "acq_chan.h"
 
 #define NUM_MAX_SLOTS                               1
@@ -12,31 +12,17 @@
 #define NUM_FMC250M_4CH_SMIOS                       1
 
 /*********************** Static ML605 FPGA layout ***********************/
-/* FMC_130M Components */
-#define FMC_130M_CTRL_RAW_REGS_OFFS                 0x0000
-#define FMC_130M_SI571_RAW_I2C_OFFS                 0x0100
-#define FMC_130M_AD9510_RAW_SPI_OFFS                0x0200
-#define FMC_130M_EEPROM_RAW_I2C_OFFS                0x0300
-#define FMC_130M_LM75A_RAW_I2C_OFFS                 0x0400
-
-/* FMC_250M Components */
-#define FMC_250M_CTRL_RAW_REGS_OFFS                 0x0000
-#define FMC_250M_AMC7823_RAW_SPI_OFFS               0x0100
-#define FMC_250M_ISLA216P_RAW_SPI_OFFS              0x0200
-#define FMC_250M_AD9510_RAW_SPI_OFFS                0x0300
-#define FMC_250M_SI571_RAW_I2C_OFFS                 0x0400
-#define FMC_250M_EEPROM_RAW_I2C_OFFS                0x0500
-
-/* DSP Components */
-#define DSP_CTRL_RAW_REGS_OFFS                      0x0000
-#define DSP_BPM_RAW_SWAP_OFFS                       0x0100
-
-/* ACQ Components */
-#define WB_ACQ_CORE_CTRL_RAW_REGS_OFFS              0x0000
 
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
+#define DSP1_BASE_RAW_ADDR                          0x00308000
+
+#define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_CTRL_RAW_REGS_OFFS)
+#define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
+                                                        DSP_BPM_RAW_SWAP_OFFS)
+
 #define FMC1_130M_BASE_RAW_ADDR                     0x00310000
 
 #define FMC1_130M_CTRL_RAW_REGS                     (FMC1_130M_BASE_RAW_ADDR +  \
@@ -65,13 +51,6 @@
 #define FMC1_250M_EEPROM_RAW_I2C                    (FMC1_250M_BASE_RAW_ADDR + \
                                                         FMC_250M_EEPROM_RAW_I2C_OFFS)
 
-#define DSP1_BASE_RAW_ADDR                          0x00308000
-
-#define DSP1_CTRL_RAW_REGS                          (DSP1_BASE_RAW_ADDR +       \
-                                                        DSP_CTRL_RAW_REGS_OFFS)
-#define DSP1_BPM_RAW_SWAP                           (DSP1_BASE_RAW_ADDR +       \
-                                                        DSP_BPM_RAW_SWAP_OFFS)
-
 #define WB_ACQ1_BASE_RAW_ADDR                       0x00330000
 
 /* Large Memory RAW Addresses. It lives at address 0 */
@@ -98,55 +77,30 @@
  * the correct one to read or write
  */
 
-/* FMC_130M Components */
-#define FMC_130M_CTRL_REGS_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_CTRL_RAW_REGS_OFFS)
-#define FMC_130M_SI571_I2C_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_SI571_RAW_I2C_OFFS)
-#define FMC_130M_AD9510_SPI_OFFS                    (/*BAR4_ADDR |*/ FMC_130M_AD9510_RAW_SPI_OFFS)
-#define FMC_130M_EEPROM_I2C_OFFS                    (/*BAR4_ADDR |*/ FMC_130M_EEPROM_RAW_I2C_OFFS)
-#define FMC_130M_LM75A_I2C_OFFS                     (/*BAR4_ADDR |*/ FMC_130M_LM75A_RAW_I2C_OFFS)
-
-/* FMC_250M Components */
-#define FMC_250M_CTRL_REGS_OFFS                     (BAR4_ADDR | FMC_250M_CTRL_RAW_REGS_OFFS)
-#define FMC_250M_AMC7823_SPI_OFFS                   (BAR4_ADDR | FMC_250M_AMC7823_RAW_SPI_OFFS)
-#define FMC_250M_ISLA216P_SPI_OFFS                  (BAR4_ADDR | FMC_250M_ISLA216P_RAW_SPI_OFFS)
-#define FMC_250M_AD9510_SPI_OFFS                    (BAR4_ADDR | FMC_250M_AD9510_RAW_SPI_OFFS)
-#define FMC_250M_SI571_I2C_OFFS                     (BAR4_ADDR | FMC_250M_SI571_RAW_I2C_OFFS)
-#define FMC_250M_EEPROM_I2C_OFFS                    (BAR4_ADDR | FMC_250M_EEPROM_RAW_I2C_OFFS)
-
-/* DSP Components */
-#define DSP_CTRL_REGS_OFFS                          (/*BAR4_ADDR |*/ DSP_CTRL_RAW_REGS_OFFS)
-#define DSP_BPM_SWAP_OFFS                           (/*BAR4_ADDR |*/ DSP_BPM_RAW_SWAP_OFFS)
-
-/* ACQ Components */
-#define WB_ACQ_CORE_CTRL_REGS_OFFS                  (/*BAR4_ADDR |*/ WB_ACQ_CORE_CTRL_RAW_REGS_OFFS)
-
 /* Wishbone Addresses */
+#define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
+
+#define DSP1_CTRL_REGS                              (BAR4_ADDR | DSP1_CTRL_RAW_REGS)
+#define DSP1_BPM_SWAP                               (BAR4_ADDR | DSP1_BPM_RAW_SWAP)
+
 #define FMC1_130M_BASE_ADDR                         (BAR4_ADDR | FMC1_130M_BASE_RAW_ADDR)
 
-#define FMC1_130M_CTRL_REGS                         (/*BAR4_ADDR |*/ FMC1_130M_CTRL_RAW_REGS)
-#define FMC1_130M_SI571_I2C                         (/*BAR4_ADDR |*/ FMC1_130M_SI571_RAW_I2C)
-#define FMC1_130M_AD9510_SPI                        (/*BAR4_ADDR |*/ FMC1_130M_AD9510_RAW_SPI)
-#define FMC1_130M_EEPROM_I2C                        (/*BAR4_ADDR |*/ FMC1_130M_EEPROM_RAW_I2C)
-#define FMC1_130M_LM75A_I2C                         (/*BAR4_ADDR |*/ FMC1_130M_LM75A_RAW_I2C)
+#define FMC1_130M_CTRL_REGS                         (BAR4_ADDR | FMC1_130M_CTRL_RAW_REGS)
+#define FMC1_130M_FMC_ADC_COMMON                    (BAR4_ADDR | FMC1_130M_FMC_ADC_COMMON_RAW_REGS)
+#define FMC1_130M_FMC_ACTIVE_CLK                    (BAR4_ADDR | FMC1_130M_FMC_ACTIVE_CLK_RAW)
+#define FMC1_130M_EEPROM_I2C                        (BAR4_ADDR | FMC1_130M_EEPROM_RAW_I2C)
+#define FMC1_130M_LM75A_I2C                         (BAR4_ADDR | FMC1_130M_LM75A_RAW_I2C)
 
 #define FMC1_250M_BASE_ADDR                         (BAR4_ADDR | FMC1_250M_BASE_RAW_ADDR)
 
-#define FMC1_250M_CTRL_REGS                         (/*BAR4_ADDR |*/ FMC1_250M_CTRL_RAW_REGS)
-#define FMC1_250M_AMC7823_SPI                       (/*BAR4_ADDR |*/ FMC1_250M_AMC7823_RAW_SPI)
-#define FMC1_250M_ISLA216P_SPI                      (/*BAR4_ADDR |*/ FMC1_250M_ISLA216P_RAW_SPI)
-#define FMC1_250M_AD9510_SPI                        (/*BAR4_ADDR |*/ FMC1_250M_AD9510_RAW_SPI)
-#define FMC1_250M_SI571_I2C                         (/*BAR4_ADDR |*/ FMC1_250M_SI571_RAW_I2C)
-#define FMC1_250M_EEPROM_I2C                        (/*BAR4_ADDR |*/ FMC1_250M_EEPROM_RAW_I2C)
-
-#define DSP1_BASE_ADDR                              (BAR4_ADDR | DSP1_BASE_RAW_ADDR)
-
-#define DSP1_CTRL_REGS                              (/*BAR4_ADDR |*/ DSP1_CTRL_RAW_REGS)
-#define DSP1_BPM_SWAP                               (/*BAR4_ADDR |*/ DSP1_BPM_RAW_SWAP)
+#define FMC1_250M_CTRL_REGS                         (BAR4_ADDR | FMC1_250M_CTRL_RAW_REGS)
+#define FMC1_250M_FMC_ADC_COMMON                    (BAR4_ADDR | FMC1_250M_FMC_ADC_COMMON_RAW_REGS)
+#define FMC1_250M_FMC_ACTIVE_CLK                    (BAR4_ADDR | FMC1_250M_FMC_ACTIVE_CLK_RAW)
+#define FMC1_250M_EEPROM_I2C                        (BAR4_ADDR | FMC1_250M_EEPROM_RAW_I2C)
+#define FMC1_250M_AMC7823_SPI                       (BAR4_ADDR | FMC1_250M_AMC7823_RAW_SPI)
+#define FMC1_250M_ISLA216P_SPI                      (BAR4_ADDR | FMC1_250M_ISLA216P_RAW_SPI)
 
 #define WB_ACQ1_BASE_ADDR                           (BAR4_ADDR | WB_ACQ1_BASE_RAW_ADDR)
-
-/* Large Memory Addresses */
-#define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
 
 /************************* ML605 Gateware Options *************************/
 

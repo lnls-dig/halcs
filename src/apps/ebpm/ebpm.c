@@ -67,10 +67,10 @@ static devio_err_e _spawn_epics_iocs (devio_t *devio, uint32_t dev_id,
         char *cfg_file, char *broker_endp, char *log_prefix, zhashx_t *hints);
 static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
         const char *devio_type, uint32_t smio_inst_id);
-static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
-static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, uint32_t dev_id);
-static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_id);
+static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32_t dev_id);
+static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id);
 
 static struct option long_options[] =
 {
@@ -468,7 +468,7 @@ int main (int argc, char *argv[])
     broker_endp = NULL;
 
     /* Spawn platform SMIOSs */
-    err = _spawn_platform_smios (devio, devio_type, fe_smio_id, devio_hints,
+    err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
             dev_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] _spawn_platform_smios error!\n");
@@ -798,20 +798,20 @@ err_devio_log_alloc:
     return NULL;
 }
 
-static devio_err_e _spawn_platform_smios (devio_t *devio, devio_type_e devio_type,
+static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
-    assert (devio);
+    assert (pipe);
 
     devio_err_e err = DEVIO_SUCCESS;
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_be_platform_smios (devio, hints, dev_id);
+            err = _spawn_be_platform_smios (pipe, hints, dev_id);
             break;
 
         case FE_DEVIO:
-            err = _spawn_fe_platform_smios (devio, smio_inst_id);
+            err = _spawn_fe_platform_smios (pipe, smio_inst_id);
             break;
 
         default:
@@ -828,7 +828,7 @@ err_register_sm:
     return err;
 }
 
-static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, uint32_t dev_id)
+static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32_t dev_id)
 {
     const char *fmc_board_130m_4ch = "fmc130m_4ch";
     const char *fmc_board_250m_4ch = "fmc250m_4ch";
@@ -854,30 +854,30 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
             streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
                 fmc_board_130m_4ch)) {
         /* Default FMC Board */
-        err = devio_register_sm (devio, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
+        err = devio_register_sm (pipe, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         }
     }
     else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
         /* FMC250m Board */
-        err = devio_register_sm (devio, fmc250m_4ch_id, FMC1_250M_BASE_ADDR, 0);
+        err = devio_register_sm (pipe, fmc250m_4ch_id, FMC1_250M_BASE_ADDR, 0);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         }
     }
 
-    err = devio_register_sm (devio, acq_id, WB_ACQ1_BASE_ADDR, 0);
+    err = devio_register_sm (pipe, acq_id, WB_ACQ1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
 
-    err = devio_register_sm (devio, dsp_id, DSP1_BASE_ADDR, 0);
+    err = devio_register_sm (pipe, dsp_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
 
-    err = devio_register_sm (devio, swap_id, DSP1_BASE_ADDR, 0);
+    err = devio_register_sm (pipe, swap_id, DSP1_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
@@ -896,35 +896,35 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
             streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
                 fmc_board_130m_4ch)) {
         /* Default FMC Board */
-        err = devio_register_sm (devio, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
+        err = devio_register_sm (pipe, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         }
     }
     else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
         /* FMC250m Board */
-        err = devio_register_sm (devio, fmc250m_4ch_id, FMC2_250M_BASE_ADDR, 1);
+        err = devio_register_sm (pipe, fmc250m_4ch_id, FMC2_250M_BASE_ADDR, 1);
         if (err != DEVIO_SUCCESS) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
         }
     }
 
-    err = devio_register_sm (devio, acq_id, WB_ACQ2_BASE_ADDR, 1);
+    err = devio_register_sm (pipe, acq_id, WB_ACQ2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
 
-    err = devio_register_sm (devio, dsp_id, DSP2_BASE_ADDR, 1);
+    err = devio_register_sm (pipe, dsp_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
 
-    err = devio_register_sm (devio, swap_id, DSP2_BASE_ADDR, 1);
+    err = devio_register_sm (pipe, swap_id, DSP2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
 
-    err = devio_register_sm (devio, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
+    err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }
@@ -936,7 +936,7 @@ static devio_err_e _spawn_be_platform_smios (devio_t *devio, zhashx_t *hints, ui
     return err;
 }
 
-static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_id)
+static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id)
 {
     uint32_t rffe_id = 0x7af21909;
     devio_err_e err = DEVIO_SUCCESS;
@@ -945,7 +945,7 @@ static devio_err_e _spawn_fe_platform_smios (devio_t *devio, uint32_t smio_inst_
     /* #if defined (__AFE_RFFE_V1__) */
 #if defined (__AFE_RFFE_V2__)
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_fe] Spawning default SMIOs ...\n");
-    err = devio_register_sm (devio, rffe_id, 0, smio_inst_id);
+    err = devio_register_sm (pipe, rffe_id, 0, smio_inst_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[dev_io_fe] devio_register_sm error!\n");
     }

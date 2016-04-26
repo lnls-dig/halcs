@@ -65,13 +65,13 @@ devio_err_e devio_destroy (devio_t **self_p);
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self);
 /* Register an specific sm_io module to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id,
+devio_err_e devio_register_sm (void *pipe, uint32_t smio_id,
         uint64_t base, uint32_t inst_id);
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
-devio_err_e devio_register_all_sm (devio_t *self);
-devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
-devio_err_e devio_unregister_all_sm (devio_t *self);
+devio_err_e devio_register_all_sm (void *pipe);
+devio_err_e devio_unregister_sm (void *pipe, const char *smio_key);
+devio_err_e devio_unregister_all_sm (void *pipe);
 /* Poll all PIPE sockets */
 void devio_loop (zsock_t *pipe, void *args);
 /* Router for all the opcodes registered for this dev_io */
