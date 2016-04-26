@@ -72,7 +72,7 @@ smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not get Si571 defaults",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_si571_set_freq (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT);
+    client_err = bpm_set_si571_freq (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set Si571 frequency",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
