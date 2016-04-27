@@ -210,7 +210,7 @@ smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
     smch_err_e err = SMCH_SUCCESS;
     double frequency = 0;
 
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Getting current "
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_freq] Getting current "
             "frequency\n");
 
     /* rfreq is usually a large value. So we divide it first */
