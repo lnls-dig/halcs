@@ -191,6 +191,12 @@ smio_err_e smio_fmc250m_4ch_destroy (smio_fmc250m_4ch_t **self_p)
             smch_pca9547_destroy (&self->smch_pca9547);
         }
 
+        /* Destroy all ISLA216P instances */
+        uint32_t i;
+        for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+            smch_isla216p_destroy (&self->smch_isla216p_adc[i]);
+        }
+
         free (self);
         *self_p = NULL;
     }
