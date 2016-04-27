@@ -378,11 +378,11 @@ devio_err_e devio_destroy (devio_t **self_p)
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
 
-        if (self->pipe) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-                    "[dev_io_core:destroy] Destroying DEVIO pipe\n");
-            zsock_destroy(&self->pipe);
-        }
+        /* Do not destroy PIPE as CZMQ actor thread will do it.
+         * See github issue #116 (https://github.com/lnls-dig/bpm-sw/issues/116)
+         *
+         *  zsock_destroy(&self->pipe);
+         * */
 
         /* Destroy all remamining sockets if any */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
