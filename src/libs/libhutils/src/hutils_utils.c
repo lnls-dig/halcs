@@ -339,7 +339,9 @@ static void _hutils_hints_free_item (void **data)
     if (*data) {
         hutils_hints_t *item = *data;
         free (item->fmc_board);
+        item->fmc_board = NULL;
         free (item->bind);
+        item->bind = NULL;
         free (item);
         *data = NULL;
     }
