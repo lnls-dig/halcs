@@ -214,7 +214,7 @@ smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
             "frequency\n");
 
     /* rfreq is usually a large value. So we divide it first */
-    frequency = (double) self->rfreq / (self->hs_div * self->n1);
+    frequency = ((double) self->rfreq / POW_2_28) / (self->hs_div * self->n1);
     frequency *= self->fxtal;
 
     *freq = frequency;
