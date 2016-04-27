@@ -181,7 +181,7 @@ disp_op_t fmc_active_clk_ad9510_pll_clk_sel_exp = {
 disp_op_t fmc_active_clk_si571_freq_exp = {
     .name = FMC_ACTIVE_CLK_NAME_SI571_FREQ,
     .opcode = FMC_ACTIVE_CLK_OPCODE_SI571_FREQ,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
