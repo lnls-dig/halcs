@@ -888,6 +888,19 @@ PARAM_FUNC_CLIENT_READ(rst_div_adcs)
             rst_div_adcs);
 }
 
+/* ISLA216P Sleep ADCs */
+PARAM_FUNC_CLIENT_WRITE(sleep_adcs)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_SLEEP_ADCS,
+            sleep_adcs);
+}
+
+PARAM_FUNC_CLIENT_READ(sleep_adcs)
+{
+    return param_client_read (self, service, FMC250M_4CH_OPCODE_SLEEP_ADCS,
+            sleep_adcs);
+}
+
 /* ISLA216P Test modes */
 PARAM_FUNC_CLIENT_WRITE(test_mode0)
 {
