@@ -335,6 +335,16 @@ RW_PARAM_FUNC(fmc250m_4ch, rst_div_adcs) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+#define BPM_FMC250M_4CH_SLEEP_ADCS_MIN        	0  /* Do nothing on SLEEP_ADCS pin */
+#define BPM_FMC250M_4CH_SLEEP_ADCS_MAX        	1  /* Pulse SLEEP_ADCS pin */
+
+RW_PARAM_FUNC(fmc250m_4ch, sleep_adcs) {
+    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+            ADC_CTL, SLEEP_ADCS, SINGLE_BIT_PARAM,
+            BPM_FMC250M_4CH_SLEEP_ADCS_MIN, BPM_FMC250M_4CH_SLEEP_ADCS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Macros to avoid repetition of the function body ISLA216P */
 typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *param);
 
@@ -474,6 +484,7 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
 #endif
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_div_adcs),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, sleep_adcs),
     FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode0),
     FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode1),
     FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode2),

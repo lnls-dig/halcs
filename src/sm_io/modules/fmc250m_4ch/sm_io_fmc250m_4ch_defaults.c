@@ -63,6 +63,10 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not reset DIV CLK ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    client_err = bpm_set_sleep_adcs (config_client, service, FMC250M_4CH_DFLT_SLEEP_ADCS);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could set activate ADCs",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     bpm_client_destroy (&config_client);
 err_alloc_client:

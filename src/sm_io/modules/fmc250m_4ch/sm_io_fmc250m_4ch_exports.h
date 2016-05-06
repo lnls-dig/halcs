@@ -40,6 +40,7 @@ extern disp_op_t fmc250m_4ch_adc_dly3_exp;
 #endif
 extern disp_op_t fmc250m_4ch_rst_adcs_exp;
 extern disp_op_t fmc250m_4ch_rst_div_adcs_exp;
+extern disp_op_t fmc250m_4ch_sleep_adcs_exp;
 extern disp_op_t fmc250m_4ch_test_mode0_exp;
 extern disp_op_t fmc250m_4ch_test_mode1_exp;
 extern disp_op_t fmc250m_4ch_test_mode2_exp;

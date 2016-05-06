@@ -34,6 +34,18 @@ disp_op_t fmc250m_4ch_rst_div_adcs_exp = {
     }
 };
 
+disp_op_t fmc250m_4ch_sleep_adcs_exp = {
+    .name = FMC250M_4CH_NAME_SLEEP_ADCS,
+    .opcode = FMC250M_4CH_OPCODE_SLEEP_ADCS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 #if 0
 disp_op_t fmc250m_4ch_adc_rand_exp = {
     .name = FMC250M_4CH_NAME_ADC_RAND,
@@ -407,6 +419,7 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
 #endif
     &fmc250m_4ch_rst_adcs_exp,
     &fmc250m_4ch_rst_div_adcs_exp,
+    &fmc250m_4ch_sleep_adcs_exp,
     &fmc250m_4ch_test_mode0_exp,
     &fmc250m_4ch_test_mode1_exp,
     &fmc250m_4ch_test_mode2_exp,
