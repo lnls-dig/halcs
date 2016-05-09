@@ -41,6 +41,8 @@ extern const smio_mod_dispatch_t _esmio_mod_dispatch;
             .bootstrap_ops = &mod_bootstrap_ops                                 \
         };
 
+#define for_each_smio(s) for ((s) = &_smio_mod_dispatch; (s) < &_esmio_mod_dispatch; (s)++)
+
 #ifdef __cplusplus
 }
 #endif
