@@ -474,14 +474,9 @@ static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self
 {
     (void) self;
 
-    volatile const smio_mod_dispatch_t *smio_mod_dispatch_start = &_smio_mod_dispatch;
-    volatile const smio_mod_dispatch_t *smio_mod_dispatch_end = &_esmio_mod_dispatch;
-    smio_mod_dispatch_t *smio_mod_handler = (smio_mod_dispatch_t *) smio_mod_dispatch_start;
+    const smio_mod_dispatch_t *smio_mod_handler;
 
-    /* For now, just do a simple linear search. We can afford this, as
-     * we don't expect to insert new sm_io modules often */
-    uint32_t i;
-    for (i = 0; smio_mod_handler < smio_mod_dispatch_end; ++i, ++smio_mod_handler) {
+    for_each_smio(smio_mod_handler) {
         if (smio_mod_handler->id == smio_id) {
             return smio_mod_handler;
         }
