@@ -261,5 +261,22 @@
 #define ISLA216P_TESTIO_OUTMODE_RES8                14
 #define ISLA216P_TESTIO_OUTMODE_RES9                15
 
+#define ISLA216P_REG_NAPSLP                         0x25
+
+/* Definition for register ISLA216P_REG_NAPSLP */
+
+#define ISLA216P_NAPSLP_SIZE                        3
+#define ISLA216P_NAPSLP_SHIFT                       0
+#define ISLA216P_NAPSLP_MASK                        WBGEN2_GEN_MASK(ISLA216P_NAPSLP_SHIFT, \
+                                                                     ISLA216P_NAPSLP_SIZE)
+#define ISLA216P_NAPSLP_W(value)                    WBGEN2_GEN_WRITE(value, ISLA216P_NAPSLP_SHIFT, \
+                                                                     ISLA216P_NAPSLP_SIZE)
+#define ISLA216P_NAPSLP_R(reg)                      WBGEN2_GEN_READ(reg, ISLA216P_NAPSLP_SHIFT, \
+                                                                     ISLA216P_NAPSLP_SIZE)
+#define ISLA216P_NAPSLP_PIN_CONTROL                0
+#define ISLA216P_NAPSLP_NORMAL_OPERATION           (1<<0)
+#define ISLA216P_NAPSLP_NAP_MODE                   (1<<1) 
+#define ISLA216P_NAPSLP_SLEEP_MODE                 (1<<2) 
+
 #endif
 
