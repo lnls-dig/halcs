@@ -912,6 +912,61 @@ bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *ser
 bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *service,
         struct _smio_afc_diag_revision_data_t *revision_data);
 
+/****************************** Trigger Functions ****************************/
+
+/* Trigger Direction functions */
+/* These set of functions write (set) or read (get) the trigger direction of
+ * a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_dir (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t dir);
+bpm_client_err_e bpm_get_trigger_dir (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *dir);
+
+/* Trigger Receive/Transmit Counter Reset functions */
+/* These set of functions write (set) or read (get) the reset of the
+ * receiver or transmitter trigger counters of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_rcv_count_rst (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t rcv_count_rst);
+bpm_client_err_e bpm_get_trigger_rcv_count_rst (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *rcv_count_rst);
+bpm_client_err_e bpm_set_trigger_transm_count_rst (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t transm_count_rst);
+bpm_client_err_e bpm_get_trigger_transm_count_rst (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *transm_count_rst);
+
+/* Trigger Receive/Transmit Debounce/Extension length functions */
+/* These set of functions write (set) or read (get) the debounce (for receiver) and
+ * pulse extension (for transmitter) for the triggers of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_rcv_len (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t rcv_len);
+bpm_client_err_e bpm_get_trigger_rcv_len (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *rcv_len);
+bpm_client_err_e bpm_set_trigger_transm_len (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t transm_len);
+bpm_client_err_e bpm_get_trigger_transm_len (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *transm_len);
+
+/* Trigger Receive/Transmit Trigger Counter functions */
+/* These set of functions write (set) or read (get) the trigger counters
+ * of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_count_rcv (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t count_rcv);
+bpm_client_err_e bpm_get_trigger_count_rcv (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *count_rcv);
+bpm_client_err_e bpm_set_trigger_count_transm (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t count_transm);
+bpm_client_err_e bpm_get_trigger_count_transm (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *count_transm);
+
+/****************************** Helper Functions ****************************/
 /* Helper Function */
 
 /* This function execute the given function *func in a disp_op_t

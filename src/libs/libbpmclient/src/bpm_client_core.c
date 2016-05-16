@@ -1794,7 +1794,7 @@ bpm_client_err_e bpm_set_rffe_data (bpm_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block));
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0);
 }
 
 bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
@@ -1802,7 +1802,8 @@ bpm_client_err_e bpm_get_rffe_data (bpm_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block));
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0,
+            rffe_data_block, sizeof (*rffe_data_block));
 }
 
 /* RFFE get version */
@@ -1811,7 +1812,8 @@ bpm_client_err_e bpm_get_rffe_version (bpm_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_VERSION,
-            rw, rffe_version, sizeof (*rffe_version));
+            rw, rffe_version, sizeof (*rffe_version), NULL, 0,
+            rffe_version, sizeof (*rffe_version));
 }
 
 /* RFFE get/set switching level */
@@ -1861,7 +1863,8 @@ bpm_client_err_e bpm_get_afc_diag_build_revision (bpm_client_t *self, char *serv
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
-            rw, revision_data, sizeof (*revision_data));
+            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            revision_data, sizeof (*revision_data));
 }
 
 /* Build Date */
@@ -1870,7 +1873,8 @@ bpm_client_err_e bpm_get_afc_diag_build_date (bpm_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
-            rw, revision_data, sizeof (*revision_data));
+            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            revision_data, sizeof (*revision_data));
 }
 
 /* Build User Name */
@@ -1879,7 +1883,8 @@ bpm_client_err_e bpm_get_afc_diag_build_user_name (bpm_client_t *self, char *ser
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
-            rw, revision_data, sizeof (*revision_data));
+            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            revision_data, sizeof (*revision_data));
 }
 
 /* Build User Email */
@@ -1888,7 +1893,101 @@ bpm_client_err_e bpm_get_afc_diag_build_user_email (bpm_client_t *self, char *se
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
-            rw, revision_data, sizeof (*revision_data));
+            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            revision_data, sizeof (*revision_data));
+}
+
+/********************** Trigger Interface Functions ********************/
+
+/* Trigger direction */
+PARAM_FUNC_CLIENT_WRITE2(trigger_dir, chan, dir)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_DIR,
+            chan, dir);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_dir, chan, dir)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_DIR,
+            chan, dir);
+}
+
+/* Trigger receive counter reset */
+PARAM_FUNC_CLIENT_WRITE2(trigger_rcv_count_rst, chan, rcv_count_rst)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_RCV_COUNT_RST,
+            chan, rcv_count_rst);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_rcv_count_rst, chan, rcv_count_rst)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_RCV_COUNT_RST,
+            chan, rcv_count_rst);
+}
+
+/* Trigger transmit counter reset */
+PARAM_FUNC_CLIENT_WRITE2(trigger_transm_count_rst, chan, transm_count_rst)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_TRANSM_COUNT_RST,
+            chan, transm_count_rst);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_transm_count_rst, chan, transm_count_rst)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_TRANSM_COUNT_RST,
+            chan, transm_count_rst);
+}
+
+/* Trigger receive length debounce */
+PARAM_FUNC_CLIENT_WRITE2(trigger_rcv_len, chan, rcv_len)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_RCV_LEN,
+            chan, rcv_len);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_rcv_len, chan, rcv_len)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_RCV_LEN,
+            chan, rcv_len);
+}
+
+/* Trigger transmit length debounce */
+PARAM_FUNC_CLIENT_WRITE2(trigger_transm_len, chan, transm_len)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_TRANSM_LEN,
+            chan, transm_len);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_transm_len, chan, transm_len)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_TRANSM_LEN,
+            chan, transm_len);
+}
+
+/* Trigger count_receive */
+PARAM_FUNC_CLIENT_WRITE2(trigger_count_rcv, chan, count_rcv)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_COUNT_RCV,
+            chan, count_rcv);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_count_rcv, chan, count_rcv)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_COUNT_RCV,
+            chan, count_rcv);
+}
+
+/* Trigger count transmit */
+PARAM_FUNC_CLIENT_WRITE2(trigger_count_transm, chan, count_transm)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_COUNT_TRANSM,
+            chan, count_transm);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_count_transm, chan, count_transm)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_COUNT_TRANSM,
+            chan, count_transm);
 }
 
 /**************** Helper Function ****************/

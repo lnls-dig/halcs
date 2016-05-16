@@ -123,6 +123,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I../../sm_io/modules/dsp \
 	       -I../../sm_io/modules/rffe \
 	       -I../../sm_io/modules/afc_diag \
+	       -I../../sm_io/modules/trigger_iface \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -156,6 +157,7 @@ $(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.
 	../../sm_io/modules/swap/sm_io_swap_codes.h \
 	../../sm_io/modules/rffe/sm_io_rffe_codes.h \
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
+	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_codes.h \
 	../../sm_io/modules/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
@@ -166,7 +168,8 @@ $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_expo
 	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
 	../../sm_io/modules/swap/sm_io_swap_exports.h \
 	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
-	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h
+	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h \
+	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
