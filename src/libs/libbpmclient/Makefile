@@ -105,8 +105,8 @@ OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
                 ../../sm_io/modules/swap/sm_io_swap_exports.o \
                 ../../sm_io/modules/rffe/sm_io_rffe_exports.o \
                 ../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.o \
-                ../../sm_io/modules/afc_diag/sm_io_trigger_iface_exports.o \
-                ../../sm_io/modules/afc_diag/sm_io_trigger_mux_exports.o
+                ../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.o \
+                ../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
