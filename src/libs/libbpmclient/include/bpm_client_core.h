@@ -1003,10 +1003,10 @@ bpm_client_err_e bpm_get_trigger_transm_src (bpm_client_t *self, char *service,
  * transmitter of a specified channel "chan".
  * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see bpm_client_err.h for all possible errors)*/
-bpm_client_err_e bpm_set_trigger_transm_in_sel (bpm_client_t *self, char *service,
-        uint32_t chan, uint32_t transm_in_sel);
-bpm_client_err_e bpm_get_trigger_transm_in_sel (bpm_client_t *self, char *service,
-        uint32_t chan, uint32_t *transm_in_sel);
+bpm_client_err_e bpm_set_trigger_transm_out_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t transm_out_sel);
+bpm_client_err_e bpm_get_trigger_transm_out_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *transm_out_sel);
 
 /****************************** Helper Functions ****************************/
 /* Helper Function */
