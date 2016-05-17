@@ -61,7 +61,7 @@ smio_err_e trigger_mux_config_defaults (char *broker_endp, char *service,
         client_err = bpm_set_trigger_rcv_src (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_SRC);
         client_err |= bpm_set_trigger_rcv_in_sel (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_IN_SEL);
         client_err |= bpm_set_trigger_transm_src (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_SRC);
-        client_err |= bpm_set_trigger_transm_in_sel (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_IN_SEL);
+        client_err |= bpm_set_trigger_transm_out_sel (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_IN_SEL);
     }
 
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could set trigger mux defaults",
