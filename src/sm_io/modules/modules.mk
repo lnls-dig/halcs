@@ -8,7 +8,7 @@ include $(SRC_DIR)/sm_io/modules/fmc130m_4ch/fmc130m_4ch.mk \
 		$(SRC_DIR)/sm_io/modules/rffe/rffe.mk \
 		$(SRC_DIR)/sm_io/modules/afc_diag/afc_diag.mk \
 		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_iface.mk \
-		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_mux.mk
+		$(SRC_DIR)/sm_io/modules/trigger_mux/trigger_mux.mk
 
 sm_io_modules_DIR = $(SRC_DIR)/sm_io/modules
 
