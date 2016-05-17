@@ -7,7 +7,8 @@ include $(SRC_DIR)/sm_io/modules/fmc130m_4ch/fmc130m_4ch.mk \
 		$(SRC_DIR)/sm_io/modules/swap/swap.mk \
 		$(SRC_DIR)/sm_io/modules/rffe/rffe.mk \
 		$(SRC_DIR)/sm_io/modules/afc_diag/afc_diag.mk \
-		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_iface.mk
+		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_iface.mk \
+		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_mux.mk
 
 sm_io_modules_DIR = $(SRC_DIR)/sm_io/modules
 
@@ -21,4 +22,5 @@ sm_io_modules_OBJS = $(sm_io_modules_DIR)/sm_io_codes.o \
 		     $(sm_io_swap_OBJS) \
 		     $(sm_io_rffe_OBJS) \
 		     $(sm_io_afc_diag_OBJS) \
-		     $(sm_io_trigger_iface_OBJS)
+		     $(sm_io_trigger_iface_OBJS) \
+		     $(sm_io_trigger_mux_OBJS)
