@@ -40,6 +40,9 @@ extern "C" {
 /* Trigger Interface Components */
 #define WB_TRIGGER_IFACE_RAW_REG_OFFS               0x0000
 
+/* Trigger Mux Components */
+#define WB_TRIGGER_MUX_RAW_REG_OFFS                 0x0000
+
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
 
