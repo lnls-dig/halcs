@@ -10,11 +10,10 @@
 
 #include "sm_io_err.h"
 
-#define TRIGGER_MUX_DFLT_DIR                      1      /* Input */
-#define TRIGGER_MUX_DFLT_RCV_RST                  1      /* Pulse Reset */
-#define TRIGGER_MUX_DFLT_TRANSM_RST               1      /* Pulse Reset */
-#define TRIGGER_MUX_DFLT_RCV_LEN                  1      /* Debounce Length */
-#define TRIGGER_MUX_DFLT_TRANSM_LEN               1      /* Pulse Extension Length */
+#define TRIGGER_MUX_DFLT_RCV_SRC                  0      /* Trigger Backplane */
+#define TRIGGER_MUX_DFLT_RCV_IN_SEL               0      /* Trigger Index 0 */
+#define TRIGGER_MUX_DFLT_TRANSM_SRC               0      /* Trigger Backplane */
+#define TRIGGER_MUX_DFLT_TRANSM_IN_SEL            0      /* Trigger Index 0 */
 
 smio_err_e trigger_mux_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);
