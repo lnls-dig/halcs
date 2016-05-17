@@ -1990,6 +1990,60 @@ PARAM_FUNC_CLIENT_WRITE_READ(trigger_count_transm, chan, count_transm)
             chan, count_transm);
 }
 
+/********************** Trigger Mux Functions ********************/
+
+/* Trigger receive source */
+PARAM_FUNC_CLIENT_WRITE2(trigger_rcv_src, chan, rcv_src)
+{
+    return param_client_write2 (self, service, TRIGGER_MUX_OPCODE_RCV_SRC,
+            chan, rcv_src);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_rcv_src, chan, rcv_src)
+{
+    return param_client_write_read (self, service, TRIGGER_MUX_OPCODE_RCV_SRC,
+            chan, rcv_src);
+}
+
+/* Trigger receive in selection */
+PARAM_FUNC_CLIENT_WRITE2(trigger_rcv_in_sel, chan, rcv_in_sel)
+{
+    return param_client_write2 (self, service, TRIGGER_MUX_OPCODE_RCV_IN_SEL,
+            chan, rcv_in_sel);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_rcv_in_sel, chan, rcv_in_sel)
+{
+    return param_client_write_read (self, service, TRIGGER_MUX_OPCODE_RCV_IN_SEL,
+            chan, rcv_in_sel);
+}
+
+/* Trigger transmit source */
+PARAM_FUNC_CLIENT_WRITE2(trigger_transm_src, chan, transm_src)
+{
+    return param_client_write2 (self, service, TRIGGER_MUX_OPCODE_TRANSM_SRC,
+            chan, transm_src);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_transm_src, chan, transm_src)
+{
+    return param_client_write_read (self, service, TRIGGER_MUX_OPCODE_TRANSM_SRC,
+            chan, transm_src);
+}
+
+/* Trigger transmit selection */
+PARAM_FUNC_CLIENT_WRITE2(trigger_transm_out_sel, chan, transm_out_sel)
+{
+    return param_client_write2 (self, service, TRIGGER_MUX_OPCODE_TRANSM_OUT_SEL,
+            chan, transm_out_sel);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_transm_out_sel, chan, transm_out_sel)
+{
+    return param_client_write_read (self, service, TRIGGER_MUX_OPCODE_TRANSM_OUT_SEL,
+            chan, transm_out_sel);
+}
+
 /**************** Helper Function ****************/
 
 bpm_client_err_e func_polling (bpm_client_t *self, char *name, char *service,

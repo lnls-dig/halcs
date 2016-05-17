@@ -966,6 +966,48 @@ bpm_client_err_e bpm_set_trigger_count_transm (bpm_client_t *self, char *service
 bpm_client_err_e bpm_get_trigger_count_transm (bpm_client_t *self, char *service,
         uint32_t chan, uint32_t *count_transm);
 
+/**************************** Trigger Mux Functions ***************************/
+
+/* Trigger Receive Source functions */
+/* These set of functions write (set) or read (get) the trigger source for the
+ * receiver of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_rcv_src (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t rcv_src);
+bpm_client_err_e bpm_get_trigger_rcv_src (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *rcv_src);
+
+/* Trigger Receive Selection functions */
+/* These set of functions write (set) or read (get) the trigger selection for the
+ * receiver of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_rcv_in_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t rcv_in_sel);
+bpm_client_err_e bpm_get_trigger_rcv_in_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *rcv_in_sel);
+
+/* Trigger Transmit Source functions */
+/* These set of functions write (set) or read (get) the trigger source for the
+ * transmitter of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_transm_src (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t transm_src);
+bpm_client_err_e bpm_get_trigger_transm_src (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *transm_src);
+
+/* Trigger Transmit Selection functions */
+/* These set of functions write (set) or read (get) the trigger selection for the
+ * transmitter of a specified channel "chan".
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_transm_in_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t transm_in_sel);
+bpm_client_err_e bpm_get_trigger_transm_in_sel (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *transm_in_sel);
+
 /****************************** Helper Functions ****************************/
 /* Helper Function */
 
