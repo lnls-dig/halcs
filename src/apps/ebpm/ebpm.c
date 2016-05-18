@@ -837,8 +837,6 @@ static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32
     uint32_t acq_id = 0x4519a0ad;
     uint32_t dsp_id = 0x1bafbf1e;
     uint32_t swap_id = 0x12897592;
-    uint32_t trigger_iface_id = 0xbcbb78d2;
-    uint32_t trigger_mux_id = 0x84b6a5ac;
     devio_err_e err = DEVIO_SUCCESS;
 
     /* ML605 or AFCv3 */
@@ -886,6 +884,8 @@ static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32
     /* AFCv3 spefific */
 #if defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
+    uint32_t trigger_iface_id = 0xbcbb78d2;
+    uint32_t trigger_mux_id = 0x84b6a5ac;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning AFCv3 specific SMIOs ...\n");
 
