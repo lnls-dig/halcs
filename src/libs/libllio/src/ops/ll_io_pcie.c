@@ -191,6 +191,8 @@ static int pcie_open (llio_t *self, llio_endpoint_t *endpoint)
 
     /* Reset FPGA */
     _pcie_reset_fpga (self);
+    /* Reset PCIe Timeout */
+    _pcie_timeout_reset (self);
 
     return err;
 
