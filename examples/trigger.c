@@ -1,7 +1,7 @@
 /*
  *   Simple example demonstrating the communication between
  *   a client and the FPGA device
- *  
+ *
  *  */
 
 #include <getopt.h>
@@ -33,10 +33,11 @@ static struct option long_options[] =
     {"transmsrc",           required_argument,   NULL, 't'},
     {"transsel",            required_argument,   NULL, 'u'},
     {"dir",                 required_argument,   NULL, 'd'},
+    {"dirpol",              required_argument,   NULL, 'x'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:r:p:t:u:d:";
+static const char* shortopt = "hb:vo:s:c:r:p:t:u:d:x:";
 
 void print_help (char *program_name)
 {
@@ -61,7 +62,8 @@ void print_help (char *program_name)
             "  -p  --rcvsel <Receive selection source for the selected channel = [TBD]> \n"
             "  -t  --transmsrc <Transmit source for the selected channel = [0 = trigger backplane, 1 = FPGA internal]> \n"
             "  -u  --transmsel <Transmit selection source for the selected channel = [TBD]> \n"
-            "  -d  --dir <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n",
+            "  -d  --dir <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n"
+            "  -x  --dirpol <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n",
             program_name);
 }
 
@@ -84,6 +86,8 @@ int main (int argc, char *argv [])
     int transmsel_sel = 0;
     char *dir_str = NULL;
     int dir_sel = 0;
+    char *dirpol_str = NULL;
+    int dirpol_sel = 0;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -133,12 +137,17 @@ int main (int argc, char *argv [])
 
             case 'u':
                 transmsel_str = strdup (optarg);
-                transmsel_sel = 1; 
+                transmsel_sel = 1;
                 break;
 
             case 'd':
                 dir_str = strdup (optarg);
                 dir_sel = 1;
+                break;
+
+            case 'x':
+                dirpol_str = strdup (optarg);
+                dirpol_sel = 1;
                 break;
 
             case '?':
@@ -156,11 +165,11 @@ int main (int argc, char *argv [])
 
     /* If we want to change a channel property, we must select a channel first */
     if ((rcvsrc_sel == 1 || rcvsel_sel == 1 || transmsrc_sel == 1 || transmsel_sel == 1 ||
-        dir_sel == 1) && chan_sel == 0) {
+        dir_sel == 1 || dirpol_sel == 1) && chan_sel == 0) {
         fprintf (stderr, "[client:trigger]: Channel number not selected (use -c or --channumber option)\n");
         exit (1);
     }
-    
+
     /* Set default broker address */
     if (broker_endp == NULL) {
         fprintf (stderr, "[client:trigger]: Setting default broker endpoint: %s\n",
@@ -267,8 +276,20 @@ int main (int argc, char *argv [])
         }
     }
 
+    uint32_t dirpol = 0;
+    if (dirpol_sel == 1) {
+        dirpol = strtoul (dirpol_str, NULL, 10);
+        bpm_client_err_e err = bpm_set_trigger_dir_pol (bpm_client, service_iface, chan, dirpol);
+        if (err != BPM_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir_pol failed\n");
+            goto err_bpm_set;
+        }
+    }
+
 err_bpm_set:
 err_bpm_client_new:
+    free (dirpol_str);
+    dirpol_str = NULL;
     free (dir_str);
     dir_str = NULL;
     free (transmsel_str);
