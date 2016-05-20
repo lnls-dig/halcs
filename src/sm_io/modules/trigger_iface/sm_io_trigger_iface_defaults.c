@@ -59,6 +59,7 @@ smio_err_e trigger_iface_config_defaults (char *broker_endp, char *service,
     uint32_t chan;
     for (chan = 0; chan < SMIO_TRIGGER_IFACE_MAX_CHAN; ++chan) {
         client_err = bpm_set_trigger_dir (config_client, service, chan, TRIGGER_IFACE_DFLT_DIR);
+        client_err |= bpm_set_trigger_dir_pol (config_client, service, chan, TRIGGER_IFACE_DIR_POL);
         client_err |= bpm_set_trigger_rcv_count_rst (config_client, service, chan, TRIGGER_IFACE_DFLT_RCV_RST);
         client_err |= bpm_set_trigger_transm_count_rst (config_client, service, chan, TRIGGER_IFACE_DFLT_TRANSM_RST);
         client_err |= bpm_set_trigger_rcv_len (config_client, service, chan, TRIGGER_IFACE_DFLT_RCV_LEN);

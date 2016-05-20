@@ -54,6 +54,15 @@ RW_PARAM_FUNC(trigger_iface, dir) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+#define BPM_TRIGGER_IFACE_DIR_POL_MIN                   0 /* Direction polarity kept */
+#define BPM_TRIGGER_IFACE_DIR_POL_MAX                   1 /* Direction polarity reversed */
+RW_PARAM_FUNC(trigger_iface, dir_pol) {
+    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+            CH0_CTL, DIR_POL, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, SINGLE_BIT_PARAM,
+            BPM_TRIGGER_IFACE_DIR_POL_MIN, BPM_TRIGGER_IFACE_DIR_POL_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
 #define BPM_TRIGGER_IFACE_RCV_COUNT_RST_MIN             0 /* Receive Counter Reset */
 #define BPM_TRIGGER_IFACE_RCV_COUNT_RST_MAX             1 /* Receive Counter Reset */
 RW_PARAM_FUNC(trigger_iface, rcv_count_rst) {
@@ -107,6 +116,7 @@ RW_PARAM_FUNC(trigger_iface, count_transm) {
 /* Exported function pointers */
 const disp_table_func_fp trigger_iface_exp_fp [] = {
     RW_PARAM_FUNC_NAME(trigger_iface, dir),
+    RW_PARAM_FUNC_NAME(trigger_iface, dir_pol),
     RW_PARAM_FUNC_NAME(trigger_iface, rcv_count_rst),
     RW_PARAM_FUNC_NAME(trigger_iface, transm_count_rst),
     RW_PARAM_FUNC_NAME(trigger_iface, rcv_len),

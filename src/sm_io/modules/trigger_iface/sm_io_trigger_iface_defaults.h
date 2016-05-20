@@ -11,6 +11,7 @@
 #include "sm_io_err.h"
 
 #define TRIGGER_IFACE_DFLT_DIR                      1      /* Input */
+#define TRIGGER_IFACE_DFLT_DIR_POL                  1      /* Reversed polarity */
 #define TRIGGER_IFACE_DFLT_RCV_RST                  1      /* Pulse Reset */
 #define TRIGGER_IFACE_DFLT_TRANSM_RST               1      /* Pulse Reset */
 #define TRIGGER_IFACE_DFLT_RCV_LEN                  1      /* Debounce Length */

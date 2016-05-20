@@ -11,6 +11,7 @@
 #include "disptable.h"
 
 extern disp_op_t trigger_iface_dir_exp;
+extern disp_op_t trigger_iface_dir_pol_exp;
 extern disp_op_t trigger_iface_rcv_count_rst_exp;
 extern disp_op_t trigger_iface_transm_count_rst_exp;
 extern disp_op_t trigger_iface_rcv_len_exp;

@@ -23,6 +23,19 @@ disp_op_t trigger_iface_dir_exp = {
     }
 };
 
+disp_op_t trigger_iface_dir_pol_exp = {
+    .name = TRIGGER_IFACE_NAME_DIR_POL,
+    .opcode = TRIGGER_IFACE_OPCODE_DIR_POL,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t trigger_iface_rcv_count_rst_exp = {
     .name = TRIGGER_IFACE_NAME_RCV_COUNT_RST,
     .opcode = TRIGGER_IFACE_OPCODE_RCV_COUNT_RST,
@@ -104,6 +117,7 @@ disp_op_t trigger_iface_count_transm_exp = {
 /* Exported function description */
 const disp_op_t *trigger_iface_exp_ops [] = {
     &trigger_iface_dir_exp,
+    &trigger_iface_dir_pol_exp,
     &trigger_iface_rcv_count_rst_exp,
     &trigger_iface_transm_count_rst_exp,
     &trigger_iface_rcv_len_exp,
