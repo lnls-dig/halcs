@@ -50,7 +50,8 @@ void print_help (char *program_name)
             "  -o  --boardslot <Board slot number = [1-12]> \n"
 	    "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
             "                                       Board slot number\n"
-            "  -c  --channumber <Channel>           Trigger Channel number\n"
+            "  -c  --channumber <Channel | Channel Range>\n"
+            "                                     Trigger Channel number\n"
             "                                     <Channel> must be one of the following:\n"
             "                                     0 -> ADC; 1 -> ADC_SWAP; 2 -> Mixer IQ120; 3 -> Mixer IQ340;\n"
             "                                     4 -> TBT Decim IQ120; 5 -> TBT Decim IQ340; 6 -> TBT Amp;\n"
@@ -178,13 +179,29 @@ int main (int argc, char *argv [])
     }
 
     /* Set default channel */
-    uint32_t chan;
+    uint32_t chan_min;
+    uint32_t chan_max;
     if (chan_str == NULL) {
         fprintf (stderr, "[client:trigger]: Setting default value to 'chan'\n");
-        chan = DFLT_CHAN_NUM;
+        chan_min = DFLT_CHAN_NUM;
+        chan_max = chan_min+1;
     }
     else {
-        chan = strtoul (chan_str, NULL, 10);
+        if (sscanf (chan_str, "[%u:%u]", &chan_min, &chan_max) != 2) {
+            if (sscanf (chan_str, "%u", &chan_min) != 1) {
+                fprintf (stderr, "[client:trigger]: Unexpected channel format\n");
+                exit (1);
+            }   
+            chan_max = chan_min+1;
+        }
+        else {
+            chan_max++;
+        }
+   
+        if (chan_max < chan_min) {
+            fprintf (stderr, "[client:trigger]: Channel range must be ascending\n");
+            exit (1);
+        }
     }
 
     /* Set default board number */
@@ -226,63 +243,66 @@ int main (int argc, char *argv [])
         goto err_bpm_client_new;
     }
 
-    uint32_t rcvsrc = 0;
-    if (rcvsrc_sel == 1) {
-        rcvsrc = strtoul (rcvsrc_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_rcv_src (bpm_client, service_mux, chan, rcvsrc);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_src failed\n");
-            goto err_bpm_set;
+    uint32_t chan;
+    for (chan = chan_min; chan < chan_max; ++chan) {
+        uint32_t rcvsrc = 0;
+        if (rcvsrc_sel == 1) {
+            rcvsrc = strtoul (rcvsrc_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_rcv_src (bpm_client, service_mux, chan, rcvsrc);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_src failed\n");
+                goto err_bpm_set;
+            }
         }
-    }
 
-    uint32_t rcvsel = 0;
-    if (rcvsel_sel == 1) {
-        rcvsel = strtoul (rcvsel_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_rcv_in_sel (bpm_client, service_mux, chan, rcvsel);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_sel failed\n");
-            goto err_bpm_set;
+        uint32_t rcvsel = 0;
+        if (rcvsel_sel == 1) {
+            rcvsel = strtoul (rcvsel_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_rcv_in_sel (bpm_client, service_mux, chan, rcvsel);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_sel failed\n");
+                goto err_bpm_set;
+            }
         }
-    }
 
-    uint32_t transmsrc = 0;
-    if (transmsrc_sel == 1) {
-        transmsrc = strtoul (transmsrc_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_transm_src (bpm_client, service_mux, chan, transmsrc);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
-            goto err_bpm_set;
+        uint32_t transmsrc = 0;
+        if (transmsrc_sel == 1) {
+            transmsrc = strtoul (transmsrc_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_transm_src (bpm_client, service_mux, chan, transmsrc);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
+                goto err_bpm_set;
+            }
         }
-    }
 
-    uint32_t transmsel = 0;
-    if (transmsel_sel == 1) {
-        transmsel = strtoul (transmsel_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_transm_out_sel (bpm_client, service_mux, chan, transmsel);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
-            goto err_bpm_set;
+        uint32_t transmsel = 0;
+        if (transmsel_sel == 1) {
+            transmsel = strtoul (transmsel_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_transm_out_sel (bpm_client, service_mux, chan, transmsel);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
+                goto err_bpm_set;
+            }
         }
-    }
 
-    uint32_t dir = 0;
-    if (dir_sel == 1) {
-        dir = strtoul (dir_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_dir (bpm_client, service_iface, chan, dir);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir failed\n");
-            goto err_bpm_set;
+        uint32_t dir = 0;
+        if (dir_sel == 1) {
+            dir = strtoul (dir_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_dir (bpm_client, service_iface, chan, dir);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir failed\n");
+                goto err_bpm_set;
+            }
         }
-    }
 
-    uint32_t dirpol = 0;
-    if (dirpol_sel == 1) {
-        dirpol = strtoul (dirpol_str, NULL, 10);
-        bpm_client_err_e err = bpm_set_trigger_dir_pol (bpm_client, service_iface, chan, dirpol);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir_pol failed\n");
-            goto err_bpm_set;
+        uint32_t dirpol = 0;
+        if (dirpol_sel == 1) {
+            dirpol = strtoul (dirpol_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_dir_pol (bpm_client, service_iface, chan, dirpol);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir_pol failed\n");
+                goto err_bpm_set;
+            }
         }
     }
 
