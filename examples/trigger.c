@@ -262,7 +262,7 @@ int main (int argc, char *argv [])
         dir = strtoul (dir_str, NULL, 10);
         bpm_client_err_e err = bpm_set_trigger_dir (bpm_client, service_iface, chan, dir);
         if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_sel failed\n");
+            fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir failed\n");
             goto err_bpm_set;
         }
     }
