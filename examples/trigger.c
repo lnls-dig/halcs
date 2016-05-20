@@ -63,7 +63,7 @@ void print_help (char *program_name)
             "  -t  --transmsrc <Transmit source for the selected channel = [0 = trigger backplane, 1 = FPGA internal]> \n"
             "  -u  --transmsel <Transmit selection source for the selected channel = [TBD]> \n"
             "  -d  --dir <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n"
-            "  -x  --dirpol <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n",
+            "  -x  --dirpol <Trigger direction polarity = [0 = Polarity unchanged, 1 = Polarity reversed]> \n",
             program_name);
 }
 
