@@ -207,7 +207,7 @@ int main (int argc, char *argv [])
     }
 
     char service_iface[50];
-    snprintf (service_iface, sizeof (service_iface), "BPM%u:DEVIO:TRIGGER_IFACE", board_number);
+    snprintf (service_iface, sizeof (service_iface), "BPM%u:DEVIO:TRIGGER_IFACE0", board_number);
     char service_mux[50];
     snprintf (service_mux, sizeof (service_mux), "BPM%u:DEVIO:TRIGGER_MUX%u", board_number, bpm_number);
 
