@@ -924,6 +924,18 @@ bpm_client_err_e bpm_set_trigger_dir (bpm_client_t *self, char *service,
 bpm_client_err_e bpm_get_trigger_dir (bpm_client_t *self, char *service,
         uint32_t chan, uint32_t *dir);
 
+/* Trigger Direction Polarity functions */
+/* These set of functions write (set) or read (get) the trigger direction
+ * polarity of a specified channel "chan". When set to 0, the output
+ * direction signal is kept the same as the FPGA internal. When set to
+ * 1, the output direction signal is reversed.
+ * All of the functions returns BPM_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see bpm_client_err.h for all possible errors)*/
+bpm_client_err_e bpm_set_trigger_dir_pol (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t dir_pol);
+bpm_client_err_e bpm_get_trigger_dir_pol (bpm_client_t *self, char *service,
+        uint32_t chan, uint32_t *dir_pol);
+
 /* Trigger Receive/Transmit Counter Reset functions */
 /* These set of functions write (set) or read (get) the reset of the
  * receiver or transmitter trigger counters of a specified channel "chan".

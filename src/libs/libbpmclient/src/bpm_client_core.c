@@ -1912,6 +1912,19 @@ PARAM_FUNC_CLIENT_WRITE_READ(trigger_dir, chan, dir)
             chan, dir);
 }
 
+/* Trigger direction */
+PARAM_FUNC_CLIENT_WRITE2(trigger_dir_pol, chan, dir_pol)
+{
+    return param_client_write2 (self, service, TRIGGER_IFACE_OPCODE_DIR_POL,
+            chan, dir_pol);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(trigger_dir_pol, chan, dir_pol)
+{
+    return param_client_write_read (self, service, TRIGGER_IFACE_OPCODE_DIR_POL,
+                chan, dir_pol);
+}
+
 /* Trigger receive counter reset */
 PARAM_FUNC_CLIENT_WRITE2(trigger_rcv_count_rst, chan, rcv_count_rst)
 {
