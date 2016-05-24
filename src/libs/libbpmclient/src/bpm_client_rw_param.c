@@ -271,7 +271,7 @@ bpm_client_err_e param_client_write_read (bpm_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, &param1,
-            sizeof (param1), NULL, 0, param_out, sizeof (*param_out));
+            sizeof (param1), &param1, sizeof (param1), param_out, sizeof (*param_out));
 }
 
 bpm_client_err_e param_client_write_read_double (bpm_client_t *self, char *service,
@@ -279,7 +279,7 @@ bpm_client_err_e param_client_write_read_double (bpm_client_t *self, char *servi
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, &param1,
-            sizeof (param1), NULL, 0, param_out, sizeof (*param_out));
+            sizeof (param1), &param1, sizeof (param1), param_out, sizeof (*param_out));
 }
 
 /********************* Utility functions ************************************/
