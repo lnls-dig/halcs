@@ -51,8 +51,10 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
-    bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
-            log_file_name, SMIO_FMC250M_4CH_LIBBPMCLIENT_LOG_MODE);
+    /* For some reason, the default timeout is not enough for FMC250M SMIO. See github issue
+     * #119 */
+    bpm_client_t *config_client = bpm_client_new_log_mode_time (broker_endp, 0,
+            log_file_name, SMIO_FMC250M_4CH_LIBBPMCLIENT_LOG_MODE, 3000);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
     client_err = bpm_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
