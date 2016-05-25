@@ -141,6 +141,15 @@ int main (int argc, char *argv [])
         goto err_bpm_set_freq;
     }
 
+    double freq = 0;
+    err = bpm_get_si571_freq (bpm_client, service, &freq);
+    if (err != BPM_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:si571_ctl]: Si571 Set frequency failed\n");
+        goto err_bpm_set_freq;
+    }
+
+    printf ("Freq: %f\n", freq);
+
 err_bpm_client_new:
 err_bpm_set_freq:
     bpm_client_destroy (&bpm_client);
