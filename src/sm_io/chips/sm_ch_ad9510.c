@@ -734,8 +734,9 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
-    _smch_ad9510_reg_update (self);
-    /* Wait for reset to complete */
+    /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
+     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * ammount of time to be sure the chip is indeed reset */
     SMCH_AD9510_WAIT_DFLT;
 
     /* Clear reset */
@@ -743,7 +744,10 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
     rw_err = _smch_ad9510_write_8 (self, AD9510_REG_CFG_SERIAL, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to AD9510_REG_CFG_SERIAL",
             err_smpr_write, SMCH_ERR_RW_SMPR);
-    _smch_ad9510_reg_update (self);
+
+    /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
+     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * ammount of time to be sure the chip is indeed reset */
 
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;

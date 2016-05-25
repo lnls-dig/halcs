@@ -469,16 +469,10 @@ static disp_table_err_e _disp_table_set_ret_op (disp_op_handler_t *disp_op_handl
         goto err_exit;
     }
 
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[disp_table] _disp_table_set_ret_op: Setting return value ...\n");
-
     /* FIXME: This shouldn't happen, as this type of error is caught on
      * initialization of the dispatch function */
     ASSERT_ALLOC (disp_op_handler->ret, err_ret_alloc, DISP_TABLE_ERR_ALLOC);
     *ret = disp_op_handler->ret;
-
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
-            "[disp_table] _disp_table_set_ret_op: Return value set\n");
 
 err_ret_alloc:
 err_exit:

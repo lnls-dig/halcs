@@ -114,8 +114,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         return -ACQ_NUM_CHAN_OOR;
     }
 
-    /* number of samples required is out of the maximum limit */
-    uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE/acq->acq_buf[chan].sample_size;
+    /* number of samples required is out of the maximum limit. Maixmum number of samples 
+     * in multishot mode is simply the maximum number of samples of the DPRAM. The DPRAM
+     * size is calculated to fit the largest sample in the design, so we are safe. */
+    uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE;
     if (((num_shots == ACQ_CORE_MIN_NUM_SHOTS) &&
             (num_samples_pre + num_samples_post > acq->acq_buf[chan].max_samples)) ||
             ((num_shots > ACQ_CORE_MIN_NUM_SHOTS) &&

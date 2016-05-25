@@ -227,6 +227,59 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                 max, chk_funcp, fmt_funcp, clr_field, smio_thsafe_client_read_32, \
                     smio_thsafe_client_write_32)
 
+/* zmq message in SET_GET_PARAM_CHANNEL macro is:
+ * frame 0: operation code
+ * frame 1: rw      R /W    1 = read mode, 0 = write mode
+ * frame 2: channel (0 to num_channels -1)
+ * frame 3: value to be written (rw = 0) or dummy value (rw = 1)
+ * */
+#define SET_GET_PARAM_CHANNEL_GEN(module, base_addr, prefix, reg, field,        \
+        chan_offset, chan_num, single_bit, min, max, chk_funcp, fmt_funcp, clr_field, \
+        read_32_fp, write_32_fp)                                                \
+    do {                                                                        \
+        assert (owner);                                                         \
+        assert (args);                                                          \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
+                "Calling SET_GET_PARAM_"#reg"\n");                              \
+        SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
+        uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);                \
+        uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);               \
+        uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
+                "SET_GET_PARAM_CHANNEL_"#reg": rw = %u, chan = %u\n", rw, chan); \
+        RW_REPLY_TYPE set_param_return;                                         \
+                                                                                \
+        if (chan > chan_num-1) {                                                \
+            return -RW_INV;                                                     \
+        }                                                                       \
+        if (rw) {                                                               \
+            set_param_return = GET_PARAM_GEN(self, module,                      \
+                    (base_addr + (chan*chan_offset)),                           \
+                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp); \
+            if (set_param_return != RW_OK) {                                    \
+                return -set_param_return;                                       \
+            }                                                                   \
+            else {                                                              \
+                *(uint32_t *) ret = value;                                      \
+                return sizeof(value);                                           \
+            }                                                                   \
+        }                                                                       \
+        else {                                                                  \
+            set_param_return = SET_PARAM_GEN(self, module,                      \
+                    (base_addr + (chan*chan_offset)),                           \
+                    prefix, reg, field, single_bit, value, min, max, chk_funcp, \
+                    clr_field, read_32_fp, write_32_fp);                        \
+            return -set_param_return;                                           \
+        }                                                                       \
+    } while (0)
+
+#define SET_GET_PARAM_CHANNEL(module, base_addr, prefix, reg, field, chan_offset, \
+        chan_num, single_bit, min, max, chk_funcp, fmt_funcp, clr_field)        \
+            SET_GET_PARAM_CHANNEL_GEN(module, base_addr, prefix, reg, field,    \
+                    chan_offset, chan_num, single_bit, min, max, chk_funcp,     \
+                    fmt_funcp, clr_field, smio_thsafe_client_read_32,           \
+                    smio_thsafe_client_write_32)
+
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max);
 
 #endif

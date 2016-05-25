@@ -884,6 +884,8 @@ static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32
     /* AFCv3 spefific */
 #if defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
+    uint32_t trigger_iface_id = 0xbcbb78d2;
+    uint32_t trigger_mux_id = 0x84b6a5ac;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning AFCv3 specific SMIOs ...\n");
 
@@ -925,6 +927,21 @@ static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32
     }
 
     err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+    }
+
+    err = devio_register_sm (pipe, trigger_iface_id, WB_TRIGGER_IFACE_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+    }
+
+    err = devio_register_sm (pipe, trigger_mux_id, WB_TRIGGER_MUX1_BASE_ADDR, 0);
+    if (err != DEVIO_SUCCESS) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
+    }
+
+    err = devio_register_sm (pipe, trigger_mux_id, WB_TRIGGER_MUX2_BASE_ADDR, 1);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
     }

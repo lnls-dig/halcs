@@ -97,6 +97,21 @@
 #define WB_AFC_DIAG_CTRL_RAW_REGS                  (WB_AFC_DIAG_RAW_ADDR + \
                                                         WB_AFC_DIAG_CTRL_RAW_REGS_OFFS)
 
+#define WB_TRIGGER_IFACE_RAW_ADDR                   0x00390000
+
+#define WB_TRIGGER_IFACE_RAW_CTRL_REGS             (WB_TRIGGER_IFACE_RAW_ADDR +  \
+                                                        WB_TRIGGER_IFACE_RAW_REG_OFFS)
+
+#define WB_TRIGGER_MUX1_RAW_ADDR                    0x00400000
+
+#define WB_TRIGGER_MUX1_RAW_CTRL_REGS               (WB_TRIGGER_MUX1_RAW_ADDR +  \
+                                                        WB_TRIGGER_MUX_RAW_REG_OFFS)
+
+#define WB_TRIGGER_MUX2_RAW_ADDR                    0x00410000
+
+#define WB_TRIGGER_MUX2_RAW_CTRL_REGS               (WB_TRIGGER_MUX2_RAW_ADDR +  \
+                                                        WB_TRIGGER_MUX_RAW_REG_OFFS)
+
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
 
@@ -175,6 +190,18 @@
 #define WB_AFC_DIAG_BASE_ADDR                       (BAR4_ADDR | WB_AFC_DIAG_RAW_ADDR)
 
 #define WB_AFC_DIAG_CTRL_REGS                       (BAR4_ADDR | WB_AFC_DIAG_CTRL_RAW_REGS)
+
+#define WB_TRIGGER_IFACE_BASE_ADDR                  (BAR4_ADDR | WB_TRIGGER_IFACE_RAW_ADDR)
+
+#define WB_TRIGGER_IFACE_CTRL_REGS                  (BAR4_ADDR | WB_TRIGGER_IFACE_RAW_CTRL_REGS)
+
+#define WB_TRIGGER_MUX1_BASE_ADDR                   (BAR4_ADDR | WB_TRIGGER_MUX1_RAW_ADDR)
+
+#define WB_TRIGGER_MUX1_CTRL_REGS                   (BAR4_ADDR | WB_TRIGGER_MUX1_RAW_CTRL_REGS)
+
+#define WB_TRIGGER_MUX2_BASE_ADDR                   (BAR4_ADDR | WB_TRIGGER_MUX2_RAW_ADDR)
+
+#define WB_TRIGGER_MUX2_CTRL_REGS                   (BAR4_ADDR | WB_TRIGGER_MUX2_RAW_CTRL_REGS)
 
 /************************* AFCv3 Gateware Options *************************/
 
