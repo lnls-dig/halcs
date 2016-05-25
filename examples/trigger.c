@@ -32,12 +32,14 @@ static struct option long_options[] =
     {"rcvsel",              required_argument,   NULL, 'p'},
     {"transmsrc",           required_argument,   NULL, 't'},
     {"transsel",            required_argument,   NULL, 'u'},
+    {"rcvlen",              required_argument,   NULL, 'l'},
+    {"trnlen",              required_argument,   NULL, 'm'},
     {"dir",                 required_argument,   NULL, 'd'},
     {"dirpol",              required_argument,   NULL, 'x'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:r:p:t:u:d:x:";
+static const char* shortopt = "hb:vo:s:c:r:p:t:u:l:m:d:x:";
 
 void print_help (char *program_name)
 {
@@ -63,6 +65,9 @@ void print_help (char *program_name)
             "  -p  --rcvsel <Receive selection source for the selected channel = [TBD]> \n"
             "  -t  --transmsrc <Transmit source for the selected channel = [0 = trigger backplane, 1 = FPGA internal]> \n"
             "  -u  --transmsel <Transmit selection source for the selected channel = [TBD]> \n"
+            "  -l  --rcvlen <Receive debounce length> \n"
+
+            "  -m  --trnlen <Transmit extension length> \n"
             "  -d  --dir <Trigger direction = [0 = FPGA Output, 1 = FPGA Input]> \n"
             "  -x  --dirpol <Trigger direction polarity = [0 = Polarity unchanged, 1 = Polarity reversed]> \n",
             program_name);
@@ -85,6 +90,10 @@ int main (int argc, char *argv [])
     int transmsrc_sel = 0;
     char *transmsel_str = NULL;
     int transmsel_sel = 0;
+    char *rcvlen_str = NULL;
+    int rcvlen_sel = 0;
+    char *trnlen_str = NULL;
+    int trnlen_sel = 0;
     char *dir_str = NULL;
     int dir_sel = 0;
     char *dirpol_str = NULL;
@@ -139,6 +148,16 @@ int main (int argc, char *argv [])
             case 'u':
                 transmsel_str = strdup (optarg);
                 transmsel_sel = 1;
+                break;
+
+            case 'l':
+                rcvlen_str = strdup (optarg);
+                rcvlen_sel = 1;
+                break;
+
+            case 'm':
+                trnlen_str = strdup (optarg);
+                trnlen_sel = 1;
                 break;
 
             case 'd':
@@ -285,6 +304,26 @@ int main (int argc, char *argv [])
             }
         }
 
+        uint32_t rcvlen = 0;
+        if (rcvlen_sel == 1) {
+            rcvlen = strtoul (rcvlen_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_rcv_len (bpm_client, service_iface, chan, rcvlen);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_len failed\n");
+                goto err_bpm_set;
+            }
+        }
+
+        uint32_t trnlen = 0;
+        if (trnlen_sel == 1) {
+            trnlen = strtoul (trnlen_str, NULL, 10);
+            bpm_client_err_e err = bpm_set_trigger_transm_len (bpm_client, service_iface, chan, trnlen);
+            if (err != BPM_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_len failed\n");
+                goto err_bpm_set;
+            }
+        }
+
         uint32_t dir = 0;
         if (dir_sel == 1) {
             dir = strtoul (dir_str, NULL, 10);
@@ -312,6 +351,10 @@ err_bpm_client_new:
     dirpol_str = NULL;
     free (dir_str);
     dir_str = NULL;
+    free (trnlen_str);
+    trnlen_str = NULL;
+    free (rcvlen_str);
+    rcvlen_str = NULL;
     free (transmsel_str);
     transmsel_str = NULL;
     free (transmsrc_str);
