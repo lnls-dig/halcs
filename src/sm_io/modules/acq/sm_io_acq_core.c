@@ -41,11 +41,16 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
 
+    self->acq_buf = __acq_buf[inst_id];
+    self->curr_chan = 0;
+
     /* Set default value for all channels */
     for (uint32_t i = 0; i < END_CHAN_ID; i++) {
         self->acq_params[i].num_samples_pre = num_samples_pre;
         self->acq_params[i].num_samples_post = num_samples_post;
         self->acq_params[i].num_shots = num_shots;
+        /* Default trigger address is the beggining of the channel address */
+        self->acq_params[i].trig_addr = self->acq_buf[i].start_addr;
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */
@@ -53,8 +58,6 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq_core] Instance ID invalid\n");
         return NULL;
     }
-
-    self->acq_buf = __acq_buf[inst_id];
 
     return self;
 
