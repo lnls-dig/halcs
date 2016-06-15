@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
-
 # Beam Position Monitor Software
+
+[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
+![Latest tag](https://img.shields.io/github/tag/lnls-dig/bpm-sw.svg?style=flat)
+[![Latest release](https://img.shields.io/github/release/lnls-dig/bpm-sw.svg?style=flat)](https://github.com/lnls-dig/bpm-sw/releases)
+[![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/bpm-sw.svg?style=flat)](COPYING)
 
 Software for controlling the AFC BPM boards
 
