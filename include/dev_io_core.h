@@ -16,6 +16,21 @@ extern "C" {
 #define SMIO_HKEY_LEN                   8
 #define NODES_MAX_LEN                   20
 
+/* Node of sig_ops list */
+typedef struct {
+    int signal;         /* Signal identifier, e.g., SIGINT, SIGKILL, etc... */
+    sig_handler_fp devio_sig_h;
+} devio_sig_handler_t;
+
+typedef struct {
+    wait_chld_handler_fp devio_wait_chld;                   /* Called to wait a all child process */
+    wait_chld_timed_handler_fp devio_wait_chld_timed;       /* Called to wait a all child process */
+    spawn_chld_handler_fp devio_spawn_chld;                 /* Called to spawn a new process to handle device */
+
+    /* List of devio_sig_handler_t */
+    zlistx_t *sig_ops;
+} devio_ops_t;
+
 typedef struct {
     disp_table_func_fp thsafe_server_open;              /* Open device */
     disp_table_func_fp thsafe_server_release;           /* Release device */
@@ -50,15 +65,15 @@ devio_err_e devio_destroy (devio_t **self_p);
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self);
 /* Register an specific sm_io module to this device */
-devio_err_e devio_register_sm (devio_t *self, uint32_t smio_id,
+devio_err_e devio_register_sm (void *pipe, uint32_t smio_id,
         uint64_t base, uint32_t inst_id);
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
-devio_err_e devio_register_all_sm (devio_t *self);
-devio_err_e devio_unregister_sm (devio_t *self, const char *smio_key);
-devio_err_e devio_unregister_all_sm (devio_t *self);
+devio_err_e devio_register_all_sm (void *pipe);
+devio_err_e devio_unregister_sm (void *pipe, const char *smio_key);
+devio_err_e devio_unregister_all_sm (void *pipe);
 /* Poll all PIPE sockets */
-devio_err_e devio_loop (devio_t *self);
+void devio_loop (zsock_t *pipe, void *args);
 /* Router for all the opcodes registered for this dev_io */
 /* devio_err_e devio_do_op (devio_t *self, uint32_t opcode, int nargs, ...); */
 /* Router for all of the low-level operations for this dev_io */
@@ -67,6 +82,26 @@ devio_err_e devio_do_smio_op (devio_t *self, void *msg);
 devio_err_e devio_set_llio (devio_t *self, llio_t *llio);
 /* Get LLIO instance from DEVIO */
 llio_t *devio_get_llio (devio_t *self);
+
+/* Register signals to Device Manager instance */
+devio_err_e devio_set_sig_handler (devio_t *self, devio_sig_handler_t *sig_handler);
+/* Register all signal handlers previously set */
+devio_err_e devio_register_sig_handlers (devio_t *self);
+/* Register function to wait a all child process */
+devio_err_e devio_set_wait_clhd_handler (devio_t *self, wait_chld_handler_fp fp);
+/* Register function to wait with timeout a all child process */
+devio_err_e devio_set_wait_clhd_timed_handler (devio_t *self, wait_chld_timed_handler_fp fp);
+/* Execute function to wait a all child process */
+devio_err_e devio_wait_chld (devio_t *self);
+/* Execute function to wait with timeout all child process */
+devio_err_e devio_wait_chld_timed (devio_t *self, int timeout);
+/* Register function to spawn a all child process */
+devio_err_e devio_set_spawn_clhd_handler (devio_t *self, spawn_chld_handler_fp fp);
+/* Execute function to spawn a all child process */
+devio_err_e devio_spawn_chld (devio_t *self, const char *program, char *const argv[]);
+
+/* Setting all operations at once */
+devio_err_e devio_set_ops (devio_t *self, devio_ops_t *devio_ops);
 
 /********* Low-level generic methods API *********/
 

@@ -18,6 +18,10 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
+# Malamute 1.0.0 requires this to be defined
+# as all of its API is in DRAFT state
+CFLAGS_USR += -DMLM_BUILD_DRAFT_API
+
 LOCAL_MSG_DBG ?= n
 DBE_DBG ?= n
 CFLAGS_DEBUG =
@@ -54,7 +58,7 @@ LIBS = -lbpmclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 LFLAGS =
 
 # Include directories
-INCLUDE_DIRS = -I. -I/usr/local/lib
+INCLUDE_DIRS = -I. -I/usr/local/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

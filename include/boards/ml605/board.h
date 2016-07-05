@@ -1,7 +1,7 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "priv_defs/defs.h"
+#include "defs.h"
 
 /****************************/
 /*    General Definitions   */

@@ -14,11 +14,11 @@ extern "C" {
 
 #define SMIO_DISPATCH_END_ID       0xdeaddead
 
-typedef struct {
+struct _smio_mod_dispatch_t {
     uint32_t id;
     const char *name;
     const smio_bootstrap_ops_t *bootstrap_ops;
-} __attribute__ ((aligned (16))) smio_mod_dispatch_t;
+} __attribute__ ((aligned (16)));
 
 /*
  * WARNING! Using SMIO_MOD_DECLARE requires .smio_mod_dispatch section in linker script
@@ -40,6 +40,8 @@ extern const smio_mod_dispatch_t _esmio_mod_dispatch;
             .name = mod_name,                                                   \
             .bootstrap_ops = &mod_bootstrap_ops                                 \
         };
+
+#define for_each_smio(s) for ((s) = &_smio_mod_dispatch; (s) < &_esmio_mod_dispatch; (s)++)
 
 #ifdef __cplusplus
 }

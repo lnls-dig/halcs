@@ -24,15 +24,6 @@ extern char *dmngr_work_dir;
 extern char *dmngr_spawn_broker_cfg_str;
 extern int dmngr_spawn_broker_cfg;
 
-/* Signal handler function pointer */
-typedef void (*sig_handler_fp)(int sig, siginfo_t *siginfo, void *context);
-/* Wait child handler function pointer */
-typedef int (*wait_chld_handler_fp)(void);
-/* Spawn child handler function pointer */
-typedef int (*spawn_chld_handler_fp)(const char *program, char *const argv[]);
-/* Spawn broker handler function pointer */
-typedef int (*spawn_broker_handler_fp)(const char *program, char *const argv[]);
-
 /* Node of sig_ops list */
 typedef struct {
     int signal;         /* Signal identifier, e.g., SIGINT, SIGKILL, etc... */

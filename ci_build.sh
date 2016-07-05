@@ -5,12 +5,14 @@ set -x
 
 # Build and local install repositories
 mkdir tmp
+mkdir tmp/etc
 BUILD_PREFIX=$PWD/tmp
+SCRIPTS_PREFIX=$PWD/tmp/etc
 
 LIBSODIUM_VER=1.0.3
 LIBZMQ_VER=v4.2.0-pre
 LIBCZMQ_VER=v3.0.2
-MALAMUTE_VER=v0.1.1
+MALAMUTE_VER=v1.0
 ZYRE_VER=v1.1.0
 
 CONFIG_FLAGS=()
@@ -27,6 +29,7 @@ BPM_OPTS=()
 BPM_OPTS+=(${CONFIG_FLAGS[@]})
 BPM_OPTS+=(${KERNEL_FLAGS[@]})
 BPM_OPTS+=("PREFIX=${BUILD_PREFIX}")
+BPM_OPTS+=("SCRIPTS_PREFIX=${SCRIPTS_PREFIX}")
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=(${CONFIG_FLAGS[@]})
@@ -58,4 +61,4 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh $BOARD $EXAMPLES $LIBS_LINK "${BPM_OPTS[@]}"
+./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${BPM_OPTS[*]}"

@@ -17,6 +17,7 @@ typedef struct {
     uint32_t sys_freq;          /* System clock [Hz] */
     uint32_t spi_freq;          /* SPI clock [Hz] */
     uint32_t init_config;       /* SPI initial config register */
+    bool bidir;                 /* SPI bidirectional control enable */
 } spi_proto_args_t;
 
 typedef enum {

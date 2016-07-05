@@ -30,16 +30,15 @@ typedef struct {
     uint32_t num_samples_pre;               /* Number of pre-trigger samples */
     uint32_t num_samples_post;              /* Number of post-trigger samples */
     uint32_t num_shots;                     /* Number of shots */
-#if 0
     /* Last trigger address. In case of multishot acquisition, this will
        contain only the last trigger address*/
     uint32_t trig_addr;
-#endif
 } acq_params_t;
 
 typedef struct {
-    acq_params_t acq_params[END_CHAN_ID];
-    const acq_buf_t *acq_buf;
+    acq_params_t acq_params[END_CHAN_ID];   /* Parameters for each channel */
+    uint32_t curr_chan;                     /* Current channel being acquired */
+    const acq_buf_t *acq_buf;               /* Channel properties */
 } smio_acq_t;
 
 /***************** Our methods *****************/

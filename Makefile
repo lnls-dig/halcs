@@ -10,9 +10,12 @@ OBJDUMP ?=	$(CROSS_COMPILE)objdump
 OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
+DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
+# Select which application we want to generate. Options are: ebpm
+APPS ?= ebpm
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE ?= y
@@ -29,10 +32,13 @@ FMC130M_4CH_EEPROM_PROGRAM ?=
 WITH_DEV_MNGR ?= y
 # Selects the AFE RFFE version. Options are: 2
 AFE_RFFE_TYPE ?= 2
-# Selects if we want to compile DEVIO Config. Options are: y(es) or n(o).
+# Selects if we want to compile specfic APP Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_DEVIO_CFG ?= y
+WITH_APP_CFG ?= y
+# Installation prefix for the scripts. This is mainly used for testing the build
+# system. Usually this is empty
+SCRIPTS_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -42,6 +48,12 @@ export CFG_DIR
 # SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
 CFG ?= crude_defconfig
 export CFG
+
+# All of our supported boards
+SUPPORTED_ML605_BOARDS = ml605
+export SUPPORTED_ML605_BOARDS
+SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
+export SUPPORTED_AFCV3_BOARDS
 
 # Config filename
 CFG_FILENAME = bpm_sw.cfg
@@ -80,18 +92,18 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
-ifeq ($(BOARD),afcv3)
+ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
 CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
 endif
 endif
 
 # Board selection
-ifeq ($(BOARD),ml605)
+ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_ML605_BOARDS)))
 CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
 endif
 
-ifeq ($(BOARD),afcv3)
+ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
 CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
@@ -102,6 +114,15 @@ endif
 
 ifeq ($(FMC130M_4CH_EEPROM_PROGRAM),passive)
 CFLAGS_USR += -D__FMC130M_4CH_EEPROM_PROGRAM__=2
+endif
+
+# Program FMC250M_4CH EEPROM
+ifeq ($(FMC250M_4CH_EEPROM_PROGRAM),active)
+CFLAGS_USR += -D__FMC250M_4CH_EEPROM_PROGRAM__=1
+endif
+
+ifeq ($(FMC250M_4CH_EEPROM_PROGRAM),passive)
+CFLAGS_USR += -D__FMC250M_4CH_EEPROM_PROGRAM__=2
 endif
 
 # Compile DEV MNGR or not
@@ -117,9 +138,9 @@ ifeq ($(AFE_RFFE_TYPE),2)
 CFLAGS_USR += -D__AFE_RFFE_V2__
 endif
 
-# Compile DEVIO Config or not
-ifeq ($(WITH_DEVIO_CFG),y)
-CFLAGS_USR += -D__WITH_DEVIO_CFG__
+# Compile APP Config or not
+ifeq ($(WITH_APP_CFG),y)
+CFLAGS_USR += -D__WITH_APP_CFG__
 endif
 
 ifneq ($(CFG_DIR),)
@@ -129,6 +150,10 @@ endif
 ifneq ($(CFG_FILENAME),)
 CFLAGS_USR += -D__CFG_FILENAME__=$(CFG_FILENAME)
 endif
+
+# Malamute 1.0.0 requires this to be defined
+# as all of its API is in DRAFT state
+CFLAGS_USR += -DMLM_BUILD_DRAFT_API
 
 # Debug conditional flags
 CFLAGS_DEBUG =
@@ -182,6 +207,9 @@ OBJS_PLATFORM =
 # Source directory
 SRC_DIR = src
 
+# Prepare "apps" include
+APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
+
 # Include other Makefiles as needed here
 include $(SRC_DIR)/sm_io/sm_io.mk
 include $(SRC_DIR)/dev_mngr/dev_mngr.mk
@@ -189,6 +217,8 @@ include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/common/common.mk
+include $(APPS_MKS)
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
@@ -205,31 +235,25 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LDFLAGS_PLATFORM)
 
 # Output modules
-OUT = $(dev_mngr_OUT) $(dev_io_OUT)
+OUT = $(dev_mngr_OUT)
+# Get each APP OUT module
+OUT += $(foreach out,$(APPS),$($(out)_OUT))
 
 # All possible output modules
-ALL_OUT = $(dev_mngr_all_OUT) $(dev_io_all_OUT)
+ALL_OUT = $(dev_mngr_all_OUT)
+# Get each APP all possible output modules
+ALL_OUT += $(foreach all_out,$(APPS),$($(all_out)_all_OUT))
 
 # Out objects
 dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
                  $(exp_ops_OBJS) $(thsafe_msg_zmq_OBJS) \
                  $(ll_io_utils_OBJS) $(dev_io_core_utils_OBJS)
 
-dev_io_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-               $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
+common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
+               $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS) \
+               $(board_common_OBJS)
 
-dev_io_cfg_OBJS += $(dev_io_core_OBJS) $(ll_io_OBJS) \
-                   $(sm_io_OBJS) $(msg_OBJS) $(board_OBJS)
-
-# Specific libraries for OUT targets
-dev_mngr_LIBS =
-dev_mngr_STATIC_LIBS =
-
-dev_io_LIBS = -lbsmp
-dev_io_STATIC_LIBS =
-
-dev_io_cfg_LIBS = -lbsmp
-dev_io_cfg_STATIC_LIBS =
+apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
 .SECONDEXPANSION:
 
@@ -242,8 +266,9 @@ OBJS_all = $(ll_io_OBJS) \
 	   $(sm_io_OBJS) \
 	   $(msg_OBJS) \
 	   $(dev_mngr_OBJS) \
-	   $(dev_io_OBJS) \
-	   $(dev_io_cfg_OBJS) \
+	   $(common_app_OBJS) \
+	   $(apps_OBJS) \
+	   $(board_common_OBJS) \
 	   $(revision_OBJS)
 
 # Sources
@@ -273,7 +298,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 all: cfg $(OUT)
 
 # Output Rule
-$(OUT): $$($$@_OBJS) $(revision_OBJS)
+$(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
 	$(CC) $(LDFLAGS) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
@@ -322,11 +347,13 @@ ifeq ($(wildcard $(DRIVER_OBJ)),)
 	@echo "PCI driver not found!";
 endif
 
+# Install just the driver and lib, not udev rules
 pcie_driver_install:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) install
+	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_install lib_driver_install
+	$(DEPMOD) -a
 
 pcie_driver_uninstall:
-	$(MAKE) -C $(PCIE_DRIVER_DIR) uninstall
+	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_uninstall lib_driver_uninstall
 
 pcie_driver_clean:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) clean
@@ -483,8 +510,8 @@ libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
 libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
     libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
 
-libs_mrproper: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_mrproper
+libs_mrproper: liberrhand_mrproper libconvc_mrproper libhutils_mrproper \
+    libdisptable_mrproper libllio_mrproper libbpmclient_mrproper libsdbfs_mrproper
 
 # External project dependencies
 
@@ -500,17 +527,27 @@ deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),install -m 755 $(core_script) ${PREFIX}/etc $(CMDSEP))
 
 core_uninstall:
 	$(foreach core_bin,$(ALL_OUT),rm -f ${PREFIX}/bin/$(core_bin) $(CMDSEP))
-	$(foreach core_script,$(INIT_SCRIPTS),rm -f ${PREFIX}/etc/$(core_script) $(CMDSEP))
 
 core_clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
 
 core_mrproper:
 	rm -f $(ALL_OUT)
+
+scripts_install:
+	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
+
+scripts_uninstall:
+	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
+
+scripts_clean:
+	$(MAKE) -C scripts clean
+
+scripts_mrproper:
+	$(MAKE) -C scripts mrproper
 
 tests:
 	$(MAKE) -C tests all
@@ -547,17 +584,17 @@ cfg_mrproper:
 
 install: core_install deps_install liberrhand_install libconvc_install \
     libhutils_install libdisptable_install libllio_install libbpmclient_install \
-    cfg_install
+    cfg_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
     libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
-    cfg_uninstall
+    cfg_uninstall scripts_uninstall
 
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
     libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
-    cfg_clean
+    cfg_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper cfg_mrproper
+    examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
 

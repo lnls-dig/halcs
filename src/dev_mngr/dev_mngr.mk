@@ -17,3 +17,6 @@ dev_mngr_OUT =
 endif
 
 dev_mngr_all_OUT = dev_mngr
+
+dev_mngr_LIBS = -lbsmp
+dev_mngr_STATIC_LIBS =

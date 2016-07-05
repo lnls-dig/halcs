@@ -31,11 +31,11 @@ typedef struct {
 
 /* Config thread args structure */
 typedef struct {
-    uint32_t smio_id;               /* ID of the SMIO instance */
-    uint32_t inst_id;               /* SMIO instance ID */
-    char *broker;                   /* Endpoint to connect to broker */
-    char *service;                  /* Full name of the exported service */
-    char *log_file;                 /* Thread log file */
+    volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
+    uint32_t inst_id;                                           /* SMIO instance ID */
+    char *broker;                                               /* Endpoint to connect to broker */
+    char *service;                                              /* Full name of the exported service */
+    char *log_file;                                             /* Thread log file */
 } th_config_args_t;
 
 /************************************************************/

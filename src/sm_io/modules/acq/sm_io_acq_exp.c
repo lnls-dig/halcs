@@ -114,8 +114,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         return -ACQ_NUM_CHAN_OOR;
     }
 
-    /* number of samples required is out of the maximum limit */
-    uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE/acq->acq_buf[chan].sample_size;
+    /* number of samples required is out of the maximum limit. Maixmum number of samples 
+     * in multishot mode is simply the maximum number of samples of the DPRAM. The DPRAM
+     * size is calculated to fit the largest sample in the design, so we are safe. */
+    uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE;
     if (((num_shots == ACQ_CORE_MIN_NUM_SHOTS) &&
             (num_samples_pre + num_samples_post > acq->acq_buf[chan].max_samples)) ||
             ((num_shots > ACQ_CORE_MIN_NUM_SHOTS) &&
@@ -214,6 +216,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     acq_core_ctl_reg |= ACQ_CORE_CTL_FSM_START_ACQ;
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_CTL, &acq_core_ctl_reg);
 
+    /* If we are here, the FPGA is acquiring samples from the
+     * specified channel. Set current channel field */
+    acq->curr_chan = chan;
+
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Acquisition Started!\n");
 
@@ -243,14 +249,19 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
             err_get_acq_handler, -ACQ_ERR);
 
+    uint32_t chan = acq->curr_chan;
+
     err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE);
     if (err != -ACQ_OK) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is not done\n");
+                "Acquisition is not done for channel %u\n", chan);
     }
     else {
+        uint32_t acq_core_trig_addr;
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
-                "Acquisition is done\n");
+                "Acquisition is done for channel %u\n", chan);
+        smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
+        acq->acq_params[chan].trig_addr = acq_core_trig_addr;
     }
 
 err_get_acq_handler:
@@ -390,11 +401,10 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * sample_size
      * */
 
-    /* First step if to read trigger address. Even on skip trigger mode,
-     * this register will contain the address after the last valid sample
-     * (end of acquisition address) */
-    uint32_t acq_core_trig_addr = 0;
-    smio_thsafe_client_read_32 (self, ACQ_CORE_REG_TRIG_POS, &acq_core_trig_addr);
+    /* First step if to get the trigger address from the channel. 
+     * Even on skip trigger mode, this will contain the address after 
+     * the last valid sample (end of acquisition address) */
+    uint32_t acq_core_trig_addr = acq->acq_params[chan].trig_addr;
 
     /* Second step is to calculate the size of the whole acquisition in bytes */
     uint32_t acq_size_bytes = (num_samples_shot*(num_shots-1) +

@@ -202,7 +202,7 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, bpm_number);
 
     bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
     if (bpm_client == NULL) {

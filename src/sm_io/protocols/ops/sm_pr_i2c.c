@@ -13,8 +13,6 @@
  */
 
 #include "bpm_server.h"
-/* private headers */
-#include "sm_pr_i2c_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -488,14 +486,14 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
 
     if (trans_size != size) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
-                "[sm_pr:i2c] _i2c_read_generic: Data size differs from Transfer size.\n"
-                "\tChoosing the smallest value\n");
+                "[sm_pr:i2c] _i2c_write_generic: Data size differs from Transfer size.\n"
+                "\tChoosing the smallest value between trans_size (%u) and size (%lu)\n", trans_size, size);
     }
 
     /* Choose the smallest one */
     trans_size = (trans_size > size) ? size : trans_size;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
-            "[sm_pr:i2c] _i2c_write_generic: Transmission size = %u bytes\n", trans_size);
+            "[sm_pr:i2c] _i2c_write_generic: Transmission size (flags) = %u bytes\n", trans_size);
 
     /* Send actual data, byte by byte*/
     uint32_t i;
@@ -574,7 +572,7 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
     if (trans_size != size) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
                 "[sm_pr:i2c] _i2c_read_generic: Data size differs from Transfer size.\n"
-                "\tChoosing the smallest value\n");
+                "\tChoosing the smallest value between trans_size (%u) and size (%lu)\n", trans_size, size);
     }
 
     /* Choose the smallest one */

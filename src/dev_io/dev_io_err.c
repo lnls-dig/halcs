@@ -27,6 +27,9 @@ static const char *devio_err [DEVIO_ERR_END] =
     [DEVIO_ERR_SMIO_DESTROY]            = "Could not destroy sm_io instance",
     [DEVIO_ERR_INV_SOCKET]              = "Invalid socket reference",
     [DEVIO_ERR_MOD_LLIO]                = "Error modifying LLIO instance",
+    [DEVIO_ERR_SIGACTION]               = "Signal registration error",
+    [DEVIO_ERR_WAITCHLD]                = "Could not complete wait child routine",
+    [DEVIO_ERR_SPAWNCHLD]               = "Could not complete spawn child routine",
     [DEVIO_ERR_CFG]                     = "Could not get property from config file"
 };
 

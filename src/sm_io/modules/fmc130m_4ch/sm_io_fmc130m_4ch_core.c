@@ -9,7 +9,7 @@
 /* Private headers */
 #include "sm_io_fmc130m_4ch_defaults.h"
 #include "sm_io_fmc130m_4ch_core.h"
-#include "sm_io_fmc130m_4ch_structs.h"
+#include "chips_addr.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -44,6 +44,7 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
+    uint64_t base = smio_get_base (parent);
 
     /* Check if Instance ID is within our expected limits */
     ASSERT_TEST(inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
@@ -109,42 +110,25 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     /* Determine the type of the FMC130M_4CH board */
     _smio_fmc130m_4ch_set_type (self, data_24aa64);
 
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] Registering FMC_ADC_COMMON SMIO\n");
+    smio_register_sm (parent, 0x2403f569, base | FMC_130M_FMC_ADC_COMMON_OFFS, inst_id);
+
     /* Now, initialize the FMC130M_4CH with the appropriate structures*/
     if (self->type == TYPE_FMC130M_4CH_ACTIVE) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] AD9510 initializing, "
-                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_ad9510_addr[inst_id],
-                inst_id);
-        self->smch_ad9510 = smch_ad9510_new (parent, FMC_130M_AD9510_SPI_OFFS,
-                fmc130m_4ch_ad9510_addr[inst_id], 0);
-        ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
-
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] SI571 initializing, "
-                "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_si571_addr[inst_id],
-                inst_id);
-        self->smch_si571 = smch_si57x_new (parent, FMC_130M_SI571_I2C_OFFS,
-                fmc130m_4ch_si571_addr[inst_id], 0);
-        ASSERT_ALLOC(self->smch_si571, err_smch_si571_alloc);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] Active Board detected. "
+                "Registering FMC_ADC_ACTIVE SMIO\n");
+        smio_register_sm (parent, 0x88c67d9c, base | FMC_130M_FMC_ACTIVE_CLK_OFFS, inst_id);
     }
     else { /* PASSIVE or Unsupported*/
-
         if (self->type != TYPE_FMC130M_4CH_PASSIVE) {
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
             "[sm_io:fmc130m_4ch_core] Unsupported FMC130M_4CH card (maybe EEPROM not configured?).\n"
             "\t Defaulting to PASSIVE board\n");
         }
-
-        self->smch_ad9510 = NULL;
-        self->smch_si571 = NULL;
     }
 
     return self;
 
-err_smch_si571_alloc:
-    if (self->smch_ad9510 != NULL) {
-        smch_ad9510_destroy (&self->smch_ad9510);
-    }
-err_smch_ad9510_alloc:
-    smch_24aa64_destroy (&self->smch_24aa64);
 err_smch_24aa64_alloc:
     if (self->smch_pca9547 != NULL) {
         smch_pca9547_destroy (&self->smch_pca9547);
@@ -164,8 +148,6 @@ smio_err_e smio_fmc130m_4ch_destroy (smio_fmc130m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc130m_4ch_t *self = *self_p;
 
-        smch_si57x_destroy (&self->smch_si571);
-        smch_ad9510_destroy (&self->smch_ad9510);
         smch_24aa64_destroy (&self->smch_24aa64);
 
         if (self->smch_pca9547 != NULL) {

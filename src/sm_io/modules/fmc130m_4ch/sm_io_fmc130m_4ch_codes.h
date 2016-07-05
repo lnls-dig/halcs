@@ -12,16 +12,6 @@
 #define FMC130M_4CH_OPCODE_TYPE                         uint32_t
 #define FMC130M_4CH_OPCODE_SIZE                         (sizeof (FMC130M_4CH_OPCODE_TYPE))
 
-#define FMC130M_4CH_OPCODE_LEDS                         0
-#define FMC130M_4CH_NAME_LEDS                           "fmc130m_4ch_leds"
-#define FMC130M_4CH_OPCODE_SI571_OE                     1
-#define FMC130M_4CH_NAME_SI571_OE                       "fmc130m_4ch_si571_oe"
-#define FMC130M_4CH_OPCODE_PLL_FUNCTION                 2
-#define FMC130M_4CH_NAME_PLL_FUNCTION                   "fmc130m_4ch_pll_function"
-#define FMC130M_4CH_OPCODE_PLL_STATUS                   3
-#define FMC130M_4CH_NAME_PLL_STATUS                     "fmc130m_4ch_pll_status"
-#define FMC130M_4CH_OPCODE_CLK_SEL                      4
-#define FMC130M_4CH_NAME_CLK_SEL                        "fmc130m_4ch_clk_sel"
 #define FMC130M_4CH_OPCODE_ADC_RAND                     5
 #define FMC130M_4CH_NAME_ADC_RAND                       "fmc130m_4ch_adc_rand"
 #define FMC130M_4CH_OPCODE_ADC_DITH                     6
@@ -70,39 +60,7 @@
 #define FMC130M_4CH_NAME_ADC_DLY2                       "fmc130m_4ch_adc_dly2"
 #define FMC130M_4CH_OPCODE_ADC_DLY3                     28
 #define FMC130M_4CH_NAME_ADC_DLY3                       "fmc130m_4ch_adc_dly3"
-#define FMC130M_4CH_OPCODE_TEST_DATA_EN                 29
-#define FMC130M_4CH_NAME_TEST_DATA_EN                   "fmc130m_4ch_adc_test_data_en"
-#define FMC130M_4CH_OPCODE_TRIG_DIR                     30
-#define FMC130M_4CH_NAME_TRIG_DIR                       "fmc130m_4ch_trig_dir"
-#define FMC130M_4CH_OPCODE_TRIG_TERM                    31
-#define FMC130M_4CH_NAME_TRIG_TERM                      "fmc130m_4ch_trig_term"
-#define FMC130M_4CH_OPCODE_TRIG_VAL                     32
-#define FMC130M_4CH_NAME_TRIG_VAL                       "fmc130m_4ch_trig_val"
-#define FMC130M_4CH_OPCODE_AD9510_CFG_DEFAULTS          33
-#define FMC130M_4CH_NAME_AD9510_CFG_DEFAULTS            "fmc130m_4ch_ad9510_cfg_defaults"
-#define FMC130M_4CH_OPCODE_AD9510_PLL_A_DIV             34
-#define FMC130M_4CH_NAME_AD9510_PLL_A_DIV               "fmc130m_4ch_ad9510_pll_a_div"
-#define FMC130M_4CH_OPCODE_AD9510_PLL_B_DIV             35
-#define FMC130M_4CH_NAME_AD9510_PLL_B_DIV               "fmc130m_4ch_ad9510_pll_b_div"
-#define FMC130M_4CH_OPCODE_AD9510_PLL_PRESCALER         36
-#define FMC130M_4CH_NAME_AD9510_PLL_PRESCALER           "fmc130m_4ch_ad9510_pll_prescaler"
-#define FMC130M_4CH_OPCODE_AD9510_R_DIV                 37
-#define FMC130M_4CH_NAME_AD9510_R_DIV                   "fmc130m_4ch_ad9510_r_div"
-#define FMC130M_4CH_OPCODE_AD9510_PLL_PDOWN             38
-#define FMC130M_4CH_NAME_AD9510_PLL_PDOWN               "fmc130m_4ch_ad9510_pll_pdown"
-#define FMC130M_4CH_OPCODE_AD9510_MUX_STATUS            39
-#define FMC130M_4CH_NAME_AD9510_MUX_STATUS              "fmc130m_4ch_ad9510_mux_status"
-#define FMC130M_4CH_OPCODE_AD9510_CP_CURRENT            40
-#define FMC130M_4CH_NAME_AD9510_CP_CURRENT              "fmc130m_4ch_ad9510_cp_current"
-#define FMC130M_4CH_OPCODE_AD9510_OUTPUTS               41
-#define FMC130M_4CH_NAME_AD9510_OUTPUTS                 "fmc130m_4ch_ad9510_outputs"
-#define FMC130M_4CH_OPCODE_AD9510_PLL_CLK_SEL           42
-#define FMC130M_4CH_NAME_AD9510_PLL_CLK_SEL             "fmc130m_4ch_ad9510_pll_clk_sel"
-#define FMC130M_4CH_OPCODE_SI571_SET_FREQ               43
-#define FMC130M_4CH_NAME_SI571_SET_FREQ                 "fmc130m_4ch_si571_set_freq"
-#define FMC130M_4CH_OPCODE_SI571_GET_DEFAULTS           44
-#define FMC130M_4CH_NAME_SI571_GET_DEFAULTS             "fmc130m_4ch_si571_get_defaults"
-#define FMC130M_4CH_OPCODE_END                          45
+#define FMC130M_4CH_OPCODE_END                          29
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_TYPE                          uint32_t

@@ -12,8 +12,6 @@
  */
 
 #include "bpm_server.h"
-/* Private headers */
-#include "sm_ch_si57x_defaults.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -166,10 +164,15 @@ smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     return _smch_si57x_get_defaults (self, fout);
 }
 
-smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency)
+smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
 {
     assert (self);
+    assert (freq);
+
     smch_err_e err = SMCH_SUCCESS;
+    double frequency = *freq;
+
+    ASSERT_TEST(frequency > 0, "Invalid frequency (0 Hz)", err_exit);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
             "frequency to %f Hz\n", frequency);
@@ -197,6 +200,24 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double frequency)
             err_exit);
 
 err_exit:
+    return err;
+}
+
+smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
+{
+    assert (self);
+    assert (freq);
+    smch_err_e err = SMCH_SUCCESS;
+    double frequency = 0;
+
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_freq] Getting current "
+            "frequency\n");
+
+    /* rfreq is usually a large value. So we divide it first */
+    frequency = ((double) self->rfreq / POW_2_28) / (self->hs_div * self->n1);
+    frequency *= self->fxtal;
+
+    *freq = frequency;
     return err;
 }
 
@@ -373,8 +394,8 @@ static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     uint8_t data = SI57X_CONTROL_RECALL;
     _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
 
-    /* Si57x takes up to 30ms to return to initial conditions */
-    SMCH_SI57X_WAIT(30000);
+    /* Si57x takes up to 30ms to return to initial conditions. To be safe, use 300ms */
+    SMCH_SI57X_WAIT(300000);
 
     /* Read dividers */
     err = _smch_si57x_get_divs (self, &self->rfreq, &self->n1, &self->hs_div);

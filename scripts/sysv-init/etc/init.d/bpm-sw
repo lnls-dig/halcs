@@ -1,0 +1,301 @@
+#!/bin/sh
+#
+# BPM-SW          This shell script takes care of starting and stopping
+#                 bpm-sw (dev_io) daemon.
+#
+# chkconfig: - 20 80
+# description: BPM-SW is used as both as a HAL for LNLS MicroTCA boards and as
+#               a remote communication middleware
+#
+### BEGIN INIT INFO
+# Provides: bpm-sw
+# Required-Start: $local_fs $remote_fs
+# Required-Stop: $local_fs $remote_fs
+# Should-Start:
+# Should-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop bpm-sw
+# Description: BPM-SW is used as both as a HAL for LNLS MicroTCA boards and as
+#              a remote communication middleware
+### END INIT INFO
+
+# Original Author: Pier Carlo Chiodi (aka Pierky) <pierky@pierky.com>
+#         http://www.pierky.com and https://github.com/pierky/pmacct-initscript
+# Author: Lucas Russo <lucas.russo@lnls.br> (modified to use with BPM-SW)
+#
+# Example:
+#
+#  To start a single bpm-sw instance
+#  /etc/init.d/bpm-sw start <instance number>
+#
+#  To stop a single bpm-sw instance
+#  /etc/init.d/bpm-sw stop <instance number>
+#
+#  To stop all bpm-sw instances
+#  /etc/init.d/bpm-sw stop
+#
+#  service bpm-sw stop <instance number>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
+DESC="bpm-sw daemons"
+SCRIPTNAME="bpm-sw"
+
+CONFIG_DIR=/usr/local/etc/bpm_sw
+PIDDIR=/var/run/bpm_sw
+DAEMONDIR=/usr/local/bin
+WORKDIR=/usr/local/bin
+DAEMON_NAME=ebpm
+LOGDIR=/media/remote_logs
+ENVFILE=/etc/sysconfig/bpm-sw-board
+INSTANCES=()
+VERBOSE=yes
+
+mkdir -p $PIDDIR >/dev/null 2>&1 || true
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+[ -f /etc/init.d/functions ] && . /etc/init.d/functions
+
+# Load error functions
+[ -f /lib/lsb/init-functions ] && . /lib/lsb/init-functions
+
+# Source BPM-SW environment variables
+[ -f $ENVFILE ] && . $ENVFILE
+
+# Export some variables as we rely on them
+export $(cut -d= -f1 $ENVFILE | sed 's/^#.*//g' | tr '\n' ' ')
+
+CONFIG=`cd $CONFIG_DIR; ls *.cfg 2>/dev/null | egrep -e "^(bpm_sw)\."`
+
+if [ -z "$CONFIG" ]; then
+    log_failure_msg "ERROR: no bpm_sw configuration instances found on $CONFIG_DIR. Please refer to comments in $0 for more details."
+    exit 1
+fi
+
+SELECTED_INSTANCE="$2"
+
+# To be replaced by LSB functions
+# Defined here for distributions that don't define
+# log_daemon_msg
+log_daemon_msg () {
+    echo $@
+}
+
+# To be replaced by LSB functions
+# Defined here for distributions that don't define
+# log_end_msg
+log_end_msg () {
+    retval=$1
+    if [ $retval -eq 0 ]; then
+        echo "."
+    else
+        echo " failed!"
+    fi
+    return $retval
+}
+
+contains_element () {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+exists_childprocess_nozombie (){
+    EXISTS=`ps --ppid $1 h | awk '$5=="<defunct>" { print $1 }'`
+    if [ -z "$EXISTS" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+signal_to_childprocesses()
+{
+    # $1 PID
+    # $2 Signal
+
+    for PID in `ps --ppid $1 -o pid h`
+    do
+        kill -$2 $PID
+    done
+}
+
+# Function that starts the daemon/service
+#
+do_start()
+{
+    # Return
+    #   0 if daemon has been started
+    #   1 if daemon was already running
+    #   2 if daemon could not be started
+
+    if [ -f $PIDFILE ]; then
+        PID=`cat $PIDFILE`
+        echo bpm-sw $INSTANCE already running: $PID
+        return 1;
+    else
+        ${DAEMON} ${DAEMON_ARGS} & echo $! > ${PIDFILE}
+	return 0
+    fi
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
+
+    RETVAL="2"
+
+    if [ -f $PIDFILE ]; then
+        signal_to_childprocesses `cat $PIDFILE` TERM
+
+        for w in 2 5 10
+        do
+            # wait for child processes to end
+            exists_childprocess_nozombie `cat $PIDFILE`
+            if [ $? -eq 0 ]; then
+                break;
+            fi
+
+            sleep $w
+
+            if [ -f $PIDFILE ]; then
+                ps `cat $PIDFILE` | grep $DAEMON_NAME >/dev/null
+
+                if [ $? -ne 0 ]; then
+                    RETVAL="0"
+                    break
+                fi
+            else
+                RETVAL="0"
+                break
+            fi
+        done
+
+        if [ "$RETVAL" -ne "0" ]; then
+            if [ -f $PIDFILE ]; then
+                ps `cat $PIDFILE` | grep $DAEMON_NAME >/dev/null
+
+                if [ $? -eq 0 ]; then
+                    killproc -p $PIDFILE $DAEMON_NAME
+                    RETVAL="$?"
+                fi
+            fi
+        fi
+
+        rm -f $PIDFILE
+        return "$RETVAL"
+    else
+        return "2"
+    fi
+}
+# Not implemented in BPM-SW
+#
+#do_reload() {
+#    if [ -f $PIDFILE ]; then
+#        #signal_to_childprocesses `cat $PIDFILE` USR2
+#        kill -USR2 `cat $PIDFILE`
+#        return 0
+#    else
+#        return 1
+#    fi
+#}
+
+# Get all running instances
+for RUNNING_INSTANCE in `ls $PIDDIR/`
+do
+    INSTANCES+=("${RUNNING_INSTANCE}")
+done
+
+contains_element ${SELECTED_INSTANCE} ${INSTANCES}
+
+if [ $? -eq 1 ]; then
+   # Get selected instance
+   INSTANCES+=("${SELECTED_INSTANCE}")
+fi
+
+# Go through all of the running instances and check if we selected any of them
+# If SELECTED_INSTANCE is empty, do the same action for all instances
+for INSTANCE in ${INSTANCES[@]}
+do
+    DAEMON=$DAEMONDIR/$DAEMON_NAME
+    PIDFILE=$PIDDIR/$INSTANCE
+    DAEMON_ARGS="-f $CONFIG_DIR/$CONFIG -n be -t pcie -i $INSTANCE -e /dev/fpga-$INSTANCE -s 0 -b tcp://127.0.0.1:8978 -l $LOGDIR"
+
+    #echo "INSTANCE: $INSTANCE"
+    #echo "DAEMON_NAME: $DAEMON_NAME"
+    #echo "DAEMON: $DAEMON"
+    #echo "PIDFILE: $PIDFILE"
+    #echo "DAEMON_ARGS: $DAEMON_ARGS"
+    #continue
+
+    if [ -z "$SELECTED_INSTANCE" -o "$SELECTED_INSTANCE" = "$INSTANCE" ]; then
+        case "$1" in
+          start)
+            [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DAEMON_NAME, instance $INSTANCE"
+            do_start
+            case "$?" in
+                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+            esac
+            ;;
+          stop)
+            [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DAEMON_NAME, instance $INSTANCE"
+            do_stop
+            case "$?" in
+                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+            esac
+            ;;
+          status)
+            if [ -f $PIDFILE ]; then
+                ps `cat $PIDFILE` | grep "$DAEMON_NAME" >/dev/null
+
+                if [ $? -eq 0 ]; then
+                    log_success_msg "$DAEMON_NAME, instance $INSTANCE is running"
+                else
+                    log_failure_msg "$DAEMON_NAME, instance $INSTANCE is not running"
+                fi
+            else
+                log_failure_msg "$DAEMON_NAME, instance $INSTANCE is not running"
+            fi
+            ;;
+          #reload)
+          #  log_daemon_msg "Reloading $DAEMON_NAME, instance $INSTANCE"
+          #  do_reload
+          #  log_end_msg $?
+          #  ;;
+          restart|force-reload)
+            log_daemon_msg "Restarting $DAEMON_NAME, instance $INSTANCE"
+            do_stop
+            case "$?" in
+              0|1)
+                do_start
+                case "$?" in
+                    0) log_end_msg 0 ;;
+                    1) log_end_msg 1 ;; # Old process is still running
+                    *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+              *)
+                # Failed to stop
+                log_end_msg 1
+                ;;
+            esac
+            ;;
+          *)
+            #echo "Usage: $SCRIPTNAME {start|stop|status|restart|reload}" >&2
+            echo "Usage: $SCRIPTNAME {start|stop|status|restart}" >&2
+            exit 3
+            ;;
+        esac
+    fi
+done

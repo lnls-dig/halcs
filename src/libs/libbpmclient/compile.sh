@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
+VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
 
 #######################################
 # All of our Makefile options
@@ -14,7 +14,7 @@ if [ -z "$BOARD" ]; then
     exit 1
 fi
 
-if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "ml605" ]; then
+if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "afcv3_1" ] && [ "$BOARD" != "ml605" ]; then
     echo "Unsupported board. "$VALID_BOARDS_STR
     exit 1
 fi
