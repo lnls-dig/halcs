@@ -147,6 +147,14 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
             sizeof (param), NULL, 0);
 }
 
+bpm_client_err_e param_client_write_byte (bpm_client_t *self, char *service,
+        uint32_t operation, uint8_t param)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service, operation, rw, &param,
+            sizeof (param), NULL, 0);
+}
+
 bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
         uint32_t operation, double param)
 {
@@ -252,6 +260,14 @@ err_send_msg:
 
 bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, operation, rw, param_out,
+            sizeof (*param_out), NULL, 0, param_out, sizeof (*param_out));
+}
+
+bpm_client_err_e param_client_read_byte (bpm_client_t *self, char *service,
+        uint32_t operation, uint8_t *param_out)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, param_out,

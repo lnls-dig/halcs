@@ -31,6 +31,10 @@ extern "C" {
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
             char *service, uint32_t reg)
 
+#define PARAM_FUNC_CLIENT_WRITE_BYTE(reg)                                       \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
+            char *service, uint8_t reg)
+
 #define PARAM_FUNC_CLIENT_WRITE_DOUBLE(reg)                                     \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
             char *service, double reg)
@@ -47,6 +51,10 @@ extern "C" {
 #define PARAM_FUNC_CLIENT_READ(reg)                                             \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
             char *service, uint32_t *reg)
+
+#define PARAM_FUNC_CLIENT_READ_BYTE(reg)                                        \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
+            char *service, uint8_t *reg)
 
 #define PARAM_FUNC_CLIENT_READ_DOUBLE(reg)                                      \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
@@ -82,6 +90,8 @@ bpm_client_err_e param_client_write (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1);
 bpm_client_err_e param_client_write2 (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2);
+bpm_client_err_e param_client_write_byte (bpm_client_t *self, char *service,
+        uint32_t operation, uint8_t param);
 bpm_client_err_e param_client_write_double (bpm_client_t *self, char *service,
         uint32_t operation, double param1);
 bpm_client_err_e param_client_write_double2 (bpm_client_t *self, char *service,
@@ -96,6 +106,8 @@ bpm_client_err_e param_client_read (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out);
 bpm_client_err_e param_client_write_read (bpm_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t *param_out);
+bpm_client_err_e param_client_read_byte (bpm_client_t *self, char *service,
+        uint32_t operation, uint8_t *param_out);
 bpm_client_err_e param_client_read_double (bpm_client_t *self, char *service,
         uint32_t operation, double *param_out);
 bpm_client_err_e param_client_write_read_double (bpm_client_t *self, char *service,

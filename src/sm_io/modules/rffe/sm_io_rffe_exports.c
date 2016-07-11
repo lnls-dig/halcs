@@ -8,21 +8,9 @@
 #include "sm_io_exports_helper.h"
 #include "sm_io_codes.h"
 
-disp_op_t rffe_set_get_sw_exp = {
-    .name = RFFE_NAME_SET_GET_SW,
-    .opcode = RFFE_OPCODE_SET_GET_SW,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rffe_set_get_att1_exp = {
-    .name = RFFE_NAME_SET_GET_ATT1,
-    .opcode = RFFE_OPCODE_SET_GET_ATT1,
+disp_op_t rffe_set_get_att_exp = {
+    .name = RFFE_NAME_SET_GET_ATT,
+    .opcode = RFFE_OPCODE_SET_GET_ATT,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -32,9 +20,9 @@ disp_op_t rffe_set_get_att1_exp = {
     }
 };
 
-disp_op_t rffe_set_get_att2_exp = {
-    .name = RFFE_NAME_SET_GET_ATT2,
-    .opcode = RFFE_OPCODE_SET_GET_ATT2,
+disp_op_t rffe_set_get_temp_ac_exp = {
+    .name = RFFE_NAME_SET_GET_TEMP_AC,
+    .opcode = RFFE_OPCODE_SET_GET_TEMP_AC,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -44,9 +32,9 @@ disp_op_t rffe_set_get_att2_exp = {
     }
 };
 
-disp_op_t rffe_set_get_temp1_exp = {
-    .name = RFFE_NAME_SET_GET_TEMP1,
-    .opcode = RFFE_OPCODE_SET_GET_TEMP1,
+disp_op_t rffe_set_get_temp_bd_exp = {
+    .name = RFFE_NAME_SET_GET_TEMP_BD,
+    .opcode = RFFE_OPCODE_SET_GET_TEMP_BD,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -56,9 +44,9 @@ disp_op_t rffe_set_get_temp1_exp = {
     }
 };
 
-disp_op_t rffe_set_get_temp2_exp = {
-    .name = RFFE_NAME_SET_GET_TEMP2,
-    .opcode = RFFE_OPCODE_SET_GET_TEMP2,
+disp_op_t rffe_set_get_set_point_ac_exp = {
+    .name = RFFE_NAME_SET_GET_SET_POINT_AC,
+    .opcode = RFFE_OPCODE_SET_GET_SET_POINT_AC,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -68,45 +56,9 @@ disp_op_t rffe_set_get_temp2_exp = {
     }
 };
 
-disp_op_t rffe_set_get_temp3_exp = {
-    .name = RFFE_NAME_SET_GET_TEMP3,
-    .opcode = RFFE_OPCODE_SET_GET_TEMP3,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rffe_set_get_temp4_exp = {
-    .name = RFFE_NAME_SET_GET_TEMP4,
-    .opcode = RFFE_OPCODE_SET_GET_TEMP4,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rffe_set_get_set_point1_exp = {
-    .name = RFFE_NAME_SET_GET_SET_POINT1,
-    .opcode = RFFE_OPCODE_SET_GET_SET_POINT1,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rffe_set_get_set_point2_exp = {
-    .name = RFFE_NAME_SET_GET_SET_POINT2,
-    .opcode = RFFE_OPCODE_SET_GET_SET_POINT2,
+disp_op_t rffe_set_get_set_point_bd_exp = {
+    .name = RFFE_NAME_SET_GET_SET_POINT_BD,
+    .opcode = RFFE_OPCODE_SET_GET_SET_POINT_BD,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -119,18 +71,18 @@ disp_op_t rffe_set_get_set_point2_exp = {
 disp_op_t rffe_set_get_temp_control_exp = {
     .name = RFFE_NAME_SET_GET_TEMP_CONTROL,
     .opcode = RFFE_OPCODE_SET_GET_TEMP_CONTROL,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT8, uint8_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint8_t),
         DISP_ARG_END
     }
 };
 
-disp_op_t rffe_set_get_output1_exp = {
-    .name = RFFE_NAME_SET_GET_OUTPUT1,
-    .opcode = RFFE_OPCODE_SET_GET_OUTPUT1,
+disp_op_t rffe_set_get_heater_ac_exp = {
+    .name = RFFE_NAME_SET_GET_HEATER_AC,
+    .opcode = RFFE_OPCODE_SET_GET_HEATER_AC,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -140,9 +92,9 @@ disp_op_t rffe_set_get_output1_exp = {
     }
 };
 
-disp_op_t rffe_set_get_output2_exp = {
-    .name = RFFE_NAME_SET_GET_OUTPUT2,
-    .opcode = RFFE_OPCODE_SET_GET_OUTPUT2,
+disp_op_t rffe_set_get_heater_bd_exp = {
+    .name = RFFE_NAME_SET_GET_HEATER_BD,
+    .opcode = RFFE_OPCODE_SET_GET_HEATER_BD,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -155,11 +107,11 @@ disp_op_t rffe_set_get_output2_exp = {
 disp_op_t rffe_set_get_reset_exp = {
     .name = RFFE_NAME_SET_GET_RESET,
     .opcode = RFFE_OPCODE_SET_GET_RESET,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT8, uint8_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT8, uint8_t),
         DISP_ARG_END
     }
 };
@@ -167,11 +119,11 @@ disp_op_t rffe_set_get_reset_exp = {
 disp_op_t rffe_set_get_reprog_exp = {
     .name = RFFE_NAME_SET_GET_REPROG,
     .opcode = RFFE_OPCODE_SET_GET_REPROG,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT8, uint8_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT8, uint8_t),
         DISP_ARG_END
     }
 };
@@ -200,37 +152,99 @@ disp_op_t rffe_set_get_version_exp = {
     }
 };
 
-disp_op_t rffe_set_get_sw_lvl_exp = {
-    .name = RFFE_NAME_SET_GET_SW_LVL,
-    .opcode = RFFE_OPCODE_SET_GET_SW_LVL,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+disp_op_t rffe_set_get_pid_ac_kp_exp = {
+    .name = RFFE_NAME_SET_GET_PID_AC_KP,
+    .opcode = RFFE_OPCODE_SET_GET_PID_AC_KP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
         DISP_ARG_END
     }
 };
 
+disp_op_t rffe_set_get_pid_ac_ti_exp = {
+    .name = RFFE_NAME_SET_GET_PID_AC_TI,
+    .opcode = RFFE_OPCODE_SET_GET_PID_AC_TI,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rffe_set_get_pid_ac_td_exp = {
+    .name = RFFE_NAME_SET_GET_PID_AC_TD,
+    .opcode = RFFE_OPCODE_SET_GET_PID_AC_TD,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rffe_set_get_pid_bd_kp_exp = {
+    .name = RFFE_NAME_SET_GET_PID_BD_KP,
+    .opcode = RFFE_OPCODE_SET_GET_PID_BD_KP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rffe_set_get_pid_bd_ti_exp = {
+    .name = RFFE_NAME_SET_GET_PID_BD_TI,
+    .opcode = RFFE_OPCODE_SET_GET_PID_BD_TI,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rffe_set_get_pid_bd_td_exp = {
+    .name = RFFE_NAME_SET_GET_PID_BD_TD,
+    .opcode = RFFE_OPCODE_SET_GET_PID_BD_TD,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
+
 /* Exported function description */
 const disp_op_t *rffe_exp_ops [] = {
-    &rffe_set_get_sw_exp,
-    &rffe_set_get_att1_exp,
-    &rffe_set_get_att2_exp,
-    &rffe_set_get_temp1_exp,
-    &rffe_set_get_temp2_exp,
-    &rffe_set_get_temp3_exp,
-    &rffe_set_get_temp4_exp,
-    &rffe_set_get_set_point1_exp,
-    &rffe_set_get_set_point2_exp,
+    &rffe_set_get_att_exp,
+    &rffe_set_get_temp_ac_exp,
+    &rffe_set_get_temp_bd_exp,
+    &rffe_set_get_set_point_ac_exp,
+    &rffe_set_get_set_point_bd_exp,
     &rffe_set_get_temp_control_exp,
-    &rffe_set_get_output1_exp,
-    &rffe_set_get_output2_exp,
+    &rffe_set_get_heater_ac_exp,
+    &rffe_set_get_heater_bd_exp,
     &rffe_set_get_reset_exp,
     &rffe_set_get_reprog_exp,
     &rffe_set_get_data_exp,
     &rffe_set_get_version_exp,
-    &rffe_set_get_sw_lvl_exp,
+    &rffe_set_get_pid_ac_kp_exp,
+    &rffe_set_get_pid_ac_ti_exp,
+    &rffe_set_get_pid_ac_td_exp,
+    &rffe_set_get_pid_bd_kp_exp,
+    &rffe_set_get_pid_bd_ti_exp,
+    &rffe_set_get_pid_bd_td_exp,
     NULL
 };
 

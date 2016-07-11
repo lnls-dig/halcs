@@ -54,16 +54,8 @@ smio_err_e rffe_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_RFFE_LIBBPMCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
-    client_err = bpm_set_rffe_sw (config_client, service, RFFE_DFLT_SW);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RFFE switching value",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_rffe_att1 (config_client, service, RFFE_DFLT_ATT1);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RFFE attenuator 1 value",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = bpm_set_rffe_att2 (config_client, service, RFFE_DFLT_ATT2);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RFFE attenuator 2 value",
+    client_err = bpm_set_rffe_att (config_client, service, RFFE_DFLT_ATT);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RFFE attenuator value",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:
