@@ -16,24 +16,24 @@
 
 #define DFLT_BOARD_NUMBER                       0
 
-#define FUNC_RFFE_SW_IDX                        0
-#define FUNC_RFFE_ATT1_IDX                      1
-#define FUNC_RFFE_ATT2_IDX                      2
-#define FUNC_RFFE_SET_POINT1_IDX                3
-#define FUNC_RFFE_SET_POINT2_IDX                4
-#define FUNC_RFFE_TEMP_CONTROL_IDX              5
+#define FUNC_RFFE_ATT_IDX                       0
+#define FUNC_RFFE_SET_POINT_AC_IDX              1
+#define FUNC_RFFE_SET_POINT_BD_IDX              2
+#define FUNC_RFFE_TEMP_CONTROL_IDX              3
+#define FUNC_RFFE_SET_HEATER_AC_IDX             4
+#define FUNC_RFFE_SET_HEATER_BD_IDX             5
 #define FUNC_RFFE_RESET_IDX                     6
-#define FUNC_RFFE_END                           7
+#define FUNC_RFFE_SET_PID_AC_KP_IDX             8
+#define FUNC_RFFE_SET_PID_AC_TI_IDX             9
+#define FUNC_RFFE_SET_PID_AC_TD_IDX             10
+#define FUNC_RFFE_SET_PID_BD_KP_IDX             11
+#define FUNC_RFFE_SET_PID_BD_TI_IDX             12
+#define FUNC_RFFE_SET_PID_BD_TD_IDX             13
+#define FUNC_RFFE_END                           14
 
 #define MAX_NUM_FUNCS                           FUNC_RFFE_END
 
 /* Functions redeclaration for compatibility with double arguments */
-bpm_client_err_e bpm_set_rffe_sw_double (bpm_client_t *self, char *service,
-        double rffe_sw)
-{
-    return bpm_set_rffe_sw (self, service, (rffe_sw == 0.0) ? 0 : 1);
-}
-
 bpm_client_err_e bpm_set_rffe_temp_control_double (bpm_client_t *self, char *service,
         double rffe_temp_control)
 {
@@ -52,13 +52,19 @@ typedef bpm_client_err_e (*bpm_func_fp) (bpm_client_t *self, char *service,
         double value);
 
 static const bpm_func_fp bpm_rffe_funcs [MAX_NUM_FUNCS] = {
-    &bpm_set_rffe_sw_double,            /* function "double" argument version */
-    &bpm_set_rffe_att1,
-    &bpm_set_rffe_att2,
-    &bpm_set_rffe_set_point1,
-    &bpm_set_rffe_set_point2,
+    &bpm_set_rffe_att,
+    &bpm_set_rffe_set_point_ac,
+    &bpm_set_rffe_set_point_bd,
     &bpm_set_rffe_temp_control_double,  /* function "double" argument version */
+    &bpm_set_rffe_heater_ac,
+    &bpm_set_rffe_heater_bd,
     &bpm_set_rffe_reset_double,         /* function "double" argument version */
+    &bpm_set_rffe_pid_ac_kp,
+    &bpm_set_rffe_pid_ac_ti,
+    &bpm_set_rffe_pid_ac_td,
+    &bpm_set_rffe_pid_bd_kp,
+    &bpm_set_rffe_pid_bd_ti,
+    &bpm_set_rffe_pid_bd_td,
 };
 
 void print_help (char *program_name)
@@ -69,19 +75,19 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
             "\t-bpm <BPM number = [0|1]>\n"
-            "\t-sw <on/off = [0|1]> Output switching\n"
-            "\t-att1 <on/off = [0 - 31.5 dB / 0.5 dB step]> Attenuator #1 value\n"
-            "\t-att2 <on/off = [0 - 31.5 dB / 0.5 dB step]> Attenuator #2 value\n"
-#if 0
-            "\t-temp1 <Temperature sensor #1 value>\n"
-            "\t-temp2 <Temperature sensor #2 value>\n"
-            "\t-temp3 <Temperature sensor #3 value>\n"
-            "\t-temp4 <Temperature sensor #4 value>\n"
-#endif
-            "\t-set_point1 <set point = [ambient temp. - 60.0 oC]> Set point #1\n"
-            "\t-set_point2 <set point = [ambient temp. - 60.0 oC]> Set point #2\n"
+            "\t-att <on/off = [0 - 31.5 dB / 0.5 dB step]> Attenuator value\n"
+            "\t-set_point_ac <set point = [ambient temp. - 60.0 oC]> Set point AC\n"
+            "\t-set_point_ac <set point = [ambient temp. - 60.0 oC]> Set point BD\n"
             "\t-temp_control <on/off = [0|1]> Temperature control\n"
+            "\t-heater_ac <> Resistor AC control\n"
+            "\t-heater_bd <> Resistor BD control\n"
             "\t-reset <on/off = [0|1]> Reset\n"
+            "\t-pid_ac_kp <> PID AC KP\n"
+            "\t-pid_ac_ti <> PID AC TI\n"
+            "\t-pid_ac_td <> PID AC TD\n"
+            "\t-pid_bd_kp <> PID BD KP\n"
+            "\t-pid_bd_ti <> PID BD TI\n"
+            "\t-pid_bd_td <> PID BD TD\n"
 #if 0
             "\t-version <RFFE software version>\n"
 #endif
@@ -100,11 +106,17 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *bpm_number_str = NULL;
-    char *sw_str = NULL;
-    char *att1_str = NULL;
-    char *att2_str = NULL;
-    char *set_point1_str = NULL;
-    char *set_point2_str = NULL;
+    char *att_str = NULL;
+    char *set_point_ac_str = NULL;
+    char *set_point_bd_str = NULL;
+    char *heater_ac_str = NULL;
+    char *heater_bd_str = NULL;
+    char *pid_ac_kp_str = NULL;
+    char *pid_ac_ti_str = NULL;
+    char *pid_ac_td_str = NULL;
+    char *pid_bd_kp_str = NULL;
+    char *pid_bd_ti_str = NULL;
+    char *pid_bd_td_str = NULL;
     char *temp_control_str = NULL;
     char *reset_str = NULL;
     func_call_t func_call [MAX_NUM_FUNCS] = {{0}};
@@ -140,35 +152,65 @@ int main (int argc, char *argv [])
         {
             str_p = &bpm_number_str;
         }
-        else if (streq (argv[i], "-sw")) { /* sw: switching value */
-            func_call [FUNC_RFFE_SW_IDX].call = 1;
-            func_call [FUNC_RFFE_SW_IDX].arg = &sw_str;
-            str_p = &sw_str;
+        else if (streq (argv[i], "-att")) { /* att1: attenuator value */
+            func_call [FUNC_RFFE_ATT_IDX].call = 1;
+            func_call [FUNC_RFFE_ATT_IDX].arg = &att_str;
+            str_p = &att_str;
         }
-        else if (streq (argv[i], "-att1")) { /* att1: attenuator value */
-            func_call [FUNC_RFFE_ATT1_IDX].call = 1;
-            func_call [FUNC_RFFE_ATT1_IDX].arg = &att1_str;
-            str_p = &att1_str;
+        else if (streq (argv[i], "-set_point_ac")) { /* set_point_ac: temperature set point value */
+            func_call [FUNC_RFFE_SET_POINT_AC_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_POINT_AC_IDX].arg = &set_point_ac_str;
+            str_p = &set_point_ac_str;
         }
-        else if (streq (argv[i], "-att2")) { /* att2: attenuator value */
-            func_call [FUNC_RFFE_ATT2_IDX].call = 1;
-            func_call [FUNC_RFFE_ATT2_IDX].arg = &att2_str;
-            str_p = &att2_str;
-        }
-        else if (streq (argv[i], "-set_point1")) { /* set_point1: temperature set point value */
-            func_call [FUNC_RFFE_SET_POINT1_IDX].call = 1;
-            func_call [FUNC_RFFE_SET_POINT1_IDX].arg = &set_point1_str;
-            str_p = &set_point1_str;
-        }
-        else if (streq (argv[i], "-set_point2")) { /* set_point2: Temperature set value */
-            func_call [FUNC_RFFE_SET_POINT2_IDX].call = 1;
-            func_call [FUNC_RFFE_SET_POINT2_IDX].arg = &set_point2_str;
-            str_p = &set_point2_str;
+        else if (streq (argv[i], "-set_point_bd")) { /* set_point_bd: Temperature set value */
+            func_call [FUNC_RFFE_SET_POINT_BD_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_POINT_BD_IDX].arg = &set_point_bd_str;
+            str_p = &set_point_bd_str;
         }
         else if (streq (argv[i], "-temp_control")) { /* temp_control: on/off */
             func_call [FUNC_RFFE_TEMP_CONTROL_IDX].call = 1;
             func_call [FUNC_RFFE_TEMP_CONTROL_IDX].arg = &temp_control_str;
             str_p = &temp_control_str;
+        }
+        else if (streq (argv[i], "-heater_ac")) { /* heater_ac: temperature set point value */
+            func_call [FUNC_RFFE_SET_HEATER_AC_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_HEATER_AC_IDX].arg = &heater_ac_str;
+            str_p = &heater_ac_str;
+        }
+        else if (streq (argv[i], "-heater_bd")) { /* heater_bd: Temperature set value */
+            func_call [FUNC_RFFE_SET_HEATER_BD_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_HEATER_BD_IDX].arg = &heater_bd_str;
+            str_p = &heater_bd_str;
+        }
+        else if (streq (argv[i], "-pid_ac_kp")) {
+            func_call [FUNC_RFFE_SET_PID_AC_KP_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_AC_KP_IDX].arg = &pid_ac_kp_str;
+            str_p = &pid_ac_kp_str;
+        }
+        else if (streq (argv[i], "-pid_ac_ti")) {
+            func_call [FUNC_RFFE_SET_PID_AC_TI_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_AC_TI_IDX].arg = &pid_ac_ti_str;
+            str_p = &pid_ac_ti_str;
+        }
+        else if (streq (argv[i], "-pid_ac_td")) {
+            func_call [FUNC_RFFE_SET_PID_AC_TD_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_AC_TD_IDX].arg = &pid_ac_td_str;
+            str_p = &pid_ac_td_str;
+        }
+        else if (streq (argv[i], "-pid_bd_kp")) {
+            func_call [FUNC_RFFE_SET_PID_BD_KP_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_BD_KP_IDX].arg = &pid_bd_kp_str;
+            str_p = &pid_bd_kp_str;
+        }
+        else if (streq (argv[i], "-pid_bd_ti")) {
+            func_call [FUNC_RFFE_SET_PID_BD_TI_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_BD_TI_IDX].arg = &pid_bd_ti_str;
+            str_p = &pid_bd_ti_str;
+        }
+        else if (streq (argv[i], "-pid_bd_td")) {
+            func_call [FUNC_RFFE_SET_PID_BD_TD_IDX].call = 1;
+            func_call [FUNC_RFFE_SET_PID_BD_TD_IDX].arg = &pid_bd_td_str;
+            str_p = &pid_bd_td_str;
         }
         else if (streq (argv[i], "-reset")) { /* reset: on/off */
             func_call [FUNC_RFFE_RESET_IDX].call = 1;
@@ -238,51 +280,35 @@ int main (int argc, char *argv [])
     }
 
     double temp;
-    err = bpm_get_rffe_temp1 (bpm_client, service, &temp);
+    err = bpm_get_rffe_temp_ac (bpm_client, service, &temp);
     if (err != BPM_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
                 "function: %s\n", bpm_client_err_str (err));
     }
-    fprintf (stdout, "[client:rffe_ctl]: Temp1: %f\n", temp);
+    fprintf (stdout, "[client:rffe_ctl]: Temp AC: %f\n", temp);
 
-    err = bpm_get_rffe_temp2 (bpm_client, service, &temp);
+    err = bpm_get_rffe_temp_bd (bpm_client, service, &temp);
     if (err != BPM_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
                 "function: %s\n", bpm_client_err_str (err));
     }
-    fprintf (stdout, "[client:rffe_ctl]: Temp2: %f\n", temp);
-
-    err = bpm_get_rffe_temp3 (bpm_client, service, &temp);
-    if (err != BPM_CLIENT_SUCCESS) {
-        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
-                "function: %s\n", bpm_client_err_str (err));
-    }
-    fprintf (stdout, "[client:rffe_ctl]: Temp3: %f\n", temp);
-
-    err = bpm_get_rffe_temp4 (bpm_client, service, &temp);
-    if (err != BPM_CLIENT_SUCCESS) {
-        fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
-                "function: %s\n", bpm_client_err_str (err));
-    }
-    fprintf (stdout, "[client:rffe_ctl]: Temp4: %f\n", temp);
+    fprintf (stdout, "[client:rffe_ctl]: Temp BD: %f\n", temp);
 
     double att;
-    err = bpm_get_rffe_att1 (bpm_client, service, &att);
+    err = bpm_get_rffe_att (bpm_client, service, &att);
     if (err != BPM_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:rffe_ctl]: Error executing remote "
                 "function: %s\n", bpm_client_err_str (err));
     }
-    fprintf (stdout, "[client:rffe_ctl]: Att1: %f\n", att);
+    fprintf (stdout, "[client:rffe_ctl]: Att: %f\n", att);
 
 err_bpm_client_new:
     bpm_client_destroy (&bpm_client);
 
     /* ugly... */
-    free (sw_str);
-    free (att1_str);
-    free (att2_str);
-    free (set_point1_str);
-    free (set_point2_str);
+    free (att_str);
+    free (set_point_ac_str);
+    free (set_point_bd_str);
     free (temp_control_str);
     free (reset_str);
     free (bpm_number_str);
