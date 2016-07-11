@@ -111,7 +111,6 @@ static llio_err_e llio_dev_eth_destroy (llio_dev_eth_t **self_p)
     if (*self_p) {
         llio_dev_eth_t *self = *self_p;
 
-        close (self->fd);
         free (self->hostname);
         free (self->port);
         free (self);
@@ -229,6 +228,11 @@ static int eth_release (llio_t *self, llio_endpoint_t *endpoint)
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
+
+    /* First destroy the FD handling the socket. This FD
+     * is initialized on eth_open (), so the proper place to
+     * destroy it is here, not on llio_dev_eth_destroy () */
+    close (dev_eth->fd);
 
     /* Deattach specific device handler to generic one */
     lerr = llio_dev_eth_destroy (&dev_eth);
