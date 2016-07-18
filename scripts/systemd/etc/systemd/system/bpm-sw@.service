@@ -4,14 +4,10 @@ After=network-online.target
 Wants=network-online.target
 After=media-remote_logs.mount
 Requires=media-remote_logs.mount
-BindsTo=dev-fpga-%i.device
-After=dev-fpga-%i.device
+After=bpm-sw-be@%i.service
+Requires=bpm-sw-be@%i.service
+After=bpm-sw-fe@%i.service
+Requires=bpm-sw-fe@%i.service
 
 [Service]
-EnvironmentFile=/etc/sysconfig/bpm-sw-board
-ExecStart=/usr/local/bin/ebpm -f /usr/local/etc/bpm_sw/bpm_sw.cfg -n be -t pcie -i %i -e /dev/fpga/%i -s 0 -b tcp://127.0.0.1:8978 -l /media/remote_logs
-WorkingDirectory=/usr/local/bin
-TimeoutStopSec=2
-
-[Install]
-RequiredBy=bpm-sw-be-ioc@%i.service bpm-sw-fe-ioc@%i.service
+ExecStart=/bin/true
