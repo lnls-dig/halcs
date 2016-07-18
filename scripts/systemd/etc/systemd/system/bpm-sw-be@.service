@@ -4,6 +4,7 @@ After=network-online.target
 Wants=network-online.target
 After=media-remote_logs.mount
 Requires=media-remote_logs.mount
+PartOf=bpm-sw@%i.service
 
 [Service]
 EnvironmentFile=/etc/sysconfig/bpm-sw-board
@@ -13,3 +14,4 @@ TimeoutStopSec=2
 
 [Install]
 RequiredBy=bpm-sw-be-ioc@%i.service
+WantedBy=bpm-sw@%i.service
