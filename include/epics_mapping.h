@@ -14,6 +14,12 @@ extern "C" {
 
 /* BPM reverse mappping structure */
 typedef struct {
+    int dev_id;
+    int smio_id;
+} board_epics_map_t;
+
+/* BPM reverse mappping structure */
+typedef struct {
     int bpm_id;
 } board_epics_rev_map_t;
 
@@ -24,6 +30,7 @@ typedef struct {
 
 
 /* EPICS mapping definitions */
+extern const board_epics_map_t board_epics_map[NUM_MAX_BPMS+1];
 extern const board_epics_rev_map_t board_epics_rev_map [NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT];
 extern const board_epics_opts_t board_epics_opts [NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT];
 

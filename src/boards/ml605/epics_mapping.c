@@ -30,6 +30,13 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io:epics]",                    \
             devio_err_str (err_type))
 
+const board_epics_map_t board_epics_map[NUM_MAX_BPMS+1] = {
+         /* board, bpm*/
+    /* 0 (INVALID)  */ {-1, -1},
+    /* 1            */ {1,   0},
+    /* 2            */ {1,   1},
+};
+
 /* Reverse bpm-sw <-> EPICS board mapping */
 const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT] = {
      /* board, bpm */    /* bpm_id */
