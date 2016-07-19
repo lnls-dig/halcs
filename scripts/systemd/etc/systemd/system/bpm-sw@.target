@@ -8,7 +8,3 @@ After=bpm-sw-be@%i.service
 Wants=bpm-sw-be@%i.service
 After=bpm-sw-fe@%i.service
 Wants=bpm-sw-fe@%i.service
-
-[Service]
-ExecStart=/bin/true
-RemainAfterExit=true

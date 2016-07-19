@@ -14,4 +14,4 @@ TimeoutStopSec=2
 
 [Install]
 RequiredBy=bpm-sw-fe-ioc@%i.service
-WantedBy=bpm-sw@%i.service
+WantedBy=bpm-sw@%i.target
