@@ -12,25 +12,6 @@
 extern "C" {
 #endif
 
-/* RFFE variables IDs. This must match the server! */
-#define SMCH_RFFE_SW_ID                                 0
-#define SMCH_RFFE_ATT1_ID                               1
-#define SMCH_RFFE_ATT2_ID                               2
-#define SMCH_RFFE_TEMP1_ID                              3
-#define SMCH_RFFE_TEMP2_ID                              4
-#define SMCH_RFFE_TEMP3_ID                              5
-#define SMCH_RFFE_TEMP4_ID                              6
-#define SMCH_RFFE_SET_POINT1_ID                         7
-#define SMCH_RFFE_SET_POINT2_ID                         8
-#define SMCH_RFFE_TEMP_CONTROL_ID                       9
-#define SMCH_RFFE_OUTPUT1_ID                            10
-#define SMCH_RFFE_OUTPUT2_ID                            11
-#define SMCH_RFFE_RESET_ID                              12
-#define SMCH_RFFE_REPROGRAMMING_ID                      13
-#define SMCH_RFFE_DATA_ID                               14
-#define SMCH_RFFE_VERSION_ID                            15
-#define SMCH_RFFE_SWITCH_LEVEL_ID                       16
-
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH RFFE */
