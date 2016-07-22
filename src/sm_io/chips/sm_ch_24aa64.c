@@ -167,7 +167,7 @@ static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
             (uint32_t *) &__data, flags);
 
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not write to SMPR", err_smpr_write, -1);
 
     /* Return just the number of data bytes written */
@@ -206,7 +206,7 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
 
     ssize_t smpr_err = smpr_write_32 (self->i2c, 0, &__data, flags);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t) smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not write to SMPR", err_smpr_write, -1);
 
     /* Now, read the data */
@@ -216,7 +216,7 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
 
     smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data, flags);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not READ from SMPR", err_smpr_read, -1);
 
     err = smpr_err;

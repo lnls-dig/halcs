@@ -272,7 +272,7 @@ static ssize_t _smch_si57x_write_generic (smch_si57x_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_write_block (self->i2c, 0, ARRAY_SIZE(__data),
             (uint32_t *) &__data, flags);
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes*/,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes*/,
             "Could not write data to I2C", err_exit, -1);
 
     /* Return just the number of data bytes written */
@@ -322,7 +322,7 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
 
     ssize_t smpr_err = smpr_write_32 (self->i2c, 0, (uint32_t *) &addr, flags);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not write data to I2C", err_exit, -1);
 
     /* Now, read the data */
@@ -333,7 +333,7 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
     smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data,
         flags);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
             "Could not read data from I2C", err_exit, -1);
 
     err = smpr_err;
@@ -376,7 +376,7 @@ static smch_err_e _smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
     *rfreq = tmp;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:si57x_get_divs]\n"
-            "\tRFREQ = %lu, HS_DIV = %u, N1 = %u\n", *rfreq, *hs_div, *n1);
+            "\tRFREQ = %"PRIu64", HS_DIV = %u, N1 = %u\n", *rfreq, *hs_div, *n1);
 
 err_exit:
     return err;

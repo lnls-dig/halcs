@@ -311,8 +311,8 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
     uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
     size_t read_bsize = *(size_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
 
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %lu, "
-            "size = %ld\n", offset, read_bsize);
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %"PRIu64", "
+            "size = %zd\n", offset, read_bsize);
     /* Call llio to perform the actual operation */
     int32_t llio_ret = llio_read_block (llio, offset, read_bsize,
             (uint32_t *) ret);
