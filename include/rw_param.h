@@ -88,8 +88,8 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                                                                                 \
         if (__ret != sizeof(uint32_t)) {                                        \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] "   \
-                "SET_PARAM_" #reg "_" #field ": Number of bytes read (%ld)\n\t" \
-                "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
+                "SET_PARAM_" #reg "_" #field ": Number of bytes read (%zd)\n\t" \
+                "does not match the request (%zu)\n", __ret, sizeof(uint32_t)); \
             err = RW_READ_EAGAIN;                                               \
         }                                                                       \
                                                                                 \
@@ -133,8 +133,8 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
-                    "SET_PARAM_" #reg "_" #field ": Number of bytes read (%ld) \n\t" \
-                    "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
+                    "SET_PARAM_" #reg "_" #field ": Number of bytes read (%zd) \n\t" \
+                    "does not match the request (%zu)\n", __ret, sizeof(uint32_t)); \
                 err = RW_WRITE_EAGAIN;                                          \
             }                                                                   \
                                                                                 \
@@ -159,8 +159,8 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
-                        "SET_PARAM_" #reg "_" #field ": Number of bytes written (%ld)\n\t" \
-                        "does not match the request (%lu)\n", __ret, sizeof(uint32_t)); \
+                        "SET_PARAM_" #reg "_" #field ": Number of bytes written (%zd)\n\t" \
+                        "does not match the request (%zu)\n", __ret, sizeof(uint32_t)); \
                 err = RW_WRITE_EAGAIN;                                          \
             }                                                                   \
             else {                                                              \

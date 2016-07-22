@@ -445,7 +445,7 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Receiving %u bytes\n", len);
     ssize_t ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *) data);
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %ld bytes\n", ret);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %zd bytes\n", ret);
 
     if (ret < 0) {
         *count = 0;
@@ -466,7 +466,7 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
             "bytes\n", len);
     ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *)(data + *count));
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %ld "
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %zd "
             "bytes\n", ret);
 
     if (ret < 0) {

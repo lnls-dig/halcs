@@ -339,7 +339,7 @@ static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw)
                     "----------------------------------------------------------\n"
                     "[ll_io_pcie:_pcie_rw_32] Going to read/write in BAR0\n");
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, full_offs = %lX\n"
+                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, full_offs = %"PRIX64"\n"
                     "-------------------------------------------------------------------------------------\n",
                     bar_no, full_offs);
             BAR0_RW(dev_pcie->bar0, full_offs, data, rw);
@@ -354,7 +354,7 @@ static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw)
             pg_offs = PCIE_ADDR_SDRAM_PG_OFFS (full_offs);
             SET_SDRAM_PG (dev_pcie->bar0, pg_num);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%"PRIX64", pg_offs = 0x%"PRIX64"\n",
                     bar_no, pg_num, full_offs, pg_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_32] full_addr = 0x%p\n"
@@ -372,7 +372,7 @@ static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw)
             pg_offs = PCIE_ADDR_WB_PG_OFFS (full_offs);
             SET_WB_PG (dev_pcie->bar0, pg_num);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    "[ll_io_pcie:_pcie_rw_32] bar_no = %d, pg_num  = %d,\n\tfull_offs = 0x%"PRIX64", pg_offs = 0x%"PRIX64"\n",
                     bar_no, pg_num, full_offs, pg_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_32] full_addr = %p\n"
@@ -411,7 +411,7 @@ static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "----------------------------------------------------------\n"
-            "[ll_io_pcie:_pcie_rw_bar2_block_raw] pg_start = %u, pg_end = %lu...\n",
+            "[ll_io_pcie:_pcie_rw_bar2_block_raw] pg_start = %u, pg_end = %"PRIu64"...\n",
             pg_start, pg_start + (pg_offs+size)/bar_size + 1);
     for (unsigned int pg = pg_start;
             pg < (pg_start + (pg_offs+size)/bar_size + 1);
@@ -495,7 +495,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "----------------------------------------------------------\n"
-            "[ll_io_pcie:_pcie_rw_bar4_block_raw] pg_start = %u, pg_end = %lu...\n",
+            "[ll_io_pcie:_pcie_rw_bar4_block_raw] pg_start = %u, pg_end = %"PRIu64"...\n",
             pg_start, pg_start + (pg_offs+size)/bar_size + 1);
     for (unsigned int pg = pg_start;
             pg < pg_start + (pg_offs+size)/bar_size + 1;
@@ -590,7 +590,7 @@ static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size, uint32_
             pg_start = PCIE_ADDR_SDRAM_PG (full_offs);
             pg_offs = PCIE_ADDR_SDRAM_PG_OFFS (full_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start = %d,\n\tfull_offs = 0x%"PRIX64", pg_offs = 0x%"PRIX64"\n",
                     bar_no, pg_start, full_offs, pg_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_block] full_addr = 0x%p\n"
@@ -607,7 +607,7 @@ static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size, uint32_
             pg_start = PCIE_ADDR_WB_PG (full_offs);
             pg_offs = PCIE_ADDR_WB_PG_OFFS (full_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start  = %d,\n\tfull_offs = 0x%lx, pg_offs = 0x%lx\n",
+                    "[ll_io_pcie:_pcie_rw_block] bar_no = %d, pg_start  = %d,\n\tfull_offs = 0x%"PRIX64", pg_offs = 0x%"PRIX64"\n",
                     bar_no, pg_start, full_offs, pg_offs);
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_pcie:_pcie_rw_block] full_addr = %p\n"

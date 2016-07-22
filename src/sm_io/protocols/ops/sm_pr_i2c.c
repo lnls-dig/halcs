@@ -487,7 +487,7 @@ static ssize_t _i2c_write_generic (smpr_t *self, uint8_t *data,
     if (trans_size != size) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
                 "[sm_pr:i2c] _i2c_write_generic: Data size differs from Transfer size.\n"
-                "\tChoosing the smallest value between trans_size (%u) and size (%lu)\n", trans_size, size);
+                "\tChoosing the smallest value between trans_size (%u) and size (%zu)\n", trans_size, size);
     }
 
     /* Choose the smallest one */
@@ -572,7 +572,7 @@ static ssize_t _i2c_read_generic (smpr_t *self, uint8_t *data,
     if (trans_size != size) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
                 "[sm_pr:i2c] _i2c_read_generic: Data size differs from Transfer size.\n"
-                "\tChoosing the smallest value between trans_size (%u) and size (%lu)\n", trans_size, size);
+                "\tChoosing the smallest value between trans_size (%u) and size (%zu)\n", trans_size, size);
     }
 
     /* Choose the smallest one */

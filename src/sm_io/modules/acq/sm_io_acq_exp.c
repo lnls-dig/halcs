@@ -443,7 +443,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
             reply_size, (uint32_t *) data_block->data);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%ld bytes read\n", valid_bytes);
+            "%zd bytes read\n", valid_bytes);
 
     /* Check if we could read successfully */
     int retf = 0;
