@@ -189,6 +189,10 @@ void *llio_get_dev_handler (llio_t *self)
     return self->dev_handler;
 }
 
+llio_type_e llio_get_type (llio_t *self)
+{
+    return self->type;
+}
 /**************** Static function ****************/
 
 static bool _llio_get_endpoint_open (llio_t *self)

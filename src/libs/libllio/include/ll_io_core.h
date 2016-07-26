@@ -82,6 +82,8 @@ char *llio_clone_endpoint_name (llio_t *self);
 llio_err_e llio_set_dev_handler (llio_t *self, void *dev_handler);
 /* Get dev handler */
 void *llio_get_dev_handler (llio_t *self);
+/* Get type */
+llio_type_e llio_get_type (llio_t *self);
 
 /************************************************************/
 /**************** Low Level generic methods API *************/
