@@ -57,33 +57,33 @@ static bpm_client_err_e _func_polling (bpm_client_t *self, char *name,
 /* Acquisition channel definitions for user's application */
 #if defined(__BOARD_ML605__)
 /* Global structure merging all of the channel's sample sizes */
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1] = {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [2] = {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [3] = {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [4] = {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [5] = {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [6] = {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [7] = {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
+                                        [1] = {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
+                                        [2] = {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
+                                        [3] = {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
+                                        [4] = {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
+                                        [5] = {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
+                                        [6] = {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
+                                        [7] = {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
                                     };
 #elif defined(__BOARD_AFCV3__)
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC0_CHAN_ID, .sample_size = ADC0_SAMPLE_SIZE},
-                                        [1]   =  {.chan = ADCSWAP0_CHAN_ID, .sample_size = ADCSWAP0_SAMPLE_SIZE},
-                                        [2]   =  {.chan = MIXIQ120_CHAN_ID, .sample_size = MIXIQ120_SAMPLE_SIZE},
-                                        [3]   =  {.chan = MIXIQ340_CHAN_ID, .sample_size = MIXIQ340_SAMPLE_SIZE},
-                                        [4]   =  {.chan = TBTDECIMIQ120_CHAN_ID, .sample_size = TBTDECIMIQ120_SAMPLE_SIZE},
-                                        [5]   =  {.chan = TBTDECIMIQ340_CHAN_ID, .sample_size = TBTDECIMIQ340_SAMPLE_SIZE},
-                                        [6]   =  {.chan = TBTAMP0_CHAN_ID, .sample_size = TBTAMP0_SAMPLE_SIZE},
-                                        [7]   =  {.chan = TBTPHA0_CHAN_ID, .sample_size = TBTPHA0_SAMPLE_SIZE},
-                                        [8]   =  {.chan = TBTPOS0_CHAN_ID, .sample_size = TBTPOS0_SAMPLE_SIZE},
-                                        [9]   =  {.chan = FOFBDECIMIQ120_CHAN_ID, .sample_size = FOFBDECIMIQ120_SAMPLE_SIZE},
-                                        [10]  =  {.chan = FOFBDECIMIQ340_CHAN_ID, .sample_size = FOFBDECIMIQ340_SAMPLE_SIZE},
-                                        [11]  =  {.chan = FOFBAMP0_CHAN_ID, .sample_size = FOFBAMP0_SAMPLE_SIZE},
-                                        [12]  =  {.chan = FOFBPHA0_CHAN_ID, .sample_size = FOFBPHA0_SAMPLE_SIZE},
-                                        [13]  =  {.chan = FOFBPOS0_CHAN_ID, .sample_size = FOFBPOS0_SAMPLE_SIZE},
-                                        [14]  =  {.chan = MONITAMP0_CHAN_ID, .sample_size = MONITAMP0_SAMPLE_SIZE},
-                                        [15]  =  {.chan = MONITPOS0_CHAN_ID, .sample_size = MONITPOS0_SAMPLE_SIZE},
-                                        [16]  =  {.chan = MONIT1POS0_CHAN_ID, .sample_size = MONIT1POS0_SAMPLE_SIZE}
+acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
+                                        [1]   =  {.chan = ADCSWAP_CHAN_ID, .sample_size = ADCSWAP_SAMPLE_SIZE},
+                                        [2]   =  {.chan = MIXIQ_CHAN_ID, .sample_size = MIXIQ_SAMPLE_SIZE},
+                                        [3]   =  {.chan = DUMMY0_CHAN_ID, .sample_size = DUMMY0_SAMPLE_SIZE},
+                                        [4]   =  {.chan = TBTDECIMIQ_CHAN_ID, .sample_size = TBTDECIMIQ_SAMPLE_SIZE},
+                                        [5]   =  {.chan = DUMMY1_CHAN_ID, .sample_size = DUMMY1_SAMPLE_SIZE},
+                                        [6]   =  {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
+                                        [7]   =  {.chan = TBTPHA_CHAN_ID, .sample_size = TBTPHA_SAMPLE_SIZE},
+                                        [8]   =  {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
+                                        [9]   =  {.chan = FOFBDECIMIQ_CHAN_ID, .sample_size = FOFBDECIMIQ_SAMPLE_SIZE},
+                                        [10]  =  {.chan = DUMMY2_CHAN_ID, .sample_size = DUMMY2_SAMPLE_SIZE},
+                                        [11]  =  {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
+                                        [12]  =  {.chan = FOFBPHA_CHAN_ID, .sample_size = FOFBPHA_SAMPLE_SIZE},
+                                        [13]  =  {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
+                                        [14]  =  {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
+                                        [15]  =  {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
+                                        [16]  =  {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
                                     };
 #else
 #error "Unsupported board!"
