@@ -13,6 +13,8 @@
 
 /*********************** Static ML605 FPGA layout ***********************/
 
+#define SDB_ADDRESS                                 0x00300000UL
+
 /* Should be autodiscovered by SDB */
 
 /* Wishbone RAW Addresses */
