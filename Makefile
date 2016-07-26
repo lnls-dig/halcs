@@ -83,6 +83,7 @@ LIBHUTILS_DIR = src/libs/libhutils
 LIBDISPTABLE_DIR = src/libs/libdisptable
 LIBLLIO_DIR = src/libs/libllio
 LIBBPMCLIENT_DIR = src/libs/libbpmclient
+LIBSDBUTILS_DIR = src/libs/libsdbutils
 LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C/CPP flags
@@ -194,9 +195,9 @@ LIBS = -lm -lzmq -lczmq -lmlm
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
 PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libbpmclient \
-                    libsdbfs libpcidriver
+                    libsdbutils  libsdbfs libpcidriver
 PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lbpmclient \
-               -lsdbfs -lpcidriver
+               -lsdbutils -lsdbfs -lpcidriver
 
 # General library flags -L<libdir>
 LFLAGS = -Lforeign/libsdbfs
@@ -284,6 +285,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libllio libllio_install libllio_uninstall libllio_clean libllio_mrproper \
 	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
+	libsdbutils libsdbutils_install libsdbutils_uninstall libsdbutils_clean libsdbutils_mrproper \
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	core_install core_uninstall core_clean core_mrproper \
@@ -479,6 +481,21 @@ libbpmclient_clean:
 libbpmclient_mrproper:
 	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
 
+libsdbutils:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) all
+
+libsdbutils_install:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) PREFIX=${PREFIX} install
+
+libsdbutils_uninstall:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) PREFIX=${PREFIX} uninstall
+
+libsdbutils_clean:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) clean
+
+libsdbutils_mrproper:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) mrproper
+
 libsdbfs:
 	$(MAKE) -C $(LIBSDBFS_DIR) all
 
@@ -495,23 +512,29 @@ libsdbfs_mrproper:
 	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
 
 libs: liberrhand libconvc libhutils \
-    libdisptable libllio libbpmclient libsdbfs
+    libdisptable libllio libbpmclient libsdbutils \
+    libsdbfs
 
 libs_install: liberrhand_install libconvc_install libhutils_install \
-    libdisptable_install libllio_install libbpmclient_install libsdbfs_install
+    libdisptable_install libllio_install libbpmclient_install libsdbutils_install \
+    libsdbfs_install
 
 libs_compile_install: liberrhand liberrhand_install libconvc libconvc_install \
     libhutils libhutils_install libdisptable libdisptable_install libllio libllio_install \
-    libbpmclient libbpmclient_install libsdbfs libsdbfs_install
+    libbpmclient libbpmclient_install libsdbutils libsdbutils_install \
+    libsdbfs libsdbfs_install
 
 libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
-    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall libsdbfs_uninstall
+    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall libsdbutils_uninstall \
+    libsdbfs_uninstall
 
 libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
+    libdisptable_clean libllio_clean libbpmclient_clean libsdbutils_clean \
+    libsdbfs_clean
 
 libs_mrproper: liberrhand_mrproper libconvc_mrproper libhutils_mrproper \
-    libdisptable_mrproper libllio_mrproper libbpmclient_mrproper libsdbfs_mrproper
+    libdisptable_mrproper libllio_mrproper libbpmclient_mrproper libsdbutils_mrproper \
+    libsdbfs_mrproper
 
 # External project dependencies
 
@@ -583,18 +606,18 @@ cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
 install: core_install deps_install liberrhand_install libconvc_install \
-    libhutils_install libdisptable_install libllio_install libbpmclient_install \
-    cfg_install scripts_install
+    libsdbutils_install libhutils_install libdisptable_install libllio_install \
+    libbpmclient_install cfg_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
-    libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
-    cfg_uninstall scripts_uninstall
+    libsdbutils_uninstall libhutils_uninstall libdisptable_uninstall libllio_uninstall \
+    libbpmclient_uninstall cfg_uninstall scripts_uninstall
 
-clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
-    cfg_clean scripts_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
+    libhutils_clean libdisptable_clean libllio_clean libbpmclient_clean examples_clean \
+    tests_clean cfg_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
-    libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
+    libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
+    libbpmclient_mrproper examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
 
