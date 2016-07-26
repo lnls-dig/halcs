@@ -123,6 +123,13 @@ void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
     while (hutils_wait_chld () > 0);
 }
 
+/* SIGCHLD default handler */
+static devio_sig_handler_t devio_sigchld_handler =
+{
+    .signal = SIGCHLD,
+    .devio_sig_h = devio_sigchld_h
+};
+
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
         llio_type_e type, char *endpoint_broker, int verbose,
@@ -213,11 +220,6 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     _devio_set_wait_clhd_handler (self, &hutils_wait_chld);
     _devio_set_wait_clhd_timed_handler (self, &hutils_wait_chld_timed);
     _devio_set_spawn_clhd_handler (self, &hutils_spawn_chld);
-
-    /* Setup SIGCHLD default handler */
-    devio_sig_handler_t devio_sigchld_handler =
-    {   .signal = SIGCHLD,
-        .devio_sig_h = devio_sigchld_h};
 
     devio_err_e derr = devio_set_sig_handler (self, &devio_sigchld_handler);
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting signal handlers", err_set_sig_handlers);
