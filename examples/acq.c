@@ -55,6 +55,29 @@ void print_data (uint32_t chan, uint32_t *data, uint32_t size, file_fmt_e file_f
             fwrite (raw_data16, 2, size/2, stdout);
         }
     }
+    else if (chan == 2 || chan == 4 || chan == 9 /* I/Q channels */ ) {
+        int32_t *raw_data32 = (int32_t *) data;
+        if (file_fmt == TEXT) {
+            for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 8; i++) {
+                if (zctx_interrupted) {
+                    break;
+                }
+
+                printf ("%8d\t %8d\t %8d\t %8d\t %8d\t %8d\t %8d\t %8d\n",
+                        raw_data32[(i*8)],
+                        raw_data32[(i*8)+1],
+                        raw_data32[(i*8)+2],
+                        raw_data32[(i*8)+3],
+                        raw_data32[(i*8)+4],
+                        raw_data32[(i*8)+5],
+                        raw_data32[(i*8)+6],
+                        raw_data32[(i*8)+7]);
+            }
+        }
+        else if (file_fmt == BINARY) {
+            fwrite (raw_data32, 8, size/8, stdout);
+        }
+    }
     else {
         int32_t *raw_data32 = (int32_t *) data;
         if (file_fmt == TEXT) {
@@ -100,14 +123,14 @@ void print_help (char *program_name)
             "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
             "  -v  --verbose                        Verbose output\n"
             "  -o  --boardslot <Board slot number = [1-12]> \n"
-	    "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
+            "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
             "                                       Board slot number\n"
             "  -c  --channumber <Channel>           Channel number\n"
             "                                     <Channel> must be one of the following:\n"
-            "                                     0 -> ADC; 1 -> ADC_SWAP; 2 -> Mixer IQ120; 3 -> Mixer IQ340;\n"
-            "                                     4 -> TBT Decim IQ120; 5 -> TBT Decim IQ340; 6 -> TBT Amp;\n"
-            "                                     7 -> TBT Phase; 8 -> TBT Pos; 9 -> FOFB Decim IQ120;\n"
-            "                                     10 -> FOFB Decim IQ340; 11 -> FOFB Amp; 12 -> FOFB Pha;\n"
+            "                                     0 -> ADC; 1 -> ADC_SWAP; 2 -> Mixer IQ; 3 -> DUMMY0;\n"
+            "                                     4 -> TBT Decim IQ; 5 -> DUMMY1; 6 -> TBT Amp;\n"
+            "                                     7 -> TBT Phase; 8 -> TBT Pos; 9 -> FOFB Decim IQ;\n"
+            "                                     10 -> DUMMY2; 11 -> FOFB Amp; 12 -> FOFB Pha;\n"
             "                                     13 -> FOFB Pos; 14 -> Monit Amp; 15 -> Monit Pha; 16 -> Monit Pos]\n"
             "  -n  --numsamples <Number of samples> Number of samples\n"
             "  -f  --filefmt <Output format = [0 = text | 1=binary]>\n"
