@@ -57,6 +57,7 @@ struct _devio_t {
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
     int timer_id;                       /* Timer ID */
+    struct sdbfs *sdbfs;                /* SDB information */
 
     /* General management operations */
     devio_ops_t *ops;
@@ -113,6 +114,14 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
+
+/* FIXME: Only valid for PCIe devices */
+static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
+        int count)
+{
+    return llio_read_block (((devio_t *)fs->drvdata)->llio,
+            BAR4_ADDR | (offset), count, (uint32_t *) buf);
+}
 
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
@@ -244,6 +253,24 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     free (llio_name);
     llio_name = NULL; /* Avoid double free error */
 
+    /* Alloc SDB structure */
+    self->sdbfs = zmalloc (sizeof *self->sdbfs);
+    ASSERT_ALLOC(self->sdbfs, err_sdbfs_alloc);
+
+    /* Initialize the sdb filesystem itself */
+    self->sdbfs->name = "sdb-area";
+    self->sdbfs->drvdata = (void *) self;
+    self->sdbfs->blocksize = 1; /* Not currently used */
+    self->sdbfs->entrypoint = SDB_ADDRESS;
+    self->sdbfs->data = 0;
+    self->sdbfs->flags = 0;
+    self->sdbfs->read = _devio_read_llio_block;
+
+    /* Create SDB */
+    err = sdbfs_dev_create (self->sdbfs);
+    ASSERT_TEST (err == 0, "Could not create SDBFS",
+            err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP);
+
     /* Init sm_io_thsafe_server_ops_h. For now, we assume we want zmq
      * for exchanging messages between smio and devio instances */
     self->thsafe_server_ops = smio_thsafe_zmq_server_ops;
@@ -280,6 +307,10 @@ err_disp_table_thsafe_ops_alloc:
 err_sm_io_cfg_h_alloc:
     zhashx_destroy (&self->sm_io_h);
 err_sm_io_h_alloc:
+    sdbfs_dev_destroy (self->sdbfs);
+err_sdbfs_create:
+    free (self->sdbfs);
+err_sdbfs_alloc:
     llio_release (self->llio, NULL);
 err_llio_open:
     llio_destroy (&self->llio);
@@ -351,6 +382,12 @@ devio_err_e devio_destroy (devio_t **self_p)
         zhashx_destroy (&self->sm_io_h);
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] All hashes destroyed\n");
+
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying SDBFS\n");
+        sdbfs_dev_destroy (self->sdbfs);
+        free (self->sdbfs);
+
         self->thsafe_server_ops = NULL;
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Releasing LLIO\n");
@@ -411,14 +448,6 @@ devio_err_e devio_destroy (devio_t **self_p)
     return DEVIO_SUCCESS;
 }
 
-/* FIXME: Only valid for PCIe devices */
-static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
-        int count)
-{
-    return llio_read_block (((devio_t *)fs->drvdata)->llio,
-            BAR4_ADDR | (offset), count, (uint32_t *) buf);
-}
-
 /* Read specific information about the device. Typically,
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (devio_t *self)
@@ -431,29 +460,10 @@ devio_err_e devio_print_info (devio_t *self)
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
-    /* The sdb filesystem itself */
-    struct sdbfs devio_sdb = {
-        .name = "sdb-area",
-        .drvdata = (void *) self,
-        .blocksize = 1, /* Not currently used */
-        .entrypoint = SDB_ADDRESS,
-        .data = 0,
-        .flags = 0,
-        .read = _devio_read_llio_block
-    };
-
-    int serr = sdbfs_dev_create (&devio_sdb);
-    ASSERT_TEST (serr == 0, "Could not create SDBFS",
-            err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP);
-
     /* Print SDB */
-    sdbutils_do_list (&devio_sdb, 1);
-
-    /* Cleanup */
-    sdbfs_dev_destroy (&devio_sdb);
+    sdbutils_do_list (self->sdbfs, 1);
     return err;
 
-err_sdbfs_create:
 err_sdb_not_supp:
     return err;
 }
