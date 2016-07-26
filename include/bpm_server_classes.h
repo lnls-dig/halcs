@@ -17,6 +17,7 @@
 #include <disptable.h>
 #include <errhand.h>
 #include <hutils.h>
+#include <sdbutils.h>
 #include <ll_io.h>
 
 /* Internal libraries dependencies */
