@@ -464,7 +464,7 @@ devio_err_e devio_print_info (devio_t *self)
     devio_err_e err = DEVIO_SUCCESS;
 
     /* FIXME: Only valid for PCIe devices */
-    ASSERT_TEST (llio_get_type (self->llio) != PCIE_DEV,
+    ASSERT_TEST (llio_get_type (self->llio) == PCIE_DEV,
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
@@ -969,7 +969,7 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
     uint32_t smio_id = 0;
 
     /* FIXME: Only valid for PCIe devices */
-    ASSERT_TEST (llio_get_type (self->llio) != PCIE_DEV,
+    ASSERT_TEST (llio_get_type (self->llio) == PCIE_DEV,
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
