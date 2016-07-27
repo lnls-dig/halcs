@@ -95,7 +95,7 @@ static char *_devio_gen_smio_key (devio_t *self,
         uint32_t inst_id);
 static char *_devio_gen_smio_key_auto (devio_t *self,
         const volatile smio_mod_dispatch_t *smio_mod_handler, uint32_t inst_id,
-        bool auto_inst_id);
+        bool auto_inst_id, uint32_t *used_inst_id);
 
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
@@ -809,8 +809,9 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
      * hash table */
 
     /* Try to generate unique key for the SMIO. */
+    uint32_t used_inst_id = 0;
     char *key = _devio_gen_smio_key_auto (self, smio_mod_handler, inst_id,
-            auto_inst_id);
+            auto_inst_id, &used_inst_id);
     ASSERT_ALLOC (key, err_key_alloc);
 
     /* Check if this genrated key is valid */
@@ -850,7 +851,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     th_args->service = self->name;
     th_args->verbose = self->verbose;
     th_args->base = base;
-    th_args->inst_id = inst_id;
+    th_args->inst_id = used_inst_id;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] Calling boot func\n");
@@ -886,7 +887,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     th_config_args->smio_handler = smio_mod_handler;
     th_config_args->service = self->name;
     th_config_args->log_file = self->log_file;
-    th_config_args->inst_id = inst_id;
+    th_config_args->inst_id = used_inst_id;
 
     /* Create actor just for configuring the new recently created SMIO. We will
        check for its end later on poll_all_sm function */
@@ -1296,24 +1297,31 @@ err_inst_id_str_alloc:
 
 static char *_devio_gen_smio_key_auto (devio_t *self,
         const volatile smio_mod_dispatch_t *smio_mod_handler, uint32_t inst_id,
-        bool auto_inst_id)
+        bool auto_inst_id, uint32_t *used_inst_id)
 {
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:_devio_gen_smio_key] Generating new SMIO key\n");
-    char *key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
+    uint32_t avail_inst_id = inst_id;
+    char *key = _devio_gen_smio_key (self, smio_mod_handler, avail_inst_id);
     ASSERT_ALLOC (key, err_key_alloc);
 
     /* If auto_inst_id is set, lookup the current SMIO key to see if it's already
      * there. If it is get the next instance ID available */
     if (auto_inst_id) {
         while (zhashx_lookup (self->sm_io_h, key) != NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                    "[dev_io_core:_devio_gen_smio_key] Duplicated key %s found. trying the next one\n", key);
             /* Try the next inst_id*/
-            inst_id++;
+            avail_inst_id++;
             free (key);
-            key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
+            key = _devio_gen_smio_key (self, smio_mod_handler, avail_inst_id);
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                    "[dev_io_core:_devio_gen_smio_key] Next key %s will be tested\n", key);
             ASSERT_ALLOC (key, err_key_alloc);
         }
     }
+
+    *used_inst_id = avail_inst_id;
 
 err_key_alloc:
     return key;
