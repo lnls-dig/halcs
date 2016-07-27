@@ -94,6 +94,12 @@ extern "C" {
 /* ACQ Components */
 #define WB_ACQ_CORE_CTRL_REGS_OFFS                  (BAR4_ADDR | WB_ACQ_CORE_CTRL_RAW_REGS_OFFS)
 
+/* Trigger Interface Components */
+#define WB_TRIGGER_IFACE_REG_OFFS                   (BAR4_ADDR | WB_TRIGGER_IFACE_RAW_REG_OFFS)
+
+/* Trigger Mux Components */
+#define WB_TRIGGER_MUX_REG_OFFS                     (BAR4_ADDR | WB_TRIGGER_MUX_RAW_REG_OFFS)
+
 /* Large Memory Addresses */
 #define LARGE_MEM_ADDR                              (BAR2_ADDR | LARGE_MEM_RAW_ADDR)
 
