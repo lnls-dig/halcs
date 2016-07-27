@@ -44,7 +44,6 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     smio_fmc250m_4ch_t *self = (smio_fmc250m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
-    uint64_t base = smio_get_base (parent);
 
     /* Check if Instance ID is within our expected limits */
     ASSERT_TEST(inst_id < NUM_FMC250M_4CH_SMIOS, "Number of FMC250M_4CH SMIOs instances exceeded",
@@ -120,28 +119,11 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
 #endif
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_core] Registering FMC_ADC_COMMON SMIO\n");
-    smio_register_sm (parent, 0x2403f569, base | FMC_250M_FMC_ADC_COMMON_OFFS, inst_id);
-
-    /* Now, initialize the FMC250M_4CH with the appropriate structures*/
-    if (self->type == TYPE_FMC250M_4CH_ACTIVE) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_core] Active Board detected. "
-                "Registering FMC_ADC_ACTIVE SMIO\n");
-        smio_register_sm (parent, 0x88c67d9c, base | FMC_250M_FMC_ACTIVE_CLK_OFFS, inst_id);
-    }
-    else { /* PASSIVE or Unsupported*/
-        if (self->type != TYPE_FMC250M_4CH_PASSIVE) {
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN,
-            "[sm_io:fmc250m_4ch_core] Unsupported FMC250M_4CH card (maybe EEPROM not configured?).\n"
-            "\t Defaulting to PASSIVE board\n");
-        }
-    }
-
     /* FIXME: We need to be sure that, if the board is ACTIVE, the FMC_ACTIVE_CLK
      * component has been sucseddfully initialized so that the ADCs has clock. 
      * Otherwise, we won't be able to RESET the ADCs, leading to undefined 
      * behavior */
-    sleep (1);
+    sleep (5);
 
     /* Setup ISLA216P ADC SPI communication */
     uint32_t i;
