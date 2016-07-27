@@ -84,6 +84,10 @@ llio_err_e llio_set_dev_handler (llio_t *self, void *dev_handler);
 void *llio_get_dev_handler (llio_t *self);
 /* Get type */
 llio_type_e llio_get_type (llio_t *self);
+/* Set SDB prefix ADDR */
+llio_err_e llio_set_sdb_prefix_addr (llio_t *self, uint64_t sdb_prefix_addr);
+/* Get SDB prefix ADDR */
+uint64_t llio_get_sdb_prefix_addr (llio_t *self);
 
 /************************************************************/
 /**************** Low Level generic methods API *************/

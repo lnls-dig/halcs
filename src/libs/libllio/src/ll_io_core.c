@@ -38,6 +38,8 @@ struct _llio_t {
                                             devices functions */
     char *name;                         /* Identification of this llio instance */
     int verbose;                        /* Print activity to stdout */
+    uint64_t sdb_prefix_addr;           /* SDB prefix address. Used to read/write to the 
+                                           SDB address space. To be set by the specific ops */
 
     /* Endpoint to connect to */
     llio_endpoint_t *endpoint;
@@ -69,6 +71,8 @@ llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
     self->verbose = verbose;
+    /* This shoule be set by the specific operations (e.g., PCIe, ETH) */
+    self->sdb_prefix_addr = 0x0;
 
     /* Initilialize llio_endpoint */
     self->endpoint = NULL;
@@ -193,6 +197,20 @@ llio_type_e llio_get_type (llio_t *self)
 {
     return self->type;
 }
+
+llio_err_e llio_set_sdb_prefix_addr (llio_t *self, uint64_t sdb_prefix_addr)
+{
+    assert (self);
+    self->sdb_prefix_addr = sdb_prefix_addr;
+    return LLIO_SUCCESS;
+}
+
+uint64_t llio_get_sdb_prefix_addr (llio_t *self)
+{
+    assert (self);
+    return self->sdb_prefix_addr;
+}
+
 /**************** Static function ****************/
 
 static bool _llio_get_endpoint_open (llio_t *self)
