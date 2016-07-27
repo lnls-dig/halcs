@@ -89,6 +89,14 @@ const disp_table_ops_t devio_disp_table_ops;
 static disp_table_err_e _devio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
 
+/* SMIO key generators */
+static char *_devio_gen_smio_key (devio_t *self,
+        const volatile smio_mod_dispatch_t *smio_mod_handler,
+        uint32_t inst_id);
+static char *_devio_gen_smio_key_auto (devio_t *self,
+        const volatile smio_mod_dispatch_t *smio_mod_handler, uint32_t inst_id,
+        bool auto_inst_id);
+
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor);
@@ -110,7 +118,7 @@ static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
-        uint32_t inst_id);
+        uint32_t inst_id, bool auto_inst_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
@@ -600,7 +608,7 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 
     if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -710,7 +718,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     }
     else if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
     }
     else if (streq (command, "$UNREGISTER_SMIO_ALL")) {
         /* Unregister all SMIOs */
@@ -773,7 +781,7 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 
 /* Register an specific sm_io modules to this device */
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
-        uint32_t inst_id)
+        uint32_t inst_id, bool auto_inst_id)
 {
     assert (self);
 
@@ -800,17 +808,9 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     /* Found! Call bootstrap code and insert in
      * hash table */
 
-    /* Stringify ID. We do it before spawning a new thread as
-     * alloc can fail */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-            "[dev_io_core:register_sm] Stringify hash ID\n");
-    char *inst_id_str = hutils_stringify_dec_key (inst_id);
-    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
-    char *key = hutils_concat_strings_no_sep (smio_mod_handler->name,
-            inst_id_str);
-    /* We don't need this anymore */
-    free (inst_id_str);
-    inst_id_str = NULL;
+    /* Try to generate unique key for the SMIO. */
+    char *key = _devio_gen_smio_key_auto (self, smio_mod_handler, inst_id,
+            auto_inst_id);
     ASSERT_ALLOC (key, err_key_alloc);
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
@@ -937,7 +937,6 @@ err_pipes_msg_handle:
 err_create_pipe_msg:
     free (key);
 err_key_alloc:
-err_inst_id_str_alloc:
 err_search_smio:
 err_max_smios_reached:
     return err;
@@ -962,8 +961,34 @@ err_register_sm:
  * according to the device information stored in the SDB */
 static devio_err_e _devio_register_all_sm_raw (devio_t *self)
 {
-    (void) self;
-    return DEVIO_ERR_FUNC_NOT_IMPL;
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+    struct sdb_device *d;
+    struct sdb_product *p;
+    struct sdb_component *c;
+    uint32_t smio_id = 0;
+
+    /* FIXME: Only valid for PCIe devices */
+    ASSERT_TEST (llio_get_type (self->llio) != PCIE_DEV,
+            "SDB is only supported for PCIe devices",
+            err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
+
+    /* New SDBFS scan: get the interconnect and ignore it */
+    sdbfs_scan (self->sdbfs, 1);
+    /* Iterate over all SDB devices */
+    while ((d = sdbutils_next_device (self->sdbfs)) != NULL) {
+        c = &d->sdb_component;
+        p = &c->product;
+
+        smio_id = ntohl(p->device_id);
+        /* Try to register SMIO. If not found, nothing is done. Also,
+         * alloc the next available inst_id for this SMIO (if already present) */
+        _devio_register_sm_raw (self, smio_id, self->sdbfs->base[
+                self->sdbfs->depth], 0, true);
+    }
+
+err_sdb_not_supp:
+    return err;
 }
 
 devio_err_e devio_register_all_sm (void *pipe)
@@ -1240,6 +1265,53 @@ const disp_table_ops_t devio_disp_table_ops = {
 /************************************************************/
 /********************* Helper Functions *********************/
 /************************************************************/
+
+static char *_devio_gen_smio_key (devio_t *self,
+        const volatile smio_mod_dispatch_t *smio_mod_handler,
+        uint32_t inst_id)
+{
+    (void) self;
+
+    char *key = NULL;
+    char *inst_id_str = hutils_stringify_dec_key (inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+
+    key = hutils_concat_strings_no_sep (smio_mod_handler->name,
+            inst_id_str);
+    /* We don't need this anymore */
+    free (inst_id_str);
+    inst_id_str = NULL;
+    /* Return the key nevertheless (succeeding or not) */
+    /* ASSERT_ALLOC (key, err_key_alloc); */
+
+err_inst_id_str_alloc:
+    return key;
+}
+
+static char *_devio_gen_smio_key_auto (devio_t *self,
+        const volatile smio_mod_dispatch_t *smio_mod_handler, uint32_t inst_id,
+        bool auto_inst_id)
+{
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+            "[dev_io_core:_devio_gen_smio_key] Generating new SMIO key\n");
+    char *key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
+    ASSERT_ALLOC (key, err_key_alloc);
+
+    /* If auto_inst_id is set, lookup the current SMIO key to see if it's already
+     * there. If it is get the next instance ID available */
+    if (auto_inst_id) {
+        while (zhashx_lookup (self->sm_io_h, key) != NULL) {
+            /* Try the next inst_id*/
+            inst_id++;
+            free (key);
+            key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
+            ASSERT_ALLOC (key, err_key_alloc);
+        }
+    }
+
+err_key_alloc:
+    return key;
+}
 
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
 {
