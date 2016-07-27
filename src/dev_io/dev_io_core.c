@@ -127,8 +127,12 @@ static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
 static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
         int count)
 {
-    return llio_read_block (((devio_t *)fs->drvdata)->llio,
-            BAR4_ADDR | (offset), count, (uint32_t *) buf);
+    devio_t *devio = (devio_t *)fs->drvdata;
+    llio_t *llio = devio->llio;
+    uint64_t llio_sdb_prefix_addr = llio_get_sdb_prefix_addr (llio);
+
+    return llio_read_block (llio, llio_sdb_prefix_addr |
+        (offset), count, (uint32_t *) buf);
 }
 
 /* Default signal handlers */
@@ -854,7 +858,8 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     th_args->inst_id = used_inst_id;
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-            "[dev_io_core:register_sm] Calling boot func\n");
+            "[dev_io_core:register_sm] Calling boot func for SMIO \"%s\" @ %016"PRIX64", instance %u\n",
+             smio_mod_handler->name, base, used_inst_id);
 
     self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_startup, th_args);
     ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
@@ -986,12 +991,18 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
     while ((d = sdbutils_next_device (self->sdbfs)) != NULL) {
         c = &d->sdb_component;
         p = &c->product;
-
         smio_id = ntohl(p->device_id);
+
         /* Try to register SMIO. If not found, nothing is done. Also,
          * alloc the next available inst_id for this SMIO (if already present) */
-        _devio_register_sm_raw (self, smio_id, self->sdbfs->base[
-                self->sdbfs->depth], 0, true);
+        uint64_t llio_sdb_prefix_addr = llio_get_sdb_prefix_addr (self->llio);
+        uint64_t smio_base_addr = (long long) self->sdbfs->base[self->sdbfs->depth] + ntohll(c->addr_first);
+        uint64_t smio_full_base_addr = llio_sdb_prefix_addr | smio_base_addr;
+	DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+            "[dev_io_core:register_all_sm_raw] Calling register_sm_raw () for smio_id %u @ %016"PRIX64"\n",
+            smio_id, smio_full_base_addr);
+        _devio_register_sm_raw (self, smio_id, llio_sdb_prefix_addr | 
+            smio_full_base_addr, 0, true);
     }
 
 err_sdb_not_supp:
