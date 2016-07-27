@@ -48,7 +48,7 @@
 #define WB_FMC_ADC_COMMON_CSR_MONITOR_GLOBAL_R(reg)     WBGEN2_GEN_READ(reg, 1, 3)
 
 RW_PARAM_FUNC(fmc_adc_common, leds) {
-    SET_GET_PARAM(fmc_adc_common, FMC_130M_FMC_ADC_COMMON_OFFS, WB_FMC_ADC_COMMON_CSR,
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
             MONITOR, GLOBAL, MULT_BIT_PARAM,
             BPM_FMC_ADC_COMMON_LEDS_MIN, BPM_FMC_ADC_COMMON_LEDS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -60,7 +60,7 @@ RW_PARAM_FUNC(fmc_adc_common, leds) {
 #define BPM_FMC_ADC_COMMON_TEST_DATA_EN_MAX             1 /* TEST data enable on */
 
 RW_PARAM_FUNC(fmc_adc_common, test_data_en) {
-    SET_GET_PARAM(fmc_adc_common, FMC_130M_FMC_ADC_COMMON_OFFS, WB_FMC_ADC_COMMON_CSR,
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
             MONITOR, TEST_DATA_EN, SINGLE_BIT_PARAM,
             BPM_FMC_ADC_COMMON_TEST_DATA_EN_MIN, BPM_FMC_ADC_COMMON_TEST_DATA_EN_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
@@ -70,7 +70,7 @@ RW_PARAM_FUNC(fmc_adc_common, test_data_en) {
 #define BPM_FMC_ADC_COMMON_TRIG_DIR_MAX                 1 /* Trigger direction output */
 
 RW_PARAM_FUNC(fmc_adc_common, trig_dir) {
-    SET_GET_PARAM(fmc_adc_common, FMC_130M_FMC_ADC_COMMON_OFFS, WB_FMC_ADC_COMMON_CSR,
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
             TRIGGER, DIR, SINGLE_BIT_PARAM,
             BPM_FMC_ADC_COMMON_TRIG_DIR_MIN, BPM_FMC_ADC_COMMON_TRIG_DIR_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
@@ -80,7 +80,7 @@ RW_PARAM_FUNC(fmc_adc_common, trig_dir) {
 #define BPM_FMC_ADC_COMMON_TRIG_TERM_MAX                1 /* Trigger termination enabled */
 
 RW_PARAM_FUNC(fmc_adc_common, trig_term) {
-    SET_GET_PARAM(fmc_adc_common, FMC_130M_FMC_ADC_COMMON_OFFS, WB_FMC_ADC_COMMON_CSR,
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
             TRIGGER, TERM, SINGLE_BIT_PARAM,
             BPM_FMC_ADC_COMMON_TRIG_TERM_MIN, BPM_FMC_ADC_COMMON_TRIG_TERM_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
@@ -90,7 +90,7 @@ RW_PARAM_FUNC(fmc_adc_common, trig_term) {
 #define BPM_FMC_ADC_COMMON_TRIG_VAL_MAX                 1 /* Trigger value 1 */
 
 RW_PARAM_FUNC(fmc_adc_common, trig_val) {
-    SET_GET_PARAM(fmc_adc_common, FMC_130M_FMC_ADC_COMMON_OFFS, WB_FMC_ADC_COMMON_CSR,
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
             TRIGGER, TRIG_VAL, SINGLE_BIT_PARAM,
             BPM_FMC_ADC_COMMON_TRIG_VAL_MIN, BPM_FMC_ADC_COMMON_TRIG_VAL_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);

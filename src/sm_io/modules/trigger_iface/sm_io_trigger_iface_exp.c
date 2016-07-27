@@ -48,7 +48,7 @@
 #define BPM_TRIGGER_IFACE_DIR_MIN                       0 /* Bidirection Buffer set to Output */
 #define BPM_TRIGGER_IFACE_DIR_MAX                       1 /* Bidirection Buffer set to Input */
 RW_PARAM_FUNC(trigger_iface, dir) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CTL, DIR, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, SINGLE_BIT_PARAM,
             BPM_TRIGGER_IFACE_DIR_MIN, BPM_TRIGGER_IFACE_DIR_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -57,7 +57,7 @@ RW_PARAM_FUNC(trigger_iface, dir) {
 #define BPM_TRIGGER_IFACE_DIR_POL_MIN                   0 /* Direction polarity kept */
 #define BPM_TRIGGER_IFACE_DIR_POL_MAX                   1 /* Direction polarity reversed */
 RW_PARAM_FUNC(trigger_iface, dir_pol) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CTL, DIR_POL, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, SINGLE_BIT_PARAM,
             BPM_TRIGGER_IFACE_DIR_POL_MIN, BPM_TRIGGER_IFACE_DIR_POL_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -66,7 +66,7 @@ RW_PARAM_FUNC(trigger_iface, dir_pol) {
 #define BPM_TRIGGER_IFACE_RCV_COUNT_RST_MIN             0 /* Receive Counter Reset */
 #define BPM_TRIGGER_IFACE_RCV_COUNT_RST_MAX             1 /* Receive Counter Reset */
 RW_PARAM_FUNC(trigger_iface, rcv_count_rst) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CTL, RCV_COUNT_RST, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, SINGLE_BIT_PARAM,
             BPM_TRIGGER_IFACE_RCV_COUNT_RST_MIN, BPM_TRIGGER_IFACE_RCV_COUNT_RST_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -75,7 +75,7 @@ RW_PARAM_FUNC(trigger_iface, rcv_count_rst) {
 #define BPM_TRIGGER_IFACE_TRANSM_COUNT_RST_MIN          0 /* Transmit Counter Reset */
 #define BPM_TRIGGER_IFACE_TRANSM_COUNT_RST_MAX          1 /* Transmit Counter Reset */
 RW_PARAM_FUNC(trigger_iface, transm_count_rst) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CTL, TRANSM_COUNT_RST, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, SINGLE_BIT_PARAM,
             BPM_TRIGGER_IFACE_TRANSM_COUNT_RST_MIN, BPM_TRIGGER_IFACE_TRANSM_COUNT_RST_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -84,7 +84,7 @@ RW_PARAM_FUNC(trigger_iface, transm_count_rst) {
 #define BPM_TRIGGER_IFACE_RCV_LEN_MIN                   0               /* Receiver Debounce Length */
 #define BPM_TRIGGER_IFACE_RCV_LEN_MAX                   ((1 << 8) -1)   /* Receiver Debounce Length */
 RW_PARAM_FUNC(trigger_iface, rcv_len) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CFG, RCV_LEN, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, MULT_BIT_PARAM,
             BPM_TRIGGER_IFACE_RCV_LEN_MIN, BPM_TRIGGER_IFACE_RCV_LEN_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -93,21 +93,21 @@ RW_PARAM_FUNC(trigger_iface, rcv_len) {
 #define BPM_TRIGGER_IFACE_TRANSM_LEN_MIN                 0              /* Receiver Debounce Length */
 #define BPM_TRIGGER_IFACE_TRANSM_LEN_MAX                 ((1 << 8) -1)  /* Receiver Debounce Length */
 RW_PARAM_FUNC(trigger_iface, transm_len) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_CFG, TRANSM_LEN, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(trigger_iface, count_rcv) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_COUNT, RCV, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(trigger_iface, count_transm) {
-    SET_GET_PARAM_CHANNEL(trigger_iface, WB_TRIGGER_IFACE_RAW_REG_OFFS, WB_TRIG_IFACE,
+    SET_GET_PARAM_CHANNEL(trigger_iface, 0x0, WB_TRIG_IFACE,
             CH0_COUNT, TRANSM, TRIGGER_IFACE_CHAN_OFFSET, TRIGGER_IFACE_NUM_CHAN, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);

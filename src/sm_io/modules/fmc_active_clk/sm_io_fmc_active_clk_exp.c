@@ -48,7 +48,7 @@ static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self,
 #define BPM_FMC_ACTIVE_CLK_SI571_OE_MAX             1 /* SI571 Output enable */
 
 RW_PARAM_FUNC(fmc_active_clk, si571_oe) {
-    SET_GET_PARAM(fmc_active_clk, FMC_ACTIVE_CLK_CTRL_REGS_OFFS, WB_FMC_ACTIVE_CLK_CSR,
+    SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, SI571_OE, SINGLE_BIT_PARAM,
             BPM_FMC_ACTIVE_CLK_SI571_OE_MIN, BPM_FMC_ACTIVE_CLK_SI571_OE_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -58,7 +58,7 @@ RW_PARAM_FUNC(fmc_active_clk, si571_oe) {
 #define BPM_FMC_ACTIVE_CLK_PLL_FUNC_MAX             1 /* PLL FUNCTION pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, pll_func) {
-    SET_GET_PARAM(fmc_active_clk, FMC_ACTIVE_CLK_CTRL_REGS_OFFS, WB_FMC_ACTIVE_CLK_CSR,
+    SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, PLL_FUNCTION, SINGLE_BIT_PARAM,
             BPM_FMC_ACTIVE_CLK_PLL_FUNC_MIN, BPM_FMC_ACTIVE_CLK_PLL_FUNC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -69,7 +69,7 @@ RW_PARAM_FUNC(fmc_active_clk, pll_func) {
 #define BPM_FMC_ACTIVE_CLK_PLL_STATUS_MAX           1 /* PLL STATUS pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, pll_status) {
-    SET_GET_PARAM(fmc_active_clk, FMC_ACTIVE_CLK_CTRL_REGS_OFFS, WB_FMC_ACTIVE_CLK_CSR,
+    SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, PLL_STATUS, SINGLE_BIT_PARAM,
             BPM_FMC_ACTIVE_CLK_PLL_STATUS_MIN, BPM_FMC_ACTIVE_CLK_PLL_STATUS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -79,7 +79,7 @@ RW_PARAM_FUNC(fmc_active_clk, pll_status) {
 #define BPM_FMC_ACTIVE_CLK_CLK_SEL_MAX              1 /* PLL CLK_SEL pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, clk_sel) {
-    SET_GET_PARAM(fmc_active_clk, FMC_ACTIVE_CLK_CTRL_REGS_OFFS, WB_FMC_ACTIVE_CLK_CSR,
+    SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, CLK_SEL, SINGLE_BIT_PARAM,
             BPM_FMC_ACTIVE_CLK_CLK_SEL_MIN, BPM_FMC_ACTIVE_CLK_CLK_SEL_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);

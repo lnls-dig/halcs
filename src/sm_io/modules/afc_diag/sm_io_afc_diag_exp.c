@@ -42,13 +42,13 @@
 /************************************************************/
 
 RW_PARAM_FUNC(afc_diag, card_slot) {
-    SET_GET_PARAM(afc_diag, WB_AFC_DIAG_CTRL_RAW_REGS_OFFS, BPM_AFC_DIAG, GEO_ID,
+    SET_GET_PARAM(afc_diag, 0x0, BPM_AFC_DIAG, GEO_ID,
             CARD_SLOT, MULT_BIT_PARAM, /* No minimum limit */,
             /* No maximum limit */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(afc_diag, ipmi_addr) {
-    SET_GET_PARAM(afc_diag, WB_AFC_DIAG_CTRL_RAW_REGS_OFFS, BPM_AFC_DIAG, GEO_ID,
+    SET_GET_PARAM(afc_diag, 0x0, BPM_AFC_DIAG, GEO_ID,
             IPMI_ADDR, MULT_BIT_PARAM, /* No minimum limit */,
             /* No maximum limit */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
