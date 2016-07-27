@@ -813,6 +813,11 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
             auto_inst_id);
     ASSERT_ALLOC (key, err_key_alloc);
 
+    /* Check if this genrated key is valid */
+    ASSERT_TEST (zhashx_lookup (self->sm_io_h, key) == NULL, 
+            "Invalid generated key. Possible duplicated value",
+            err_inv_key);
+
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] Allocating thread args\n");
 
@@ -935,6 +940,7 @@ err_pipes_msg_handle:
     zsock_destroy (&self->pipes_msg [pipe_msg_idx]);
     zsock_destroy (&pipe_msg_backend);
 err_create_pipe_msg:
+err_inv_key:
     free (key);
 err_key_alloc:
 err_search_smio:
