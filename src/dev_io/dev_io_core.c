@@ -132,7 +132,7 @@ static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
     uint64_t llio_sdb_prefix_addr = llio_get_sdb_prefix_addr (llio);
 
     return llio_read_block (llio, llio_sdb_prefix_addr |
-        (offset), count, (uint32_t *) buf);
+            (offset), count, (uint32_t *) buf);
 }
 
 /* Default signal handlers */
@@ -211,7 +211,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     /* Set loop timeout. This is needed to ensure zloop will
      * frequently check for rebuilding its poll set */
     self->timer_id = zloop_timer (self->loop, DEVIO_POLLER_TIMEOUT, DEVIO_POLLER_NTIMES,
-        _devio_handle_timer, NULL);
+            _devio_handle_timer, NULL);
     ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
 
     /* Set-up backend handler for forcing interrupting the zloop and rebuild
@@ -819,7 +819,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     ASSERT_ALLOC (key, err_key_alloc);
 
     /* Check if this genrated key is valid */
-    ASSERT_TEST (zhashx_lookup (self->sm_io_h, key) == NULL, 
+    ASSERT_TEST (zhashx_lookup (self->sm_io_h, key) == NULL,
             "Invalid generated key. Possible duplicated value",
             err_inv_key);
 
@@ -839,7 +839,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Register socket handlers */
     err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx],
-        _devio_handle_pipe_msg);
+            _devio_handle_pipe_msg);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
             err_pipes_msg_handle);
 
@@ -859,14 +859,14 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
             "[dev_io_core:register_sm] Calling boot func for SMIO \"%s\" @ %016"PRIX64", instance %u\n",
-             smio_mod_handler->name, base, used_inst_id);
+            smio_mod_handler->name, base, used_inst_id);
 
     self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_startup, th_args);
     ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
             err_spawn_smio_thread);
 
     err = _devio_engine_handle_socket (self, self->pipes_mgmt [pipe_mgmt_idx],
-        _devio_handle_pipe_mgmt);
+            _devio_handle_pipe_mgmt);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register management socket handler",
             err_pipes_mgmt_handle);
 
@@ -915,7 +915,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Register socket handlers */
     err = _devio_engine_handle_socket (self, self->pipes_config [pipe_config_idx],
-        _devio_handle_pipe_cfg);
+            _devio_handle_pipe_cfg);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
             err_pipes_cfg_handle);
 
@@ -963,7 +963,7 @@ devio_err_e devio_register_sm (void *pipe, uint32_t smio_id, uint64_t base,
     int zerr = zsock_send (pipe, "s484", "$REGISTER_SMIO", smio_id, base,
             inst_id);
     ASSERT_TEST(zerr == 0, "Could not register SMIO", err_register_sm,
-           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_register_sm:
     return err;
@@ -998,11 +998,11 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
         uint64_t llio_sdb_prefix_addr = llio_get_sdb_prefix_addr (self->llio);
         uint64_t smio_base_addr = (long long) self->sdbfs->base[self->sdbfs->depth] + ntohll(c->addr_first);
         uint64_t smio_full_base_addr = llio_sdb_prefix_addr | smio_base_addr;
-	DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
-            "[dev_io_core:register_all_sm_raw] Calling register_sm_raw () for smio_id %u @ %016"PRIX64"\n",
-            smio_id, smio_full_base_addr);
-        _devio_register_sm_raw (self, smio_id, llio_sdb_prefix_addr | 
-            smio_full_base_addr, 0, true);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE,
+                "[dev_io_core:register_all_sm_raw] Calling register_sm_raw () for smio_id %u @ %016"PRIX64"\n",
+                smio_id, smio_full_base_addr);
+        _devio_register_sm_raw (self, smio_id, llio_sdb_prefix_addr |
+                smio_full_base_addr, 0, true);
     }
 
 err_sdb_not_supp:
@@ -1016,7 +1016,7 @@ devio_err_e devio_register_all_sm (void *pipe)
 
     int zerr = zsock_send (pipe, "s", "$REGISTER_SMIO_ALL");
     ASSERT_TEST(zerr == 0, "Could not register all SMIOs", err_register_sm_all,
-           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_register_sm_all:
     return err;
@@ -1042,7 +1042,7 @@ devio_err_e devio_unregister_sm (void *pipe, const char *smio_key)
 
     int zerr = zsock_send (pipe, "ss", "$UNREGISTER_SMIO", smio_key);
     ASSERT_TEST(zerr == 0, "Could not unregister SMIOs", err_unregister_sm,
-           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_unregister_sm:
     return err;
@@ -1069,7 +1069,7 @@ devio_err_e devio_unregister_all_sm (void *pipe)
 
     int zerr = zsock_send (pipe, "s", "$UNREGISTER_SMIO_ALL");
     ASSERT_TEST(zerr == 0, "Could not unregister all SMIOs", err_unregister_sm_all,
-           DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_unregister_sm_all:
     return err;
