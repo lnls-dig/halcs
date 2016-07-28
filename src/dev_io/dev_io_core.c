@@ -473,6 +473,8 @@ devio_err_e devio_print_info (devio_t *self)
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
     /* Print SDB */
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+            "[devio_print_info] SDB information:\n");
     sdbutils_do_list (self->sdbfs, 1);
     return err;
 
