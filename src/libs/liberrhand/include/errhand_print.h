@@ -49,7 +49,7 @@ void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
 
 /* dbg has the following format:
  *    31 - 4            3 - 1           0-0
- *  ERRHAND_SUBSYS   ERRHAND_LVL   ERRHAND_HALT
+ *  ERRHAND_SUBSYS   ERRHAND_LVL   ERRHAND_SIMPLE
  */
 
 #ifdef ERRHAND_DBG
@@ -59,12 +59,8 @@ void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
         if (((dbg) & ERRHAND_SUBSYS_ON) &&              \
             (((dbg) & ERRHAND_LVL_MASK) >=              \
             ERRHAND_MIN_LEVEL)) {                       \
-            errhand_log_print((dbg) & ERRHAND_LVL_MASK, \
+            errhand_log_print((dbg) & ERRHAND_LVL_SIMPLE_MASK, \
                     fmt, ## __VA_ARGS__);               \
-                                                        \
-            if ((dbg) & ERRHAND_LVL_HALT) {             \
-                while(1);                               \
-            }                                           \
         }                                               \
     } while(0)
 
@@ -74,9 +70,6 @@ void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
             (((dbg) & ERRHAND_LVL_MASK) >=              \
             ERRHAND_MIN_LEVEL)) {                       \
             errhand_print_vec(fmt, data, len);          \
-                                                        \
-            if ((dbg) & ERRHAND_LVL_HALT)               \
-                while(1);                               \
         }                                               \
     } while(0)
 
