@@ -65,7 +65,6 @@ static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
         const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
-static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32_t dev_id);
 static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id);
 
 static struct option long_options[] =
@@ -610,12 +609,14 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
     assert (pipe);
+(void) hints;
+(void) dev_id;
 
     devio_err_e err = DEVIO_SUCCESS;
 
     switch (devio_type) {
         case BE_DEVIO:
-            err = _spawn_be_platform_smios (pipe, hints, dev_id);
+            err = devio_register_all_sm (pipe);
             break;
 
         case FE_DEVIO:
@@ -633,131 +634,6 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
     }
 
 err_register_sm:
-    return err;
-}
-
-static devio_err_e _spawn_be_platform_smios (void *pipe, zhashx_t *hints, uint32_t dev_id)
-{
-    const char *fmc_board_130m_4ch = "fmc130m_4ch";
-    const char *fmc_board_250m_4ch = "fmc250m_4ch";
-    uint32_t fmc130m_4ch_id = 0x7085ef15;
-    uint32_t fmc250m_4ch_id = 0x68e3b1af;
-    uint32_t acq_id = 0x4519a0ad;
-    uint32_t dsp_id = 0x1bafbf1e;
-    uint32_t swap_id = 0x12897592;
-    devio_err_e err = DEVIO_SUCCESS;
-
-    /* ML605 or AFCv3 */
-#if defined (__BOARD_ML605__) || (__BOARD_AFCV3__)
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning default SMIOs ...\n");
-
-    /* Look for which FMC board to spawn */
-    char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
-    snprintf (hints_key, sizeof (hints_key),
-            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
-
-    hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
-    /* If key is not found, assume the fmc130m default FMC board */
-    if (cfg_item == NULL || cfg_item->fmc_board == NULL ||
-            streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
-                fmc_board_130m_4ch)) {
-        /* Default FMC Board */
-        err = devio_register_sm (pipe, fmc130m_4ch_id, FMC1_130M_BASE_ADDR, 0);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        }
-    }
-    else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
-        /* FMC250m Board */
-        err = devio_register_sm (pipe, fmc250m_4ch_id, FMC1_250M_BASE_ADDR, 0);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        }
-    }
-
-    err = devio_register_sm (pipe, acq_id, WB_ACQ1_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, dsp_id, DSP1_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, swap_id, DSP1_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-    /* AFCv3 spefific */
-#if defined (__BOARD_AFCV3__)
-    uint32_t afc_diag_id = 0x51954750;
-    uint32_t trigger_iface_id = 0xbcbb78d2;
-    uint32_t trigger_mux_id = 0x84b6a5ac;
-
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Spawning AFCv3 specific SMIOs ...\n");
-
-    snprintf (hints_key, sizeof (hints_key),
-            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
-
-    cfg_item = zhashx_lookup (hints, hints_key);
-    /* If key is not found, assume the fmc130m default FMC board */
-    if (cfg_item == NULL || cfg_item->fmc_board == NULL ||
-            streq (cfg_item->fmc_board, "") || streq (cfg_item->fmc_board,
-                fmc_board_130m_4ch)) {
-        /* Default FMC Board */
-        err = devio_register_sm (pipe, fmc130m_4ch_id, FMC2_130M_BASE_ADDR, 1);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        }
-    }
-    else if (streq (cfg_item->fmc_board, fmc_board_250m_4ch)) {
-        /* FMC250m Board */
-        err = devio_register_sm (pipe, fmc250m_4ch_id, FMC2_250M_BASE_ADDR, 1);
-        if (err != DEVIO_SUCCESS) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-        }
-    }
-
-    err = devio_register_sm (pipe, acq_id, WB_ACQ2_BASE_ADDR, 1);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, dsp_id, DSP2_BASE_ADDR, 1);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, swap_id, DSP2_BASE_ADDR, 1);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, trigger_iface_id, WB_TRIGGER_IFACE_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, trigger_mux_id, WB_TRIGGER_MUX1_BASE_ADDR, 0);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-
-    err = devio_register_sm (pipe, trigger_mux_id, WB_TRIGGER_MUX2_BASE_ADDR, 1);
-    if (err != DEVIO_SUCCESS) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[ebpm] devio_register_sm error!\n");
-    }
-#endif
-#else
-#error "BE FPGA Board not supported!"
-#endif
-
     return err;
 }
 

@@ -195,6 +195,9 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
     /* Signal that the endpoint is opened and ready to work */
     llio_set_endpoint_open (self, true);
 
+    /* Set SDB prefix adress */
+    llio_set_sdb_prefix_addr (self, 0x0);
+
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
             "[ll_io_eth] Opened ETH device located at %s\n",
             llio_get_endpoint_name (self));

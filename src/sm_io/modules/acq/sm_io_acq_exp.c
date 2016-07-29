@@ -673,7 +673,7 @@ err_inv_skip_trig:
 #define ACQ_HW_DATA_TRIG_POL_MIN                    0       /* positive slope: 0 -> 1 */
 #define ACQ_HW_DATA_TRIG_POL_MAX                    1       /* negative slope: 1 -> 0 */
 RW_PARAM_FUNC(acq, hw_data_trig_pol) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_CFG,
             HW_TRIG_POL, SINGLE_BIT_PARAM, ACQ_HW_DATA_TRIG_POL_MIN,
             ACQ_HW_DATA_TRIG_POL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -681,7 +681,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_pol) {
 #define ACQ_HW_DATA_TRIG_SEL_MIN                    0
 #define ACQ_HW_DATA_TRIG_SEL_MAX                    3
 RW_PARAM_FUNC(acq, hw_data_trig_sel) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_CFG,
             INT_TRIG_SEL, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_SEL_MIN,
             ACQ_HW_DATA_TRIG_SEL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -689,7 +689,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_sel) {
 #define ACQ_HW_DATA_TRIG_FILT_MIN                   0
 #define ACQ_HW_DATA_TRIG_FILT_MAX                   ((1 << 8)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_filt) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DATA_CFG,
             THRES_FILT, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_FILT_MIN,
             ACQ_HW_DATA_TRIG_FILT_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -698,7 +698,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_filt) {
 #define ACQ_CORE_TRIG_DATA_THRES_W(val)             (val)
 #define ACQ_CORE_TRIG_DATA_THRES_MASK               ((1ULL<<32)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_thres) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_THRES,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DATA_THRES,
             /* No field */, MULT_BIT_PARAM, /* No minimum check*/,
             /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -708,7 +708,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_thres) {
 #define ACQ_CORE_TRIG_DLY_W(val)                    (val)
 #define ACQ_CORE_TRIG_DLY_MASK                      ((1ULL<<32)-1)
 RW_PARAM_FUNC(acq, hw_trig_dly) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DLY,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DLY,
             /* No field*/, MULT_BIT_PARAM, /* No minimum check */,
             /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -719,7 +719,7 @@ RW_PARAM_FUNC(acq, hw_trig_dly) {
 #define ACQ_SW_TRIG_MIN                             0
 #define ACQ_SW_TRIG_MAX                             1
 RW_PARAM_FUNC(acq, sw_trig) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, SW_TRIG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, SW_TRIG,
             /* No field*/, MULT_BIT_PARAM, ACQ_SW_TRIG_MIN,
             ACQ_SW_TRIG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -727,7 +727,7 @@ RW_PARAM_FUNC(acq, sw_trig) {
 #define ACQ_FSM_STOP_MIN                            0
 #define ACQ_FSM_STOP_MAX                            1
 RW_PARAM_FUNC(acq, fsm_stop) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, CTL,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, CTL,
             FSM_STOP_ACQ, SINGLE_BIT_PARAM, ACQ_FSM_STOP_MIN,
             ACQ_FSM_STOP_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -735,7 +735,7 @@ RW_PARAM_FUNC(acq, fsm_stop) {
 #define ACQ_DATA_DRIVEN_CHAN_MIN                    0
 #define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
 RW_PARAM_FUNC(acq, hw_data_trig_chan) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, ACQ_CHAN_CTL,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL,
             DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,
             ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }

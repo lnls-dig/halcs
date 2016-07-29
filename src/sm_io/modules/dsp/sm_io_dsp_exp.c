@@ -44,42 +44,42 @@
 #define KX_PARAM_MIN                        1
 #define KX_PARAM_MAX                        ((1<<25)-1)
 RW_PARAM_FUNC(dsp, kx) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, KX, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, KX, VAL, MULT_BIT_PARAM,
             KX_PARAM_MIN, KX_PARAM_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define KY_PARAM_MIN                        1
 #define KY_PARAM_MAX                        ((1<<25)-1)
 RW_PARAM_FUNC(dsp, ky) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, KY, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, KY, VAL, MULT_BIT_PARAM,
             KY_PARAM_MIN, KY_PARAM_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define KSUM_PARAM_MIN                      1
 #define KSUM_PARAM_MAX                      ((1<<25)-1)
 RW_PARAM_FUNC(dsp, ksum) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, KSUM, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, KSUM, VAL, MULT_BIT_PARAM,
             KSUM_PARAM_MIN, KSUM_PARAM_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define DS_TBT_THRES_MIN                    0
 #define DS_TBT_THRES_MAX                    ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_tbt_thres) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DS_TBT_THRES, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DS_TBT_THRES, VAL, MULT_BIT_PARAM,
             DS_TBT_THRES_MIN, DS_TBT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define DS_FOFB_THRES_MIN                   0
 #define DS_FOFB_THRES_MAX                   ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_fofb_thres) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DS_FOFB_THRES, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DS_FOFB_THRES, VAL, MULT_BIT_PARAM,
             DS_FOFB_THRES_MIN, DS_FOFB_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define DS_MONIT_THRES_MIN                  0
 #define DS_MONIT_THRES_MAX                  ((1<<26)-1)
 RW_PARAM_FUNC(dsp, ds_monit_thres) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DS_MONIT_THRES, VAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DS_MONIT_THRES, VAL, MULT_BIT_PARAM,
             DS_MONIT_THRES_MIN, DS_MONIT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -88,7 +88,7 @@ RW_PARAM_FUNC(dsp, ds_monit_thres) {
 #define POS_CALC_DSP_MONIT_AMP_CH0_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_amp_ch0) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH0, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_AMP_CH0, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -98,7 +98,7 @@ RW_PARAM_FUNC(dsp, monit_amp_ch0) {
 #define POS_CALC_DSP_MONIT_AMP_CH1_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_amp_ch1) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH1, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_AMP_CH1, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -108,7 +108,7 @@ RW_PARAM_FUNC(dsp, monit_amp_ch1) {
 #define POS_CALC_DSP_MONIT_AMP_CH2_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_amp_ch2) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH2, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_AMP_CH2, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -118,7 +118,7 @@ RW_PARAM_FUNC(dsp, monit_amp_ch2) {
 #define POS_CALC_DSP_MONIT_AMP_CH3_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_amp_ch3) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_AMP_CH3, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_AMP_CH3, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -128,7 +128,7 @@ RW_PARAM_FUNC(dsp, monit_amp_ch3) {
 #define POS_CALC_DSP_MONIT_POS_X_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_pos_x) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_X, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_POS_X, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -138,7 +138,7 @@ RW_PARAM_FUNC(dsp, monit_pos_x) {
 #define POS_CALC_DSP_MONIT_POS_Y_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_pos_y) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_Y, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_POS_Y, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -148,7 +148,7 @@ RW_PARAM_FUNC(dsp, monit_pos_y) {
 #define POS_CALC_DSP_MONIT_POS_Q_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_pos_q) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_Q, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_POS_Q, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -158,7 +158,7 @@ RW_PARAM_FUNC(dsp, monit_pos_q) {
 #define POS_CALC_DSP_MONIT_POS_SUM_MASK         ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_pos_sum) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_POS_SUM, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_POS_SUM, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -168,7 +168,7 @@ RW_PARAM_FUNC(dsp, monit_pos_sum) {
 #define POS_CALC_DSP_MONIT_UPDT_MASK            ((1ULL<<32)-1)
 
 RW_PARAM_FUNC(dsp, monit_updt) {
-    SET_GET_PARAM(dsp, DSP_CTRL_REGS_OFFS, POS_CALC, DSP_MONIT_UPDT, /* No field */,
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DSP_MONIT_UPDT, /* No field */,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
