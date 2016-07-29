@@ -278,10 +278,14 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     self->sdbfs->flags = 0;
     self->sdbfs->read = _devio_read_llio_block;
 
-    /* Create SDB */
-    err = sdbfs_dev_create (self->sdbfs);
-    ASSERT_TEST (err == 0, "Could not create SDBFS",
-            err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP);
+    /* Create SDB. If the device does not support SDB, this will fail.
+     * So, avoid creating SDB in this case, for now, as some unsupported
+     * endpoints do not have timeout implemented just yet */
+    if (llio_get_type (self->llio) == PCIE_DEV) {
+        err = sdbfs_dev_create (self->sdbfs);
+        ASSERT_TEST (err == 0, "Could not create SDBFS",
+                err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP);
+    }
 
     /* Init sm_io_thsafe_server_ops_h. For now, we assume we want zmq
      * for exchanging messages between smio and devio instances */
@@ -319,7 +323,9 @@ err_disp_table_thsafe_ops_alloc:
 err_sm_io_cfg_h_alloc:
     zhashx_destroy (&self->sm_io_h);
 err_sm_io_h_alloc:
-    sdbfs_dev_destroy (self->sdbfs);
+    if (llio_get_type (self->llio) == PCIE_DEV) {
+        sdbfs_dev_destroy (self->sdbfs);
+    }
 err_sdbfs_create:
     free (self->sdbfs);
 err_sdbfs_alloc:
