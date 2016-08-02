@@ -43,8 +43,6 @@ struct _llio_t {
 
     /* Endpoint to connect to */
     llio_endpoint_t *endpoint;
-    /* SDB device info */
-    /* struct _llio_dev_info_t *dev_info; Moved to dev_io */
     /* Device operations */
     const llio_ops_t *ops;
 };
