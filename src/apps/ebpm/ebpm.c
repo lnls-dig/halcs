@@ -462,7 +462,7 @@ int main (int argc, char *argv[])
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
+    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, &llio_ops_pcie,
             broker_endp, verbose, devio_log_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 

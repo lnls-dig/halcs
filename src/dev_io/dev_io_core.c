@@ -153,23 +153,23 @@ static devio_sig_handler_t devio_sigchld_handler =
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose,
+        const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
         const char *log_file_name)
 {
     assert (name);
     assert (endpoint_dev);
+    assert (reg_ops);
     assert (endpoint_broker);
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
     errhand_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
 
-    char *dev_type_c = llio_type_to_str (type);
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
             " with exported service %s, for a %s device \n\tlocated on %s,"
-            " broker address %s, with logfile on %s ...\n", name, dev_type_c,
+            " broker address %s, with logfile on %s ...\n", name,
+            (reg_ops->name == NULL) ? "NULL" : reg_ops->name,
             endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
-    free (dev_type_c);
 
     /* Print Software info */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] BPM Device I/O version %s,"
@@ -253,7 +253,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     ASSERT_ALLOC(llio_name, err_llio_name_alloc);
     strcat (llio_name, name);
     strcat (llio_name, LLIO_STR);
-    self->llio = llio_new (llio_name, endpoint_dev, type,
+    self->llio = llio_new (llio_name, endpoint_dev, reg_ops,
             verbose);
     ASSERT_ALLOC(self->llio, err_llio_alloc);
 
@@ -281,7 +281,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     /* Create SDB. If the device does not support SDB, this will fail.
      * So, avoid creating SDB in this case, for now, as some unsupported
      * endpoints do not have timeout implemented just yet */
-    if (llio_get_type (self->llio) == PCIE_DEV) {
+    if (streq (llio_get_ops_name (self->llio), "PCIE")) {
         err = sdbfs_dev_create (self->sdbfs);
         ASSERT_TEST (err == 0, "Could not create SDBFS",
                 err_sdbfs_create, DEVIO_ERR_SMIO_DO_OP);
@@ -323,7 +323,7 @@ err_disp_table_thsafe_ops_alloc:
 err_sm_io_cfg_h_alloc:
     zhashx_destroy (&self->sm_io_h);
 err_sm_io_h_alloc:
-    if (llio_get_type (self->llio) == PCIE_DEV) {
+    if (streq (llio_get_ops_name (self->llio), "PCIE")) {
         sdbfs_dev_destroy (self->sdbfs);
     }
 err_sdbfs_create:
@@ -474,7 +474,7 @@ devio_err_e devio_print_info (devio_t *self)
     devio_err_e err = DEVIO_SUCCESS;
 
     /* FIXME: Only valid for PCIe devices */
-    ASSERT_TEST (llio_get_type (self->llio) == PCIE_DEV,
+    ASSERT_TEST (streq (llio_get_ops_name (self->llio), "PCIE"),
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
@@ -989,7 +989,7 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
     uint32_t smio_id = 0;
 
     /* FIXME: Only valid for PCIe devices */
-    ASSERT_TEST (llio_get_type (self->llio) == PCIE_DEV,
+    ASSERT_TEST (streq (llio_get_ops_name (self->llio), "PCIE"),
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
