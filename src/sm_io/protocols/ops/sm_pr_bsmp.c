@@ -483,6 +483,7 @@ err_packet_header:
 }
 
 const smpr_proto_ops_t smpr_proto_ops_bsmp = {
+    .proto_name           = "BSMP",             /* Protocol name */
     .proto_open           = bsmp_open,          /* Open device */
     .proto_release        = bsmp_release,       /* Release device */
     .proto_read_16        = NULL,               /* Read 16-bit data */

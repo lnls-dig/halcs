@@ -19,15 +19,6 @@ extern "C" {
 #define SMPR_WB_REG_2_BYTE                  4       /* 32-bit word */
 #define SMPR_WB_REG_2_BIT                   (SMPR_WB_REG_2_BYTE*SMPR_BYTE_2_BIT)
 
-typedef enum {
-    SMPR_SPI = 0,
-    SMPR_I2C,
-    SMPR_BSMP,
-    SMPR_1WIRE,
-    SMPR_GPIO,
-    SMPR_BYPASS
-} smpr_type_e;
-
 /* Open protocol */
 typedef int (*proto_open_fp) (smpr_t *self, uint64_t base, void *args);
 /* Release protocol */
@@ -50,6 +41,7 @@ typedef ssize_t (*proto_read_dma_fp) (smpr_t *self, uint64_t offs, size_t size, 
 typedef ssize_t (*proto_write_dma_fp) (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data, uint32_t flags);
 
 typedef struct {
+    const char *proto_name;                     /* Protocol name */
     proto_open_fp proto_open;                   /* Open protocol */
     proto_release_fp proto_release;             /* Release protocol */
     proto_read_16_fp proto_read_16;             /* Read 16-bit data */
@@ -71,7 +63,8 @@ typedef struct {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the Low-level I/O */
-smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose);
+smpr_t * smpr_new (char *name, smio_t *parent, const smpr_proto_ops_t *reg_ops,
+        int verbose);
 /* Destroy an instance of the Low-level I/O */
 smpr_err_e smpr_destroy (smpr_t **self_p);
 /* Register Specific Protocol operations to smpr instance */
@@ -82,6 +75,8 @@ void *smpr_get_handler (smpr_t *self);
 void *smpr_unset_handler (smpr_t *self);
 /* Get parent handler */
 smio_t *smpr_get_parent (smpr_t *self);
+/* Get protocol name */
+const char *smpr_get_ops_name (smpr_t *self);
 
 /************************************************************/
 /***************** Thsafe generic methods API ***************/

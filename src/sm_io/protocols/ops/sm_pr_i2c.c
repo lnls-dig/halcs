@@ -652,6 +652,7 @@ err_exit:
 #endif
 
 const smpr_proto_ops_t smpr_proto_ops_i2c = {
+    .proto_name           = "I2C",              /* Protocol name */
     .proto_open           = i2c_open,           /* Open device */
     .proto_release        = i2c_release,        /* Release device */
     .proto_read_16        = i2c_read_16,        /* Read 16-bit data */
