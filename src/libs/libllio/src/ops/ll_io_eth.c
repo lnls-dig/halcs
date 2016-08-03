@@ -475,6 +475,7 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
 }
 
 const llio_ops_t llio_ops_eth = {
+    .name           = "ETH",            /* Operations name */
     .open           = eth_open,         /* Open device */
     .release        = eth_release,      /* Release device */
     .read_16        = eth_read_16,      /* Read 16-bit data */
