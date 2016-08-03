@@ -62,7 +62,7 @@ smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_24aa64_t *self = (smch_24aa64_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_24AA64_NAME, parent, SMPR_I2C, verbose);
+    self->i2c = smpr_new (SMCH_24AA64_NAME, parent, &smpr_proto_ops_i2c, verbose);
     ASSERT_ALLOC(self->i2c, err_i2c_alloc);
 
     /* Initalize the I2C protocol */

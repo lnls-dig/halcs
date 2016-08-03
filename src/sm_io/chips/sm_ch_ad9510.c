@@ -65,7 +65,7 @@ smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_ad9510_t *self = (smch_ad9510_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_AD9510_NAME, parent, SMPR_SPI, verbose);
+    self->spi = smpr_new (SMCH_AD9510_NAME, parent, &smpr_proto_ops_spi, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
     /* Initalize the SPI protocol */
@@ -735,7 +735,7 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
     /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
-     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * does not need to be updated by setting the "update registers" bit. We still wait our default
      * ammount of time to be sure the chip is indeed reset */
     SMCH_AD9510_WAIT_DFLT;
 
@@ -746,7 +746,7 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
     /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
-     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * does not need to be updated by setting the "update registers" bit. We still wait our default
      * ammount of time to be sure the chip is indeed reset */
 
     /* Wait for reset to complete */

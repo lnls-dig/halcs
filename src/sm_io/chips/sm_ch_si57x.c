@@ -85,7 +85,7 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_si57x_t *self = (smch_si57x_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_SI57X_NAME, parent, SMPR_I2C, verbose);
+    self->i2c = smpr_new (SMCH_SI57X_NAME, parent, &smpr_proto_ops_i2c, verbose);
     ASSERT_ALLOC(self->i2c, err_i2c_alloc);
 
     /* Initalize the I2C protocol */

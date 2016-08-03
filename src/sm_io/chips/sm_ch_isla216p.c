@@ -58,7 +58,7 @@ smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_isla216p_t *self = (smch_isla216p_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, SMPR_SPI, verbose);
+    self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, &smpr_proto_ops_spi, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
     /* Initalize the SPI protocol */
@@ -199,7 +199,7 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 #endif
 
-    data = ISLA216P_NAPSLP_W(ISLA216P_NAPSLP_NORMAL_OPERATION); 
+    data = ISLA216P_NAPSLP_W(ISLA216P_NAPSLP_NORMAL_OPERATION);
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_NAPSLP, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_NAPSLP",
             err_smpr_write, SMCH_ERR_RW_SMPR);

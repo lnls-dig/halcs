@@ -54,7 +54,7 @@ smch_rffe_t * smch_rffe_new (smio_t *parent, int verbose)
     smch_rffe_t *self = (smch_rffe_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->bsmp = smpr_new (SMCH_RFFE_NAME, parent, SMPR_BSMP, verbose);
+    self->bsmp = smpr_new (SMCH_RFFE_NAME, parent, &smpr_proto_ops_bsmp, verbose);
     ASSERT_ALLOC(self->bsmp, err_bsmp_alloc);
 
     /* Initalize the BSMP protocol */
