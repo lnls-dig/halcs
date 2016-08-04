@@ -1,1 +1,3 @@
 include 'foreign:libbsmp'
+
+include 'libs:errhand'
