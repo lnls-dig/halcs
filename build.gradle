@@ -1,0 +1,19 @@
+allprojects {
+    apply plugin: 'c'
+
+    model {
+        buildTypes {
+            debug
+            production
+        }
+
+        binaries {
+            all {
+                cCompiler.args '-Wall', '-Wextra', '-Werror'
+
+                if (buildType == buildTypes.debug)
+                    cCompiler.args '-g'
+            }
+        }
+    }
+}
