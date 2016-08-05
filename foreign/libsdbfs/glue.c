@@ -199,7 +199,7 @@ int sdbfs_open_name(struct sdbfs *fs, const char *name)
 		return -ENOENT;
 	sdbfs_scan(fs, 1); /* new scan: get the interconnect and igore it */
 	while ( (d = sdbfs_scan(fs, 0)) != NULL) {
-		if (strncmp(name, d->sdb_component.product.name, len))
+		if (strncmp(name, (const char*)d->sdb_component.product.name, len))
 			continue;
 		if (len < 19 && d->sdb_component.product.name[len] != ' ')
 			continue;
