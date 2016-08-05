@@ -50,7 +50,7 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 
 /* Creates a new instance of the SMCH ISLA216P */
 smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
-        int verbose)
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -58,7 +58,7 @@ smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_isla216p_t *self = (smch_isla216p_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, &smpr_proto_ops_spi, verbose);
+    self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, reg_ops, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
     /* Initalize the SPI protocol */

@@ -57,7 +57,7 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
                 inst_id);
         /* FPGA I2C Switch */
         self->smch_pca9547 = smch_pca9547_new (parent, FMC_130M_EEPROM_I2C_OFFS,
-                fmc130m_4ch_pca9547_addr[inst_id], 0);
+                fmc130m_4ch_pca9547_addr[inst_id], &smpr_proto_ops_i2c, 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
 
         /* Enable default I2C channel */
@@ -72,7 +72,7 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
             inst_id);
     /* EEPROM  is on the same I2C bus as the LM75A */
     self->smch_24aa64 = smch_24aa64_new (parent, FMC_130M_LM75A_I2C_OFFS,
-            fmc130m_4ch_24aa64_addr[inst_id], 0);
+            fmc130m_4ch_24aa64_addr[inst_id], &smpr_proto_ops_i2c, 0);
     ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
 
     uint32_t data_24aa64;

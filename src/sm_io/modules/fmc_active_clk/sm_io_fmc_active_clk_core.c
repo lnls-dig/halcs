@@ -46,14 +46,14 @@ smio_fmc_active_clk_t * smio_fmc_active_clk_new (smio_t *parent)
             "addr: 0x%08X, Inst ID: %u\n", fmc_active_clk_ad9510_addr,
             inst_id);
     self->smch_ad9510 = smch_ad9510_new (parent, FMC_ACTIVE_CLK_AD9510_SPI_OFFS,
-            fmc_active_clk_ad9510_addr, 0);
+            fmc_active_clk_ad9510_addr, &smpr_proto_ops_spi, 0);
     ASSERT_ALLOC(self->smch_ad9510, err_smch_ad9510_alloc);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_core] SI571 initializing, "
             "addr: 0x%08X, Inst ID: %u\n", fmc_active_clk_si571_addr,
             inst_id);
     self->smch_si571 = smch_si57x_new (parent, FMC_ACTIVE_CLK_SI571_I2C_OFFS,
-            fmc_active_clk_si571_addr, 0);
+            fmc_active_clk_si571_addr, &smpr_proto_ops_i2c, 0);
     ASSERT_ALLOC(self->smch_si571, err_smch_si571_alloc);
 
     return self;

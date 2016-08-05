@@ -16,7 +16,7 @@ extern "C" {
 
 /* Creates a new instance of the SMCH 24AA64 */
 smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose);
+        const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH 24AA64 */
 smch_err_e smch_24aa64_destroy (smch_24aa64_t **self_p);
 

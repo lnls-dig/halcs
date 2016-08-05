@@ -58,7 +58,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
         /* FPGA I2C Switch */
 #if 0
         self->smch_pca9547 = smch_pca9547_new (parent, FMC_250M_EEPROM_I2C_OFFS,
-                fmc250m_4ch_pca9547_addr[inst_id], 0);
+                fmc250m_4ch_pca9547_addr[inst_id], &smpr_proto_ops_i2c, 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
 
         /* Enable default I2C channel */
@@ -77,7 +77,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
 #if 0
     /* EEPROM  is on the same I2C bus as the LM75A */
     self->smch_24aa64 = smch_24aa64_new (parent, FMC_250M_EEPROM_I2C_OFFS,
-            fmc250m_4ch_24aa64_addr[inst_id], 0);
+            fmc250m_4ch_24aa64_addr[inst_id], &smpr_proto_ops_i2c, 0);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
             "[sm_io:fmc250m_4ch_core] post new 24AA64 data: 0x%08X\n", 0);
     ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
@@ -120,8 +120,8 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
     /* FIXME: We need to be sure that, if the board is ACTIVE, the FMC_ACTIVE_CLK
-     * component has been sucseddfully initialized so that the ADCs has clock. 
-     * Otherwise, we won't be able to RESET the ADCs, leading to undefined 
+     * component has been sucseddfully initialized so that the ADCs has clock.
+     * Otherwise, we won't be able to RESET the ADCs, leading to undefined
      * behavior */
     sleep (5);
 
@@ -130,7 +130,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         self->smch_isla216p_adc[i] = NULL;
         self->smch_isla216p_adc[i] = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS,
-            fmc250m_4ch_isla216p_addr[inst_id][i], 0);
+            fmc250m_4ch_isla216p_addr[inst_id][i], &smpr_proto_ops_spi, 0);
         ASSERT_ALLOC(self->smch_isla216p_adc[i], err_smch_isla216p_adc);
 
         uint8_t chipid = 0;

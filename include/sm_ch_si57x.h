@@ -16,7 +16,7 @@ extern "C" {
 
 /* Creates a new instance of the SMCH SI57X */
 smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose);
+        const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH SI57X */
 smch_err_e smch_si57x_destroy (smch_si57x_t **self_p);
 

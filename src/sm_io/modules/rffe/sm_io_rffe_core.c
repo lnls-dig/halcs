@@ -40,7 +40,7 @@ smio_rffe_t * smio_rffe_new (smio_t *parent)
     smio_rffe_t *self = (smio_rffe_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->ctl = smch_rffe_new (parent, 0);
+    self->ctl = smch_rffe_new (parent, &smpr_proto_ops_bsmp, 0);
     ASSERT_ALLOC(self->ctl, err_rffe_alloc);
 
     return self;

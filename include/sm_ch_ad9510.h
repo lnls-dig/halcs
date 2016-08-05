@@ -16,7 +16,7 @@ extern "C" {
 
 /* Creates a new instance of the SMCH AD9510 */
 smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
-        int verbose);
+        const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH AD9510 */
 smch_err_e smch_ad9510_destroy (smch_ad9510_t **self_p);
 

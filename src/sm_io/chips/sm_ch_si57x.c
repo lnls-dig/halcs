@@ -77,7 +77,7 @@ static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
 
 /* Creates a new instance of the SMCH SI57X */
 smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose)
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -85,7 +85,7 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_si57x_t *self = (smch_si57x_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_SI57X_NAME, parent, &smpr_proto_ops_i2c, verbose);
+    self->i2c = smpr_new (SMCH_SI57X_NAME, parent, reg_ops, verbose);
     ASSERT_ALLOC(self->i2c, err_i2c_alloc);
 
     /* Initalize the I2C protocol */

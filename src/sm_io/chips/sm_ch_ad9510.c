@@ -57,7 +57,7 @@ static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 
 /* Creates a new instance of the SMCH AD9510 */
 smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
-        int verbose)
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -65,7 +65,7 @@ smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_ad9510_t *self = (smch_ad9510_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_AD9510_NAME, parent, &smpr_proto_ops_spi, verbose);
+    self->spi = smpr_new (SMCH_AD9510_NAME, parent, reg_ops, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
     /* Initalize the SPI protocol */
