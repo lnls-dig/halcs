@@ -53,7 +53,7 @@ typedef struct {
 
 static smpr_err_e _spi_init (smpr_t *self);
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
-        size_t size, spi_mode_e mode, uint32_t flags);
+        size_t size, spi_mode_e mode);
 
 /************ Our methods implementation **********/
 
@@ -163,77 +163,75 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from SPI */
-ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data, uint32_t flags)
+ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 16-bit data to SPI device */
-ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data, uint32_t flags)
+ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+            SPI_MODE_WRITE);
 }
 
 /* Read 32-bit data from SPI */
-ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data, uint32_t flags)
+ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 32-bit data to SPI device */
-ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data, uint32_t flags)
+ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+            SPI_MODE_WRITE);
 }
 
 /* Read 64-bit data from SPI */
-ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data, uint32_t flags)
+ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 64-bit data to SPI device */
-ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data, uint32_t flags)
+ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+            SPI_MODE_WRITE);
 }
 
 /* Read data block from SPI device, size in bytes */
-ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data,
-        uint32_t flags)
+ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
     return _spi_read_write_generic (self, (uint8_t *) data, size,
-            SPI_MODE_WRITE_READ, flags);
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write data block from SPI device, size in bytes */
-ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data,
-        uint32_t flags)
+ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, size,
-                SPI_MODE_WRITE, flags);
+                SPI_MODE_WRITE);
 }
 
 /************ Static functions **********/
@@ -300,7 +298,7 @@ err_proto_handler:
 
 /* Generic read/write to/from SPI */
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
-        size_t size, spi_mode_e mode, uint32_t flags)
+        size_t size, spi_mode_e mode)
 {
     assert (self);
 
@@ -323,9 +321,10 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: Config register = 0x%08X\n", config);
 
-    /* Decode flags */
-    uint32_t ss = SMPR_PROTO_SPI_SS_FLAGS_R(flags);
-    uint32_t charlen = SMPR_PROTO_SPI_CHARLEN_FLAGS_R(flags);
+    /* Get specific parameters */
+    smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
+    uint32_t ss = smpr_spi_get_ss (smpr_spi);
+    uint32_t charlen = smpr_spi_get_charlen (smpr_spi);
 
     /* Configure SS line */
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
