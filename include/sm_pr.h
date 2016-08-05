@@ -75,6 +75,8 @@ void *smpr_get_handler (smpr_t *self);
 void *smpr_unset_handler (smpr_t *self);
 /* Get parent handler */
 smio_t *smpr_get_parent (smpr_t *self);
+/* Get ops */
+const smpr_proto_ops_t *smpr_get_ops (smpr_t *self);
 /* Get protocol name */
 const char *smpr_get_ops_name (smpr_t *self);
 

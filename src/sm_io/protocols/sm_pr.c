@@ -147,6 +147,12 @@ smio_t *smpr_get_parent (smpr_t *self)
     return self->parent;
 }
 
+const smpr_proto_ops_t *smpr_get_ops (smpr_t *self)
+{
+    assert (self);
+    return self->ops;
+}
+
 const char *smpr_get_ops_name (smpr_t *self)
 {
     assert (self);
