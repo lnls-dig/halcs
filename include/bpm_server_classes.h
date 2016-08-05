@@ -77,6 +77,11 @@ typedef enum _smpr_err_e smpr_err_e;
 /* Opaque sm_pr_t structure */
 typedef struct _smpr_t smpr_t;
 
+/* Opaque smpr_spi_t structure */
+typedef struct _smpr_spi_t smpr_spi_t;
+/* Opaque smpr_i2c_t structure */
+typedef struct _smpr_i2c_t smpr_i2c_t;
+
 /* Forward smch_err_e declaration enumeration */
 typedef enum _smch_err_e smch_err_e;
 /* Opaque sm_ch_24aa64_t structure */
@@ -125,10 +130,12 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "sm_pr_err.h"
 #include "sm_pr.h"
 #include "sm_pr_spi.h"
+#include "sm_pr_spi_obj.h"
 #include "hw/wb_spi_regs.h"
 #include "protocols/smpr_spi_regs.h"
 #include "protocols/sm_pr_spi_defaults.h"
 #include "sm_pr_i2c.h"
+#include "sm_pr_i2c_obj.h"
 #include "hw/wb_i2c_regs.h"
 #include "protocols/smpr_i2c_regs.h"
 #include "protocols/sm_pr_i2c_defaults.h"
