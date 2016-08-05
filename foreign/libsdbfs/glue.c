@@ -90,7 +90,7 @@ static struct sdb_device *sdbfs_readentry(struct sdbfs *fs,
 
 	if (fs->flags & SDBFS_F_CONVERT32) {
 		uint32_t *p = (void *)&fs->current_record;
-		int i;
+		unsigned int i;
 
 		for (i = 0; i < sizeof(fs->current_record) / sizeof(*p); i++)
 			p[i] = ntohl(p[i]);
