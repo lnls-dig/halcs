@@ -49,6 +49,15 @@ typedef struct {
     i2c_mode_e mode;            /* I2C mode */
 } smpr_proto_i2c_t;
 
+/* Protocol object specification */
+struct _smpr_i2c_t {
+    /* Must be located first */
+    smpr_proto_ops_t proto_ops;         /* I2C protocol operations */
+    uint32_t rep_start;                 /* I2C repetitive start */
+    uint32_t trans_size;                /* I2C transaction size */
+    uint32_t addr;                      /* I2C transaction size */
+};
+
 static smpr_err_e _i2c_init (smpr_t *self);
 static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check);
 static smpr_err_e _i2c_set_mode (smpr_t *self);
@@ -92,7 +101,7 @@ static smpr_err_e smpr_proto_i2c_destroy (smpr_proto_i2c_t **self_p)
 /************ smpr_proto_ops_i2c Implementation **********/
 
 /* Open I2C protocol */
-int i2c_open (smpr_t *self, uint64_t base, void *args)
+static int i2c_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 
@@ -143,7 +152,7 @@ err_proto_handler_alloc:
 }
 
 /* Release I2C protocol device */
-int i2c_release (smpr_t *self)
+static int i2c_release (smpr_t *self)
 {
     assert (self);
 
@@ -163,7 +172,7 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from I2C */
-ssize_t i2c_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
+static ssize_t i2c_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -172,14 +181,14 @@ ssize_t i2c_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
 }
 
 /* Write 16-bit data to PCIe device */
-ssize_t i2c_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
+static ssize_t i2c_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data));
 }
 
 /* Read 32-bit data from I2C */
-ssize_t i2c_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
+static ssize_t i2c_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -188,14 +197,14 @@ ssize_t i2c_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
 }
 
 /* Write 32-bit data to PCIe device */
-ssize_t i2c_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
+static ssize_t i2c_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data));
 }
 
 /* Read 64-bit data from I2C */
-ssize_t i2c_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
+static ssize_t i2c_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -204,14 +213,14 @@ ssize_t i2c_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
 }
 
 /* Write 64-bit data to PCIe device */
-ssize_t i2c_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
+static ssize_t i2c_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, sizeof(*data));
 }
 
 /* Read data block from PCIe device, size in bytes */
-ssize_t i2c_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
+static ssize_t i2c_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -220,7 +229,7 @@ ssize_t i2c_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data
 }
 
 /* Write data block from PCIe device, size in bytes */
-ssize_t i2c_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data)
+static ssize_t i2c_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
     (void) offs;
     return _i2c_write_generic (self, (uint8_t *) data, size);
@@ -655,7 +664,7 @@ err_exit:
 }
 #endif
 
-const smpr_proto_ops_t smpr_proto_ops_i2c = {
+static const smpr_proto_ops_t smpr_proto_ops_i2c = {
     .proto_name           = "I2C",              /* Protocol name */
     .proto_open           = i2c_open,           /* Open device */
     .proto_release        = i2c_release,        /* Release device */
@@ -674,3 +683,88 @@ const smpr_proto_ops_t smpr_proto_ops_i2c = {
     .proto_write_dma      = NULL                /* Write arbitrary block size data via DMA,
                                                     parameter size in bytes */
 };
+
+/************ Our methods implementation **********/
+
+/* Creates a new instance of the proto_i2c */
+smpr_i2c_t *smpr_i2c_new (uint32_t rep_start, uint32_t trans_size, uint32_t addr)
+{
+    smpr_i2c_t *self = (smpr_i2c_t *) zmalloc (sizeof *self);
+    ASSERT_ALLOC (self, err_smpr_i2c_alloc);
+
+    /* copy I2C operations */
+    self->proto_ops = smpr_proto_ops_i2c;
+
+    self->rep_start = rep_start;
+    self->trans_size = trans_size;
+    self->addr = addr;
+
+    return self;
+
+err_smpr_i2c_alloc:
+    return NULL;
+}
+
+/* Destroy an instance of the i2c */
+smpr_err_e smpr_i2c_destroy (smpr_i2c_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        smpr_i2c_t *self = *self_p;
+
+        free (self);
+        self_p = NULL;
+    }
+
+    return SMPR_SUCCESS;
+}
+
+smpr_err_e smpr_i2c_set_rep_start (smpr_i2c_t *self, uint32_t rep_start)
+{
+    assert (self);
+    self->rep_start = rep_start;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_i2c_get_rep_start (smpr_i2c_t *self)
+{
+    assert (self);
+    return self->rep_start;
+}
+
+smpr_err_e smpr_i2c_set_trans_size (smpr_i2c_t *self, uint32_t trans_size)
+{
+    assert (self);
+    self->trans_size = trans_size;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_i2c_get_trans_size (smpr_i2c_t *self)
+{
+    assert (self);
+    return self->trans_size;
+}
+
+smpr_err_e smpr_i2c_set_addr (smpr_i2c_t *self, uint32_t addr)
+{
+    assert (self);
+    self->addr = addr;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_i2c_get_addr (smpr_i2c_t *self)
+{
+    assert (self);
+    return self->addr;
+}
+
+const smpr_proto_ops_t *smpr_i2c_get_ops (smpr_i2c_t *self)
+{
+    assert (self);
+    return &self->proto_ops;
+}
+

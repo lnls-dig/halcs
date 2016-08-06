@@ -51,6 +51,15 @@ typedef struct {
     bool bidir;                 /* SPI bidirectional control enable */
 } smpr_proto_spi_t;
 
+/* Protocol object specification */
+struct _smpr_spi_t {
+    /* Must be located first */
+    smpr_proto_ops_t proto_ops;       /* SPI protocol operations */
+    uint32_t ss;                      /* SPI Slave Select */
+    uint32_t charlen;                 /* SPI character length:
+                                         0 is 128-bit data word, 1 is 1 bit, 2 is 2-bit and so on */
+};
+
 static smpr_err_e _spi_init (smpr_t *self);
 static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         size_t size, spi_mode_e mode);
@@ -89,7 +98,7 @@ static smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
 /************ smpr_proto_ops_spi Implementation **********/
 
 /* Open SPI protocol */
-int spi_open (smpr_t *self, uint64_t base, void *args)
+static int spi_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 
@@ -142,7 +151,7 @@ err_proto_handler_alloc:
 }
 
 /* Release SPI protocol device */
-int spi_release (smpr_t *self)
+static int spi_release (smpr_t *self)
 {
     assert (self);
 
@@ -163,7 +172,7 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from SPI */
-ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
+static ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -173,7 +182,7 @@ ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
 }
 
 /* Write 16-bit data to SPI device */
-ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
+static ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -181,7 +190,7 @@ ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
 }
 
 /* Read 32-bit data from SPI */
-ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
+static ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -191,7 +200,7 @@ ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
 }
 
 /* Write 32-bit data to SPI device */
-ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
+static ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -199,7 +208,7 @@ ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
 }
 
 /* Read 64-bit data from SPI */
-ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
+static ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -209,7 +218,7 @@ ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
 }
 
 /* Write 64-bit data to SPI device */
-ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
+static ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
@@ -217,7 +226,7 @@ ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
 }
 
 /* Read data block from SPI device, size in bytes */
-ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
+static ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
     (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
@@ -227,7 +236,7 @@ ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data
 }
 
 /* Write data block from SPI device, size in bytes */
-ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data)
+static ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
     (void) offs;
     return _spi_read_write_generic (self, (uint8_t *) data, size,
@@ -452,7 +461,7 @@ err_proto_handler:
     return err;
 }
 
-const smpr_proto_ops_t smpr_proto_ops_spi = {
+static const smpr_proto_ops_t smpr_proto_ops_spi = {
     .proto_name           = "SPI",              /* Protocol name */
     .proto_open           = spi_open,           /* Open device */
     .proto_release        = spi_release,        /* Release device */
@@ -471,3 +480,72 @@ const smpr_proto_ops_t smpr_proto_ops_spi = {
     .proto_write_dma      = NULL                /* Write arbitrary block size data via DMA,
                                                     parameter size in bytes */
 };
+
+/************ Our methods implementation **********/
+
+/* Creates a new instance of the proto_spi */
+smpr_spi_t *smpr_spi_new (uint32_t ss, uint32_t charlen)
+{
+    smpr_spi_t *self = (smpr_spi_t *) zmalloc (sizeof *self);
+    ASSERT_ALLOC (self, err_smpr_spi_alloc);
+
+    /* copy SPI operations */
+    self->proto_ops = smpr_proto_ops_spi;
+
+    self->ss = ss;
+    self->charlen = charlen;
+
+    return self;
+
+err_smpr_spi_alloc:
+    return NULL;
+}
+
+/* Destroy an instance of the spi */
+smpr_err_e smpr_spi_destroy (smpr_spi_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        smpr_spi_t *self = *self_p;
+
+        free (self);
+        self_p = NULL;
+    }
+
+    return SMPR_SUCCESS;
+}
+
+smpr_err_e smpr_spi_set_ss (smpr_spi_t *self, uint32_t ss)
+{
+    assert (self);
+    self->ss = ss;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_spi_get_ss (smpr_spi_t *self)
+{
+    assert (self);
+    return self->ss;
+}
+
+smpr_err_e smpr_spi_set_charlen (smpr_spi_t *self, uint32_t charlen)
+{
+    assert (self);
+    self->charlen = charlen;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_spi_get_charlen (smpr_spi_t *self)
+{
+    assert (self);
+    return self->charlen;
+}
+
+const smpr_proto_ops_t *smpr_spi_get_ops (smpr_spi_t *self)
+{
+    assert (self);
+    return &self->proto_ops;
+}
