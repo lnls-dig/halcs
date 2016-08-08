@@ -212,33 +212,33 @@ int smpr_release (smpr_t *self)
     SMPR_FUNC_WRAPPER (proto_release)
 
 /**** Read data from device ****/
-ssize_t smpr_read_16 (smpr_t *self, uint64_t offs, uint16_t *data)
-    SMPR_FUNC_WRAPPER (proto_read_16, offs, data)
-ssize_t smpr_read_32 (smpr_t *self, uint64_t offs, uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_read_32, offs, data)
-ssize_t smpr_read_64 (smpr_t *self, uint64_t offs, uint64_t *data)
-    SMPR_FUNC_WRAPPER (proto_read_64, offs, data)
+ssize_t smpr_read_16 (smpr_t *self, size_t size_offs, uint64_t offs, uint16_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_16, size_offs, offs, data)
+ssize_t smpr_read_32 (smpr_t *self,size_t size_offs,  uint64_t offs, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_32, size_offs, offs, data)
+ssize_t smpr_read_64 (smpr_t *self, size_t size_offs, uint64_t offs, uint64_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_64, size_offs, offs, data)
 
 /**** Write data to device ****/
-ssize_t smpr_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data)
-    SMPR_FUNC_WRAPPER (proto_write_16, offs, data)
-ssize_t smpr_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_write_32, offs, data)
-ssize_t smpr_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data)
-    SMPR_FUNC_WRAPPER (proto_write_64, offs, data)
+ssize_t smpr_write_16 (smpr_t *self, size_t size_offs, uint64_t offs, const uint16_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_16, size_offs, offs, data)
+ssize_t smpr_write_32 (smpr_t *self, size_t size_offs, uint64_t offs, const uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_32, size_offs, offs, data)
+ssize_t smpr_write_64 (smpr_t *self, size_t size_offs, uint64_t offs, const uint64_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_64, size_offs, offs, data)
 
 /**** Read data block from device function pointer, size in bytes ****/
-ssize_t smpr_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_read_block, offs, size, data)
+ssize_t smpr_read_block (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_block, size_offs, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t smpr_write_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_write_block, offs, size, data)
+ssize_t smpr_write_block (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_block, size_offs, offs, size, data)
 
 /**** Read data block from via DMA from protocol function pointer, size in bytes ****/
-ssize_t smpr_read_dma (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_read_dma, offs, size, data)
+ssize_t smpr_read_dma (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_dma, size_offs, offs, size, data)
 
 /**** Write data block via DMA from protocol function pointer, size in bytes ****/
-ssize_t smpr_write_dma (smpr_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMPR_FUNC_WRAPPER (proto_write_dma, offs, size, data)
+ssize_t smpr_write_dma (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_dma, size_offs, offs, size, data)
