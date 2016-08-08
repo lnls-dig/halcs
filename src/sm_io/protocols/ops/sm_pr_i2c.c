@@ -61,14 +61,12 @@ static smpr_err_e _i2c_init (smpr_t *self);
 static ssize_t _i2c_check_transfer (smpr_t *self, bool ack_check);
 static smpr_err_e _i2c_set_mode (smpr_t *self);
 static ssize_t _i2c_read_write_header (smpr_t *self, bool rw);
-static ssize_t _i2c_read_generic (smpr_t *self, size_t size_offs, uint64_t offs,
-        uint8_t *data, size_t size);
 static ssize_t _i2c_write_generic (smpr_t *self, size_t size_offs, uint64_t offs,
-        uint8_t *data, size_t size);
-static ssize_t _i2c_read_raw (smpr_t *self, uint8_t *data,
-        size_t size);
-static ssize_t _i2c_write_raw (smpr_t *self, uint8_t *data,
-        size_t size);
+        size_t size, uint8_t *data);
+static ssize_t _i2c_write_read_generic (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, uint8_t *data);
+static ssize_t _i2c_read_raw (smpr_t *self, size_t size, uint8_t *data);
+static ssize_t _i2c_write_raw (smpr_t *self, size_t size, uint8_t *data);
 
 /************ Our methods implementation **********/
 
@@ -180,14 +178,14 @@ static ssize_t i2c_read_16 (smpr_t *self, size_t size_offs, uint64_t offs,
 {
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _i2c_read_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_read_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Write 16-bit data to I2C device */
 static ssize_t i2c_write_16 (smpr_t *self, size_t size_offs, uint64_t offs,
         const uint16_t *data)
 {
-    return _i2c_write_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Read 32-bit data from I2C */
@@ -196,14 +194,14 @@ static ssize_t i2c_read_32 (smpr_t *self, size_t size_offs, uint64_t offs,
 {
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _i2c_read_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_read_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Write 32-bit data to I2C device */
 static ssize_t i2c_write_32 (smpr_t *self, size_t size_offs, uint64_t offs,
         const uint32_t *data)
 {
-    return _i2c_write_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Read 64-bit data from I2C */
@@ -212,14 +210,14 @@ static ssize_t i2c_read_64 (smpr_t *self, size_t size_offs, uint64_t offs,
 {
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _i2c_read_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_read_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Write 64-bit data to I2C device */
 static ssize_t i2c_write_64 (smpr_t *self, size_t size_offs, uint64_t offs,
         const uint64_t *data)
 {
-    return _i2c_write_generic (self, size_offs, offs, (uint8_t *) data, sizeof(*data));
+    return _i2c_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data);
 }
 
 /* Read data block from I2C device, size in bytes */
@@ -228,14 +226,14 @@ static ssize_t i2c_read_block (smpr_t *self, size_t size_offs, uint64_t offs,
 {
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _i2c_read_generic (self, size_offs, offs, (uint8_t *) data, size);
+    return _i2c_write_read_generic (self, size_offs, offs, size, (uint8_t *) data);
 }
 
 /* Write data block from I2C device, size in bytes */
 static ssize_t i2c_write_block (smpr_t *self, size_t size_offs, uint64_t offs,
         size_t size, const uint32_t *data)
 {
-    return _i2c_write_generic (self, size_offs, offs, (uint8_t *) data, size);
+    return _i2c_write_generic (self, size_offs, offs, size, (uint8_t *) data);
 }
 
 /************ Static functions **********/
@@ -464,8 +462,7 @@ err_proto_handler:
 }
 
 /* Raw write to I2C */
-static ssize_t _i2c_write_raw (smpr_t *self, uint8_t *data,
-        size_t size)
+static ssize_t _i2c_write_raw (smpr_t *self, size_t size, uint8_t *data)
 {
     assert (self);
 
@@ -533,8 +530,7 @@ err_proto_handler:
 }
 
 /* Raw read from I2C */
-static ssize_t _i2c_read_raw (smpr_t *self, uint8_t *data,
-        size_t size)
+static ssize_t _i2c_read_raw (smpr_t *self, size_t size, uint8_t *data)
 {
     assert (self);
 
@@ -602,47 +598,41 @@ err_proto_handler:
     return err;
 }
 
-#if 0
 /* Generic write / read from I2C */
-static ssize_t _i2c_write_read_generic (smpr_t *self, uint8_t *data,
-        size_t size)
+static ssize_t _i2c_write_read_generic (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, uint8_t *data)
 {
-    int err = 0;
-    smpr_proto_i2c_t *i2c_proto = SMPR_PROTO_I2C(self);
+    assert (self);
 
-    i2c_proto->mode = I2C_MODE_REP_START;
+    ssize_t err = 0;
+    smpr_proto_i2c_t *i2c_proto = smpr_get_handler (self);
+    ASSERT_TEST(i2c_proto != NULL, "Could not get SMPR protocol handler",
+            err_proto_handler, -1);
 
     /* Get specific parameters */
     smpr_i2c_t *smpr_i2c = (smpr_i2c_t *) smpr_get_ops (self);
-    uint32_t trans_size = size; /* in bytes */
+    /* Write followed by read always have repeated start mode on */
+    smpr_i2c_set_rep_start (smpr_i2c, I2C_MODE_REP_START);
 
-    ssize_t smpr_err = _i2c_write_raw (self, data, size);
-    ASSERT_TEST(smpr_err == smpr_i2c->trans_size/SMPR_BYTE_2_BIT /* in bytes*/,
+    /* Write the address only */
+    err = _i2c_write_raw (self, size_offs, (uint8_t *) &offs);
+    ASSERT_TEST(err > 0 && (size_t) err == size_offs /* in bytes*/,
             "Could not write data to I2C", err_exit, -1);
 
-    smpr_err = _i2c_read_raw (self, data, size);
-    ASSERT_TEST(smpr_err == size /* in bytes*/,
+    /* Read the data */
+    err = _i2c_read_raw (self, size, data);
+    ASSERT_TEST(err > 0 && (size_t) err == size /* in bytes*/,
             "Could not read data to I2C", err_exit, -1);
 
-    i2c_proto->mode = I2C_MODE_NORMAL;
-
 err_exit:
+    /* Restore mode to normal */
+    smpr_i2c_set_rep_start (smpr_i2c, I2C_MODE_NORMAL);
+err_proto_handler:
     return err;
-}
-#endif
-
-static ssize_t _i2c_read_generic (smpr_t *self, size_t size_offs, uint64_t offs,
-        uint8_t *data, size_t size)
-{
-    assert (self);
-    (void) size_offs;
-    (void) offs;
-
-    return _i2c_read_raw (self, data, size);
 }
 
 static ssize_t _i2c_write_generic (smpr_t *self, size_t size_offs, uint64_t offs,
-        uint8_t *data, size_t size)
+        size_t size, uint8_t *data)
 {
     assert (self);
     size_t raw_size = size_offs + size;
@@ -654,7 +644,15 @@ static ssize_t _i2c_write_generic (smpr_t *self, size_t size_offs, uint64_t offs
         memcpy (&raw_data + size_offs, data, size);
     }
 
-    return _i2c_write_raw (self, raw_data, raw_size);
+    ssize_t err = _i2c_write_raw (self, raw_size, raw_data);
+    ASSERT_TEST(err > 0 && (size_t) err == raw_size /* in bytes*/,
+            "Could not write data to I2C", err_exit, -1);
+
+    /* We return only the number of data bytes actually written, not addr+data */
+    err = size;
+
+err_exit:
+    return err;
 }
 
 static const smpr_proto_ops_t smpr_proto_ops_i2c = {
