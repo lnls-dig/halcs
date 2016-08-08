@@ -28,7 +28,9 @@ typedef enum {
 
 typedef struct {
     fmc130m_4ch_type_e type;                /* FMC130M_4CH type */
+    smpr_i2c_t *smpr_i2c_24aa64;            /* I2C protocol handler */
     smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */
+    smpr_i2c_t *smpr_i2c_pca9547;           /* I2C protocol handler */
     smch_pca9547_t *smch_pca9547;           /* FPGA I2C Switch */
 } smio_fmc130m_4ch_t;
 
