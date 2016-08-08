@@ -31,14 +31,13 @@
             smch_err_str (err_type))
 
 #define SMCH_ISLA216P_WAIT_TRIES            10
-#define SMCH_ISLA216P_NAME                  "SPI_ISLA216P"
+#define SMCH_ISLA216P_NAME                  "ISLA216P"
 #define SMCH_ISLA216P_USECS_WAIT            1000
 #define SMCH_ISLA216P_WAIT(usecs)           usleep(usecs)
 #define SMCH_ISLA216P_WAIT_DFLT             SMCH_ISLA216P_WAIT(SMCH_ISLA216P_USECS_WAIT)
 
 struct _smch_isla216p_t {
-    smpr_t *spi;                    /* SPI protocol object */
-    uint32_t ss;                    /* Slave select line for this ISLA216P chip */
+    smpr_t *proto;                    /* PROTO protocol object */
 };
 
 static smch_err_e _smch_isla216p_init (smch_isla216p_t *self);
@@ -49,7 +48,7 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
         uint8_t *data);
 
 /* Creates a new instance of the SMCH ISLA216P */
-smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
+smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
@@ -58,13 +57,12 @@ smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_isla216p_t *self = (smch_isla216p_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_ISLA216P_NAME, parent, reg_ops, verbose);
-    ASSERT_ALLOC(self->spi, err_spi_alloc);
+    self->proto = smpr_new (SMCH_ISLA216P_NAME, parent, reg_ops, verbose);
+    ASSERT_ALLOC(self->proto, err_proto_alloc);
 
-    /* Initalize the SPI protocol */
-    int smpr_err = smpr_open (self->spi, base, NULL /* Default parameters are fine */);
+    /* Initalize the PROTO protocol */
+    int smpr_err = smpr_open (self->proto, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-    self->ss = ss;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:isla216p] Created instance of SMCH\n");
 
@@ -74,10 +72,10 @@ smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
     return self;
 
 err_smch_init:
-    smpr_release (self->spi);
+    smpr_release (self->proto);
 err_smpr_init:
-    smpr_destroy (&self->spi);
-err_spi_alloc:
+    smpr_destroy (&self->proto);
+err_proto_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -91,8 +89,8 @@ smch_err_e smch_isla216p_destroy (smch_isla216p_t **self_p)
     if (*self_p) {
         smch_isla216p_t *self = *self_p;
 
-        smpr_release (self->spi);
-        smpr_destroy (&self->spi);
+        smpr_release (self->proto);
+        smpr_destroy (&self->proto);
         free (self);
         *self_p = NULL;
     }
@@ -173,7 +171,7 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
 
-    /* Turn on Bidirectional SPI */
+    /* Turn on Bidirectional PROTO */
     uint8_t data = ISLA216P_PORTCONFIG_SDO_ACTIVE;
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
@@ -224,14 +222,14 @@ static ssize_t _smch_isla216p_write_8 (smch_isla216p_t *self, uint8_t addr,
 
     /* We transmit a WRITE operation, with 1 byte transfer, with address as "addr"
      * and data as "data" */
-    uint32_t __data = ~ISLA216P_HDR_RW & (
+    uint32_t __addr = ~ISLA216P_HDR_RW & (
                 ISLA216P_HDR_BT_W(0x0) |
-                ISLA216P_HDR_ADDR_W(addr) |
-                ISLA216P_DATA_W(*data)
+                ISLA216P_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(ISLA216P_TRANS_SIZE);
-    ssize_t smpr_err = smpr_write_32 (self->spi, 0, &__data, flags);
+    uint32_t __data = ISLA216P_DATA_W(*data);
+
+    ssize_t smpr_err = smpr_write_block (self->proto, ISLA216P_INSTADDR_SIZE, __addr,
+            ISLA216P_DATA_SIZE, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 
@@ -252,13 +250,14 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
      * */
 
     /* We transmit a READ operation, with 1 byte transfer, with address as "addr"  */
-    uint32_t __data = ISLA216P_HDR_RW | (
+    uint32_t __addr = ISLA216P_HDR_RW | (
                 ISLA216P_HDR_BT_W(0x0) |
                 ISLA216P_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(ISLA216P_TRANS_SIZE);
-    ssize_t smpr_err = smpr_read_32 (self->spi, 0, &__data, flags);
+    uint32_t __data = 0;
+
+    ssize_t smpr_err = smpr_read_block (self->proto, ISLA216P_INSTADDR_SIZE, __addr,
+            ISLA216P_DATA_SIZE, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 

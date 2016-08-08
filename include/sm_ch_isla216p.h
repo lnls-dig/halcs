@@ -15,7 +15,7 @@ extern "C" {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH ISLA216P */
-smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base, uint32_t ss,
+smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH ISLA216P */
 smch_err_e smch_isla216p_destroy (smch_isla216p_t **self_p);

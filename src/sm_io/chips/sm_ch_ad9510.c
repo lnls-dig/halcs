@@ -44,7 +44,6 @@
 
 struct _smch_ad9510_t {
     smpr_t *spi;                    /* SPI protocol object */
-    uint32_t ss;                    /* Slave select line for this AD9510 chip */
 };
 
 static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
@@ -56,7 +55,7 @@ static bool _smch_ad9510_wait_completion (smch_ad9510_t *self, unsigned int trie
 static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 
 /* Creates a new instance of the SMCH AD9510 */
-smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
+smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
@@ -71,8 +70,6 @@ smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
     /* Initalize the SPI protocol */
     int smpr_err = smpr_open (self->spi, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-
-    self->ss = ss;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:ad9510] Created instance of SMCH\n");
 
@@ -770,14 +767,13 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
 
     /* We transmit a WRITE operation, with 1 byte transfer, with address as "addr"
      * and data as "data" */
-    uint32_t __data = ~AD9510_HDR_RW & (
+    uint64_t __addr = ~AD9510_HDR_RW & (
                 AD9510_HDR_BT_W(0x0) |
-                AD9510_HDR_ADDR_W(addr) |
-                AD9510_DATA_W(*data)
+                AD9510_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(AD9510_TRASNS_SIZE);
-    ssize_t smpr_err = smpr_write_32 (self->spi, 0, &__data, flags);
+    uint32_t __data = AD9510_DATA_W(*data);
+    ssize_t smpr_err = smpr_write_block (self->spi, AD9510_INSTADDR_SIZE, __addr,
+            AD9510_DATA_SIZE, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 
@@ -798,13 +794,13 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
      * */
 
     /* We transmit a READ operation, with 1 byte transfer, with address as "addr"  */
-    uint32_t __data = AD9510_HDR_RW | (
+    uint64_t __addr = AD9510_HDR_RW | (
                 AD9510_HDR_BT_W(0x0) |
                 AD9510_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(AD9510_TRASNS_SIZE);
-    ssize_t smpr_err = smpr_read_32 (self->spi, 0, &__data, flags);
+    uint32_t __data = 0;
+    ssize_t smpr_err = smpr_read_block (self->spi, AD9510_INSTADDR_SIZE, __addr,
+            AD9510_DATA_SIZE, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 

@@ -15,7 +15,7 @@ extern "C" {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH SI57X */
-smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
+smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH SI57X */
 smch_err_e smch_si57x_destroy (smch_si57x_t **self_p);
@@ -29,9 +29,6 @@ smch_err_e smch_si57x_read_8 (smch_si57x_t *self, uint8_t addr,
         uint8_t *data);
 smch_err_e smch_si57x_read_block (smch_si57x_t *self, uint8_t addr,
         uint8_t *data, size_t size);
-
-/* Probe bus for I2C devices */
-ssize_t smch_si57x_probe_bus (smch_si57x_t *self);
 
 /* Get Si57X divider values */
 smch_err_e smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
