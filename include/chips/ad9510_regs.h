@@ -24,18 +24,16 @@
 #define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
 #endif
 
-#define AD9510_TRASNS_SIZE                          24          /* in bits */
-
 /* AD9510 Instruction Header for 24-bit transfers */
 
 /* AD9510 Transfer type field */
 #define AD9510_HDR_RW_SIZE                          1
-#define AD9510_HDR_RW_SHIFT                         23
+#define AD9510_HDR_RW_SHIFT                         15
 #define AD9510_HDR_RW                               WBGEN2_GEN_MASK(AD9510_HDR_RW_SHIFT, \
                                                                     AD9510_HDR_RW_SIZE)
 /* AD9510 Byte transfer field */
 #define AD9510_HDR_BT_SIZE                          2
-#define AD9510_HDR_BT_SHIFT                         21
+#define AD9510_HDR_BT_SHIFT                         13
 #define AD9510_HDR_BT_MASK                          WBGEN2_GEN_MASK(AD9510_HDR_BT_SHIFT, \
                                                                    AD9510_HDR_BT_SIZE)
 #define AD9510_HDR_BT_W(value)                      WBGEN2_GEN_WRITE(value, AD9510_HDR_BT_SHIFT, \
@@ -46,13 +44,17 @@
 /* AD9510 Address field. Only the bits 0 to 6 are available. The remaining 7 to 12
  * are fixed to 0, as mandated by the AD9510 rev. B datasheet */
 #define AD9510_HDR_ADDR_SIZE                        7
-#define AD9510_HDR_ADDR_SHIFT                       8
+#define AD9510_HDR_ADDR_SHIFT                       0
 #define AD9510_HDR_ADDR_MASK                        WBGEN2_GEN_MASK(AD9510_HDR_ADDR_SHIFT, \
                                                                         AD9510_HDR_ADDR_SIZE)
 #define AD9510_HDR_ADDR_W(value)                    WBGEN2_GEN_WRITE(value, AD9510_HDR_ADDR_SHIFT, \
                                                                         AD9510_HDR_ADDR_SIZE)
 #define AD9510_HDR_ADDR_R(reg)                      WBGEN2_GEN_READ(reg, AD9510_HDR_ADDR_SHIFT, \
                                                                             AD9510_HDR_ADDR_SIZE)
+
+#define AD9510_INSTADDR_SIZE                        (AD9510_HDR_RW_SIZE + \
+                                                        AD9510_HDR_BT_SIZE + \
+                                                        AD9510_HDR_ADDR_SIZE)
 
 /* AD9510 Data for 24-bit transfers */
 #define AD9510_DATA_SIZE                            8
@@ -63,6 +65,8 @@
                                                                         AD9510_DATA_SIZE)
 #define AD9510_DATA_R(reg)                          WBGEN2_GEN_READ(reg, AD9510_DATA_SHIFT, \
                                                                         AD9510_DATA_SIZE)
+
+#define AD9510_TRANS_SIZE                           (AD9510_INSTADDR_SIZE+AD9510_DATA_SIZE)          /* in bits */
 
 /* AD9510 Register map, as described by the AD9510 reb. B datasheet. Not all of them
  * are descried here, just the ones we use */
