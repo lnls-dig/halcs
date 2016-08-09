@@ -293,6 +293,7 @@ int main (int argc, char *argv[])
     }
 
     devio_err_e err = DEVIO_SUCCESS;
+    const llio_ops_t *llio_ops = NULL;
     /* Check Dev_type */
     switch (llio_type) {
         case ETH_DEV:
@@ -312,6 +313,9 @@ int main (int argc, char *argv[])
                 ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get dev_entry from config file",
                         err_exit);
             }
+
+            /* Get LLIO operations */
+            llio_ops = &llio_ops_eth;
             break;
 
         case PCIE_DEV:
@@ -355,10 +359,13 @@ int main (int argc, char *argv[])
              * on a larger system relying on systemd spawning, for instance */
             ASSERT_TEST (fe_smio_id == 0, "Invalid Dev_id for PCIE_DEV. Only "
                     "odd device IDs are available", err_exit, 0);
+
+            llio_ops = &llio_ops_pcie;
             break;
 
         default:
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[ebpm] Invalid Dev_type. Exiting ...\n");
+            llio_ops = NULL;
             goto err_exit;
     }
 
@@ -462,7 +469,7 @@ int main (int argc, char *argv[])
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "BPM%u:DEVIO", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, &llio_ops_pcie,
+    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
             broker_endp, verbose, devio_log_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 
