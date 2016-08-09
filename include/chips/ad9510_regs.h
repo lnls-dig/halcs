@@ -52,8 +52,12 @@
 #define AD9510_HDR_ADDR_R(reg)                      WBGEN2_GEN_READ(reg, AD9510_HDR_ADDR_SHIFT, \
                                                                             AD9510_HDR_ADDR_SIZE)
 
+/* Pad bytes to 16-bit */
+#define AD9510_HDR_ADDR_PAD_SIZE                    6
+
 #define AD9510_INSTADDR_SIZE                        (AD9510_HDR_RW_SIZE + \
                                                         AD9510_HDR_BT_SIZE + \
+                                                        AD9510_HDR_ADDR_PAD_SIZE + \
                                                         AD9510_HDR_ADDR_SIZE)
 
 /* AD9510 Data for 24-bit transfers */
