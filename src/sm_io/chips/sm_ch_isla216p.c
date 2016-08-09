@@ -232,8 +232,8 @@ static ssize_t _smch_isla216p_write_8 (smch_isla216p_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_write_block (self->proto, __addr_size, 
             __addr, __data_size, &__data);
-    ASSERT_TEST(smpr_err == __data_size, "Could not write to SMPR",
-            err_smpr_write, -1);
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
+            "Could not write to SMPR", err_smpr_write, -1);
 
 err_smpr_write:
     return err;
@@ -262,12 +262,12 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_read_block (self->proto, __addr_size,
             __addr, __data_size, &__data);
-    ASSERT_TEST(smpr_err == __data_size, "Could not write to SMPR",
-            err_smpr_write, -1);
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
+            "Could not read to SMPR", err_smpr_read, -1);
 
     /* Only the 8 LSB are valid for one byte reading (ISLA216P_HDR_BT_W(0x0)) */
     memcpy(data, &__data, sizeof(uint8_t));
 
-err_smpr_write:
+err_smpr_read:
     return err;
 }
