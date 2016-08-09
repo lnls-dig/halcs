@@ -256,8 +256,8 @@ static ssize_t _smch_si57x_write_generic (smch_si57x_t *self, uint8_t addr,
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_write_8] addr = 0x%02X\n",
             addr);
 
-    err = smpr_write_block (self->proto, SI57X_ADDR_TRANS_SIZE, addr,
-            size, (uint32_t *) data);
+    err = smpr_write_block (self->proto, SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT,
+            addr, size, (uint32_t *) data);
     ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes*/,
             "Could not write data to PROTO", err_exit, -1);
 
@@ -300,8 +300,8 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
 
     uint64_t __addr = addr;
 
-    err = smpr_read_block (self->proto, SI57X_ADDR_TRANS_SIZE, __addr,
-            size, (uint32_t *) data);
+    err = smpr_read_block (self->proto, SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT,
+            __addr, size, (uint32_t *) data);
     /* Check if we have written everything */
     ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes */,
             "Could not read data from PROTO", err_exit, -1);

@@ -149,8 +149,8 @@ static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_write_generic] data =  0x%02X\n", *data);
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_write_generic] addr =  0x%04X\n", addr);
 
-    ssize_t smpr_err = smpr_write_block (self->proto, E24AA64_ADDR_SIZE, E24AA64_ADDR_W(addr),
-            size, (uint32_t *) &data);
+    ssize_t smpr_err = smpr_write_block (self->proto, E24AA64_ADDR_SIZE/SMPR_BYTE_2_BIT,
+            E24AA64_ADDR_W(addr), size, (uint32_t *) &data);
 
     /* Check if we have written everything */
     ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == size /* in bytes */,
@@ -184,8 +184,8 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
      * */
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_read_generic] addr = 0x%04X\n", addr);
 
-    err = smpr_read_block (self->proto, E24AA64_ADDR_SIZE, E24AA64_ADDR_W(addr),
-            size, (uint32_t *) data);
+    err = smpr_read_block (self->proto, E24AA64_ADDR_SIZE/SMPR_BYTE_2_BIT,
+            E24AA64_ADDR_W(addr), size, (uint32_t *) data);
     /* Check if we have written everything */
     ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes */,
             "Could not READ from SMPR", err_smpr_read, -1);

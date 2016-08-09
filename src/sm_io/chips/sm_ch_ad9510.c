@@ -772,8 +772,8 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
                 AD9510_HDR_ADDR_W(addr)
             );
     uint32_t __data = AD9510_DATA_W(*data);
-    ssize_t smpr_err = smpr_write_block (self->spi, AD9510_INSTADDR_SIZE, __addr,
-            AD9510_DATA_SIZE, &__data);
+    ssize_t smpr_err = smpr_write_block (self->spi, AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT, __addr,
+            AD9510_DATA_SIZE/SMPR_BYTE_2_BIT, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 
@@ -799,8 +799,8 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
                 AD9510_HDR_ADDR_W(addr)
             );
     uint32_t __data = 0;
-    ssize_t smpr_err = smpr_read_block (self->spi, AD9510_INSTADDR_SIZE, __addr,
-            AD9510_DATA_SIZE, &__data);
+    ssize_t smpr_err = smpr_read_block (self->spi, AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT, __addr,
+            AD9510_DATA_SIZE/SMPR_BYTE_2_BIT, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 

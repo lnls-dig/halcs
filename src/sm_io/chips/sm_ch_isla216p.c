@@ -228,8 +228,8 @@ static ssize_t _smch_isla216p_write_8 (smch_isla216p_t *self, uint8_t addr,
             );
     uint32_t __data = ISLA216P_DATA_W(*data);
 
-    ssize_t smpr_err = smpr_write_block (self->proto, ISLA216P_INSTADDR_SIZE, __addr,
-            ISLA216P_DATA_SIZE, &__data);
+    ssize_t smpr_err = smpr_write_block (self->proto, ISLA216P_INSTADDR_SIZE/SMPR_BYTE_2_BIT, 
+            __addr, ISLA216P_DATA_SIZE/SMPR_BYTE_2_BIT, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 
@@ -256,8 +256,8 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
             );
     uint32_t __data = 0;
 
-    ssize_t smpr_err = smpr_read_block (self->proto, ISLA216P_INSTADDR_SIZE, __addr,
-            ISLA216P_DATA_SIZE, &__data);
+    ssize_t smpr_err = smpr_read_block (self->proto, ISLA216P_INSTADDR_SIZE/SMPR_BYTE_2_BIT,
+            __addr, ISLA216P_DATA_SIZE/SMPR_BYTE_2_BIT, &__data);
     ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
             err_smpr_write, -1);
 
