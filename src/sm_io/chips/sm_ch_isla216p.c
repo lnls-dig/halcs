@@ -257,16 +257,12 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
                 ISLA216P_HDR_ADDR_W(addr)
             );
     size_t __addr_size = ISLA216P_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
-    uint32_t __data = 0;
     size_t __data_size = ISLA216P_DATA_SIZE/SMPR_BYTE_2_BIT;
 
     ssize_t smpr_err = smpr_read_block (self->proto, __addr_size,
-            __addr, __data_size, &__data);
+            __addr, __data_size, (uint32_t *) data);
     ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not read to SMPR", err_smpr_read, -1);
-
-    /* Only the 8 LSB are valid for one byte reading (ISLA216P_HDR_BT_W(0x0)) */
-    memcpy(data, &__data, sizeof(uint8_t));
 
 err_smpr_read:
     return err;

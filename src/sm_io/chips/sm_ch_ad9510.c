@@ -772,7 +772,11 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
                 AD9510_HDR_ADDR_W(addr)
             );
     size_t __addr_size = AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
+        DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
+                "[_smch_ad9510_write_8] data = 0x%08X\n", *data);
     uint32_t __data = AD9510_DATA_W(*data);
+        DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
+                "[_smch_ad9510_write_8] __data = 0x%08X\n", __data);
     size_t __data_size = AD9510_DATA_SIZE/SMPR_BYTE_2_BIT;
 
     ssize_t smpr_err = smpr_write_block (self->spi, __addr_size, __addr,
@@ -802,16 +806,12 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
                 AD9510_HDR_ADDR_W(addr)
             );
     size_t __addr_size = AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
-    uint32_t __data = 0;
     size_t __data_size = AD9510_DATA_SIZE/SMPR_BYTE_2_BIT;
 
     ssize_t smpr_err = smpr_read_block (self->spi, __addr_size, __addr,
-            __data_size, &__data);
+            __data_size, (uint32_t *) data);
     ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
             "Could not read to SMPR", err_read_write, -1);
-
-    /* Only the 8 LSB are valid for one byte reading (AD9510_HDR_BT_W(0x0)) */
-    memcpy(data, &__data, sizeof(uint8_t));
 
 err_read_write:
     return err;
