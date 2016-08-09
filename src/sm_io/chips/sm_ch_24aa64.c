@@ -188,7 +188,7 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
             E24AA64_ADDR_W(addr), size, (uint32_t *) data);
     /* Check if we have written everything */
     ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes */,
-            "Could not READ from SMPR", err_smpr_read, -1);
+            "Could not read from SMPR", err_smpr_read, -1);
 
     /* 24AA64 takes up to 2 ms to write the page */
     SMCH_24AA64_WAIT_DFLT;
