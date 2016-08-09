@@ -640,10 +640,10 @@ static ssize_t _i2c_write_generic (smpr_t *self, size_t size_offs, uint64_t offs
 
     size_t trans_size = 0;
     /* Copy address + data */
-    memcpy (&raw_data, &offs, size_offs);
+    memcpy (raw_data, &offs, size_offs);
     trans_size += size_offs;
     if (data != NULL) {
-        memcpy (&raw_data + size_offs, data, size);
+        memcpy (raw_data + size_offs, data, size);
         trans_size += size;
     }
 
