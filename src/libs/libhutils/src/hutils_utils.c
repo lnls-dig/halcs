@@ -178,6 +178,24 @@ char *hutils_concat_strings3 (const char *str1, const char* str2,
 }
 
 /*******************************************************************/
+/*****************  Byte manipulation functions ********************/
+/*******************************************************************/
+
+uint32_t hutils_calculate_padding(uint32_t value, uint32_t alignment)
+{
+    uint32_t exceeded = value % alignment;
+    uint32_t remaining = alignment - exceeded;
+    uint32_t padding = remaining % alignment;
+
+    return padding;
+}
+
+uint32_t hutils_align_value(uint32_t value, uint32_t alignment)
+{
+    return value + hutils_calculate_padding(value, alignment);
+}
+
+/*******************************************************************/
 /*****************  System Fork/Exec functions *********************/
 /*******************************************************************/
 
@@ -502,4 +520,3 @@ err_hash_item_alloc:
 err_cfg_exit:
     return err;
 }
-
