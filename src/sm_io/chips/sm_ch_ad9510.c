@@ -772,11 +772,7 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
                 AD9510_HDR_ADDR_W(addr)
             );
     size_t __addr_size = AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
-        DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
-                "[_smch_ad9510_write_8] data = 0x%08X\n", *data);
     uint32_t __data = AD9510_DATA_W(*data);
-        DBE_DEBUG (DBG_SM_PR | DBG_LVL_WARN,
-                "[_smch_ad9510_write_8] __data = 0x%08X\n", __data);
     size_t __data_size = AD9510_DATA_SIZE/SMPR_BYTE_2_BIT;
 
     ssize_t smpr_err = smpr_write_block (self->spi, __addr_size, __addr,
