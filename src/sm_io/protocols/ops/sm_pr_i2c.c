@@ -638,14 +638,17 @@ static ssize_t _i2c_write_generic (smpr_t *self, size_t size_offs, uint64_t offs
     size_t raw_size = size_offs + size;
     uint8_t raw_data [raw_size];
 
+    size_t trans_size = 0;
     /* Copy address + data */
     memcpy (&raw_data, &offs, size_offs);
+    trans_size += size_offs;
     if (data != NULL) {
         memcpy (&raw_data + size_offs, data, size);
+        trans_size += size;
     }
 
-    ssize_t err = _i2c_write_raw (self, raw_size, raw_data);
-    ASSERT_TEST(err > 0 && (size_t) err == raw_size /* in bytes*/,
+    ssize_t err = _i2c_write_raw (self, trans_size, raw_data);
+    ASSERT_TEST(err > 0 && (size_t) err == trans_size /* in bytes*/,
             "Could not write data to I2C", err_exit, -1);
 
     /* We return only the number of data bytes actually written, not addr+data */

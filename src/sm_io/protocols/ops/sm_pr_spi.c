@@ -472,27 +472,32 @@ static ssize_t _spi_read_write_generic (smpr_t *self, size_t size_offs, uint64_t
     smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
     uint32_t addr_msb = smpr_spi_get_addr_msb (smpr_spi);
 
+    size_t trans_size = 0;
     if (addr_msb) {
         /* Copy address (MSB) + data */
         if (data != NULL) {
             memcpy (&raw_data, data, size);
             memcpy (&raw_data + size, &offs, size_offs);
+            trans_size += size + size_offs;
         }
         /* Only copy address to buffer */
         else {
             memcpy (&raw_data, &offs, size_offs);
+            trans_size += size_offs;
         }
     }
     else {
         /* Copy data (MSB) + address */
         memcpy (&raw_data, &offs, size_offs);
+        trans_size += size_offs;
         if (data != NULL) {
             memcpy (&raw_data + size_offs, data, size);
+            trans_size += size;
         }
     }
 
-    ssize_t err = _spi_read_write_raw (self, raw_size, raw_data, mode);
-    ASSERT_TEST(err > 0 && (size_t) err == raw_size /* in bytes*/,
+    ssize_t err = _spi_read_write_raw (self, trans_size, raw_data, mode);
+    ASSERT_TEST(err > 0 && (size_t) err == trans_size /* in bytes*/,
             "Could not write data to SPI", err_exit, -1);
 
     /* We return only the number of data bytes actually written, not addr+data */
