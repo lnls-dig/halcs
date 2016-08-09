@@ -335,8 +335,7 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
     smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
     uint32_t ss = smpr_spi_get_ss (smpr_spi);
     uint32_t charlen = size*SMPR_BYTE_2_BIT; /* in bits */
-    uint32_t size_align = size + SMPR_WB_REG_2_BYTE - 
-        (size % SMPR_WB_REG_2_BYTE);
+    uint32_t size_align = hutils_align_value(size, SMPR_WB_REG_2_BYTE);
 
     /* Configure SS line */
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
