@@ -335,6 +335,8 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
     smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
     uint32_t ss = smpr_spi_get_ss (smpr_spi);
     uint32_t charlen = size*SMPR_BYTE_2_BIT; /* in bits */
+    uint32_t size_align = size + SMPR_WB_REG_2_BYTE - 
+        (size % SMPR_WB_REG_2_BYTE);
 
     /* Configure SS line */
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
@@ -375,12 +377,12 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
     if (mode == SPI_MODE_WRITE || mode == SPI_MODE_WRITE_READ) {
         /* Copy data to temp */
         uint8_t data_write[SPI_PROTO_REG_RXTX_NUM * SMPR_WB_REG_2_BYTE] = {0};
-        memcpy (data_write, data, size);
+        memcpy (data_write, data, size_align);
 
         uint32_t i;
         /* We write 32-bit at a time */
 
-        for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+        for (i = 0; i < size_align/SMPR_WB_REG_2_BYTE; ++i) {
             /* As the TXs are just a single register, we write using the SMIO
              * functions directly */
             DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
@@ -394,7 +396,7 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
         }
 
         /* Return error if we could not write everything */
-        ASSERT_TEST(err >= 0 && (size_t) err == size,
+        ASSERT_TEST(err >= 0 && (size_t) err == size_align,
                 "Could not write everything to TX registers", err_exit, -1);
     }
 
@@ -437,7 +439,7 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
      * SPI_PROTO_REG_RX0_SINGLE */
     uint32_t read_base_addr = (spi_proto->bidir) ? SPI_PROTO_REG_RX0 : SPI_PROTO_REG_RX0_SINGLE;
     /* We read 32-bit at a time */
-    for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+    for (i = 0; i < size_align/SMPR_WB_REG_2_BYTE; ++i) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Reading from RX%u\n", i);
         /* As the RXs are just a single register, we write using the SMIO
@@ -455,6 +457,8 @@ static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
 
     /* TODO: Reduce the ammount of memcpy () throughout this simple code*/
     memcpy (data, data_read, size);
+    /* Return just the effective number of bytes read/written */
+    err = size;
 
 err_exit:
 err_inv_size:
