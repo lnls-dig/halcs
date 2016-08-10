@@ -1034,6 +1034,178 @@ bpm_client_err_e bpm_get_trigger_transm_out_sel (bpm_client_t *self, char *servi
 bpm_client_err_e func_polling (bpm_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output, int timeout);
 
+/********************** AFC Timing Functions ********************/
+
+/* Status functions */
+bpm_client_err_e afc_timing_get_link_status (bpm_client_t *self, char *service,
+        uint32_t *link_status);
+bpm_client_err_e afc_timing_get_rxen_status (bpm_client_t *self, char *service,
+        uint32_t *rxen_status);
+bpm_client_err_e afc_timing_get_ref_clk_locked (bpm_client_t *self, char *service,
+        uint32_t *ref_clk_locked);
+
+/* Event code channel 0 functions */
+bpm_client_err_e afc_timing_set_evt_code_0 (bpm_client_t *self, char *service,
+        uint32_t evt_code_0);
+bpm_client_err_e afc_timing_get_evt_code_0 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_0);
+
+/* Event code channel 1 functions */
+bpm_client_err_e afc_timing_set_evt_code_1 (bpm_client_t *self, char *service,
+        uint32_t evt_code_1);
+bpm_client_err_e afc_timing_get_evt_code_1 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_1);
+
+/* Event code channel 2 functions */
+bpm_client_err_e afc_timing_set_evt_code_2 (bpm_client_t *self, char *service,
+        uint32_t evt_code_2);
+bpm_client_err_e afc_timing_get_evt_code_2 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_2);
+
+/* Event code channel 3 functions */
+bpm_client_err_e afc_timing_set_evt_code_3 (bpm_client_t *self, char *service,
+        uint32_t evt_code_3);
+bpm_client_err_e afc_timing_get_evt_code_3 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_3);
+
+/* Event code channel 4 functions */
+bpm_client_err_e afc_timing_set_evt_code_4 (bpm_client_t *self, char *service,
+        uint32_t evt_code_4);
+bpm_client_err_e afc_timing_get_evt_code_4 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_4);
+
+/* Event code channel 5 functions */
+bpm_client_err_e afc_timing_set_evt_code_5 (bpm_client_t *self, char *service,
+        uint32_t evt_code_5);
+bpm_client_err_e afc_timing_get_evt_code_5 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_5);
+
+/* Event code channel 6 functions */
+bpm_client_err_e afc_timing_set_evt_code_6 (bpm_client_t *self, char *service,
+        uint32_t evt_code_6);
+bpm_client_err_e afc_timing_get_evt_code_6 (bpm_client_t *self, char *service,
+        uint32_t *evt_code_6);
+
+/* Event delay channel 0 functions */
+bpm_client_err_e afc_timing_set_evt_delay_0 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_0);
+bpm_client_err_e afc_timing_get_evt_delay_0 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_0);
+
+/* Event delay channel 1 functions */
+bpm_client_err_e afc_timing_set_evt_delay_1 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_1);
+bpm_client_err_e afc_timing_get_evt_delay_1 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_1);
+
+/* Event delay channel 2 functions */
+bpm_client_err_e afc_timing_set_evt_delay_2 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_2);
+bpm_client_err_e afc_timing_get_evt_delay_2 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_2);
+
+/* Event delay channel 3 functions */
+bpm_client_err_e afc_timing_set_evt_delay_3 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_3);
+bpm_client_err_e afc_timing_get_evt_delay_3 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_3);
+
+/* Event delay channel 4 functions */
+bpm_client_err_e afc_timing_set_evt_delay_4 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_4);
+bpm_client_err_e afc_timing_get_evt_delay_4 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_4);
+
+/* Event delay channel 5 functions */
+bpm_client_err_e afc_timing_set_evt_delay_5 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_5);
+bpm_client_err_e afc_timing_get_evt_delay_5 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_5);
+
+/* Event delay channel 6 functions */
+bpm_client_err_e afc_timing_set_evt_delay_6 (bpm_client_t *self, char *service,
+        uint32_t evt_delay_6);
+bpm_client_err_e afc_timing_get_evt_delay_6 (bpm_client_t *self, char *service,
+        uint32_t *evt_delay_6);
+
+/* Event width channel 0 functions */
+bpm_client_err_e afc_timing_set_evt_width_0 (bpm_client_t *self, char *service,
+        uint32_t evt_width_0);
+bpm_client_err_e afc_timing_get_evt_width_0 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_0);
+
+/* Event width channel 1 functions */
+bpm_client_err_e afc_timing_set_evt_width_1 (bpm_client_t *self, char *service,
+        uint32_t evt_width_1);
+bpm_client_err_e afc_timing_get_evt_width_1 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_1);
+
+/* Event width channel 2 functions */
+bpm_client_err_e afc_timing_set_evt_width_2 (bpm_client_t *self, char *service,
+        uint32_t evt_width_2);
+bpm_client_err_e afc_timing_get_evt_width_2 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_2);
+
+/* Event width channel 3 functions */
+bpm_client_err_e afc_timing_set_evt_width_3 (bpm_client_t *self, char *service,
+        uint32_t evt_width_3);
+bpm_client_err_e afc_timing_get_evt_width_3 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_3);
+
+/* Event width channel 4 functions */
+bpm_client_err_e afc_timing_set_evt_width_4 (bpm_client_t *self, char *service,
+        uint32_t evt_width_4);
+bpm_client_err_e afc_timing_get_evt_width_4 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_4);
+
+/* Event width channel 5 functions */
+bpm_client_err_e afc_timing_set_evt_width_5 (bpm_client_t *self, char *service,
+        uint32_t evt_width_5);
+bpm_client_err_e afc_timing_get_evt_width_5 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_5);
+
+/* Event width channel 6 functions */
+bpm_client_err_e afc_timing_set_evt_width_6 (bpm_client_t *self, char *service,
+        uint32_t evt_width_6);
+bpm_client_err_e afc_timing_get_evt_width_6 (bpm_client_t *self, char *service,
+        uint32_t *evt_width_6);
+
+/* Proportional Gain of Frequency feedback functions */
+bpm_client_err_e afc_timing_set_freq_kp (bpm_client_t *self, char *service,
+        uint32_t freq_kp);
+bpm_client_err_e afc_timing_get_freq_kp (bpm_client_t *self, char *service,
+        uint32_t *freq_kp);
+
+/* Integral Gain of Frequency feedback functions */
+bpm_client_err_e afc_timing_set_freq_ki (bpm_client_t *self, char *service,
+        uint32_t freq_ki);
+bpm_client_err_e afc_timing_get_freq_ki (bpm_client_t *self, char *service,
+        uint32_t *freq_ki);
+
+/* Proportional Gain of Phase feedback functions */
+bpm_client_err_e afc_timing_set_phase_kp (bpm_client_t *self, char *service,
+        uint32_t phase_kp);
+bpm_client_err_e afc_timing_get_phase_kp (bpm_client_t *self, char *service,
+        uint32_t *phase_kp);
+
+/* Integral Gain of Phase feedback functions */
+bpm_client_err_e afc_timing_set_phase_ki (bpm_client_t *self, char *service,
+        uint32_t phase_ki);
+bpm_client_err_e afc_timing_get_phase_ki (bpm_client_t *self, char *service,
+        uint32_t *phase_ki);
+
+/* Phase Bias functions */
+bpm_client_err_e afc_timing_set_phase_bias (bpm_client_t *self, char *service,
+        uint32_t phase_bias);
+bpm_client_err_e afc_timing_get_phase_bias (bpm_client_t *self, char *service,
+        uint32_t *phase_bias);
+
+/* Average Exponent funcrions */
+bpm_client_err_e afc_timing_set_avg_exponent (bpm_client_t *self, char *service,
+        uint32_t avg_exponent);
+bpm_client_err_e afc_timing_get_avg_exponent (bpm_client_t *self, char *service,
+        uint32_t *avg_exponent);
+
 #ifdef __cplusplus
 }
 #endif

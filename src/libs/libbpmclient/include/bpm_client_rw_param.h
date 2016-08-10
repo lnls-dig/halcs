@@ -25,10 +25,22 @@ extern "C" {
 /* Read function name */
 #define PARAM_FUNC_CLIENT_NAME_READ(reg)                                        \
     bpm_get ## _ ## reg
+    
+/* Write function name */
+#define PARAM_FUNC_CLIENT_NAME_WRITE_MOD(module, reg)                           \
+    module ## _ ## set ## _ ## reg
+
+/* Read function name */
+#define PARAM_FUNC_CLIENT_NAME_READ_MOD(module, reg)                            \
+	module ## _ ## get ## _ ## reg
 
 /* Write function declaration */
 #define PARAM_FUNC_CLIENT_WRITE(reg)                                            \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (bpm_client_t *self,     \
+            char *service, uint32_t reg)
+
+#define PARAM_FUNC_CLIENT_WRITE_MOD(module, reg)                                        \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE_MOD(module, reg) (bpm_client_t *self, \
             char *service, uint32_t reg)
 
 #define PARAM_FUNC_CLIENT_WRITE_BYTE(reg)                                       \
@@ -44,12 +56,16 @@ extern "C" {
             char *service, uint32_t param1, uint32_t param2)
 
 #define PARAM_FUNC_CLIENT_WRITE_GEN(param)                                      \
-    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(param) (bpm_client_t *self,     \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(param) (bpm_client_t *self,   \
             char *service, void *param, size_t size)
 
 /* Read function declaration */
 #define PARAM_FUNC_CLIENT_READ(reg)                                             \
     bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (bpm_client_t *self,      \
+            char *service, uint32_t *reg)
+
+#define PARAM_FUNC_CLIENT_READ_MOD(module, reg)                                         \
+    bpm_client_err_e PARAM_FUNC_CLIENT_NAME_READ_MOD(module, reg) (bpm_client_t *self,  \
             char *service, uint32_t *reg)
 
 #define PARAM_FUNC_CLIENT_READ_BYTE(reg)                                        \

@@ -106,7 +106,8 @@ OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
                 ../../sm_io/modules/rffe/sm_io_rffe_exports.o \
                 ../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.o \
                 ../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.o \
-                ../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.o
+                ../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.o \
+                ../../sm_io/modules/afc_timing/sm_io_afc_timing_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
@@ -127,6 +128,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I../../sm_io/modules/afc_diag \
 	       -I../../sm_io/modules/trigger_iface \
 	       -I../../sm_io/modules/trigger_mux \
+	       -I../../sm_io/modules/afc_timing \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -162,6 +164,7 @@ $(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
 	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_codes.h \
 	../../sm_io/modules/trigger_mux/sm_io_trigger_mux_codes.h \
+	../../sm_io/modules/afc_timing/sm_io_afc_timing_codes.h \
 	../../sm_io/modules/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
@@ -174,7 +177,8 @@ $(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_expo
 	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
 	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h \
 	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.h \
-	../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.h
+	../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.h \
+	../../sm_io/modules/afc_timing/sm_io_afc_timing_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
