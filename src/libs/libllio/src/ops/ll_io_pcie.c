@@ -188,7 +188,7 @@ static int pcie_open (llio_t *self, llio_endpoint_t *endpoint)
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
             "[ll_io_pcie] Opened PCIe device located at %s\n",
             llio_get_endpoint_name (self));
-    
+
     /* Set SDB prefix adress */
     llio_set_sdb_prefix_addr (self, BAR4_ADDR);
 
@@ -653,6 +653,7 @@ static ssize_t _pcie_reset_fpga (llio_t *self)
 }
 
 const llio_ops_t llio_ops_pcie = {
+    .name           = "PCIE",           /* Operations name */
     .open           = pcie_open,        /* Open device */
     .release        = pcie_release,     /* Release device */
     .read_16        = NULL,             /* Read 16-bit data */

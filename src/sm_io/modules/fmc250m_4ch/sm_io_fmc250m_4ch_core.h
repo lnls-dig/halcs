@@ -33,8 +33,11 @@ typedef struct {
 #if 0
     smch_amc7823_t *smch_amc7823;           /* AMC7823 chip handler */
 #endif
+    smpr_spi_t *smpr_spi_isla216p_adc[NUM_FMC250M_4CH_ISLA216P];     /* SPI protocol handler */
     smch_isla216p_t *smch_isla216p_adc[NUM_FMC250M_4CH_ISLA216P];    /* ISLA216P chip handlers */
+    smpr_i2c_t *smpr_i2c_24aa64;            /* I2C protocol handler */
     smch_24aa64_t *smch_24aa64;             /* 24AA64 chip handler */
+    smpr_i2c_t *smpr_i2c_pca9547;           /* I2C protocol handler */
     smch_pca9547_t *smch_pca9547;           /* FPGA I2C Switch */
 } smio_fmc250m_4ch_t;
 

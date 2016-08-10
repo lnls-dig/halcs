@@ -77,6 +77,13 @@ typedef enum _smpr_err_e smpr_err_e;
 /* Opaque sm_pr_t structure */
 typedef struct _smpr_t smpr_t;
 
+/* Opaque smpr_spi_t structure */
+typedef struct _smpr_spi_t smpr_spi_t;
+/* Opaque smpr_i2c_t structure */
+typedef struct _smpr_i2c_t smpr_i2c_t;
+/* Opaque smpr_bsmp_t structure */
+typedef struct _smpr_bsmp_t smpr_bsmp_t;
+
 /* Forward smch_err_e declaration enumeration */
 typedef enum _smch_err_e smch_err_e;
 /* Opaque sm_ch_24aa64_t structure */

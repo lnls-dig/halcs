@@ -4,7 +4,7 @@
  *
  * Released according to the GNU GPL, version 3 or any later version.
  *
- * Description: Software driver for rPCA9547 I2C switch chip
+ * Description: Software driver for PCA9547 switch chip
  */
 
 #include "bpm_server.h"
@@ -32,19 +32,18 @@
     CHECK_HAL_ERR(err, SM_CH, "[sm_ch:pca9547]",                    \
             smch_err_str (err_type))
 
-#define SMCH_PCA9547_NAME                    "I2C_PCA9547"
+#define SMCH_PCA9547_NAME                    "PCA9547"
 
 struct _smch_pca9547_t {
-    smpr_t *i2c;                    /* I2C protocol object */
-    uint32_t addr;                  /* I2C address for this PCA9547 chip */
+    smpr_t *proto;                    /* PROTO protocol object */
 };
 
 static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data);
 static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data);
 
 /* Creates a new instance of the SMCH PCA9547 */
-smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose)
+smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint64_t base,
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -52,21 +51,19 @@ smch_pca9547_t * smch_pca9547_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_pca9547_t *self = (smch_pca9547_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_PCA9547_NAME, parent, SMPR_I2C, verbose);
-    ASSERT_ALLOC(self->i2c, err_i2c_alloc);
+    self->proto = smpr_new (SMCH_PCA9547_NAME, parent, reg_ops, verbose);
+    ASSERT_ALLOC(self->proto, err_proto_alloc);
 
-    /* Initalize the I2C protocol */
-    int smpr_err = smpr_open (self->i2c, base, NULL /* Default parameters are fine */);
+    /* Initalize the PROTO protocol */
+    int smpr_err = smpr_open (self->proto, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-
-    self->addr = addr;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:pca9547] Created instance of SMCH\n");
     return self;
 
 err_smpr_init:
-    smpr_destroy (&self->i2c);
-err_i2c_alloc:
+    smpr_destroy (&self->proto);
+err_proto_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -80,8 +77,8 @@ smch_err_e smch_pca9547_destroy (smch_pca9547_t **self_p)
     if (*self_p) {
         smch_pca9547_t *self = *self_p;
 
-        smpr_release (self->i2c);
-        smpr_destroy (&self->i2c);
+        smpr_release (self->proto);
+        smpr_destroy (&self->proto);
         free (self);
         *self_p = NULL;
     }
@@ -104,9 +101,6 @@ smch_err_e smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *data)
 {
     smch_err_e err = SMCH_SUCCESS;
-    uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
-    uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
 
     /* PCA9547 write byte transaction is:
      *
@@ -116,8 +110,8 @@ static smch_err_e _smch_pca9547_write_8 (smch_pca9547_t *self, const uint8_t *da
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:pca9547_write_8] data =  0x%02X\n",
             *data);
 
-    ssize_t smpr_err = smpr_write_32 (self->i2c, 0, (uint32_t *) data, flags);
-    ASSERT_TEST(smpr_err == PCA9547_DATA_TRANS_SIZE/SMPR_BYTE_2_BIT /* in bytes*/,
+    ssize_t smpr_err = smpr_write_block (self->proto, 0, 0, sizeof (*data), (uint32_t *) data);
+    ASSERT_TEST(smpr_err == sizeof (*data) /* in bytes*/,
             "Could not write data to I2C", err_exit, SMCH_ERR_RW_SMPR);
 
 err_exit:
@@ -127,9 +121,6 @@ err_exit:
 static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
 {
     smch_err_e err = SMCH_SUCCESS;
-    uint32_t trans_size = PCA9547_DATA_TRANS_SIZE;
-    uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
 
     /* PCA9547 read byte transaction is:
      *
@@ -137,8 +128,8 @@ static smch_err_e _smch_pca9547_read_8 (smch_pca9547_t *self, uint8_t *data)
      *      8-bit
      * */
 
-    ssize_t smpr_err = smpr_read_32 (self->i2c, 0, (uint32_t *) data, flags);
-    ASSERT_TEST(smpr_err == PCA9547_DATA_TRANS_SIZE/SMPR_BYTE_2_BIT /* in bytes*/,
+    ssize_t smpr_err = smpr_read_block (self->proto, 0, 0, sizeof (*data), (uint32_t *) data);
+    ASSERT_TEST(smpr_err == sizeof (*data) /* in bytes*/,
             "Could not read data to I2C", err_exit, SMCH_ERR_RW_SMPR);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:pca9547_read_8] data =  0x%02X\n",
