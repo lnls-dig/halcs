@@ -32,32 +32,29 @@
 
 /* LLIO class object */
 struct _llio_t {
-    llio_type_e type;                   /* Device type (PCIe, Ethnernet, or other) */
     void *dev_handler;                  /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
     char *name;                         /* Identification of this llio instance */
     int verbose;                        /* Print activity to stdout */
-    uint64_t sdb_prefix_addr;           /* SDB prefix address. Used to read/write to the 
+    uint64_t sdb_prefix_addr;           /* SDB prefix address. Used to read/write to the
                                            SDB address space. To be set by the specific ops */
 
     /* Endpoint to connect to */
     llio_endpoint_t *endpoint;
-    /* SDB device info */
-    /* struct _llio_dev_info_t *dev_info; Moved to dev_io */
     /* Device operations */
     const llio_ops_t *ops;
 };
 
 /* Register Low-level operations to llio instance. Helpper function */
-static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **llio_ops);
+static llio_err_e _llio_register_ops (const llio_ops_t **ops, const llio_ops_t *reg_ops);
 /* Unregister Low-level operations to llio instance. Helpper function */
 static llio_err_e _llio_unregister_ops (const llio_ops_t **ops);
 /* Get open endpoint status */
 static bool _llio_get_endpoint_open (llio_t *self);
 
 /* Creates a new instance of the Low-level I/O */
-llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
+llio_t * llio_new (char *name, char *endpoint, const llio_ops_t *reg_ops, int verbose)
 {
     assert (name);
     assert (endpoint);
@@ -66,7 +63,6 @@ llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Initialize Low-level IO type */
-    self->type = type;
     self->dev_handler = NULL;       /* This is set by the device functions */
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
@@ -86,12 +82,9 @@ llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose)
     ASSERT_ALLOC(self->dev_info, err_dev_info_alloc); Moved to dev_io */
 
     /* Initilialize llio_ops */
-    /* self->ops = (llio_ops_t *) zmalloc (sizeof *self->ops); */
-    /* ASSERT_ALLOC(self->ops, err_ops_alloc); */
-    /* Nullify every ops field to indicate a non-implemented function */
-    /* *self->ops = (const llio_ops_t) {0}; */
+    self->ops = NULL;
     /* Attach Low-level operation to instance of llio */
-    _llio_register_ops (type, &self->ops);
+    _llio_register_ops (&self->ops, reg_ops);
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io] Created instance of llio\n");
     return self;
@@ -193,9 +186,14 @@ void *llio_get_dev_handler (llio_t *self)
     return self->dev_handler;
 }
 
-llio_type_e llio_get_type (llio_t *self)
+const char *llio_get_ops_name (llio_t *self)
 {
-    return self->type;
+    assert (self);
+
+    if (self->ops == NULL) {
+        return NULL;
+    }
+    return self->ops->name;
 }
 
 llio_err_e llio_set_sdb_prefix_addr (llio_t *self, uint64_t sdb_prefix_addr)
@@ -221,26 +219,9 @@ static bool _llio_get_endpoint_open (llio_t *self)
 /**************** Helper Functions ***************/
 
 /* Register Low-level operations to llio instance. Helpper function */
-static llio_err_e _llio_register_ops (llio_type_e type, const llio_ops_t **ops)
+static llio_err_e _llio_register_ops (const llio_ops_t **ops, const llio_ops_t *reg_ops)
 {
-    switch (type) {
-        case GENERIC_DEV:
-            *ops = NULL;
-            return LLIO_ERR_INV_FUNC_PARAM;
-
-        case PCIE_DEV:
-            *ops = &llio_ops_pcie;
-            break;
-
-        case ETH_DEV:
-            *ops = &llio_ops_eth;
-            break;
-
-        default:
-            *ops = NULL;
-            return LLIO_ERR_INV_FUNC_PARAM;
-    }
-
+    *ops = reg_ops;
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO, "[ll_io] Ops set\n");
     return LLIO_SUCCESS;
 }

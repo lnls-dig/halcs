@@ -51,9 +51,19 @@ typedef struct {
     bool bidir;                 /* SPI bidirectional control enable */
 } smpr_proto_spi_t;
 
+/* Protocol object specification */
+struct _smpr_spi_t {
+    /* Must be located first */
+    smpr_proto_ops_t proto_ops;       /* SPI protocol operations */
+    uint32_t ss;                      /* SPI Slave Select */
+    uint32_t addr_msb;                /* Copy address to MSB */
+};
+
 static smpr_err_e _spi_init (smpr_t *self);
-static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
-        size_t size, spi_mode_e mode, uint32_t flags);
+static ssize_t _spi_read_write_generic (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, uint8_t *data, spi_mode_e mode);
+static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
+        spi_mode_e mode);
 
 /************ Our methods implementation **********/
 
@@ -89,7 +99,7 @@ static smpr_err_e smpr_proto_spi_destroy (smpr_proto_spi_t **self_p)
 /************ smpr_proto_ops_spi Implementation **********/
 
 /* Open SPI protocol */
-int spi_open (smpr_t *self, uint64_t base, void *args)
+static int spi_open (smpr_t *self, uint64_t base, void *args)
 {
     assert (self);
 
@@ -142,7 +152,7 @@ err_proto_handler_alloc:
 }
 
 /* Release SPI protocol device */
-int spi_release (smpr_t *self)
+static int spi_release (smpr_t *self)
 {
     assert (self);
 
@@ -163,77 +173,75 @@ err_proto_handler_unset:
 }
 
 /* Read 16-bit data from SPI */
-ssize_t spi_read_16 (smpr_t *self, uint64_t offs, uint16_t *data, uint32_t flags)
+static ssize_t spi_read_16 (smpr_t *self, size_t size_offs, uint64_t offs,
+        uint16_t *data)
 {
-    (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 16-bit data to SPI device */
-ssize_t spi_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data, uint32_t flags)
+static ssize_t spi_write_16 (smpr_t *self, size_t size_offs, uint64_t offs,
+        const uint16_t *data)
 {
-    (void) offs;
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE);
 }
 
 /* Read 32-bit data from SPI */
-ssize_t spi_read_32 (smpr_t *self, uint64_t offs, uint32_t *data, uint32_t flags)
+static ssize_t spi_read_32 (smpr_t *self, size_t size_offs, uint64_t offs,
+        uint32_t *data)
 {
-    (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 32-bit data to SPI device */
-ssize_t spi_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data, uint32_t flags)
+static ssize_t spi_write_32 (smpr_t *self, size_t size_offs, uint64_t offs,
+        const uint32_t *data)
 {
-    (void) offs;
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE);
 }
 
 /* Read 64-bit data from SPI */
-ssize_t spi_read_64 (smpr_t *self, uint64_t offs, uint64_t *data, uint32_t flags)
+static ssize_t spi_read_64 (smpr_t *self, size_t size_offs, uint64_t offs,
+        uint64_t *data)
 {
-    (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE_READ, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write 64-bit data to SPI device */
-ssize_t spi_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data, uint32_t flags)
+static ssize_t spi_write_64 (smpr_t *self, size_t size_offs, uint64_t offs,
+        const uint64_t *data)
 {
-    (void) offs;
-    return _spi_read_write_generic (self, (uint8_t *) data, sizeof(*data),
-            SPI_MODE_WRITE, flags);
+    return _spi_read_write_generic (self, size_offs, offs, sizeof(*data), (uint8_t *) data,
+            SPI_MODE_WRITE);
 }
 
 /* Read data block from SPI device, size in bytes */
-ssize_t spi_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data,
-        uint32_t flags)
+static ssize_t spi_read_block (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, uint32_t *data)
 {
-    (void) offs;
     /* We want to request a read command from some off-FPGA chip. So, we
      * always use WRITE_READ mode */
-    return _spi_read_write_generic (self, (uint8_t *) data, size,
-            SPI_MODE_WRITE_READ, flags);
+    return _spi_read_write_generic (self, size_offs, offs, size, (uint8_t *) data,
+            SPI_MODE_WRITE_READ);
 }
 
 /* Write data block from SPI device, size in bytes */
-ssize_t spi_write_block (smpr_t *self, uint64_t offs, size_t size, const uint32_t *data,
-        uint32_t flags)
+static ssize_t spi_write_block (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, const uint32_t *data)
 {
-    (void) offs;
-    return _spi_read_write_generic (self, (uint8_t *) data, size,
-                SPI_MODE_WRITE, flags);
+    return _spi_read_write_generic (self, size_offs, offs, size, (uint8_t *) data,
+                SPI_MODE_WRITE);
 }
 
 /************ Static functions **********/
@@ -299,8 +307,8 @@ err_proto_handler:
 }
 
 /* Generic read/write to/from SPI */
-static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
-        size_t size, spi_mode_e mode, uint32_t flags)
+static ssize_t _spi_read_write_raw (smpr_t *self, size_t size, uint8_t *data,
+        spi_mode_e mode)
 {
     assert (self);
 
@@ -323,9 +331,11 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
             "[sm_pr:spi] _spi_rw_generic: Config register = 0x%08X\n", config);
 
-    /* Decode flags */
-    uint32_t ss = SMPR_PROTO_SPI_SS_FLAGS_R(flags);
-    uint32_t charlen = SMPR_PROTO_SPI_CHARLEN_FLAGS_R(flags);
+    /* Get specific parameters */
+    smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
+    uint32_t ss = smpr_spi_get_ss (smpr_spi);
+    uint32_t charlen = size*SMPR_BYTE_2_BIT; /* in bits */
+    uint32_t size_align = hutils_align_value(size, SMPR_WB_REG_2_BYTE);
 
     /* Configure SS line */
     rw_err = SET_PARAM(parent, sm_pr_spi, spi_proto->base, SPI_PROTO, SS, /* field = NULL */,
@@ -371,7 +381,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         uint32_t i;
         /* We write 32-bit at a time */
 
-        for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+        for (i = 0; i < size_align/SMPR_WB_REG_2_BYTE; ++i) {
             /* As the TXs are just a single register, we write using the SMIO
              * functions directly */
             DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
@@ -385,7 +395,7 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
         }
 
         /* Return error if we could not write everything */
-        ASSERT_TEST(err >= 0 && (size_t) err == size,
+        ASSERT_TEST(err >= 0 && (size_t) err == size_align,
                 "Could not write everything to TX registers", err_exit, -1);
     }
 
@@ -423,19 +433,19 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
     /* Read data from RX regsiters */
     uint32_t i;
     uint8_t data_read[SPI_PROTO_REG_RXTX_NUM * SMPR_WB_REG_2_BYTE] = {0};
-    /* If we are using Bidirectional SPI, the receved data is located on base address 
-     * SPI_PROTO_REG_RX0. Otherwise, the data is on a different register 
+    /* If we are using Bidirectional SPI, the receved data is located on base address
+     * SPI_PROTO_REG_RX0. Otherwise, the data is on a different register
      * SPI_PROTO_REG_RX0_SINGLE */
     uint32_t read_base_addr = (spi_proto->bidir) ? SPI_PROTO_REG_RX0 : SPI_PROTO_REG_RX0_SINGLE;
     /* We read 32-bit at a time */
-    for (i = 0; i < size/SMPR_WB_REG_2_BYTE; ++i) {
+    for (i = 0; i < size_align/SMPR_WB_REG_2_BYTE; ++i) {
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Reading from RX%u\n", i);
         /* As the RXs are just a single register, we write using the SMIO
          * functions directly */
-            num_bytes = smio_thsafe_client_read_32 (parent,
-                    (spi_proto->base | read_base_addr) + SMPR_WB_REG_2_BYTE*i,
-                    (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
+        num_bytes = smio_thsafe_client_read_32 (parent,
+                (spi_proto->base | read_base_addr) + SMPR_WB_REG_2_BYTE*i,
+                (uint32_t *)(data_read + SMPR_WB_REG_2_BYTE*i));
         DBE_DEBUG (DBG_SM_PR | DBG_LVL_TRACE,
                 "[sm_pr:spi] _spi_rw_generic: Read 0x%08X from RX%u\n",
                 *((uint32_t *) (data_read + SMPR_WB_REG_2_BYTE*i)), i);
@@ -446,6 +456,8 @@ static ssize_t _spi_read_write_generic (smpr_t *self, uint8_t *data,
 
     /* TODO: Reduce the ammount of memcpy () throughout this simple code*/
     memcpy (data, data_read, size);
+    /* Return just the effective number of bytes read/written */
+    err = size;
 
 err_exit:
 err_inv_size:
@@ -453,7 +465,57 @@ err_proto_handler:
     return err;
 }
 
-const smpr_proto_ops_t smpr_proto_ops_spi = {
+static ssize_t _spi_read_write_generic (smpr_t *self, size_t size_offs, uint64_t offs,
+        size_t size, uint8_t *data, spi_mode_e mode)
+{
+    assert (self);
+    size_t raw_size = size_offs + size;
+    uint8_t raw_data [raw_size];
+
+    smpr_spi_t *smpr_spi = (smpr_spi_t *) smpr_get_ops (self);
+    uint32_t addr_msb = smpr_spi_get_addr_msb (smpr_spi);
+
+    size_t trans_size = 0;
+    if (addr_msb) {
+        /* Copy address (MSB) + data */
+        if (data != NULL) {
+            memcpy (raw_data, data, size);
+            memcpy (raw_data + size, &offs, size_offs);
+            trans_size += size + size_offs;
+        }
+        /* Only copy address to buffer */
+        else {
+            memcpy (raw_data, &offs, size_offs);
+            trans_size += size_offs;
+        }
+    }
+    else {
+        /* Copy data (MSB) + address */
+        memcpy (raw_data, &offs, size_offs);
+        trans_size += size_offs;
+        if (data != NULL) {
+            memcpy (raw_data + size_offs, data, size);
+            trans_size += size;
+        }
+    }
+
+    ssize_t err = _spi_read_write_raw (self, trans_size, raw_data, mode);
+    ASSERT_TEST(err > 0 && (size_t) err == trans_size /* in bytes*/,
+            "Could not write data to SPI", err_exit, -1);
+
+    /* Copy the number of bytes request back to user */
+    memcpy (data, raw_data, size);
+
+    /* We return only the number of data bytes actually written, not addr+data */
+    err = size;
+
+err_exit:
+    return err;
+
+}
+
+static const smpr_proto_ops_t smpr_proto_ops_spi = {
+    .proto_name           = "SPI",              /* Protocol name */
     .proto_open           = spi_open,           /* Open device */
     .proto_release        = spi_release,        /* Release device */
     .proto_read_16        = spi_read_16,        /* Read 16-bit data */
@@ -471,3 +533,72 @@ const smpr_proto_ops_t smpr_proto_ops_spi = {
     .proto_write_dma      = NULL                /* Write arbitrary block size data via DMA,
                                                     parameter size in bytes */
 };
+
+/************ Our methods implementation **********/
+
+/* Creates a new instance of the proto_spi */
+smpr_spi_t *smpr_spi_new (uint32_t ss, uint32_t addr_msb)
+{
+    smpr_spi_t *self = (smpr_spi_t *) zmalloc (sizeof *self);
+    ASSERT_ALLOC (self, err_smpr_spi_alloc);
+
+    /* copy SPI operations */
+    self->proto_ops = smpr_proto_ops_spi;
+
+    self->ss = ss;
+    self->addr_msb = addr_msb;
+
+    return self;
+
+err_smpr_spi_alloc:
+    return NULL;
+}
+
+/* Destroy an instance of the spi */
+smpr_err_e smpr_spi_destroy (smpr_spi_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        smpr_spi_t *self = *self_p;
+
+        free (self);
+        self_p = NULL;
+    }
+
+    return SMPR_SUCCESS;
+}
+
+smpr_err_e smpr_spi_set_ss (smpr_spi_t *self, uint32_t ss)
+{
+    assert (self);
+    self->ss = ss;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_spi_get_ss (smpr_spi_t *self)
+{
+    assert (self);
+    return self->ss;
+}
+
+smpr_err_e smpr_spi_set_addr_msb (smpr_spi_t *self, uint32_t addr_msb)
+{
+    assert (self);
+    self->addr_msb = addr_msb;
+
+    return SMPR_SUCCESS;
+}
+
+uint32_t smpr_spi_get_addr_msb (smpr_spi_t *self)
+{
+    assert (self);
+    return self->addr_msb;
+}
+
+const smpr_proto_ops_t *smpr_spi_get_ops (smpr_spi_t *self)
+{
+    assert (self);
+    return &self->proto_ops;
+}

@@ -57,8 +57,11 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
                 inst_id);
         /* FPGA I2C Switch */
 #if 0
+        self->smpr_i2c_pca9547 = smpr_i2c_new (0, fmc250m_4ch_pca9547_addr[inst_id]);
+        ASSERT_ALLOC(self->smpr_i2c_pca9547, err_smpr_i2c_pca9547_alloc);
+
         self->smch_pca9547 = smch_pca9547_new (parent, FMC_250M_EEPROM_I2C_OFFS,
-                fmc250m_4ch_pca9547_addr[inst_id], 0);
+                smpr_i2c_get_ops (self->smpr_i2c_pca9547), 0);
         ASSERT_ALLOC(self->smch_pca9547, err_smch_pca9547_alloc);
 
         /* Enable default I2C channel */
@@ -66,6 +69,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     }
     else {
 #endif
+        self->smpr_i2c_pca9547 = NULL;
         self->smch_pca9547 = NULL;
     }
 
@@ -75,9 +79,15 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
             "[sm_io:fmc250m_4ch_core] pre new EEPROM 24AA64 data: 0x%08X\n", 0);
 #if 0
+
+    /* Create I2C protocol for 24aa64 chip */
+    self->smpr_i2c_24aa64 = smpr_i2c_new (0, fmc250m_4ch_24aa64_addr[inst_id]);
+    ASSERT_ALLOC(self->smpr_i2c_24aa64, err_smpr_i2c_24aa64_alloc);
+
     /* EEPROM  is on the same I2C bus as the LM75A */
-    self->smch_24aa64 = smch_24aa64_new (parent, FMC_250M_EEPROM_I2C_OFFS,
-            fmc250m_4ch_24aa64_addr[inst_id], 0);
+    self->smch_24aa64 = smch_24aa64_new (parent, FMC_250M_LM75A_I2C_OFFS,
+            smpr_i2c_get_ops (self->smpr_i2c_24aa64), 0);
+    ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO,
             "[sm_io:fmc250m_4ch_core] post new 24AA64 data: 0x%08X\n", 0);
     ASSERT_ALLOC(self->smch_24aa64, err_smch_24aa64_alloc);
@@ -120,17 +130,21 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
     /* FIXME: We need to be sure that, if the board is ACTIVE, the FMC_ACTIVE_CLK
-     * component has been sucseddfully initialized so that the ADCs has clock. 
-     * Otherwise, we won't be able to RESET the ADCs, leading to undefined 
+     * component has been sucseddfully initialized so that the ADCs has clock.
+     * Otherwise, we won't be able to RESET the ADCs, leading to undefined
      * behavior */
     sleep (5);
 
     /* Setup ISLA216P ADC SPI communication */
     uint32_t i;
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        /* Create SPI protocol for ISLA216P chips */
+        self->smpr_spi_isla216p_adc[i] = smpr_spi_new (fmc250m_4ch_isla216p_addr[inst_id][i], 1 /* addr_msb */);
+        ASSERT_ALLOC(self->smpr_spi_isla216p_adc[i], err_smpr_spi_isla216p_adc_alloc);
+
         self->smch_isla216p_adc[i] = NULL;
         self->smch_isla216p_adc[i] = smch_isla216p_new (parent, FMC_250M_ISLA216P_SPI_OFFS,
-            fmc250m_4ch_isla216p_addr[inst_id][i], 0);
+            smpr_spi_get_ops (self->smpr_spi_isla216p_adc[i]), 0);
         ASSERT_ALLOC(self->smch_isla216p_adc[i], err_smch_isla216p_adc);
 
         uint8_t chipid = 0;
@@ -146,19 +160,31 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
 
     return self;
 
-#if 0
-err_smch_24aa64_alloc:
-    if (self->smch_pca9547 != NULL) {
-        smch_pca9547_destroy (&self->smch_pca9547);
-    }
-#endif
-#if 0
-err_smch_pca9547_alloc:
-#endif
 err_smch_isla216p_adc:
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         smch_isla216p_destroy (&self->smch_isla216p_adc[i]);
     }
+err_smpr_spi_isla216p_adc_alloc:
+    for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        smpr_spi_destroy (&self->smpr_spi_isla216p_adc[i]);
+    }
+#if 0
+#ifdef __FMC250M_4CH_EEPROM_PROGRAM__
+err_smch_ad9510_alloc:
+    smch_24aa64_destroy (&self->smch_24aa64);
+#endif
+err_smch_24aa64_alloc:
+    smpr_i2c_destroy (&self->smpr_i2c_24aa64);
+err_smpr_i2c_24aa64_alloc:
+    if (self->smch_pca9547 != NULL) {
+        smch_pca9547_destroy (&self->smch_pca9547);
+    }
+err_smch_pca9547_alloc:
+    if (self->smpr_i2c_pca9547 != NULL) {
+        smpr_i2c_destroy (&self->smpr_i2c_pca9547);
+    }
+err_smpr_i2c_pca9547_alloc:
+#endif
 err_num_fmc250m_4ch_smios:
     free (self);
 err_self_alloc:
@@ -173,16 +199,23 @@ smio_err_e smio_fmc250m_4ch_destroy (smio_fmc250m_4ch_t **self_p)
     if (*self_p) {
         smio_fmc250m_4ch_t *self = *self_p;
 
-        smch_24aa64_destroy (&self->smch_24aa64);
-
-        if (self->smch_pca9547 != NULL) {
-            smch_pca9547_destroy (&self->smch_pca9547);
-        }
-
         /* Destroy all ISLA216P instances */
         uint32_t i;
         for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
             smch_isla216p_destroy (&self->smch_isla216p_adc[i]);
+        }
+        for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+            smpr_spi_destroy (&self->smpr_spi_isla216p_adc[i]);
+        }
+
+        smch_24aa64_destroy (&self->smch_24aa64);
+        smpr_i2c_destroy (&self->smpr_i2c_24aa64);
+
+        if (self->smch_pca9547 != NULL) {
+            smch_pca9547_destroy (&self->smch_pca9547);
+        }
+        if (self->smpr_i2c_pca9547 != NULL) {
+            smpr_i2c_destroy (&self->smpr_i2c_pca9547);
         }
 
         free (self);

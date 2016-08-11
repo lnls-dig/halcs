@@ -15,8 +15,8 @@ extern "C" {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH 24AA64 */
-smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose);
+smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base,
+        const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH 24AA64 */
 smch_err_e smch_24aa64_destroy (smch_24aa64_t **self_p);
 
@@ -29,9 +29,6 @@ smch_err_e smch_24aa64_write_block (smch_24aa64_t *self, uint16_t addr, const ui
         size_t size);
 smch_err_e smch_24aa64_read_block (smch_24aa64_t *self, uint16_t addr, uint32_t *data,
         size_t size);
-
-/* Probe bus for I2C devices */
-ssize_t smch_24aa64_probe_bus (smch_24aa64_t *self);
 
 #ifdef __cplusplus
 }

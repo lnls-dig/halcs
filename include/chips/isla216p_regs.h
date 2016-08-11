@@ -44,13 +44,13 @@
 
 /* ISLA216P Transfer type field */
 #define ISLA216P_HDR_RW_SIZE                        1
-#define ISLA216P_HDR_RW_SHIFT                       23
+#define ISLA216P_HDR_RW_SHIFT                       15
 #define ISLA216P_HDR_RW                             WBGEN2_GEN_MASK(ISLA216P_HDR_RW_SHIFT, \
                                                                ISLA216P_HDR_RW_SIZE)
 
 /* ISLA216P Byte transfer field */
 #define ISLA216P_HDR_BT_SIZE                        2
-#define ISLA216P_HDR_BT_SHIFT                       21
+#define ISLA216P_HDR_BT_SHIFT                       13
 #define ISLA216P_HDR_BT_MASK                        WBGEN2_GEN_MASK(ISLA216P_HDR_BT_SHIFT, \
                                                               ISLA216P_HDR_BT_SIZE)
 #define ISLA216P_HDR_BT_W(value)                    WBGEN2_GEN_WRITE(value, ISLA216P_HDR_BT_SHIFT, \
@@ -60,7 +60,7 @@
 
 /* ISLA216P Address field */
 #define ISLA216P_HDR_ADDR_SIZE                      13
-#define ISLA216P_HDR_ADDR_SHIFT                     8
+#define ISLA216P_HDR_ADDR_SHIFT                     0
 #define ISLA216P_HDR_ADDR_MASK                      WBGEN2_GEN_MASK(ISLA216P_HDR_ADDR_SHIFT, \
                                                                       ISLA216P_HDR_ADDR_SIZE)
 #define ISLA216P_HDR_ADDR_W(value)                  WBGEN2_GEN_WRITE(value, ISLA216P_HDR_ADDR_SHIFT, \
@@ -275,8 +275,8 @@
                                                                      ISLA216P_NAPSLP_SIZE)
 #define ISLA216P_NAPSLP_PIN_CONTROL                0
 #define ISLA216P_NAPSLP_NORMAL_OPERATION           (1<<0)
-#define ISLA216P_NAPSLP_NAP_MODE                   (1<<1) 
-#define ISLA216P_NAPSLP_SLEEP_MODE                 (1<<2) 
+#define ISLA216P_NAPSLP_NAP_MODE                   (1<<1)
+#define ISLA216P_NAPSLP_SLEEP_MODE                 (1<<2)
 
 #endif
 

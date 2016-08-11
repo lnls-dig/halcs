@@ -87,6 +87,13 @@ char *hutils_concat_strings_no_sep (const char *str1, const char* str2);
 char *hutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);
 
+/* Calculates necessary padding so that a given value is a multiple of a given
+ * alignment */
+uint32_t hutils_calculate_padding(uint32_t value, uint32_t alignment);
+
+/* Aligns a given value to a given alignment */
+uint32_t hutils_align_value(uint32_t value, uint32_t alignment);
+
 /* Spawns (fork and exec) a new process. Returns, for the parent process, -1
  * in case of error and child's PID (> 0) if success. For the child process,
  * returns -1 in case of error and 0 in case of success */

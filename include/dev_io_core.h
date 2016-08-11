@@ -56,7 +56,7 @@ typedef struct {
 
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
-        llio_type_e type, char *endpoint_broker, int verbose,
+        const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
         const char *log_file_name);
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);

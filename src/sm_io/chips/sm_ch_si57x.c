@@ -37,14 +37,13 @@
             smch_err_str (err_type))
 
 #define SMCH_SI57X_WAIT_TRIES               10
-#define SMCH_SI57X_NAME                     "I2C_SI57X"
+#define SMCH_SI57X_NAME                     "SI57X"
 #define SMCH_SI57X_USECS_WAIT               10000
 #define SMCH_SI57X_WAIT(usecs)              usleep(usecs)
 #define SMCH_SI57X_WAIT_DFLT                SMCH_SI57X_WAIT(SMCH_SI57X_USECS_WAIT)
 
 struct _smch_si57x_t {
-    smpr_t *i2c;                    /* I2C protocol object */
-    uint32_t addr;                  /* I2C address for this SI57X chip */
+    smpr_t *proto;                  /* PROTO protocol object */
     double fxtal;                   /* Internal crystal frequency */
     unsigned int n1;                /* N1 divider value */
     unsigned int hs_div;            /* High Speed divider value */
@@ -76,8 +75,8 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
 static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
 
 /* Creates a new instance of the SMCH SI57X */
-smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose)
+smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -85,14 +84,12 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_si57x_t *self = (smch_si57x_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_SI57X_NAME, parent, SMPR_I2C, verbose);
-    ASSERT_ALLOC(self->i2c, err_i2c_alloc);
+    self->proto = smpr_new (SMCH_SI57X_NAME, parent, reg_ops, verbose);
+    ASSERT_ALLOC(self->proto, err_proto_alloc);
 
-    /* Initalize the I2C protocol */
-    int smpr_err = smpr_open (self->i2c, base, NULL /* Default parameters are fine */);
+    /* Initalize the PROTO protocol */
+    int smpr_err = smpr_open (self->proto, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-
-    self->addr = addr;
 
     /* Initialize Si57X parameters */
     self->fxtal     = SMCH_SI57X_DFLT_FXTAL;
@@ -105,8 +102,8 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base, uint32_t addr,
     return self;
 
 err_smpr_init:
-    smpr_destroy (&self->i2c);
-err_i2c_alloc:
+    smpr_destroy (&self->proto);
+err_proto_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -120,8 +117,8 @@ smch_err_e smch_si57x_destroy (smch_si57x_t **self_p)
     if (*self_p) {
         smch_si57x_t *self = *self_p;
 
-        smpr_release (self->i2c);
-        smpr_destroy (&self->i2c);
+        smpr_release (self->proto);
+        smpr_destroy (&self->proto);
         free (self);
         *self_p = NULL;
     }
@@ -247,10 +244,6 @@ static ssize_t _smch_si57x_write_generic (smch_si57x_t *self, uint8_t addr,
     ASSERT_TEST(size < SI57X_DATA_BYTES_MAX /* in bytes */,
             "Transaction size too big. Maximum of 32 bytes.", err_smpr_write, -1);
 
-    uint32_t trans_size = SI57X_ADDR_TRANS_SIZE + size*SI57X_DATA_TRANS_SIZE;
-    uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
-
     /* SI57X write byte transaction is:
      *
      *
@@ -263,20 +256,10 @@ static ssize_t _smch_si57x_write_generic (smch_si57x_t *self, uint8_t addr,
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_write_8] addr = 0x%02X\n",
             addr);
 
-    /* FIXME? Reduce memcpy calls? We just need this because the address must
-     * come in the LSBs of data */
-    uint8_t __data[SI57X_TRANS_SIZE_MAX/SMPR_BYTE_2_BIT];
-    memcpy ((uint8_t *) &__data, &addr, SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT);
-    memcpy ((uint8_t *) &__data + SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT, data,
-            size);
-
-    ssize_t smpr_err = smpr_write_block (self->i2c, 0, ARRAY_SIZE(__data),
-            (uint32_t *) &__data, flags);
-    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes*/,
-            "Could not write data to I2C", err_exit, -1);
-
-    /* Return just the number of data bytes written */
-    err = smpr_err - SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT;
+    err = smpr_write_block (self->proto, SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT,
+            addr, size, (uint32_t *) data);
+    ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes*/,
+            "Could not write data to PROTO", err_exit, -1);
 
 err_exit:
 err_smpr_write:
@@ -304,11 +287,6 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
     assert (data);
 
     ssize_t err = -1;
-    uint32_t trans_size = SI57X_ADDR_TRANS_SIZE;
-    /* Si571 needs a repeated start between the write and read commands */
-    uint32_t flags = SMPR_PROTO_I2C_REP_START  |
-        SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
 
     /* SI57X read byte transaction is:
      *
@@ -320,23 +298,13 @@ static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr, uint8
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_read_8] addr = 0x%02X\n",
             addr);
 
-    ssize_t smpr_err = smpr_write_32 (self->i2c, 0, (uint32_t *) &addr, flags);
+    uint64_t __addr = addr;
+
+    err = smpr_read_block (self->proto, SI57X_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT,
+            __addr, size, (uint32_t *) data);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
-            "Could not write data to I2C", err_exit, -1);
-
-    /* Now, read the data */
-    trans_size = size*SI57X_DATA_TRANS_SIZE;
-    flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
-
-    smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data,
-        flags);
-    /* Check if we have written everything */
-    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
-            "Could not read data from I2C", err_exit, -1);
-
-    err = smpr_err;
+    ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes */,
+            "Could not read data from PROTO", err_exit, -1);
 
 err_exit:
     return err;
@@ -452,34 +420,6 @@ static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
             "frequency completed\n");
 
 err_exit:
-    return err;
-}
-
-/* FIXME: reuse 24AA64 probe function */
-ssize_t smch_si57x_probe_bus (smch_si57x_t *self)
-{
-    assert (self);
-    ssize_t err = 0;
-
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_probe_bus] Probing bus ...\n");
-
-    uint32_t i;
-
-    for (i = 0; i < 128; ++i) {
-        uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(8) /* in bits */ |
-            SMPR_PROTO_I2C_ADDR_FLAGS_W(i);
-        uint32_t __data = 0;
-
-        ssize_t smpr_err = smpr_read_32 (self->i2c, 0, &__data, flags);
-
-        if (smpr_err >= 0) {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:si57x_probe_bus] "
-                    "Found device at address 0x%02X\n", i);
-        }
-
-        SMCH_SI57X_WAIT_DFLT;
-    }
-
     return err;
 }
 

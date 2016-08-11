@@ -15,7 +15,7 @@ extern "C" {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMCH RFFE */
-smch_rffe_t * smch_rffe_new (smio_t *parent, int verbose);
+smch_rffe_t * smch_rffe_new (smio_t *parent, const smpr_proto_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the SMCH RFFE */
 smch_err_e smch_rffe_destroy (smch_rffe_t **self_p);
 

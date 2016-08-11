@@ -114,7 +114,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         return -ACQ_NUM_CHAN_OOR;
     }
 
-    /* number of samples required is out of the maximum limit. Maixmum number of samples 
+    /* number of samples required is out of the maximum limit. Maixmum number of samples
      * in multishot mode is simply the maximum number of samples of the DPRAM. The DPRAM
      * size is calculated to fit the largest sample in the design, so we are safe. */
     uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE;
@@ -159,15 +159,19 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             "Number of shots = %u\n", acq_core_shots);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
+    uint32_t trigger = 0;
+    _acq_get_trigger_type (self, &trigger);
+
     /* FIXME FPGA Firmware requires number of samples to be divisible by
      * acquisition channel sample size */
     uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
-    uint32_t num_samples_pre_aligned = num_samples_pre + samples_alignment -
-        (num_samples_pre % samples_alignment);
-    uint32_t num_samples_post_aligned = (num_samples_post==0) ? 0 :
-        num_samples_post + samples_alignment -
-        (num_samples_post % samples_alignment);
+    uint32_t num_samples_pre_aligned = hutils_align_value(num_samples_pre,
+            samples_alignment);
+    /* FIXME. Curently, the FPGA gateware does not support triggered acquisitions with
+     * post_samples = 0. See github lnls-bpm/bpm-gw#62 */
+    uint32_t num_samples_post_aligned = (num_samples_post == 0 && trigger != TYPE_ACQ_CORE_SKIP) ? 
+            samples_alignment : hutils_align_value(num_samples_post, samples_alignment);
 
     /* Set the parameters: number of samples of this channel */
     acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
@@ -401,8 +405,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * sample_size
      * */
 
-    /* First step if to get the trigger address from the channel. 
-     * Even on skip trigger mode, this will contain the address after 
+    /* First step if to get the trigger address from the channel.
+     * Even on skip trigger mode, this will contain the address after
      * the last valid sample (end of acquisition address) */
     uint32_t acq_core_trig_addr = acq->acq_params[chan].trig_addr;
 
