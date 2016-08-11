@@ -5,8 +5,8 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "sm_io_exports_helper.h"
 #include "sm_io_codes.h"
+#include "sm_io_exports_helper.h"
 
 /* Description SMIO FMC_ACTIVE_CLK functions */
 

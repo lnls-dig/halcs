@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "pcie_regs.h"
+#include "hw/pcie_regs.h"
 
 /* FMC_ACTIVE_CLK Component */
 #define FMC_ACTIVE_CLK_CTRL_RAW_REGS_OFFS           0x0000

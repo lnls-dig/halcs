@@ -32,6 +32,12 @@
 #define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
 #endif
 
+#ifdef __BOARD_ML605__
+#   define __WR_SHIFT_FIX__ 2
+#else
+#   define __WR_SHIFT_FIX__ 0
+#endif
+
 
 /* definitions for register: Control register */
 

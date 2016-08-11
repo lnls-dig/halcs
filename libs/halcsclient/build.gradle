@@ -1,0 +1,33 @@
+plugins {
+    id 'org.ajoberstar.grgit' version '1.5.1'
+    id 'org.ajoberstar.release-opinion' version '1.5.1'
+}
+
+apply plugin: com.janitovff.grgit.config.GitConfigPlugin
+
+model {
+    components {
+        halcsclient(NativeLibrarySpec) {
+            sources {
+                c {
+                    exportedHeaders.srcDir 'include'
+
+                    lib project: ':common', library: 'common'
+                    lib project: ':libs:convc', library: 'convc'
+                    lib project: ':libs:disptable', library: 'disptable'
+                    lib project: ':libs:errhand', library: 'errhand'
+                    lib project: ':libs:hutils', library: 'hutils'
+                    lib project: ':sm_io', library: 'sm_io', linkage: 'api'
+                }
+            }
+
+            binaries.all {
+                cCompiler.define "GIT_REVISION=\"$project.version\""
+                cCompiler.define "GIT_USER_NAME=\"$gitConfig.user.name\""
+                cCompiler.define "GIT_USER_EMAIL=\"$gitConfig.user.email\""
+
+                linker.args '-lmlm'
+            }
+        }
+    }
+}

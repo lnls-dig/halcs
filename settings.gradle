@@ -2,9 +2,13 @@ include 'foreign:pcie-driver'
 include 'foreign:libbsmp'
 include 'foreign:libsdbfs'
 
+include 'libs:halcsclient'
 include 'libs:convc'
 include 'libs:disptable'
 include 'libs:errhand'
 include 'libs:hutils'
 include 'libs:llio'
 include 'libs:sdbutils'
+
+include 'common'
+include 'sm_io'

@@ -1,0 +1,15 @@
+model {
+    components {
+        common(NativeLibrarySpec) {
+            sources {
+                c {
+                    exportedHeaders.srcDir 'include'
+
+                    lib project: ':libs:llio', library: 'llio'
+                    lib project: ':libs:sdbutils', library: 'sdbutils'
+                    lib project: ':sm_io', library: 'sm_io'
+                }
+            }
+        }
+    }
+}
