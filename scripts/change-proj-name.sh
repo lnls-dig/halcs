@@ -1,9 +1,50 @@
 #!/usr/bin/env bash
 
+set -u
+set -e
+set -a
+set -x
+
+TOP=$(pwd)
+
 function usage() {
     echo "Usage: $0 [-o <Current project name> -n <New project name> -i <Current main app> -t <New main app>]"
 }
 
+function change_filenames () {
+    C_NAME=$1
+    set +u
+    C_DIR=${TOP}/$3
+    set -u
+
+    cd ${C_DIR}
+    N_NAME=$2
+    find . -type f \
+        -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*" -print0 | \
+        xargs -0 --no-run-if-empty rename "s/${C_NAME}/${N_NAME}/g"
+    cd ${TOP}
+}
+
+function change_file_insides () {
+    C_NAME=$1
+    N_NAME=$2
+    C_DIR=${TOP}/$3
+
+    cd ${C_DIR}
+    grep -lR "${C_NAME}" \
+        --exclude-dir=".git" \
+        --exclude-dir="foreign" \
+        --exclude="*.orig" \
+        --exclude="*.o" \
+        --exclude="*.cmd" \
+        --exclude="*.swp" | \
+        xargs --no-run-if-empty sed -i -e "s/${C_NAME}/${N_NAME}/g"
+    cd ${TOP}
+}
+
+LIBS_DIR=src/libs
+LIBS_CURRENT_NAME=bpm
+LIBS_NEW_NAME=
 CURRENT_MAIN_APP=
 NEW_MAIN_APP=
 CURRENT_NAME=
@@ -62,33 +103,26 @@ if [ -z "$NEW_MAIN_APP" ]; then
     exit 1
 fi
 
-# Rename filenames
-find . -type f \
-    -name "*${CURRENT_NAME}*" -not -path "*.git/*" -not -path "*foreign/*" -print0 | \
-    xargs -0 rename "s/${CURRENT_NAME}/${NEW_NAME}/g"
+# Rename project filenames
+change_filenames "${CURRENT_NAME}" "${NEW_NAME}"
 
-# Change file insides
-grep -lR "${CURRENT_NAME}" \
-    --exclude-dir=".git" \
-    --exclude-dir="foreign" \
-    --exclude="*.orig" \
-    --exclude="*.o" \
-    --exclude="*.cmd" \
-    --exclude="*.swp" | \
-    xargs sed -i -e "s/${CURRENT_NAME}/${NEW_NAME}/g"
+## Change project file insides
+change_file_insides "${CURRENT_NAME}" "${NEW_NAME}" ""
 
-# Change main EBPM application
-find . -type f \
-    -name "*${MAIN_APP}*" -not -path "*.git/*" -not -path "*foreign/*" -print0 | \
-    xargs -0 rename "s/${MAIN_APP}/${NEW_MAIN_APP}/g"
+# Change LIBS filenames
+change_filenames "${LIBS_CURRENT_NAME}_" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
+change_filenames "${LIBS_CURRENT_NAME}" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
 
-# Change file insides
-grep -lR "${CURRENT_MAIN_APP}" \
-    --exclude-dir=".git" \
-    --exclude-dir="foreign" \
-    --exclude="*.orig" \
-    --exclude="*.o" \
-    --exclude="*.cmd" \
-    --exclude="*.swp" | \
-    xargs sed -i -e "s/${CURRENT_MAIN_APP}/${NEW_MAIN_APP}/g"
+#Change LIBS file insides
+change_file_insides "${LIBS_CURRENT_NAME}_" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
+change_file_insides "${LIBS_CURRENT_NAME}" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
+
+# Change whole lib name to another. FIXME
+#mv ${LIBS_DIR}/libbpmclient ${LIBS_DIR}/libclient
+
+# Rename project filenames
+change_filenames "${CURRENT_MAIN_APP}" "${NEW_MAIN_APP}"
+
+## Change project file insides
+change_file_insides "${CURRENT_MAIN_APP}" "${NEW_MAIN_APP}" ""
 
