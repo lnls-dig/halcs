@@ -3,7 +3,6 @@
 set -u
 set -e
 set -a
-set -x
 
 TOP=$(pwd)
 
@@ -19,9 +18,15 @@ function change_filenames () {
 
     cd ${C_DIR}
     N_NAME=$2
-    find . -type f \
-        -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*" -print0 | \
-        xargs -0 --no-run-if-empty rename "s/${C_NAME}/${N_NAME}/g"
+    FILES=$(find . -type f \
+        -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*")
+    for file in ${FILES};
+    do
+        new_file=$(echo ${file} | sed -e "s/${C_NAME}/${N_NAME}/g")
+        new_dir=${new_file%/*}
+        mkdir -p ${new_dir}
+        mv ${file} ${new_file}
+    done
     cd ${TOP}
 }
 
@@ -116,9 +121,6 @@ change_filenames "${LIBS_CURRENT_NAME}" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
 #Change LIBS file insides
 change_file_insides "${LIBS_CURRENT_NAME}_" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
 change_file_insides "${LIBS_CURRENT_NAME}" "${LIBS_NEW_NAME}" "${LIBS_DIR}"
-
-# Change whole lib name to another. FIXME
-#mv ${LIBS_DIR}/libbpmclient ${LIBS_DIR}/libclient
 
 # Rename project filenames
 change_filenames "${CURRENT_MAIN_APP}" "${NEW_MAIN_APP}"
