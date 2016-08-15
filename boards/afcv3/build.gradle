@@ -1,0 +1,25 @@
+model {
+    components {
+        afcv3(NativeLibrarySpec) {
+            sources {
+                c {
+                    lib project: ':common', library: 'common'
+                    lib project: ':foreign:libbsmp', library: 'bsmp'
+                    lib project: ':foreign:libsdbfs', library: 'sdbfs'
+                    lib project: ':libs:halcsclient', library: 'halcsclient'
+                    lib project: ':libs:convc', library: 'convc'
+                    lib project: ':libs:disptable', library: 'disptable'
+                    lib project: ':libs:errhand', library: 'errhand'
+                    lib project: ':libs:hutils', library: 'hutils'
+                    lib project: ':libs:llio', library: 'llio'
+                    lib project: ':libs:sdbutils', library: 'sdbutils'
+                    lib project: ':sm_io', library: 'sm_io'
+                }
+            }
+
+            binaries.all {
+                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
+            }
+        }
+    }
+}

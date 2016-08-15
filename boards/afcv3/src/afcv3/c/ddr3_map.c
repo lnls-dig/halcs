@@ -11,6 +11,8 @@
 #include "ddr3_map.h"
 #include "ddr3_map_structs.h"
 
+#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
+
 const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
     /*** Acquisition Core 0 Channel Parameters ***/
     {
@@ -257,3 +259,5 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         },
     }
 };
+
+#endif

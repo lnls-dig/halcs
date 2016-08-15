@@ -7,6 +7,8 @@
 
 #include "halcs_server.h"
 
+#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
+
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
 #undef ASSERT_TEST
@@ -145,3 +147,5 @@ const board_epics_opts_t board_epics_opts[NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLO
     /* 12, 1          */  {.telnet_port = 20000 + 24,
                            .telnet_afe_port = 20100 + 24}},
 };
+
+#endif

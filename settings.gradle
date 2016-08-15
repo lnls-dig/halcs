@@ -1,3 +1,4 @@
+include 'boards:afcv3'
 include 'boards:common'
 include 'boards:ml605'
 

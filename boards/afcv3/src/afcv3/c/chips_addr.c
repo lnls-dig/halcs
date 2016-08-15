@@ -7,6 +7,8 @@
 
 #include "halcs_server.h"
 
+#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
+
 /* FMC130M_4CH chip addresses */
 const uint32_t fmc130m_4ch_si571_addr[NUM_FMC130M_4CH_SMIOS] = {0x49, 0x49};
 const uint32_t fmc130m_4ch_ad9510_addr[NUM_FMC130M_4CH_SMIOS] = {0x01, 0x01};
@@ -38,3 +40,4 @@ const uint32_t fmc250m_4ch_isla216p_addr[NUM_FMC250M_4CH_SMIOS][NUM_FMC250M_4CH_
 /* This CI PCA9547 is located on the carrier, but it's controlled by the FMC250M_4CH */
 const uint32_t fmc250m_4ch_pca9547_addr[NUM_FMC250M_4CH_SMIOS] = {0x70, 0x70};
 
+#endif
