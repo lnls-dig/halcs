@@ -16,6 +16,10 @@ model {
 
                     exportedHeaders.srcDir 'include'
 
+                    lib project: ':boards:common', library: 'common'
+                    lib project: ':boards:afcv3', library: 'afcv3'
+                    lib project: ':boards:afcv3_1', library: 'afcv3_1'
+                    lib project: ':boards:ml605', library: 'ml605'
                     lib project: ':common', library: 'common', linkage: 'api'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
