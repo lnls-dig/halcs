@@ -680,7 +680,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_pol) {
 }
 
 #define ACQ_HW_DATA_TRIG_SEL_MIN                    0
-#define ACQ_HW_DATA_TRIG_SEL_MAX                    3
+#define ACQ_HW_DATA_TRIG_SEL_MAX                    ((1 << 5)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_sel) {
     SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_CFG,
             INT_TRIG_SEL, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_SEL_MIN,
