@@ -16,10 +16,10 @@ ${CURDIR}/change-proj-name.sh -o bpm_client -n halcs_client -i change-bpm-name.s
 
 ${CURDIR}/change-proj-name.sh -o BPM-SW -n HALCS -i change-bpm-name.sh
 ${CURDIR}/change-proj-name.sh -o bpm-sw -n halcs -i change-bpm-name.sh
-${CURDIR}/change-proj-name.sh -o BPM_SW -n HALCS -i change-bpm-name.sh
-${CURDIR}/change-proj-name.sh -o bpm_sw -n halcs -i change-bpm-name.sh
+${CURDIR}/change-proj-name.sh -o "BPM_SW" -n 'HALCS' -i change-bpm-name.sh
+${CURDIR}/change-proj-name.sh -o "bpm_sw" -n 'halcs' -i change-bpm-name.sh
 ${CURDIR}/change-proj-name.sh -o EBPM -n HALCSD -i change-bpm-name.sh
 ${CURDIR}/change-proj-name.sh -o ebpm -n halcsd -i change-bpm-name.sh
 
-${CURDIR}/change-proj-name.sh -o BPM_ -n HALCS_ -i change-bpm-name.sh
-${CURDIR}/change-proj-name.sh -o bpm_ -n halcs_ -i change-bpm-name.sh
+${CURDIR}/change-proj-name.sh -o "BPM" -n 'HALCS' -i change-bpm-name.sh
+${CURDIR}/change-proj-name.sh -o "bpm" -n 'halcs' -i change-bpm-name.sh

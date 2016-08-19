@@ -23,17 +23,17 @@ function change_filenames () {
         -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*" -not -path "${IGNORE}")
     for file in ${FILES};
     do
-        new_file=$(echo ${file} | sed -e "s/${C_NAME}/${N_NAME}/g")
+        new_file=$(echo ${file} | sed -e "/bpm_swap/ b skip;/BPM_SWAP/ b skip; s/${C_NAME}/${N_NAME}/g;:skip")
         new_dir=${new_file%/*}
         mkdir -p ${new_dir}
-        mv ${file} ${new_file}
+        mv ${file} ${new_file} 2>/dev/null || true
     done
 
     DIRS=$(find . -type d \
         -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*" -not -path "${IGNORE}")
     for dir in ${DIRS};
     do
-        new_dir=$(echo ${dir} | sed -e "s/${C_NAME}/${N_NAME}/g")
+        new_dir=$(echo ${dir} | sed -e "/bpm_swap/ b skip;/BPM_SWAP/ b skip; s/${C_NAME}/${N_NAME}/g;:skip")
         mkdir -p ${new_dir}
         mv ${dir}/* ${new_dir} 2>/dev/null || true
     done
@@ -55,7 +55,7 @@ function change_file_insides () {
         --exclude="*.cmd" \
         --exclude="*.swp" \
         --exclude="${IGNORE}" | \
-        xargs --no-run-if-empty sed -i -e "s/${C_NAME}/${N_NAME}/g"
+        xargs --no-run-if-empty sed -i -e "/bpm_swap/ b skip;/BPM_SWAP/ b skip; s/${C_NAME}/${N_NAME}/g;:skip"
     cd ${TOP}
 }
 
