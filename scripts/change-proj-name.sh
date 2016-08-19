@@ -27,6 +27,15 @@ function change_filenames () {
         mkdir -p ${new_dir}
         mv ${file} ${new_file}
     done
+
+    DIRS=$(find . -type d \
+        -name "*${C_NAME}*" -not -path "*.git/*" -not -path "*foreign/*")
+    for dir in ${DIRS};
+    do
+        new_dir=$(echo ${dir} | sed -e "s/${C_NAME}/${N_NAME}/g")
+        mkdir -p ${new_dir}
+        mv ${dir} ${new_dir}
+    done
     cd ${TOP}
 }
 
