@@ -1,11 +1,14 @@
-# Beam Position Monitor Software
+# Hardware Abstraction Layer for Control Systems
+
+To keep things tidy, old issues will be kept on
+the old repository: https://github.com/lnls-dig/bpm-sw/issues
 
 [![Build Status](https://travis-ci.org/lnls-dig/halcs.svg)](https://travis-ci.org/lnls-dig/halcs)
 ![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
 [![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
 [![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/halcs.svg?style=flat)](COPYING)
 
-Software for controlling the AFC HALCS boards
+Software for creating controlling daemons for devices
 
 ## Prerequisites:
 
