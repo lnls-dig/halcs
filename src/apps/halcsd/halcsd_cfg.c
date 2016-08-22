@@ -166,6 +166,7 @@ int main (int argc, char *argv[])
         goto err_exit;
     }
 
+    const llio_ops_t *llio_ops = NULL;
     uint32_t dev_id = 0;
     /* Check for device ID */
     if (dev_id_str == NULL) {
@@ -187,6 +188,8 @@ int main (int argc, char *argv[])
                             "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
+
+                llio_ops = &llio_ops_pcie;
                 break;
 
             default:
@@ -214,7 +217,7 @@ int main (int argc, char *argv[])
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:DEVIO_CFG", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
+    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
             broker_endp, verbose, log_filename);
 
     if (devio == NULL) {
