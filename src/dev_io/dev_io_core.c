@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_mod_dispatch.h"
 
@@ -172,7 +172,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
             endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
 
     /* Print Software info */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] BPM Device I/O version %s,"
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] HALCS Device I/O version %s,"
             " Build by: %s, %s\n",
             revision_get_build_version (),
             revision_get_build_user_name (),
@@ -436,7 +436,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         zsock_destroy (&self->pipe_frontend);
 
         /* Do not destroy PIPE as CZMQ actor thread will do it.
-         * See github issue #116 (https://github.com/lnls-dig/bpm-sw/issues/116)
+         * See github issue #116 (https://github.com/lnls-dig/halcs/issues/116)
          *
          *  zsock_destroy(&self->pipe);
          * */

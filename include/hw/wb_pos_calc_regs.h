@@ -73,43 +73,43 @@
 #define POS_CALC_DS_MONIT_THRES_RESERVED_W(value) WBGEN2_GEN_WRITE(value, 26, 6)
 #define POS_CALC_DS_MONIT_THRES_RESERVED_R(reg) WBGEN2_GEN_READ(reg, 26, 6)
 
-/* definitions for register: BPM sensitivity (X axis) parameter register */
+/* definitions for register: HALCS sensitivity (X axis) parameter register */
 
-/* definitions for field: BPM sensitivity (X axis) parameter register in reg: BPM sensitivity (X axis) parameter register */
+/* definitions for field: HALCS sensitivity (X axis) parameter register in reg: HALCS sensitivity (X axis) parameter register */
 #define POS_CALC_KX_VAL_MASK                  WBGEN2_GEN_MASK(0, 25)
 #define POS_CALC_KX_VAL_SHIFT                 0
 #define POS_CALC_KX_VAL_W(value)              WBGEN2_GEN_WRITE(value, 0, 25)
 #define POS_CALC_KX_VAL_R(reg)                WBGEN2_GEN_READ(reg, 0, 25)
 
-/* definitions for field: Reserved in reg: BPM sensitivity (X axis) parameter register */
+/* definitions for field: Reserved in reg: HALCS sensitivity (X axis) parameter register */
 #define POS_CALC_KX_RESERVED_MASK             WBGEN2_GEN_MASK(25, 7)
 #define POS_CALC_KX_RESERVED_SHIFT            25
 #define POS_CALC_KX_RESERVED_W(value)         WBGEN2_GEN_WRITE(value, 25, 7)
 #define POS_CALC_KX_RESERVED_R(reg)           WBGEN2_GEN_READ(reg, 25, 7)
 
-/* definitions for register: BPM sensitivity (Y axis) parameter register */
+/* definitions for register: HALCS sensitivity (Y axis) parameter register */
 
-/* definitions for field: BPM sensitivity (Y axis) parameter register in reg: BPM sensitivity (Y axis) parameter register */
+/* definitions for field: HALCS sensitivity (Y axis) parameter register in reg: HALCS sensitivity (Y axis) parameter register */
 #define POS_CALC_KY_VAL_MASK                  WBGEN2_GEN_MASK(0, 25)
 #define POS_CALC_KY_VAL_SHIFT                 0
 #define POS_CALC_KY_VAL_W(value)              WBGEN2_GEN_WRITE(value, 0, 25)
 #define POS_CALC_KY_VAL_R(reg)                WBGEN2_GEN_READ(reg, 0, 25)
 
-/* definitions for field: Reserved in reg: BPM sensitivity (Y axis) parameter register */
+/* definitions for field: Reserved in reg: HALCS sensitivity (Y axis) parameter register */
 #define POS_CALC_KY_RESERVED_MASK             WBGEN2_GEN_MASK(25, 7)
 #define POS_CALC_KY_RESERVED_SHIFT            25
 #define POS_CALC_KY_RESERVED_W(value)         WBGEN2_GEN_WRITE(value, 25, 7)
 #define POS_CALC_KY_RESERVED_R(reg)           WBGEN2_GEN_READ(reg, 25, 7)
 
-/* definitions for register: BPM sensitivity (Sum) parameter register */
+/* definitions for register: HALCS sensitivity (Sum) parameter register */
 
-/* definitions for field: BPM sensitivity (Sum) parameter register in reg: BPM sensitivity (Sum) parameter register */
+/* definitions for field: HALCS sensitivity (Sum) parameter register in reg: HALCS sensitivity (Sum) parameter register */
 #define POS_CALC_KSUM_VAL_MASK                WBGEN2_GEN_MASK(0, 25)
 #define POS_CALC_KSUM_VAL_SHIFT               0
 #define POS_CALC_KSUM_VAL_W(value)            WBGEN2_GEN_WRITE(value, 0, 25)
 #define POS_CALC_KSUM_VAL_R(reg)              WBGEN2_GEN_READ(reg, 0, 25)
 
-/* definitions for field: Reserved in reg: BPM sensitivity (Sum) parameter register */
+/* definitions for field: Reserved in reg: HALCS sensitivity (Sum) parameter register */
 #define POS_CALC_KSUM_RESERVED_MASK           WBGEN2_GEN_MASK(25, 7)
 #define POS_CALC_KSUM_RESERVED_SHIFT          25
 #define POS_CALC_KSUM_RESERVED_W(value)       WBGEN2_GEN_WRITE(value, 25, 7)
@@ -358,11 +358,11 @@
 #define POS_CALC_REG_DS_FOFB_THRES 0x00000004
 /* [0x8]: REG Config divisor threshold Monit. register */
 #define POS_CALC_REG_DS_MONIT_THRES 0x00000008
-/* [0xc]: REG BPM sensitivity (X axis) parameter register */
+/* [0xc]: REG HALCS sensitivity (X axis) parameter register */
 #define POS_CALC_REG_KX 0x0000000c
-/* [0x10]: REG BPM sensitivity (Y axis) parameter register */
+/* [0x10]: REG HALCS sensitivity (Y axis) parameter register */
 #define POS_CALC_REG_KY 0x00000010
-/* [0x14]: REG BPM sensitivity (Sum) parameter register */
+/* [0x14]: REG HALCS sensitivity (Sum) parameter register */
 #define POS_CALC_REG_KSUM 0x00000014
 /* [0x18]: REG DSP TBT incorrect TDM counter */
 #define POS_CALC_REG_DSP_CTNR_TBT 0x00000018

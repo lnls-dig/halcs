@@ -3,12 +3,12 @@
  */
 
 #include <inttypes.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -21,7 +21,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-sleep_adcs <Test mode = [0-15]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
@@ -31,7 +31,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *sleep_adcs_str = NULL;
     char **str_p = NULL;
 
@@ -58,9 +58,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq(argv[i], "-sleep_adcs"))
         {
@@ -91,24 +91,24 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:fmc250m_sleep_adcs]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:fmc250m_sleep_adcs]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:fmc250m_sleep_adcs]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:fmc250m_sleep_adcs]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
-    /* Set default bpm number */
+    /* Set default halcs number */
     uint32_t sleep_adcs;
     if (sleep_adcs_str == NULL) {
         fprintf (stderr, "[client:fmc250m_sleep_adcs]: Setting default value to test mode: %u\n",
@@ -126,22 +126,22 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC250M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC250M_4CH%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:fmc250m_sleep_adcs]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:fmc250m_sleep_adcs]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
-    bpm_client_err_e err = bpm_set_sleep_adcs (bpm_client, service, sleep_adcs);
-    if (err != BPM_CLIENT_SUCCESS) {
-        fprintf (stderr, "[client:fmc250_sleep_adcs]: bpm_set_sleep_adcs error\n");
-        goto err_bpm_client_new;
+    halcs_client_err_e err = halcs_set_sleep_adcs (halcs_client, service, sleep_adcs);
+    if (err != HALCS_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:fmc250_sleep_adcs]: halcs_set_sleep_adcs error\n");
+        goto err_halcs_client_new;
     }
 
-err_bpm_client_new:
-    bpm_client_destroy (&bpm_client);
+err_halcs_client_new:
+    halcs_client_destroy (&halcs_client);
 
     str_p = &sleep_adcs_str;
     free (*str_p);
@@ -152,8 +152,8 @@ err_bpm_client_new:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
     return 0;
 }

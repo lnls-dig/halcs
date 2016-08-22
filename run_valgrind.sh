@@ -23,7 +23,7 @@ board_slot=$1
 
 valgrind --leak-check=yes --trace-children=yes \
     --suppressions=valgrind.supp \
-    ${PREFIX}/bin/ebpm -f ${PREFIX}/etc/bpm_sw/bpm_sw.cfg \
+    ${PREFIX}/bin/halcsd -f ${PREFIX}/etc/halcs/halcs.cfg \
     -n be -t pcie \
     -i ${board_slot} \
     -b tcp://127.0.0.1:8978 -l stdout > \

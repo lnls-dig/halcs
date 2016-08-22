@@ -8,15 +8,15 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
 #define DFLT_NUM_SAMPLES            4096
 #define DFLT_CHAN_NUM               0
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -104,7 +104,7 @@ static struct option long_options[] =
     {"help",                no_argument,         NULL, 'h'},
     {"brokerendp",          required_argument,   NULL, 'b'},
     {"verbose",             no_argument,         NULL, 'v'},
-    {"bpmnumber",           required_argument,   NULL, 's'},
+    {"halcsnumber",           required_argument,   NULL, 's'},
     {"boardslot",           required_argument,   NULL, 'o'},
     {"channumber",          required_argument,   NULL, 'c'},
     {"numsamples",          required_argument,   NULL, 'n'},
@@ -116,14 +116,14 @@ static const char* shortopt = "hb:vo:s:c:n:f:";
 
 void print_help (char *program_name)
 {
-    fprintf (stdout, "EBPM Acquisition Utility\n"
+    fprintf (stdout, "HALCSD Acquisition Utility\n"
             "Usage: %s [options]\n"
             "\n"
             "  -h  --help                           Display this usage information\n"
             "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
             "  -v  --verbose                        Verbose output\n"
             "  -o  --boardslot <Board slot number = [1-12]> \n"
-            "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
+            "  -s  --halcsnumber <HALCS number = [0|1]> HALCS number\n"
             "                                       Board slot number\n"
             "  -c  --channumber <Channel>           Channel number\n"
             "                                     <Channel> must be one of the following:\n"
@@ -144,7 +144,7 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *chan_str = NULL;
     char *file_fmt_str = NULL;
     int opt;
@@ -171,7 +171,7 @@ int main (int argc, char *argv [])
                 break;
 
             case 's':
-                bpm_number_str = strdup (optarg);
+                halcs_number_str = strdup (optarg);
                 break;
 
             case 'c':
@@ -255,20 +255,20 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:acq]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:acq]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:acq]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
@@ -289,20 +289,20 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     /* Set trigger to skip */
     uint32_t acq_trig = 0;
-    bpm_client_err_e err = bpm_set_acq_trig (bpm_client, service, acq_trig);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_acq_set_trig failed\n");
-        goto err_bpm_set_acq_trig;
+    halcs_client_err_e err = halcs_set_acq_trig (halcs_client, service, acq_trig);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_acq_set_trig failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
@@ -319,11 +319,11 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    err = bpm_get_curve (bpm_client, service, &acq_trans,
+    err = halcs_get_curve (halcs_client, service, &acq_trans,
             50000, new_acq);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
-        goto err_bpm_get_curve;
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_get_curve failed\n");
+        goto err_halcs_get_curve;
     }
 
     if (!freopen (NULL, "wb", stdout)) {
@@ -333,22 +333,22 @@ int main (int argc, char *argv [])
     print_data (chan, data, acq_trans.block.bytes_read, file_fmt);
 
 err_set_file_mode:
-err_bpm_get_curve:
-err_bpm_set_acq_trig:
-err_bpm_client_new:
+err_halcs_get_curve:
+err_halcs_set_acq_trig:
+err_halcs_client_new:
     free (file_fmt_str);
     file_fmt_str = NULL;
     free (chan_str);
     chan_str = NULL;
     free (board_number_str);
     board_number_str = NULL;
-    free (bpm_number_str);
-    bpm_number_str = NULL;
+    free (halcs_number_str);
+    halcs_number_str = NULL;
     free (num_samples_str);
     num_samples_str = NULL;
     free (broker_endp);
     broker_endp = NULL;
-    bpm_client_destroy (&bpm_client);
+    halcs_client_destroy (&halcs_client);
 
     return 0;
 }

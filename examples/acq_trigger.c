@@ -7,15 +7,15 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
 #define DFLT_NUM_SAMPLES            4096
 #define DFLT_CHAN_NUM               0
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -65,7 +65,7 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-s <num_samples_str> Number of samples\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-ch <chan_str> Acquisition channel\n"
             , program_name);
 }
@@ -76,7 +76,7 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *chan_str = NULL;
     char **str_p = NULL;
 
@@ -111,9 +111,9 @@ int main (int argc, char *argv [])
         else if (streq (argv[i], "-board")) { /* board_number: board number */
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         /* Fallout for options with parameters */
         else {
@@ -177,82 +177,82 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:leds]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:ACQ%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
 
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
     /* Change trigger type here if needed */
     uint32_t acq_trig = 2;
-    err = bpm_set_acq_trig (bpm_client, service, acq_trig);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_trig failed\n");
-        goto err_bpm_set_acq_trig;
+    err = halcs_set_acq_trig (halcs_client, service, acq_trig);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_trig failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_trig_thres = 200;
-    err = bpm_set_acq_data_trig_thres (bpm_client, service, data_trig_thres);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_data_trig_thres failed\n");
-        goto err_bpm_set_acq_trig;
+    err = halcs_set_acq_data_trig_thres (halcs_client, service, data_trig_thres);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_thres failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_trig_pol = 0;
-    err = bpm_set_acq_data_trig_pol (bpm_client, service, data_trig_pol);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_data_trig_pol failed\n");
-        goto err_bpm_set_acq_trig;
+    err = halcs_set_acq_data_trig_pol (halcs_client, service, data_trig_pol);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_pol failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_trig_sel = 0;
-    err = bpm_set_acq_data_trig_sel (bpm_client, service, data_trig_sel);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_data_trig_sel failed\n");
-        goto err_bpm_set_acq_trig;
+    err = halcs_set_acq_data_trig_sel (halcs_client, service, data_trig_sel);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_sel failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_trig_filt = 1;
-    err = bpm_set_acq_data_trig_filt (bpm_client, service, data_trig_filt);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_data_trig_filt failed\n");
-        goto err_bpm_set_acq_trig;
+    err = halcs_set_acq_data_trig_filt (halcs_client, service, data_trig_filt);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_filt failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t hw_trig_dly = 0;
-    err =  bpm_set_acq_hw_trig_dly (bpm_client, service, hw_trig_dly);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_hw_trig_dly failed\n");
-        goto err_bpm_set_acq_trig;
+    err =  halcs_set_acq_hw_trig_dly (halcs_client, service, hw_trig_dly);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_hw_trig_dly failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t data_trig_chan = 6;
-    err =  bpm_set_acq_data_trig_chan (bpm_client, service, data_trig_chan);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_set_acq_data_trig_chan failed\n");
-        goto err_bpm_set_acq_trig;
+    err =  halcs_set_acq_data_trig_chan (halcs_client, service, data_trig_chan);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_chan failed\n");
+        goto err_halcs_set_acq_trig;
     }
 
     uint32_t num_samples_pre = num_samples;
@@ -273,36 +273,36 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    err = bpm_get_curve (bpm_client, service, &acq_trans,
+    err = halcs_get_curve (halcs_client, service, &acq_trans,
             500000, new_acq);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: bpm_get_curve failed\n");
-        goto err_bpm_get_curve;
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: halcs_get_curve failed\n");
+        goto err_halcs_get_curve;
     }
 
-    //fprintf (stdout, "[client:acq]: bpm_get_curve was successfully executed\n");
+    //fprintf (stdout, "[client:acq]: halcs_get_curve was successfully executed\n");
     fprintf (stdout, "clear\n");
     print_data (chan, data, acq_trans.block.bytes_read);
 
-err_bpm_client_new:
-err_bpm_set_acq_trig:
-err_bpm_get_curve:
+err_halcs_client_new:
+err_halcs_set_acq_trig:
+err_halcs_get_curve:
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
     str_p = &num_samples_str;
     free (*str_p);
     num_samples_str = NULL;
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
-    bpm_client_destroy (&bpm_client);
+    halcs_client_destroy (&halcs_client);
 
     return 0;
 }

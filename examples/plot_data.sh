@@ -6,7 +6,7 @@ DFLT_SLEEP_INTERV=2                 # in seconds
 
 if [ $# -lt $EXPECTED_ARGS ]
 then
-	echo "Usage: `basename $0` {broker endpoint} {number of samples} {channel number} {board number} {bpm number} [sleep interval]"
+	echo "Usage: `basename $0` {broker endpoint} {number of samples} {channel number} {board number} {halcs number} [sleep interval]"
 	exit 1;
 fi
 
@@ -14,7 +14,7 @@ broker_endp=$1
 nsamples=$2
 ch_number=$3
 board_number=$4
-bpm_number=$5
+halcs_number=$5
 
 if [ -z "$6" ]
 then
@@ -26,13 +26,13 @@ fi
 acquire_samples () {
     if [ $# -lt 5 ]
     then
-        echo "acquire_samples usage: {broker endpoint} {number of samples} {channel number} {board number} {bpm number} [sleep_interval]"
+        echo "acquire_samples usage: {broker endpoint} {number of samples} {channel number} {board number} {halcs number} [sleep_interval]"
         exit 1;
     fi
 
     while :
     do
-        ./acq -b $1 -s $2 -ch $3 -board $4 -bpm $5 > ${DATAPLOT_FILE}.$4.$5
+        ./acq -b $1 -s $2 -ch $3 -board $4 -halcs $5 > ${DATAPLOT_FILE}.$4.$5
         sleep $6
     done
 }
@@ -52,7 +52,7 @@ plot_data () {
 }
 
 
-acquire_samples $broker_endp $nsamples $ch_number $board_number $bpm_number $sleep_interval &
+acquire_samples $broker_endp $nsamples $ch_number $board_number $halcs_number $sleep_interval &
 sleep 2
-plot_data $nsamples $board_number $bpm_number $sleep_interval
+plot_data $nsamples $board_number $halcs_number $sleep_interval
 

@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "ddr3_map.h"
 #include "sm_io_acq_codes.h"
@@ -169,7 +169,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t num_samples_pre_aligned = hutils_align_value(num_samples_pre,
             samples_alignment);
     /* FIXME. Curently, the FPGA gateware does not support triggered acquisitions with
-     * post_samples = 0. See github lnls-bpm/bpm-gw#62 */
+     * post_samples = 0. See github lnls-halcs/halcs-gw#62 */
     uint32_t num_samples_post_aligned = (num_samples_post == 0 && trigger != TYPE_ACQ_CORE_SKIP) ? 
             samples_alignment : hutils_align_value(num_samples_post, samples_alignment);
 

@@ -11,7 +11,7 @@
  * Description: Software driver for AD9510 chip (clock distribution)
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

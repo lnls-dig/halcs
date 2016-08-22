@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_dsp_codes.h"
 #include "sm_io_dsp_defaults.h"

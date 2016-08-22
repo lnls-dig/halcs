@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_fmc250m_4ch_defaults.h"
 
@@ -32,7 +32,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:fmc250m_4ch_defaults]",               \
             smio_err_str (err_type))
 
-#define SMIO_FMC250M_4CH_LIBBPMCLIENT_LOG_MODE                "a"
+#define SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE                "a"
 
 /* We use the actual libclient to send and configure our default values,
  * maintaining internal consistency. So, in fact, we are sending ourselves
@@ -48,29 +48,29 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Configuring SMIO "
             "FMC250M_4CH with default values ...\n");
-    bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
+    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
     /* For some reason, the default timeout is not enough for FMC250M SMIO. See github issue
      * #119 */
-    bpm_client_t *config_client = bpm_client_new_log_mode_time (broker_endp, 0,
-            log_file_name, SMIO_FMC250M_4CH_LIBBPMCLIENT_LOG_MODE, 10000);
+    halcs_client_t *config_client = halcs_client_new_log_mode_time (broker_endp, 0,
+            log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE, 10000);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
-    client_err = bpm_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not reset ADCs",
+    client_err = halcs_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not reset ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_rst_div_adcs (config_client, service, FMC250M_4CH_DFLT_RST_DIV_ADCS);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not reset DIV CLK ADCs",
+    client_err = halcs_set_rst_div_adcs (config_client, service, FMC250M_4CH_DFLT_RST_DIV_ADCS);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not reset DIV CLK ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_sleep_adcs (config_client, service, FMC250M_4CH_DFLT_SLEEP_ADCS);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could set activate ADCs",
+    client_err = halcs_set_sleep_adcs (config_client, service, FMC250M_4CH_DFLT_SLEEP_ADCS);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set activate ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:
-    bpm_client_destroy (&config_client);
+    halcs_client_destroy (&config_client);
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Exiting Config thread %s\n",
         service);

@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_trigger_mux_codes.h"
 #include "sm_io_trigger_mux_defaults.h"
@@ -45,39 +45,39 @@
 /************ Specific TRIGGER MUX Operations **************/
 /*****************************************************************/
 
-#define BPM_TRIGGER_MUX_RCV_SRC_MIN                         0 /* Trigger Source Selection (= Trigger Backplane) */
-#define BPM_TRIGGER_MUX_RCV_SRC_MAX                         1 /* Trigger Source Selection (= FPGA internal) */
+#define HALCS_TRIGGER_MUX_RCV_SRC_MIN                         0 /* Trigger Source Selection (= Trigger Backplane) */
+#define HALCS_TRIGGER_MUX_RCV_SRC_MAX                         1 /* Trigger Source Selection (= FPGA internal) */
 RW_PARAM_FUNC(trigger_mux, rcv_src) {
     SET_GET_PARAM_CHANNEL(trigger_mux, 0x0, WB_TRIG_MUX,
             CH0_CTL, RCV_SRC, TRIGGER_MUX_CHAN_OFFSET, TRIGGER_MUX_NUM_CHAN, SINGLE_BIT_PARAM,
-            BPM_TRIGGER_MUX_RCV_SRC_MIN, BPM_TRIGGER_MUX_RCV_SRC_MAX, NO_CHK_FUNC,
+            HALCS_TRIGGER_MUX_RCV_SRC_MIN, HALCS_TRIGGER_MUX_RCV_SRC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_TRIGGER_MUX_RCV_IN_SEL_MIN                       0              /* Minimum selection */
-#define BPM_TRIGGER_MUX_RCV_IN_SEL_MAX                       ((1 << 8) -1)  /* Maximum selection */
+#define HALCS_TRIGGER_MUX_RCV_IN_SEL_MIN                       0              /* Minimum selection */
+#define HALCS_TRIGGER_MUX_RCV_IN_SEL_MAX                       ((1 << 8) -1)  /* Maximum selection */
 RW_PARAM_FUNC(trigger_mux, rcv_in_sel) {
     SET_GET_PARAM_CHANNEL(trigger_mux, 0x0, WB_TRIG_MUX,
             CH0_CTL, RCV_IN_SEL, TRIGGER_MUX_CHAN_OFFSET, TRIGGER_MUX_NUM_CHAN, MULT_BIT_PARAM,
-            BPM_TRIGGER_MUX_RCV_IN_SEL_MIN, BPM_TRIGGER_MUX_RCV_IN_SEL_MAX, NO_CHK_FUNC,
+            HALCS_TRIGGER_MUX_RCV_IN_SEL_MIN, HALCS_TRIGGER_MUX_RCV_IN_SEL_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_TRIGGER_MUX_TRANSM_SRC_MIN                       0 /* Trigger Source Selection (= Trigger Backplane) */
-#define BPM_TRIGGER_MUX_TRANSM_SRC_MAX                       1 /* Trigger Source Selection (= FPGA internal) */
+#define HALCS_TRIGGER_MUX_TRANSM_SRC_MIN                       0 /* Trigger Source Selection (= Trigger Backplane) */
+#define HALCS_TRIGGER_MUX_TRANSM_SRC_MAX                       1 /* Trigger Source Selection (= FPGA internal) */
 RW_PARAM_FUNC(trigger_mux, transm_src) {
     SET_GET_PARAM_CHANNEL(trigger_mux, 0x0, WB_TRIG_MUX,
             CH0_CTL, TRANSM_SRC, TRIGGER_MUX_CHAN_OFFSET, TRIGGER_MUX_NUM_CHAN, SINGLE_BIT_PARAM,
-            BPM_TRIGGER_MUX_TRANSM_SRC_MIN, BPM_TRIGGER_MUX_TRANSM_SRC_MAX, NO_CHK_FUNC,
+            HALCS_TRIGGER_MUX_TRANSM_SRC_MIN, HALCS_TRIGGER_MUX_TRANSM_SRC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_TRIGGER_MUX_TRANSM_OUT_SEL_MIN                   0              /* Minimum selection */
-#define BPM_TRIGGER_MUX_TRANSM_OUT_SEL_MAX                   ((1 << 8) -1)  /* Maximum selection */
+#define HALCS_TRIGGER_MUX_TRANSM_OUT_SEL_MIN                   0              /* Minimum selection */
+#define HALCS_TRIGGER_MUX_TRANSM_OUT_SEL_MAX                   ((1 << 8) -1)  /* Maximum selection */
 RW_PARAM_FUNC(trigger_mux, transm_out_sel) {
     SET_GET_PARAM_CHANNEL(trigger_mux, 0x0, WB_TRIG_MUX,
             CH0_CTL, TRANSM_OUT_SEL, TRIGGER_MUX_CHAN_OFFSET, TRIGGER_MUX_NUM_CHAN, MULT_BIT_PARAM,
-            BPM_TRIGGER_MUX_TRANSM_OUT_SEL_MIN, BPM_TRIGGER_MUX_TRANSM_OUT_SEL_MAX, NO_CHK_FUNC,
+            HALCS_TRIGGER_MUX_TRANSM_OUT_SEL_MIN, HALCS_TRIGGER_MUX_TRANSM_OUT_SEL_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 

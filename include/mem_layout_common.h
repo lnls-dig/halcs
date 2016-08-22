@@ -29,7 +29,7 @@ extern "C" {
 
 /* DSP Components */
 #define DSP_CTRL_RAW_REGS_OFFS                      0x0000
-#define DSP_BPM_RAW_SWAP_OFFS                       0x0100
+#define DSP_HALCS_RAW_SWAP_OFFS                       0x0100
 
 /* AFC DIAG Components */
 #define WB_AFC_DIAG_CTRL_RAW_REGS_OFFS              0x0000
@@ -86,7 +86,7 @@ extern "C" {
  *
  * However, PCI devices generally employ multiple BAR
  * registers mapped to different parts of the device.
- * For instance, in the bpm-gw FPGA firmware, the PCIe
+ * For instance, in the halcs-gw FPGA firmware, the PCIe
  * core has 3 BARs (BAR0, BAR2 and BAR4) mapped to the
  * following:
  *

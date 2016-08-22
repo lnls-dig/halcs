@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_fmc130m_4ch_defaults.h"
@@ -58,43 +58,43 @@
 /************************************************************/
 
 /***************************** ADC LT2208 Control ***************************/
-#define BPM_FMC130M_4CH_RAND_MIN                0 /* RAND disabled */
-#define BPM_FMC130M_4CH_RAND_MAX                1 /* RAND enabled  */
+#define HALCS_FMC130M_4CH_RAND_MIN                0 /* RAND disabled */
+#define HALCS_FMC130M_4CH_RAND_MAX                1 /* RAND enabled  */
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_rand) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             ADC, RAND, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_RAND_MIN, BPM_FMC130M_4CH_RAND_MAX, NO_CHK_FUNC,
+            HALCS_FMC130M_4CH_RAND_MIN, HALCS_FMC130M_4CH_RAND_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_DITH_MIN                0 /* DITH disabled */
-#define BPM_FMC130M_4CH_DITH_MAX                1 /* DITH enabled  */
+#define HALCS_FMC130M_4CH_DITH_MIN                0 /* DITH disabled */
+#define HALCS_FMC130M_4CH_DITH_MAX                1 /* DITH enabled  */
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_dith) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             ADC, DITH, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_DITH_MIN, BPM_FMC130M_4CH_DITH_MAX, NO_CHK_FUNC,
+            HALCS_FMC130M_4CH_DITH_MIN, HALCS_FMC130M_4CH_DITH_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_SHDN_MIN                0 /* SHDN disabled */
-#define BPM_FMC130M_4CH_SHDN_MAX                1 /* SHDN enabled  */
+#define HALCS_FMC130M_4CH_SHDN_MIN                0 /* SHDN disabled */
+#define HALCS_FMC130M_4CH_SHDN_MAX                1 /* SHDN enabled  */
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_shdn) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             ADC, SHDN, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_SHDN_MIN, BPM_FMC130M_4CH_SHDN_MAX, NO_CHK_FUNC,
+            HALCS_FMC130M_4CH_SHDN_MIN, HALCS_FMC130M_4CH_SHDN_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC130M_4CH_PGA_MIN                 0 /* PGA disabled */
-#define BPM_FMC130M_4CH_PGA_MAX                 1 /* PGA enabled  */
+#define HALCS_FMC130M_4CH_PGA_MIN                 0 /* PGA disabled */
+#define HALCS_FMC130M_4CH_PGA_MAX                 1 /* PGA enabled  */
 
 RW_PARAM_FUNC(fmc130m_4ch, adc_pga) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             ADC, PGA, SINGLE_BIT_PARAM,
-            BPM_FMC130M_4CH_PGA_MIN, BPM_FMC130M_4CH_PGA_MAX, NO_CHK_FUNC,
+            HALCS_FMC130M_4CH_PGA_MIN, HALCS_FMC130M_4CH_PGA_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -111,14 +111,14 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_pga) {
 
 /* We receive data as 32-bit, but the 16 MSB are zeroed. It is conveninent
  * to sign extend the bits */
-static int _rw_bpm_fmc130m_4ch_data_fmt (uint32_t *data)
+static int _rw_halcs_fmc130m_4ch_data_fmt (uint32_t *data)
 {
     *data = WBGEN2_SIGN_EXTEND(*data, 15);
 
     return PARAM_OK;
 }
 
-rw_param_format_fp rw_bpm_fmc130m_4ch_data_fmt_fp = _rw_bpm_fmc130m_4ch_data_fmt;
+rw_param_format_fp rw_halcs_fmc130m_4ch_data_fmt_fp = _rw_halcs_fmc130m_4ch_data_fmt;
 
 #define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
 #define  WB_FMC_130M_4CH_CSR_DATA0_GLOBAL_W(val)    WB_FMC_130M_4CH_CSR_DATA_GLOBAL_W(val)
@@ -127,7 +127,7 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data0) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             DATA0, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 #define  WB_FMC_130M_4CH_CSR_DATA1_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
@@ -137,7 +137,7 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data1) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             DATA1, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 #define  WB_FMC_130M_4CH_CSR_DATA2_GLOBAL_MASK       WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
@@ -147,7 +147,7 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data2) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             DATA2, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 #define  WB_FMC_130M_4CH_CSR_DATA3_GLOBAL_MASK      WB_FMC_130M_4CH_CSR_DATA_GLOBAL_MASK
@@ -157,7 +157,7 @@ RW_PARAM_FUNC(fmc130m_4ch, adc_data3) {
     SET_GET_PARAM(fmc130m_4ch, 0x0, WB_FMC_130M_4CH_CSR,
             DATA3, GLOBAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc130m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc130m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 /******************************** ADC Delay Values ****************************/

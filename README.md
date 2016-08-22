@@ -1,11 +1,11 @@
 # Beam Position Monitor Software
 
-[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
-![Latest tag](https://img.shields.io/github/tag/lnls-dig/bpm-sw.svg?style=flat)
-[![Latest release](https://img.shields.io/github/release/lnls-dig/bpm-sw.svg?style=flat)](https://github.com/lnls-dig/bpm-sw/releases)
-[![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/bpm-sw.svg?style=flat)](COPYING)
+[![Build Status](https://travis-ci.org/lnls-dig/halcs.svg)](https://travis-ci.org/lnls-dig/halcs)
+![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
+[![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
+[![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/halcs.svg?style=flat)](COPYING)
 
-Software for controlling the AFC BPM boards
+Software for controlling the AFC HALCS boards
 
 ## Prerequisites:
 
@@ -40,7 +40,7 @@ the binaries or executing the instructions below:
 
 ## Cloning this repository
 
-	git clone --recursive https://github.com/lerwys/bpm-sw.git
+	git clone --recursive https://github.com/lerwys/halcs.git
 
 ## PCIe Installation Instructions
 
@@ -220,7 +220,7 @@ run it without superuser.
 
 Change to the Client API folder
 
-	cd src/libs/libbpmclient
+	cd src/libs/libhalcsclient
 
 Compile the library, with debug info
 
@@ -248,15 +248,15 @@ Compile the examples
 
 Run an example application, for instance, the leds example
 
-	./leds -v -b <broker_endpoint> -board <board_number> -bpm <bpm_number>
+	./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./leds -v -b ipc:///tmp/bpm -board <board_number> -bpm <bpm_number>
+	./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
 
 If one would like to use TCP, it should call, for instance:
 
-	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -bpm <bpm_number>
+	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
 
 Leds should be blinking in the FMC ADC board

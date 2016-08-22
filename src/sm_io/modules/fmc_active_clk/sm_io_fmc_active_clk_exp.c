@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_fmc_active_clk_codes.h"
 #include "sm_io_fmc_active_clk_defaults.h"
@@ -44,44 +44,44 @@ static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self,
 /*********** Specific FMC_ACTIVE_CLK Operations *************/
 /************************************************************/
 
-#define BPM_FMC_ACTIVE_CLK_SI571_OE_MIN             0 /* SI571 Output disable */
-#define BPM_FMC_ACTIVE_CLK_SI571_OE_MAX             1 /* SI571 Output enable */
+#define HALCS_FMC_ACTIVE_CLK_SI571_OE_MIN             0 /* SI571 Output disable */
+#define HALCS_FMC_ACTIVE_CLK_SI571_OE_MAX             1 /* SI571 Output enable */
 
 RW_PARAM_FUNC(fmc_active_clk, si571_oe) {
     SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, SI571_OE, SINGLE_BIT_PARAM,
-            BPM_FMC_ACTIVE_CLK_SI571_OE_MIN, BPM_FMC_ACTIVE_CLK_SI571_OE_MAX, NO_CHK_FUNC,
+            HALCS_FMC_ACTIVE_CLK_SI571_OE_MIN, HALCS_FMC_ACTIVE_CLK_SI571_OE_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC_ACTIVE_CLK_PLL_FUNC_MIN             0 /* PLL FUNCTION pin 0 */
-#define BPM_FMC_ACTIVE_CLK_PLL_FUNC_MAX             1 /* PLL FUNCTION pin 1 */
+#define HALCS_FMC_ACTIVE_CLK_PLL_FUNC_MIN             0 /* PLL FUNCTION pin 0 */
+#define HALCS_FMC_ACTIVE_CLK_PLL_FUNC_MAX             1 /* PLL FUNCTION pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, pll_func) {
     SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, PLL_FUNCTION, SINGLE_BIT_PARAM,
-            BPM_FMC_ACTIVE_CLK_PLL_FUNC_MIN, BPM_FMC_ACTIVE_CLK_PLL_FUNC_MAX, NO_CHK_FUNC,
+            HALCS_FMC_ACTIVE_CLK_PLL_FUNC_MIN, HALCS_FMC_ACTIVE_CLK_PLL_FUNC_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 
-#define BPM_FMC_ACTIVE_CLK_PLL_STATUS_MIN           0 /* PLL STATUS pin 0 */
-#define BPM_FMC_ACTIVE_CLK_PLL_STATUS_MAX           1 /* PLL STATUS pin 1 */
+#define HALCS_FMC_ACTIVE_CLK_PLL_STATUS_MIN           0 /* PLL STATUS pin 0 */
+#define HALCS_FMC_ACTIVE_CLK_PLL_STATUS_MAX           1 /* PLL STATUS pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, pll_status) {
     SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, PLL_STATUS, SINGLE_BIT_PARAM,
-            BPM_FMC_ACTIVE_CLK_PLL_STATUS_MIN, BPM_FMC_ACTIVE_CLK_PLL_STATUS_MAX, NO_CHK_FUNC,
+            HALCS_FMC_ACTIVE_CLK_PLL_STATUS_MIN, HALCS_FMC_ACTIVE_CLK_PLL_STATUS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC_ACTIVE_CLK_CLK_SEL_MIN              0 /* PLL CLK_SEL pin 0 */
-#define BPM_FMC_ACTIVE_CLK_CLK_SEL_MAX              1 /* PLL CLK_SEL pin 1 */
+#define HALCS_FMC_ACTIVE_CLK_CLK_SEL_MIN              0 /* PLL CLK_SEL pin 0 */
+#define HALCS_FMC_ACTIVE_CLK_CLK_SEL_MAX              1 /* PLL CLK_SEL pin 1 */
 
 RW_PARAM_FUNC(fmc_active_clk, clk_sel) {
     SET_GET_PARAM(fmc_active_clk, 0x0, WB_FMC_ACTIVE_CLK_CSR,
             CLK_DISTRIB, CLK_SEL, SINGLE_BIT_PARAM,
-            BPM_FMC_ACTIVE_CLK_CLK_SEL_MIN, BPM_FMC_ACTIVE_CLK_CLK_SEL_MAX, NO_CHK_FUNC,
+            HALCS_FMC_ACTIVE_CLK_CLK_SEL_MIN, HALCS_FMC_ACTIVE_CLK_CLK_SEL_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 

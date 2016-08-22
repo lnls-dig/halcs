@@ -6,7 +6,7 @@
  */
 
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_swap_core.h"
 

@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 const uint32_t fmc130m_4ch_si571_addr[NUM_FMC130M_4CH_SMIOS] = {0x49};
 const uint32_t fmc130m_4ch_ad9510_addr[NUM_FMC130M_4CH_SMIOS] = {0x01};

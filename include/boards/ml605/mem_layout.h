@@ -5,8 +5,8 @@
 #include "acq_chan.h"
 
 #define NUM_MAX_SLOTS                               1
-#define NUM_MAX_BPM_PER_SLOT                        2
-#define NUM_MAX_BPMS                                (NUM_MAX_SLOTS * NUM_MAX_BPM_PER_SLOT)
+#define NUM_MAX_HALCS_PER_SLOT                        2
+#define NUM_MAX_HALCSS                                (NUM_MAX_SLOTS * NUM_MAX_HALCS_PER_SLOT)
 
 #define NUM_FMC130M_4CH_SMIOS                       1
 #define NUM_FMC250M_4CH_SMIOS                       1

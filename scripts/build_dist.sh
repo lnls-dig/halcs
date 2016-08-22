@@ -3,8 +3,8 @@
 USER=$(whoami)
 IP="localhost"
 PREFIX=$(pwd)
-DIR="bpm-sw-deploy"
-DIST_NAME="bpm-sw"
+DIR="halcs-deploy"
+DIST_NAME="halcs"
 DEFAULT_BOARD="afcv3"
 VALID_BOARDS_STR="Valid values are: \"ml605\" and \"afcv3\"."
 
@@ -22,5 +22,5 @@ if [ "$BOARD_TYPE" != "afcv3" ] && [ "$BOARD_TYPE" != "ml605" ]; then
 fi
 
 ./deploy.sh ${USER} ${IP} ${PREFIX}/${DIR}
-makeself --bzip2  ${PREFIX}/${DIR} ${DIST_NAME}.bz2.run "LNLS BPM Software Package" \
+makeself --bzip2  ${PREFIX}/${DIR} ${DIST_NAME}.bz2.run "LNLS HALCS Software Package" \
     ./compile.sh ${BOARD_TYPE}

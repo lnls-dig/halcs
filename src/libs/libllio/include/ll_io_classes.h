@@ -16,7 +16,7 @@
 #include <errhand.h>
 #include <convc.h>
 
-/* BPM version macros for compile-time API detection */
+/* HALCS version macros for compile-time API detection */
 
 #define LL_IO_VERSION_MAJOR 0
 #define LL_IO_VERSION_MINOR 1

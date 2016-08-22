@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_swap_codes.h"
 #include "sm_io_swap_defaults.h"
@@ -57,11 +57,11 @@ RW_PARAM_FUNC(swap, sw) {
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_SW_EN_MIN                           0 /* Switching enabled */
-#define BPM_SW_EN_MAX                           1 /* Switching disabled */
+#define HALCS_EN_MIN                           0 /* Switching enabled */
+#define HALCS_EN_MAX                           1 /* Switching disabled */
 RW_PARAM_FUNC(swap, sw_en) {
     SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
-            BPM_SW_EN_MIN, BPM_SW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+            HALCS_EN_MIN, HALCS_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_SWAP_DIV_F_MIN                      1

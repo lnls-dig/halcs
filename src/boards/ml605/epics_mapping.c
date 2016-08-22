@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -30,24 +30,24 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io:epics]",                    \
             devio_err_str (err_type))
 
-const board_epics_map_t board_epics_map[NUM_MAX_BPMS+1] = {
-         /* board, bpm*/
+const board_epics_map_t board_epics_map[NUM_MAX_HALCSS+1] = {
+         /* board, halcs*/
     /* 0 (INVALID)  */ {-1, -1},
     /* 1            */ {1,   0},
     /* 2            */ {1,   1},
 };
 
-/* Reverse bpm-sw <-> EPICS board mapping */
-const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT] = {
-     /* board, bpm */    /* bpm_id */
+/* Reverse halcs <-> EPICS board mapping */
+const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLOT] = {
+     /* board, halcs */    /* halcs_id */
     /* 0, 0 (INVALID) */ {{-1},
     /* 0, 1 (INVALID) */  {-1}},
     /* 1, 0           */ {{1},
     /* 1, 1           */  {2}}
 };
 
-const board_epics_opts_t board_epics_opts[NUM_MAX_SLOTS+1][NUM_MAX_BPM_PER_SLOT] = {
-    /* board, bpm */    /* bpm_id */
+const board_epics_opts_t board_epics_opts[NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLOT] = {
+    /* board, halcs */    /* halcs_id */
     /* 0, 0 (INVALID) */ {{.telnet_port = -1,
                            .telnet_afe_port = -1},
     /* 0, 1 (INVALID) */  {.telnet_port = -1,

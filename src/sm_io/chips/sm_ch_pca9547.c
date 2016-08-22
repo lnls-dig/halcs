@@ -7,7 +7,7 @@
  * Description: Software driver for PCA9547 switch chip
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

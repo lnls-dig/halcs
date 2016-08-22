@@ -15,22 +15,22 @@ extern "C" {
 /******************* Configuration file property names ************************/
 
 #define HUTILS_FE_CFG_ENDP_MAX_PATH         256
-#define HUTILS_FE_CFG_ENDP_PATH_PATTERN     "/dev_io/board%u/bpm%u/afe/bind"
+#define HUTILS_FE_CFG_ENDP_PATH_PATTERN     "/dev_io/board%u/halcs%u/afe/bind"
 
 /* We don't expect our hash key to be bigger than this */
 #define HUTILS_CFG_HASH_KEY_MAX_LEN         64
-/* Our config hash key is composed of this pattern: board%u/bpm%u/afe
- * or board%u/bpm%u/dbe */
+/* Our config hash key is composed of this pattern: board%u/halcs%u/afe
+ * or board%u/halcs%u/dbe */
 #define HUTILS_CFG_BOARD_TYPE               "%s"
 #define HUTILS_CFG_BOARD_PATTERN            "board%u"
-#define HUTILS_CFG_BPM_TYPE                 "%s"
-#define HUTILS_CFG_BPM_PATTERN              "bpm%u"
+#define HUTILS_CFG_HALCS_TYPE                 "%s"
+#define HUTILS_CFG_HALCS_PATTERN              "halcs%u"
 #define HUTILS_CFG_DEVIO_MODEL_TYPE         "%s"
 
 #define HUTILS_CFG_HASH_KEY_PATTERN         HUTILS_CFG_BOARD_TYPE \
-                                            "/" HUTILS_CFG_BPM_TYPE
+                                            "/" HUTILS_CFG_HALCS_TYPE
 #define HUTILS_CFG_HASH_KEY_PATTERN_COMPL   HUTILS_CFG_BOARD_PATTERN \
-                                            "/" HUTILS_CFG_BPM_PATTERN
+                                            "/" HUTILS_CFG_HALCS_PATTERN
 
 typedef struct {
     char *bind;                 /* AFE Endpoint address to bind to */
