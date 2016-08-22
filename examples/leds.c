@@ -3,12 +3,12 @@
  */
 
 #include <inttypes.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -18,7 +18,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n", program_name);
 }
 
@@ -27,7 +27,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char **str_p = NULL;
 
     if (argc < 2) {
@@ -53,9 +53,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
@@ -82,30 +82,30 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:leds]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC_ADC_COMMON%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC_ADC_COMMON%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     for (i = 0; i < 32768; ++i) {
@@ -116,14 +116,14 @@ int main (int argc, char *argv [])
                 break;
             }
 
-            bpm_blink_leds (bpm_client, service, leds);
+            halcs_blink_leds (halcs_client, service, leds);
             usleep (400000);
             leds <<= 1;
         }
     }
 
-err_bpm_client_new:
-    bpm_client_destroy (&bpm_client);
+err_halcs_client_new:
+    halcs_client_destroy (&halcs_client);
 
     str_p = &broker_endp;
     free (*str_p);
@@ -131,8 +131,8 @@ err_bpm_client_new:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
     return 0;
 }

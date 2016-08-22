@@ -112,31 +112,46 @@ extern "C" {
 extern const char *errhand_lvl_str [ERRHAND_LVL_NUM];
 char *errhand_lvl_to_str (int errhand_lvl);
 
-/****************** Debug halt macros ******************/
+/****************** Debug simple macros ******************/
 /*
- * ERRHAND_HALT variable is binary encoded in bit 0:
+ * ERRHAND_SIMPLE variable is binary encoded in bit 0:
  *  bit 31  ... bit 4   bit 3 ... bit 1   bit 0
  *    X          X        X         X     [1|0]
  */
 
-/* Debug halt */
-#define ERRHAND_HALT_SHIFT          0
-#define ERRHAND_HALT_MAX            1
-#define ERRHAND_HALT_MASK_RAW       ((1 << ERRHAND_HALT_SHIFT)-1)
-#define ERRHAND_HALT_MASK           (ERRHAND_HALT_MASK_RAW << ERRHAND_HALT_SHIFT)
+/* This bits sets the simple mode for writing without headers/prefix,
+ * just plain text */
 
-/* 1 halt signal */
-#define ERRHAND_HALT_GEN(val)       ((val & ERRHAND_HALT_MASK_RAW) << ERRHAND_HALT_SHIFT)
-#define ERRHAND_HALT_DEGEN(val)     ((val & ERRHAND_HALT_MASK) >> ERRHAND_HALT_SHIFT)
+/* Debug simple */
+#define ERRHAND_SIMPLE_SHIFT          0
+#define ERRHAND_SIMPLE_MAX            1
+#define ERRHAND_SIMPLE_MASK_RAW       ((1 << ERRHAND_SIMPLE_MAX)-1)
+#define ERRHAND_SIMPLE_MASK           (ERRHAND_SIMPLE_MASK_RAW << ERRHAND_SIMPLE_SHIFT)
 
-/* Debug halt raw */
-#define ERRHAND_LVL_HALT_RAW        0x1
+/* 1 simple signal */
+#define ERRHAND_SIMPLE_GEN(val)       ((val & ERRHAND_SIMPLE_MASK_RAW) << ERRHAND_SIMPLE_SHIFT)
+#define ERRHAND_SIMPLE_DEGEN(val)     ((val & ERRHAND_SIMPLE_MASK) >> ERRHAND_SIMPLE_SHIFT)
 
-/* Debug halt mask'ed and shift'ed */
-#define ERRHAND_LVL_HALT            ERRHAND_HALT_GEN(ERRHAND_LVL_HALT_RAW)
+/* Debug simple raw */
+#define ERRHAND_LVL_SIMPLE_RAW        0x1
+
+/* Debug simple mask'ed and shift'ed */
+#define ERRHAND_LVL_SIMPLE            ERRHAND_SIMPLE_GEN(ERRHAND_LVL_SIMPLE_RAW)
 
 /* For compatibility */
-#define DBG_LVL_HALT                ERRHAND_LVL_HALT
+#define DBG_LVL_SIMPLE                ERRHAND_LVL_SIMPLE
+
+/****************** Debug levels + simple macros ******************/
+
+/* Debug simple */
+#define ERRHAND_LVL_SIMPLE_SHIFT      0
+#define ERRHAND_LVL_SIMPLE_MAX        4
+#define ERRHAND_LVL_SIMPLE_MASK_RAW   ((1 << ERRHAND_LVL_SIMPLE_MAX)-1)
+#define ERRHAND_LVL_SIMPLE_MASK       (ERRHAND_LVL_SIMPLE_MASK_RAW << ERRHAND_LVL_SIMPLE_SHIFT)
+
+/* 1 simple signal */
+#define ERRHAND_LVL_SIMPLE_GEN(val)   ((val & ERRHAND_LVL_SIMPLE_MASK_RAW) << ERRHAND_LVL_SIMPLE_SHIFT)
+#define ERRHAND_LVL_SIMPLE_DEGEN(val) ((val & ERRHAND_LVL_SIMPLE_MASK) >> ERRHAND_LVL_SIMPLE_SHIFT)
 
 #ifdef __cplusplus
 }

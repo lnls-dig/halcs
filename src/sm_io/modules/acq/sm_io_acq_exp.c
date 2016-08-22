@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "ddr3_map.h"
 #include "sm_io_acq_codes.h"
@@ -114,7 +114,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
         return -ACQ_NUM_CHAN_OOR;
     }
 
-    /* number of samples required is out of the maximum limit. Maixmum number of samples 
+    /* number of samples required is out of the maximum limit. Maixmum number of samples
      * in multishot mode is simply the maximum number of samples of the DPRAM. The DPRAM
      * size is calculated to fit the largest sample in the design, so we are safe. */
     uint32_t max_samples_multishot = ACQ_CORE_MULTISHOT_MEM_SIZE;
@@ -163,11 +163,12 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
      * acquisition channel sample size */
     uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/acq->acq_buf[chan].sample_size;
-    uint32_t num_samples_pre_aligned = num_samples_pre + samples_alignment -
-        (num_samples_pre % samples_alignment);
-    uint32_t num_samples_post_aligned = (num_samples_post==0) ? 0 :
-        num_samples_post + samples_alignment -
-        (num_samples_post % samples_alignment);
+    uint32_t num_samples_pre_aligned = hutils_align_value (num_samples_pre,
+            samples_alignment);
+    /* FIXME. Curently, the FPGA gateware does not support triggered acquisitions with
+     * post_samples = 0. See github lnls-bpm/bpm-gw#62 */
+    uint32_t num_samples_post_aligned = (num_samples_post == 0 && trigger_type != TYPE_ACQ_CORE_SKIP) ?
+            samples_alignment : hutils_align_value (num_samples_post, samples_alignment);
 
     /* Set the parameters: number of samples of this channel */
     acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
@@ -401,8 +402,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * sample_size
      * */
 
-    /* First step if to get the trigger address from the channel. 
-     * Even on skip trigger mode, this will contain the address after 
+    /* First step if to get the trigger address from the channel.
+     * Even on skip trigger mode, this will contain the address after
      * the last valid sample (end of acquisition address) */
     uint32_t acq_core_trig_addr = acq->acq_params[chan].trig_addr;
 
@@ -443,7 +444,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
             reply_size, (uint32_t *) data_block->data);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%ld bytes read\n", valid_bytes);
+            "%zd bytes read\n", valid_bytes);
 
     /* Check if we could read successfully */
     int retf = 0;
@@ -673,15 +674,15 @@ err_inv_skip_trig:
 #define ACQ_HW_DATA_TRIG_POL_MIN                    0       /* positive slope: 0 -> 1 */
 #define ACQ_HW_DATA_TRIG_POL_MAX                    1       /* negative slope: 1 -> 0 */
 RW_PARAM_FUNC(acq, hw_data_trig_pol) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_CFG,
             HW_TRIG_POL, SINGLE_BIT_PARAM, ACQ_HW_DATA_TRIG_POL_MIN,
             ACQ_HW_DATA_TRIG_POL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define ACQ_HW_DATA_TRIG_SEL_MIN                    0
-#define ACQ_HW_DATA_TRIG_SEL_MAX                    3
+#define ACQ_HW_DATA_TRIG_SEL_MAX                    ((1 << 5)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_sel) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_CFG,
             INT_TRIG_SEL, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_SEL_MIN,
             ACQ_HW_DATA_TRIG_SEL_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -689,7 +690,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_sel) {
 #define ACQ_HW_DATA_TRIG_FILT_MIN                   0
 #define ACQ_HW_DATA_TRIG_FILT_MAX                   ((1 << 8)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_filt) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_CFG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DATA_CFG,
             THRES_FILT, MULT_BIT_PARAM, ACQ_HW_DATA_TRIG_FILT_MIN,
             ACQ_HW_DATA_TRIG_FILT_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -698,7 +699,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_filt) {
 #define ACQ_CORE_TRIG_DATA_THRES_W(val)             (val)
 #define ACQ_CORE_TRIG_DATA_THRES_MASK               ((1ULL<<32)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_thres) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DATA_THRES,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DATA_THRES,
             /* No field */, MULT_BIT_PARAM, /* No minimum check*/,
             /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -708,7 +709,7 @@ RW_PARAM_FUNC(acq, hw_data_trig_thres) {
 #define ACQ_CORE_TRIG_DLY_W(val)                    (val)
 #define ACQ_CORE_TRIG_DLY_MASK                      ((1ULL<<32)-1)
 RW_PARAM_FUNC(acq, hw_trig_dly) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, TRIG_DLY,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, TRIG_DLY,
             /* No field*/, MULT_BIT_PARAM, /* No minimum check */,
             /* No maximum check */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -719,7 +720,7 @@ RW_PARAM_FUNC(acq, hw_trig_dly) {
 #define ACQ_SW_TRIG_MIN                             0
 #define ACQ_SW_TRIG_MAX                             1
 RW_PARAM_FUNC(acq, sw_trig) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, SW_TRIG,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, SW_TRIG,
             /* No field*/, MULT_BIT_PARAM, ACQ_SW_TRIG_MIN,
             ACQ_SW_TRIG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -727,7 +728,7 @@ RW_PARAM_FUNC(acq, sw_trig) {
 #define ACQ_FSM_STOP_MIN                            0
 #define ACQ_FSM_STOP_MAX                            1
 RW_PARAM_FUNC(acq, fsm_stop) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, CTL,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, CTL,
             FSM_STOP_ACQ, SINGLE_BIT_PARAM, ACQ_FSM_STOP_MIN,
             ACQ_FSM_STOP_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -735,7 +736,7 @@ RW_PARAM_FUNC(acq, fsm_stop) {
 #define ACQ_DATA_DRIVEN_CHAN_MIN                    0
 #define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
 RW_PARAM_FUNC(acq, hw_data_trig_chan) {
-    SET_GET_PARAM(acq, WB_ACQ_CORE_CTRL_REGS_OFFS, ACQ_CORE, ACQ_CHAN_CTL,
+    SET_GET_PARAM(acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL,
             DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,
             ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }

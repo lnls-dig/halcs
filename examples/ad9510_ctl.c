@@ -5,14 +5,14 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER                        "/tmp/bpm"
+#define DFLT_BIND_FOLDER                        "/tmp/halcs"
 
 /* Default value definitions */
 
-#define DFLT_BPM_NUMBER                         0
-#define MAX_BPM_NUMBER                          1
+#define DFLT_HALCS_NUMBER                         0
+#define MAX_HALCS_NUMBER                          1
 
 #define DFLT_BOARD_NUMBER                       0
 
@@ -29,19 +29,19 @@
 
 #define MAX_NUM_FUNCS                           FUNC_AD9510_END
 
-typedef bpm_client_err_e (*bpm_func_fp) (bpm_client_t *self, char *service,
+typedef halcs_client_err_e (*halcs_func_fp) (halcs_client_t *self, char *service,
         uint32_t value);
 
-static const bpm_func_fp bpm_ad9510_funcs [MAX_NUM_FUNCS] = {
-    &bpm_set_ad9510_pll_a_div,
-    &bpm_set_ad9510_pll_b_div,
-    &bpm_set_ad9510_pll_prescaler,
-    &bpm_set_ad9510_r_div,
-    &bpm_set_ad9510_pll_pdown,
-    &bpm_set_ad9510_mux_status,
-    &bpm_set_ad9510_cp_current,
-    &bpm_set_ad9510_outputs,
-    &bpm_set_ad9510_pll_clk_sel,
+static const halcs_func_fp halcs_ad9510_funcs [MAX_NUM_FUNCS] = {
+    &halcs_set_ad9510_pll_a_div,
+    &halcs_set_ad9510_pll_b_div,
+    &halcs_set_ad9510_pll_prescaler,
+    &halcs_set_ad9510_r_div,
+    &halcs_set_ad9510_pll_pdown,
+    &halcs_set_ad9510_mux_status,
+    &halcs_set_ad9510_cp_current,
+    &halcs_set_ad9510_outputs,
+    &halcs_set_ad9510_pll_clk_sel,
 };
 
 void print_help (char *program_name)
@@ -51,7 +51,7 @@ void print_help (char *program_name)
             "\t-v Verbose output\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-a_div <divider> PLL A Divider\n"
             "\t-b_div <divider> PLL B Divider\n"
             "\t-prescaler <value> PLL Prescaler value\n"
@@ -74,7 +74,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *a_div_str = NULL;
     char *b_div_str = NULL;
     char *prescaler_div_str = NULL;
@@ -113,9 +113,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq (argv[i], "-a_div")) { /* a_div: divider value */
             func_call [FUNC_AD9510_A_DIV_IDX].call = 1;
@@ -184,48 +184,48 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:leds]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:leds]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:leds]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     for (i = 0; i < MAX_NUM_FUNCS; ++i) {
         if (func_call [i].call == 1) {
             fprintf (stdout, "[client:ad9510_ctl]: Calling function #%d\n", i);
             fprintf (stdout, "[client:ad9510_ctl]: Argument: %lu\n", strtoul (*func_call [i].arg, NULL, 10));
-            bpm_client_err_e err = bpm_ad9510_funcs [i]
-                (bpm_client, service, strtoul (*func_call [i].arg, NULL, 10));
+            halcs_client_err_e err = halcs_ad9510_funcs [i]
+                (halcs_client, service, strtoul (*func_call [i].arg, NULL, 10));
 
-            if (err != BPM_CLIENT_SUCCESS) {
+            if (err != HALCS_CLIENT_SUCCESS) {
                 fprintf (stderr, "[client:ad9510_ctl]: Error executing remote "
-                        "function: %s\n", bpm_client_err_str (err));
+                        "function: %s\n", halcs_client_err_str (err));
             }
         }
     }
 
-err_bpm_client_new:
-    bpm_client_destroy (&bpm_client);
+err_halcs_client_new:
+    halcs_client_destroy (&halcs_client);
 
     /* ugly... */
     free (a_div_str);
@@ -238,7 +238,7 @@ err_bpm_client_new:
     free (outputs_str);
     free (pll_clk_sel_str);
     free (board_number_str);
-    free (bpm_number_str);
+    free (halcs_number_str);
     free (broker_endp);
 
     return 0;

@@ -1,11 +1,14 @@
-# Beam Position Monitor Software
+# Hardware Abstraction Layer for Control Systems
 
-[![Build Status](https://travis-ci.org/lnls-dig/bpm-sw.svg)](https://travis-ci.org/lnls-dig/bpm-sw)
-![Latest tag](https://img.shields.io/github/tag/lnls-dig/bpm-sw.svg?style=flat)
-[![Latest release](https://img.shields.io/github/release/lnls-dig/bpm-sw.svg?style=flat)](https://github.com/lnls-dig/bpm-sw/releases)
-[![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/bpm-sw.svg?style=flat)](COPYING)
+To keep things tidy, old issues will be kept on
+the old repository: https://github.com/lnls-dig/bpm-sw/issues
 
-Software for controlling the AFC BPM boards
+[![Build Status](https://travis-ci.org/lnls-dig/halcs.svg)](https://travis-ci.org/lnls-dig/halcs)
+![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
+[![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
+[![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/halcs.svg?style=flat)](COPYING)
+
+Software for creating controlling daemons for devices
 
 ## Prerequisites:
 
@@ -40,7 +43,7 @@ the binaries or executing the instructions below:
 
 ## Cloning this repository
 
-	git clone --recursive https://github.com/lerwys/bpm-sw.git
+	git clone --recursive https://github.com/lerwys/halcs.git
 
 ## PCIe Installation Instructions
 
@@ -213,19 +216,24 @@ the PCIe kernel driver.
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	./compile.sh <board type = [ml605|afcv3]>
+	Usage: ./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
+		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
 
 ### Client
 
 Change to the Client API folder
 
-	cd src/libs/libbpmclient
+	cd src/libs/libhalcsclient
 
 Compile the library, with debug info
 
-	make ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
+	make BOARD=<board> ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
         ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
         DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
+
+or
+
+	sudo ./compile.sh [<board>]
 
 Install the library
 
@@ -243,15 +251,15 @@ Compile the examples
 
 Run an example application, for instance, the leds example
 
-	./leds -v -b <broker_endpoint> -board <board_number> -bpm <bpm_number>
+	./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
-	./leds -v -b ipc:///tmp/bpm -board <board_number> -bpm <bpm_number>
+	./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
 
 If one would like to use TCP, it should call, for instance:
 
-	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -bpm <bpm_number>
+	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
 
 Leds should be blinking in the FMC ADC board

@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_rffe_codes.h"
 #include "sm_io_rffe_defaults.h"
@@ -102,69 +102,39 @@ err_get_rffe_handler:
     return err;
 }
 
-RFFE_FUNC_NAME_HEADER(sw)
+RFFE_FUNC_NAME_HEADER(att)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SW,
-            "Could not set/get RFFE switching");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_ATT,
+            "Could not set/get RFFE attenuator");
 }
 
-
-RFFE_FUNC_NAME_HEADER(att1)
+RFFE_FUNC_NAME_HEADER(temp_ac)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_ATT1,
-            "Could not set/get RFFE attenuator 1");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP_AC,
+            "Could not set/get RFFE temperature AC");
 }
 
-RFFE_FUNC_NAME_HEADER(att2)
+RFFE_FUNC_NAME_HEADER(temp_bd)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_ATT2,
-            "Could not set/get RFFE attenuator 2");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP_BD,
+            "Could not set/get RFFE temperature BD");
 }
 
-RFFE_FUNC_NAME_HEADER(temp1)
+RFFE_FUNC_NAME_HEADER(set_point_ac)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP1,
-            "Could not set/get RFFE temperature 1");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT_AC,
+            "Could not set/get RFFE set point AC");
 }
 
-RFFE_FUNC_NAME_HEADER(temp2)
+RFFE_FUNC_NAME_HEADER(set_point_bd)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP2,
-            "Could not set/get RFFE temperature 2");
-}
-
-RFFE_FUNC_NAME_HEADER(temp3)
-{
-    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP3,
-            "Could not set/get RFFE temperature 3");
-}
-
-
-RFFE_FUNC_NAME_HEADER(temp4)
-{
-    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_TEMP4,
-            "Could not set/get RFFE temperature 4");
-}
-
-RFFE_FUNC_NAME_HEADER(set_point1)
-{
-    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT1,
-            "Could not set/get RFFE set point 1");
-}
-
-RFFE_FUNC_NAME_HEADER(set_point2)
-{
-    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT2,
-            "Could not set/get RFFE set point 2");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SET_POINT_BD,
+            "Could not set/get RFFE set point BD");
 }
 
 RFFE_FUNC_NAME_HEADER(temp_control)
@@ -174,19 +144,19 @@ RFFE_FUNC_NAME_HEADER(temp_control)
             "Could not set/get RFFE temperature control");
 }
 
-RFFE_FUNC_NAME_HEADER(output1)
+RFFE_FUNC_NAME_HEADER(heater_ac)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_OUTPUT1,
-            "Could not set/get RFFE output 1");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_HEATER_AC,
+            "Could not set/get RFFE heater AC");
 }
 
 
-RFFE_FUNC_NAME_HEADER(output2)
+RFFE_FUNC_NAME_HEADER(heater_bd)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_OUTPUT2,
-            "Could not set/get RFFE output 2");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_HEATER_BD,
+            "Could not set/get RFFE output BD");
 }
 
 RFFE_FUNC_NAME_HEADER(reset)
@@ -218,32 +188,68 @@ RFFE_FUNC_NAME_HEADER(version)
 }
 
 
-RFFE_FUNC_NAME_HEADER(sw_lvl)
+RFFE_FUNC_NAME_HEADER(pid_ac_kp)
 {
     return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
-            smch_rffe_write_var, RFFE_OPCODE_SET_GET_SW_LVL,
-            "Could not set/get RFFE switching level");
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_AC_KP,
+            "Could not set/get RFFE AC PID KP parameter");
+}
+
+RFFE_FUNC_NAME_HEADER(pid_ac_ti)
+{
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_AC_TI,
+            "Could not set/get RFFE AC PID TI parameter");
+}
+
+RFFE_FUNC_NAME_HEADER(pid_ac_td)
+{
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_AC_TD,
+            "Could not set/get RFFE AC PID TD parameter");
+}
+
+RFFE_FUNC_NAME_HEADER(pid_bd_kp)
+{
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_BD_KP,
+            "Could not set/get RFFE BD PID KP parameter");
+}
+
+RFFE_FUNC_NAME_HEADER(pid_bd_ti)
+{
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_BD_TI,
+            "Could not set/get RFFE BD PID TI parameter");
+}
+
+RFFE_FUNC_NAME_HEADER(pid_bd_td)
+{
+    return _rffe_var_rw(owner, args, ret, smch_rffe_read_var,
+            smch_rffe_write_var, RFFE_OPCODE_SET_GET_PID_BD_TD,
+            "Could not set/get RFFE BD PID TD parameter");
 }
 
 /* Exported function pointers */
 const disp_table_func_fp rffe_exp_fp [] = {
-    RFFE_FUNC_NAME(sw),
-    RFFE_FUNC_NAME(att1),
-    RFFE_FUNC_NAME(att2),
-    RFFE_FUNC_NAME(temp1),
-    RFFE_FUNC_NAME(temp2),
-    RFFE_FUNC_NAME(temp3),
-    RFFE_FUNC_NAME(temp4),
-    RFFE_FUNC_NAME(set_point1),
-    RFFE_FUNC_NAME(set_point2),
+    RFFE_FUNC_NAME(att),
+    RFFE_FUNC_NAME(temp_ac),
+    RFFE_FUNC_NAME(temp_bd),
+    RFFE_FUNC_NAME(set_point_ac),
+    RFFE_FUNC_NAME(set_point_bd),
     RFFE_FUNC_NAME(temp_control),
-    RFFE_FUNC_NAME(output1),
-    RFFE_FUNC_NAME(output2),
+    RFFE_FUNC_NAME(heater_ac),
+    RFFE_FUNC_NAME(heater_bd),
     RFFE_FUNC_NAME(reset),
     RFFE_FUNC_NAME(reprog),
     RFFE_FUNC_NAME(data),
     RFFE_FUNC_NAME(version),
-    RFFE_FUNC_NAME(sw_lvl),
+    RFFE_FUNC_NAME(pid_ac_kp),
+    RFFE_FUNC_NAME(pid_ac_ti),
+    RFFE_FUNC_NAME(pid_ac_td),
+    RFFE_FUNC_NAME(pid_bd_kp),
+    RFFE_FUNC_NAME(pid_bd_ti),
+    RFFE_FUNC_NAME(pid_bd_td),
     NULL
 };
 

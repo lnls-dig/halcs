@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_fmc250m_4ch_codes.h"
 #include "sm_io_fmc250m_4ch_defaults.h"
@@ -73,69 +73,69 @@ static smch_err_e smch_isla216p_test_mode_compat (smch_isla216p_t *self,
 
 /* We receive data as 32-bit, but the 16 MSB are zeroed. It is conveninent
  * to sign extend the bits */
-static int _rw_bpm_fmc250m_4ch_data_fmt (uint32_t *data)
+static int _rw_halcs_fmc250m_4ch_data_fmt (uint32_t *data)
 {
     *data = WBGEN2_SIGN_EXTEND(*data, 15);
 
     return PARAM_OK;
 }
 
-rw_param_format_fp rw_bpm_fmc250m_4ch_data_fmt_fp = _rw_bpm_fmc250m_4ch_data_fmt;
+rw_param_format_fp rw_halcs_fmc250m_4ch_data_fmt_fp = _rw_halcs_fmc250m_4ch_data_fmt;
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_data0) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             CH0_STA, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc250m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc250m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_data1) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             CH1_STA, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc250m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc250m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_data2) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             CH2_STA, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc250m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc250m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_data3) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             CH3_STA, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
-            rw_bpm_fmc250m_4ch_data_fmt_fp, SET_FIELD);
+            rw_halcs_fmc250m_4ch_data_fmt_fp, SET_FIELD);
 }
 
 #if 0
 /******************************** ADC Delay Values ****************************/
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val0) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY0_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val1) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY1_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val2) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY2_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val3) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY3_CAL, VAL, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -144,28 +144,28 @@ RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val3) {
 /******************************** ADC Delay Lines *****************************/
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line0) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY0_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line1) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY1_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line2) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY2_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line3) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY3_CAL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -174,28 +174,28 @@ RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line3) {
 /******************************** ADC Delay Update ****************************/
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt0) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY0_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt1) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY1_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt2) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY2_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt3) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             IDELAY3_CAL, UPDATE, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
@@ -284,7 +284,7 @@ err_adc_dly:
                                                                                 \
         /* Delay value will be masked inside _fmc250m_4ch_set_adc_dly_ll */     \
                                                                                 \
-        return _fmc250m_4ch_set_adc_dly_ll (self, FMC_250M_CTRL_REGS_OFFS |     \
+        return _fmc250m_4ch_set_adc_dly_ll (self, 0x0 |     \
                 WB_FMC_250M_4CH_CSR_REG_IDELAY ## channel ## _CAL, dly_val,     \
                 dly_type);                                                      \
                                                                                 \
@@ -315,33 +315,33 @@ FMC250M_4CH_ADC_DLY_FUNC_HEADER(3)
 
 /***************************** ADC ISLA216P Control ***************************/
 
-#define BPM_FMC250M_4CH_RST_ADCS_MIN            0 /* Do nothing on RST_ADCS pin */
-#define BPM_FMC250M_4CH_RST_ADCS_MAX            1 /* Pulse RST_ADCS pin */
+#define HALCS_FMC250M_4CH_RST_ADCS_MIN            0 /* Do nothing on RST_ADCS pin */
+#define HALCS_FMC250M_4CH_RST_ADCS_MAX            1 /* Pulse RST_ADCS pin */
 
 RW_PARAM_FUNC(fmc250m_4ch, rst_adcs) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             ADC_CTL, RST_ADCS, SINGLE_BIT_PARAM,
-            BPM_FMC250M_4CH_RST_ADCS_MIN, BPM_FMC250M_4CH_RST_ADCS_MAX, NO_CHK_FUNC,
+            HALCS_FMC250M_4CH_RST_ADCS_MIN, HALCS_FMC250M_4CH_RST_ADCS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC250M_4CH_RST_DIV_ADCS_MIN        0  /* Do nothing on RST_DIV_ADCS pin */
-#define BPM_FMC250M_4CH_RST_DIV_ADCS_MAX        1  /* Pulse RST_DIV_ADCS pin */
+#define HALCS_FMC250M_4CH_RST_DIV_ADCS_MIN        0  /* Do nothing on RST_DIV_ADCS pin */
+#define HALCS_FMC250M_4CH_RST_DIV_ADCS_MAX        1  /* Pulse RST_DIV_ADCS pin */
 
 RW_PARAM_FUNC(fmc250m_4ch, rst_div_adcs) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             ADC_CTL, RST_DIV_ADCS, SINGLE_BIT_PARAM,
-            BPM_FMC250M_4CH_RST_DIV_ADCS_MIN, BPM_FMC250M_4CH_RST_DIV_ADCS_MAX, NO_CHK_FUNC,
+            HALCS_FMC250M_4CH_RST_DIV_ADCS_MIN, HALCS_FMC250M_4CH_RST_DIV_ADCS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define BPM_FMC250M_4CH_SLEEP_ADCS_MIN        	0  /* Do nothing on SLEEP_ADCS pin */
-#define BPM_FMC250M_4CH_SLEEP_ADCS_MAX        	1  /* Pulse SLEEP_ADCS pin */
+#define HALCS_FMC250M_4CH_SLEEP_ADCS_MIN        	0  /* Do nothing on SLEEP_ADCS pin */
+#define HALCS_FMC250M_4CH_SLEEP_ADCS_MAX        	1  /* Pulse SLEEP_ADCS pin */
 
 RW_PARAM_FUNC(fmc250m_4ch, sleep_adcs) {
-    SET_GET_PARAM(fmc250m_4ch, FMC_250M_CTRL_REGS_OFFS, WB_FMC_250M_4CH_CSR,
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
             ADC_CTL, SLEEP_ADCS, SINGLE_BIT_PARAM,
-            BPM_FMC250M_4CH_SLEEP_ADCS_MIN, BPM_FMC250M_4CH_SLEEP_ADCS_MAX, NO_CHK_FUNC,
+            HALCS_FMC250M_4CH_SLEEP_ADCS_MIN, HALCS_FMC250M_4CH_SLEEP_ADCS_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 

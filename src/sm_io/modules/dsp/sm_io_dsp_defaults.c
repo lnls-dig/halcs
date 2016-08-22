@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_dsp_defaults.h"
 
@@ -32,7 +32,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:dsp_defaults]",               \
             smio_err_str (err_type))
 
-#define SMIO_DSP_LIBBPMCLIENT_LOG_MODE                "a"
+#define SMIO_DSP_LIBHALCSCLIENT_LOG_MODE                "a"
 
 /* We use the actual libclient to send and configure our default values,
  * maintaining internal consistency. So, in fact, we are sending ourselves
@@ -48,39 +48,39 @@ smio_err_e dsp_config_defaults (char *broker_endp, char *service,
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:dsp_defaults] Configuring SMIO "
             "DSP with default values ...\n");
-    bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
+    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
-    bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
-            log_file_name, SMIO_DSP_LIBBPMCLIENT_LOG_MODE);
+    halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_DSP_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
-    client_err = bpm_set_kx (config_client, service, DSP_DFLT_KX_VAL);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set KX value",
+    client_err = halcs_set_kx (config_client, service, DSP_DFLT_KX_VAL);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set KX value",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_ky (config_client, service, DSP_DFLT_KY_VAL);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set KY value",
+    client_err = halcs_set_ky (config_client, service, DSP_DFLT_KY_VAL);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set KY value",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_ksum (config_client, service, DSP_DFLT_KSUM_VAL);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set KSUM value",
+    client_err = halcs_set_ksum (config_client, service, DSP_DFLT_KSUM_VAL);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set KSUM value",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_ds_tbt_thres (config_client, service, DSP_DFLT_DS_TBT_THRES);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set Delta-Sigma TBT threshold",
+    client_err = halcs_set_ds_tbt_thres (config_client, service, DSP_DFLT_DS_TBT_THRES);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set Delta-Sigma TBT threshold",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_ds_fofb_thres (config_client, service, DSP_DFLT_DS_FOFB_THRES);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set Delta-Sigma FOFB threshold",
+    client_err = halcs_set_ds_fofb_thres (config_client, service, DSP_DFLT_DS_FOFB_THRES);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set Delta-Sigma FOFB threshold",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = bpm_set_ds_monit_thres (config_client, service, DSP_DFLT_DS_MONIT_THRES);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set Delta-Sigma MONIT threshold",
+    client_err = halcs_set_ds_monit_thres (config_client, service, DSP_DFLT_DS_MONIT_THRES);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set Delta-Sigma MONIT threshold",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:
-    bpm_client_destroy (&config_client);
+    halcs_client_destroy (&config_client);
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:dsp_defaults] Exiting Config thread %s\n",
         service);

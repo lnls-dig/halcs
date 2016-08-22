@@ -5,12 +5,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -20,7 +20,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-sw <Switching = [0|1]> Start switching counters\n"
             "\t-sw_en <Switching enable= [0|1]> Enable switching outputs\n"
@@ -34,7 +34,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *sw_str = NULL;
     char *sw_en_str = NULL;
     char *div_clk_str = NULL;
@@ -64,9 +64,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq (argv[i], "-sw")) {
             str_p = &sw_str;
@@ -105,96 +105,96 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:dsp]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:dsp]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:dsp]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:dsp]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     /* Generate the service names for each SMIO */
     char service_dsp[50];
-    snprintf (service_dsp, sizeof (service_dsp), "BPM%u:DEVIO:DSP%u", board_number, bpm_number);
+    snprintf (service_dsp, sizeof (service_dsp), "HALCS%u:DEVIO:DSP%u", board_number, halcs_number);
     char service_swap[50];
-    snprintf (service_swap, sizeof (service_swap), "BPM%u:DEVIO:SWAP%u", board_number, bpm_number);
+    snprintf (service_swap, sizeof (service_swap), "HALCS%u:DEVIO:SWAP%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     uint32_t kx_set = 10000000;
     fprintf (stdout, "[client:dsp]: kx = %u\n", kx_set);
-    bpm_client_err_e err = bpm_set_kx (bpm_client, service_dsp, kx_set);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_set_kx failed\n");
-        goto err_bpm_set;
+    halcs_client_err_e err = halcs_set_kx (halcs_client, service_dsp, kx_set);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_set_kx failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:dsp]: bpm_set_kx was successfully executed\n");
+    fprintf (stdout, "[client:dsp]: halcs_set_kx was successfully executed\n");
 
     uint32_t ds_tbt_thres = 200000;
     fprintf (stdout, "[client:dsp]: ds_tbt_thres = %u\n", ds_tbt_thres);
-    err = bpm_set_ds_tbt_thres (bpm_client, service_dsp, ds_tbt_thres);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_set_tbt_ds_thres failed\n");
-        goto err_bpm_set;
+    err = halcs_set_ds_tbt_thres (halcs_client, service_dsp, ds_tbt_thres);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_set_tbt_ds_thres failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:dsp]: bpm_set_ds_tbt_thres was successfully executed\n");
+    fprintf (stdout, "[client:dsp]: halcs_set_ds_tbt_thres was successfully executed\n");
 
     uint32_t kx_get;
-    err = bpm_get_kx (bpm_client, service_dsp, &kx_get);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_get_kx failed\n");
-        goto err_bpm_get;
+    err = halcs_get_kx (halcs_client, service_dsp, &kx_get);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_get_kx failed\n");
+        goto err_halcs_get;
     }
-    fprintf (stdout, "[client:dsp]: bpm_get_kx = %u was successfully executed\n",
+    fprintf (stdout, "[client:dsp]: halcs_get_kx = %u was successfully executed\n",
                     kx_get);
 
     uint32_t ky_set = 10000000;
     fprintf (stdout, "[client:dsp]: ky = %u\n", ky_set);
-    err = bpm_set_ky (bpm_client, service_dsp, ky_set);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_set_ky failed\n");
-        goto err_bpm_set;
+    err = halcs_set_ky (halcs_client, service_dsp, ky_set);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_set_ky failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:dsp]: bpm_set_ky was successfully executed\n");
+    fprintf (stdout, "[client:dsp]: halcs_set_ky was successfully executed\n");
 
     uint32_t ky_get;
-    err = bpm_get_ky (bpm_client, service_dsp, &ky_get);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_get_ky failed\n");
-        goto err_bpm_get;
+    err = halcs_get_ky (halcs_client, service_dsp, &ky_get);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_get_ky failed\n");
+        goto err_halcs_get;
     }
-    fprintf (stdout, "[client:dsp]: bpm_get_ky = %u was successfully executed\n",
+    fprintf (stdout, "[client:dsp]: halcs_get_ky = %u was successfully executed\n",
                     ky_get);
 
     uint32_t ksum_set = 0x7FFFFF;  // 1.0 FIX25_24;
     fprintf (stdout, "[client:dsp]: ksum = %u\n", ksum_set);
-    err = bpm_set_ksum (bpm_client, service_dsp, ksum_set);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_set_ksum failed\n");
-        goto err_bpm_set;
+    err = halcs_set_ksum (halcs_client, service_dsp, ksum_set);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_set_ksum failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:dsp]: bpm_set_ksum was successfully executed\n");
+    fprintf (stdout, "[client:dsp]: halcs_set_ksum was successfully executed\n");
 
     uint32_t ksum_get;
-    err = bpm_get_ksum (bpm_client, service_dsp, &ksum_get);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:dsp]: bpm_get_ksum failed\n");
-        goto err_bpm_get;
+    err = halcs_get_ksum (halcs_client, service_dsp, &ksum_get);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:dsp]: halcs_get_ksum failed\n");
+        goto err_halcs_get;
     }
-    fprintf (stdout, "[client:dsp]: bpm_get_ksum = %u was successfully executed\n",
+    fprintf (stdout, "[client:dsp]: halcs_get_ksum = %u was successfully executed\n",
                     ksum_get);
 
     uint32_t sw = 0;
@@ -202,12 +202,12 @@ int main (int argc, char *argv [])
         sw = strtoul (sw_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: sw = %u\n", sw);
-        err = bpm_set_sw (bpm_client, service_swap, sw);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_sw failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_sw (halcs_client, service_swap, sw);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_sw was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw was successfully executed\n");
     }
 
     uint32_t sw_en = 0;
@@ -215,12 +215,12 @@ int main (int argc, char *argv [])
         sw_en = strtoul (sw_en_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: sw_en = %u\n", sw_en);
-        err = bpm_set_sw_en (bpm_client, service_swap, sw_en);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_sw_en failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_sw_en (halcs_client, service_swap, sw_en);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw_en failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_sw_en was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw_en was successfully executed\n");
     }
 
     uint32_t div_clk = 0;
@@ -228,12 +228,12 @@ int main (int argc, char *argv [])
         div_clk = strtoul (div_clk_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: div_clk = %u\n", div_clk);
-        err = bpm_set_div_clk (bpm_client, service_swap, div_clk);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_div_clk failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_div_clk (halcs_client, service_swap, div_clk);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_div_clk failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_div_clk was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_div_clk was successfully executed\n");
     }
 
     uint32_t sw_dly = 0;
@@ -241,53 +241,53 @@ int main (int argc, char *argv [])
         sw_dly = strtoul (sw_dly_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: sw_dly = %u\n", sw_dly);
-        err = bpm_set_sw_dly (bpm_client, service_swap, sw_dly);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_sw_dly failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_sw_dly (halcs_client, service_swap, sw_dly);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw_dly failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_sw_dly was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw_dly was successfully executed\n");
     }
 
     uint32_t gain_aa = 32768;
     uint32_t gain_ac = 32768;
-    err = bpm_set_gain_a (bpm_client, service_swap, gain_aa, gain_ac);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: bpm_set_gain_a failed\n");
-        goto err_bpm_set;
+    err = halcs_set_gain_a (halcs_client, service_swap, gain_aa, gain_ac);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: halcs_set_gain_a failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:swap]: bpm_set_gain_a = direct %u, inverted %u was successfully executed\n",
+    fprintf (stdout, "[client:swap]: halcs_set_gain_a = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
-    err = bpm_set_gain_b (bpm_client, service_swap, gain_aa, gain_ac);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: bpm_set_gain_b failed\n");
-        goto err_bpm_set;
+    err = halcs_set_gain_b (halcs_client, service_swap, gain_aa, gain_ac);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: halcs_set_gain_b failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:swap]: bpm_set_gain_b = direct %u, inverted %u was successfully executed\n",
+    fprintf (stdout, "[client:swap]: halcs_set_gain_b = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
-    err = bpm_set_gain_c (bpm_client, service_swap, gain_aa, gain_ac);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: bpm_set_gain_c failed\n");
-        goto err_bpm_set;
+    err = halcs_set_gain_c (halcs_client, service_swap, gain_aa, gain_ac);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: halcs_set_gain_c failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:swap]: bpm_set_gain_c = direct %u, inverted %u was successfully executed\n",
+    fprintf (stdout, "[client:swap]: halcs_set_gain_c = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
-    err = bpm_set_gain_d (bpm_client, service_swap, gain_aa, gain_ac);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: bpm_set_gain_d failed\n");
-        goto err_bpm_set;
+    err = halcs_set_gain_d (halcs_client, service_swap, gain_aa, gain_ac);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:swap]: halcs_set_gain_d failed\n");
+        goto err_halcs_set;
     }
-    fprintf (stdout, "[client:swap]: bpm_set_gain_d = direct %u, inverted %u was successfully executed\n",
+    fprintf (stdout, "[client:swap]: halcs_set_gain_d = direct %u, inverted %u was successfully executed\n",
             gain_aa, gain_ac);
 
-err_bpm_client_new:
-err_bpm_exit:
-err_bpm_get:
-err_bpm_set:
-    bpm_client_destroy (&bpm_client);
+err_halcs_client_new:
+err_halcs_exit:
+err_halcs_get:
+err_halcs_set:
+    halcs_client_destroy (&halcs_client);
     str_p = &div_clk_str;
     free (*str_p);
     div_clk_str = NULL;
@@ -306,9 +306,9 @@ err_bpm_set:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
 
     return 0;
 }

@@ -11,7 +11,7 @@
  * Description: Software driver for AD9510 chip (clock distribution)
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -44,7 +44,6 @@
 
 struct _smch_ad9510_t {
     smpr_t *spi;                    /* SPI protocol object */
-    uint32_t ss;                    /* Slave select line for this AD9510 chip */
 };
 
 static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
@@ -56,8 +55,8 @@ static bool _smch_ad9510_wait_completion (smch_ad9510_t *self, unsigned int trie
 static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 
 /* Creates a new instance of the SMCH AD9510 */
-smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
-        int verbose)
+smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base,
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -65,14 +64,12 @@ smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base, uint32_t ss,
     smch_ad9510_t *self = (smch_ad9510_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->spi = smpr_new (SMCH_AD9510_NAME, parent, SMPR_SPI, verbose);
+    self->spi = smpr_new (SMCH_AD9510_NAME, parent, reg_ops, verbose);
     ASSERT_ALLOC(self->spi, err_spi_alloc);
 
     /* Initalize the SPI protocol */
     int smpr_err = smpr_open (self->spi, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-
-    self->ss = ss;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:ad9510] Created instance of SMCH\n");
 
@@ -735,7 +732,7 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
     /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
-     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * does not need to be updated by setting the "update registers" bit. We still wait our default
      * ammount of time to be sure the chip is indeed reset */
     SMCH_AD9510_WAIT_DFLT;
 
@@ -746,7 +743,7 @@ static smch_err_e _smch_ad9510_init (smch_ad9510_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
     /* According to AD9510 datasheet Rev. B, page 46, table 25, regester 0x00 (CFG_SERIAL),
-     * does not need to be updated by setting the "update registers" bit. We still wait our default 
+     * does not need to be updated by setting the "update registers" bit. We still wait our default
      * ammount of time to be sure the chip is indeed reset */
 
     /* Wait for reset to complete */
@@ -770,16 +767,18 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
 
     /* We transmit a WRITE operation, with 1 byte transfer, with address as "addr"
      * and data as "data" */
-    uint32_t __data = ~AD9510_HDR_RW & (
+    uint64_t __addr = ~AD9510_HDR_RW & (
                 AD9510_HDR_BT_W(0x0) |
-                AD9510_HDR_ADDR_W(addr) |
-                AD9510_DATA_W(*data)
+                AD9510_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(AD9510_TRASNS_SIZE);
-    ssize_t smpr_err = smpr_write_32 (self->spi, 0, &__data, flags);
-    ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
-            err_smpr_write, -1);
+    size_t __addr_size = AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
+    uint32_t __data = AD9510_DATA_W(*data);
+    size_t __data_size = AD9510_DATA_SIZE/SMPR_BYTE_2_BIT;
+
+    ssize_t smpr_err = smpr_write_block (self->spi, __addr_size, __addr,
+            __data_size, &__data);
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+            "Could not write to SMPR", err_smpr_write, -1);
 
 err_smpr_write:
     return err;
@@ -798,20 +797,19 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
      * */
 
     /* We transmit a READ operation, with 1 byte transfer, with address as "addr"  */
-    uint32_t __data = AD9510_HDR_RW | (
+    uint64_t __addr = AD9510_HDR_RW | (
                 AD9510_HDR_BT_W(0x0) |
                 AD9510_HDR_ADDR_W(addr)
             );
-    uint32_t flags = SMPR_PROTO_SPI_SS_FLAGS_W(self->ss) |
-            SMPR_PROTO_SPI_CHARLEN_FLAGS_W(AD9510_TRASNS_SIZE);
-    ssize_t smpr_err = smpr_read_32 (self->spi, 0, &__data, flags);
-    ASSERT_TEST(smpr_err == sizeof(uint32_t), "Could not write to SMPR",
-            err_smpr_write, -1);
+    size_t __addr_size = AD9510_INSTADDR_SIZE/SMPR_BYTE_2_BIT;
+    size_t __data_size = AD9510_DATA_SIZE/SMPR_BYTE_2_BIT;
 
-    /* Only the 8 LSB are valid for one byte reading (AD9510_HDR_BT_W(0x0)) */
-    memcpy(data, &__data, sizeof(uint8_t));
+    ssize_t smpr_err = smpr_read_block (self->spi, __addr_size, __addr,
+            __data_size, (uint32_t *) data);
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+            "Could not read to SMPR", err_read_write, -1);
 
-err_smpr_write:
+err_read_write:
     return err;
 }
 

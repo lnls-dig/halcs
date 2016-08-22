@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -30,7 +30,7 @@
     CHECK_HAL_ERR(err, DEV_MNGR, "[dev_mngr]",                      \
             dmngr_err_str (err_type))
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 #define DFLT_BIND_ADDR              "0"
 #define IPC_FILE_PERM               0777
 
@@ -47,15 +47,15 @@ static const char* shortopt = "hf:";
 
 void print_help (char *program_name)
 {
-    fprintf (stdout, "EBPM Device Manager\n"
+    fprintf (stdout, "HALCSD Device Manager\n"
             "Usage: %s [options]\n"
             "Version %s\n, Build by: %s, %s\n"
             "\n"
             "  -h  --help                           Display this usage information\n"
             "  -f  --cfgfile <Configuration File>   Specify configuration file\n"
             "\n"
-            "\n\t Most of the options resides at the bpm_sw configuration file,\n"
-            "typically located in /etc/bpm_sw", program_name,
+            "\n\t Most of the options resides at the halcs configuration file,\n"
+            "typically located in /etc/halcs", program_name,
             revision_get_build_version (),
             revision_get_build_user_name (), revision_get_build_date ());
 }

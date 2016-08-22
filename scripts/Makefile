@@ -22,7 +22,7 @@ LDCONFIG_LOCAL_DIR := ldconf
 PWD = 		$(shell pwd)
 
 # OS information
-SERVICE_NAME = bpm-sw
+SERVICE_NAME = halcs
 INIT_SYSTEM := $(shell ./get-init-system.sh)
 SCRIPTS_FULL_NAME := $(shell cd $(INIT_SYSTEM) && find . -type f)
 LDCONFIG_FULL_NAME = $(shell cd $(LDCONFIG_LOCAL_DIR) && find . -type f)

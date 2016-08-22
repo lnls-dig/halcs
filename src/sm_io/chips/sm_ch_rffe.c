@@ -11,7 +11,7 @@
  * Description: Software driver for EEPROM RFFE chip
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -36,17 +36,18 @@
     CHECK_HAL_ERR(err, SM_CH, "[sm_ch:rffe]",                           \
             smch_err_str (err_type))
 
-#define SMCH_RFFE_NAME                    "BSMP_RFFE"
+#define SMCH_RFFE_NAME                    "RFFE"
 #define SMCH_RFFE_USECS_WAIT              10000
 #define SMCH_RFFE_WAIT(usecs)             usleep(usecs)
 #define SMCH_RFFE_WAIT_DFLT               SMCH_RFFE_WAIT(SMCH_RFFE_USECS_WAIT)
 
 struct _smch_rffe_t {
-    smpr_t *bsmp;                                       /* BSMP protocol object */
+    smpr_t *proto;                                       /* PROTO protocol object */
 };
 
 /* Creates a new instance of the SMCH RFFE */
-smch_rffe_t * smch_rffe_new (smio_t *parent, int verbose)
+smch_rffe_t * smch_rffe_new (smio_t *parent, const smpr_proto_ops_t *reg_ops,
+        int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -54,19 +55,19 @@ smch_rffe_t * smch_rffe_new (smio_t *parent, int verbose)
     smch_rffe_t *self = (smch_rffe_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->bsmp = smpr_new (SMCH_RFFE_NAME, parent, SMPR_BSMP, verbose);
-    ASSERT_ALLOC(self->bsmp, err_bsmp_alloc);
+    self->proto = smpr_new (SMCH_RFFE_NAME, parent, reg_ops, verbose);
+    ASSERT_ALLOC(self->proto, err_proto_alloc);
 
-    /* Initalize the BSMP protocol */
-    int smpr_err = smpr_open (self->bsmp, 0, NULL /* Default parameters are fine */);
+    /* Initalize the PROTO protocol */
+    int smpr_err = smpr_open (self->proto, 0, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:rffe] Created instance of SMCH\n");
     return self;
 
 err_smpr_init:
-    smpr_destroy (&self->bsmp);
-err_bsmp_alloc:
+    smpr_destroy (&self->proto);
+err_proto_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -80,8 +81,8 @@ smch_err_e smch_rffe_destroy (smch_rffe_t **self_p)
     if (*self_p) {
         smch_rffe_t *self = *self_p;
 
-        smpr_release (self->bsmp);
-        smpr_destroy (&self->bsmp);
+        smpr_release (self->proto);
+        smpr_destroy (&self->proto);
         free (self);
         *self_p = NULL;
     }
@@ -97,7 +98,7 @@ smch_err_e smch_rffe_write_var (smch_rffe_t *self, uint32_t id, uint8_t *data,
 
     smch_err_e err = SMCH_SUCCESS;
 
-    smpr_err_e smpr_err = smpr_bsmp_write_var_by_id (self->bsmp, id, data, size);
+    smpr_err_e smpr_err = smpr_bsmp_write_var_by_id (self->proto, id, data, size);
     ASSERT_TEST(smpr_err == SMPR_SUCCESS, "Could not write variable to SMPR",
             err_smpr_write_var, SMCH_ERR_RW_SMPR);
 
@@ -113,7 +114,7 @@ smch_err_e smch_rffe_read_var (smch_rffe_t *self, uint32_t id, uint8_t *data,
 
     smch_err_e err = SMCH_SUCCESS;
 
-    smpr_err_e smpr_err = smpr_bsmp_read_var_by_id (self->bsmp, id, data, size);
+    smpr_err_e smpr_err = smpr_bsmp_read_var_by_id (self->proto, id, data, size);
     ASSERT_TEST(smpr_err == SMPR_SUCCESS, "Could not read variable to SMPR",
             err_smpr_read_var, SMCH_ERR_RW_SMPR);
 

@@ -9,12 +9,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -25,7 +25,7 @@ static struct option long_options[] =
     {"help",                no_argument,         NULL, 'h'},
     {"brokerendp",          required_argument,   NULL, 'b'},
     {"verbose",             no_argument,         NULL, 'v'},
-    {"bpmnumber",           required_argument,   NULL, 's'},
+    {"halcsnumber",           required_argument,   NULL, 's'},
     {"boardslot",           required_argument,   NULL, 'o'},
     {"channumber",          required_argument,   NULL, 'c'},
     {"rcvsrc",              required_argument,   NULL, 'r'},
@@ -43,14 +43,14 @@ static const char* shortopt = "hb:vo:s:c:r:p:t:u:l:m:d:x:";
 
 void print_help (char *program_name)
 {
-    fprintf (stdout, "EBPM Trigger Utility\n"
+    fprintf (stdout, "HALCSD Trigger Utility\n"
             "Usage: %s [options]\n"
             "\n"
             "  -h  --help                           Display this usage information\n"
             "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
             "  -v  --verbose                        Verbose output\n"
             "  -o  --boardslot <Board slot number = [1-12]> \n"
-	    "  -s  --bpmnumber <BPM number = [0|1]> BPM number\n"
+	    "  -s  --halcsnumber <HALCS number = [0|1]> HALCS number\n"
             "                                       Board slot number\n"
             "  -c  --channumber <Channel | Channel Range>\n"
             "                                     Trigger Channel number\n"
@@ -79,7 +79,7 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *chan_str = NULL;
     int chan_sel = 0;
     char *rcvsrc_str = NULL;
@@ -122,7 +122,7 @@ int main (int argc, char *argv [])
                 break;
 
             case 's':
-                bpm_number_str = strdup (optarg);
+                halcs_number_str = strdup (optarg);
                 break;
 
             case 'c':
@@ -234,32 +234,32 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:trigger]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:trigger]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:trigger]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:trigger]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     char service_iface[50];
-    snprintf (service_iface, sizeof (service_iface), "BPM%u:DEVIO:TRIGGER_IFACE0", board_number);
+    snprintf (service_iface, sizeof (service_iface), "HALCS%u:DEVIO:TRIGGER_IFACE0", board_number);
     char service_mux[50];
-    snprintf (service_mux, sizeof (service_mux), "BPM%u:DEVIO:TRIGGER_MUX%u", board_number, bpm_number);
+    snprintf (service_mux, sizeof (service_mux), "HALCS%u:DEVIO:TRIGGER_MUX%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:trigger]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:trigger]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     uint32_t chan;
@@ -267,86 +267,86 @@ int main (int argc, char *argv [])
         uint32_t rcvsrc = 0;
         if (rcvsrc_sel == 1) {
             rcvsrc = strtoul (rcvsrc_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_rcv_src (bpm_client, service_mux, chan, rcvsrc);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_src failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_rcv_src (halcs_client, service_mux, chan, rcvsrc);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_src failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t rcvsel = 0;
         if (rcvsel_sel == 1) {
             rcvsel = strtoul (rcvsel_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_rcv_in_sel (bpm_client, service_mux, chan, rcvsel);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_sel failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_rcv_in_sel (halcs_client, service_mux, chan, rcvsel);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_sel failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t transmsrc = 0;
         if (transmsrc_sel == 1) {
             transmsrc = strtoul (transmsrc_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_transm_src (bpm_client, service_mux, chan, transmsrc);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_transm_src (halcs_client, service_mux, chan, transmsrc);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_sel failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t transmsel = 0;
         if (transmsel_sel == 1) {
             transmsel = strtoul (transmsel_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_transm_out_sel (bpm_client, service_mux, chan, transmsel);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_sel failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_transm_out_sel (halcs_client, service_mux, chan, transmsel);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_sel failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t rcvlen = 0;
         if (rcvlen_sel == 1) {
             rcvlen = strtoul (rcvlen_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_rcv_len (bpm_client, service_iface, chan, rcvlen);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_rcv_len failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_rcv_len (halcs_client, service_iface, chan, rcvlen);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_len failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t trnlen = 0;
         if (trnlen_sel == 1) {
             trnlen = strtoul (trnlen_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_transm_len (bpm_client, service_iface, chan, trnlen);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_transm_len failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_transm_len (halcs_client, service_iface, chan, trnlen);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_len failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t dir = 0;
         if (dir_sel == 1) {
             dir = strtoul (dir_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_dir (bpm_client, service_iface, chan, dir);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_dir (halcs_client, service_iface, chan, dir);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_dir failed\n");
+                goto err_halcs_set;
             }
         }
 
         uint32_t dirpol = 0;
         if (dirpol_sel == 1) {
             dirpol = strtoul (dirpol_str, NULL, 10);
-            bpm_client_err_e err = bpm_set_trigger_dir_pol (bpm_client, service_iface, chan, dirpol);
-            if (err != BPM_CLIENT_SUCCESS){
-                fprintf (stderr, "[client:trigger]: bpm_set_trigger_dir_pol failed\n");
-                goto err_bpm_set;
+            halcs_client_err_e err = halcs_set_trigger_dir_pol (halcs_client, service_iface, chan, dirpol);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_set_trigger_dir_pol failed\n");
+                goto err_halcs_set;
             }
         }
     }
 
-err_bpm_set:
-err_bpm_client_new:
+err_halcs_set:
+err_halcs_client_new:
     free (dirpol_str);
     dirpol_str = NULL;
     free (dir_str);
@@ -367,13 +367,13 @@ err_bpm_client_new:
     chan_str = NULL;
     free (board_number_str);
     board_number_str = NULL;
-    free (bpm_number_str);
-    bpm_number_str = NULL;
+    free (halcs_number_str);
+    halcs_number_str = NULL;
     free (num_samples_str);
     num_samples_str = NULL;
     free (broker_endp);
     broker_endp = NULL;
-    bpm_client_destroy (&bpm_client);
+    halcs_client_destroy (&halcs_client);
 
     return 0;
 }

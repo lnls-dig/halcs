@@ -36,6 +36,9 @@ typedef ssize_t (*write_dma_fp)(llio_t *self, uint64_t offs, size_t size, uint32
 /* typedef int (*read_info_fp)(struct _llio_t *self, struct _llio_dev_info_t *dev_info); moved to dev_io */
 
 typedef struct {
+    const char *name;               /* LLIO device name */
+
+    /* Operations */
     open_fp open;                   /* Open device */
     release_fp release;             /* Release device */
     read_16_fp read_16;             /* Read 16-bit data */
@@ -60,7 +63,7 @@ typedef struct {
 /************************************************************/
 
 /* Creates a new instance of the Low-level I/O */
-llio_t * llio_new (char *name, char *endpoint, llio_type_e type, int verbose);
+llio_t * llio_new (char *name, char *endpoint, const llio_ops_t *reg_ops, int verbose);
 /* Destroy an instance of the Low-level I/O */
 llio_err_e llio_destroy (llio_t **self_p);
 
@@ -82,6 +85,12 @@ char *llio_clone_endpoint_name (llio_t *self);
 llio_err_e llio_set_dev_handler (llio_t *self, void *dev_handler);
 /* Get dev handler */
 void *llio_get_dev_handler (llio_t *self);
+/* Get type */
+const char *llio_get_ops_name (llio_t *self);
+/* Set SDB prefix ADDR */
+llio_err_e llio_set_sdb_prefix_addr (llio_t *self, uint64_t sdb_prefix_addr);
+/* Get SDB prefix ADDR */
+uint64_t llio_get_sdb_prefix_addr (llio_t *self);
 
 /************************************************************/
 /**************** Low Level generic methods API *************/

@@ -25,11 +25,11 @@ KERNEL_FLAGS=()
 KERNEL_FLAGS+=("INSTALLDIR=${BUILD_PREFIX}/lib/modules/$(shell uname -r)/extra")
 KERNEL_FLAGS+=("INSTALLHDRDIR=${BUILD_PREFIX}/include/pciDriver/driver")
 
-BPM_OPTS=()
-BPM_OPTS+=(${CONFIG_FLAGS[@]})
-BPM_OPTS+=(${KERNEL_FLAGS[@]})
-BPM_OPTS+=("PREFIX=${BUILD_PREFIX}")
-BPM_OPTS+=("SCRIPTS_PREFIX=${SCRIPTS_PREFIX}")
+HALCS_OPTS=()
+HALCS_OPTS+=(${CONFIG_FLAGS[@]})
+HALCS_OPTS+=(${KERNEL_FLAGS[@]})
+HALCS_OPTS+=("PREFIX=${BUILD_PREFIX}")
+HALCS_OPTS+=("SCRIPTS_PREFIX=${SCRIPTS_PREFIX}")
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=(${CONFIG_FLAGS[@]})
@@ -61,4 +61,4 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${BPM_OPTS[*]}"
+./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"

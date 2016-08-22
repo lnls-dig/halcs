@@ -8,10 +8,11 @@
 #ifndef _SM_IO_RFFE_CORE_H_
 #define _SM_IO_RFFE_CORE_H_
 
-#define SMIO_CTL_HANDLER(smio_handler) (smio_handler->ctl)
+#define SMIO_CTL_HANDLER(smio_handler) (smio_handler->smch_ctl)
 
 typedef struct {
-    smch_rffe_t *ctl;
+    smpr_bsmp_t *smpr_ctl;
+    smch_rffe_t *smch_ctl;
 } smio_rffe_t;
 
 /***************** Our methods *****************/

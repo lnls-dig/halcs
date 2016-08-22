@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_rffe_core.h"
 
@@ -35,17 +35,21 @@
 /* Creates a new instance of Device Information */
 smio_rffe_t * smio_rffe_new (smio_t *parent)
 {
-    (void) parent;
-
     smio_rffe_t *self = (smio_rffe_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->ctl = smch_rffe_new (parent, 0);
-    ASSERT_ALLOC(self->ctl, err_rffe_alloc);
+    /* Create BSMP protocol for RFFE */
+    self->smpr_ctl = smpr_bsmp_new ();
+    ASSERT_ALLOC(self->smpr_ctl, err_smpr_ctl_alloc);
+
+    self->smch_ctl = smch_rffe_new (parent, smpr_bsmp_get_ops (self->smpr_ctl), 0);
+    ASSERT_ALLOC(self->smch_ctl, err_rffe_alloc);
 
     return self;
 
 err_rffe_alloc:
+    smpr_bsmp_destroy (&self->smpr_ctl);
+err_smpr_ctl_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -59,7 +63,8 @@ smio_err_e smio_rffe_destroy (smio_rffe_t **self_p)
     if (*self_p) {
         smio_rffe_t *self = *self_p;
 
-        smch_rffe_destroy (&self->ctl);
+        smpr_bsmp_destroy (&self->smpr_ctl);
+        smch_rffe_destroy (&self->smch_ctl);
         free (self);
         *self_p = NULL;
     }

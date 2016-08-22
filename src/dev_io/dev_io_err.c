@@ -8,7 +8,7 @@
 /* Error definitions and output stringification based on the work available
  * at the libsllp project repository: https://github.com/brunoseivam/libsllp */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 static const char *devio_err [DEVIO_ERR_END] =
 {

@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* FMC ACTIVE CLOCK chip addresses */
 const uint32_t fmc_active_clk_si571_addr = 0x49;

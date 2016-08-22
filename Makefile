@@ -14,8 +14,8 @@ DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= ml605
-# Select which application we want to generate. Options are: ebpm
-APPS ?= ebpm
+# Select which application we want to generate. Options are: halcsd
+APPS ?= halcsd
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE ?= y
@@ -42,7 +42,7 @@ SCRIPTS_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
-CFG_DIR ?= ${PREFIX}/etc/bpm_sw
+CFG_DIR ?= ${PREFIX}/etc/halcs
 export CFG_DIR
 # Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
 # SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
@@ -56,10 +56,10 @@ SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
 # Config filename
-CFG_FILENAME = bpm_sw.cfg
+CFG_FILENAME = halcs.cfg
 
 # Linker script
-LD_SCRIPT = linker/bpm-sw.ld
+LD_SCRIPT = linker/halcs.ld
 
 # Init sripts
 INIT_SCRIPTS =
@@ -82,7 +82,8 @@ LIBCONVC_DIR = src/libs/libconvc
 LIBHUTILS_DIR = src/libs/libhutils
 LIBDISPTABLE_DIR = src/libs/libdisptable
 LIBLLIO_DIR = src/libs/libllio
-LIBBPMCLIENT_DIR = src/libs/libbpmclient
+LIBHALCSCLIENT_DIR = src/libs/libhalcsclient
+LIBSDBUTILS_DIR = src/libs/libsdbutils
 LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C/CPP flags
@@ -193,10 +194,10 @@ LIBS = -lm -lzmq -lczmq -lmlm
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
-PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libbpmclient \
-                    libsdbfs libpcidriver
-PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lbpmclient \
-               -lsdbfs -lpcidriver
+PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libhalcsclient \
+                    libsdbutils  libsdbfs libpcidriver
+PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
+               -lsdbutils -lsdbfs -lpcidriver
 
 # General library flags -L<libdir>
 LFLAGS = -Lforeign/libsdbfs
@@ -283,7 +284,8 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libhutils libhutils_install libhutils_uninstall libhutils_clean libhutils_mrproper \
 	libdisptable libdisptable_install libdisptable_uninstall libdisptable_clean libdisptable_mrproper \
 	libllio libllio_install libllio_uninstall libllio_clean libllio_mrproper \
-	libbpmclient libbpmclient_install libbpmclient_uninstall libbpmclient_clean libbpmclient_mrproper \
+	libhalcsclient libhalcsclient_install libhalcsclient_uninstall libhalcsclient_clean libhalcsclient_mrproper \
+	libsdbutils libsdbutils_install libsdbutils_uninstall libsdbutils_clean libsdbutils_mrproper \
 	libsdbfs libsdbfs_install libsdbfs_uninstall libsdbfs_clean libsdbfs_mrproper \
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	core_install core_uninstall core_clean core_mrproper \
@@ -464,20 +466,35 @@ libllio_clean:
 libllio_mrproper:
 	$(MAKE) -C $(LIBLLIO_DIR) mrproper
 
-libbpmclient:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) all
+libhalcsclient:
+	$(MAKE) -C $(LIBHALCSCLIENT_DIR) all
 
-libbpmclient_install:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} install
+libhalcsclient_install:
+	$(MAKE) -C $(LIBHALCSCLIENT_DIR) PREFIX=${PREFIX} install
 
-libbpmclient_uninstall:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) PREFIX=${PREFIX} uninstall
+libhalcsclient_uninstall:
+	$(MAKE) -C $(LIBHALCSCLIENT_DIR) PREFIX=${PREFIX} uninstall
 
-libbpmclient_clean:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) clean
+libhalcsclient_clean:
+	$(MAKE) -C $(LIBHALCSCLIENT_DIR) clean
 
-libbpmclient_mrproper:
-	$(MAKE) -C $(LIBBPMCLIENT_DIR) mrproper
+libhalcsclient_mrproper:
+	$(MAKE) -C $(LIBHALCSCLIENT_DIR) mrproper
+
+libsdbutils:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) all
+
+libsdbutils_install:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) PREFIX=${PREFIX} install
+
+libsdbutils_uninstall:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) PREFIX=${PREFIX} uninstall
+
+libsdbutils_clean:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) clean
+
+libsdbutils_mrproper:
+	$(MAKE) -C $(LIBSDBUTILS_DIR) mrproper
 
 libsdbfs:
 	$(MAKE) -C $(LIBSDBFS_DIR) all
@@ -495,23 +512,29 @@ libsdbfs_mrproper:
 	$(MAKE) -C $(LIBSDBFS_DIR) mrproper
 
 libs: liberrhand libconvc libhutils \
-    libdisptable libllio libbpmclient libsdbfs
+    libdisptable libllio libhalcsclient libsdbutils \
+    libsdbfs
 
 libs_install: liberrhand_install libconvc_install libhutils_install \
-    libdisptable_install libllio_install libbpmclient_install libsdbfs_install
+    libdisptable_install libllio_install libhalcsclient_install libsdbutils_install \
+    libsdbfs_install
 
 libs_compile_install: liberrhand liberrhand_install libconvc libconvc_install \
     libhutils libhutils_install libdisptable libdisptable_install libllio libllio_install \
-    libbpmclient libbpmclient_install libsdbfs libsdbfs_install
+    libhalcsclient libhalcsclient_install libsdbutils libsdbutils_install \
+    libsdbfs libsdbfs_install
 
 libs_uninstall: liberrhand_uninstall libconvc_uninstall libhutils_uninstall \
-    libdisptable_uninstall libllio_uninstall libbpmclient_uninstall libsdbfs_uninstall
+    libdisptable_uninstall libllio_uninstall libhalcsclient_uninstall libsdbutils_uninstall \
+    libsdbfs_uninstall
 
 libs_clean: liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean libsdbfs_clean
+    libdisptable_clean libllio_clean libhalcsclient_clean libsdbutils_clean \
+    libsdbfs_clean
 
 libs_mrproper: liberrhand_mrproper libconvc_mrproper libhutils_mrproper \
-    libdisptable_mrproper libllio_mrproper libbpmclient_mrproper libsdbfs_mrproper
+    libdisptable_mrproper libllio_mrproper libhalcsclient_mrproper libsdbutils_mrproper \
+    libsdbfs_mrproper
 
 # External project dependencies
 
@@ -583,18 +606,18 @@ cfg_mrproper:
 	$(MAKE) -C cfg mrproper
 
 install: core_install deps_install liberrhand_install libconvc_install \
-    libhutils_install libdisptable_install libllio_install libbpmclient_install \
-    cfg_install scripts_install
+    libsdbutils_install libhutils_install libdisptable_install libllio_install \
+    libhalcsclient_install cfg_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
-    libhutils_uninstall libdisptable_uninstall libllio_uninstall libbpmclient_uninstall \
-    cfg_uninstall scripts_uninstall
+    libsdbutils_uninstall libhutils_uninstall libdisptable_uninstall libllio_uninstall \
+    libhalcsclient_uninstall cfg_uninstall scripts_uninstall
 
-clean: core_clean deps_clean liberrhand_clean libconvc_clean libhutils_clean \
-    libdisptable_clean libllio_clean libbpmclient_clean examples_clean tests_clean \
-    cfg_clean scripts_clean
+clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
+    libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean examples_clean \
+    tests_clean cfg_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
-    libhutils_mrproper libdisptable_mrproper libllio_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
+    libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
+    libhalcsclient_mrproper examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
 

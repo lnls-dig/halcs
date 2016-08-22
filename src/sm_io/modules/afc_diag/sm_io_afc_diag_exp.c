@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_afc_diag_codes.h"
 #include "sm_io_afc_diag_defaults.h"
@@ -42,13 +42,13 @@
 /************************************************************/
 
 RW_PARAM_FUNC(afc_diag, card_slot) {
-    SET_GET_PARAM(afc_diag, WB_AFC_DIAG_CTRL_RAW_REGS_OFFS, BPM_AFC_DIAG, GEO_ID,
+    SET_GET_PARAM(afc_diag, 0x0, HALCS_AFC_DIAG, GEO_ID,
             CARD_SLOT, MULT_BIT_PARAM, /* No minimum limit */,
             /* No maximum limit */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(afc_diag, ipmi_addr) {
-    SET_GET_PARAM(afc_diag, WB_AFC_DIAG_CTRL_RAW_REGS_OFFS, BPM_AFC_DIAG, GEO_ID,
+    SET_GET_PARAM(afc_diag, 0x0, HALCS_AFC_DIAG, GEO_ID,
             IPMI_ADDR, MULT_BIT_PARAM, /* No minimum limit */,
             /* No maximum limit */, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }

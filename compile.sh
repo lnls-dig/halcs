@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
-VALID_APPS_STR="Valid values are: \"ebpm\"."
+VALID_APPS_STR="Valid values are: \"halcsd\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
@@ -130,10 +130,10 @@ AFE_RFFE_TYPE=2
 # synthesized.
 WITH_APP_CFG=n
 # Selects the install location of the config file
-CFG_FILENAME=/etc/bpm_sw/bpm_sw.cfg
+CFG_FILENAME=/etc/halcs/halcs.cfg
 # Selects the install location of the config file
 PREFIX=/usr/local
-CFG_DIR=${PREFIX}/etc/bpm_sw
+CFG_DIR=${PREFIX}/etc/halcs
 # Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
 CFG=lnls_defconfig
 export CFG

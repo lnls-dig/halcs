@@ -7,12 +7,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER             0
-#define MAX_BPM_NUMBER              1
+#define DFLT_HALCS_NUMBER             0
+#define MAX_HALCS_NUMBER              1
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -22,7 +22,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             , program_name);
 }
@@ -32,7 +32,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char **str_p = NULL;
 
     if (argc < 3) {
@@ -58,9 +58,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
@@ -87,83 +87,83 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:afc_diag]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:afc_diag]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:afc_diag]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:afc_diag]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     /* Generate the service names for each SMIO */
     char service_afc_diag[50];
-    snprintf (service_afc_diag, sizeof (service_afc_diag), "BPM%u:DEVIO:AFC_DIAG0",
+    snprintf (service_afc_diag, sizeof (service_afc_diag), "HALCS%u:DEVIO:AFC_DIAG0",
             board_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
-    if (bpm_client == NULL) {
-        fprintf (stderr, "[client:acq]: bpm_client could be created\n");
-        goto err_bpm_client_new;
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
+    if (halcs_client == NULL) {
+        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
+        goto err_halcs_client_new;
     }
 
     uint32_t data;
-    bpm_client_err_e err = bpm_get_afc_diag_card_slot (bpm_client, service_afc_diag, &data);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:afc_diag]: bpm_get_afc_diag_card_slot failed\n");
-        goto err_bpm_get;
+    halcs_client_err_e err = halcs_get_afc_diag_card_slot (halcs_client, service_afc_diag, &data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_card_slot failed\n");
+        goto err_halcs_get;
     }
     fprintf (stdout, "[client:afc_diag]: Card slot: 0x%08X\n", data);
 
-    err = bpm_get_afc_diag_ipmi_addr (bpm_client, service_afc_diag, &data);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:afc_diag]: bpm_get_afc_diag_ipmi_addr failed\n");
-        goto err_bpm_get;
+    err = halcs_get_afc_diag_ipmi_addr (halcs_client, service_afc_diag, &data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_ipmi_addr failed\n");
+        goto err_halcs_get;
     }
     fprintf (stdout, "[client:afc_diag]: IPMI addr: 0x%08X\n", data);
 
     smio_afc_diag_revision_data_t rev_data;
-    err = bpm_get_afc_diag_build_date (bpm_client, service_afc_diag, &rev_data);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:afc_diag]: bpm_get_afc_diag_build_user_date failed\n");
-        goto err_bpm_get;
+    err = halcs_get_afc_diag_build_date (halcs_client, service_afc_diag, &rev_data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_build_user_date failed\n");
+        goto err_halcs_get;
     }
     fprintf (stdout, "[client:afc_diag]: Build date: %s\n", (char *) rev_data.data);
 
-    err = bpm_get_afc_diag_build_user_name (bpm_client, service_afc_diag, &rev_data);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:afc_diag]: bpm_get_afc_diag_build_user_name failed\n");
-        goto err_bpm_get;
+    err = halcs_get_afc_diag_build_user_name (halcs_client, service_afc_diag, &rev_data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_build_user_name failed\n");
+        goto err_halcs_get;
     }
     fprintf (stdout, "[client:afc_diag]: Build user name: %s\n", (char *) rev_data.data);
 
-    err = bpm_get_afc_diag_build_user_email (bpm_client, service_afc_diag, &rev_data);
-    if (err != BPM_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:afc_diag]: bpm_get_afc_diag_build_user_email failed\n");
-        goto err_bpm_get;
+    err = halcs_get_afc_diag_build_user_email (halcs_client, service_afc_diag, &rev_data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_build_user_email failed\n");
+        goto err_halcs_get;
     }
     fprintf (stdout, "[client:afc_diag]: Build user email: %s\n", (char *) rev_data.data);
 
-err_bpm_client_new:
-err_bpm_get:
-    bpm_client_destroy (&bpm_client);
+err_halcs_client_new:
+err_halcs_get:
+    halcs_client_destroy (&halcs_client);
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
 
     return 0;
 }

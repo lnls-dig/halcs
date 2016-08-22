@@ -5,12 +5,12 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <bpm_client.h>
+#include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/bpm"
+#define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_BPM_NUMBER                     0
-#define MAX_BPM_NUMBER                      1
+#define DFLT_HALCS_NUMBER                     0
+#define MAX_HALCS_NUMBER                      1
 
 #define DFLT_BOARD_NUMBER                   0
 
@@ -20,7 +20,7 @@ void print_help (char *program_name)
             "\t-h This help message\n"
             "\t-v Verbose output\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
-            "\t-bpm <BPM number = [0|1]>\n"
+            "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-pll_status PLL Lock status\n"
             "\t-trig_dir <dir> Trigger direction\n"
@@ -37,7 +37,7 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
-    char *bpm_number_str = NULL;
+    char *halcs_number_str = NULL;
     char *trig_dir_str = NULL;
     char *trig_term_str = NULL;
     char *adc_rand_str = NULL;
@@ -70,9 +70,9 @@ int main (int argc, char *argv [])
         {
             str_p = &board_number_str;
         }
-        else if (streq(argv[i], "-bpm"))
+        else if (streq(argv[i], "-halcs"))
         {
-            str_p = &bpm_number_str;
+            str_p = &halcs_number_str;
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
@@ -121,41 +121,41 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default bpm number */
-    uint32_t bpm_number;
-    if (bpm_number_str == NULL) {
-        fprintf (stderr, "[client:fmc130m_4ch]: Setting default value to BPM number: %u\n",
-                DFLT_BPM_NUMBER);
-        bpm_number = DFLT_BPM_NUMBER;
+    /* Set default halcs number */
+    uint32_t halcs_number;
+    if (halcs_number_str == NULL) {
+        fprintf (stderr, "[client:fmc130m_4ch]: Setting default value to HALCS number: %u\n",
+                DFLT_HALCS_NUMBER);
+        halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
-        bpm_number = strtoul (bpm_number_str, NULL, 10);
+        halcs_number = strtoul (halcs_number_str, NULL, 10);
 
-        if (bpm_number > MAX_BPM_NUMBER) {
-            fprintf (stderr, "[client:fmc130m_4ch]: BPM number too big! Defaulting to: %u\n",
-                    MAX_BPM_NUMBER);
-            bpm_number = MAX_BPM_NUMBER;
+        if (halcs_number > MAX_HALCS_NUMBER) {
+            fprintf (stderr, "[client:fmc130m_4ch]: HALCS number too big! Defaulting to: %u\n",
+                    MAX_HALCS_NUMBER);
+            halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
     /* Generate the service names for each SMIO */
     char service[50];
-    snprintf (service, sizeof (service), "BPM%u:DEVIO:FMC130M_4CH%u", board_number, bpm_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC130M_4CH%u", board_number, halcs_number);
 
-    bpm_client_t *bpm_client = bpm_client_new (broker_endp, verbose, NULL);
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
 
-    bpm_client_err_e err = BPM_CLIENT_SUCCESS;
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
     uint32_t trig_dir = 0;
     if (trig_dir_str != NULL) {
         trig_dir = strtoul (trig_dir_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: trig_dir = %u\n", trig_dir);
-        err = bpm_set_trig_dir (bpm_client, service, trig_dir);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_trig_dir failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_trig_dir (halcs_client, service, trig_dir);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_trig_dir failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_trig_dir was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_trig_dir was successfully executed\n");
     }
 
     uint32_t trig_term = 0;
@@ -163,12 +163,12 @@ int main (int argc, char *argv [])
         trig_term = strtoul (trig_term_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: trig_term = %u\n", trig_term);
-        err = bpm_set_trig_term (bpm_client, service, trig_term);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_trig_term failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_trig_term (halcs_client, service, trig_term);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_trig_term failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_trig_term was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_trig_term was successfully executed\n");
     }
 
     uint32_t adc_rand = 0;
@@ -176,12 +176,12 @@ int main (int argc, char *argv [])
         adc_rand = strtoul (adc_rand_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: adc_rand = %u\n", adc_rand);
-        err = bpm_set_adc_rand (bpm_client, service, adc_rand);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_adc_rand failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_adc_rand (halcs_client, service, adc_rand);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_adc_rand failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_adc_rand was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_adc_rand was successfully executed\n");
     }
 
     uint32_t adc_dith = 0;
@@ -189,12 +189,12 @@ int main (int argc, char *argv [])
         adc_dith = strtoul (adc_dith_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: adc_dith = %u\n", adc_dith);
-        err = bpm_set_adc_dith (bpm_client, service, adc_dith);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_adc_dith failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_adc_dith (halcs_client, service, adc_dith);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_adc_dith failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_adc_dith was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_adc_dith was successfully executed\n");
     }
 
     uint32_t adc_shdn = 0;
@@ -202,12 +202,12 @@ int main (int argc, char *argv [])
         adc_shdn = strtoul (adc_shdn_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: adc_shdn = %u\n", adc_shdn);
-        err = bpm_set_adc_shdn (bpm_client, service, adc_shdn);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_adc_shdn failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_adc_shdn (halcs_client, service, adc_shdn);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_adc_shdn failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_adc_shdn was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_adc_shdn was successfully executed\n");
     }
 
     uint32_t adc_pga = 0;
@@ -215,27 +215,27 @@ int main (int argc, char *argv [])
         adc_pga = strtoul (adc_pga_str, NULL, 10);
 
         fprintf (stdout, "[client:fmc130m_4ch]: adc_pga = %u\n", adc_pga);
-        err = bpm_set_adc_pga (bpm_client, service, adc_pga);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_set_adc_pga failed\n");
-            goto err_bpm_exit;
+        err = halcs_set_adc_pga (halcs_client, service, adc_pga);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_adc_pga failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_set_adc_pga was successfully executed\n");
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_adc_pga was successfully executed\n");
     }
 
     if (get_pll_status) {
         uint32_t pll_status = 0;
-        bpm_client_err_e err = bpm_get_fmc_pll_status (bpm_client, service, &pll_status);
-        if (err != BPM_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: bpm_get_fmc_pll_status failed\n");
-            goto err_bpm_exit;
+        halcs_client_err_e err = halcs_get_fmc_pll_status (halcs_client, service, &pll_status);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fmc130m_4ch]: halcs_get_fmc_pll_status failed\n");
+            goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: bpm_get_fmc_pll_status: 0x%08X\n",
+        fprintf (stdout, "[client:fmc130m_4ch]: halcs_get_fmc_pll_status: 0x%08X\n",
                 pll_status);
     }
 
-err_bpm_exit:
-    bpm_client_destroy (&bpm_client);
+err_halcs_exit:
+    halcs_client_destroy (&halcs_client);
     str_p = &adc_rand_str;
     free (*str_p);
     adc_rand_str = NULL;
@@ -260,9 +260,9 @@ err_bpm_exit:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
-    str_p = &bpm_number_str;
+    str_p = &halcs_number_str;
     free (*str_p);
-    bpm_number_str = NULL;
+    halcs_number_str = NULL;
 
     return 0;
 }

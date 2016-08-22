@@ -12,7 +12,9 @@
 #define SMIO_SI57X_HANDLER(smio_handler) ((smch_si57x_t *) smio_handler->smch_si571)
 
 typedef struct {
+    smpr_spi_t *smpr_spi_ad9510;                /* SPI protocol handler */
     smch_ad9510_t *smch_ad9510;                 /* AD9510 chip handler */
+    smpr_i2c_t *smpr_i2c_si571;                 /* I2C protocol handler */
     smch_si57x_t *smch_si571;                   /* SI571 chip handler */
 } smio_fmc_active_clk_t;
 

@@ -1,7 +1,7 @@
 Project Dependencies:
     liberrhand
     libhutils
-    libbpmclient
+    libhalcsclient
 
 Foreign Dependencies:
     libmlm

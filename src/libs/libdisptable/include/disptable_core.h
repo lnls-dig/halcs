@@ -28,7 +28,9 @@ typedef int (*disp_table_func_fp)(void *owner, void * args, void *ret);
 typedef enum {
     DISP_ATYPE_ERROR = 0xFF,
     DISP_ATYPE_NONE  = 0,           /* used as terminator */
-    DISP_ATYPE_INT16 = 1,
+    DISP_ATYPE_INT8 = 1,
+    DISP_ATYPE_UINT8,
+    DISP_ATYPE_INT16,
     DISP_ATYPE_UINT16,
     DISP_ATYPE_INT32,
     DISP_ATYPE_UINT32,

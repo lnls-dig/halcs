@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -31,7 +31,6 @@
             smpr_err_str (err_type))
 
 struct _smpr_t {
-    smpr_type_e type;                   /* Protocol type (SPI, I2C, 1-wire, GPIO, Bypass) */
     void *proto_handler;                /* Generic pointer to a protocol handler. This
                                             must be cast to a specific type by the
                                             specific protocol functions */
@@ -45,12 +44,13 @@ struct _smpr_t {
     const smpr_proto_ops_t *ops;
 };
 
-static smpr_err_e _smpr_register_proto_ops (smpr_type_e type,
-        const smpr_proto_ops_t **ops);
+static smpr_err_e _smpr_register_proto_ops (const smpr_proto_ops_t **ops,
+        const smpr_proto_ops_t *reg_ops);
 static smpr_err_e _smpr_unregister_proto_ops (const smpr_proto_ops_t **ops);
 
 /* Creates a new instance of the Low-level I/O */
-smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
+smpr_t * smpr_new (char *name, smio_t *parent, const smpr_proto_ops_t *reg_ops,
+        int verbose)
 {
     assert (name);
     assert (parent);
@@ -58,8 +58,7 @@ smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
     smpr_t *self = (smpr_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    /* Initialize Protocol type */
-    self->type = type;
+    /* Initialize Protocol */
     self->proto_handler = NULL;       /* This is set by the specific protocol functions */
     self->name = strdup (name);
     ASSERT_ALLOC(self->name, err_name_alloc);
@@ -71,7 +70,7 @@ smpr_t * smpr_new (char *name, smio_t *parent, smpr_type_e type, int verbose)
             err_parent_null);
 
     /* Attach protocol operation to instance of smpr */
-    smpr_err_e err = _smpr_register_proto_ops (type, &self->ops);
+    smpr_err_e err = _smpr_register_proto_ops (&self->ops, reg_ops);
     ASSERT_TEST(err == SMPR_SUCCESS, "Could not register SMPR operation",
             err_register_ops);
 
@@ -148,41 +147,29 @@ smio_t *smpr_get_parent (smpr_t *self)
     return self->parent;
 }
 
+const smpr_proto_ops_t *smpr_get_ops (smpr_t *self)
+{
+    assert (self);
+    return self->ops;
+}
+
+const char *smpr_get_ops_name (smpr_t *self)
+{
+    assert (self);
+
+    if (self->ops == NULL) {
+        return NULL;
+    }
+    return self->ops->proto_name;
+}
+
 /**************** Helper Functions ***************/
 
 /* Register Specific Protocol operations to smpr instance. Helper function */
-static smpr_err_e _smpr_register_proto_ops (smpr_type_e type, const smpr_proto_ops_t **ops)
+static smpr_err_e _smpr_register_proto_ops (const smpr_proto_ops_t **ops,
+        const smpr_proto_ops_t *reg_ops)
 {
-    switch (type) {
-        case SMPR_SPI:
-            *ops = &smpr_proto_ops_spi;
-            break;
-
-        case SMPR_I2C:
-            *ops = &smpr_proto_ops_i2c;
-            break;
-
-        case SMPR_BSMP:
-            *ops = &smpr_proto_ops_bsmp;
-            break;
-
-        /*case SMPR_1WIRE:
-            *ops = &smpr_proto_ops_1wire;
-            break;
-
-        case SMPR_GPIO:
-            *ops = &smpr_proto_ops_gpio;
-            break;
-
-        case SMPR_BYPASS:
-            *ops = &smpr_proto_ops_bypass;
-            break;*/
-
-        default:
-            *ops = NULL;
-            return SMPR_ERR_INV_FUNC_PARAM;
-    }
-
+    *ops = reg_ops;
     DBE_DEBUG (DBG_SM_PR | DBG_LVL_INFO, "[sm_pr] Proto ops set\n");
     return SMPR_SUCCESS;
 }
@@ -225,33 +212,33 @@ int smpr_release (smpr_t *self)
     SMPR_FUNC_WRAPPER (proto_release)
 
 /**** Read data from device ****/
-ssize_t smpr_read_16 (smpr_t *self, uint64_t offs, uint16_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_read_16, offs, data, flags)
-ssize_t smpr_read_32 (smpr_t *self, uint64_t offs, uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_read_32, offs, data, flags)
-ssize_t smpr_read_64 (smpr_t *self, uint64_t offs, uint64_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_read_64, offs, data, flags)
+ssize_t smpr_read_16 (smpr_t *self, size_t size_offs, uint64_t offs, uint16_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_16, size_offs, offs, data)
+ssize_t smpr_read_32 (smpr_t *self,size_t size_offs,  uint64_t offs, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_32, size_offs, offs, data)
+ssize_t smpr_read_64 (smpr_t *self, size_t size_offs, uint64_t offs, uint64_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_64, size_offs, offs, data)
 
 /**** Write data to device ****/
-ssize_t smpr_write_16 (smpr_t *self, uint64_t offs, const uint16_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_write_16, offs, data, flags)
-ssize_t smpr_write_32 (smpr_t *self, uint64_t offs, const uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_write_32, offs, data, flags)
-ssize_t smpr_write_64 (smpr_t *self, uint64_t offs, const uint64_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_write_64, offs, data, flags)
+ssize_t smpr_write_16 (smpr_t *self, size_t size_offs, uint64_t offs, const uint16_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_16, size_offs, offs, data)
+ssize_t smpr_write_32 (smpr_t *self, size_t size_offs, uint64_t offs, const uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_32, size_offs, offs, data)
+ssize_t smpr_write_64 (smpr_t *self, size_t size_offs, uint64_t offs, const uint64_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_64, size_offs, offs, data)
 
 /**** Read data block from device function pointer, size in bytes ****/
-ssize_t smpr_read_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_read_block, offs, size, data, flags)
+ssize_t smpr_read_block (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_block, size_offs, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t smpr_write_block (smpr_t *self, uint64_t offs, size_t size, uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_write_block, offs, size, data, flags)
+ssize_t smpr_write_block (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_block, size_offs, offs, size, data)
 
 /**** Read data block from via DMA from protocol function pointer, size in bytes ****/
-ssize_t smpr_read_dma (smpr_t *self, uint64_t offs, size_t size, uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_read_dma, offs, size, data, flags)
+ssize_t smpr_read_dma (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_read_dma, size_offs, offs, size, data)
 
 /**** Write data block via DMA from protocol function pointer, size in bytes ****/
-ssize_t smpr_write_dma (smpr_t *self, uint64_t offs, size_t size, uint32_t *data, uint32_t flags)
-    SMPR_FUNC_WRAPPER (proto_write_dma, offs, size, data, flags)
+ssize_t smpr_write_dma (smpr_t *self, size_t size_offs, uint64_t offs, size_t size, uint32_t *data)
+    SMPR_FUNC_WRAPPER (proto_write_dma, size_offs, offs, size, data)

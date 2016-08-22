@@ -111,7 +111,6 @@ static llio_err_e llio_dev_eth_destroy (llio_dev_eth_t **self_p)
     if (*self_p) {
         llio_dev_eth_t *self = *self_p;
 
-        close (self->fd);
         free (self->hostname);
         free (self->port);
         free (self);
@@ -196,6 +195,9 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
     /* Signal that the endpoint is opened and ready to work */
     llio_set_endpoint_open (self, true);
 
+    /* Set SDB prefix adress */
+    llio_set_sdb_prefix_addr (self, 0x0);
+
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_INFO,
             "[ll_io_eth] Opened ETH device located at %s\n",
             llio_get_endpoint_name (self));
@@ -229,6 +231,11 @@ static int eth_release (llio_t *self, llio_endpoint_t *endpoint)
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
+
+    /* First destroy the FD handling the socket. This FD
+     * is initialized on eth_open (), so the proper place to
+     * destroy it is here, not on llio_dev_eth_destroy () */
+    close (dev_eth->fd);
 
     /* Deattach specific device handler to generic one */
     lerr = llio_dev_eth_destroy (&dev_eth);
@@ -420,11 +427,11 @@ static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len)
     size_t bytesleft = len;  /* how many we have left to send */
     ssize_t n;
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sending %lu bytes\n", len);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sending %zu bytes\n", len);
 
     while (total < len) {
         n = send (fd, (char *) buf+total, bytesleft, 0);
-        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sent %ld bytes\n", n);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Sent %zd bytes\n", n);
 
         /* On error, don't try to recover, just inform it to the caller*/
         if (n == -1) {
@@ -444,11 +451,11 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
     size_t bytesleft = len; /* how many we have left to recv */
     ssize_t n;
 
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Receiving %lu bytes\n", len);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Receiving %zu bytes\n", len);
 
     while (total < len) {
         n = recv (fd, (char *) buf+total, bytesleft, 0);
-        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Received %ld bytes\n", n);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Received %zd bytes\n", n);
 
         /* On error, don't try to recover, just inform it to the caller*/
         if (n == -1) {
@@ -468,6 +475,7 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
 }
 
 const llio_ops_t llio_ops_eth = {
+    .name           = "ETH",            /* Operations name */
     .open           = eth_open,         /* Open device */
     .release        = eth_release,      /* Release device */
     .read_16        = eth_read_16,      /* Read 16-bit data */

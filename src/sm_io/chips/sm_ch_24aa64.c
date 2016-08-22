@@ -11,7 +11,7 @@
  * Description: Software driver for EEPROM 24AA64 chip
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -37,14 +37,13 @@
             smch_err_str (err_type))
 
 #define SMCH_24AA64_WAIT_TRIES              10
-#define SMCH_24AA64_NAME                    "I2C_24AA64"
+#define SMCH_24AA64_NAME                    "24AA64"
 #define SMCH_24AA64_USECS_WAIT              10000
 #define SMCH_24AA64_WAIT(usecs)             usleep(usecs)
 #define SMCH_24AA64_WAIT_DFLT               SMCH_24AA64_WAIT(SMCH_24AA64_USECS_WAIT)
 
 struct _smch_24aa64_t {
-    smpr_t *i2c;                    /* I2C protocol object */
-    uint32_t addr;                  /* I2C address for this 24AA64 chip */
+    smpr_t *proto;                    /* PROTO protocol object */
 };
 
 static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
@@ -53,8 +52,8 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
         uint8_t *data, size_t size);
 
 /* Creates a new instance of the SMCH 24AA64 */
-smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
-        int verbose)
+smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base,
+        const smpr_proto_ops_t *reg_ops, int verbose)
 {
     (void) verbose;
     assert (parent);
@@ -62,21 +61,19 @@ smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base, uint32_t addr,
     smch_24aa64_t *self = (smch_24aa64_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
-    self->i2c = smpr_new (SMCH_24AA64_NAME, parent, SMPR_I2C, verbose);
-    ASSERT_ALLOC(self->i2c, err_i2c_alloc);
+    self->proto = smpr_new (SMCH_24AA64_NAME, parent, reg_ops, verbose);
+    ASSERT_ALLOC(self->proto, err_proto_alloc);
 
-    /* Initalize the I2C protocol */
-    int smpr_err = smpr_open (self->i2c, base, NULL /* Default parameters are fine */);
+    /* Initalize the PROTO protocol */
+    int smpr_err = smpr_open (self->proto, base, NULL /* Default parameters are fine */);
     ASSERT_TEST(smpr_err == 0, "Could not initialize SMPR protocol", err_smpr_init);
-
-    self->addr = addr;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:24aa64] Created instance of SMCH\n");
     return self;
 
 err_smpr_init:
-    smpr_destroy (&self->i2c);
-err_i2c_alloc:
+    smpr_destroy (&self->proto);
+err_proto_alloc:
     free (self);
 err_self_alloc:
     return NULL;
@@ -90,8 +87,8 @@ smch_err_e smch_24aa64_destroy (smch_24aa64_t **self_p)
     if (*self_p) {
         smch_24aa64_t *self = *self_p;
 
-        smpr_release (self->i2c);
-        smpr_destroy (&self->i2c);
+        smpr_release (self->proto);
+        smpr_destroy (&self->proto);
         free (self);
         *self_p = NULL;
     }
@@ -144,10 +141,6 @@ static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
      * Source: 24AA64/24LC64 DS21189F datasheet, page 8
      */
 
-    uint32_t trans_size = E24AA64_ADDR_TRANS_SIZE + size*E24AA64_DATA_TRANS_SIZE;
-    uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
-
     /* 24AA64 write byte transaction is:
      *
      * Address high byte   |  Address low byte   |    Data0    |    Data1   ...
@@ -156,22 +149,15 @@ static ssize_t _smch_24aa64_write_generic (smch_24aa64_t *self, uint16_t addr,
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_write_generic] data =  0x%02X\n", *data);
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_write_generic] addr =  0x%04X\n", addr);
 
-    /* FIXME? Reduce memcpy calls? We just need this because the address must
-     * come in the LSBs of data */
-    uint8_t __data[E24AA64_PAGE_TRANS_SIZE_MAX/SMPR_BYTE_2_BIT];
-    uint16_t __addr = E24AA64_ADDR_W(addr);
-    memcpy ((uint8_t *) &__data, &__addr, E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT);
-    memcpy ((uint8_t *) &__data + E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT, data, size);
-
-    ssize_t smpr_err = smpr_write_block (self->i2c, 0, ARRAY_SIZE(__data),
-            (uint32_t *) &__data, flags);
+    ssize_t smpr_err = smpr_write_block (self->proto, E24AA64_ADDR_SIZE/SMPR_BYTE_2_BIT,
+            E24AA64_ADDR_W(addr), size, (uint32_t *) &data);
 
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
+    ASSERT_TEST(smpr_err >= 0 && (size_t)smpr_err == size /* in bytes */,
             "Could not write to SMPR", err_smpr_write, -1);
 
-    /* Return just the number of data bytes written */
-    err = smpr_err - E24AA64_ADDR_TRANS_SIZE/SMPR_BYTE_2_BIT;
+    /* Return the number of data bytes written */
+    err = smpr_err;
 
     /* 24AA64 takes up to 2 ms to write the page */
     SMCH_24AA64_WAIT_DFLT;
@@ -191,66 +177,23 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
      * Source: 24AA64/24LC64 DS21189F datasheet, page 10-11
      */
 
-    uint32_t trans_size = E24AA64_ADDR_TRANS_SIZE;
-    uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
-
     /* 24AA64 byte read transaction is:
      *
      * Address high byte   |  Address low byte
      *      8-bit          |        8-bit
      * */
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_read_generic] addr =  0x%04X\n", addr);
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_read_generic] addr = 0x%04X\n", addr);
 
-    uint32_t __data = E24AA64_ADDR_W(addr);
-
-    ssize_t smpr_err = smpr_write_32 (self->i2c, 0, &__data, flags);
+    err = smpr_read_block (self->proto, E24AA64_ADDR_SIZE/SMPR_BYTE_2_BIT,
+            E24AA64_ADDR_W(addr), size, (uint32_t *) data);
     /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
-            "Could not write to SMPR", err_smpr_write, -1);
-
-    /* Now, read the data */
-    trans_size = size*E24AA64_DATA_TRANS_SIZE;
-    flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(trans_size) /* in bits */ |
-        SMPR_PROTO_I2C_ADDR_FLAGS_W(self->addr);
-
-    smpr_err = smpr_read_block (self->i2c, 0, size, (uint32_t *) data, flags);
-    /* Check if we have written everything */
-    ASSERT_TEST(smpr_err == trans_size/SMPR_BYTE_2_BIT /* in bytes */,
-            "Could not READ from SMPR", err_smpr_read, -1);
-
-    err = smpr_err;
+    ASSERT_TEST(err >= 0 && (size_t) err == size /* in bytes */,
+            "Could not read from SMPR", err_smpr_read, -1);
 
     /* 24AA64 takes up to 2 ms to write the page */
     SMCH_24AA64_WAIT_DFLT;
 
 err_smpr_read:
-err_smpr_write:
     return err;
 }
 
-ssize_t smch_24aa64_probe_bus (smch_24aa64_t *self)
-{
-    ssize_t err = 0;
-
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:24aa64_probe_bus] Probing bus ...\n");
-
-    uint32_t i;
-
-    for (i = 0; i < 128; ++i) {
-        uint32_t flags = SMPR_PROTO_I2C_TRANS_SIZE_FLAGS_W(8) /* in bits */ |
-            SMPR_PROTO_I2C_ADDR_FLAGS_W(i);
-        uint32_t __data = 0;
-
-        ssize_t smpr_err = smpr_read_32 (self->i2c, 0, &__data, flags);
-
-        if (smpr_err >= 0) {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:24aa64_probe_bus] "
-                    "Found device at address 0x%02X\n", i);
-        }
-
-        SMCH_24AA64_WAIT_DFLT;
-    }
-
-    return err;
-}

@@ -1,4 +1,4 @@
 # Permissions for the fpga devices
 
-ACTION=="add", KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", RUN+="/sbin/initctl start bpm-sw BOARD=%c"
-ACTION=="remove", KERNEL=="fpga*", PROGRAM="/usr/local/bin/eat-dashes.sh %k", RUN+="/sbin/initctl stop bpm-sw BOARD=%c"
+ACTION=="add", KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", RUN+="/sbin/initctl start halcs BOARD=%c"
+ACTION=="remove", KERNEL=="fpga*", PROGRAM="/usr/local/bin/eat-dashes.sh %k", RUN+="/sbin/initctl stop halcs BOARD=%c"

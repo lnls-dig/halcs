@@ -8,6 +8,8 @@
 #include "errhand.h"
 
 #define ERRHAND_PRINT_PAD_FMT           "-5"
+#define ERRHAND_DATE_LENGTH             20
+#define ERRHAND_TEXT_LENGTH             1024
 
 /* Our logfile */
 static FILE *_errhand_logfile = NULL;
@@ -23,7 +25,7 @@ void errhand_print (const char *fmt, ...)
 
 /* Based on CZMQ s_log () function. Available in
  * https://github.com/zeromq/czmq/blob/master/src/zsys.c */
-static void _errhand_log_write (char *errhand_lvl_str, char *msg)
+static void _errhand_log_write (char *errhand_lvl_str, char *msg, bool verbose)
 {
     /* Default to stdout */
     if (!_errhand_logfile) {
@@ -32,13 +34,18 @@ static void _errhand_log_write (char *errhand_lvl_str, char *msg)
 
     time_t curtime = time (NULL);
     struct tm *loctime = localtime (&curtime);
-    char date [20];
+    char date [ERRHAND_DATE_LENGTH];
+    char log_text [ERRHAND_TEXT_LENGTH];
 
-    strftime (date, 20, "%y-%m-%d %H:%M:%S", loctime);
+    if (verbose) {
+        strftime (date, ERRHAND_DATE_LENGTH, "%y-%m-%d %H:%M:%S", loctime);
+        snprintf (log_text, ERRHAND_TEXT_LENGTH, "%" ERRHAND_PRINT_PAD_FMT "s: [%s] %s",
+                errhand_lvl_str, date, msg);
+    }
+    else {
+        snprintf (log_text, ERRHAND_TEXT_LENGTH, "%s", msg);
+    }
 
-    char log_text [1024];
-    snprintf (log_text, 1024, "%" ERRHAND_PRINT_PAD_FMT "s: [%s] %s",
-            errhand_lvl_str, date, msg);
     fprintf (_errhand_logfile, "%s", log_text);
     fflush (_errhand_logfile);
 }
@@ -52,9 +59,12 @@ void errhand_log_print (int errhand_lvl, const char *fmt, ...)
     char *msg = errhand_lprint_vprintf (fmt, argptr);
     va_end (argptr);
 
+    /* Check if we opted for the simple print (i.e., no warning level and date) */
+    bool verbose = !(ERRHAND_SIMPLE_DEGEN(errhand_lvl) & ERRHAND_LVL_SIMPLE_RAW);
+
     /* Convert errhand level code to string */
     char *errhand_lvl_str = errhand_lvl_to_str (errhand_lvl);
-    _errhand_log_write (errhand_lvl_str, msg);
+    _errhand_log_write (errhand_lvl_str, msg, verbose);
     free (msg);
     free (errhand_lvl_str);
 }

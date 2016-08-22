@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 /* Private headers */
 #include "sm_io_trigger_mux_defaults.h"
 
@@ -32,7 +32,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io:trigger_mux_defaults]",               \
             smio_err_str (err_type))
 
-#define SMIO_TRIGGER_MUX_LIBBPMCLIENT_LOG_MODE                "a"
+#define SMIO_TRIGGER_MUX_LIBHALCSCLIENT_LOG_MODE                "a"
 #define SMIO_TRIGGER_MUX_MAX_CHAN                             24
 
 /* We use the actual libclient to send and configure our default values,
@@ -49,36 +49,36 @@ smio_err_e trigger_mux_config_defaults (char *broker_endp, char *service,
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:trigger_mux_defaults] Configuring SMIO "
             "TRIGGER_MUX with default values ...\n");
-    bpm_client_err_e client_err = BPM_CLIENT_SUCCESS;
+    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
-    bpm_client_t *config_client = bpm_client_new_log_mode (broker_endp, 0,
-            log_file_name, SMIO_TRIGGER_MUX_LIBBPMCLIENT_LOG_MODE);
+    halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_TRIGGER_MUX_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
     uint32_t chan;
     for (chan = 0; chan < SMIO_TRIGGER_MUX_MAX_CHAN; ++chan) {
-        client_err = bpm_set_trigger_rcv_src (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_SRC);
-        client_err |= bpm_set_trigger_rcv_in_sel (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_IN_SEL);
-        client_err |= bpm_set_trigger_transm_src (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_SRC);
-        client_err |= bpm_set_trigger_transm_out_sel (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_IN_SEL);
+        client_err = halcs_set_trigger_rcv_src (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_SRC);
+        client_err |= halcs_set_trigger_rcv_in_sel (config_client, service, chan, TRIGGER_MUX_DFLT_RCV_IN_SEL);
+        client_err |= halcs_set_trigger_transm_src (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_SRC);
+        client_err |= halcs_set_trigger_transm_out_sel (config_client, service, chan, TRIGGER_MUX_DFLT_TRANSM_IN_SEL);
     }
 
     /* Switching Trigger. Change it to correct parameters */
-    client_err = bpm_set_trigger_rcv_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err = halcs_set_trigger_rcv_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
         TRIGGER_MUX_SW_CLK_DFLT_RCV_SRC);
-    client_err |= bpm_set_trigger_rcv_in_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_rcv_in_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
         TRIGGER_MUX_SW_CLK_DFLT_RCV_IN_SEL);
-    client_err |= bpm_set_trigger_transm_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_transm_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
         TRIGGER_MUX_SW_CLK_DFLT_TRANSM_SRC);
-    client_err |= bpm_set_trigger_transm_out_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_transm_out_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
         TRIGGER_MUX_SW_CLK_DFLT_TRANSM_IN_SEL);
 
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could set trigger mux defaults",
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set trigger mux defaults",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:
-    bpm_client_destroy (&config_client);
+    halcs_client_destroy (&config_client);
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:trigger_mux_defaults] Exiting Config thread %s\n",
         service);

@@ -178,6 +178,24 @@ char *hutils_concat_strings3 (const char *str1, const char* str2,
 }
 
 /*******************************************************************/
+/*****************  Byte manipulation functions ********************/
+/*******************************************************************/
+
+uint32_t hutils_calculate_padding(uint32_t value, uint32_t alignment)
+{
+    uint32_t exceeded = value % alignment;
+    uint32_t remaining = alignment - exceeded;
+    uint32_t padding = remaining % alignment;
+
+    return padding;
+}
+
+uint32_t hutils_align_value(uint32_t value, uint32_t alignment)
+{
+    return value + hutils_calculate_padding(value, alignment);
+}
+
+/*******************************************************************/
 /*****************  System Fork/Exec functions *********************/
 /*******************************************************************/
 
@@ -256,7 +274,7 @@ int hutils_wait_chld_timed (int timeout)
     while ((time(NULL) - start)*1000 < timeout) {
         if (zsys_interrupted) {
             err = -1;
-            goto bpm_zsys_interrupted;
+            goto halcs_zsys_interrupted;
         }
 
         err = hutils_wait_chld ();
@@ -270,7 +288,7 @@ int hutils_wait_chld_timed (int timeout)
     }
 
 exit:
-bpm_zsys_interrupted:
+halcs_zsys_interrupted:
     return err;
 }
 
@@ -380,23 +398,23 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
         DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE, "Config file: "
                 "board_cfg name: %s\n", zconfig_name (board_cfg));
 
-        zconfig_t *bpm_cfg = zconfig_child (board_cfg);
-        ASSERT_TEST (bpm_cfg != NULL, "Could not find "
-                "bpm* property in configuration file", err_cfg_exit,
+        zconfig_t *halcs_cfg = zconfig_child (board_cfg);
+        ASSERT_TEST (halcs_cfg != NULL, "Could not find "
+                "halcs* property in configuration file", err_cfg_exit,
                 HUTILS_ERR_CFG);
 
-        /* Navigate through all of our bpm siblings and fill the hash table */
-        for (; bpm_cfg != NULL; bpm_cfg = zconfig_next (bpm_cfg)) {
+        /* Navigate through all of our halcs siblings and fill the hash table */
+        for (; halcs_cfg != NULL; halcs_cfg = zconfig_next (halcs_cfg)) {
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE, "Config file: "
-                    "bpm_cfg name: %s\n", zconfig_name (bpm_cfg));
+                    "halcs_cfg name: %s\n", zconfig_name (halcs_cfg));
 
             /* Create hash item */
             item = (hutils_hints_t *) zmalloc (sizeof *item);
             ASSERT_ALLOC(item, err_hash_item_alloc, HUTILS_ERR_ALLOC);
 
-            /* We expect to the FMC board type of this bpm/board instance
+            /* We expect to the FMC board type of this halcs/board instance
              * in the configuration file */
-            char *fmc_board = zconfig_resolve (bpm_cfg, "/dbe/fmc_board",
+            char *fmc_board = zconfig_resolve (halcs_cfg, "/dbe/fmc_board",
                     NULL);
             ASSERT_TEST (fmc_board != NULL, "[hutils:utils] Could not find "
                     "FMC Board type (fmc_board = <value>) in configuration file", err_fmc_board,
@@ -405,9 +423,9 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
             item->fmc_board = strdup (fmc_board);
             ASSERT_ALLOC(item->fmc_board, err_hash_fmc_board, HUTILS_ERR_ALLOC);
 
-            /* Now, we expect to find the bind address of this bpm/board instance
+            /* Now, we expect to find the bind address of this halcs/board instance
              * in the configuration file */
-            char *afe_bind = zconfig_resolve (bpm_cfg, "/afe/bind",
+            char *afe_bind = zconfig_resolve (halcs_cfg, "/afe/bind",
                     NULL);
             ASSERT_TEST (afe_bind != NULL, "[hutils:utils] Could not find "
                     "AFE bind address (bind = <value>) in configuration file", err_afe_bind,
@@ -418,7 +436,7 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
 
             /* Read if the user ask us to spawn the EPICS IOC in the
              * configuration file */
-            char *spawn_dbe_epics_ioc = zconfig_resolve (bpm_cfg, "/dbe/spawn_epics_ioc",
+            char *spawn_dbe_epics_ioc = zconfig_resolve (halcs_cfg, "/dbe/spawn_epics_ioc",
                     NULL);
             ASSERT_TEST (spawn_dbe_epics_ioc != NULL, "[hutils:utils] Could not find "
                     "DBE EPICS IOC (spawn_epics_ioc = <value>) in configuration file",
@@ -437,7 +455,7 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
                 goto err_inv_spawn_dbe_epics_ioc;
             }
 
-            char *spawn_afe_epics_ioc = zconfig_resolve (bpm_cfg, "/afe/spawn_epics_ioc",
+            char *spawn_afe_epics_ioc = zconfig_resolve (halcs_cfg, "/afe/spawn_epics_ioc",
                     NULL);
             ASSERT_TEST (spawn_afe_epics_ioc != NULL, "[hutils:utils] Could not find "
                     "AFE EPICS IOC (spawn_epics_ioc = <value>) in configuration file",
@@ -457,12 +475,12 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
             }
 
             /* Now, we only need to generate a valid key to insert in the hash.
-             * we choose the combination of the type "board%u/bpm%u/afe" or
-             * board%u/bpm%u/dbe */
+             * we choose the combination of the type "board%u/halcs%u/afe" or
+             * board%u/halcs%u/dbe */
             char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
             int errs = snprintf (hints_key, sizeof (hints_key),
                     HUTILS_CFG_HASH_KEY_PATTERN, zconfig_name (board_cfg),
-                    zconfig_name (bpm_cfg));
+                    zconfig_name (halcs_cfg));
 
             /* Only when the number of characters written is less than the whole buffer,
              * it is guaranteed that the string was written successfully */
@@ -502,4 +520,3 @@ err_hash_item_alloc:
 err_cfg_exit:
     return err;
 }
-

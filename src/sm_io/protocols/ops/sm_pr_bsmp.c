@@ -5,7 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#include "bpm_server.h"
+#include "halcs_server.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
@@ -51,6 +51,12 @@ typedef struct {
     struct bsmp_group_list *groups_list;                /* BSMP groups handler */
 } smpr_proto_bsmp_t;
 
+/* Protocol object specification */
+struct _smpr_bsmp_t {
+    /* Must be located first */
+    smpr_proto_ops_t proto_ops;       /* BSMP protocol operations */
+};
+
 static smpr_err_e _smpr_proto_bsmp_get_handlers (smpr_t *self);
 static int _smpr_proto_bsmp_send (uint8_t *data, uint32_t *count);
 static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count);
@@ -95,7 +101,7 @@ static smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p)
 /************ smpr_proto_ops_bsmp Implementation **********/
 
 /* Open BSMP protocol */
-int bsmp_open (smpr_t *self, uint64_t base, void *args)
+static int bsmp_open (smpr_t *self, uint64_t base, void *args)
 {
     (void) args;
     assert (self);
@@ -146,7 +152,7 @@ err_proto_handler_alloc:
 }
 
 /* Release BSMP protocol device */
-int bsmp_release (smpr_t *self)
+static int bsmp_release (smpr_t *self)
 {
     assert (self);
 
@@ -445,7 +451,7 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Receiving %u bytes\n", len);
     ssize_t ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *) data);
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %ld bytes\n", ret);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received %zd bytes\n", ret);
 
     if (ret < 0) {
         *count = 0;
@@ -466,7 +472,7 @@ static int _smpr_proto_bsmp_recv (uint8_t *data, uint32_t *count)
             "bytes\n", len);
     ret = smio_thsafe_client_read_block (bsmp_glue.parent, 0, len,
             (uint32_t *)(data + *count));
-    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %ld "
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[sm_pr:bsmp] Received another %zd "
             "bytes\n", ret);
 
     if (ret < 0) {
@@ -482,7 +488,8 @@ err_packet_header:
     return err;
 }
 
-const smpr_proto_ops_t smpr_proto_ops_bsmp = {
+static const smpr_proto_ops_t smpr_proto_ops_bsmp = {
+    .proto_name           = "BSMP",             /* Protocol name */
     .proto_open           = bsmp_open,          /* Open device */
     .proto_release        = bsmp_release,       /* Release device */
     .proto_read_16        = NULL,               /* Read 16-bit data */
@@ -500,3 +507,41 @@ const smpr_proto_ops_t smpr_proto_ops_bsmp = {
     .proto_write_dma      = NULL                /* Write arbitrary block size data via DMA,
                                                     parameter size in bytes */
 };
+
+/************ Our methods implementation **********/
+
+/* Creates a new instance of the proto_bsmp */
+smpr_bsmp_t *smpr_bsmp_new ()
+{
+    smpr_bsmp_t *self = (smpr_bsmp_t *) zmalloc (sizeof *self);
+    ASSERT_ALLOC (self, err_smpr_bsmp_alloc);
+
+    /* copy BSMP operations */
+    self->proto_ops = smpr_proto_ops_bsmp;
+
+    return self;
+
+err_smpr_bsmp_alloc:
+    return NULL;
+}
+
+/* Destroy an instance of the bsmp */
+smpr_err_e smpr_bsmp_destroy (smpr_bsmp_t **self_p)
+{
+    assert (self_p);
+
+    if (*self_p) {
+        smpr_bsmp_t *self = *self_p;
+
+        free (self);
+        self_p = NULL;
+    }
+
+    return SMPR_SUCCESS;
+}
+
+const smpr_proto_ops_t *smpr_bsmp_get_ops (smpr_bsmp_t *self)
+{
+    assert (self);
+    return &self->proto_ops;
+}

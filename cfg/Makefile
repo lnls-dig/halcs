@@ -12,10 +12,10 @@ SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 
 PREFIX ?= /usr/local
-CFG_DIR ?= ${PREFIX}/etc/bpm_sw
+CFG_DIR ?= ${PREFIX}/etc/halcs
 
 # Config file must have the following name
-CFG_FILENAME = bpm_sw.cfg
+CFG_FILENAME = halcs.cfg
 # This could be set to a different config folder
 CFG ?= crude_defconfig
 

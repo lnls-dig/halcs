@@ -53,7 +53,7 @@ endif
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lbpmclient -lerrhand -lhutils -lmlm -lczmq -lzmq
+LIBS = -lhalcsclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 # General library flags -L<libdir>
 LFLAGS =
 
