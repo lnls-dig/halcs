@@ -67,6 +67,8 @@ devio_err_e devio_print_info (devio_t *self);
 /* Register an specific sm_io module to this device */
 devio_err_e devio_register_sm (void *pipe, uint32_t smio_id,
         uint64_t base, uint32_t inst_id);
+/* Register a specific sm_io module to this device */
+devio_err_e devio_register_sm_by_id (void *pipe, uint32_t smio_id);
 /* Register all sm_io module that this device can handle,
  * according to the device information stored in the SDB */
 devio_err_e devio_register_all_sm (void *pipe);
