@@ -310,7 +310,7 @@ static devio_err_e _spawn_be_platform_smios (void *pipe)
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Spawning AFCv3 specific SMIOs ...\n");
 
-    err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
+    err = devio_register_sm_by_id (pipe, afc_diag_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd_cfg] devio_register_sm error!\n");
     }
