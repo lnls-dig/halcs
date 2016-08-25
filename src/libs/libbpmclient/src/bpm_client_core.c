@@ -2428,18 +2428,18 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_ki)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_KI, phase_ki);
 }
 
-/* Phase Bias functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, phase_bias)
+/* Phase Setpoint functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, phase_set)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_BIAS, phase_bias);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_SET, phase_set);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_bias)
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_set)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_BIAS, phase_bias);
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_SET, phase_set);
 }
 
-/* Average Exponent funcrions */
+/* Average Exponent functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, avg_exponent)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT, avg_exponent);
@@ -2448,5 +2448,93 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, avg_exponent)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, avg_exponent)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT, avg_exponent);
+}
+
+/* RTM Si570 rfreq[37-19] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_rfreq_hi)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI, rtm_rfreq_hi);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_rfreq_hi)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI, rtm_rfreq_hi);
+}
+
+/* RTM Si570 rfreq[18-0] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_rfreq_lo)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO, rtm_rfreq_lo);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_rfreq_lo)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO, rtm_rfreq_lo);
+}
+
+/* RTM Si570 n1 functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_n1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_N1, rtm_n1);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_n1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_N1, rtm_n1);
+}
+
+/* RTM Si570 hs_div functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_hs_div)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV, rtm_hs_div);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_hs_div)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV, rtm_hs_div);
+}
+
+/* AFC Si570 rfreq[37-19] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_rfreq_hi)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI, afc_rfreq_hi);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_rfreq_hi)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI, afc_rfreq_hi);
+}
+
+/* AFC Si570 rfreq[18-0] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_rfreq_lo)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO, afc_rfreq_lo);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_rfreq_lo)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO, afc_rfreq_lo);
+}
+
+/* AFC Si570 n1 functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_n1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_N1, afc_n1);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_n1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_N1, afc_n1);
+}
+
+/* AFC Si570 hs_div functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_hs_div)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_hs_div)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
 }
 

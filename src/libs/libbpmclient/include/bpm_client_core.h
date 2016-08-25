@@ -1194,17 +1194,65 @@ bpm_client_err_e afc_timing_set_phase_ki (bpm_client_t *self, char *service,
 bpm_client_err_e afc_timing_get_phase_ki (bpm_client_t *self, char *service,
         uint32_t *phase_ki);
 
-/* Phase Bias functions */
-bpm_client_err_e afc_timing_set_phase_bias (bpm_client_t *self, char *service,
-        uint32_t phase_bias);
-bpm_client_err_e afc_timing_get_phase_bias (bpm_client_t *self, char *service,
-        uint32_t *phase_bias);
+/* Phase Setpoint functions */
+bpm_client_err_e afc_timing_set_phase_set (bpm_client_t *self, char *service,
+        uint32_t phase_set);
+bpm_client_err_e afc_timing_get_phase_set (bpm_client_t *self, char *service,
+        uint32_t *phase_set);
 
-/* Average Exponent funcrions */
+/* Average Exponent functions */
 bpm_client_err_e afc_timing_set_avg_exponent (bpm_client_t *self, char *service,
         uint32_t avg_exponent);
 bpm_client_err_e afc_timing_get_avg_exponent (bpm_client_t *self, char *service,
         uint32_t *avg_exponent);
+
+/* RTM Si570 rfreq[37-19] functions */
+bpm_client_err_e afc_timing_set_rtm_rfreq_hi (bpm_client_t *self, char *service,
+        uint32_t rtm_rfreq_hi);
+bpm_client_err_e afc_timing_get_rtm_rfreq_hi (bpm_client_t *self, char *service,
+        uint32_t *rtm_rfreq_hi);
+
+/* RTM Si570 rfreq[18-0] functions */
+bpm_client_err_e afc_timing_set_rtm_rfreq_lo (bpm_client_t *self, char *service,
+        uint32_t rtm_rfreq_lo);
+bpm_client_err_e afc_timing_get_rtm_rfreq_lo (bpm_client_t *self, char *service,
+        uint32_t *rtm_rfreq_lo);
+
+/* RTM Si570 n1 functions */
+bpm_client_err_e afc_timing_set_rtm_n1 (bpm_client_t *self, char *service,
+        uint32_t rtm_n1);
+bpm_client_err_e afc_timing_get_rtm_n1 (bpm_client_t *self, char *service,
+        uint32_t *rtm_n1);
+
+/* RTM Si570 hs_div functions */
+bpm_client_err_e afc_timing_set_rtm_hs_div (bpm_client_t *self, char *service,
+        uint32_t rtm_hs_div);
+bpm_client_err_e afc_timing_get_rtm_hs_div (bpm_client_t *self, char *service,
+        uint32_t *rtm_hs_div);
+
+/* AFC Si570 rfreq[37-19] functions */
+bpm_client_err_e afc_timing_set_afc_rfreq_hi (bpm_client_t *self, char *service,
+        uint32_t afc_rfreq_hi);
+bpm_client_err_e afc_timing_get_afc_rfreq_hi (bpm_client_t *self, char *service,
+        uint32_t *afc_rfreq_hi);
+
+/* AFC Si570 rfreq[18-0] functions */
+bpm_client_err_e afc_timing_set_afc_rfreq_lo (bpm_client_t *self, char *service,
+        uint32_t afc_rfreq_lo);
+bpm_client_err_e afc_timing_get_afc_rfreq_lo (bpm_client_t *self, char *service,
+        uint32_t *afc_rfreq_lo);
+
+/* AFC Si570 n1 functions */
+bpm_client_err_e afc_timing_set_afc_n1 (bpm_client_t *self, char *service,
+        uint32_t afc_n1);
+bpm_client_err_e afc_timing_get_afc_n1 (bpm_client_t *self, char *service,
+        uint32_t *afc_n1);
+
+/* AFC Si570 hs_div functions */
+bpm_client_err_e afc_timing_set_afc_hs_div (bpm_client_t *self, char *service,
+        uint32_t afc_hs_div);
+bpm_client_err_e afc_timing_get_afc_hs_div (bpm_client_t *self, char *service,
+        uint32_t *afc_hs_div);
 
 #ifdef __cplusplus
 }
