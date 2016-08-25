@@ -166,7 +166,6 @@ int main (int argc, char *argv[])
         goto err_exit;
     }
 
-    const llio_ops_t *llio_ops = NULL;
     uint32_t dev_id = 0;
     /* Check for device ID */
     if (dev_id_str == NULL) {
@@ -188,8 +187,6 @@ int main (int argc, char *argv[])
                             "\tIt must be in the format \"/dev/fpga-<device_number>\". Exiting ...\n");
                     goto err_exit;
                 }
-
-                llio_ops = &llio_ops_pcie;
                 break;
 
             default:
@@ -217,7 +214,7 @@ int main (int argc, char *argv[])
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:DEVIO_CFG", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
+    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_type,
             broker_endp, verbose, log_filename);
 
     if (devio == NULL) {
@@ -254,18 +251,17 @@ int main (int argc, char *argv[])
         goto err_plat_devio;
     }
 
-err_plat_devio:
-    zactor_destroy (&server);
-err_server:
+err_plat_devio_devio:
     devio_destroy (&devio);
+err_server:
 err_exit:
     free (log_filename);
     free (broker_endp);
     free (dev_id_str);
     free (dev_entry);
     free (dev_type);
-    free (devio_type_str);
     free (devio_work_dir);
+    free (devio_type_str);
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Exiting ...\n");
     return 0;
 }
@@ -311,7 +307,7 @@ static devio_err_e _spawn_be_platform_smios (void *pipe)
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Spawning AFCv3 specific SMIOs ...\n");
 
-    err = devio_register_sm_by_id (pipe, afc_diag_id);
+    err = devio_register_sm (pipe, afc_diag_id, WB_AFC_DIAG_BASE_ADDR, 0);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd_cfg] devio_register_sm error!\n");
     }

@@ -26,9 +26,21 @@ extern "C" {
 #define PARAM_FUNC_CLIENT_NAME_READ(reg)                                        \
     halcs_get ## _ ## reg
 
+/* Write function name */
+#define PARAM_FUNC_CLIENT_NAME_WRITE_MOD(module, reg)                           \
+    module ## _ ## set ## _ ## reg
+
+/* Read function name */
+#define PARAM_FUNC_CLIENT_NAME_READ_MOD(module, reg)                            \
+	module ## _ ## get ## _ ## reg
+
 /* Write function declaration */
 #define PARAM_FUNC_CLIENT_WRITE(reg)                                            \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
+            char *service, uint32_t reg)
+
+#define PARAM_FUNC_CLIENT_WRITE_MOD(module, reg)                                        \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE_MOD(module, reg) (halcs_client_t *self, \
             char *service, uint32_t reg)
 
 #define PARAM_FUNC_CLIENT_WRITE_BYTE(reg)                                       \
@@ -50,6 +62,10 @@ extern "C" {
 /* Read function declaration */
 #define PARAM_FUNC_CLIENT_READ(reg)                                             \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
+            char *service, uint32_t *reg)
+
+#define PARAM_FUNC_CLIENT_READ_MOD(module, reg)                                         \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ_MOD(module, reg) (halcs_client_t *self,  \
             char *service, uint32_t *reg)
 
 #define PARAM_FUNC_CLIENT_READ_BYTE(reg)                                        \

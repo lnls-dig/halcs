@@ -119,7 +119,6 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id, bool auto_inst_id);
-static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
@@ -729,10 +728,6 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         /* Register all SMIOs */
         _devio_register_all_sm_raw (devio);
     }
-    else if (streq (command, "$REGISTER_SMIO_BY_ID")) {
-        /* Register new SMIO */
-        _devio_register_sm_by_id_raw (devio, smio_id);
-    }
     else if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
         _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
@@ -795,29 +790,6 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 /************************************************************/
 /*********************** API methods ************************/
 /************************************************************/
-
-/* Register a specific sm_io module to this device */
-static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id)
-{
-    uint64_t base = sdbfs_find_id(self->sdbfs, LNLS_VENDOR_ID, smio_id);
-
-    /* Register the sm_io module using the retrieved base address, and
-     * automatically assign an instance id to it */
-    return _devio_register_sm_raw(self, smio_id, base, 0, true);
-}
-
-devio_err_e devio_register_sm_by_id (void *pipe, uint32_t smio_id)
-{
-    assert (pipe);
-    devio_err_e err = DEVIO_SUCCESS;
-
-    int zerr = zsock_send (pipe, "s4", "$REGISTER_SMIO_BY_ID", smio_id);
-    ASSERT_TEST(zerr == 0, "Could not register SMIO", err_register_sm,
-            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
-
-err_register_sm:
-    return err;
-}
 
 /* Register an specific sm_io modules to this device */
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
