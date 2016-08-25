@@ -155,12 +155,44 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set integral gain of phase feedback",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_phase_bias (config_client, service, AFC_TIMING_DFLT_PHASE_BIAS);
-    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set bias of phase feedback",
+    client_err = afc_timing_set_phase_set (config_client, service, AFC_TIMING_DFLT_PHASE_SET);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set set of phase feedback",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_DDMTD_AVG_EXP);
     ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set average exponent number of phase feedback",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_RTM_RFREQ_HI);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RTM Si570 rfreq[37-19]",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_RTM_RFREQ_LO);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RTM Si570 rfreq[18-0]",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_RTM_N1);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RTM Si570 n1",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_RTM_HS_DIV);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set RTM Si570 hs_div",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_AFC_RFREQ_HI);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set AFC Si570 rfreq[37-19]",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_AFC_RFREQ_LO);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set AFC Si570 rfreq[18-0]",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_AFC_N1);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set AFC Si570 n1",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_avg_exponent (config_client, service, AFC_TIMING_DFLT_AFC_HS_DIV);
+    ASSERT_TEST(client_err == BPM_CLIENT_SUCCESS, "Could not set AFC Si570 hs_div",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:

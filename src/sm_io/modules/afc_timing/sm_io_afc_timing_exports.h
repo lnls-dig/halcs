@@ -38,8 +38,16 @@ extern disp_op_t afc_timing_set_get_freq_kp_exp;
 extern disp_op_t afc_timing_set_get_freq_ki_exp;
 extern disp_op_t afc_timing_set_get_phase_kp_exp;
 extern disp_op_t afc_timing_set_get_phase_ki_exp;
-extern disp_op_t afc_timing_set_get_phase_bias_exp;
+extern disp_op_t afc_timing_set_get_phase_set_exp;
 extern disp_op_t afc_timing_set_get_avg_exponent_exp;
+extern disp_op_t afc_timing_set_get_rtm_rfreq_hi_exp;
+extern disp_op_t afc_timing_set_get_rtm_rfreq_lo_exp;
+extern disp_op_t afc_timing_set_get_rtm_n1_exp;
+extern disp_op_t afc_timing_set_get_rtm_hs_div_exp;
+extern disp_op_t afc_timing_set_get_afc_rfreq_hi_exp;
+extern disp_op_t afc_timing_set_get_afc_rfreq_lo_exp;
+extern disp_op_t afc_timing_set_get_afc_n1_exp;
+extern disp_op_t afc_timing_set_get_afc_hs_div_exp;
 
 extern const disp_op_t *afc_timing_exp_ops [];
 

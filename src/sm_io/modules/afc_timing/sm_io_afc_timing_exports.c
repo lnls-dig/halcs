@@ -346,9 +346,9 @@ disp_op_t afc_timing_set_get_phase_ki_exp = {
     }
 };
 
-disp_op_t afc_timing_set_get_phase_bias_exp = {
-    .name = AFC_TIMING_NAME_SET_GET_PHASE_BIAS,
-    .opcode = AFC_TIMING_OPCODE_SET_GET_PHASE_BIAS,
+disp_op_t afc_timing_set_get_phase_set_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_PHASE_SET,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_PHASE_SET,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -361,6 +361,102 @@ disp_op_t afc_timing_set_get_phase_bias_exp = {
 disp_op_t afc_timing_set_get_avg_exponent_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AVG_EXPONENT,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_rtm_rfreq_hi_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_RTM_RFREQ_HI,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_rtm_rfreq_lo_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_RTM_RFREQ_LO,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_rtm_n1_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_RTM_N1,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_N1,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_rtm_hs_div_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_RTM_HS_DIV,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_afc_rfreq_hi_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AFC_RFREQ_HI,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_afc_rfreq_lo_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AFC_RFREQ_LO,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_afc_n1_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AFC_N1,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_N1,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_afc_hs_div_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AFC_HS_DIV,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -400,7 +496,15 @@ const disp_op_t *afc_timing_exp_ops [] = {
     &afc_timing_set_get_freq_ki_exp,
     &afc_timing_set_get_phase_kp_exp,
     &afc_timing_set_get_phase_ki_exp,
-    &afc_timing_set_get_phase_bias_exp,
+    &afc_timing_set_get_phase_set_exp,
     &afc_timing_set_get_avg_exponent_exp,
+    &afc_timing_set_get_rtm_rfreq_hi_exp,
+    &afc_timing_set_get_rtm_rfreq_lo_exp,
+    &afc_timing_set_get_rtm_n1_exp,
+    &afc_timing_set_get_rtm_hs_div_exp,
+    &afc_timing_set_get_afc_rfreq_hi_exp,
+    &afc_timing_set_get_afc_rfreq_lo_exp,
+    &afc_timing_set_get_afc_n1_exp,
+    &afc_timing_set_get_afc_hs_div_exp,
     NULL
 };

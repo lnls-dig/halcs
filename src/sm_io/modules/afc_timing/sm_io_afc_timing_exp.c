@@ -268,11 +268,11 @@ RW_PARAM_FUNC(afc_timing, phase_ki) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_PHASE_BIAS_GLOBAL_MASK                  (0xffffffff)
-#define TIMING_PHASE_BIAS_GLOBAL_W(val)                (val)
-#define TIMING_PHASE_BIAS_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(afc_timing, phase_bias) {
-    SET_GET_PARAM(afc_timing, 0x0, TIMING, PHASE_BIAS, GLOBAL, MULT_BIT_PARAM,
+#define TIMING_PHASE_SET_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_PHASE_SET_GLOBAL_W(val)                (val)
+#define TIMING_PHASE_SET_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, phase_set) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, PHASE_SET, GLOBAL, MULT_BIT_PARAM,
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -284,6 +284,57 @@ RW_PARAM_FUNC(afc_timing, avg_exponent) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+#define TIMING_RTM_RFREQ_HI_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_RTM_RFREQ_HI_GLOBAL_W(val)                (val)
+#define TIMING_RTM_RFREQ_HI_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, rtm_rfreq_hi) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM_RFREQ_HI, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define TIMING_RTM_RFREQ_LO_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_RTM_RFREQ_LO_GLOBAL_W(val)                (val)
+#define TIMING_RTM_RFREQ_LO_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, rtm_rfreq_lo) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM_RFREQ_LO, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, rtm_n1) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM, N1, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, rtm_hs_div) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM, HS_DIV, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define TIMING_AFC_RFREQ_HI_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_AFC_RFREQ_HI_GLOBAL_W(val)                (val)
+#define TIMING_AFC_RFREQ_HI_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, afc_rfreq_hi) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_RFREQ_HI, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define TIMING_AFC_RFREQ_LO_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_AFC_RFREQ_LO_GLOBAL_W(val)                (val)
+#define TIMING_AFC_RFREQ_LO_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, afc_rfreq_lo) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_RFREQ_LO, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, afc_n1) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC, N1, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, afc_hs_div) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC, HS_DIV, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
 
 /* Exported function pointers */
 const disp_table_func_fp afc_timing_exp_fp [] = {
@@ -315,8 +366,16 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, freq_ki),
     RW_PARAM_FUNC_NAME(afc_timing, phase_kp),
     RW_PARAM_FUNC_NAME(afc_timing, phase_ki),
-    RW_PARAM_FUNC_NAME(afc_timing, phase_bias),
+    RW_PARAM_FUNC_NAME(afc_timing, phase_set),
     RW_PARAM_FUNC_NAME(afc_timing, avg_exponent),
+    RW_PARAM_FUNC_NAME(afc_timing, rtm_rfreq_hi),
+    RW_PARAM_FUNC_NAME(afc_timing, rtm_rfreq_lo),
+    RW_PARAM_FUNC_NAME(afc_timing, rtm_n1),
+    RW_PARAM_FUNC_NAME(afc_timing, rtm_hs_div),
+    RW_PARAM_FUNC_NAME(afc_timing, afc_rfreq_hi),
+    RW_PARAM_FUNC_NAME(afc_timing, afc_rfreq_lo),
+    RW_PARAM_FUNC_NAME(afc_timing, afc_n1),
+    RW_PARAM_FUNC_NAME(afc_timing, afc_hs_div),
     NULL
 };
 

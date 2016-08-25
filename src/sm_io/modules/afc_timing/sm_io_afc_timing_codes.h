@@ -70,11 +70,27 @@
 #define AFC_TIMING_NAME_SET_GET_PHASE_KP            "afc_timing_set_get_phase_kp"
 #define AFC_TIMING_OPCODE_SET_GET_PHASE_KI          27
 #define AFC_TIMING_NAME_SET_GET_PHASE_KI            "afc_timing_set_get_phase_ki"
-#define AFC_TIMING_OPCODE_SET_GET_PHASE_BIAS        28
-#define AFC_TIMING_NAME_SET_GET_PHASE_BIAS          "afc_timing_set_get_phase_bias"
+#define AFC_TIMING_OPCODE_SET_GET_PHASE_SET         28
+#define AFC_TIMING_NAME_SET_GET_PHASE_SET           "afc_timing_set_get_phase_set"
 #define AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT      29
 #define AFC_TIMING_NAME_SET_GET_AVG_EXPONENT        "afc_timing_set_get_avg_exponent"
-#define AFC_TIMING_OPCODE_END                       30
+#define AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI      30
+#define AFC_TIMING_NAME_SET_GET_RTM_RFREQ_HI        "afc_timing_set_get_rtm_rfreq_hi"
+#define AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO      31
+#define AFC_TIMING_NAME_SET_GET_RTM_RFREQ_LO        "afc_timing_set_get_rtm_rfreq_lo"
+#define AFC_TIMING_OPCODE_SET_GET_RTM_N1            32
+#define AFC_TIMING_NAME_SET_GET_RTM_N1              "afc_timing_set_get_rtm_n1"
+#define AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV        33
+#define AFC_TIMING_NAME_SET_GET_RTM_HS_DIV          "afc_timing_set_get_rtm_hs_div"
+#define AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI      34
+#define AFC_TIMING_NAME_SET_GET_AFC_RFREQ_HI        "afc_timing_set_get_afc_rfreq_hi"
+#define AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO      35
+#define AFC_TIMING_NAME_SET_GET_AFC_RFREQ_LO        "afc_timing_set_get_afc_rfreq_lo"
+#define AFC_TIMING_OPCODE_SET_GET_AFC_N1            36
+#define AFC_TIMING_NAME_SET_GET_AFC_N1              "afc_timing_set_get_afc_n1"
+#define AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV        37
+#define AFC_TIMING_NAME_SET_GET_AFC_HS_DIV          "afc_timing_set_get_afc_hs_div"
+#define AFC_TIMING_OPCODE_END                       38
 
 #endif
 
