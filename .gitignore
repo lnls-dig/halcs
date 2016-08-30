@@ -9,3 +9,4 @@ valgrind_report.txt
 *.a
 *.so
 .gradle
+build
