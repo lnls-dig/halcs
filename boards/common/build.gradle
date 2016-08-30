@@ -13,7 +13,7 @@ model {
                     lib project: ':libs:hutils', library: 'hutils'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'
-                    lib project: ':sm_io', library: 'sm_io'
+                    lib project: ':sm_io', library: 'sm_io', linkage: 'api'
                 }
             }
 
