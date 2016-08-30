@@ -10,7 +10,7 @@
 #  include "libsdbfs-freestanding.h"
 #endif
 
-#include <sdb.h> /* Please point your "-I" to some sensible place */
+#include <linux/sdb.h> /* Please point your "-I" to some sensible place */
 
 #define SDBFS_DEPTH 4 /* Max number of subdirectory depth */
 /*

@@ -1,5 +1,6 @@
 include 'foreign:pcie-driver'
 include 'foreign:libbsmp'
+include 'foreign:libsdbfs'
 
 include 'libs:convc'
 include 'libs:disptable'
