@@ -2,3 +2,4 @@ include 'foreign:libbsmp'
 
 include 'libs:convc'
 include 'libs:errhand'
+include 'libs:hutils'
