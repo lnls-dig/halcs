@@ -1,0 +1,13 @@
+model {
+    components {
+        convc(NativeLibrarySpec) {
+            sources {
+                c {
+                    exportedHeaders.srcDir 'include'
+
+                    lib project: ':libs:errhand', library: 'errhand'
+                }
+            }
+        }
+    }
+}
