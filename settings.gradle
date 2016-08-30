@@ -11,5 +11,6 @@ include 'libs:llio'
 include 'libs:sdbutils'
 
 include 'common'
+include 'dev_io'
 include 'revision'
 include 'sm_io'
