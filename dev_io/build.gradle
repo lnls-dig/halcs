@@ -13,6 +13,7 @@ model {
                     lib project: ':libs:hutils', library: 'hutils'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'
+                    lib project: ':msg', library: 'msg'
                     lib project: ':sm_io', library: 'sm_io'
                 }
             }
