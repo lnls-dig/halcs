@@ -7,6 +7,12 @@ allprojects {
             production
         }
 
+        flavors {
+            afcv3
+            afcv3_1
+            ml605
+        }
+
         binaries {
             all {
                 cCompiler.args '-Wall', '-Wextra', '-Werror'
@@ -18,6 +24,14 @@ allprojects {
 
                 if (buildType == buildTypes.debug)
                     cCompiler.args '-g'
+
+                if (flavor == flavors.afcv3)
+                    cCompiler.define '__BOARD_AFCV3__'
+                else if (flavor == flavors.afcv3_1) {
+                    cCompiler.define '__BOARD_AFCV3__'
+                    cCompiler.define '__BOARD_AFCV3_1__'
+                } else if (flavor == flavors.ml605)
+                    cCompiler.define '__BOARD_ML605__'
             }
         }
     }
