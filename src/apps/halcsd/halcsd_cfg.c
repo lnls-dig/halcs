@@ -254,17 +254,18 @@ int main (int argc, char *argv[])
         goto err_plat_devio;
     }
 
-err_plat_devio_devio:
-    devio_destroy (&devio);
+err_plat_devio:
+    zactor_destroy (&server);
 err_server:
+    devio_destroy (&devio);
 err_exit:
     free (log_filename);
     free (broker_endp);
     free (dev_id_str);
     free (dev_entry);
     free (dev_type);
-    free (devio_work_dir);
     free (devio_type_str);
+    free (devio_work_dir);
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Exiting ...\n");
     return 0;
 }
