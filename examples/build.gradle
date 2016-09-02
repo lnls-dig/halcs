@@ -1,0 +1,51 @@
+model {
+    components {
+        acq(NativeExecutableSpec)
+        acq_gen_sw_trigger(NativeExecutableSpec)
+        acq_trigger(NativeExecutableSpec)
+        ad9510_ctl(NativeExecutableSpec)
+        adc_data(NativeExecutableSpec)
+        adc_dly(NativeExecutableSpec)
+        dsp_swap(NativeExecutableSpec)
+        fmc130m_4ch_ctl(NativeExecutableSpec)
+        fmc250m_4ch_sleep(NativeExecutableSpec)
+        fmc250m_4ch_test_mode(NativeExecutableSpec)
+        fpga_info(NativeExecutableSpec)
+        leds(NativeExecutableSpec)
+        monit_amp(NativeExecutableSpec)
+        monit_pos(NativeExecutableSpec)
+        rffe_ctl(NativeExecutableSpec)
+        si571_ctl(NativeExecutableSpec)
+        test_data_en(NativeExecutableSpec)
+        trigger(NativeExecutableSpec)
+
+        all {
+            sources {
+                c {
+                    lib project: ':boards:common', library: 'common'
+                    lib project: ':boards:afcv3', library: 'afcv3'
+                    lib project: ':boards:afcv3_1', library: 'afcv3_1'
+                    lib project: ':boards:ml605', library: 'ml605'
+                    lib project: ':common', library: 'common'
+                    lib project: ':foreign:libbsmp', library: 'bsmp'
+                    lib project: ':foreign:libsdbfs', library: 'sdbfs'
+                    lib project: ':foreign:pcie-driver', library: 'pcieDriverLib'
+                    lib project: ':libs:convc', library: 'convc'
+                    lib project: ':libs:disptable', library: 'disptable'
+                    lib project: ':libs:errhand', library: 'errhand'
+                    lib project: ':libs:halcsclient', library: 'halcsclient'
+                    lib project: ':libs:hutils', library: 'hutils'
+                    lib project: ':libs:llio', library: 'llio'
+                    lib project: ':libs:sdbutils', library: 'sdbutils'
+                    lib project: ':sm_io', library: 'sm_io'
+                    lib project: ':msg', library: 'msg'
+                    lib project: ':dev_io', library: 'dev_io'
+                }
+            }
+
+            binaries.all {
+                linker.args '-lczmq', '-lmlm'
+            }
+        }
+    }
+}
