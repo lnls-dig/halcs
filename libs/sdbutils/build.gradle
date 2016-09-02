@@ -9,10 +9,6 @@ model {
                     lib project: ':libs:errhand', library: 'errhand'
                 }
             }
-
-            binaries.all {
-                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
-            }
         }
     }
 }

@@ -32,10 +32,6 @@ model {
                     lib project: ':libs:sdbutils', library: 'sdbutils'
                 }
             }
-
-            binaries.all {
-                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
-            }
         }
     }
 }

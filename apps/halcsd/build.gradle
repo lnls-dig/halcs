@@ -26,8 +26,6 @@ model {
             }
 
             binaries.all {
-                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
-
                 cCompiler.define '__AFE_RFFE_V2__'
 
                 linker.args '-lczmq'
@@ -59,8 +57,6 @@ model {
             }
 
             binaries.all {
-                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
-
                 cCompiler.define '__AFE_RFFE_V2__'
 
                 linker.args '-lczmq'

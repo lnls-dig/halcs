@@ -16,10 +16,6 @@ model {
                     lib project: ':sm_io', library: 'sm_io'
                 }
             }
-
-            binaries.all {
-                cCompiler.args '-I/usr/src/linux-headers-4.4.0-34/include'
-            }
         }
     }
 }
