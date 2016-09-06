@@ -37,6 +37,10 @@
 #   define SDBUTILS_EXPORT
 #endif
 
+/* Known vendor IDs */
+
+#define LNLS_VENDOR_ID      0x1215
+
 /* Opaque class structures to allow forward references */
 
 /* Public API classes */
