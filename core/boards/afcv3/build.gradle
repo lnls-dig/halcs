@@ -1,26 +1,10 @@
 model {
-    binaries {
-        all {
-            linker.args '-T', '../linker/halcs.ld'
-        }
-    }
-
     components {
-        sm_io(NativeLibrarySpec) {
+        afcv3(NativeLibrarySpec) {
             sources {
                 c {
-                    source {
-                        srcDir 'src/sm_io/c'
-                        include '**/*.c'
-                    }
-
-                    exportedHeaders.srcDir 'include'
-
-                    lib project: ':boards:common', library: 'common'
-                    lib project: ':boards:afcv3', library: 'afcv3'
-                    lib project: ':boards:afcv3_1', library: 'afcv3_1'
-                    lib project: ':boards:ml605', library: 'ml605'
-                    lib project: ':common', library: 'common', linkage: 'api'
+                    lib project: ':core:common', library: 'common'
+                    lib project: ':core:sm_io', library: 'sm_io', linkage: 'api'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
                     lib project: ':libs:halcsclient', library: 'halcsclient'

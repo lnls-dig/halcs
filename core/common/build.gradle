@@ -5,9 +5,9 @@ model {
                 c {
                     exportedHeaders.srcDir 'include'
 
+                    lib project: ':core:sm_io', library: 'sm_io'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'
-                    lib project: ':sm_io', library: 'sm_io'
                 }
             }
         }

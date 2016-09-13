@@ -1,9 +1,10 @@
 model {
     components {
-        common(NativeLibrarySpec) {
+        ml605(NativeLibrarySpec) {
             sources {
                 c {
-                    lib project: ':common', library: 'common'
+                    lib project: ':core:common', library: 'common'
+                    lib project: ':core:sm_io', library: 'sm_io', linkage: 'api'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
                     lib project: ':libs:halcsclient', library: 'halcsclient'
@@ -13,9 +14,9 @@ model {
                     lib project: ':libs:hutils', library: 'hutils'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'
-                    lib project: ':sm_io', library: 'sm_io', linkage: 'api'
                 }
             }
         }
     }
 }
+

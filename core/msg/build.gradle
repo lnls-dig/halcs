@@ -1,9 +1,15 @@
 model {
     components {
-        afcv3_1(NativeLibrarySpec) {
+        msg(NativeLibrarySpec) {
             sources {
                 c {
-                    lib project: ':common', library: 'common'
+                    source {
+                        srcDir 'src/msg/c'
+                        include '**/*.c'
+                    }
+
+                    lib project: ':core:common', library: 'common'
+                    lib project: ':core:sm_io', library: 'sm_io'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
                     lib project: ':libs:halcsclient', library: 'halcsclient'
@@ -13,7 +19,6 @@ model {
                     lib project: ':libs:hutils', library: 'hutils'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'
-                    lib project: ':sm_io', library: 'sm_io', linkage: 'api'
                 }
             }
         }
