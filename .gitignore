@@ -3,7 +3,9 @@
 *.orig
 *.bak
 *.o
-*.d
+# Dependency files
+*.d         # Ignore all dependency files
+!*.d/       # But keep the directories matching this (e.g., init.d)
 *.pyc
 valgrind_report.txt
 *.a
