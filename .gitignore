@@ -1,12 +1,20 @@
+# Text editors swap/temporary files
 *~
 *.swp
 *.orig
 *.bak
 *.o
+
 # Dependency files
 *.d         # Ignore all dependency files
 !*.d/       # But keep the directories matching this (e.g., init.d)
+
+# Compiled python files
 *.pyc
+
+# Reports
 valgrind_report.txt
+
+# Libraries
 *.a
 *.so
