@@ -74,6 +74,9 @@ all: $(OUT)
 %: %.c
 	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
+# For compatibility
+install:
+
 #BAD
 clean:
 	find . -iname "*.o" -exec rm '{}' \;
