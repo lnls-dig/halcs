@@ -10,7 +10,6 @@
 #include "errhand.h"
 #include "halcs_client_rw_param_codes.h"
 #include "halcs_client_codes.h"
-#include "sm_io_swap_useful_macros.h"
 #include "halcs_client_revision.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -1502,17 +1501,6 @@ PARAM_FUNC_CLIENT_READ(sw)
     return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW, sw);
 }
 
-/* Switching enabling functions */
-PARAM_FUNC_CLIENT_WRITE(sw_en)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
-}
-
-PARAM_FUNC_CLIENT_READ(sw_en)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
-}
-
 /* Switching Clock division functions */
 PARAM_FUNC_CLIENT_WRITE(div_clk)
 {
@@ -1533,105 +1521,6 @@ PARAM_FUNC_CLIENT_WRITE(sw_dly)
 PARAM_FUNC_CLIENT_READ(sw_dly)
 {
     return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_DLY, sw_dly);
-}
-
-/* Windowing functions */
-/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
-PARAM_FUNC_CLIENT_WRITE(wdw)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
-}
-
-/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
-PARAM_FUNC_CLIENT_READ(wdw)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
-}
-
-PARAM_FUNC_CLIENT_WRITE(wdw_dly)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
-}
-
-PARAM_FUNC_CLIENT_READ(wdw_dly)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
-}
-
-/* Gain functions */
-/* TODO: reduce code repetition by, possibilly, group the OPCODES in
- * structure and merge all functions in a single
- * generic one for all channels (A, B, C, D) */
-PARAM_FUNC_CLIENT_WRITE2(gain_a, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_A,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_a, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_A, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_b, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_B,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_b, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_B, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_c, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_C,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_c, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_C, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_d, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_D,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_d, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_D, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
 }
 
 /**************** RFFE SMIO Functions ****************/

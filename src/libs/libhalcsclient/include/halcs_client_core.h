@@ -692,10 +692,6 @@ halcs_client_err_e halcs_set_sw (halcs_client_t *self, char *service,
         uint32_t sw);
 halcs_client_err_e halcs_get_sw (halcs_client_t *self, char *service,
         uint32_t *sw);
-halcs_client_err_e halcs_set_sw_en (halcs_client_t *self, char *service,
-        uint32_t sw_en);
-halcs_client_err_e halcs_get_sw_en (halcs_client_t *self, char *service,
-        uint32_t *sw_en);
 
 /* Switching clock functions */
 /* These set of functions write (set) or read (get) the switching
@@ -720,48 +716,6 @@ halcs_client_err_e halcs_set_sw_dly (halcs_client_t *self, char *service,
         uint32_t sw_dly);
 halcs_client_err_e halcs_get_sw_dly (halcs_client_t *self, char *service,
         uint32_t *sw_dly);
-
-/* Windowing functions */
-/* These set of functions write (set) or read (get) the windowing state with
- * halcs_*_wdw () and the delay between the beggining of the window and the switching
- * state change. It is a experimental feature that applies a window to the ADC
- * data, in order to try to reduce the undesired effects of the switching, such
- * as phase shifts. All of the functions returns HALCS_CLIENT_SUCCESS if the
- * parameter was correctly set or error (see halcs_client_err.h for all possible
- * errors) */
-halcs_client_err_e halcs_set_wdw (halcs_client_t *self, char *service,
-        uint32_t wdw);
-halcs_client_err_e halcs_get_wdw (halcs_client_t *self, char *service,
-        uint32_t *wdw);
-halcs_client_err_e halcs_set_wdw_dly (halcs_client_t *self, char *service,
-        uint32_t wdw_dly);
-halcs_client_err_e halcs_get_wdw_dly (halcs_client_t *self, char *service,
-        uint32_t *wdw_dly);
-
-/* Gain functions */
-/* TODO: reduce code repetition by, possibilly, group the OPCODES in
- * structure and merge all functions in a single
- * generic one for all channels (A, B, C, D) */
-/* These set of functions write (set) or read (get) the gain in all ADC channels,
- * for both the direct path and the inverted path. All of the functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors) */
-halcs_client_err_e halcs_set_gain_a (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_a (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_b (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_b (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_c (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_c (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_d (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_d (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
 
 /********************** RFFE Functions ********************/
 
