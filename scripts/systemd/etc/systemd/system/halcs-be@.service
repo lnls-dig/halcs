@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 After=media-remote_logs.mount
 Requires=media-remote_logs.mount
-PartOf=halcs@%i.service
+PartOf=halcs@%i.target
 
 [Service]
 EnvironmentFile=/etc/sysconfig/halcs-board
