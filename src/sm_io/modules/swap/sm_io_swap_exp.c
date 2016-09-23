@@ -47,12 +47,8 @@
  * */
 #define SW_MIN                                  0
 #define SW_MAX                                  3
-
-#define BPM_SWAP_CTRL_MODE_GLOBAL_MASK          (BPM_SWAP_CTRL_MODE1_MASK   | BPM_SWAP_CTRL_MODE2_MASK)
-#define BPM_SWAP_CTRL_MODE_GLOBAL_W(val)        (BPM_SWAP_CTRL_MODE1_W(val) | BPM_SWAP_CTRL_MODE2_W(val))
-#define BPM_SWAP_CTRL_MODE_GLOBAL_R(val)        (BPM_SWAP_CTRL_MODE1_R(val) | BPM_SWAP_CTRL_MODE2_R(val))
 RW_PARAM_FUNC(swap, sw) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, MODE, MULT_BIT_PARAM,
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -66,12 +62,8 @@ RW_PARAM_FUNC(swap, div_clk) {
 /* Number of clock cycles between the switching and deswitching */
 #define BPM_SWAP_SW_DLY_MIN                     0
 #define BPM_SWAP_SW_DLY_MAX                     ((1<<16)-1)
-
-#define BPM_SWAP_DLY_GLOBAL_MASK                (BPM_SWAP_DLY_1_MASK   | BPM_SWAP_DLY_2_MASK)
-#define BPM_SWAP_DLY_GLOBAL_W(val)              (BPM_SWAP_DLY_1_W(val) | BPM_SWAP_DLY_2_W(val))
-#define BPM_SWAP_DLY_GLOBAL_R(val)              (BPM_SWAP_DLY_1_R(val) | BPM_SWAP_DLY_2_R(val))
 RW_PARAM_FUNC(swap, sw_dly) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, 0x0, BPM_SWAP, DLY, DESWAP, MULT_BIT_PARAM,
             BPM_SWAP_SW_DLY_MIN, BPM_SWAP_SW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC,
             SET_FIELD);
 }
