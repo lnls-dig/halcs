@@ -2,4 +2,4 @@
 
 KERNEL=="fpga*", ACTION=="add", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/generate-dev-idx.sh %k", SYMLINK+="fpga/%c{1}", RUN+="/usr/bin/systemctl --no-block start halcs-ioc@%c{2}.target halcs-ioc@%c{3}.target"
 
-KERNEL=="fpga*", ACTION=="remove", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/generate-dev-idx.sh %k", SYMLINK+="fpga/%c{1}", RUN+="/usr/bin/systemctl --no-block stop halcs@%c{2}.target halcs@%c{3}.target"
+KERNEL=="fpga*", ACTION=="remove", PROGRAM="/usr/local/bin/generate-dev-idx.sh %k", RUN+="/usr/bin/systemctl --no-block stop halcs@%c{2}.target halcs@%c{3}.target"
