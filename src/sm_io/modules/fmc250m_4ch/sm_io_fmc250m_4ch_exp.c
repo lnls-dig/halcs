@@ -354,7 +354,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
 #define FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(func_name)                          \
         static int FMC250M_4CH_ISLA216P_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-#define FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, inst, read_func, write_func,   \
+#define FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, max_channel, read_func, write_func,   \
                 error_msg)                                                        \
         do {                                                                      \
             assert (owner);                                                       \
@@ -365,13 +365,17 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
             smio_fmc250m_4ch_t *fmc250m = smio_get_handler (self);                \
             ASSERT_TEST(fmc250m != NULL, "Could not get SMIO FMC250M handler",    \
                     err_get_fmc250m_handler, -FMC250M_4CH_ERR);                   \
-            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, inst); \
             uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);              \
-            (void) rw;                                                            \
+            uint32_t channel = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);          \
             uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);            \
                                                                                   \
+            ASSERT_TEST(channel < max_channel, "Received ISLA216P channel too big", \
+                    err_rcv_channel, -FMC250M_4CH_ERR);                           \
+                                                                                  \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] Calling " \
-                    "ISLA216P function\n");                                       \
+                    "ISLA216P function, for channel #%u\n", channel);              \
+                                                                                   \
+            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, channel); \
                                                                                    \
             smch_err_e serr = SMCH_SUCCESS;                                        \
             /* Call specific function */                                           \
@@ -417,6 +421,83 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
                 )                                                                  \
             }                                                                      \
                                                                                    \
+    err_rcv_channel:                                                               \
+    err_get_fmc250m_handler:                                                       \
+            return err;                                                            \
+        } while(0)
+
+typedef smch_err_e (*smch_isla216p_func_fp2) (smch_isla216p_t *self, uint32_t *param1, uint32_t *param2);
+
+/* FIXME. Code almost the same as above */
+#define FMC250M_4CH_ISLA216P_FUNC_BODY2(owner, args, ret, max_channel, read_func, write_func,   \
+                error_msg)                                                        \
+        do {                                                                      \
+            assert (owner);                                                       \
+            assert (args);                                                        \
+                                                                                  \
+            int err = -FMC250M_4CH_OK;                                            \
+            SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                        \
+            smio_fmc250m_4ch_t *fmc250m = smio_get_handler (self);                \
+            ASSERT_TEST(fmc250m != NULL, "Could not get SMIO FMC250M handler",    \
+                    err_get_fmc250m_handler, -FMC250M_4CH_ERR);                   \
+            uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);              \
+            uint32_t channel = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);          \
+            uint32_t param1 = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);           \
+            uint32_t param2 = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);           \
+                                                                                  \
+            ASSERT_TEST(channel < max_channel, "Received ISLA216P channel too big", \
+                    err_rcv_channel, -FMC250M_4CH_ERR);                           \
+                                                                                  \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] Calling " \
+                    "ISLA216P function, for channel #%u\n", channel);              \
+                                                                                   \
+            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, channel); \
+                                                                                   \
+            smch_err_e serr = SMCH_SUCCESS;                                        \
+            /* Call specific function */                                           \
+            if (rw) {                                                              \
+                WHEN(ISEMPTY(read_func))(                                          \
+                    (void) ret;                                                    \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] " \
+                            "ISLA216P read function not implemented\n");           \
+                    err = -FMC250M_4CH_UNINPL;                                     \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(read_func))(                                       \
+                    uint32_t value = 0;                                            \
+                    serr = ((smch_isla216p_func_fp2) read_func) (smch_isla216p,    \
+                            &param1, &value);                                      \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC250M_4CH_ERR;                                    \
+                    }                                                              \
+                    else {                                                         \
+                        *((uint32_t *) ret) = value;                               \
+                        err = sizeof (value);                                      \
+                        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] " \
+                                "ISLA216P function read value = 0x%08X\n", value); \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+            else {                                                                 \
+                WHEN(ISEMPTY(write_func))(                                         \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] " \
+                            "ISLA216P write function not implemented\n");          \
+                    err = -FMC250M_4CH_UNINPL;                                     \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(write_func))(                                      \
+                    serr = ((smch_isla216p_func_fp2) write_func) (smch_isla216p,   \
+                            &param1, &param2);                                     \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC250M_4CH_ERR;                                    \
+                    }                                                              \
+                    else {                                                         \
+                        err = -FMC250M_4CH_OK;                                     \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+                                                                                   \
+    err_rcv_channel:                                                               \
     err_get_fmc250m_handler:                                                       \
             return err;                                                            \
         } while(0)
@@ -428,28 +509,50 @@ static smch_err_e smch_isla216p_test_mode_compat (smch_isla216p_t *self,
     return smch_isla216p_set_test_mode (self, test_mode);
 }
 
-FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode0)
+#define HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL      4
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode)
 {
-    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 0, /* No read function */,
-            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            /* No read function */, smch_isla216p_test_mode_compat,
+            "Could not set/get ISLA216P test mode");
 }
 
-FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode1)
+static smch_err_e smch_isla216p_rst_compat (smch_isla216p_t *self,
+        uint32_t *rst_arg)
 {
-    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 1, /* No read function */,
-            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+    uint8_t rst = *(uint8_t *) rst_arg;
+    return smch_isla216p_set_rst (self, rst);
 }
 
-FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode2)
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(rst)
 {
-    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 2, /* No read function */,
-            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            /* No read function */, smch_isla216p_rst_compat,
+            "Could not set/get ISLA216P reset");
 }
 
-FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode3)
+static smch_err_e smch_isla216p_set_reg (smch_isla216p_t *self,
+        uint32_t *addr_arg, uint32_t *data_arg)
 {
-    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, 3, /* No read function */,
-            smch_isla216p_test_mode_compat, "Could not set/get ISLA216P test mode");
+    uint8_t addr = *(uint8_t *) addr_arg;
+    const uint8_t *data = (const uint8_t *) data_arg;
+    return smch_isla216p_write_8 (self, addr, data);
+}
+
+static smch_err_e smch_isla216p_get_reg (smch_isla216p_t *self,
+        uint32_t *addr_arg, uint32_t *data_arg)
+{
+    uint8_t addr = *(uint8_t *) addr_arg;
+    uint8_t *data = (uint8_t *) data_arg;
+    return smch_isla216p_read_8 (self, addr, data);
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(reg)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY2(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            smch_isla216p_get_reg, smch_isla216p_set_reg,
+            "Could not set/get ISLA216P register");
 }
 
 /* Exported function pointers */
@@ -485,10 +588,9 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_div_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, sleep_adcs),
-    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode0),
-    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode1),
-    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode2),
-    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode3),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(rst),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(reg),
     NULL
 };
 

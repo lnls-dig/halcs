@@ -70,15 +70,13 @@
 #define FMC250M_4CH_NAME_RST_DIV_ADCS                   "fmc250m_4ch_rst_div_adcs"
 #define FMC250M_4CH_OPCODE_SLEEP_ADCS                   47
 #define FMC250M_4CH_NAME_SLEEP_ADCS                     "fmc250m_4ch_sleep_adcs"
-#define FMC250M_4CH_OPCODE_TESTMODE0                    48
-#define FMC250M_4CH_NAME_TESTMODE0                      "fmc250m_4ch_test_mode0"
-#define FMC250M_4CH_OPCODE_TESTMODE1                    49
-#define FMC250M_4CH_NAME_TESTMODE1                      "fmc250m_4ch_test_mode1"
-#define FMC250M_4CH_OPCODE_TESTMODE2                    50
-#define FMC250M_4CH_NAME_TESTMODE2                      "fmc250m_4ch_test_mode2"
-#define FMC250M_4CH_OPCODE_TESTMODE3                    51
-#define FMC250M_4CH_NAME_TESTMODE3                      "fmc350m_4ch_test_mode3"
-#define FMC250M_4CH_OPCODE_END                          52
+#define FMC250M_4CH_OPCODE_TESTMODE                     48
+#define FMC250M_4CH_NAME_TESTMODE                       "fmc250m_4ch_test_mode"
+#define FMC250M_4CH_OPCODE_RST                          49
+#define FMC250M_4CH_NAME_RST                            "fmc250m_4ch_rst"
+#define FMC250M_4CH_OPCODE_REG                          50
+#define FMC250M_4CH_NAME_REG                            "fmc250m_4ch_reg"
+#define FMC250M_4CH_OPCODE_END                          51
 
 /* Messaging Reply OPCODES */
 #define FMC250M_4CH_REPLY_TYPE                          uint32_t
