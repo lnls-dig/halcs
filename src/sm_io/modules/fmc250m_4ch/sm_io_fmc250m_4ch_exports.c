@@ -368,7 +368,7 @@ disp_op_t fmc250m_4ch_rst_exp = {
 disp_op_t fmc250m_4ch_reg_exp = {
     .name = FMC250M_4CH_NAME_REG,
     .opcode = FMC250M_4CH_OPCODE_REG,
-    .retval = DISP_ARG_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
