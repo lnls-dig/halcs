@@ -169,7 +169,7 @@ smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation)
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
 
-    ASSERT_TEST(rst_operation > ISLA216P_NAPSLP_SLEEP_MODE,
+    ASSERT_TEST(rst_operation <= ISLA216P_NAPSLP_SLEEP_MODE,
             "Reset operation is out of range", err_smpr_write,
             SMCH_ERR_INV_FUNC_PARAM);
 
