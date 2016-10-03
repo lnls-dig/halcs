@@ -405,6 +405,10 @@ halcs_client_err_e halcs_set_test_mode_adc (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_set_rst_modes_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t rst);
 
+/* Set ISLA216P portconfig */
+halcs_client_err_e halcs_set_portconfig_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t portconfig);
+
 /* Set/Get ISLA216P register values */
 halcs_client_err_e halcs_set_reg_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t addr, uint32_t val);

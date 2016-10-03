@@ -914,6 +914,13 @@ PARAM_FUNC_CLIENT_WRITE2(rst_modes_adc, chan, mode)
             chan, mode);
 }
 
+/* ISLA216P portconfig */
+PARAM_FUNC_CLIENT_WRITE2(portconfig_adc, chan, portconfig)
+{
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_PORTCONFIG,
+            chan, portconfig);
+}
+
 /* ISLA216P write register */
 PARAM_FUNC_CLIENT_WRITE3(reg_adc, chan, addr, val)
 {
