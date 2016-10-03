@@ -164,6 +164,26 @@ err_smpr_read:
     return err;
 }
 
+smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    ASSERT_TEST(rst_operation > ISLA216P_NAPSLP_SLEEP_MODE,
+            "Reset operation is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = ISLA216P_NAPSLP_W(rst_operation);
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_NAPSLP, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_NAPSLP",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
 /***************** Static functions *****************/
 
 static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
@@ -197,12 +217,9 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
             err_smpr_write, SMCH_ERR_RW_SMPR);
 #endif
 
-    data = ISLA216P_NAPSLP_W(ISLA216P_NAPSLP_NORMAL_OPERATION);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_NAPSLP, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_NAPSLP",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    SMCH_ISLA216P_WAIT_DFLT;
+    err = smch_isla216p_set_rst (self, ISLA216P_NAPSLP_NORMAL_OPERATION);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to normal operation",
+            err_smpr_write);
 
 err_smpr_write:
     return err;
@@ -230,7 +247,7 @@ static ssize_t _smch_isla216p_write_8 (smch_isla216p_t *self, uint8_t addr,
     uint32_t __data = ISLA216P_DATA_W(*data);
     size_t __data_size = ISLA216P_DATA_SIZE/SMPR_BYTE_2_BIT;
 
-    ssize_t smpr_err = smpr_write_block (self->proto, __addr_size, 
+    ssize_t smpr_err = smpr_write_block (self->proto, __addr_size,
             __addr, __data_size, &__data);
     ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not write to SMPR", err_smpr_write, -1);
