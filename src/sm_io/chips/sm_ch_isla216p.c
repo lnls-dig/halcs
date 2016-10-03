@@ -184,22 +184,31 @@ err_smpr_write:
     return err;
 }
 
+smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &config);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
 /***************** Static functions *****************/
 
 static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
 {
     smch_err_e err = SMCH_SUCCESS;
-    ssize_t rw_err = -1;
 
-    /* Turn on Bidirectional PROTO */
-    uint8_t data = ISLA216P_PORTCONFIG_SDO_ACTIVE;
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
-            "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    SMCH_ISLA216P_WAIT_DFLT;
+    /* Turn on SDO (4-wire mode) */
+    err = smch_isla216p_set_portconfig (self, ISLA216P_PORTCONFIG_SDO_ACTIVE);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to 4-wire mode",
+            err_smpr_write);
 
 #if 0
     /* Reset registers */

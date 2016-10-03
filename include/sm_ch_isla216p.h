@@ -35,6 +35,8 @@ smch_err_e smch_isla216p_get_chipid (smch_isla216p_t *self, uint8_t *chipid);
 smch_err_e smch_isla216p_get_chipver (smch_isla216p_t *self, uint8_t *chipver);
 /* Reset ISLA216P */
 smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation);
+/* Set port config */
+smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config);
 
 #ifdef __cplusplus
 }
