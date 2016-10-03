@@ -397,14 +397,19 @@ halcs_client_err_e halcs_set_sleep_adcs (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_sleep_adcs (halcs_client_t *self, char *service,
         uint32_t *sleep_adcs);
 
-halcs_client_err_e halcs_set_test_mode0 (halcs_client_t *self, char *service,
-        uint32_t test_mode0);
-halcs_client_err_e halcs_set_test_mode1 (halcs_client_t *self, char *service,
-        uint32_t test_mode1);
-halcs_client_err_e halcs_set_test_mode2 (halcs_client_t *self, char *service,
-        uint32_t test_mode2);
-halcs_client_err_e halcs_set_test_mode3 (halcs_client_t *self, char *service,
-        uint32_t test_mode3);
+/* Set ISLA216P test mode */
+halcs_client_err_e halcs_set_test_mode_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t mode);
+
+/* Set ISLA216P reset modes */
+halcs_client_err_e halcs_set_rst_modes_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t rst);
+
+/* Set/Get ISLA216P register values */
+halcs_client_err_e halcs_set_reg_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t addr, uint32_t val);
+halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t addr, uint32_t *val);
 
 /********************** ACQ SMIO Functions ********************/
 

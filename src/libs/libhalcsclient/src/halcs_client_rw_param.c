@@ -34,9 +34,10 @@
     CHECK_HAL_ERR(err, LIB_CLIENT, "[libclient:rw_param_client]",   \
             halcs_client_err_str (err_type))
 
+/* FIXME. use zsock_bsend () for generic argument handling */
 halcs_client_err_e param_client_send_gen_rw (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2)
+        void *param2, size_t size2, void *param3, size_t size3)
 {
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
@@ -54,6 +55,9 @@ halcs_client_err_e param_client_send_gen_rw (halcs_client_t *self, char *service
     zmsg_addmem (request, param1, size1);
     if (param2 != NULL) {
         zmsg_addmem (request, param2, size2);
+    }
+    if (param3 != NULL) {
+        zmsg_addmem (request, param3, size3);
     }
 
     /* Get poller and timeout from client */
@@ -92,7 +96,7 @@ err_get_handler:
 
 halcs_client_err_e param_client_write_gen (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2)
+        void *param2, size_t size2, void *param3, size_t size3)
 {
     assert (self);
     assert (service);
@@ -101,7 +105,7 @@ halcs_client_err_e param_client_write_gen (halcs_client_t *self, char *service,
     zmsg_t *report;
 
     err = param_client_send_gen_rw (self, service, operation, rw, param1,
-            size1, param2, size2);
+            size1, param2, size2, param3, size3);
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -136,7 +140,7 @@ halcs_client_err_e param_client_write_raw (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2)
 {
     return param_client_write_gen (self, service, operation, param1, &param2,
-            sizeof (param2), NULL, 0);
+            sizeof (param2), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e param_client_write (halcs_client_t *self, char *service,
@@ -144,7 +148,7 @@ halcs_client_err_e param_client_write (halcs_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param,
-            sizeof (param), NULL, 0);
+            sizeof (param), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e param_client_write_byte (halcs_client_t *self, char *service,
@@ -152,7 +156,7 @@ halcs_client_err_e param_client_write_byte (halcs_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param,
-            sizeof (param), NULL, 0);
+            sizeof (param), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e param_client_write_double (halcs_client_t *self, char *service,
@@ -160,7 +164,7 @@ halcs_client_err_e param_client_write_double (halcs_client_t *self, char *servic
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param,
-            sizeof (param), NULL, 0);
+            sizeof (param), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e param_client_write2 (halcs_client_t *self, char *service,
@@ -168,7 +172,15 @@ halcs_client_err_e param_client_write2 (halcs_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param1,
-            sizeof (param1), &param2, sizeof (param2));
+            sizeof (param1), &param2, sizeof (param2), NULL, 0);
+}
+
+halcs_client_err_e param_client_write3 (halcs_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2, uint32_t param3)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service, operation, rw, &param1,
+            sizeof (param1), &param2, sizeof (param2), &param3, sizeof (param3));
 }
 
 halcs_client_err_e param_client_write_double2 (halcs_client_t *self, char *service,
@@ -176,12 +188,13 @@ halcs_client_err_e param_client_write_double2 (halcs_client_t *self, char *servi
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, operation, rw, &param1,
-            sizeof (param1), &param2, sizeof (param2));
+            sizeof (param1), &param2, sizeof (param2), NULL, 0);
 }
 
 halcs_client_err_e param_client_read_gen (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2, void *param_out, size_t size_out)
+        void *param2, size_t size2, void *param3, size_t size3,
+        void *param_out, size_t size_out)
 {
     assert (self);
     assert (service);
@@ -195,7 +208,8 @@ halcs_client_err_e param_client_read_gen (halcs_client_t *self, char *service,
      * the passed parameter here */
     err = param_client_send_gen_rw (self, service, operation, rw,
             param1, size1,
-            param2, size2);
+            param2, size2,
+            param3, size3);
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not send message", err_send_msg);
     err = param_client_recv_rw (self, service, &report);
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not receive message", err_recv_msg);
@@ -263,7 +277,7 @@ halcs_client_err_e param_client_read (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, param_out,
-            sizeof (*param_out), NULL, 0, param_out, sizeof (*param_out));
+            sizeof (*param_out), NULL, 0, NULL, 0, param_out, sizeof (*param_out));
 }
 
 halcs_client_err_e param_client_read_byte (halcs_client_t *self, char *service,
@@ -271,7 +285,7 @@ halcs_client_err_e param_client_read_byte (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, param_out,
-            sizeof (*param_out), NULL, 0, param_out, sizeof (*param_out));
+            sizeof (*param_out), NULL, 0, NULL, 0, param_out, sizeof (*param_out));
 }
 
 halcs_client_err_e param_client_read_double (halcs_client_t *self, char *service,
@@ -279,7 +293,7 @@ halcs_client_err_e param_client_read_double (halcs_client_t *self, char *service
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, param_out,
-            sizeof (*param_out), NULL, 0, param_out, sizeof (*param_out));
+            sizeof (*param_out), NULL, 0, NULL, 0, param_out, sizeof (*param_out));
 }
 
 halcs_client_err_e param_client_write_read (halcs_client_t *self, char *service,
@@ -287,7 +301,17 @@ halcs_client_err_e param_client_write_read (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, &param1,
-            sizeof (param1), &param1, sizeof (param1), param_out, sizeof (*param_out));
+            sizeof (param1), &param1, sizeof (param1), NULL, 0,
+            param_out, sizeof (*param_out));
+}
+
+halcs_client_err_e param_client_write2_read (halcs_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2, uint32_t *param_out)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, operation, rw, &param1,
+            sizeof (param1), &param2, sizeof (param2), &param2, sizeof (param2),
+            param_out, sizeof (*param_out));
 }
 
 halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *service,
@@ -295,7 +319,8 @@ halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *s
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, &param1,
-            sizeof (param1), &param1, sizeof (param1), param_out, sizeof (*param_out));
+            sizeof (param1), &param1, sizeof (param1), NULL, 0,
+            param_out, sizeof (*param_out));
 }
 
 /********************* Utility functions ************************************/

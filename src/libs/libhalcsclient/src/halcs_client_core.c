@@ -901,28 +901,30 @@ PARAM_FUNC_CLIENT_READ(sleep_adcs)
 }
 
 /* ISLA216P Test modes */
-PARAM_FUNC_CLIENT_WRITE(test_mode0)
+PARAM_FUNC_CLIENT_WRITE2(test_mode_adc, chan, mode)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE0,
-            test_mode0);
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_TESTMODE,
+            chan, mode);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode1)
+/* ISLA216P reset modes */
+PARAM_FUNC_CLIENT_WRITE2(rst_modes_adc, chan, mode)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE1,
-            test_mode1);
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_RST,
+            chan, mode);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode2)
+/* ISLA216P write register */
+PARAM_FUNC_CLIENT_WRITE3(reg_adc, chan, addr, val)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE2,
-            test_mode2);
+    return param_client_write3 (self, service, FMC250M_4CH_OPCODE_REG,
+            chan, addr, val);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode3)
+PARAM_FUNC_CLIENT_WRITE2_READ(reg_adc, chan, addr, val)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE3,
-            test_mode3);
+    return param_client_write2_read (self, service, FMC250M_4CH_OPCODE_REG,
+            chan, addr, val);
 }
 
 /****************** ACQ SMIO Functions ****************/
@@ -1646,7 +1648,7 @@ halcs_client_err_e halcs_set_rffe_data (halcs_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0);
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e halcs_get_rffe_data (halcs_client_t *self, char *service,
@@ -1654,7 +1656,7 @@ halcs_client_err_e halcs_get_rffe_data (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0,
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0, NULL, 0,
             rffe_data_block, sizeof (*rffe_data_block));
 }
 
@@ -1664,7 +1666,7 @@ halcs_client_err_e halcs_get_rffe_version (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_VERSION,
-            rw, rffe_version, sizeof (*rffe_version), NULL, 0,
+            rw, rffe_version, sizeof (*rffe_version), NULL, 0, NULL, 0,
             rffe_version, sizeof (*rffe_version));
 }
 
@@ -1775,7 +1777,7 @@ halcs_client_err_e halcs_get_afc_diag_build_revision (halcs_client_t *self, char
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1785,7 +1787,7 @@ halcs_client_err_e halcs_get_afc_diag_build_date (halcs_client_t *self, char *se
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1795,7 +1797,7 @@ halcs_client_err_e halcs_get_afc_diag_build_user_name (halcs_client_t *self, cha
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1805,7 +1807,7 @@ halcs_client_err_e halcs_get_afc_diag_build_user_email (halcs_client_t *self, ch
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 

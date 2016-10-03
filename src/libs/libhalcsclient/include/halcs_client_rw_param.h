@@ -55,6 +55,10 @@ extern "C" {
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
             char *service, uint32_t param1, uint32_t param2)
 
+#define PARAM_FUNC_CLIENT_WRITE3(reg, param1, param2, param3)                   \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
+            char *service, uint32_t param1, uint32_t param2, uint32_t param3)
+
 #define PARAM_FUNC_CLIENT_WRITE_GEN(param)                                      \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(param) (halcs_client_t *self,     \
             char *service, void *param, size_t size)
@@ -84,6 +88,10 @@ extern "C" {
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
             char *service, uint32_t param1, uint32_t *param_out)
 
+#define PARAM_FUNC_CLIENT_WRITE2_READ(reg, param1, param2, param_out)           \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
+            char *service, uint32_t param1, uint32_t param2, uint32_t *param_out)
+
 #define PARAM_FUNC_CLIENT_READ_GEN(param)                                       \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(param) (halcs_client_t *self,    \
             char *service, void *param, size_t size)
@@ -91,14 +99,14 @@ extern "C" {
 /* Low-level protocol functions */
 halcs_client_err_e param_client_send_gen_rw (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2);
+        void *param2, size_t size2, void *param3, size_t size3);
 halcs_client_err_e param_client_recv_rw (halcs_client_t *self, char *service,
     zmsg_t **report);
 
 /* Write functions */
 halcs_client_err_e param_client_write_gen (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2);
+        void *param2, size_t size2, void *param3, size_t size3);
 halcs_client_err_e param_client_write_raw (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2);
 
@@ -106,6 +114,8 @@ halcs_client_err_e param_client_write (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1);
 halcs_client_err_e param_client_write2 (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2);
+halcs_client_err_e param_client_write3 (halcs_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2, uint32_t param3);
 halcs_client_err_e param_client_write_byte (halcs_client_t *self, char *service,
         uint32_t operation, uint8_t param);
 halcs_client_err_e param_client_write_double (halcs_client_t *self, char *service,
@@ -116,12 +126,15 @@ halcs_client_err_e param_client_write_double2 (halcs_client_t *self, char *servi
 /* Read functions */
 halcs_client_err_e param_client_read_gen (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t rw, void *param1, size_t size1,
-        void *param2, size_t size2, void *param_out, size_t size_out);
+        void *param2, size_t size2, void *param3, size_t size3,
+        void *param_out, size_t size_out);
 
 halcs_client_err_e param_client_read (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t *param_out);
 halcs_client_err_e param_client_write_read (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t *param_out);
+halcs_client_err_e param_client_write2_read (halcs_client_t *self, char *service,
+        uint32_t operation, uint32_t param1, uint32_t param2, uint32_t *param_out);
 halcs_client_err_e param_client_read_byte (halcs_client_t *self, char *service,
         uint32_t operation, uint8_t *param_out);
 halcs_client_err_e param_client_read_double (halcs_client_t *self, char *service,
