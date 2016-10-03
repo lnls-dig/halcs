@@ -532,7 +532,21 @@ FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(rst)
             "Could not set/get ISLA216P reset");
 }
 
-static smch_err_e smch_isla216p_set_reg (smch_isla216p_t *self,
+static smch_err_e smch_isla216p_portconfig_compat (smch_isla216p_t *self,
+        uint32_t *portconfig_arg)
+{
+    uint8_t portconfig = *(uint8_t *) portconfig_arg;
+    return smch_isla216p_set_portconfig (self, portconfig);
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(portconfig)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            /* No read function */, smch_isla216p_portconfig_compat,
+            "Could not set/get portconfig");
+}
+
+static smch_err_e smch_isla216p_set_reg_compat (smch_isla216p_t *self,
         uint32_t *addr_arg, uint32_t *data_arg)
 {
     uint8_t addr = *(uint8_t *) addr_arg;
@@ -540,7 +554,7 @@ static smch_err_e smch_isla216p_set_reg (smch_isla216p_t *self,
     return smch_isla216p_write_8 (self, addr, data);
 }
 
-static smch_err_e smch_isla216p_get_reg (smch_isla216p_t *self,
+static smch_err_e smch_isla216p_get_reg_compat (smch_isla216p_t *self,
         uint32_t *addr_arg, uint32_t *data_arg)
 {
     uint8_t addr = *(uint8_t *) addr_arg;
@@ -551,7 +565,7 @@ static smch_err_e smch_isla216p_get_reg (smch_isla216p_t *self,
 FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(reg)
 {
     FMC250M_4CH_ISLA216P_FUNC_BODY2(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
-            smch_isla216p_get_reg, smch_isla216p_set_reg,
+            smch_isla216p_get_reg_compat, smch_isla216p_set_reg_compat,
             "Could not set/get ISLA216P register");
 }
 
@@ -590,6 +604,7 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc250m_4ch, sleep_adcs),
     FMC250M_4CH_ISLA216P_FUNC_NAME(test_mode),
     FMC250M_4CH_ISLA216P_FUNC_NAME(rst),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(portconfig),
     FMC250M_4CH_ISLA216P_FUNC_NAME(reg),
     NULL
 };

@@ -43,6 +43,7 @@ extern disp_op_t fmc250m_4ch_rst_div_adcs_exp;
 extern disp_op_t fmc250m_4ch_sleep_adcs_exp;
 extern disp_op_t fmc250m_4ch_test_mode_exp;
 extern disp_op_t fmc250m_4ch_rst_exp;
+extern disp_op_t fmc250m_4ch_portconfig_exp;
 extern disp_op_t fmc250m_4ch_reg_exp;
 
 extern const disp_op_t *fmc250m_4ch_exp_ops [];
