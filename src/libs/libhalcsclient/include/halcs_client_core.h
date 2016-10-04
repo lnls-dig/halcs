@@ -415,6 +415,10 @@ halcs_client_err_e halcs_set_reg_adc (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t addr, uint32_t *val);
 
+/* get ISLA216P temperature */
+halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *temp);
+
 /********************** ACQ SMIO Functions ********************/
 
 /* Acquisition request */

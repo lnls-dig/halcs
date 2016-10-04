@@ -934,6 +934,13 @@ PARAM_FUNC_CLIENT_WRITE2_READ(reg_adc, chan, addr, val)
             chan, addr, val);
 }
 
+/* ISLA216P temperature */
+PARAM_FUNC_CLIENT_WRITE_READ(temp, chan, temp)
+{
+    return param_client_write_read (self, service, FMC250M_4CH_OPCODE_TEMP,
+            chan, temp);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
