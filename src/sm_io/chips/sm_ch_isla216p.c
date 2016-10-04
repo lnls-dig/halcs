@@ -228,7 +228,7 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
     ASSERT_TEST(rw_err == sizeof(uint16_t), "Could not read temperature code",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
-    *temp = ISLA216P_TEMP_COUNTER_COMPOSE(temp_code_high, temp_code_low);
+    *temp = ISLA216P_TEMP_COUNTER_R(temp_code_high, temp_code_low);
 
     /* Power-down temperature counter again, as per ISLA216P datahsheet */
     data = ISLA216P_TEMP_CTL_PD;
