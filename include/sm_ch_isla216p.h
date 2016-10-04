@@ -37,6 +37,8 @@ smch_err_e smch_isla216p_get_chipver (smch_isla216p_t *self, uint8_t *chipver);
 smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation);
 /* Set port config */
 smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config);
+/* Read temperature code */
+smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp);
 
 #ifdef __cplusplus
 }
