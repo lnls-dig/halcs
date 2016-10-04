@@ -935,7 +935,7 @@ PARAM_FUNC_CLIENT_WRITE2_READ(reg_adc, chan, addr, val)
 }
 
 /* ISLA216P temperature */
-PARAM_FUNC_CLIENT_WRITE_READ(temp, chan, temp)
+PARAM_FUNC_CLIENT_WRITE_READ(temp_adc, chan, temp)
 {
     return param_client_write_read (self, service, FMC250M_4CH_OPCODE_TEMP,
             chan, temp);
