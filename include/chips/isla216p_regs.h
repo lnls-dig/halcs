@@ -273,10 +273,78 @@
                                                                      ISLA216P_NAPSLP_SIZE)
 #define ISLA216P_NAPSLP_R(reg)                      WBGEN2_GEN_READ(reg, ISLA216P_NAPSLP_SHIFT, \
                                                                      ISLA216P_NAPSLP_SIZE)
-#define ISLA216P_NAPSLP_PIN_CONTROL                0
-#define ISLA216P_NAPSLP_NORMAL_OPERATION           (1<<0)
-#define ISLA216P_NAPSLP_NAP_MODE                   (1<<1)
-#define ISLA216P_NAPSLP_SLEEP_MODE                 (1<<2)
+#define ISLA216P_NAPSLP_PIN_CONTROL                 0
+#define ISLA216P_NAPSLP_NORMAL_OPERATION            (1<<0)
+#define ISLA216P_NAPSLP_NAP_MODE                    (1<<1)
+#define ISLA216P_NAPSLP_SLEEP_MODE                  (1<<2)
+
+#define ISLA216P_REG_TEMP_COUNTER_HIGH              0x4B
+
+/* Definition for register ISLA216P_REG_TEMP_COUNTER_HIGH */
+
+#define ISLA216P_TEMP_COUNTER_HIGH_SIZE             3
+#define ISLA216P_TEMP_COUNTER_HIGH_SHIFT            0
+#define ISLA216P_TEMP_COUNTER_HIGH_MASK             WBGEN2_GEN_MASK(ISLA216P_TEMP_COUNTER_HIGH_SHIFT, \
+                                                                          ISLA216P_TEMP_COUNTER_HIGH_SIZE)
+#define ISLA216P_TEMP_COUNTER_HIGH_W(value)         WBGEN2_GEN_WRITE(value, ISLA216P_TEMP_COUNTER_HIGH_SHIFT, \
+                                                                           ISLA216P_TEMP_COUNTER_HIGH_SIZE)
+#define ISLA216P_TEMP_COUNTER_HIGH_R(reg)           WBGEN2_GEN_READ(reg, ISLA216P_TEMP_COUNTER_HIGH_SHIFT, \
+                                                                           ISLA216P_TEMP_COUNTER_HIGH_SIZE)
+
+#define ISLA216P_REG_TEMP_COUNTER_LOW               0x4C
+
+/* Definition for register ISLA216P_REG_TEMP_COUNTER_LOW */
+
+#define ISLA216P_TEMP_COUNTER_LOW_SIZE              8
+#define ISLA216P_TEMP_COUNTER_LOW_SHIFT             0
+#define ISLA216P_TEMP_COUNTER_LOW_MASK              WBGEN2_GEN_MASK(ISLA216P_TEMP_COUNTER_LOW_SHIFT, \
+                                                                            ISLA216P_TEMP_COUNTER_LOW_SIZE)
+#define ISLA216P_TEMP_COUNTER_LOW_W(value)          WBGEN2_GEN_WRITE(value, ISLA216P_TEMP_COUNTER_LOW_SHIFT, \
+                                                                            ISLA216P_TEMP_COUNTER_LOW_SIZE)
+#define ISLA216P_TEMP_COUNTER_LOW_R(reg)            WBGEN2_GEN_READ(reg, ISLA216P_TEMP_COUNTER_LOW_SHIFT, \
+                                                                            ISLA216P_TEMP_COUNTER_LOW_SIZE)
+
+#define ISLA216P_TEMP_COUNTER_COMPOSE(high, low)    (high << ISLA216P_TEMP_COUNTER_LOW_SIZE | low)
+
+#define ISLA216P_REG_TEMP_CTL                       0x4D
+
+/* Definition for register ISLA216P_REG_TEMP_CTL */
+
+#define ISLA216P_TEMP_CTL_SELECT_SIZE               1
+#define ISLA216P_TEMP_CTL_SELECT_SHIFT              0
+#define ISLA216P_TEMP_CTL_SELECT                    WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_SELECT_SHIFT, \
+                                                                  ISLA216P_TEMP_CTL_SELECT_SIZE)
+
+#define ISLA216P_TEMP_CTL_DIVIDER_SIZE              3
+#define ISLA216P_TEMP_CTL_DIVIDER_SHIFT             1
+#define ISLA216P_TEMP_CTL_DIVIDER_MASK              WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_DIVIDER_SHIFT, \
+                                                                            ISLA216P_TEMP_CTL_DIVIDER_SIZE)
+#define ISLA216P_TEMP_CTL_DIVIDER_W(value)          WBGEN2_GEN_WRITE(value, ISLA216P_TEMP_CTL_DIVIDER_SHIFT, \
+                                                                            ISLA216P_TEMP_CTL_DIVIDER_SIZE)
+#define ISLA216P_TEMP_CTL_DIVIDER_R(reg)            WBGEN2_GEN_READ(reg, ISLA216P_TEMP_CTL_DIVIDER_SHIFT, \
+                                                                            ISLA216P_TEMP_CTL_DIVIDER_SIZE)
+/* Recommended by Intersil, ISLA216P25 datasheet, page 28 */
+#define ISLA216P_TEMP_CTL_DIVIDER_REC_VALUE         5 /* '101' */
+
+#define ISLA216P_TEMP_CTL_RESET_SIZE                1
+#define ISLA216P_TEMP_CTL_RESET_SHIFT               4
+#define ISLA216P_TEMP_CTL_RESET                     WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_RESET_SHIFT, \
+                                                                   ISLA216P_TEMP_CTL_RESET_SIZE)
+
+#define ISLA216P_TEMP_CTL_PD_SIZE                   1
+#define ISLA216P_TEMP_CTL_PD_SHIFT                  5
+#define ISLA216P_TEMP_CTL_PD                        WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_PD_SHIFT, \
+                                                                      ISLA216P_TEMP_CTL_PD_SIZE)
+
+#define ISLA216P_TEMP_CTL_ENABLE_SIZE               1
+#define ISLA216P_TEMP_CTL_ENABLE_SHIFT              6
+#define ISLA216P_TEMP_CTL_ENABLE                    WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_ENABLE_SHIFT, \
+                                                                  ISLA216P_TEMP_CTL_ENABLE_SIZE)
+
+#define ISLA216P_TEMP_CTL_PTAT_MODE_EN_SIZE         1
+#define ISLA216P_TEMP_CTL_PTAT_MODE_EN_SHIFT        7
+#define ISLA216P_TEMP_CTL_PTAT_MODE_EN              WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_PTAT_MODE_EN_SHIFT, \
+                                                            ISLA216P_TEMP_CTL_PTAT_MODE_EN_SIZE)
 
 #endif
 
