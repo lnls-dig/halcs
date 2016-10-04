@@ -204,31 +204,47 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
 
-    /* As per ISLA216P25 datasheet, page 28 */
-    uint8_t data = (ISLA216P_TEMP_CTL_PTAT_MODE_EN |
-                      ISLA216P_TEMP_CTL_ENABLE | 
-                      ISLA216P_TEMP_CTL_DIVIDER_W(ISLA216P_TEMP_CTL_DIVIDER_REC_VALUE));
+    /* Reset counter */
+    uint8_t data = ISLA216P_TEMP_CTL_RESET;
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_TEMP_CTL",
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not reset temperature counter",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
-    /* Wait longer than 132us */
-    SMCH_ISLA216P_WAIT_DFLT;
+    uint32_t i = 0;
+    for (i = 0; i < SMCH_ISLA216P_WAIT_TRIES; ++i) {
+        /* As per ISLA216P25 datasheet, page 28 */
+        data = (ISLA216P_TEMP_CTL_PTAT_MODE_EN |
+                          ISLA216P_TEMP_CTL_ENABLE | 
+                          ISLA216P_TEMP_CTL_DIVIDER_W(ISLA216P_TEMP_CTL_DIVIDER_REC_VALUE));
+        rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+        ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_TEMP_CTL",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
 
-    /* Power-down temperature counter */
-    data = ISLA216P_TEMP_CTL_PD;
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not power-down ISLA216P temperature counter",
+        /* Wait longer than 132us */
+        SMCH_ISLA216P_WAIT_DFLT;
+
+        /* Power-down temperature counter */
+        data = ISLA216P_TEMP_CTL_PD;
+        rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+        ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not power-down ISLA216P temperature counter",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+
+        uint8_t temp_code_high = 0;
+        uint8_t temp_code_low = 0;
+        rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_HIGH, &temp_code_high);
+        rw_err += _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_LOW, &temp_code_low);
+        ASSERT_TEST(rw_err == sizeof(uint16_t), "Could not read temperature code",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+        
+        /* Check if reading is valid */
+        if (temp_code_high & ISLA216P_TEMP_CTL_VALID_READ) {
+            *temp = ISLA216P_TEMP_COUNTER_R(temp_code_high, temp_code_low);
+            break;
+        }
+    }
+
+    ASSERT_TEST((i < SMCH_ISLA216P_WAIT_TRIES), "Could not read valid temperature counter",
             err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    uint8_t temp_code_high = 0;
-    uint8_t temp_code_low = 0;
-    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_HIGH, &temp_code_high);
-    rw_err += _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_LOW, &temp_code_low);
-    ASSERT_TEST(rw_err == sizeof(uint16_t), "Could not read temperature code",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    *temp = ISLA216P_TEMP_COUNTER_R(temp_code_high, temp_code_low);
 
     /* Power-down temperature counter again, as per ISLA216P datahsheet */
     data = ISLA216P_TEMP_CTL_PD;
