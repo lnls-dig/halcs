@@ -291,6 +291,11 @@
 #define ISLA216P_TEMP_COUNTER_HIGH_R(reg)           WBGEN2_GEN_READ(reg, ISLA216P_TEMP_COUNTER_HIGH_SHIFT, \
                                                                            ISLA216P_TEMP_COUNTER_HIGH_SIZE)
 
+#define ISLA216P_TEMP_CTL_VALID_READ_SIZE           1
+#define ISLA216P_TEMP_CTL_VALID_READ_SHIFT          7
+#define ISLA216P_TEMP_CTL_VALID_READ                WBGEN2_GEN_MASK(ISLA216P_TEMP_CTL_VALID_READ_SHIFT, \
+                                                              ISLA216P_TEMP_CTL_VALID_READ_SIZE)
+
 #define ISLA216P_REG_TEMP_COUNTER_LOW               0x4C
 
 /* Definition for register ISLA216P_REG_TEMP_COUNTER_LOW */
@@ -304,7 +309,8 @@
 #define ISLA216P_TEMP_COUNTER_LOW_R(reg)            WBGEN2_GEN_READ(reg, ISLA216P_TEMP_COUNTER_LOW_SHIFT, \
                                                                             ISLA216P_TEMP_COUNTER_LOW_SIZE)
 
-#define ISLA216P_TEMP_COUNTER_COMPOSE(high, low)    (high << ISLA216P_TEMP_COUNTER_LOW_SIZE | low)
+#define ISLA216P_TEMP_COUNTER_R(high, low)          (ISLA216P_TEMP_COUNTER_HIGH_R(high) << ISLA216P_TEMP_COUNTER_LOW_SIZE | \
+                                                     ISLA216P_TEMP_COUNTER_LOW_R(low))
 
 #define ISLA216P_REG_TEMP_CTL                       0x4D
 
