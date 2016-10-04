@@ -388,6 +388,7 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
                     return err;                                                    \
                 )                                                                  \
                 WHENNOT(ISEMPTY(read_func))(                                       \
+                    (void) param;                                                  \
                     uint32_t value = 0;                                            \
                     serr = ((smch_isla216p_func_fp) read_func) (smch_isla216p, \
                             &value);                                               \
@@ -569,6 +570,21 @@ FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(reg)
             "Could not set/get ISLA216P register");
 }
 
+static smch_err_e smch_isla216p_temp_compat (smch_isla216p_t *self,
+        uint32_t *temp_code_arg)
+{
+    uint16_t *temp_code = (uint16_t *) temp_code_arg;
+    return smch_isla216p_get_temp (self, temp_code);
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(temp)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            smch_isla216p_temp_compat, /* No write function */,
+            "Could not set/get temperature");
+}
+
+
 /* Exported function pointers */
 const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
 #if 0
@@ -606,6 +622,7 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     FMC250M_4CH_ISLA216P_FUNC_NAME(rst),
     FMC250M_4CH_ISLA216P_FUNC_NAME(portconfig),
     FMC250M_4CH_ISLA216P_FUNC_NAME(reg),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(temp),
     NULL
 };
 

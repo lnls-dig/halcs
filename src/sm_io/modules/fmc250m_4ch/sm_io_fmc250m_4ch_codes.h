@@ -78,7 +78,9 @@
 #define FMC250M_4CH_NAME_PORTCONFIG                     "fmc250m_4ch_portconfig"
 #define FMC250M_4CH_OPCODE_REG                          51
 #define FMC250M_4CH_NAME_REG                            "fmc250m_4ch_reg"
-#define FMC250M_4CH_OPCODE_END                          52
+#define FMC250M_4CH_OPCODE_TEMP                         52
+#define FMC250M_4CH_NAME_TEMP                           "fmc250m_4ch_temp"
+#define FMC250M_4CH_OPCODE_END                          53
 
 /* Messaging Reply OPCODES */
 #define FMC250M_4CH_REPLY_TYPE                          uint32_t

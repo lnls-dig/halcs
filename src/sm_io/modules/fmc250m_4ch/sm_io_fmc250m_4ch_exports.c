@@ -392,6 +392,19 @@ disp_op_t fmc250m_4ch_reg_exp = {
     }
 };
 
+disp_op_t fmc250m_4ch_temp_exp = {
+    .name = FMC250M_4CH_NAME_TEMP,
+    .opcode = FMC250M_4CH_OPCODE_TEMP,
+    .retval = DISP_ARG_END,
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *fmc250m_4ch_exp_ops [] = {
 #if 0
@@ -429,6 +442,7 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_rst_exp,
     &fmc250m_4ch_portconfig_exp,
     &fmc250m_4ch_reg_exp,
+    &fmc250m_4ch_temp_exp,
     NULL
 };
 
