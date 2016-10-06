@@ -1,5 +1,6 @@
 allprojects {
     apply plugin: 'c'
+    apply plugin: br.lnls.dig.gradle.currentplatform.CurrentPlatformPlugin
 
     model {
         buildTypes {
