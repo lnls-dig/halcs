@@ -3,6 +3,7 @@ plugins {
     id 'org.ajoberstar.release-opinion' version '1.5.1'
 }
 
+apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: com.janitovff.grgit.config.GitConfigPlugin
 
 model {

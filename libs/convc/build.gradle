@@ -1,3 +1,5 @@
+apply plugin: 'br.lnls.dig.gradle.nativedistribution'
+
 model {
     components {
         convc(NativeLibrarySpec) {
