@@ -203,12 +203,15 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
 {
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
+    uint8_t data = 0;
 
     /* Reset counter */
-    uint8_t data = ISLA216P_TEMP_CTL_RESET;
+#if 0
+    data = ISLA216P_TEMP_CTL_RESET;
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not reset temperature counter",
             err_smpr_write, SMCH_ERR_RW_SMPR);
+#endif
 
     uint32_t i = 0;
     for (i = 0; i < SMCH_ISLA216P_WAIT_TRIES; ++i) {
@@ -221,7 +224,7 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
                 err_smpr_write, SMCH_ERR_RW_SMPR);
 
         /* Wait longer than 132us */
-        SMCH_ISLA216P_WAIT_DFLT;
+        SMCH_ISLA216P_WAIT(1000);
 
         /* Power-down temperature counter */
         data = ISLA216P_TEMP_CTL_PD;
