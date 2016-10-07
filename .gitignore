@@ -7,7 +7,6 @@
 
 # Dependency files
 *.d         # Ignore all dependency files
-!*.d/       # But keep the directories matching this (e.g., init.d)
 
 # Compiled python files
 *.pyc
