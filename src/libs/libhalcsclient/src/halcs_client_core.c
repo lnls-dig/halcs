@@ -941,6 +941,217 @@ PARAM_FUNC_CLIENT_WRITE_READ(temp_adc, chan, temp)
             chan, temp);
 }
 
+/****************** FMC250M Delay Value Functions ****************/
+
+/* ADC delay value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY0, adc250_data_dly0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY0, adc250_data_dly0);
+}
+
+/* ADC delay value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY1, adc250_data_dly1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY1, adc250_data_dly1);
+}
+
+/* ADC delay value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY2, adc250_data_dly2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY2, adc250_data_dly2);
+}
+
+/* ADC delay value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY3, adc250_data_dly3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY3, adc250_data_dly3);
+}
+
+/* ADC delay value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY0, adc250_clk_dly0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY0, adc250_clk_dly0);
+}
+
+/* ADC delay value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY1, adc250_clk_dly1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY1, adc250_clk_dly1);
+}
+
+/* ADC delay value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY2, adc250_clk_dly2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY2, adc250_clk_dly2);
+}
+
+/* ADC delay value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY3, adc250_clk_dly3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY3, adc250_clk_dly3);
+}
+
+/****************** FMC250M Delay Line selection Functions ****************/
+
+/* ADC line value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE0, adc250_dly_line0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE0, adc250_dly_line0);
+}
+
+/* ADC line value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE1, adc250_dly_line1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE1, adc250_dly_line1);
+}
+
+/* ADC line value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE2, adc250_dly_line2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE2, adc250_dly_line2);
+}
+
+/* ADC line value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE3, adc250_dly_line3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE3, adc250_dly_line3);
+}
+
+/****************** FMC250M Delay update Functions ****************/
+
+/* ADC Update channel 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT0, adc250_dly_updt0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT0, adc250_dly_updt0);
+}
+
+/* ADC Update channel 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT1, adc250_dly_updt1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT1, adc250_dly_updt1);
+}
+
+/* ADC Update channel 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT2, adc250_dly_updt2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT2, adc250_dly_updt2);
+}
+
+/* ADC Update channel 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT3, adc250_dly_updt3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT3, adc250_dly_updt3);
+}
+
+/****************** FMC250M set delay functions ****************/
+
+/* ADC set delay channel 0 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly0, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY0,
+            type, val);
+}
+
+/* ADC set delay channel 1 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly1, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY1,
+            type, val);
+}
+
+/* ADC set delay channel 2 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly2, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY2,
+            type, val);
+}
+/* ADC set delay channel 3 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly3, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY3,
+            type, val);
+}
+
 /****************** ACQ SMIO Functions ****************/
 #define MIN_WAIT_TIME           1                           /* in ms */
 #define MSECS                   1000                        /* in seconds */
