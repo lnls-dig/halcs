@@ -12,16 +12,8 @@
 #define FMC250M_4CH_OPCODE_TYPE                         uint32_t
 #define FMC250M_4CH_OPCODE_SIZE                         (sizeof (FMC250M_4CH_OPCODE_TYPE))
 
-#if 0
-#define FMC250M_4CH_OPCODE_ADC_RAND                     5
-#define FMC250M_4CH_NAME_ADC_RAND                       "fmc250m_4ch_adc_rand"
-#define FMC250M_4CH_OPCODE_ADC_DITH                     6
-#define FMC250M_4CH_NAME_ADC_DITH                       "fmc250m_4ch_adc_dith"
-#define FMC250M_4CH_OPCODE_ADC_SHDN                     7
-#define FMC250M_4CH_NAME_ADC_SHDN                       "fmc250m_4ch_adc_shdn"
-#define FMC250M_4CH_OPCODE_ADC_PGA                      8
-#define FMC250M_4CH_NAME_ADC_PGA                        "fmc250m_4ch_adc_pga"
-#endif
+/* FIXME. Codes here are declared with "weird" offsets, as this used to share
+ * codes with FMC130M module, but not anymore. Remove this */
 #define FMC250M_4CH_OPCODE_ADC_DATA0                    9
 #define FMC250M_4CH_NAME_ADC_DATA0                      "fmc250m_4ch_adc_data0"
 #define FMC250M_4CH_OPCODE_ADC_DATA1                    10
@@ -30,40 +22,46 @@
 #define FMC250M_4CH_NAME_ADC_DATA2                      "fmc250m_4ch_adc_data2"
 #define FMC250M_4CH_OPCODE_ADC_DATA3                    12
 #define FMC250M_4CH_NAME_ADC_DATA3                      "fmc250m_4ch_adc_data3"
-#if 0
-#define FMC250M_4CH_OPCODE_ADC_DLY_VAL0                 13
-#define FMC250M_4CH_NAME_ADC_DLY_VAL0                   "fmc250m_4ch_adc_dly_val0"
-#define FMC250M_4CH_OPCODE_ADC_DLY_VAL1                 14
-#define FMC250M_4CH_NAME_ADC_DLY_VAL1                   "fmc250m_4ch_adc_dly_val1"
-#define FMC250M_4CH_OPCODE_ADC_DLY_VAL2                 15
-#define FMC250M_4CH_NAME_ADC_DLY_VAL2                   "fmc250m_4ch_adc_dly_val2"
-#define FMC250M_4CH_OPCODE_ADC_DLY_VAL3                 16
-#define FMC250M_4CH_NAME_ADC_DLY_VAL3                   "fmc250m_4ch_adc_dly_val3"
-#define FMC250M_4CH_OPCODE_ADC_DLY_LINE0                17
+#define FMC250M_4CH_OPCODE_ADC_DATA_DLY0                13
+#define FMC250M_4CH_NAME_ADC_DATA_DLY0                  "fmc250m_4ch_adc_data_dly0"
+#define FMC250M_4CH_OPCODE_ADC_DATA_DLY1                14
+#define FMC250M_4CH_NAME_ADC_DATA_DLY1                  "fmc250m_4ch_adc_data_dly1"
+#define FMC250M_4CH_OPCODE_ADC_DATA_DLY2                15
+#define FMC250M_4CH_NAME_ADC_DATA_DLY2                  "fmc250m_4ch_adc_data_dly2"
+#define FMC250M_4CH_OPCODE_ADC_DATA_DLY3                16
+#define FMC250M_4CH_NAME_ADC_DATA_DLY3                  "fmc250m_4ch_adc_data_dly3"
+#define FMC250M_4CH_OPCODE_ADC_CLK_DLY0                 17
+#define FMC250M_4CH_NAME_ADC_CLK_DLY0                   "fmc250m_4ch_adc_clk_dly0"
+#define FMC250M_4CH_OPCODE_ADC_CLK_DLY1                 18
+#define FMC250M_4CH_NAME_ADC_CLK_DLY1                   "fmc250m_4ch_adc_clk_dly1"
+#define FMC250M_4CH_OPCODE_ADC_CLK_DLY2                 19
+#define FMC250M_4CH_NAME_ADC_CLK_DLY2                   "fmc250m_4ch_adc_clk_dly2"
+#define FMC250M_4CH_OPCODE_ADC_CLK_DLY3                 20
+#define FMC250M_4CH_NAME_ADC_CLK_DLY3                   "fmc250m_4ch_adc_clk_dly3"
+#define FMC250M_4CH_OPCODE_ADC_DLY_LINE0                21
 #define FMC250M_4CH_NAME_ADC_DLY_LINE0                  "fmc250m_4ch_adc_dly_line0"
-#define FMC250M_4CH_OPCODE_ADC_DLY_LINE1                18
+#define FMC250M_4CH_OPCODE_ADC_DLY_LINE1                22
 #define FMC250M_4CH_NAME_ADC_DLY_LINE1                  "fmc250m_4ch_adc_dly_line1"
-#define FMC250M_4CH_OPCODE_ADC_DLY_LINE2                19
+#define FMC250M_4CH_OPCODE_ADC_DLY_LINE2                23
 #define FMC250M_4CH_NAME_ADC_DLY_LINE2                  "fmc250m_4ch_adc_dly_line2"
-#define FMC250M_4CH_OPCODE_ADC_DLY_LINE3                20
+#define FMC250M_4CH_OPCODE_ADC_DLY_LINE3                24
 #define FMC250M_4CH_NAME_ADC_DLY_LINE3                  "fmc250m_4ch_adc_dly_line3"
-#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT0                21
+#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT0                25
 #define FMC250M_4CH_NAME_ADC_DLY_UPDT0                  "fmc250m_4ch_adc_dly_updt0"
-#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT1                22
+#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT1                26
 #define FMC250M_4CH_NAME_ADC_DLY_UPDT1                  "fmc250m_4ch_adc_dly_updt1"
-#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT2                23
+#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT2                27
 #define FMC250M_4CH_NAME_ADC_DLY_UPDT2                  "fmc250m_4ch_adc_dly_updt2"
-#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT3                24
+#define FMC250M_4CH_OPCODE_ADC_DLY_UPDT3                28
 #define FMC250M_4CH_NAME_ADC_DLY_UPDT3                  "fmc250m_4ch_adc_dly_updt3"
-#define FMC250M_4CH_OPCODE_ADC_DLY0                     25
+#define FMC250M_4CH_OPCODE_ADC_DLY0                     29
 #define FMC250M_4CH_NAME_ADC_DLY0                       "fmc250m_4ch_adc_dly0"
-#define FMC250M_4CH_OPCODE_ADC_DLY1                     26
+#define FMC250M_4CH_OPCODE_ADC_DLY1                     30
 #define FMC250M_4CH_NAME_ADC_DLY1                       "fmc250m_4ch_adc_dly1"
-#define FMC250M_4CH_OPCODE_ADC_DLY2                     27
+#define FMC250M_4CH_OPCODE_ADC_DLY2                     31
 #define FMC250M_4CH_NAME_ADC_DLY2                       "fmc250m_4ch_adc_dly2"
-#define FMC250M_4CH_OPCODE_ADC_DLY3                     28
+#define FMC250M_4CH_OPCODE_ADC_DLY3                     32
 #define FMC250M_4CH_NAME_ADC_DLY3                       "fmc250m_4ch_adc_dly3"
-#endif
 #define FMC250M_4CH_OPCODE_RST_ADCS                     45
 #define FMC250M_4CH_NAME_RST_ADCS                       "fmc250m_4ch_rst_adcs"
 #define FMC250M_4CH_OPCODE_RST_DIV_ADCS                 46

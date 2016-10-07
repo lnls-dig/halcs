@@ -46,56 +46,6 @@ disp_op_t fmc250m_4ch_sleep_adcs_exp = {
     }
 };
 
-#if 0
-disp_op_t fmc250m_4ch_adc_rand_exp = {
-    .name = FMC250M_4CH_NAME_ADC_RAND,
-    .opcode = FMC250M_4CH_OPCODE_ADC_RAND,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t fmc250m_4ch_adc_dith_exp = {
-    .name = FMC250M_4CH_NAME_ADC_DITH,
-    .opcode = FMC250M_4CH_OPCODE_ADC_DITH,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t fmc250m_4ch_adc_shdn_exp = {
-    .name = FMC250M_4CH_NAME_ADC_SHDN,
-    .opcode = FMC250M_4CH_OPCODE_ADC_SHDN,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t fmc250m_4ch_adc_pga_exp = {
-    .name = FMC250M_4CH_NAME_ADC_PGA,
-    .opcode = FMC250M_4CH_OPCODE_ADC_PGA,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-#endif
-
 disp_op_t fmc250m_4ch_adc_data0_exp = {
     .name = FMC250M_4CH_NAME_ADC_DATA0,
     .opcode = FMC250M_4CH_OPCODE_ADC_DATA0,
@@ -144,10 +94,9 @@ disp_op_t fmc250m_4ch_adc_data3_exp = {
     }
 };
 
-#if 0
-disp_op_t fmc250m_4ch_adc_dly_val0_exp = {
-    .name = FMC250M_4CH_NAME_ADC_DLY_VAL0,
-    .opcode = FMC250M_4CH_OPCODE_ADC_DLY_VAL0,
+disp_op_t fmc250m_4ch_adc_data_dly0_exp = {
+    .name = FMC250M_4CH_NAME_ADC_DATA_DLY0,
+    .opcode = FMC250M_4CH_OPCODE_ADC_DATA_DLY0,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -157,9 +106,9 @@ disp_op_t fmc250m_4ch_adc_dly_val0_exp = {
     }
 };
 
-disp_op_t fmc250m_4ch_adc_dly_val1_exp = {
-    .name = FMC250M_4CH_NAME_ADC_DLY_VAL1,
-    .opcode = FMC250M_4CH_OPCODE_ADC_DLY_VAL1,
+disp_op_t fmc250m_4ch_adc_data_dly1_exp = {
+    .name = FMC250M_4CH_NAME_ADC_DATA_DLY1,
+    .opcode = FMC250M_4CH_OPCODE_ADC_DATA_DLY1,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -169,9 +118,9 @@ disp_op_t fmc250m_4ch_adc_dly_val1_exp = {
     }
 };
 
-disp_op_t fmc250m_4ch_adc_dly_val2_exp = {
-    .name = FMC250M_4CH_NAME_ADC_DLY_VAL2,
-    .opcode = FMC250M_4CH_OPCODE_ADC_DLY_VAL2,
+disp_op_t fmc250m_4ch_adc_data_dly2_exp = {
+    .name = FMC250M_4CH_NAME_ADC_DATA_DLY2,
+    .opcode = FMC250M_4CH_OPCODE_ADC_DATA_DLY2,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -181,9 +130,57 @@ disp_op_t fmc250m_4ch_adc_dly_val2_exp = {
     }
 };
 
-disp_op_t fmc250m_4ch_adc_dly_val3_exp = {
-    .name = FMC250M_4CH_NAME_ADC_DLY_VAL3,
-    .opcode = FMC250M_4CH_OPCODE_ADC_DLY_VAL3,
+disp_op_t fmc250m_4ch_adc_data_dly3_exp = {
+    .name = FMC250M_4CH_NAME_ADC_DATA_DLY3,
+    .opcode = FMC250M_4CH_OPCODE_ADC_DATA_DLY3,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_adc_clk_dly0_exp = {
+    .name = FMC250M_4CH_NAME_ADC_CLK_DLY0,
+    .opcode = FMC250M_4CH_OPCODE_ADC_CLK_DLY0,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_adc_clk_dly1_exp = {
+    .name = FMC250M_4CH_NAME_ADC_CLK_DLY1,
+    .opcode = FMC250M_4CH_OPCODE_ADC_CLK_DLY1,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_adc_clk_dly2_exp = {
+    .name = FMC250M_4CH_NAME_ADC_CLK_DLY2,
+    .opcode = FMC250M_4CH_OPCODE_ADC_CLK_DLY2,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fmc250m_4ch_adc_clk_dly3_exp = {
+    .name = FMC250M_4CH_NAME_ADC_CLK_DLY3,
+    .opcode = FMC250M_4CH_OPCODE_ADC_CLK_DLY3,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -337,7 +334,6 @@ disp_op_t fmc250m_4ch_adc_dly3_exp = {
         DISP_ARG_END
     }
 };
-#endif
 
 disp_op_t fmc250m_4ch_test_mode_exp = {
     .name = FMC250M_4CH_NAME_TESTMODE,
@@ -407,21 +403,18 @@ disp_op_t fmc250m_4ch_temp_exp = {
 
 /* Exported function description */
 const disp_op_t *fmc250m_4ch_exp_ops [] = {
-#if 0
-    &fmc250m_4ch_adc_rand_exp,
-    &fmc250m_4ch_adc_dith_exp,
-    &fmc250m_4ch_adc_shdn_exp,
-    &fmc250m_4ch_adc_pga_exp,
-#endif
     &fmc250m_4ch_adc_data0_exp,
     &fmc250m_4ch_adc_data1_exp,
     &fmc250m_4ch_adc_data2_exp,
     &fmc250m_4ch_adc_data3_exp,
-#if 0
-    &fmc250m_4ch_adc_dly_val0_exp,
-    &fmc250m_4ch_adc_dly_val1_exp,
-    &fmc250m_4ch_adc_dly_val2_exp,
-    &fmc250m_4ch_adc_dly_val3_exp,
+    &fmc250m_4ch_adc_data_dly0_exp,
+    &fmc250m_4ch_adc_data_dly1_exp,
+    &fmc250m_4ch_adc_data_dly2_exp,
+    &fmc250m_4ch_adc_data_dly3_exp,
+    &fmc250m_4ch_adc_clk_dly0_exp,
+    &fmc250m_4ch_adc_clk_dly1_exp,
+    &fmc250m_4ch_adc_clk_dly2_exp,
+    &fmc250m_4ch_adc_clk_dly3_exp,
     &fmc250m_4ch_adc_dly_line0_exp,
     &fmc250m_4ch_adc_dly_line1_exp,
     &fmc250m_4ch_adc_dly_line2_exp,
@@ -434,7 +427,6 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_adc_dly1_exp,
     &fmc250m_4ch_adc_dly2_exp,
     &fmc250m_4ch_adc_dly3_exp,
-#endif
     &fmc250m_4ch_rst_adcs_exp,
     &fmc250m_4ch_rst_div_adcs_exp,
     &fmc250m_4ch_sleep_adcs_exp,

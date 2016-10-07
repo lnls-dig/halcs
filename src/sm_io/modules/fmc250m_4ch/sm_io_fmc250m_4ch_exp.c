@@ -110,33 +110,62 @@ RW_PARAM_FUNC(fmc250m_4ch, adc_data3) {
             rw_halcs_fmc250m_4ch_data_fmt_fp, SET_FIELD);
 }
 
-#if 0
-/******************************** ADC Delay Values ****************************/
+/******************************ADC Data Delay Values *************************/
 
-RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val0) {
+RW_PARAM_FUNC(fmc250m_4ch, adc_data_dly0) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY0_CAL, VAL, MULT_BIT_PARAM,
+            CH0_FN_DLY, DATA_CHAIN_DLY, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val1) {
+RW_PARAM_FUNC(fmc250m_4ch, adc_data_dly1) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY1_CAL, VAL, MULT_BIT_PARAM,
+            CH1_FN_DLY, DATA_CHAIN_DLY, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val2) {
+RW_PARAM_FUNC(fmc250m_4ch, adc_data_dly2) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY2_CAL, VAL, MULT_BIT_PARAM,
+            CH2_FN_DLY, DATA_CHAIN_DLY, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val3) {
+RW_PARAM_FUNC(fmc250m_4ch, adc_data_dly3) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY3_CAL, VAL, MULT_BIT_PARAM,
+            CH3_FN_DLY, DATA_CHAIN_DLY, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+/******************************ADC Clock Delay Values *************************/
+
+RW_PARAM_FUNC(fmc250m_4ch, adc_clk_dly0) {
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
+            CH0_FN_DLY, CLK_CHAIN_DLY, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fmc250m_4ch, adc_clk_dly1) {
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
+            CH1_FN_DLY, CLK_CHAIN_DLY, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fmc250m_4ch, adc_clk_dly2) {
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
+            CH2_FN_DLY, CLK_CHAIN_DLY, MULT_BIT_PARAM,
+            /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fmc250m_4ch, adc_clk_dly3) {
+    SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
+            CH3_FN_DLY, CLK_CHAIN_DLY, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -145,115 +174,158 @@ RW_PARAM_FUNC(fmc250m_4ch, adc_dly_val3) {
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line0) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY0_CAL, LINE, MULT_BIT_PARAM,
+            CH0_FN_SEL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line1) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY1_CAL, LINE, MULT_BIT_PARAM,
+            CH1_FN_SEL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line2) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY2_CAL, LINE, MULT_BIT_PARAM,
+            CH2_FN_SEL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_line3) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY3_CAL, LINE, MULT_BIT_PARAM,
+            CH3_FN_SEL, LINE, MULT_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 /******************************** ADC Delay Update ****************************/
 
+/* On FMC250, all update delays set the same register., but we keep FMC130M
+ * compatibility and register one function for each */
+
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt0) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY0_CAL, UPDATE, SINGLE_BIT_PARAM,
+            ADC_CTL, UPDATE_CLK_DLY, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt1) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY1_CAL, UPDATE, SINGLE_BIT_PARAM,
+            ADC_CTL, UPDATE_CLK_DLY, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt2) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY2_CAL, UPDATE, SINGLE_BIT_PARAM,
+            ADC_CTL, UPDATE_CLK_DLY, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fmc250m_4ch, adc_dly_updt3) {
     SET_GET_PARAM(fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR,
-            IDELAY3_CAL, UPDATE, SINGLE_BIT_PARAM,
+            ADC_CTL, UPDATE_CLK_DLY, SINGLE_BIT_PARAM,
             /* no minimum value */, /* no maximum value */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 /***************************** Convenient ADC Delay ***************************/
 
-#define FMC250M_4CH_IDELAY_CLK_LINE                 (0x01 << 16)    /* Bit 16 is clock */
-#define FMC250M_4CH_IDELAY_DATA_LINES               0x00FFFF        /* Bits 0 to 15 are data */
-#define FMC250M_4CH_IDELAY_ALL_LINES                (FMC250M_4CH_IDELAY_CLK_LINE | \
-                                                        FMC250M_4CH_IDELAY_DATA_LINES)
+#define FMC250M_4CH_IDELAY_CLK_LINE                             (0x01 << 16)    /* Bit 16 is clock */
+#define FMC250M_4CH_IDELAY_DATA_LINES                           0x00FFFF        /* Bits 0 to 15 are data */
+#define FMC250M_4CH_IDELAY_ALL_LINES                            (FMC250M_4CH_IDELAY_CLK_LINE | \
+                                                                    FMC250M_4CH_IDELAY_DATA_LINES)
 
-#define FMC_250M_4CH_IDELAY_LINE_MASK               WB_FMC_250M_4CH_CSR_IDELAY0_CAL_LINE_MASK
-#define FMC_250M_4CH_IDELAY_LINE_SHIFT              WB_FMC_250M_4CH_CSR_IDELAY0_CAL_LINE_SHIFT
-#define FMC_250M_4CH_IDELAY_LINE_W(value)           WB_FMC_250M_4CH_CSR_IDELAY0_CAL_LINE_W(value)
-#define FMC_250M_4CH_IDELAY_LINE_R(reg)             WB_FMC_250M_4CH_CSR_IDELAY0_CAL_LINE_R(reg)
-#define FMC_250M_4CH_IDELAY_LINE_UPDT               WB_FMC_250M_4CH_CSR_IDELAY0_CAL_UPDATE
+#define FMC_250M_4CH_IDELAY_LINE_MASK                           WB_FMC_250M_4CH_CSR_CH0_FN_SEL_LINE_MASK
+#define FMC_250M_4CH_IDELAY_LINE_SHIFT                          WB_FMC_250M_4CH_CSR_CH0_FN_SEL_LINE_SHIFT
+#define FMC_250M_4CH_IDELAY_LINE_W(value)                       WB_FMC_250M_4CH_CSR_CH0_FN_SEL_LINE_W(value)
+#define FMC_250M_4CH_IDELAY_LINE_R(reg)                         WB_FMC_250M_4CH_CSR_CH0_FN_SEL_LINE_R(reg)
+#define FMC_250M_4CH_IDELAY_LINE_UPDT                           WB_FMC_250M_4CH_CSR_CH0_FN_SEL_UPDATE
 
-#define FMC_250M_4CH_IDELAY_CAL_VAL_W(value)        WB_FMC_250M_4CH_CSR_IDELAY0_CAL_VAL_W(value)
-#define FMC_250M_4CH_IDELAY_CAL_VAL_R(reg)          WB_FMC_250M_4CH_CSR_IDELAY0_CAL_VAL_R(reg)
+#define FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_W(value)         WB_FMC_250M_4CH_CSR_CH0_FN_DLY_DATA_CHAIN_DLY_W(value)
+#define FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_R(reg)           WB_FMC_250M_4CH_CSR_CH0_FN_DLY_DATA_CHAIN_DLY_R(reg)
+
+#define FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_W(value)          WB_FMC_250M_4CH_CSR_CH0_FN_DLY_CLK_CHAIN_DLY_W(value)
+#define FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_R(reg)            WB_FMC_250M_4CH_CSR_CH0_FN_DLY_CLK_CHAIN_DLY_R(reg)
 
 /* Low-level ADC delay function. Must be called with the correct arguments, so
  * only internal functions shall use this */
-static int _fmc250m_4ch_set_adc_dly_ll (smio_t* owner, uint64_t addr, uint32_t dly_val,
+static int _fmc250m_4ch_set_adc_dly_ll (smio_t* owner, uint64_t addr_dly,
+        uint64_t addr_sel, uint64_t addr_updt, uint32_t dly_val,
         uint32_t dly_type)
 {
-    uint32_t val = 0;
+    uint32_t dly_sel_val = 0;
+    uint32_t dly_reg_val = 0;
+    uint32_t dly_updt = 0;
+    bool is_dly_type_data = (dly_type & DLY_TYPE_DATA)? true : false;
+    bool is_dly_type_clk = (dly_type & DLY_TYPE_CLK)? true : false;
 
-    if (dly_type & DLY_TYPE_DATA) {
-        val = FMC_250M_4CH_IDELAY_LINE_W(FMC250M_4CH_IDELAY_DATA_LINES);
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                "[sm_io:fmc250m_4ch] Setting ADC data line delays...\n");
+    if (is_dly_type_data) {
+        /* Prepare line selection register */
+        dly_sel_val = FMC_250M_4CH_IDELAY_LINE_W(FMC250M_4CH_IDELAY_DATA_LINES);
+        /* Prepare update delay register */
+        dly_updt = WB_FMC_250M_4CH_CSR_ADC_CTL_UPDATE_DATA_DLY;
+        /* Write data delay register */
+        dly_reg_val = FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_W(dly_val);
     }
 
-    if (dly_type & DLY_TYPE_CLK) {
-        val |= FMC_250M_4CH_IDELAY_LINE_W(FMC250M_4CH_IDELAY_CLK_LINE);
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                "[sm_io:fmc250m_4ch] Setting ADC clock line delay...\n");
+    if (is_dly_type_clk) {
+        /* Prepare line selection register */
+        dly_sel_val |= FMC_250M_4CH_IDELAY_LINE_W(FMC250M_4CH_IDELAY_CLK_LINE);
+        /* Prepare update delay register */
+        dly_updt |= WB_FMC_250M_4CH_CSR_ADC_CTL_UPDATE_CLK_DLY;
+        /* Write clock delay register */
+        dly_reg_val |= FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_W(dly_val);
     }
 
-    val |= FMC_250M_4CH_IDELAY_CAL_VAL_W(dly_val);
-    smio_thsafe_client_write_32 (owner, addr, &val);
-    val |= FMC_250M_4CH_IDELAY_LINE_UPDT;
-    smio_thsafe_client_write_32 (owner, addr, &val);
-
+    /* Write data/clk delay value */
+    smio_thsafe_client_write_32 (owner, addr_dly, &dly_reg_val);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-            "[sm_io:fmc250m_4ch] ADC delay value set to %u\n", dly_val);
+            "[sm_io:fmc250m_4ch] ADC data delay set to %u\n",
+            FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_R(dly_reg_val));
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "[sm_io:fmc250m_4ch] ADC clock delay set to %u\n",
+            FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_R(dly_reg_val));
 
-    /* Do a readback test to guarantee the delay is set correctly */
-    val = 0;
+    /* Write delay lines selection */
+    smio_thsafe_client_write_32 (owner, addr_sel, &dly_sel_val);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "[sm_io:fmc250m_4ch] ADC delay lines value set to %u\n", dly_sel_val);
+
+    /* Update delay registers */
+    smio_thsafe_client_write_32 (owner, addr_updt, &dly_updt);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "[sm_io:fmc250m_4ch] ADC delay update set to %u\n", dly_updt);
+
+    /* Do a readback test to guarantee the delay is set correctly. FIXME: FPGA
+     * might not implement readback values for all LINES! So, this test might
+     * fail */
+    uint32_t dly_val_rb = 0;
     usleep (1000);
-    smio_thsafe_client_read_32 (owner, addr, &val);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-            "[sm_io:fmc250m_4ch] ADC delay read value is %u\n",
-            FMC_250M_4CH_IDELAY_CAL_VAL_R(val));
-    ASSERT_TEST(FMC_250M_4CH_IDELAY_CAL_VAL_R(val) == dly_val,
-            "Could not set ADC delay correctly. Readback test failed", err_adc_dly);
+    if (is_dly_type_data) {
+        smio_thsafe_client_read_32 (owner, addr_dly, &dly_val_rb);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                "[sm_io:fmc250m_4ch] ADC data delay read value is %u\n",
+                FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_R(dly_val_rb));
+        ASSERT_TEST(FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_R(dly_val_rb) ==
+                FMC_250M_4CH_IDELAY_CAL_DATA_CHAIN_DLY_R(dly_reg_val),
+                "Could not set ADC data delay correctly. Readback test failed", err_adc_dly);
+    }
+
+    if (is_dly_type_clk) {
+        smio_thsafe_client_read_32 (owner, addr_dly, &dly_val_rb);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                "[sm_io:fmc250m_4ch] ADC clk delay read value is %u\n",
+                FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_R(dly_val_rb));
+        ASSERT_TEST(FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_R(dly_val_rb) ==
+                FMC_250M_4CH_IDELAY_CAL_CLK_CHAIN_DLY_R(dly_reg_val),
+                "Could not set ADC clk delay correctly. Readback test failed", err_adc_dly);
+    }
 
     return -FMC250M_4CH_OK;
 
@@ -284,8 +356,11 @@ err_adc_dly:
                                                                                 \
         /* Delay value will be masked inside _fmc250m_4ch_set_adc_dly_ll */     \
                                                                                 \
-        return _fmc250m_4ch_set_adc_dly_ll (self, 0x0 |     \
-                WB_FMC_250M_4CH_CSR_REG_IDELAY ## channel ## _CAL, dly_val,     \
+        return _fmc250m_4ch_set_adc_dly_ll (self,                               \
+                WB_FMC_250M_4CH_CSR_REG_CH ## channel ## _FN_DLY,               \
+                WB_FMC_250M_4CH_CSR_REG_CH ## channel ## _FN_SEL,               \
+                WB_FMC_250M_4CH_CSR_REG_ADC_CTL,                                \
+                dly_val,                                                        \
                 dly_type);                                                      \
                                                                                 \
 err_dly_type_range:                                                             \
@@ -311,7 +386,6 @@ FMC250M_4CH_ADC_DLY_FUNC_HEADER(3)
 {
     FMC250M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 3);
 }
-#endif
 
 /***************************** ADC ISLA216P Control ***************************/
 
@@ -587,21 +661,18 @@ FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(temp)
 
 /* Exported function pointers */
 const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
-#if 0
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_rand),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dith),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_shdn),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_pga),
-#endif
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data0),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data1),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data2),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data3),
-#if 0
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_val0),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_val1),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_val2),
-    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_val3),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data_dly0),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data_dly1),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data_dly2),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_data_dly3),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_clk_dly0),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_clk_dly1),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_clk_dly2),
+    RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_clk_dly3),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_line0),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_line1),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, adc_dly_line2),
@@ -614,7 +685,6 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     FMC250M_4CH_ADC_DLY_FUNC_NAME(1),
     FMC250M_4CH_ADC_DLY_FUNC_NAME(2),
     FMC250M_4CH_ADC_DLY_FUNC_NAME(3),
-#endif
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, rst_div_adcs),
     RW_PARAM_FUNC_NAME(fmc250m_4ch, sleep_adcs),
