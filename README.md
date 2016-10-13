@@ -40,7 +40,7 @@ the binaries or executing the instructions below:
 
 ## Cloning this repository
 
-	git clone --recursive https://github.com/lerwys/halcs.git
+	git clone --recursive https://github.com/lnls-dig/halcs.git
 
 ## PCIe Installation Instructions
 
