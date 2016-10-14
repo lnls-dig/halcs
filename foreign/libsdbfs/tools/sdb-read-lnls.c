@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
 	drvdata = calloc(1, sizeof(*drvdata));
 	if (!drvdata) {perror("malloc"); exit(1);}
-	drvdata->llio = llio_new ("llio_pcie", fsname, PCIE_DEV, opt_verbose);
+	drvdata->llio = llio_new ("llio_pcie", fsname, &llio_ops_pcie, opt_verbose);
 	if (!drvdata->llio) {
 		fprintf(stderr, "%s: llio_new() error\n", prgname);
 		exit(1);
