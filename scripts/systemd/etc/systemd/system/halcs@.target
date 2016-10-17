@@ -2,8 +2,6 @@
 Description=HALCS server instance %I
 After=network-online.target
 Wants=network-online.target
-After=media-remote_logs.mount
-Requires=media-remote_logs.mount
 After=halcs-be@%i.service
 Wants=halcs-be@%i.service
 After=halcs-fe@%i.service
