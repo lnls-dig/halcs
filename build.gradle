@@ -1,6 +1,7 @@
 allprojects {
     apply plugin: 'c'
     apply plugin: br.lnls.dig.gradle.currentplatform.CurrentPlatformPlugin
+    apply plugin: 'br.lnls.dig.gradle.sanec'
 
     model {
         buildTypes {
