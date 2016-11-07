@@ -8,7 +8,7 @@
 #include "ll_io.h"
 
 /* PCIe specifics */
-#include <pciDriver.h>
+#include <pciDriver/lib/pciDriver.h>
 #include "hw/pcie_regs.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */

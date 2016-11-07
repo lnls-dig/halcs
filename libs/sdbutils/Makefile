@@ -65,15 +65,15 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src
+SRC_DIR = src/sdbutils/c
 # Include directory
 INCLUDE_DIR = include
 
 # Include directories
 # FIXME. Needed so we can find libsdbfs headers
 INCLUDE_DIRS = -Iinclude -I${PREFIX}/include \
-			   -I../../../foreign/libsdbfs \
-			   -I../../../include
+			   -I../../foreign/libsdbfs/include \
+			   -I../../core/common/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

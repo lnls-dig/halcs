@@ -1,4 +1,4 @@
-halcsd_DIR = $(SRC_DIR)/apps/halcsd
+halcsd_DIR = $(SRC_DIR)/apps/halcsd/src/halcsd/c
 
 halcsd_OBJS = $(halcsd_DIR)/halcsd.o
 

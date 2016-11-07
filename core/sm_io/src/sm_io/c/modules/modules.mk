@@ -1,17 +1,17 @@
-include $(SRC_DIR)/sm_io/modules/fmc130m_4ch/fmc130m_4ch.mk \
-		$(SRC_DIR)/sm_io/modules/fmc250m_4ch/fmc250m_4ch.mk \
-		$(SRC_DIR)/sm_io/modules/fmc_adc_common/fmc_adc_common.mk \
-		$(SRC_DIR)/sm_io/modules/fmc_active_clk/fmc_active_clk.mk \
-		$(SRC_DIR)/sm_io/modules/acq/acq.mk \
-		$(SRC_DIR)/sm_io/modules/dsp/dsp.mk \
-		$(SRC_DIR)/sm_io/modules/swap/swap.mk \
-		$(SRC_DIR)/sm_io/modules/rffe/rffe.mk \
-		$(SRC_DIR)/sm_io/modules/afc_diag/afc_diag.mk \
-		$(SRC_DIR)/sm_io/modules/trigger_iface/trigger_iface.mk \
-		$(SRC_DIR)/sm_io/modules/trigger_mux/trigger_mux.mk \
-		$(SRC_DIR)/sm_io/modules/afc_timing/afc_timing.mk
+sm_io_modules_DIR = $(sm_io_DIR)/modules
 
-sm_io_modules_DIR = $(SRC_DIR)/sm_io/modules
+include $(sm_io_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
+		$(sm_io_modules_DIR)/fmc250m_4ch/fmc250m_4ch.mk \
+		$(sm_io_modules_DIR)/fmc_adc_common/fmc_adc_common.mk \
+		$(sm_io_modules_DIR)/fmc_active_clk/fmc_active_clk.mk \
+		$(sm_io_modules_DIR)/acq/acq.mk \
+		$(sm_io_modules_DIR)/dsp/dsp.mk \
+		$(sm_io_modules_DIR)/swap/swap.mk \
+		$(sm_io_modules_DIR)/rffe/rffe.mk \
+		$(sm_io_modules_DIR)/afc_diag/afc_diag.mk \
+		$(sm_io_modules_DIR)/trigger_iface/trigger_iface.mk \
+		$(sm_io_modules_DIR)/trigger_mux/trigger_mux.mk \
+		$(sm_io_modules_DIR)/afc_timing/afc_timing.mk
 
 sm_io_modules_OBJS = $(sm_io_modules_DIR)/sm_io_codes.o \
 		     $(sm_io_fmc130m_4ch_OBJS) \

@@ -1,4 +1,4 @@
-dev_io_DIR = $(SRC_DIR)/dev_io
+dev_io_DIR = $(SRC_DIR)/core/dev_io/src/dev_io/c
 
 dev_io_core_utils_OBJS = $(dev_io_DIR)/dev_io_utils.o
 

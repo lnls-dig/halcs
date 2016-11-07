@@ -85,9 +85,12 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src
+SRC_DIR = src/halcsclient/c
 # Include directory
 INCLUDE_DIR = include
+
+SMIO_DIR = ../../core/sm_io
+SMIO_SRC_DIR = $(SMIO_DIR)/src/sm_io/c
 
 # Specific board objects
 OBJS_BOARD =
@@ -95,19 +98,19 @@ OBJS_BOARD =
 OBJS_PLATFORM =
 # Objects that are not specificaly related to the halcs_client, but composes
 # our library, as it eases some tasks for us
-OBJS_EXTERNAL = ../../sm_io/modules/sm_io_codes.o \
-                ../../sm_io/modules/acq/sm_io_acq_exports.o \
-                ../../sm_io/modules/dsp/sm_io_dsp_exports.o \
-                ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
-                ../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.o \
-                ../../sm_io/modules/fmc_adc_common/sm_io_fmc_adc_common_exports.o \
-                ../../sm_io/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.o \
-                ../../sm_io/modules/swap/sm_io_swap_exports.o \
-                ../../sm_io/modules/rffe/sm_io_rffe_exports.o \
-                ../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.o \
-                ../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.o \
-                ../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.o \
-                ../../sm_io/modules/afc_timing/sm_io_afc_timing_exports.o
+OBJS_EXTERNAL = $(SMIO_SRC_DIR)/modules/sm_io_codes.o \
+                $(SMIO_SRC_DIR)/modules/acq/sm_io_acq_exports.o \
+                $(SMIO_SRC_DIR)/modules/dsp/sm_io_dsp_exports.o \
+                $(SMIO_SRC_DIR)/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
+                $(SMIO_SRC_DIR)/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.o \
+                $(SMIO_SRC_DIR)/modules/fmc_adc_common/sm_io_fmc_adc_common_exports.o \
+                $(SMIO_SRC_DIR)/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.o \
+                $(SMIO_SRC_DIR)/modules/swap/sm_io_swap_exports.o \
+                $(SMIO_SRC_DIR)/modules/rffe/sm_io_rffe_exports.o \
+                $(SMIO_SRC_DIR)/modules/afc_diag/sm_io_afc_diag_exports.o \
+                $(SMIO_SRC_DIR)/modules/trigger_iface/sm_io_trigger_iface_exports.o \
+                $(SMIO_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_exports.o \
+                $(SMIO_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
@@ -116,19 +119,21 @@ boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
 INCLUDE_DIRS = -I. -Iinclude \
 	       $(boards_INCLUDE_DIRS) \
 	       -I../../../include \
-	       -I../../sm_io/modules \
-	       -I../../sm_io/modules/fmc130m_4ch \
-	       -I../../sm_io/modules/fmc250m_4ch \
-	       -I../../sm_io/modules/fmc_adc_common \
-	       -I../../sm_io/modules/fmc_active_clk \
-	       -I../../sm_io/modules/acq \
-	       -I../../sm_io/modules/swap \
-	       -I../../sm_io/modules/dsp \
-	       -I../../sm_io/modules/rffe \
-	       -I../../sm_io/modules/afc_diag \
-	       -I../../sm_io/modules/trigger_iface \
-	       -I../../sm_io/modules/trigger_mux \
-	       -I../../sm_io/modules/afc_timing \
+		   -I../../core/common/include \
+		   -I$(SMIO_DIR)/include \
+	       -I$(SMIO_SRC_DIR)/modules \
+	       -I$(SMIO_SRC_DIR)/modules/fmc130m_4ch \
+	       -I$(SMIO_SRC_DIR)/modules/fmc250m_4ch \
+	       -I$(SMIO_SRC_DIR)/modules/fmc_adc_common \
+	       -I$(SMIO_SRC_DIR)/modules/fmc_active_clk \
+	       -I$(SMIO_SRC_DIR)/modules/acq \
+	       -I$(SMIO_SRC_DIR)/modules/swap \
+	       -I$(SMIO_SRC_DIR)/modules/dsp \
+	       -I$(SMIO_SRC_DIR)/modules/rffe \
+	       -I$(SMIO_SRC_DIR)/modules/afc_diag \
+	       -I$(SMIO_SRC_DIR)/modules/trigger_iface \
+	       -I$(SMIO_SRC_DIR)/modules/trigger_mux \
+	       -I$(SMIO_SRC_DIR)/modules/afc_timing \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -151,39 +156,38 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 # Objects for each version of library
 $(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
 $(LIBNAME)_CODE_HEADERS = \
-	../../../include/acq_chan_gen_defs.h
+	../../core/common/include/acq_chan_gen_defs.h
 
-$(LIBNAME)_SMIO_CODES = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
-	../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_codes.h \
-	../../sm_io/modules/fmc_adc_common/sm_io_fmc_adc_common_codes.h \
-	../../sm_io/modules/fmc_active_clk/sm_io_fmc_active_clk_codes.h \
-	../../sm_io/modules/acq/sm_io_acq_codes.h \
-	../../sm_io/modules/dsp/sm_io_dsp_codes.h \
-	../../sm_io/modules/swap/sm_io_swap_codes.h \
-	../../sm_io/modules/rffe/sm_io_rffe_codes.h \
-	../../sm_io/modules/afc_diag/sm_io_afc_diag_codes.h \
-	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_codes.h \
-	../../sm_io/modules/trigger_mux/sm_io_trigger_mux_codes.h \
-	../../sm_io/modules/afc_timing/sm_io_afc_timing_codes.h \
-	../../sm_io/modules/sm_io_codes.h
+$(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
+	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_codes.h \
+	$(SMIO_DIR)/include/sm_io_fmc_adc_common_codes.h \
+	$(SMIO_DIR)/include/sm_io_fmc_active_clk_codes.h \
+	$(SMIO_DIR)/include/sm_io_acq_codes.h \
+	$(SMIO_DIR)/include/sm_io_dsp_codes.h \
+	$(SMIO_DIR)/include/sm_io_swap_codes.h \
+	$(SMIO_DIR)/include/sm_io_rffe_codes.h \
+	$(SMIO_DIR)/include/sm_io_afc_diag_codes.h \
+	$(SMIO_DIR)/include/sm_io_trigger_iface_codes.h \
+	$(SMIO_DIR)/include/sm_io_trigger_mux_codes.h \
+	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h
 
-$(LIBNAME)_SMIO_EXPORTS = ../../sm_io/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
-	../../sm_io/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.h \
-	../../sm_io/modules/fmc_adc_common/sm_io_fmc_adc_common_exports.h \
-	../../sm_io/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.h \
-	../../sm_io/modules/acq/sm_io_acq_exports.h \
-	../../sm_io/modules/dsp/sm_io_dsp_exports.h \
-	../../sm_io/modules/swap/sm_io_swap_exports.h \
-	../../sm_io/modules/rffe/sm_io_rffe_exports.h \
-	../../sm_io/modules/afc_diag/sm_io_afc_diag_exports.h \
-	../../sm_io/modules/trigger_iface/sm_io_trigger_iface_exports.h \
-	../../sm_io/modules/trigger_mux/sm_io_trigger_mux_exports.h \
-	../../sm_io/modules/afc_timing/sm_io_afc_timing_exports.h
+$(LIBNAME)_SMIO_EXPORTS = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_exports.h \
+	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_exports.h \
+	$(SMIO_DIR)/include/sm_io_fmc_adc_common_exports.h \
+	$(SMIO_DIR)/include/sm_io_fmc_active_clk_exports.h \
+	$(SMIO_DIR)/include/sm_io_acq_exports.h \
+	$(SMIO_DIR)/include/sm_io_dsp_exports.h \
+	$(SMIO_DIR)/include/sm_io_swap_exports.h \
+	$(SMIO_DIR)/include/sm_io_rffe_exports.h \
+	$(SMIO_DIR)/include/sm_io_afc_diag_exports.h \
+	$(SMIO_DIR)/include/sm_io_trigger_iface_exports.h \
+	$(SMIO_DIR)/include/sm_io_trigger_mux_exports.h \
+	$(SMIO_DIR)/include/sm_io_afc_timing_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBNAME)_ACQ_HEADERS = \
-	../../../include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
+	../../core/common/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 $(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers
@@ -194,7 +198,7 @@ $(LIBNAME)_INST_SMIO_HEADERS = $(addprefix include/,$(addsuffix .h,$($(LIBNAME)_
 # Our local library headers
 $(LIBNAME)_HEADERS_LIB = $(INCLUDE_DIR)/halcs_client.h $(INCLUDE_DIR)/halcs_client_classes.h \
 	$(INCLUDE_DIR)/halcs_client_prelude.h $(INCLUDE_DIR)/halcs_client_codes.h \
-	$(subst src/,include/, $(patsubst %.o,%.h,$($(LIBNAME)_OBJS_LIB)))
+	$(subst $(SRC_DIR)/,$(INCLUDE_DIR)/, $(patsubst %.o,%.h,$($(LIBNAME)_OBJS_LIB)))
 
 $(LIBNAME)_HEADERS = $($(LIBNAME)_HEADERS_LIB) $($(LIBNAME)_CODE_HEADERS) \
 	$($(LIBNAME)_INST_SMIO_HEADERS)

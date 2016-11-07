@@ -1,4 +1,4 @@
-sm_io_chips_DIR = $(SRC_DIR)/sm_io/chips
+sm_io_chips_DIR = $(sm_io_DIR)/chips
 
 # Here we call <output_name>_core_OBJS as we need to add
 # more objects to this target. This is done in the hal.mk

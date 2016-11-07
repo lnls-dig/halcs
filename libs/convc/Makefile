@@ -65,7 +65,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src
+SRC_DIR = src/convc/c
 # Include directory
 INCLUDE_DIR = include
 

@@ -1,4 +1,4 @@
-sm_io_protocols_ops_DIR = $(SRC_DIR)/sm_io/protocols/ops
+sm_io_protocols_ops_DIR = $(sm_io_protocols_DIR)/ops
 
 sm_io_protocols_ops_OBJS = $(sm_io_protocols_ops_DIR)/sm_pr_spi.o \
 		 $(sm_io_protocols_ops_DIR)/sm_pr_i2c.o \

@@ -78,7 +78,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src
+SRC_DIR = src/errhand/c
 # Include directory
 INCLUDE_DIR = include
 

@@ -1,6 +1,6 @@
-include $(SRC_DIR)/sm_io/protocols/ops/ops.mk
+sm_io_protocols_DIR = $(sm_io_DIR)/protocols
 
-sm_io_protocols_DIR = $(SRC_DIR)/sm_io/protocols
+include $(sm_io_protocols_DIR)/ops/ops.mk
 
 # Here we call <output_name>_core_OBJS as we need to add
 # more objects to this target. This is done in the hal.mk

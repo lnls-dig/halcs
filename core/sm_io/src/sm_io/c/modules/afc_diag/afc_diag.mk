@@ -1,4 +1,4 @@
-sm_io_afc_diag_DIR = $(SRC_DIR)/sm_io/modules/afc_diag
+sm_io_afc_diag_DIR = $(sm_io_modules_DIR)/afc_diag
 
 sm_io_afc_diag_OBJS = $(sm_io_afc_diag_DIR)/sm_io_afc_diag_exports.o
 

@@ -1,4 +1,4 @@
-dev_mngr_DIR = $(SRC_DIR)/dev_mngr
+dev_mngr_DIR = $(SRC_DIR)/core/dev_mngr/src/dev_mngr/c
 
 # Here we call <output_name>_core_OBJS as we need to add
 # more objects to this target. This is done in the hal.mk

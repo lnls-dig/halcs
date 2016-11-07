@@ -1,9 +1,9 @@
-include $(SRC_DIR)/sm_io/modules/modules.mk
-include $(SRC_DIR)/sm_io/rw_param/rw_param.mk
-include $(SRC_DIR)/sm_io/protocols/protocols.mk
-include $(SRC_DIR)/sm_io/chips/chips.mk
+sm_io_DIR = core/sm_io/src/sm_io/c
 
-sm_io_DIR = $(SRC_DIR)/sm_io
+include $(sm_io_DIR)/modules/modules.mk
+include $(sm_io_DIR)/rw_param/rw_param.mk
+include $(sm_io_DIR)/protocols/protocols.mk
+include $(sm_io_DIR)/chips/chips.mk
 
 sm_io_OBJS = $(sm_io_DIR)/sm_io.o \
 	     $(sm_io_DIR)/sm_io_bootstrap.o \
