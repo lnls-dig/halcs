@@ -169,7 +169,8 @@ $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_afc_diag_codes.h \
 	$(SMIO_DIR)/include/sm_io_trigger_iface_codes.h \
 	$(SMIO_DIR)/include/sm_io_trigger_mux_codes.h \
-	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h
+	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h \
+	$(SMIO_DIR)/include/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_exports.h \
 	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_exports.h \
