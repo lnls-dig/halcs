@@ -17,6 +17,7 @@ model {
         rffe_ctl(NativeExecutableSpec)
         si571_ctl(NativeExecutableSpec)
         test_data_en(NativeExecutableSpec)
+        timing(NativeExecutableSpec)
         trigger(NativeExecutableSpec)
 
         all {
