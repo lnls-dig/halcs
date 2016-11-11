@@ -13,7 +13,7 @@
 
 /*********************** Static AFCv3 FPGA layout ***********************/
 
-#define SDB_ADDRESS                                 0x00200000UL
+#define SDB_ADDRESS                                 0x00000000UL
 
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
