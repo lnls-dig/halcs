@@ -4,8 +4,7 @@ import org.gradle.api.distribution.Distribution
 import org.gradle.api.Task
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.Flavor
-import org.gradle.nativeplatform.NativeExecutableBinarySpec
-import org.gradle.nativeplatform.SharedLibraryBinarySpec
+import org.gradle.nativeplatform.NativeBinarySpec
 import org.gradle.platform.base.Platform
 
 public interface DistributionVariant extends Distribution {
@@ -19,9 +18,7 @@ public interface DistributionVariant extends Distribution {
     void setPlatform(Platform platform)
     void setUsage(String usage)
 
-    void addExecutablesFrom(Iterable<NativeExecutableBinarySpec> executables)
-    void addSharedLibrariesFrom(
-            Iterable<SharedLibraryBinarySpec> sharedLibraries)
+    void addBinaries(Iterable<NativeBinarySpec> binaries)
 
     Set<Task> getBuildTasks()
 }

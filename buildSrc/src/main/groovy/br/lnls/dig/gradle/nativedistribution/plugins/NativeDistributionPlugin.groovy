@@ -17,10 +17,9 @@ import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.BuildTypeContainer
 import org.gradle.nativeplatform.Flavor
 import org.gradle.nativeplatform.FlavorContainer
-import org.gradle.nativeplatform.NativeExecutableBinarySpec
+import org.gradle.nativeplatform.NativeBinarySpec
 import org.gradle.nativeplatform.NativeLibrarySpec
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-import org.gradle.nativeplatform.SharedLibraryBinarySpec
 import org.gradle.nativeplatform.TargetedNativeComponent
 import org.gradle.platform.base.Platform
 import org.gradle.platform.base.PlatformContainer
@@ -83,19 +82,12 @@ class NativeDistributionPlugin implements Plugin<Project> {
         }
 
         @Mutate
-        public void addSharedLibraryComponentsToDistribution(
+        public void addNativeBinariesToDistribution(
                 DistributionContainer distributions,
-                @Path("binaries") ModelMap<SharedLibraryBinarySpec>
-                        sharedLibraries) {
-            distributions.all { it.addSharedLibrariesFrom(sharedLibraries) }
-        }
-
-        @Mutate
-        public void addExecutableComponentsToDistribution(
-                DistributionContainer distributions,
-                @Path("binaries") ModelMap<NativeExecutableBinarySpec>
-                        executables) {
-            distributions.all { it.addExecutablesFrom(executables) }
+                @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
+            distributions.all { distribution ->
+                distribution.addBinaries(binaries)
+            }
         }
 
         @Mutate

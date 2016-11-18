@@ -5,6 +5,7 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.Task
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.Flavor
+import org.gradle.nativeplatform.NativeBinarySpec
 import org.gradle.nativeplatform.NativeExecutableBinarySpec
 import org.gradle.nativeplatform.SharedLibraryBinarySpec
 import org.gradle.platform.base.Platform
@@ -28,20 +29,18 @@ public class DefaultDistributionVariant extends DefaultDistribution
         sharedLibraries = new LinkedHashSet<>()
     }
 
-    void addExecutablesFrom(Iterable<NativeExecutableBinarySpec> executables) {
-        this.executables += executables.findAll() { executable ->
-            executable.buildType == buildType &&
-            executable.flavor == flavor &&
-            executable.targetPlatform == platform
+    void addBinaries(Iterable<NativeBinarySpec> binaries) {
+        def compatibleBinaries = binaries.findAll() { binary ->
+            binary.buildType == buildType &&
+            binary.flavor == flavor &&
+            binary.targetPlatform == platform
         }
-    }
 
-    void addSharedLibrariesFrom(
-            Iterable<SharedLibraryBinarySpec> sharedLibraries) {
-        this.sharedLibraries += sharedLibraries.findAll() { sharedLibrary ->
-            sharedLibrary.buildType == buildType &&
-            sharedLibrary.flavor == flavor &&
-            sharedLibrary.targetPlatform == platform
+        compatibleBinaries.each { binary ->
+            if (binary instanceof NativeExecutableBinarySpec)
+                executables.add((NativeExecutableBinarySpec)binary)
+            if (binary instanceof SharedLibraryBinarySpec)
+                sharedLibraries.add((SharedLibraryBinarySpec)binary)
         }
     }
 
