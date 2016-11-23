@@ -8,6 +8,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.language.nativeplatform.DependentSourceSet
 import org.gradle.language.nativeplatform.HeaderExportingSourceSet
 import org.gradle.model.internal.registry.ModelRegistry
 import org.gradle.nativeplatform.NativeBinarySpec
@@ -108,7 +109,11 @@ class NativeInstall extends Copy {
     public void addDependenciesFrom(Set<NativeBinarySpec> binaries,
             ProjectModelResolver resolver) {
         binaries.inputs.each { sources ->
-            sources.each { source ->
+            def sourcesWithDependencies = sources.findAll { source ->
+                source instanceof DependentSourceSet
+            }
+
+            sourcesWithDependencies.each { source ->
                 source.libs.each { lib ->
                     addDetectedDependency(lib, resolver)
                 }

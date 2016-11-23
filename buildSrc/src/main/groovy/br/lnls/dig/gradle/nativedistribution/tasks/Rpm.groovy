@@ -143,7 +143,11 @@ class Rpm extends AbstractArchiveTask {
     public void addDependenciesFrom(Set<NativeBinarySpec> binaries,
             ProjectModelResolver resolver) {
         binaries.inputs.each { sources ->
-            sources.each { source ->
+            def sourcesWithDependencies = sources.findAll { source ->
+                source instanceof DependentSourceSet
+            }
+
+            sourcesWithDependencies.each { source ->
                 source.libs.each { lib ->
                     addDetectedDependency(lib, resolver)
                 }
