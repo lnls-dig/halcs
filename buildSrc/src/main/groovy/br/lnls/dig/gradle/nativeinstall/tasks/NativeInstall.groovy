@@ -19,6 +19,7 @@ import org.gradle.platform.base.ComponentSpecContainer
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.Dependency
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveHeadersAction
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveSharedLibrariesAction
+import br.lnls.dig.gradle.sysfiles.model.SysFilesSet
 
 class NativeInstall extends Copy {
     Distribution distribution
@@ -29,6 +30,7 @@ class NativeInstall extends Copy {
     private FileCollection executables
     private FileCollection exportedHeaders
     private FileCollection sharedLibraries
+    private FileCollection sysFiles
 
     public NativeInstall() {
         setInstallationPrefix(new File('/usr/local'))
@@ -43,11 +45,31 @@ class NativeInstall extends Copy {
         this.distribution = distribution
 
         from(getExecutables()) { into 'bin/' }
+        from(getSysFiles()) { into '.' }
 
         if (distribution.usage == 'development')
             from(getExportedHeaders()) { into 'include/' }
         else
             from(getSharedLibraries()) { into 'lib/' }
+    }
+
+    public FileCollection getSysFiles() {
+        if (sysFiles == null)
+            collectSysFiles()
+
+        return sysFiles
+    }
+
+    public void collectSysFiles() {
+        def sysFilesSets = distribution.binariesWithSysFiles.collect { binary ->
+            def sourceSets = binary.inputs.findAll { sourceSet ->
+                sourceSet instanceof SysFilesSet
+            }
+
+            sourceSets.collect { it.source }.sum()
+        }
+
+        sysFiles = sysFilesSets.sum() ?: project.files()
     }
 
     public FileCollection getExecutables() {

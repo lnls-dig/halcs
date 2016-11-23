@@ -8,6 +8,7 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.language.nativeplatform.DependentSourceSet
 import org.gradle.language.nativeplatform.HeaderExportingSourceSet
 import org.gradle.model.internal.registry.ModelRegistry
 import org.gradle.nativeplatform.NativeBinarySpec
@@ -18,6 +19,7 @@ import org.gradle.platform.base.ComponentSpecContainer
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.Dependency
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveHeadersAction
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveSharedLibrariesAction
+import br.lnls.dig.gradle.sysfiles.model.SysFilesSet
 
 class Rpm extends AbstractArchiveTask {
     Distribution distribution
@@ -33,6 +35,7 @@ class Rpm extends AbstractArchiveTask {
     private FileCollection executables
     private FileCollection exportedHeaders
     private FileCollection sharedLibraries
+    private FileCollection sysFiles
     FileCollection unpackagedDependencies
 
     public Rpm() {
@@ -54,6 +57,7 @@ class Rpm extends AbstractArchiveTask {
 
         source += getExecutables()
         source += getUnpackagedDependencies()
+        source += getSysFiles()
 
         return source
     }
@@ -76,6 +80,7 @@ class Rpm extends AbstractArchiveTask {
         collectExecutables()
         collectExportedHeaders()
         collectSharedLibraries()
+        collectSysFiles()
     }
 
     public FileCollection getExecutables() {
@@ -131,6 +136,25 @@ class Rpm extends AbstractArchiveTask {
 
     public FileCollection getUnpackagedDependencies() {
         return unpackagedDependencies
+    }
+
+    public FileCollection getSysFiles() {
+        if (sysFiles == null)
+            collectSysFiles()
+
+        return sysFiles
+    }
+
+    public void collectSysFiles() {
+        def sysFilesSets = distribution.binariesWithSysFiles.collect { binary ->
+            def sourceSets = binary.inputs.findAll { sourceSet ->
+                sourceSet instanceof SysFilesSet
+            }
+
+            sourceSets.collect { it.source }.sum()
+        }
+
+        sysFiles = sysFilesSets.sum() ?: project.files()
     }
 
     public void resolveDependencies(ProjectModelResolver resolver) {

@@ -22,6 +22,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     Builder rpmBuilder
     Distribution distribution
     FileCollection executables
+    FileCollection sysFiles
     String installationPrefix
     String projectName
     String projectVersion
@@ -30,6 +31,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     public AbstractRpmArchiveAction(Rpm rpmTask) {
         distribution = rpmTask.distribution
         executables = rpmTask.executables
+        sysFiles = rpmTask.sysFiles
         installationPrefix = rpmTask.installationPrefix
         outputDirectory = rpmTask.outputDirectory
         projectName = rpmTask.project.name
@@ -91,6 +93,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     protected void addArchiveFiles() {
         addArchiveExecutableFiles()
         addArchiveLibraryFiles()
+        addArchiveSysFiles()
     }
 
     protected void addArchiveExecutableFiles() {
@@ -102,6 +105,20 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
         def permissions = 0755
 
         rpmBuilder.addFile(executableFilePath, executableFile, permissions)
+    }
+
+    protected void addArchiveSysFiles() {
+        sysFiles.asFileTree.visit { visit ->
+            if (!visit.isDirectory())
+                addSysFile(visit.file, visit.relativePath.toString())
+        }
+    }
+
+    protected void addSysFile(File sysFile, String path) {
+        def sysFilePath = "$installationPrefix/$path"
+        def permissions = 0644
+
+        rpmBuilder.addFile(sysFilePath, sysFile, permissions)
     }
 
     protected abstract void addArchiveLibraryFiles()
