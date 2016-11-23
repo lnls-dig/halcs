@@ -1,5 +1,6 @@
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: 'br.lnls.dig.gradle.nativeinstall'
+apply plugin: 'br.lnls.dig.gradle.sysfiles'
 
 model {
     components {
