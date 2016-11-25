@@ -141,6 +141,7 @@ int main (int argc, char *argv [])
     err |= halcs_set_sleep_adcs (halcs_client, service, sleep_adcs);
     for (i = 0; i < 4; ++i) {
         err |= halcs_set_rst_modes_adc (halcs_client, service, i, 0x1);
+        err |= halcs_set_portconfig_adc (halcs_client, service, i, 0x81);
     } 
     if (err != HALCS_CLIENT_SUCCESS)  {
         fprintf (stderr, "[client:fmc250_sleep_adcs]: halcs_set_sleep_adcs error\n");
