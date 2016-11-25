@@ -78,7 +78,7 @@ void smio_startup (zsock_t *pipe, void *args)
     ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
             err_smio_export);
 
-    /* Signal parent we ready */
+    /* Signal parent we are ready */
     zsock_signal (pipe_mgmt, 0);
 
     /* Main loop request-action */

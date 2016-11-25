@@ -128,6 +128,9 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id, bool auto_inst_id);
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+        char *msg);
 static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
@@ -642,14 +645,21 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     uint32_t smio_id;
     uint64_t base;
     uint32_t inst_id;
+    uint32_t dest_smio_id;
+    uint32_t dest_inst_id;
+    char *msg = NULL;
 
-    /* This command expects the following */
-    /* Command: (string) $REGISTER_SMIO
+    /* This command expects the following or less (depending on command) */
+    /* Command: (string)   $REGISTER_SMIO | $MGMT_MSG_SMIO
      * Arg1:    (uint32_t) smio_id
      * Arg2:    (uint64_t) base
      * Arg3:    (uint32_t) inst_id
+     * Arg4:    (uint32_t) dest_smio_id
+     * Arg5:    (uint32_t) dest_inst_id
+     * Arg6:    (string)   message
      * */
-    int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
+    int zerr = zsock_recv (reader, "s48444s", &command, &smio_id, &base, &inst_id,
+        &dest_smio_id, &dest_inst_id, &msg);
     if (zerr == -1) {
         return 0; /* Malformed message */
     }
@@ -657,6 +667,11 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
         _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
+    }
+    if (streq (command, "$MGMT_MSG_SMIO")) {
+        /* Register new SMIO */
+        _devio_send_smio_mgmt_msg_raw (devio, smio_id, base, inst_id, dest_smio_id,
+            dest_inst_id, msg);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -839,6 +854,44 @@ static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id
     /* Register the sm_io module using the retrieved base address, and
      * automatically assign an instance id to it */
     return _devio_register_sm_raw(self, smio_id, base, 0, true);
+}
+
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+        char *msg)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* Search for specified PIPE by using the dest_smio_id and dest_inst_id */
+    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self, 
+        dest_smio_id);
+    ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO "
+            "for sending MGMT message", err_search_smio, DEVIO_ERR_NO_SMIO_ID);
+
+    /* Get key to search in hash */
+    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler, 
+        dest_inst_id);
+    ASSERT_ALLOC (dest_smio_key, err_key_alloc);
+
+    /* Finally, do the lookup */
+    zactor_t *dest_smio_actor = zhashx_lookup (self->sm_io_h, dest_smio_key);
+    ASSERT_TEST (dest_smio_actor != NULL,
+            "Could not find destination SMIO PIPE for sending MGMT message",
+            err_inv_key);
+
+    /* Send message */
+    int zerr = zsock_send (dest_smio_actor, "s48444s", "$MGMT_MSG_SMIO", smio_id,
+        base, inst_id, dest_smio_id, dest_inst_id, msg);
+    ASSERT_TEST(zerr == 0, "Could not send MGMT message", err_send_mgmt_msg,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_send_mgmt_msg:
+err_inv_key:
+    free (dest_smio_key);
+err_key_alloc:
+err_search_smio:
+    return err;
 }
 
 devio_err_e devio_register_sm_by_id (void *pipe, uint32_t smio_id)
