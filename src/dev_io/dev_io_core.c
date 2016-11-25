@@ -876,13 +876,13 @@ static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_i
     ASSERT_ALLOC (dest_smio_key, err_key_alloc);
 
     /* Finally, do the lookup */
-    zactor_t *dest_smio_actor = zhashx_lookup (self->sm_io_h, dest_smio_key);
+    zactor_t **dest_smio_actor = (zactor_t **) zhashx_lookup (self->sm_io_h, dest_smio_key);
     ASSERT_TEST (dest_smio_actor != NULL,
             "Could not find destination SMIO PIPE for sending MGMT message",
             err_inv_key);
 
     /* Send message */
-    int zerr = zsock_send (dest_smio_actor, "s48444s", "$MGMT_MSG_SMIO", smio_id,
+    int zerr = zsock_send (*dest_smio_actor, "s48444s", "$MGMT_MSG_SMIO", smio_id,
         base, inst_id, dest_smio_id, dest_inst_id, msg);
     ASSERT_TEST(zerr == 0, "Could not send MGMT message", err_send_mgmt_msg,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
