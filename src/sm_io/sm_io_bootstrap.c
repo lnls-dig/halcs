@@ -44,6 +44,9 @@ void smio_startup (zsock_t *pipe, void *args)
     zsock_t *pipe_msg = th_args->pipe_msg;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
+    /* Signal parent we are ready */
+    zsock_signal (pipe_mgmt, 0);
+
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
@@ -77,9 +80,6 @@ void smio_startup (zsock_t *pipe, void *args)
     err = smio_export_ops (self, smio_exp_ops);
     ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
             err_smio_export);
-
-    /* Signal parent we are ready */
-    zsock_signal (pipe_mgmt, 0);
 
     /* Main loop request-action */
     err = smio_loop (self);
