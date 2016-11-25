@@ -133,7 +133,7 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
      * component has been sucseddfully initialized so that the ADCs has clock.
      * Otherwise, we won't be able to RESET the ADCs, leading to undefined
      * behavior */
-    sleep (5);
+    //sleep (5);
 
     /* Setup ISLA216P ADC SPI communication */
     uint32_t i;

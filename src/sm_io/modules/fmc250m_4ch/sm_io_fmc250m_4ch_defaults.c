@@ -53,8 +53,8 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
 
     /* For some reason, the default timeout is not enough for FMC250M SMIO. See github issue
      * #119 */
-    halcs_client_t *config_client = halcs_client_new_log_mode_time (broker_endp, 0,
-            log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE, 10000);
+    halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
     client_err = halcs_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
