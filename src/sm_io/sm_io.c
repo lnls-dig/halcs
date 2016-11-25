@@ -277,7 +277,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
         zmsg_destroy (&recv_msg);
         return -1;
     }
-    else if (streq (command, "MGMT_MSG_SMIO")) {
+    else if (streq (command, "$MGMT_MSG_SMIO")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
                "received MGMT_MSG_SMIO command.\n");
         
