@@ -272,10 +272,10 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
 
 #if 0
     /* Reset registers */
-    data |= ISLA216P_PORTCONFIG_SOFT_RESET;
+    uint8_t data = ISLA216P_PORTCONFIG_SOFT_RESET;
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
+    ssize_t rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
@@ -284,6 +284,11 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    /* Turn on SDO (4-wire mode) again as reset disabled it */
+    err = smch_isla216p_set_portconfig (self, ISLA216P_PORTCONFIG_SDO_ACTIVE);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to 4-wire mode",
+            err_smpr_write);
 #endif
 
     err = smch_isla216p_set_rst (self, ISLA216P_NAPSLP_NORMAL_OPERATION);
