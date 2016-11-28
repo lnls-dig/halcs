@@ -8,6 +8,10 @@
 #ifndef _MSG_MACROS_H_
 #define _MSG_MACROS_H_
 
+/* SMIO THSAFE ZMQ server function arguments macros */
+#define GEN_MSG_ZMQ_TYPE                               zmsg_t *
+#define GEN_MSG_ZMQ(args)                              ((zmsg_t *) args)
+
 #define GEN_MSG_ZMQ_POP_NEXT_ARG(zmq_msg)               zmsg_pop (zmq_msg)
 #define GEN_MSG_ZMQ_CLENUP_ARG(zmq_frame_p)             zframe_destroy (zmq_frame_p)
 #define GEN_MSG_ZMQ_PEEK_NEXT_ARG(zmq_msg)              zmsg_next (zmq_msg)
