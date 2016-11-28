@@ -320,6 +320,34 @@ FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(get_defaults)
             smch_si57x_get_defaults_compat, "Could not restart SI571 to its defaults");
 }
 
+static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
+{
+    (void) ret;
+    assert (owner);
+    assert (args);
+    int err = -FMC_ACTIVE_CLK_OK;
+    smio_err_e serr = SMIO_SUCCESS;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    uint32_t inst_id = smio_get_inst_id (self);
+
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    (void) rw;
+    uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk] "
+            "Calling _fmc_active_clk_rst_isla216p\n");
+
+    /* Tell FMC250M_4CH that we have initialized */
+    if (value == 0x1) {
+        serr = smio_send_mgmt_msg (self, 0x68e3b1af, inst_id, "INIT_OK");
+        ASSERT_TEST(serr == SMIO_SUCCESS, "Could not send MGMT message to FMC250M", err_send_mgmt_msg,
+               -FMC_ACTIVE_CLK_ERR);
+    }
+
+err_send_mgmt_msg:
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc_active_clk, si571_oe),
@@ -338,6 +366,7 @@ const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(pll_clk_sel),
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(freq),
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(get_defaults),
+    _fmc_active_clk_rst_isla216p,
     NULL
 };
 

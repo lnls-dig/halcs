@@ -169,6 +169,7 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 
 /* MSG */
 #include "msg_macros.h"
+#include "str_msg_macros.h"
 #include "msg_err.h"
 /* MSG EXP ops */
 #include "exp_ops_codes.h"

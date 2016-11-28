@@ -44,7 +44,9 @@
 #define FMC_ACTIVE_CLK_NAME_SI571_FREQ                     "fmc_active_clk_si571_freq"
 #define FMC_ACTIVE_CLK_OPCODE_SI571_GET_DEFAULTS           15
 #define FMC_ACTIVE_CLK_NAME_SI571_GET_DEFAULTS             "fmc_active_clk_si571_get_defaults"
-#define FMC_ACTIVE_CLK_OPCODE_END                          16
+#define FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P                 16
+#define FMC_ACTIVE_CLK_NAME_RST_ISLA216P                   "fmc_active_clk_rst_isla216p"
+#define FMC_ACTIVE_CLK_OPCODE_END                          17
 
 /* Messaging Reply OPCODES */
 #define FMC_ACTIVE_CLK_REPLY_TYPE                          uint32_t

@@ -73,6 +73,7 @@ struct _smio_t {
 const disp_table_ops_t smio_disp_table_ops;
 
 static smio_err_e _smio_do_op (void *owner, void *msg);
+static smio_err_e _smio_do_mgmt_msg (void *owner, void *msg);
 /* Dispatch table message check handler */
 static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
         const disp_op_t *disp_op, void *args);
@@ -254,8 +255,11 @@ static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
     (void) loop;
-
+    
+    /* Arguments for command */
     char *command = NULL;
+
+    smio_err_e err = SMIO_SUCCESS;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
     (void) smio;
@@ -273,9 +277,27 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
         zmsg_destroy (&recv_msg);
         return -1;
     }
+    else if (streq (command, "$MGMT_MSG_SMIO")) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
+               "received MGMT_MSG_SMIO command.\n");
+        
+        /* Call SMIO MGMT callback, passing a zmsg_t argument */
+        err = _smio_do_mgmt_msg (smio, recv_msg);
+
+        /* What can I do in case of error ?*/
+        if (err != SMIO_SUCCESS) {
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+                    "_smio_handle_pipe_mgmt smio_do_mgmt_msg: %s\n",
+                    smio_err_str (err));
+        }
+
+        free (command);
+        zmsg_destroy (&recv_msg);
+        return 0;
+    }
 
     /* Invalid message received. Discard message and continue normally */
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
             "received an invalid command\n");
     zmsg_destroy (&recv_msg);
     return 0;
@@ -380,6 +402,22 @@ smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
            SMIO_ERR_REGISTER_SM);
 
 err_register_sm:
+    return err;
+}
+
+smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id, 
+    uint32_t dest_smio_inst, char *msg)
+{
+    assert (self);
+    smio_err_e err = SMIO_SUCCESS;
+
+    int zerr = zsock_send (self->pipe_mgmt, "s48444s", "$MGMT_MSG_SMIO", 
+            self->id, self->base, self->inst_id, dest_smio_id, dest_smio_inst,
+            msg);
+    ASSERT_TEST(zerr == 0, "Could not send MGMT message", err_send_mgmt_msg,
+           SMIO_ERR_REGISTER_SM);
+
+err_send_mgmt_msg:
     return err;
 }
 
@@ -651,6 +689,25 @@ static smio_err_e _smio_do_op (void *owner, void *msg)
            SMIO_ERR_MSG_NOT_SUPP /* returning a more meaningful error? */);
 
 err_hand_req:
+err_do_op:
+    return err;
+}
+
+static smio_err_e _smio_do_mgmt_msg (void *owner, void *msg)
+{
+    assert (owner);
+    assert (msg);
+
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_err_e err = SMIO_SUCCESS;
+
+    /* TODO: The SMIO do_op must not modify the packet! We could pass a copy of the
+     * message to it, but we this is in the critical path! Evaluate the impact
+     * of doing this */
+    SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, do_mgmt_op, msg);
+    ASSERT_TEST (err == SMIO_SUCCESS, "Registered SMIO \"do_mgmt_op\" function error",
+            err_do_op);
+
 err_do_op:
     return err;
 }

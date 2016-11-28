@@ -58,6 +58,8 @@ typedef struct {
     export_ops_fp export_ops;           /* Export sm_io operations to dev_io */
     unexport_ops_fp unexport_ops;       /* Unexport sm_io operations to dev_io */
     do_op_fp do_op;                     /* Generic wrapper for handling specific operations */
+    do_op_fp do_mgmt_op;                /* Generic wrapper for handling management messages.
+                                           For communcation between SMIOs, not external use */
 } smio_ops_t;
 
 /* Open device */
@@ -127,6 +129,9 @@ smio_err_e smio_loop (smio_t *self);
 /* Register SMIO */
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id);
+/* Send MGMT message */
+smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id, 
+    uint32_t dest_smio_inst, char *msg);
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
         const disp_table_func_fp *func_fps);

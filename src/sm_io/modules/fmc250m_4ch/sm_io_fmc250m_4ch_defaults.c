@@ -45,11 +45,21 @@
 smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
+    (void) broker_endp;
+    (void) service;
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Configuring SMIO "
             "FMC250M_4CH with default values ...\n");
-    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
+#if 0
+    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
+
+    /* We are not using the default config_defaults () callback to
+     * initialize our ADC ISLA216P. Instead we rely on a more complex
+     * method by using the do_mgmt_op () callback. This is needed because
+     * the FMC250M is instantiated before FMC_ACTIVE_CLK SMIO, and therefore 
+     * no clock is available for the ISLA216P if we do it here.
+     */
 
     /* For some reason, the default timeout is not enough for FMC250M SMIO. See github issue
      * #119 */
@@ -84,6 +94,7 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
 err_param_set:
     halcs_client_destroy (&config_client);
 err_alloc_client:
+#endif
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Exiting Config thread %s\n",
         service);
     return err;

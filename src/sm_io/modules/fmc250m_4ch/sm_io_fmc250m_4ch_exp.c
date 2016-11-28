@@ -743,9 +743,81 @@ smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg)
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
+smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
+{
+    assert (owner);
+    assert (msg);
+    
+    smio_err_e err = SMIO_SUCCESS;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_fmc250m_4ch_t *fmc250m = smio_get_handler (self);
+    GEN_MSG_ZMQ_TYPE *recv_msg = GEN_MSG_ZMQ(msg);
+    uint32_t my_inst_id = smio_get_inst_id (self);
+
+    /* We expect the following */
+    /*
+     * Arg1:    (uint32_t) smio_id
+     * Arg2:    (uint64_t) base
+     * Arg3:    (uint32_t) inst_id
+     * Arg4:    (uint32_t) dest_smio_id
+     * Arg5:    (uint32_t) dest_inst_id
+     * Arg6:    (string)   message
+     * */
+    STR_MSG_ZMQ_TYPE *smio_id_str = STR_MSG_ZMQ_FIRST_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *base_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *inst_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *dest_smio_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE * dest_inst_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *mgmt_msg_zmq_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+
+    /* Conversions */
+    uint32_t inst_id = strtol(inst_id_str, NULL, 10);
+
+    /* Check if FMC_ACTIVE_CLK SMIO sent this message */
+    if (inst_id == my_inst_id && streq (mgmt_msg_zmq_str, "INIT_OK")) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_fmc250m_4ch_do_mgmt_op] Resetting ADCs\n");
+        /* Reset ISLA216P. Do the same as the config_defaults () routine
+         * would do. We call this late initialization */
+        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                RST_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_ADCS, /* min */, /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                RST_DIV_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_DIV_ADCS, /* min */, /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                SLEEP_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_SLEEP_ADCS, /* min */, /* max */,
+                NO_CHK_FUNC, SET_FIELD);
+
+        uint32_t i;
+        for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
+            smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_DFLT_RST_MODE_ADC);
+            smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+        }
+    }
+    else {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_fmc250m_4ch_do_mgmt_op] Unexpected message received\n");
+    }
+
+    /* Clenup strings */
+    STR_MSG_ZMQ_CLENUP_ARG(smio_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(base_str);
+    STR_MSG_ZMQ_CLENUP_ARG(inst_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(dest_smio_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(dest_inst_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(mgmt_msg_zmq_str);
+
+    return err;
+}
+
 smio_err_e fmc250m_4ch_do_op (void *self, void *msg)
 {
     return _fmc250m_4ch_do_op (self, msg);
+}
+
+smio_err_e fmc250m_4ch_do_mgmt_op (void *self, void *msg)
+{
+    return _fmc250m_4ch_do_mgmt_op (self, msg);
 }
 
 const smio_ops_t fmc250m_4ch_ops = {
@@ -753,7 +825,8 @@ const smio_ops_t fmc250m_4ch_ops = {
     .deattach           = fmc250m_4ch_deattach,        /* Deattach sm_io instance to dev_io */
     .export_ops         = fmc250m_4ch_export_ops,      /* Export sm_io operations to dev_io */
     .unexport_ops       = fmc250m_4ch_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = fmc250m_4ch_do_op            /* Generic wrapper for handling specific operations */
+    .do_op              = fmc250m_4ch_do_op,           /* Generic wrapper for handling specific operations */
+    .do_mgmt_op         = fmc250m_4ch_do_mgmt_op       /* Generic wrapper for handling internal SMIO operations */
 };
 
 /************************************************************/
