@@ -122,6 +122,9 @@ void smio_config_defaults (zsock_t *pipe, void *args)
     th_config_args_t *th_args = (th_config_args_t *) args;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
+    /* Signal parent we are ready */
+    zsock_signal (pipe, 0);
+
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
@@ -138,9 +141,6 @@ void smio_config_defaults (zsock_t *pipe, void *args)
 
     SMIO_DISPATCH_FUNC_WRAPPER_GEN(config_defaults, smio_mod_dispatch,
             th_args->broker, smio_service, th_args->log_file);
-
-    /* Signal parent we are ready */
-    zsock_signal (pipe, 0);
 
     /* We've finished configuring the SMIO. Tell DEVIO we are done */
     char *smio_service_suffix = hutils_concat_strings_no_sep (
