@@ -133,6 +133,15 @@ halcs_client_err_e halcs_set_fmc_clk_sel (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_fmc_clk_sel (halcs_client_t *self, char *service,
         uint32_t *clk_sel);
 
+/* RST ISLA216P Functions. Set the ADC ISLA216P to reset itself
+ * 0: nothing
+ * 1: reset ADCs
+ *
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_rst_isla216p (halcs_client_t *self, char *service,
+        uint32_t rst_isla216p);
+
 /* ADC LTC2208 Control */
 /* These set of functions read (get) or write (set) some ADC LTC2208
  * functionalities. Check LTC2208 datasheet for details.

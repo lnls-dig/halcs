@@ -443,6 +443,13 @@ PARAM_FUNC_CLIENT_READ(fmc_clk_sel)
             fmc_clk_sel);
 }
 
+/* RESET ISLA250P functions */
+PARAM_FUNC_CLIENT_WRITE(rst_isla216p)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P,
+            rst_isla216p);
+}
+
 PARAM_FUNC_CLIENT_WRITE(si571_oe)
 {
     return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_OE, si571_oe);
