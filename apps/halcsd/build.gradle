@@ -66,5 +66,7 @@ model {
                 linker.args '-lczmq'
             }
         }
+
+        systemd(NativeLibrarySpec)
     }
 }
