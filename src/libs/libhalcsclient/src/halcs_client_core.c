@@ -866,6 +866,19 @@ PARAM_FUNC_CLIENT_WRITE2(adc_dly3, type, val)
             type, val);
 }
 
+/****************** FMC130M EEPROM functions ****************/
+
+/* EEPROM read/write */
+PARAM_FUNC_CLIENT_WRITE2(24aa64_data, addr, data)
+{
+    return param_client_write2 (self, service, FMC130M_4CH_OPCODE_24AA64_DATA, addr, data);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(24aa64_data, addr, data)
+{
+    return param_client_write_read (self, service, FMC130M_4CH_OPCODE_24AA64_DATA, addr, data);
+}
+
 /*************************** FMC250M Chips Functions *************************/
 
 /* ISLA216P RST ADCs */

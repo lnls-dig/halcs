@@ -385,6 +385,14 @@ halcs_client_err_e halcs_get_si571_freq (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_set_si571_defaults (halcs_client_t *self, char *service,
         double si571_defaults);
 
+/* FMC EEPROM Read/Write.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_24aa64_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t data);
+halcs_client_err_e halcs_get_24aa64_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t *data);
+
 /******************** FMC250M SMIO Functions ******************/
 
 /* The three set of group functions provide a low-lovel interface to the FPGA
