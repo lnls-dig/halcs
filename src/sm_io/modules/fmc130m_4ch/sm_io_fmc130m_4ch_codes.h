@@ -60,7 +60,9 @@
 #define FMC130M_4CH_NAME_ADC_DLY2                       "fmc130m_4ch_adc_dly2"
 #define FMC130M_4CH_OPCODE_ADC_DLY3                     28
 #define FMC130M_4CH_NAME_ADC_DLY3                       "fmc130m_4ch_adc_dly3"
-#define FMC130M_4CH_OPCODE_END                          29
+#define FMC130M_4CH_OPCODE_24AA64_DATA                  29
+#define FMC130M_4CH_NAME_24AA64_DATA                    "fmc130m_4ch_24aa64_data"
+#define FMC130M_4CH_OPCODE_END                          30
 
 /* Messaging Reply OPCODES */
 #define FMC130M_4CH_REPLY_TYPE                          uint32_t

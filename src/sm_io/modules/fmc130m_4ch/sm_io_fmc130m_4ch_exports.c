@@ -299,6 +299,19 @@ disp_op_t fmc130m_4ch_adc_dly3_exp = {
     }
 };
 
+disp_op_t fmc130m_4ch_24aa64_data_exp = {
+    .name = FMC130M_4CH_NAME_24AA64_DATA,
+    .opcode = FMC130M_4CH_OPCODE_24AA64_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_adc_rand_exp,
@@ -325,6 +338,7 @@ const disp_op_t *fmc130m_4ch_exp_ops [] = {
     &fmc130m_4ch_adc_dly1_exp,
     &fmc130m_4ch_adc_dly2_exp,
     &fmc130m_4ch_adc_dly3_exp,
+    &fmc130m_4ch_24aa64_data_exp,
     NULL
 };
 

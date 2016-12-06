@@ -361,6 +361,113 @@ FMC130M_4CH_ADC_DLY_FUNC_HEADER(3)
     FMC130M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, 3);
 }
 
+/* Macros to avoid repetition of the function body 24AA64 */
+typedef smch_err_e (*smch_24aa64_func_fp) (smch_24aa64_t *self, uint32_t *addr,
+        uint32_t *param);
+
+#define FMC130M_4CH_24AA64_FUNC_NAME(func_name)                                 \
+        _fmc130m_4ch_24aa64_ ## func_name
+
+#define FMC130M_4CH_24AA64_FUNC_NAME_HEADER(func_name)                          \
+        static int FMC130M_4CH_24AA64_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
+
+#define FMC130M_4CH_24AA64_FUNC_BODY(owner, args, ret, max_addr, read_func, write_func,   \
+                error_msg)                                                         \
+        do {                                                                       \
+            assert (owner);                                                        \
+            assert (args);                                                         \
+                                                                                   \
+            int err = -FMC130M_4CH_OK;                                             \
+            SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                         \
+            smio_fmc130m_4ch_t *fmc130m = smio_get_handler (self);                 \
+            ASSERT_TEST(fmc130m != NULL, "Could not get SMIO FMC130M handler",     \
+                    err_get_fmc130m_handler, -FMC130M_4CH_ERR);                    \
+            uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);               \
+            uint32_t addr = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+            uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);             \
+                                                                                   \
+            ASSERT_TEST(addr < max_addr, "Received 24AA64 addr too big",           \
+                    err_rcv_addr, -FMC130M_4CH_ERR);                               \
+                                                                                   \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] Calling " \
+                    "24AA64 function, for addr #%u\n", addr);                      \
+                                                                                   \
+            smch_24aa64_t *smch_24aa64 = SMIO_24AA64_HANDLER(fmc130m);             \
+                                                                                   \
+            smch_err_e serr = SMCH_SUCCESS;                                        \
+            /* Call specific function */                                           \
+            if (rw) {                                                              \
+                WHEN(ISEMPTY(read_func))(                                          \
+                    (void) ret;                                                    \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
+                            "24AA64 read function not implemented\n");             \
+                    err = -FMC130M_4CH_UNINPL;                                     \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(read_func))(                                       \
+                    (void) param;                                                  \
+                    uint32_t value = 0;                                            \
+                    serr = ((smch_24aa64_func_fp) read_func) (smch_24aa64, &addr,  \
+                            &value);                                               \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC130M_4CH_ERR;                                    \
+                    }                                                              \
+                    else {                                                         \
+                        *((uint32_t *) ret) = value;                               \
+                        err = sizeof (value);                                      \
+                        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
+                                "24AA64 function read value = 0x%08X\n", value);   \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+            else {                                                                 \
+                WHEN(ISEMPTY(write_func))(                                         \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_exp] " \
+                            "24AA64 write function not implemented\n");            \
+                    err = -FMC130M_4CH_UNINPL;                                     \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(write_func))(                                      \
+                    serr = ((smch_24aa64_func_fp) write_func) (smch_24aa64, &addr, \
+                            &param);                                               \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC130M_4CH_ERR;                                    \
+                    }                                                              \
+                    else {                                                         \
+                        err = -FMC130M_4CH_OK;                                     \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+                                                                                   \
+    err_rcv_addr:                                                                  \
+    err_get_fmc130m_handler:                                                       \
+            return err;                                                            \
+        } while(0)
+
+static smch_err_e smch_24aa64_read_8_compat (smch_24aa64_t *self,
+        uint32_t *addr_arg, uint32_t *data)
+{
+    uint16_t addr = *(uint16_t *) addr_arg;
+    return smch_24aa64_read_8 (self, addr, (uint8_t *) data);
+}
+
+static smch_err_e smch_24aa64_write_8_compat (smch_24aa64_t *self,
+        uint32_t *addr_arg, uint32_t *data_arg)
+{
+    uint16_t addr = *(uint16_t *) addr_arg;
+    const uint8_t *data = (const uint8_t *) data_arg;
+    return smch_24aa64_write_8 (self, addr, data);
+}
+
+#define HALCS_FMC130M_4CH_24AA64_MAX_ADDR           ((1<<16)-1)
+
+FMC130M_4CH_24AA64_FUNC_NAME_HEADER(data)
+{
+    FMC130M_4CH_24AA64_FUNC_BODY(owner, args, ret, HALCS_FMC130M_4CH_24AA64_MAX_ADDR,
+            smch_24aa64_read_8_compat, smch_24aa64_write_8_compat,
+            "Could not read/write 24AA64");
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc130m_4ch, adc_rand),
@@ -387,6 +494,7 @@ const disp_table_func_fp fmc130m_4ch_exp_fp [] = {
     FMC130M_4CH_ADC_DLY_FUNC_NAME(1),
     FMC130M_4CH_ADC_DLY_FUNC_NAME(2),
     FMC130M_4CH_ADC_DLY_FUNC_NAME(3),
+    FMC130M_4CH_24AA64_FUNC_NAME(data),
     NULL
 };
 

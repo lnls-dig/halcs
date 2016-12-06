@@ -8,6 +8,8 @@
 #ifndef _SM_IO_FMC130M_4CH_CORE_H_
 #define _SM_IO_FMC130M_4CH_CORE_H_
 
+#define SMIO_24AA64_HANDLER(smio_handler) ((smch_24aa64_t *) smio_handler->smch_24aa64)
+
 /* The follosing codes were generated via the following command:
  * > echo FMC130M_4CH_ACTIVE | md5sum | cut -c 1-8
  * > cb04db4d
