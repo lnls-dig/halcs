@@ -13,7 +13,6 @@ LIBSODIUM_VER=1.0.3
 LIBZMQ_VER=v4.2.0
 LIBCZMQ_VER=v4.0.1
 MALAMUTE_VER=v1.3
-ZYRE_VER=v1.2.0
 
 CONFIG_FLAGS=()
 CONFIG_FLAGS+=("CFLAGS=-I${BUILD_PREFIX}/include")
@@ -49,11 +48,6 @@ git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git &&
 #   CZMQ
 git clone --branch=${LIBCZMQ_VER} git://github.com/zeromq/czmq.git &&
 ( cd czmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
-    make check && make install ) || exit 1
-
-#   Zyre
-git clone --branch=${ZYRE_VER} git://github.com/zeromq/zyre.git &&
-( cd zyre; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
 #   Malamute
