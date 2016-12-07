@@ -10,9 +10,9 @@ BUILD_PREFIX=$PWD/tmp
 SCRIPTS_PREFIX=$PWD/tmp/etc
 
 LIBSODIUM_VER=1.0.3
-LIBZMQ_VER=v4.2.0-pre
-LIBCZMQ_VER=v3.0.2
-MALAMUTE_VER=v1.0
+LIBZMQ_VER=v4.2.0
+LIBCZMQ_VER=v4.0.1
+MALAMUTE_VER=v1.3
 ZYRE_VER=v1.1.0
 
 CONFIG_FLAGS=()
@@ -42,7 +42,7 @@ git clone --branch=${LIBSODIUM_VER} git://github.com/jedisct1/libsodium.git &&
     make check && make install ) || exit 1
 
 #   libzmq
-git clone --branch=${LIBZMQ_VER} git://github.com/lnls-dig/libzmq.git &&
+git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git &&
 ( cd libzmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
