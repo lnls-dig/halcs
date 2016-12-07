@@ -122,7 +122,7 @@ int main (int argc, char *argv [])
     }
 
     /* Set default board number */
-    uint32_t eeprom_rw;
+    uint32_t eeprom_rw = 0;
     if (eeprom_rw_str == NULL) {
         fprintf (stderr, "[client:fmc130m_4ch_eeprom_ctl]: Setting default value to RW parameter: %u\n",
                 DFLT_EEPROM_RW);
@@ -137,7 +137,7 @@ int main (int argc, char *argv [])
     }
 
     /* EEPROM addr/data */
-    uint32_t eeprom_data;
+    uint32_t eeprom_data = 0;
     if (eeprom_data_str == NULL) {
         if (eeprom_rw) {
             fprintf (stderr, "[client:fmc130m_eeprom_ctl]: Missing \"-data\" argument\n");
@@ -148,7 +148,7 @@ int main (int argc, char *argv [])
         eeprom_data = strtoul (eeprom_data_str, NULL, 10);
     }
 
-    uint32_t eeprom_addr;
+    uint32_t eeprom_addr = 0;
     if (eeprom_addr_str == NULL) {
         fprintf (stderr, "[client:fmc130m_eeprom_ctl]: Missing \"-addr\" argument\n");
         return 0;
