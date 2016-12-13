@@ -83,7 +83,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     protected void addDependencies() {
         dependencies.each { dependency ->
             def name = dependency.name
-            def version = dependency.version
+            def version = dependency.version.replaceAll("-", "_")
             def versionFlag = dependency.versionFlag
 
             rpmBuilder.addDependency(name, version, versionFlag)
