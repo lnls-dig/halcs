@@ -13,7 +13,6 @@ include 'core:sm_io'
 
 include 'examples'
 
-include 'foreign:pcie-driver'
 include 'foreign:libbsmp'
 include 'foreign:libsdbfs'
 

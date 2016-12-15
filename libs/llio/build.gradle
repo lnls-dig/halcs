@@ -8,10 +8,13 @@ model {
                 c {
                     exportedHeaders.srcDir 'include'
 
-                    lib project: ':foreign:pcie-driver', library: 'pcieDriverLib'
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:errhand', library: 'errhand'
                 }
+            }
+
+            binaries.all {
+                linker.args '-lczmq', '-lpcidriver'
             }
         }
     }

@@ -18,7 +18,6 @@ model {
                     lib project: ':core:sm_io', library: 'sm_io'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
-                    lib project: ':foreign:pcie-driver', library: 'pcieDriverLib'
                     lib project: ':libs:halcsclient', library: 'halcsclient'
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:disptable', library: 'disptable'
@@ -32,7 +31,7 @@ model {
             binaries.all {
                 cCompiler.define '__AFE_RFFE_V2__'
 
-                linker.args '-lczmq'
+                linker.args '-lczmq', '-lpcidriver'
             }
         }
 
@@ -47,7 +46,6 @@ model {
                     lib project: ':core:dev_io', library: 'dev_io'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
-                    lib project: ':foreign:pcie-driver', library: 'pcieDriverLib'
                     lib project: ':libs:halcsclient', library: 'halcsclient'
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:disptable', library: 'disptable'
@@ -63,7 +61,7 @@ model {
             binaries.all {
                 cCompiler.define '__AFE_RFFE_V2__'
 
-                linker.args '-lczmq'
+                linker.args '-lczmq', '-lpcidriver'
             }
         }
 

@@ -30,7 +30,6 @@ model {
                     lib project: ':core:common', library: 'common'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
-                    lib project: ':foreign:pcie-driver', library: 'pcieDriverLib'
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:disptable', library: 'disptable'
                     lib project: ':libs:errhand', library: 'errhand'
@@ -45,7 +44,7 @@ model {
             }
 
             binaries.all {
-                linker.args '-lczmq', '-lmlm'
+                linker.args '-lczmq', '-lmlm', '-lpcidriver'
             }
         }
     }
