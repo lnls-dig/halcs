@@ -134,10 +134,10 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    halcs_client_err_e err = halcs_set_test_mode0 (halcs_client, service, test_mode);
-    err |= halcs_set_test_mode1 (halcs_client, service, test_mode);
-    err |= halcs_set_test_mode2 (halcs_client, service, test_mode);
-    err |= halcs_set_test_mode3 (halcs_client, service, test_mode);
+    halcs_client_err_e err = halcs_set_test_mode_adc (halcs_client, service, 0, test_mode);
+    err |= halcs_set_test_mode_adc (halcs_client, service, 1, test_mode);
+    err |= halcs_set_test_mode_adc (halcs_client, service, 2, test_mode);
+    err |= halcs_set_test_mode_adc (halcs_client, service, 3, test_mode);
     if (err != HALCS_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:fmc250_test_mode]: halcs_set_test_mode error\n");
         goto err_halcs_client_new;

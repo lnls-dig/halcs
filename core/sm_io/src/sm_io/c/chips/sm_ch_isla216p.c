@@ -164,29 +164,118 @@ err_smpr_read:
     return err;
 }
 
-/***************** Static functions *****************/
-
-static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
+smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation)
 {
     smch_err_e err = SMCH_SUCCESS;
     ssize_t rw_err = -1;
 
-    /* Turn on Bidirectional PROTO */
-    uint8_t data = ISLA216P_PORTCONFIG_SDO_ACTIVE;
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
-            "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
+    ASSERT_TEST(rst_operation <= ISLA216P_NAPSLP_SLEEP_MODE,
+            "Reset operation is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
+    uint8_t data = ISLA216P_NAPSLP_W(rst_operation);
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_NAPSLP, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_NAPSLP",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &config);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
     SMCH_ISLA216P_WAIT_DFLT;
 
+err_smpr_write:
+    return err;
+}
+
+smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+    uint8_t data = 0;
+
+    /* Reset counter */
+#if 0
+    data = ISLA216P_TEMP_CTL_RESET;
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not reset temperature counter",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+#endif
+
+    uint32_t i = 0;
+    for (i = 0; i < SMCH_ISLA216P_WAIT_TRIES; ++i) {
+        /* As per ISLA216P25 datasheet, page 28 */
+        data = (ISLA216P_TEMP_CTL_PTAT_MODE_EN |
+                          ISLA216P_TEMP_CTL_ENABLE | 
+                          ISLA216P_TEMP_CTL_DIVIDER_W(ISLA216P_TEMP_CTL_DIVIDER_REC_VALUE));
+        rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+        ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_TEMP_CTL",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+
+        /* Wait longer than 132us */
+        SMCH_ISLA216P_WAIT(1000);
+
+        /* Power-down temperature counter */
+        data = ISLA216P_TEMP_CTL_PD;
+        rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+        ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not power-down ISLA216P temperature counter",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+
+        uint8_t temp_code_high = 0;
+        uint8_t temp_code_low = 0;
+        rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_HIGH, &temp_code_high);
+        rw_err += _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_LOW, &temp_code_low);
+        ASSERT_TEST(rw_err == sizeof(uint16_t), "Could not read temperature code",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+        
+        /* Check if reading is valid */
+        if (temp_code_high & ISLA216P_TEMP_CTL_VALID_READ) {
+            *temp = ISLA216P_TEMP_COUNTER_R(temp_code_high, temp_code_low);
+            break;
+        }
+    }
+
+    ASSERT_TEST((i < SMCH_ISLA216P_WAIT_TRIES), "Could not read valid temperature counter",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    /* Power-down temperature counter again, as per ISLA216P datahsheet */
+    data = ISLA216P_TEMP_CTL_PD;
+    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not power-down ISLA216P temperature counter",
+            err_smpr_write, SMCH_ERR_RW_SMPR);
+
+err_smpr_write:
+    return err;
+}
+
+/***************** Static functions *****************/
+
+static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
+{
+    smch_err_e err = SMCH_SUCCESS;
+
+    /* Turn on SDO (4-wire mode) */
+    err = smch_isla216p_set_portconfig (self, ISLA216P_PORTCONFIG_SDO_ACTIVE);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to 4-wire mode",
+            err_smpr_write);
+
 #if 0
     /* Reset registers */
-    data |= ISLA216P_PORTCONFIG_SOFT_RESET;
+    uint8_t data = ISLA216P_PORTCONFIG_SOFT_RESET;
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
             "[sm_ch:isla216p] Writing 0x%02X to addr 0x%02X\n", data, ISLA216P_REG_PORTCONFIG);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
+    ssize_t rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
 
@@ -195,14 +284,16 @@ static smch_err_e _smch_isla216p_init (smch_isla216p_t *self)
     rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_PORTCONFIG, &data);
     ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_PORTCONFIG",
             err_smpr_write, SMCH_ERR_RW_SMPR);
+
+    /* Turn on SDO (4-wire mode) again as reset disabled it */
+    err = smch_isla216p_set_portconfig (self, ISLA216P_PORTCONFIG_SDO_ACTIVE);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to 4-wire mode",
+            err_smpr_write);
 #endif
 
-    data = ISLA216P_NAPSLP_W(ISLA216P_NAPSLP_NORMAL_OPERATION);
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_NAPSLP, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_NAPSLP",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-
-    SMCH_ISLA216P_WAIT_DFLT;
+    err = smch_isla216p_set_rst (self, ISLA216P_NAPSLP_NORMAL_OPERATION);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set ISLA216P to normal operation",
+            err_smpr_write);
 
 err_smpr_write:
     return err;
@@ -230,7 +321,7 @@ static ssize_t _smch_isla216p_write_8 (smch_isla216p_t *self, uint8_t addr,
     uint32_t __data = ISLA216P_DATA_W(*data);
     size_t __data_size = ISLA216P_DATA_SIZE/SMPR_BYTE_2_BIT;
 
-    ssize_t smpr_err = smpr_write_block (self->proto, __addr_size, 
+    ssize_t smpr_err = smpr_write_block (self->proto, __addr_size,
             __addr, __data_size, &__data);
     ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not write to SMPR", err_smpr_write, -1);

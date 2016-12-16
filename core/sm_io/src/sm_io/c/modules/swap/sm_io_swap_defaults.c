@@ -63,28 +63,8 @@ smio_err_e swap_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set switching state",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = halcs_set_sw_en (config_client, service, SWAP_DFLT_SW_EN);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set switching enable state",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_gain_a (config_client, service, SWAP_DFLT_GAIN_AA,
-            SWAP_DFLT_GAIN_AC);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set channel A gain",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_gain_b (config_client, service, SWAP_DFLT_GAIN_BB,
-            SWAP_DFLT_GAIN_BD);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set channel B gain",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_gain_c (config_client, service, SWAP_DFLT_GAIN_CC,
-            SWAP_DFLT_GAIN_CA);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set channel C gain",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_gain_d (config_client, service, SWAP_DFLT_GAIN_DD,
-            SWAP_DFLT_GAIN_DB);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set channel D gain",
+    client_err = halcs_set_sw_dly (config_client, service, SWAP_DFLT_SW_DLY);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set switching delay",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:

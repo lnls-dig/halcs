@@ -43,7 +43,8 @@ void smio_startup (zsock_t *pipe, void *args)
     zsock_t *pipe_mgmt = pipe;
     zsock_t *pipe_msg = th_args->pipe_msg;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
-    /* Signal parent we are initializing */
+
+    /* Signal parent we are ready */
     zsock_signal (pipe_mgmt, 0);
 
     /* We must export our service as the combination of the
@@ -120,7 +121,8 @@ void smio_config_defaults (zsock_t *pipe, void *args)
 {
     th_config_args_t *th_args = (th_config_args_t *) args;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
-    /* Signal parent we are initializing */
+
+    /* Signal parent we are ready */
     zsock_signal (pipe, 0);
 
     /* We must export our service as the combination of the

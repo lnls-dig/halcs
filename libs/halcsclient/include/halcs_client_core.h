@@ -133,6 +133,15 @@ halcs_client_err_e halcs_set_fmc_clk_sel (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_fmc_clk_sel (halcs_client_t *self, char *service,
         uint32_t *clk_sel);
 
+/* RST ISLA216P Functions. Set the ADC ISLA216P to reset itself
+ * 0: nothing
+ * 1: reset ADCs
+ *
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_rst_isla216p (halcs_client_t *self, char *service,
+        uint32_t rst_isla216p);
+
 /* ADC LTC2208 Control */
 /* These set of functions read (get) or write (set) some ADC LTC2208
  * functionalities. Check LTC2208 datasheet for details.
@@ -376,7 +385,129 @@ halcs_client_err_e halcs_get_si571_freq (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_set_si571_defaults (halcs_client_t *self, char *service,
         double si571_defaults);
 
+/* FMC EEPROM Read/Write.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_24aa64_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t data);
+halcs_client_err_e halcs_get_24aa64_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t *data);
+
 /******************** FMC250M SMIO Functions ******************/
+
+/* The three set of group functions provide a low-lovel interface to the FPGA
+ * firmware. The correct usage to set the ADC clock and data paths delay are:
+ *
+ * 1) Set the delay value with halcs_set_adc250_dly_val<*> for the desired channel.
+ *      Accepted values are from 0 to 31.
+ * 2) Set the delay line which will be updated with halcs_set_adc250_dly_line<*> for the desired channel
+ *      Accepted values are the bitmask of the desired lines with bit 16 corresponding
+ *      to the clock line and bits 15-0 to ADC bits 15 to 0
+ * 3) call the update functions halcs_set_adc250_dly_updt<*> for the desired channel.
+ */
+
+/* These set of functions read/write (set/get) the ADC delay values.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_adc250_data_dly0 (halcs_client_t *self, char *service,
+        uint32_t adc250_data_dly0);
+halcs_client_err_e halcs_get_adc250_data_dly0 (halcs_client_t *self, char *service,
+        uint32_t *adc250_data_dly0);
+halcs_client_err_e halcs_set_adc250_data_dly1 (halcs_client_t *self, char *service,
+        uint32_t adc250_data_dly1);
+halcs_client_err_e halcs_get_adc250_data_dly1 (halcs_client_t *self, char *service,
+        uint32_t *adc250_data_dly1);
+halcs_client_err_e halcs_set_adc250_data_dly2 (halcs_client_t *self, char *service,
+        uint32_t adc250_data_dly2);
+halcs_client_err_e halcs_get_adc250_data_dly2 (halcs_client_t *self, char *service,
+        uint32_t *adc250_data_dly2);
+halcs_client_err_e halcs_set_adc250_data_dly3 (halcs_client_t *self, char *service,
+        uint32_t adc250_data_dly3);
+halcs_client_err_e halcs_get_adc250_data_dly3 (halcs_client_t *self, char *service,
+        uint32_t *adc250_data_dly3);
+
+halcs_client_err_e halcs_set_adc250_clk_dly0 (halcs_client_t *self, char *service,
+        uint32_t adc250_clk_dly0);
+halcs_client_err_e halcs_get_adc250_clk_dly0 (halcs_client_t *self, char *service,
+        uint32_t *adc250_clk_dly0);
+halcs_client_err_e halcs_set_adc250_clk_dly1 (halcs_client_t *self, char *service,
+        uint32_t adc250_clk_dly1);
+halcs_client_err_e halcs_get_adc250_clk_dly1 (halcs_client_t *self, char *service,
+        uint32_t *adc250_clk_dly1);
+halcs_client_err_e halcs_set_adc250_clk_dly2 (halcs_client_t *self, char *service,
+        uint32_t adc250_clk_dly2);
+halcs_client_err_e halcs_get_adc250_clk_dly2 (halcs_client_t *self, char *service,
+        uint32_t *adc250_clk_dly2);
+halcs_client_err_e halcs_set_adc250_clk_dly3 (halcs_client_t *self, char *service,
+        uint32_t adc250_clk_dly3);
+halcs_client_err_e halcs_get_adc250_clk_dly3 (halcs_client_t *self, char *service,
+        uint32_t *adc250_clk_dly3);
+
+/* ADC delay line functions */
+/* These set of functions read/write (set/get) the ADC delay line values,
+ * meaning which lines (16 = clock, 15-0 = data bits) are to be updated
+ * on halcs_set_adc250_dly_updt<*> functions.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_adc250_dly_line0 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_line0);
+halcs_client_err_e halcs_get_adc250_dly_line0 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_line0);
+halcs_client_err_e halcs_set_adc250_dly_line1 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_line1);
+halcs_client_err_e halcs_get_adc250_dly_line1 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_line1);
+halcs_client_err_e halcs_set_adc250_dly_line2 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_line2);
+halcs_client_err_e halcs_get_adc250_dly_line2 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_line2);
+halcs_client_err_e halcs_set_adc250_dly_line3 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_line3);
+halcs_client_err_e halcs_get_adc250_dly_line3 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_line3);
+
+/* ADC update functions */
+/* These set of functions read/write (set/get) the ADC delay update values
+ * for each channel. This will effectively update the FPGA delay primitives to
+ * the previous delay values set by the corresponding halcs_get_adc250_dly_updt<*>
+ * functions.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_adc250_dly_updt0 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_updt0);
+halcs_client_err_e halcs_get_adc250_dly_updt0 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_updt0);
+halcs_client_err_e halcs_set_adc250_dly_updt1 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_updt1);
+halcs_client_err_e halcs_get_adc250_dly_updt1 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_updt1);
+halcs_client_err_e halcs_set_adc250_dly_updt2 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_updt2);
+halcs_client_err_e halcs_get_adc250_dly_updt2 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_updt2);
+halcs_client_err_e halcs_set_adc250_dly_updt3 (halcs_client_t *self, char *service,
+        uint32_t adc250_dly_updt3);
+halcs_client_err_e halcs_get_adc250_dly_updt3 (halcs_client_t *self, char *service,
+        uint32_t *adc250_dly_updt3);
+
+/* Higher-level ADC delay functions */
+/* These set of functions write (set) the ADC delays for each channel.
+ * This functions wrap all of the functionality present by the 3 groups above
+ * in a conveninent way to the user.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_adc250_dly0 (halcs_client_t *self, char *service,
+        uint32_t dly_type0, uint32_t dly_val0);
+halcs_client_err_e halcs_set_adc250_dly1 (halcs_client_t *self, char *service,
+        uint32_t dly_type1, uint32_t dly_val1);
+halcs_client_err_e halcs_set_adc250_dly2 (halcs_client_t *self, char *service,
+        uint32_t dly_type2, uint32_t dly_val2);
+halcs_client_err_e halcs_set_adc250_dly3 (halcs_client_t *self, char *service,
+        uint32_t dly_type3, uint32_t dly_val3);
 
 /* ADC ISLA216P Control */
 /* These set of functions read (get) or write (set) some ADC ISLA216P
@@ -397,14 +528,27 @@ halcs_client_err_e halcs_set_sleep_adcs (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_sleep_adcs (halcs_client_t *self, char *service,
         uint32_t *sleep_adcs);
 
-halcs_client_err_e halcs_set_test_mode0 (halcs_client_t *self, char *service,
-        uint32_t test_mode0);
-halcs_client_err_e halcs_set_test_mode1 (halcs_client_t *self, char *service,
-        uint32_t test_mode1);
-halcs_client_err_e halcs_set_test_mode2 (halcs_client_t *self, char *service,
-        uint32_t test_mode2);
-halcs_client_err_e halcs_set_test_mode3 (halcs_client_t *self, char *service,
-        uint32_t test_mode3);
+/* Set ISLA216P test mode */
+halcs_client_err_e halcs_set_test_mode_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t mode);
+
+/* Set ISLA216P reset modes */
+halcs_client_err_e halcs_set_rst_modes_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t rst);
+
+/* Set ISLA216P portconfig */
+halcs_client_err_e halcs_set_portconfig_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t portconfig);
+
+/* Set/Get ISLA216P register values */
+halcs_client_err_e halcs_set_reg_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t addr, uint32_t val);
+halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t addr, uint32_t *val);
+
+/* get ISLA216P temperature */
+halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *temp);
 
 /********************** ACQ SMIO Functions ********************/
 
@@ -692,10 +836,6 @@ halcs_client_err_e halcs_set_sw (halcs_client_t *self, char *service,
         uint32_t sw);
 halcs_client_err_e halcs_get_sw (halcs_client_t *self, char *service,
         uint32_t *sw);
-halcs_client_err_e halcs_set_sw_en (halcs_client_t *self, char *service,
-        uint32_t sw_en);
-halcs_client_err_e halcs_get_sw_en (halcs_client_t *self, char *service,
-        uint32_t *sw_en);
 
 /* Switching clock functions */
 /* These set of functions write (set) or read (get) the switching
@@ -720,48 +860,6 @@ halcs_client_err_e halcs_set_sw_dly (halcs_client_t *self, char *service,
         uint32_t sw_dly);
 halcs_client_err_e halcs_get_sw_dly (halcs_client_t *self, char *service,
         uint32_t *sw_dly);
-
-/* Windowing functions */
-/* These set of functions write (set) or read (get) the windowing state with
- * halcs_*_wdw () and the delay between the beggining of the window and the switching
- * state change. It is a experimental feature that applies a window to the ADC
- * data, in order to try to reduce the undesired effects of the switching, such
- * as phase shifts. All of the functions returns HALCS_CLIENT_SUCCESS if the
- * parameter was correctly set or error (see halcs_client_err.h for all possible
- * errors) */
-halcs_client_err_e halcs_set_wdw (halcs_client_t *self, char *service,
-        uint32_t wdw);
-halcs_client_err_e halcs_get_wdw (halcs_client_t *self, char *service,
-        uint32_t *wdw);
-halcs_client_err_e halcs_set_wdw_dly (halcs_client_t *self, char *service,
-        uint32_t wdw_dly);
-halcs_client_err_e halcs_get_wdw_dly (halcs_client_t *self, char *service,
-        uint32_t *wdw_dly);
-
-/* Gain functions */
-/* TODO: reduce code repetition by, possibilly, group the OPCODES in
- * structure and merge all functions in a single
- * generic one for all channels (A, B, C, D) */
-/* These set of functions write (set) or read (get) the gain in all ADC channels,
- * for both the direct path and the inverted path. All of the functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors) */
-halcs_client_err_e halcs_set_gain_a (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_a (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_b (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_b (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_c (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_c (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
-halcs_client_err_e halcs_set_gain_d (halcs_client_t *self, char *service,
-        uint32_t gain_dir, uint32_t gain_inv);
-halcs_client_err_e halcs_get_gain_d (halcs_client_t *self, char *service,
-        uint32_t *gain_dir, uint32_t *gain_inv);
 
 /********************** RFFE Functions ********************/
 

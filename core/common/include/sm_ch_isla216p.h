@@ -33,6 +33,12 @@ smch_err_e smch_isla216p_set_test_mode (smch_isla216p_t *self, uint8_t mode);
 smch_err_e smch_isla216p_get_chipid (smch_isla216p_t *self, uint8_t *chipid);
 /* CHIP Version */
 smch_err_e smch_isla216p_get_chipver (smch_isla216p_t *self, uint8_t *chipver);
+/* Reset ISLA216P */
+smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation);
+/* Set port config */
+smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config);
+/* Read temperature code */
+smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp);
 
 #ifdef __cplusplus
 }

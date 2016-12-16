@@ -13,7 +13,7 @@
 #define DFLT_BOARD_NUMBER           0
 
 #define DFLT_TEST_MODE              0
-#define MAX_TEST_MODE               1
+#define MAX_TEST_MODE               4
 
 void print_help (char *program_name)
 {
@@ -91,6 +91,7 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
+
     /* Set default halcs number */
     uint32_t halcs_number;
     if (halcs_number_str == NULL) {
@@ -134,8 +135,15 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    halcs_client_err_e err = halcs_set_sleep_adcs (halcs_client, service, sleep_adcs);
-    if (err != HALCS_CLIENT_SUCCESS) {
+    halcs_client_err_e err = 0x0;
+    err |= halcs_set_rst_adcs (halcs_client, service, 0x1);
+    err |= halcs_set_rst_div_adcs (halcs_client, service, 0x1);
+    err |= halcs_set_sleep_adcs (halcs_client, service, sleep_adcs);
+    for (i = 0; i < 4; ++i) {
+        err |= halcs_set_rst_modes_adc (halcs_client, service, i, 0x1);
+        err |= halcs_set_portconfig_adc (halcs_client, service, i, 0x81);
+    } 
+    if (err != HALCS_CLIENT_SUCCESS)  {
         fprintf (stderr, "[client:fmc250_sleep_adcs]: halcs_set_sleep_adcs error\n");
         goto err_halcs_client_new;
     }

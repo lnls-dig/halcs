@@ -129,12 +129,6 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
 #endif
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
-    /* FIXME: We need to be sure that, if the board is ACTIVE, the FMC_ACTIVE_CLK
-     * component has been sucseddfully initialized so that the ADCs has clock.
-     * Otherwise, we won't be able to RESET the ADCs, leading to undefined
-     * behavior */
-    sleep (5);
-
     /* Setup ISLA216P ADC SPI communication */
     uint32_t i;
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
@@ -156,6 +150,10 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
         /* Read ISLA216P Version */
         smch_isla216p_get_chipver (self->smch_isla216p_adc[i], &chipver);
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_core] ISLA216P0 CHIPVER: 0x%02X\n", chipver);
+        /* Read ISLA216P temperature */
+        uint16_t temp = 0;
+        smch_isla216p_get_temp (self->smch_isla216p_adc[i], &temp);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_core] ISLA216P0 TEMP: 0x%04X\n", temp);
     }
 
     return self;

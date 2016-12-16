@@ -597,6 +597,9 @@ tests_mrproper:
 examples:
 	$(MAKE) -C examples all
 
+examples_install:
+	$(MAKE) -C examples install
+
 examples_clean:
 	$(MAKE) -C examples clean
 

@@ -9,7 +9,6 @@
 /* Private headers */
 #include "sm_io_swap_codes.h"
 #include "sm_io_swap_defaults.h"
-#include "sm_io_swap_useful_macros.h"
 #include "sm_io_swap_exports.h"
 #include "sm_io_swap_core.h"
 #include "sm_io_swap_exp.h"
@@ -48,20 +47,9 @@
  * */
 #define SW_MIN                                  0
 #define SW_MAX                                  3
-
-#define BPM_SWAP_CTRL_MODE_GLOBAL_MASK          (BPM_SWAP_CTRL_MODE1_MASK   | BPM_SWAP_CTRL_MODE2_MASK)
-#define BPM_SWAP_CTRL_MODE_GLOBAL_W(val)        (BPM_SWAP_CTRL_MODE1_W(val) | BPM_SWAP_CTRL_MODE2_W(val))
-#define BPM_SWAP_CTRL_MODE_GLOBAL_R(val)        (BPM_SWAP_CTRL_MODE1_R(val) | BPM_SWAP_CTRL_MODE2_R(val))
 RW_PARAM_FUNC(swap, sw) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, MODE_GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, MODE, MULT_BIT_PARAM,
             SW_MIN, SW_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define HALCS_EN_MIN                           0 /* Switching enabled */
-#define HALCS_EN_MAX                           1 /* Switching disabled */
-RW_PARAM_FUNC(swap, sw_en) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, CLK_SWAP_EN, SINGLE_BIT_PARAM,
-            HALCS_EN_MIN, HALCS_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define BPM_SWAP_DIV_F_MIN                      1
@@ -74,108 +62,17 @@ RW_PARAM_FUNC(swap, div_clk) {
 /* Number of clock cycles between the switching and deswitching */
 #define BPM_SWAP_SW_DLY_MIN                     0
 #define BPM_SWAP_SW_DLY_MAX                     ((1<<16)-1)
-
-#define BPM_SWAP_DLY_GLOBAL_MASK                (BPM_SWAP_DLY_1_MASK   | BPM_SWAP_DLY_2_MASK)
-#define BPM_SWAP_DLY_GLOBAL_W(val)              (BPM_SWAP_DLY_1_W(val) | BPM_SWAP_DLY_2_W(val))
-#define BPM_SWAP_DLY_GLOBAL_R(val)              (BPM_SWAP_DLY_1_R(val) | BPM_SWAP_DLY_2_R(val))
 RW_PARAM_FUNC(swap, sw_dly) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, DLY, GLOBAL, MULT_BIT_PARAM,
+    SET_GET_PARAM(swap, 0x0, BPM_SWAP, DLY, DESWAP, MULT_BIT_PARAM,
             BPM_SWAP_SW_DLY_MIN, BPM_SWAP_SW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC,
             SET_FIELD);
-}
-
-#define BPM_SWAP_WDW_EN_MIN                     0 /* Windowing enabled */
-#define BPM_SWAP_WDW_EN_MAX                     1 /* Windowing disabled */
-
-#define BPM_SWAP_WDW_CTL_EN_GLOBAL              (BPM_SWAP_WDW_CTL_USE | BPM_SWAP_WDW_CTL_SWCLK_EXT)
-RW_PARAM_FUNC(swap, wdw_en) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, WDW_CTL, EN_GLOBAL, SINGLE_BIT_PARAM,
-            BPM_SWAP_WDW_EN_MIN, BPM_SWAP_WDW_EN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define BPM_SWAP_WDW_DLY_MIN                    0
-#define BPM_SWAP_WDW_DLY_MAX                    ((1<<16)-1)
-RW_PARAM_FUNC(swap, wdw_dly) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, WDW_CTL, DLY, MULT_BIT_PARAM,
-            BPM_SWAP_WDW_DLY_MIN, BPM_SWAP_WDW_DLY_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-/* SWAP gain functions.
- * These are a bit different from the others, in that the parameter passed to
- * them are neither a single bit nor a multi-bit paramter written to multiple
- * fields. Instead, the parameter is divided in 2 parts of 16-bits (16-bit lower
- * part is the direct path gain and the 16-bit upper part is the inverted path
- * gain) written as a whole in the specified register */
-
-/* All gains have the same format, so we use the A gain for all of them */
-#define RW_SWAP_GAIN_MIN                        1
-#define RW_SWAP_GAIN_MAX                        ((1<<16)-1)
-/* Custom parameter check */
-static int _rw_bpm_swap_gain_chk (uint32_t gain)
-{
-    if (RW_SWAP_GAIN_LOWER_R(gain) < RW_SWAP_GAIN_MIN ||
-            RW_SWAP_GAIN_LOWER_R(gain) > RW_SWAP_GAIN_MAX ||
-            RW_SWAP_GAIN_UPPER_R(gain) < RW_SWAP_GAIN_MIN ||
-            RW_SWAP_GAIN_UPPER_R(gain) > RW_SWAP_GAIN_MAX) {
-        return PARAM_ERR;
-    }
-
-    return PARAM_OK;
-}
-
-rw_param_check_fp rw_bpm_swap_gain_chk_fp = _rw_bpm_swap_gain_chk;
-
-#define BPM_SWAP_GAIN_MIN                       0
-#define BPM_SWAP_GAIN_MAX                       ((1ULL<<32)-1)
-
-#define BPM_SWAP_A_GLOBAL_MASK                  (BPM_SWAP_A_A_MASK      | BPM_SWAP_A_C_MASK)
-#define BPM_SWAP_A_GLOBAL_W(val)                (val)
-#define BPM_SWAP_A_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(swap, gain_a) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, A, GLOBAL, MULT_BIT_PARAM,
-            BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define BPM_SWAP_B_GLOBAL_MASK                  (BPM_SWAP_B_B_MASK      | BPM_SWAP_B_D_MASK)
-#define BPM_SWAP_B_GLOBAL_W(val)                (val)
-#define BPM_SWAP_B_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(swap, gain_b) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, B, GLOBAL, MULT_BIT_PARAM,
-            BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define BPM_SWAP_C_GLOBAL_MASK                  (BPM_SWAP_C_C_MASK      | BPM_SWAP_C_A_MASK)
-#define BPM_SWAP_C_GLOBAL_W(val)                (val)
-#define BPM_SWAP_C_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(swap, gain_c) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, C, GLOBAL, MULT_BIT_PARAM,
-            BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define BPM_SWAP_D_GLOBAL_MASK                  (BPM_SWAP_D_D_MASK      | BPM_SWAP_D_B_MASK)
-#define BPM_SWAP_D_GLOBAL_W(val)                (val)
-#define BPM_SWAP_D_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(swap, gain_d) {
-    SET_GET_PARAM(swap, 0x0, BPM_SWAP, D, GLOBAL, MULT_BIT_PARAM,
-            BPM_SWAP_GAIN_MIN, BPM_SWAP_GAIN_MAX, rw_bpm_swap_gain_chk_fp,
-            NO_FMT_FUNC, SET_FIELD);
 }
 
 /* Exported function pointers */
 const disp_table_func_fp swap_exp_fp [] = {
     RW_PARAM_FUNC_NAME(swap, sw),
-    RW_PARAM_FUNC_NAME(swap, sw_en),
     RW_PARAM_FUNC_NAME(swap, div_clk),
     RW_PARAM_FUNC_NAME(swap, sw_dly),
-    RW_PARAM_FUNC_NAME(swap, wdw_en),
-    RW_PARAM_FUNC_NAME(swap, wdw_dly),
-    RW_PARAM_FUNC_NAME(swap, gain_a),
-    RW_PARAM_FUNC_NAME(swap, gain_b),
-    RW_PARAM_FUNC_NAME(swap, gain_c),
-    RW_PARAM_FUNC_NAME(swap, gain_d),
     NULL
 };
 

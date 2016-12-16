@@ -34,6 +34,7 @@ extern disp_op_t fmc130m_4ch_adc_dly0_exp;
 extern disp_op_t fmc130m_4ch_adc_dly1_exp;
 extern disp_op_t fmc130m_4ch_adc_dly2_exp;
 extern disp_op_t fmc130m_4ch_adc_dly3_exp;
+extern disp_op_t fmc130m_4ch_24aa64_data_exp;
 
 extern const disp_op_t *fmc130m_4ch_exp_ops [];
 

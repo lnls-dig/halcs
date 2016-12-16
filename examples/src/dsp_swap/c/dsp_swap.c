@@ -23,7 +23,6 @@ void print_help (char *program_name)
             "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-sw <Switching = [0|1]> Start switching counters\n"
-            "\t-sw_en <Switching enable= [0|1]> Enable switching outputs\n"
             "\t-div_clk <Switching divider = [0 to ADC clock period]> Switching clock divider\n"
             "\t-sw_dly <Switching/Deswitching delay = [0 to ADC clock period]> Switching/Deswitching delay\n"
             , program_name);
@@ -36,7 +35,6 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
     char *sw_str = NULL;
-    char *sw_en_str = NULL;
     char *div_clk_str = NULL;
     char *sw_dly_str = NULL;
     char **str_p = NULL;
@@ -70,9 +68,6 @@ int main (int argc, char *argv [])
         }
         else if (streq (argv[i], "-sw")) {
             str_p = &sw_str;
-        }
-        else if (streq (argv[i], "-sw_en")) {
-            str_p = &sw_en_str;
         }
         else if (streq (argv[i], "-div_clk")) {
             str_p = &div_clk_str;
@@ -201,87 +196,40 @@ int main (int argc, char *argv [])
     if (sw_str != NULL) {
         sw = strtoul (sw_str, NULL, 10);
 
-        fprintf (stdout, "[client:fmc130m_4ch]: sw = %u\n", sw);
+        fprintf (stdout, "[client:swap]: sw = %u\n", sw);
         err = halcs_set_sw (halcs_client, service_swap, sw);
         if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw failed\n");
+            fprintf (stderr, "[client:swap]: halcs_set_sw failed\n");
             goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw was successfully executed\n");
-    }
-
-    uint32_t sw_en = 0;
-    if (sw_en_str != NULL) {
-        sw_en = strtoul (sw_en_str, NULL, 10);
-
-        fprintf (stdout, "[client:fmc130m_4ch]: sw_en = %u\n", sw_en);
-        err = halcs_set_sw_en (halcs_client, service_swap, sw_en);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw_en failed\n");
-            goto err_halcs_exit;
-        }
-        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw_en was successfully executed\n");
+        fprintf (stdout, "[client:swap]: halcs_set_sw was successfully executed\n");
     }
 
     uint32_t div_clk = 0;
     if (div_clk_str != NULL) {
         div_clk = strtoul (div_clk_str, NULL, 10);
 
-        fprintf (stdout, "[client:fmc130m_4ch]: div_clk = %u\n", div_clk);
+        fprintf (stdout, "[client:swap]: div_clk = %u\n", div_clk);
         err = halcs_set_div_clk (halcs_client, service_swap, div_clk);
         if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_div_clk failed\n");
+            fprintf (stderr, "[client:swap]: halcs_set_div_clk failed\n");
             goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_div_clk was successfully executed\n");
+        fprintf (stdout, "[client:swap]: halcs_set_div_clk was successfully executed\n");
     }
 
     uint32_t sw_dly = 0;
     if (sw_dly_str != NULL) {
         sw_dly = strtoul (sw_dly_str, NULL, 10);
 
-        fprintf (stdout, "[client:fmc130m_4ch]: sw_dly = %u\n", sw_dly);
+        fprintf (stdout, "[client:swap]: sw_dly = %u\n", sw_dly);
         err = halcs_set_sw_dly (halcs_client, service_swap, sw_dly);
         if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fmc130m_4ch]: halcs_set_sw_dly failed\n");
+            fprintf (stderr, "[client:swap]: halcs_set_sw_dly failed\n");
             goto err_halcs_exit;
         }
-        fprintf (stdout, "[client:fmc130m_4ch]: halcs_set_sw_dly was successfully executed\n");
+        fprintf (stdout, "[client:swap]: halcs_set_sw_dly was successfully executed\n");
     }
-
-    uint32_t gain_aa = 32768;
-    uint32_t gain_ac = 32768;
-    err = halcs_set_gain_a (halcs_client, service_swap, gain_aa, gain_ac);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: halcs_set_gain_a failed\n");
-        goto err_halcs_set;
-    }
-    fprintf (stdout, "[client:swap]: halcs_set_gain_a = direct %u, inverted %u was successfully executed\n",
-            gain_aa, gain_ac);
-
-    err = halcs_set_gain_b (halcs_client, service_swap, gain_aa, gain_ac);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: halcs_set_gain_b failed\n");
-        goto err_halcs_set;
-    }
-    fprintf (stdout, "[client:swap]: halcs_set_gain_b = direct %u, inverted %u was successfully executed\n",
-            gain_aa, gain_ac);
-
-    err = halcs_set_gain_c (halcs_client, service_swap, gain_aa, gain_ac);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: halcs_set_gain_c failed\n");
-        goto err_halcs_set;
-    }
-    fprintf (stdout, "[client:swap]: halcs_set_gain_c = direct %u, inverted %u was successfully executed\n",
-            gain_aa, gain_ac);
-
-    err = halcs_set_gain_d (halcs_client, service_swap, gain_aa, gain_ac);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:swap]: halcs_set_gain_d failed\n");
-        goto err_halcs_set;
-    }
-    fprintf (stdout, "[client:swap]: halcs_set_gain_d = direct %u, inverted %u was successfully executed\n",
-            gain_aa, gain_ac);
 
 err_halcs_client_new:
 err_halcs_exit:
@@ -297,9 +245,6 @@ err_halcs_set:
     str_p = &sw_str;
     free (*str_p);
     sw_str = NULL;
-    str_p = &sw_en_str;
-    free (*str_p);
-    sw_en_str = NULL;
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;

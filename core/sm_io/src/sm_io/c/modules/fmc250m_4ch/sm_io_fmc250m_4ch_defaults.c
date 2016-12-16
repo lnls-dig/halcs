@@ -45,16 +45,26 @@
 smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
+    (void) broker_endp;
+    (void) service;
     (void) log_file_name;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Configuring SMIO "
             "FMC250M_4CH with default values ...\n");
-    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
+#if 0
+    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
+
+    /* We are not using the default config_defaults () callback to
+     * initialize our ADC ISLA216P. Instead we rely on a more complex
+     * method by using the do_mgmt_op () callback. This is needed because
+     * the FMC250M is instantiated before FMC_ACTIVE_CLK SMIO, and therefore 
+     * no clock is available for the ISLA216P if we do it here.
+     */
 
     /* For some reason, the default timeout is not enough for FMC250M SMIO. See github issue
      * #119 */
-    halcs_client_t *config_client = halcs_client_new_log_mode_time (broker_endp, 0,
-            log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE, 10000);
+    halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
+            log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
     client_err = halcs_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
@@ -69,9 +79,22 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set activate ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    /*
+     * After resetting the ADCs with halcs_set_rst_adcs (), all of its functions are
+     * reset, even SPI mode. So, we need to restore the 4-wire mode with halcs_set_portconfig_adc ()
+     */
+    uint32_t i = 0;
+    for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        client_err = halcs_set_rst_modes_adc (config_client, service, i, FMC250M_4CH_DFLT_RST_MODE_ADC);
+        client_err |= halcs_set_portconfig_adc (config_client, service, i, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+        ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set ADCs to default parameters",
+                err_param_set, SMIO_ERR_CONFIG_DFLT);
+    }
+
 err_param_set:
     halcs_client_destroy (&config_client);
 err_alloc_client:
+#endif
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc250m_4ch_defaults] Exiting Config thread %s\n",
         service);
     return err;

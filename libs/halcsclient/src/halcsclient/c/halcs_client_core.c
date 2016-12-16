@@ -10,7 +10,6 @@
 #include "errhand.h"
 #include "halcs_client_rw_param_codes.h"
 #include "halcs_client_codes.h"
-#include "sm_io_swap_useful_macros.h"
 #include "halcs_client_revision.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
@@ -444,6 +443,13 @@ PARAM_FUNC_CLIENT_READ(fmc_clk_sel)
             fmc_clk_sel);
 }
 
+/* RESET ISLA250P functions */
+PARAM_FUNC_CLIENT_WRITE(rst_isla216p)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P,
+            rst_isla216p);
+}
+
 PARAM_FUNC_CLIENT_WRITE(si571_oe)
 {
     return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_OE, si571_oe);
@@ -860,6 +866,19 @@ PARAM_FUNC_CLIENT_WRITE2(adc_dly3, type, val)
             type, val);
 }
 
+/****************** FMC130M EEPROM functions ****************/
+
+/* EEPROM read/write */
+PARAM_FUNC_CLIENT_WRITE2(24aa64_data, addr, data)
+{
+    return param_client_write2 (self, service, FMC130M_4CH_OPCODE_24AA64_DATA, addr, data);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(24aa64_data, addr, data)
+{
+    return param_client_write_read (self, service, FMC130M_4CH_OPCODE_24AA64_DATA, addr, data);
+}
+
 /*************************** FMC250M Chips Functions *************************/
 
 /* ISLA216P RST ADCs */
@@ -902,28 +921,255 @@ PARAM_FUNC_CLIENT_READ(sleep_adcs)
 }
 
 /* ISLA216P Test modes */
-PARAM_FUNC_CLIENT_WRITE(test_mode0)
+PARAM_FUNC_CLIENT_WRITE2(test_mode_adc, chan, mode)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE0,
-            test_mode0);
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_TESTMODE,
+            chan, mode);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode1)
+/* ISLA216P reset modes */
+PARAM_FUNC_CLIENT_WRITE2(rst_modes_adc, chan, mode)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE1,
-            test_mode1);
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_RST,
+            chan, mode);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode2)
+/* ISLA216P portconfig */
+PARAM_FUNC_CLIENT_WRITE2(portconfig_adc, chan, portconfig)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE2,
-            test_mode2);
+    return param_client_write2 (self, service, FMC250M_4CH_OPCODE_PORTCONFIG,
+            chan, portconfig);
 }
 
-PARAM_FUNC_CLIENT_WRITE(test_mode3)
+/* ISLA216P write register */
+PARAM_FUNC_CLIENT_WRITE3(reg_adc, chan, addr, val)
 {
-    return param_client_write (self, service, FMC250M_4CH_OPCODE_TESTMODE3,
-            test_mode3);
+    return param_client_write3 (self, service, FMC250M_4CH_OPCODE_REG,
+            chan, addr, val);
+}
+
+PARAM_FUNC_CLIENT_WRITE2_READ(reg_adc, chan, addr, val)
+{
+    return param_client_write2_read (self, service, FMC250M_4CH_OPCODE_REG,
+            chan, addr, val);
+}
+
+/* ISLA216P temperature */
+PARAM_FUNC_CLIENT_WRITE_READ(temp_adc, chan, temp)
+{
+    return param_client_write_read (self, service, FMC250M_4CH_OPCODE_TEMP,
+            chan, temp);
+}
+
+/****************** FMC250M Delay Value Functions ****************/
+
+/* ADC delay value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY0, adc250_data_dly0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY0, adc250_data_dly0);
+}
+
+/* ADC delay value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY1, adc250_data_dly1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY1, adc250_data_dly1);
+}
+
+/* ADC delay value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY2, adc250_data_dly2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY2, adc250_data_dly2);
+}
+
+/* ADC delay value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_data_dly3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY3, adc250_data_dly3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_data_dly3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DATA_DLY3, adc250_data_dly3);
+}
+
+/* ADC delay value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY0, adc250_clk_dly0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY0, adc250_clk_dly0);
+}
+
+/* ADC delay value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY1, adc250_clk_dly1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY1, adc250_clk_dly1);
+}
+
+/* ADC delay value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY2, adc250_clk_dly2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY2, adc250_clk_dly2);
+}
+
+/* ADC delay value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_clk_dly3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY3, adc250_clk_dly3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_clk_dly3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_CLK_DLY3, adc250_clk_dly3);
+}
+
+/****************** FMC250M Delay Line selection Functions ****************/
+
+/* ADC line value 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE0, adc250_dly_line0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE0, adc250_dly_line0);
+}
+
+/* ADC line value 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE1, adc250_dly_line1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE1, adc250_dly_line1);
+}
+
+/* ADC line value 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE2, adc250_dly_line2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE2, adc250_dly_line2);
+}
+
+/* ADC line value 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_line3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE3, adc250_dly_line3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_line3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_LINE3, adc250_dly_line3);
+}
+
+/****************** FMC250M Delay update Functions ****************/
+
+/* ADC Update channel 0 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt0)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT0, adc250_dly_updt0);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt0)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT0, adc250_dly_updt0);
+}
+
+/* ADC Update channel 1 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt1)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT1, adc250_dly_updt1);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt1)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT1, adc250_dly_updt1);
+}
+
+/* ADC Update channel 2 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt2)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT2, adc250_dly_updt2);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt2)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT2, adc250_dly_updt2);
+}
+
+/* ADC Update channel 3 */
+PARAM_FUNC_CLIENT_WRITE(adc250_dly_updt3)
+{
+    return param_client_write (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT3, adc250_dly_updt3);
+}
+
+PARAM_FUNC_CLIENT_READ(adc250_dly_updt3)
+{
+     return param_client_read (self, service, FMC250M_4CH_OPCODE_ADC_DLY_UPDT3, adc250_dly_updt3);
+}
+
+/****************** FMC250M set delay functions ****************/
+
+/* ADC set delay channel 0 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly0, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY0,
+            type, val);
+}
+
+/* ADC set delay channel 1 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly1, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY1,
+            type, val);
+}
+
+/* ADC set delay channel 2 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly2, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY2,
+            type, val);
+}
+/* ADC set delay channel 3 */
+PARAM_FUNC_CLIENT_WRITE2(adc250_dly3, type, val)
+{
+    return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY3,
+            type, val);
 }
 
 /****************** ACQ SMIO Functions ****************/
@@ -1502,17 +1748,6 @@ PARAM_FUNC_CLIENT_READ(sw)
     return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW, sw);
 }
 
-/* Switching enabling functions */
-PARAM_FUNC_CLIENT_WRITE(sw_en)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
-}
-
-PARAM_FUNC_CLIENT_READ(sw_en)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_EN, sw_en);
-}
-
 /* Switching Clock division functions */
 PARAM_FUNC_CLIENT_WRITE(div_clk)
 {
@@ -1533,105 +1768,6 @@ PARAM_FUNC_CLIENT_WRITE(sw_dly)
 PARAM_FUNC_CLIENT_READ(sw_dly)
 {
     return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_DLY, sw_dly);
-}
-
-/* Windowing functions */
-/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
-PARAM_FUNC_CLIENT_WRITE(wdw)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
-}
-
-/* FIXME: Change client function wdw () to wdw_en (), which is a more semantic name */
-PARAM_FUNC_CLIENT_READ(wdw)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_EN, wdw);
-}
-
-PARAM_FUNC_CLIENT_WRITE(wdw_dly)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
-}
-
-PARAM_FUNC_CLIENT_READ(wdw_dly)
-{
-    return param_client_read (self, service, SWAP_OPCODE_SET_GET_WDW_DLY, wdw_dly);
-}
-
-/* Gain functions */
-/* TODO: reduce code repetition by, possibilly, group the OPCODES in
- * structure and merge all functions in a single
- * generic one for all channels (A, B, C, D) */
-PARAM_FUNC_CLIENT_WRITE2(gain_a, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_A,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_a, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_A, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_b, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_B,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_b, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_B, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_c, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_C,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_c, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_C, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
-}
-
-PARAM_FUNC_CLIENT_WRITE2(gain_d, dir_gain, inv_gain)
-{
-    return param_client_write (self, service, SWAP_OPCODE_SET_GET_GAIN_D,
-            RW_SWAP_GAIN_UPPER_W(inv_gain) | RW_SWAP_GAIN_LOWER_W(dir_gain));
-}
-
-PARAM_FUNC_CLIENT_READ2(gain_d, dir_gain, inv_gain)
-{
-    uint32_t gain;
-    halcs_client_err_e err = param_client_read (self, service,
-            SWAP_OPCODE_SET_GET_GAIN_D, &gain);
-
-    *dir_gain = RW_SWAP_GAIN_LOWER_R(gain);
-    *inv_gain = RW_SWAP_GAIN_UPPER_R(gain);
-
-    return err;
 }
 
 /**************** RFFE SMIO Functions ****************/
@@ -1757,7 +1893,7 @@ halcs_client_err_e halcs_set_rffe_data (halcs_client_t *self, char *service,
 {
     uint32_t rw = WRITE_MODE;
     return param_client_write_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0);
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0, NULL, 0);
 }
 
 halcs_client_err_e halcs_get_rffe_data (halcs_client_t *self, char *service,
@@ -1765,7 +1901,7 @@ halcs_client_err_e halcs_get_rffe_data (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_DATA,
-            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0,
+            rw, rffe_data_block, sizeof (*rffe_data_block), NULL, 0, NULL, 0,
             rffe_data_block, sizeof (*rffe_data_block));
 }
 
@@ -1775,7 +1911,7 @@ halcs_client_err_e halcs_get_rffe_version (halcs_client_t *self, char *service,
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, RFFE_OPCODE_SET_GET_VERSION,
-            rw, rffe_version, sizeof (*rffe_version), NULL, 0,
+            rw, rffe_version, sizeof (*rffe_version), NULL, 0, NULL, 0,
             rffe_version, sizeof (*rffe_version));
 }
 
@@ -1886,7 +2022,7 @@ halcs_client_err_e halcs_get_afc_diag_build_revision (halcs_client_t *self, char
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1896,7 +2032,7 @@ halcs_client_err_e halcs_get_afc_diag_build_date (halcs_client_t *self, char *se
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1906,7 +2042,7 @@ halcs_client_err_e halcs_get_afc_diag_build_user_name (halcs_client_t *self, cha
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1916,7 +2052,7 @@ halcs_client_err_e halcs_get_afc_diag_build_user_email (halcs_client_t *self, ch
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
-            rw, revision_data, sizeof (*revision_data), NULL, 0,
+            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 

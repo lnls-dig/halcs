@@ -1,8 +1,5 @@
 # Hardware Abstraction Layer for Control Systems
 
-To keep things tidy, old issues will be kept on
-the old repository: https://github.com/lnls-dig/bpm-sw/issues
-
 [![Build Status](https://travis-ci.org/lnls-dig/halcs.svg)](https://travis-ci.org/lnls-dig/halcs)
 ![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
 [![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
@@ -43,7 +40,7 @@ the binaries or executing the instructions below:
 
 ## Cloning this repository
 
-	git clone --recursive https://github.com/lerwys/halcs.git
+	git clone --recursive https://github.com/lnls-dig/halcs.git
 
 ## PCIe Installation Instructions
 

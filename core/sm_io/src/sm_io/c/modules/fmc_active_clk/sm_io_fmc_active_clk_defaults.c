@@ -80,6 +80,11 @@ smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not enable SI571 Output",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
+    /* After everything is complete. Send message telling FMC250 to initialize */
+    client_err = halcs_set_rst_isla216p (config_client, service, FMC_ACTIVE_CLK_DFLT_RST_ISLA216P);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not reset FMC250M_4CH",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     halcs_client_destroy (&config_client);
 err_alloc_client:

@@ -8,6 +8,7 @@ model {
         adc_dly(NativeExecutableSpec)
         dsp_swap(NativeExecutableSpec)
         fmc130m_4ch_ctl(NativeExecutableSpec)
+        fmc130m_eeprom_ctl(NativeExecutableSpec)
         fmc250m_4ch_sleep(NativeExecutableSpec)
         fmc250m_4ch_test_mode(NativeExecutableSpec)
         fpga_info(NativeExecutableSpec)
