@@ -262,6 +262,8 @@ common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
+apps_SCRIPTS = $(foreach app,$(APPS),$($(app)_SCRIPTS))
+
 .SECONDEXPANSION:
 
 # Save a git repository description
@@ -307,6 +309,7 @@ all: cfg $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
+	echo OUTPUT RULE $(OUT)
 	$(CC) $(LDFLAGS) $(LFLAGS) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $^ $($@_STATIC_LIBS) $(LIBS) $($@_LIBS) $(PROJECT_LIBS)
 
 # Special rule for the revision object
@@ -567,9 +570,13 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
+	echo $(LEDBG)
+	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
 
 scripts_uninstall:
+	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
 
 scripts_clean:
