@@ -115,7 +115,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     }
 
     protected void addSysFile(File sysFile, String path) {
-        def sysFilePath = "$installationPrefix/$path"
+        def sysFilePath = "/$path"
         def permissions = 0644
 
         rpmBuilder.addFile(sysFilePath, sysFile, permissions)
