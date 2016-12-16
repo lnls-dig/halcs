@@ -29,6 +29,7 @@ import br.lnls.dig.gradle.distribution.model.DistributionContainer
 import br.lnls.dig.gradle.nativedistribution.model.DistributionVariant
 import br.lnls.dig.gradle.nativedistribution.plugins.internal.DistributionVariants
 import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
+import br.lnls.dig.gradle.nativedistribution.tasks.RpmInstall
 
 import static org.gradle.api.distribution.plugins.DistributionPlugin.MAIN_DISTRIBUTION_NAME
 
@@ -132,7 +133,7 @@ class NativeDistributionPlugin implements Plugin<Project> {
             }
         }
 
-        private String getRpmTaskWithLibrariesFor(Rpm developmentRpmTask) {
+        private String getRpmTaskWithLibrariesFor(Task developmentRpmTask) {
             String developmentName = developmentRpmTask.name
 
             int developmentIndex = developmentName.lastIndexOf('Development')
@@ -142,6 +143,36 @@ class NativeDistributionPlugin implements Plugin<Project> {
             String secondPart = developmentName.substring(developmentEndIndex)
 
             return firstPart + secondPart
+        }
+
+        @Mutate
+        public void addInstallationTasks(ModelMap<Task> tasks,
+                DistributionContainer distributions,
+                @Path("buildDir") File buildDir) {
+            distributions.all { distribution ->
+                tasks.create(getTaskNameFor(distribution, "installRpm"),
+                        RpmInstall) { task ->
+                    task.dependsOn getTaskNameFor(distribution, "distRpm")
+                    task.distribution = distribution
+                    task.rpmDirectory = new File(buildDir,
+                            "/distributions/$task.distribution.name")
+                }
+            }
+        }
+
+        @Mutate
+        public void addDependencyBetweenDevelopmentAndRuntimeRpmInstallations(
+                @Each RpmInstall task) {
+            if (task.distribution.usage == 'development')
+                task.dependsOn getRpmTaskWithLibrariesFor(task)
+        }
+
+        @Mutate
+        public void processDetectedInstallationDependencies(
+                @Each RpmInstall task, ServiceRegistry serviceRegistry) {
+            def projectModelResolver = serviceRegistry.get(ProjectModelResolver)
+
+            task.resolveDependencies(projectModelResolver)
         }
     }
 }
