@@ -55,4 +55,9 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+if [ -z "$GRADLE" ]; then
+    ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+else
+    export ${CONFIG_FLAGS[@]}
+    ./gradlew $GRADLE
+fi
