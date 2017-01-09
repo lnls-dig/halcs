@@ -38,3 +38,32 @@ allprojects {
         }
     }
 }
+
+task buildLibPcieDriver(type: Exec) {
+    commandLine 'make', 'lib_pcie_driver'
+    environment = ['PATH': System.getenv('PATH')]
+}
+
+task installLibPcieDriverHeaders(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/include/pcie/lib'
+    into 'tmp/include/pciDriver/lib'
+
+    include '*.h'
+}
+
+task installLibPcieDriverBinaries(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/lib/pcie'
+    into 'tmp/lib'
+
+    include '*.so'
+    include '*.a'
+}
+
+task installLibPcieDriver {
+    dependsOn 'installLibPcieDriverHeaders'
+    dependsOn 'installLibPcieDriverBinaries'
+}
