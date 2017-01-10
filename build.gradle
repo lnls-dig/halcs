@@ -1,5 +1,7 @@
 allprojects {
     apply plugin: 'c'
+    apply plugin: 'br.lnls.dig.gradle.assemblevarianttask'
+    apply plugin: 'br.lnls.dig.gradle.compilerflags'
     apply plugin: br.lnls.dig.gradle.currentplatform.CurrentPlatformPlugin
     apply plugin: 'br.lnls.dig.gradle.sanec'
 
@@ -17,6 +19,7 @@ allprojects {
 
         binaries {
             all {
+                cCompiler.args '-std=gnu99', '-O2'
                 cCompiler.args '-Wall', '-Wextra', '-Werror'
 
                 cCompiler.define 'ERRHAND_MIN_LEVEL=DBG_LVL_TRACE'
@@ -37,4 +40,33 @@ allprojects {
             }
         }
     }
+}
+
+task buildLibPcieDriver(type: Exec) {
+    commandLine 'make', 'lib_pcie_driver'
+    environment = ['PATH': System.getenv('PATH')]
+}
+
+task installLibPcieDriverHeaders(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/include/pcie/lib'
+    into 'tmp/include/pciDriver/lib'
+
+    include '*.h'
+}
+
+task installLibPcieDriverBinaries(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/lib/pcie'
+    into 'tmp/lib'
+
+    include '*.so'
+    include '*.a'
+}
+
+task installLibPcieDriver {
+    dependsOn 'installLibPcieDriverHeaders'
+    dependsOn 'installLibPcieDriverBinaries'
 }

@@ -45,6 +45,15 @@ model {
             }
 
             binaries.all {
+                cCompiler.args '-Wno-missing-field-initializers',
+                    '-Wno-missing-braces'
+
+                if (toolChain in Gcc) {
+                    cCompiler.args '-Wno-cpp'
+                } else if (toolChain in Clang) {
+                    cCompiler.args '-Wno-error=#warnings'
+                }
+
                 linker.args '-lczmq', '-lmlm', '-lpcidriver'
             }
         }

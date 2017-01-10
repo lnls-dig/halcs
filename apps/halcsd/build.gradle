@@ -31,7 +31,7 @@ model {
             binaries.all {
                 cCompiler.define '__AFE_RFFE_V2__'
 
-                linker.args '-lczmq', '-lpcidriver'
+                linker.args '-lczmq', '-lpcidriver', '-lmlm'
             }
         }
 
@@ -61,7 +61,7 @@ model {
             binaries.all {
                 cCompiler.define '__AFE_RFFE_V2__'
 
-                linker.args '-lczmq', '-lpcidriver'
+                linker.args '-lczmq', '-lpcidriver', '-lmlm'
             }
         }
 

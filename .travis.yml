@@ -11,6 +11,12 @@ env:
 - BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+- GRADLE="installLibPcieDriver assembleMl605Debug"
+- GRADLE="installLibPcieDriver assembleAfcv3Debug"
+- GRADLE="installLibPcieDriver assembleAfcv3_1Debug"
+- GRADLE="installLibPcieDriver assembleMl605Production"
+- GRADLE="installLibPcieDriver assembleAfcv3Production"
+- GRADLE="installLibPcieDriver assembleAfcv3_1Production"
 
 addons:
   apt:
