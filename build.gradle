@@ -19,6 +19,7 @@ allprojects {
 
         binaries {
             all {
+                cCompiler.args '-std=gnu99', '-O2'
                 cCompiler.args '-Wall', '-Wextra', '-Werror'
 
                 cCompiler.define 'ERRHAND_MIN_LEVEL=DBG_LVL_TRACE'
