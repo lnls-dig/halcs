@@ -28,6 +28,8 @@ public class NativeReleasePlugin extends RuleSource {
                 task.into "$task.project.rootProject.buildDir/release"
                 task.from "$buildDir/distributions/$distribution.name"
 
+                task.rename '(.*)', "$distribution.name-\$1"
+
                 task.dependsOn rpmTaskName
             }
         }
