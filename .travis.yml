@@ -17,6 +17,7 @@ env:
 - GRADLE="installLibPcieDriver ml605CollectRpms"
 - GRADLE="installLibPcieDriver afcv3CollectRpms"
 - GRADLE="installLibPcieDriver afcv3_1CollectRpms"
+- GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
 
 addons:
   apt:
@@ -43,4 +44,4 @@ deploy:
   on:
     all_branches: true
     tags: true
-    condition: -n $GRADLE
+    condition: $DEPLOY = "yes"
