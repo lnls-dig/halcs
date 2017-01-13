@@ -1,5 +1,6 @@
 package br.lnls.dig.gradle.nativerelease.plugins
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.Task
 import org.gradle.model.Each
@@ -31,6 +32,12 @@ public class NativeReleasePlugin extends RuleSource {
                 task.rename '(.*)', "$distribution.name-\$1"
 
                 task.dependsOn rpmTaskName
+            }
+        }
+
+        tasks.create("collectRpms", DefaultTask) { task ->
+            distributions.all { distribution ->
+                task.dependsOn "${distribution.name}CollectRpms"
             }
         }
     }
