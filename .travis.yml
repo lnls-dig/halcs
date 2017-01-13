@@ -11,12 +11,12 @@ env:
 - BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- GRADLE="installLibPcieDriver assembleMl605Debug"
-- GRADLE="installLibPcieDriver assembleAfcv3Debug"
-- GRADLE="installLibPcieDriver assembleAfcv3_1Debug"
-- GRADLE="installLibPcieDriver assembleMl605Production"
-- GRADLE="installLibPcieDriver assembleAfcv3Production"
-- GRADLE="installLibPcieDriver assembleAfcv3_1Production"
+- GRADLE="installLibPcieDriver ml605DebugCollectRpms"
+- GRADLE="installLibPcieDriver afcv3DebugCollectRpms"
+- GRADLE="installLibPcieDriver afcv3_1DebugCollectRpms"
+- GRADLE="installLibPcieDriver ml605CollectRpms"
+- GRADLE="installLibPcieDriver afcv3CollectRpms"
+- GRADLE="installLibPcieDriver afcv3_1CollectRpms"
 
 addons:
   apt:
@@ -29,3 +29,18 @@ before_install:
 #   Build and check this project
 script:
 - ./ci_build.sh
+
+before_deploy:
+- ./ci_deploy.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "TMHoQQwZ4eHnnzfxoDEV15igEFpaVyYWVTN/Q583PtF15CLkbQpfEWDDgKZTMiUbuoeI3X+WPMb2F713wBB6MQ+yVKkRDfHKyIbpTWmwIht5isBnn8+eXuV53X1PzAPJXmzrbos5X3FNExV7eJqf1sldxiVmPyLKMssM+X4wG3+GIHPjxYd1dp/9v9d1uj2DZe1iApDezUxi2Oz3fdVZyx1O8KgyAoQ8uqXc3WDykGNXsJKJGMSFtpTGCyMI6etPZJRA0pn+zrGViYzsZnpv55whzAXGxXWsmo5OT6HvjrjKtiDDSyKLuNM7kqC3MoeYZ+2XGoYycoVMAlPdUKqMqrM/UVJ4ltYsJVb1ROSRpFmK17dEtZwQWLxNPkww/ixZeGFP47UUgdET+8ZDkvNC6ZM0VoMBvvoTKzrotQdM83DqDiGTyXDmgwWXzoqze02iYrV8UdmaX4JEvhMDJJGowzVipHy/VvPO6wRj5v8Achy6ntENM0wPYfQjanM+0pGJvsSHo/rZTP+OWOLtILKtcW7c3jMY/jlNq7jLc/WGEj3GZfUqgx8wN0ldCG0jO0n7OlZtmV5qUkqMNB3WunkFYEujaaCobTDScIjVx10UcXfUYT/iPmZr0Pt/8yBNyPHAORfStKNbVhgwzRZtDKzYKxaU9z2G6gAY9cFAViA8P3U="
+  file_glob: true
+  file: build/release/*
+  skip_cleanup: true
+  on:
+    all_branches: true
+    tags: true
+    condition: -n $GRADLE
