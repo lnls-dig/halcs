@@ -12,4 +12,17 @@ class Dependency implements Serializable {
         this.version = version
         this.versionFlag = EQUAL
     }
+
+    boolean equals(Object other) {
+        if (!other instanceof Dependency)
+            return false
+
+        return name.equals(other.name) &&
+            version.equals(other.version) &&
+            versionFlag == other.versionFlag
+    }
+
+    int hashCode() {
+        return name.hashCode()
+    }
 }
