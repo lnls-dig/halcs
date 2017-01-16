@@ -21,3 +21,6 @@ valgrind_report.txt
 # Gradle local cache and output directory
 .gradle
 build
+
+# Directory for temporary files
+tmp
