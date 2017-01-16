@@ -24,3 +24,9 @@ build
 
 # Directory for temporary files
 tmp
+
+# Directories of project dependencies
+czmq
+libsodium
+libzmq
+malamute
