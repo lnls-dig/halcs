@@ -17,5 +17,7 @@ valgrind_report.txt
 # Libraries
 *.a
 *.so
+
+# Gradle local cache and output directory
 .gradle
 build
