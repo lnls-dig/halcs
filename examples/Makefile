@@ -37,8 +37,13 @@ endif
 # Debug flags -D<flasg_name>=<value>
 CFLAGS_DEBUG += -g
 
+CFLAGS_DEBUG += -DERRHAND_DBG=y -DERRHAND_MIN_LEVEL=DBG_MIN_INFO \
+				-DERRHAND_SUBSYS_ON="(DBG_DEV_MNGR | \
+					DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT  | \
+					DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+
 # Specific platform Flags
-CFLAGS_PLATFORM = -Wall -Wextra -Werror \
+CFLAGS_PLATFORM = -Wall -Wextra \
 		  -Wno-missing-field-initializers \
 		  -Wno-missing-braces
 
