@@ -1,6 +1,6 @@
 plugins {
-    id 'org.ajoberstar.grgit' version '1.5.1'
-    id 'org.ajoberstar.release-opinion' version '1.5.1'
+    id 'org.ajoberstar.grgit' version '1.6.0'
+    id 'org.ajoberstar.release-opinion' version '1.6.0'
 }
 
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
