@@ -4,6 +4,7 @@
 set -x
 
 COMPILE_MODES=()
+COMPILE_MODES+=("")
 COMPILE_MODES+=("Debug")
 COMPILE_MODES+=("DebugDevelopment")
 COMPILE_MODES+=("Development")
