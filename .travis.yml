@@ -32,7 +32,7 @@ script:
 - ./ci_build.sh
 
 before_deploy:
-- ./ci_deploy.sh
+- . ./ci_deploy.sh
 
 deploy:
   provider: releases
