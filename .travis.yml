@@ -11,13 +11,13 @@ env:
 - BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 - BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- GRADLE="installLibPcieDriver ml605DebugCollectRpms"
-- GRADLE="installLibPcieDriver afcv3DebugCollectRpms"
-- GRADLE="installLibPcieDriver afcv3_1DebugCollectRpms"
-- GRADLE="installLibPcieDriver ml605CollectRpms"
-- GRADLE="installLibPcieDriver afcv3CollectRpms"
-- GRADLE="installLibPcieDriver afcv3_1CollectRpms"
-- GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
+
+matrix:
+  include:
+  - compiler: gcc
+    env: GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
+  - compiler: clang
+    env: GRADLE="installLibPcieDriver assemble"
 
 addons:
   apt:
