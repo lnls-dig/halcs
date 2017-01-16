@@ -39,3 +39,5 @@ if [ "$DEPLOY" = "yes" ]; then
     sha1sum ${TOPDIR}/build/release/*.rpm > SHA1SUMS
     cd -
 fi
+
+set +x
