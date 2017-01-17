@@ -459,7 +459,8 @@ static smch_err_e smch_24aa64_write_8_compat (smch_24aa64_t *self,
     return smch_24aa64_write_8 (self, addr, data);
 }
 
-#define HALCS_FMC130M_4CH_24AA64_MAX_ADDR           ((1<<16)-1)
+/* 24AA64 is 64Kbit = 8KB = 13 bits */
+#define HALCS_FMC130M_4CH_24AA64_MAX_ADDR           ((1<<13)-1)
 
 FMC130M_4CH_24AA64_FUNC_NAME_HEADER(data)
 {
