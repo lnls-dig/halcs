@@ -59,5 +59,5 @@ if [ -z "$GRADLE" ]; then
     ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
 else
     export ${CONFIG_FLAGS[@]}
-    ./gradlew $GRADLE
+    ./gradlew $GRADLE -Prelease.stage=ci_release
 fi
