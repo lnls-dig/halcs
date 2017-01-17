@@ -1,3 +1,5 @@
+import org.ajoberstar.gradle.git.release.opinion.Strategies
+
 plugins {
     id 'org.ajoberstar.grgit' version '1.6.0'
     id 'org.ajoberstar.release-opinion' version '1.6.0'
@@ -33,4 +35,12 @@ model {
             }
         }
     }
+}
+
+release {
+    versionStrategy Strategies.FINAL.copyWith(
+        name: 'ci_release',
+        stages: ['ci_release'] as SortedSet,
+        allowDirtyRepo: true
+    )
 }
