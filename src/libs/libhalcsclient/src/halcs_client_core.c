@@ -1649,6 +1649,17 @@ PARAM_FUNC_CLIENT_READ(ds_monit_thres)
      return param_client_read (self, service, DSP_OPCODE_SET_GET_DS_MONIT_THRES, ds_monit_thres);
 }
 
+/* Test Data functions */
+PARAM_FUNC_CLIENT_WRITE(dsp_cfg_test_data)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_CFG_TEST_DATA, dsp_cfg_test_data);
+}
+
+PARAM_FUNC_CLIENT_READ(dsp_cfg_test_data)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_CFG_TEST_DATA, dsp_cfg_test_data);
+}
+
 /* Monitoring Amplitude channel 0 value */
 PARAM_FUNC_CLIENT_WRITE(monit_amp_ch0)
 {

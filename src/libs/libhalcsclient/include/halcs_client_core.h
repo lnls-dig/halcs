@@ -773,6 +773,16 @@ halcs_client_err_e halcs_set_ds_monit_thres (halcs_client_t *self, char *service
 halcs_client_err_e halcs_get_ds_monit_thres (halcs_client_t *self, char *service,
         uint32_t *ds_monit_thres);
 
+/* Test Data functions */
+/* These set of functions read (get) the test data enable.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_dsp_cfg_test_data (halcs_client_t *self, char *service,
+        uint32_t dsp_cfg_test_data);
+halcs_client_err_e halcs_get_dsp_cfg_test_data (halcs_client_t *self, char *service,
+        uint32_t *dsp_cfg_test_data);
+
 /* Monitoring Position values */
 /* These set of functions read (get) the Monitoring position values.
  * All of the functions returns HALCS_CLIENT_SUCCESS if the
