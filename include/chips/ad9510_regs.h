@@ -178,6 +178,8 @@
                                                            AD9510_PLL_2_MUX_SEL_SIZE)
 #define AD9510_PLL_2_MUX_SEL_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_2_MUX_SEL_SHIFT, \
                                                                        AD9510_PLL_2_MUX_SEL_SIZE)
+#define AD9510_PLL_2_MUX_SEL_MIN                    0
+#define AD9510_PLL_2_MUX_SEL_MAX                    ((1 << AD9510_PLL_2_MUX_SEL_SIZE)-1)
 
 #define AD9510_PLL_2_PFD_POL_POS_SHIFT              6
 #define AD9510_PLL_2_PFD_POL_POS_SIZE               1

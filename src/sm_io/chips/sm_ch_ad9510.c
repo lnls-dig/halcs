@@ -455,6 +455,11 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
     smch_err_e err = SMCH_SUCCESS;
     uint32_t __mux = *mux;
 
+    ASSERT_TEST(__mux > AD9510_PLL_2_MUX_SEL_MIN-1 &&
+            __mux < AD9510_PLL_2_MUX_SEL_MAX+1,
+            "Mux status is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
     uint8_t data = 0;
     _smch_ad9510_read_8 (self, AD9510_REG_PLL_2, &data);
 
@@ -466,6 +471,7 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_smpr_write:
     return err;
 }
 
@@ -777,7 +783,7 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_write_block (self->spi, __addr_size, __addr,
             __data_size, &__data);
-    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not write to SMPR", err_smpr_write, -1);
 
 err_smpr_write:
@@ -806,7 +812,7 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_read_block (self->spi, __addr_size, __addr,
             __data_size, (uint32_t *) data);
-    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not read to SMPR", err_read_write, -1);
 
 err_read_write:
