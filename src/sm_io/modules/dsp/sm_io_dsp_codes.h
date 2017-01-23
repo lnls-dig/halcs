@@ -24,24 +24,26 @@
 #define DSP_NAME_SET_GET_DS_FOFB_THRES      "dsp_set_get_fofb_thres"
 #define DSP_OPCODE_SET_GET_DS_MONIT_THRES   5
 #define DSP_NAME_SET_GET_DS_MONIT_THRES     "dsp_set_get_monit_thres"
-#define DSP_OPCODE_SET_GET_MONIT_AMP_CH0    6
+#define DSP_OPCODE_SET_GET_CFG_TEST_DATA    6
+#define DSP_NAME_SET_GET_CFG_TEST_DATA      "dsp_set_get_cfg_test_data"
+#define DSP_OPCODE_SET_GET_MONIT_AMP_CH0    7
 #define DSP_NAME_SET_GET_MONIT_AMP_CH0      "dsp_set_get_monit_amp_ch0"
-#define DSP_OPCODE_SET_GET_MONIT_AMP_CH1    7
+#define DSP_OPCODE_SET_GET_MONIT_AMP_CH1    8
 #define DSP_NAME_SET_GET_MONIT_AMP_CH1      "dsp_set_get_monit_amp_ch1"
-#define DSP_OPCODE_SET_GET_MONIT_AMP_CH2    8
+#define DSP_OPCODE_SET_GET_MONIT_AMP_CH2    9
 #define DSP_NAME_SET_GET_MONIT_AMP_CH2      "dsp_set_get_monit_amp_ch2"
-#define DSP_OPCODE_SET_GET_MONIT_AMP_CH3    9
+#define DSP_OPCODE_SET_GET_MONIT_AMP_CH3    10
 #define DSP_NAME_SET_GET_MONIT_AMP_CH3      "dsp_set_get_monit_amp_ch3"
-#define DSP_OPCODE_SET_GET_MONIT_POS_X      10
+#define DSP_OPCODE_SET_GET_MONIT_POS_X      11
 #define DSP_NAME_SET_GET_MONIT_POS_X        "dsp_set_get_monit_pos_x"
-#define DSP_OPCODE_SET_GET_MONIT_POS_Y      11
+#define DSP_OPCODE_SET_GET_MONIT_POS_Y      12
 #define DSP_NAME_SET_GET_MONIT_POS_Y        "dsp_set_get_monit_pos_y"
-#define DSP_OPCODE_SET_GET_MONIT_POS_Q      12
+#define DSP_OPCODE_SET_GET_MONIT_POS_Q      13
 #define DSP_NAME_SET_GET_MONIT_POS_Q        "dsp_set_get_monit_pos_q"
-#define DSP_OPCODE_SET_GET_MONIT_POS_SUM    13
+#define DSP_OPCODE_SET_GET_MONIT_POS_SUM    14
 #define DSP_NAME_SET_GET_MONIT_POS_SUM      "dsp_set_get_monit_pos_sum"
-#define DSP_OPCODE_SET_GET_MONIT_UPDT       14
+#define DSP_OPCODE_SET_GET_MONIT_UPDT       15
 #define DSP_NAME_SET_GET_MONIT_UPDT         "dsp_set_get_monit_updt"
-#define DSP_OPCODE_END                      15
+#define DSP_OPCODE_END                      16
 
 #endif

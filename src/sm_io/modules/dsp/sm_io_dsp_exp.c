@@ -83,6 +83,14 @@ RW_PARAM_FUNC(dsp, ds_monit_thres) {
             DS_MONIT_THRES_MIN, DS_MONIT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define POS_CALC_DDS_CFG_TEST_DATA_MIN      0
+#define POS_CALC_DDS_CFG_TEST_DATA_MAX      1
+RW_PARAM_FUNC(dsp, pos_calc_cfg_test_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DDS_CFG, TEST_DATA, SINGLE_BIT_PARAM,
+            POS_CALC_DDS_CFG_TEST_DATA_MIN, POS_CALC_DDS_CFG_TEST_DATA_MAX, 
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define POS_CALC_DSP_MONIT_AMP_CH0_R(val)       (val)
 #define POS_CALC_DSP_MONIT_AMP_CH0_W(val)       (val)
 #define POS_CALC_DSP_MONIT_AMP_CH0_MASK         ((1ULL<<32)-1)
@@ -181,6 +189,7 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, ds_tbt_thres),
     RW_PARAM_FUNC_NAME(dsp, ds_fofb_thres),
     RW_PARAM_FUNC_NAME(dsp, ds_monit_thres),
+    RW_PARAM_FUNC_NAME(dsp, pos_calc_cfg_test_data),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch0),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch1),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch2),

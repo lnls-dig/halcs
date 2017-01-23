@@ -82,6 +82,18 @@ disp_op_t dsp_set_get_ds_monit_thres_exp = {
     }
 };
 
+disp_op_t dsp_set_get_cfg_test_data_exp = {
+    .name = DSP_NAME_SET_GET_CFG_TEST_DATA,
+    .opcode = DSP_OPCODE_SET_GET_CFG_TEST_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t dsp_set_get_monit_amp_ch0_exp = {
     .name = DSP_NAME_SET_GET_MONIT_AMP_CH0,
     .opcode = DSP_OPCODE_SET_GET_MONIT_AMP_CH0,
@@ -198,6 +210,7 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_ds_tbt_thres_exp,
     &dsp_set_get_ds_fofb_thres_exp,
     &dsp_set_get_ds_monit_thres_exp,
+    &dsp_set_get_cfg_test_data_exp,
     &dsp_set_get_monit_amp_ch0_exp,
     &dsp_set_get_monit_amp_ch1_exp,
     &dsp_set_get_monit_amp_ch2_exp,
