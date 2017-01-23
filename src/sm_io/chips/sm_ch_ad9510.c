@@ -455,8 +455,8 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
     smch_err_e err = SMCH_SUCCESS;
     uint32_t __mux = *mux;
 
-    ASSERT_TEST(__mux > AD9510_PLL_2_MUX_SEL_MIN-1 &&
-            __mux < AD9510_PLL_2_MUX_SEL_MAX+1,
+    ASSERT_TEST(/*__mux >= AD9510_PLL_2_MUX_SEL_MIN && */
+            __mux <= AD9510_PLL_2_MUX_SEL_MAX,
             "Mux status is out of range", err_smpr_write,
             SMCH_ERR_INV_FUNC_PARAM);
 
