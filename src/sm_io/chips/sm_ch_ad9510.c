@@ -332,23 +332,28 @@ smch_err_e smch_ad9510_set_pll_b_div (smch_ad9510_t *self, uint32_t *div)
             SMCH_ERR_INV_FUNC_PARAM);
 
     uint8_t data = 0;
-    if (__div == 0) {
-        _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
+    /* Read bypass B divider*/
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
 
+    /* Check if we need to bypass the divider or not */
+    if (__div == 0) {
         data |= AD9510_PLL_4_B_BYPASS;
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
     }
     else {
-        /* Extract MSB part of the divider */
-        data = AD9510_PLL_B_MSB_COUNTER_W(__div >>
-                AD9510_PLL_B_LSB_COUNTER_SIZE);
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
-
-        /* Extract LSB part of the divider */
-        data = AD9510_PLL_B_LSB_COUNTER_W(__div);
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+        data &= ~AD9510_PLL_4_B_BYPASS;
     }
 
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+
+    /* Extract MSB part of the divider */
+    data = AD9510_PLL_B_MSB_COUNTER_W(__div >>
+            AD9510_PLL_B_LSB_COUNTER_SIZE);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
+
+    /* Extract LSB part of the divider */
+    data = AD9510_PLL_B_LSB_COUNTER_W(__div);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+    
     _smch_ad9510_reg_update (self);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
