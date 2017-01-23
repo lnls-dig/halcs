@@ -409,6 +409,8 @@
 #define AD9510_CLK_OPT_CLK2_PD                      WBGEN2_GEN_MASK(AD9510_CLK_OPT_CLK2_PD_SHIFT,\
                                                                         AD9510_CLK_OPT_CLK2_PD_SIZE)
 
+#define AD9510_CLK_OPT_CLK_PD_MASK                  (AD9510_CLK_OPT_CLK1_PD | AD9510_CLK_OPT_CLK2_PD)
+
 #define AD9510_CLK_OPT_PS_PD_SHIFT                  3
 #define AD9510_CLK_OPT_PS_PD_SIZE                   1
 #define AD9510_CLK_OPT_PS_PD                        WBGEN2_GEN_MASK(AD9510_CLK_OPT_PS_PD_SHIFT,\

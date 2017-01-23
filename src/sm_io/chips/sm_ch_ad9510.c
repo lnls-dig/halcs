@@ -683,15 +683,24 @@ smch_err_e smch_ad9510_set_pll_clk_sel (smch_ad9510_t *self, uint32_t *clk_num)
     uint8_t data = 0;
     _smch_ad9510_read_8 (self, AD9510_REG_CLK_OPT, &data);
 
+    /* Mask Power Down bits */
+    data &= ~AD9510_CLK_OPT_CLK_PD_MASK;
+    /* Select clock and power-down unused clock */
     switch (__clk_num) {
         case AD9510_PLL_CLK1_SEL:
             data |= AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK2_PD;
             break;
         case AD9510_PLL_CLK2_SEL:
             data &= ~AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK1_PD;
             break;
         default:
             data |= AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK2_PD;
     }
 
     _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
