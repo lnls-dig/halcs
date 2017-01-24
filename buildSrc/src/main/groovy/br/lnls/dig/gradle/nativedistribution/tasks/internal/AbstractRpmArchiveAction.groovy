@@ -13,14 +13,13 @@ import org.gradle.api.internal.tasks.SimpleWorkResult
 import org.gradle.api.tasks.WorkResult
 
 import org.redline_rpm.Builder
-import org.redline_rpm.header.Architecture
 import org.redline_rpm.header.Os
 
 import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
 
 abstract class AbstractRpmArchiveAction implements CopyAction {
     private File gatheredFilesDirectory
-    private File outputDirectory
+    private File outputFile
 
     Builder rpmBuilder
     Distribution distribution
@@ -28,7 +27,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     FileCollection sysFiles
     String installationPrefix
     String projectName
-    String projectVersion
+    String version
     Set<Dependency> dependencies
 
     public AbstractRpmArchiveAction(Rpm rpmTask) {
@@ -36,9 +35,9 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
         executables = rpmTask.executables
         sysFiles = rpmTask.sysFiles
         installationPrefix = rpmTask.installationPrefix
-        outputDirectory = rpmTask.outputDirectory
+        outputFile = rpmTask.outputFile
         projectName = rpmTask.project.name
-        projectVersion = rpmTask.project.version
+        version = rpmTask.version
         dependencies = rpmTask.dependencies
 
         gatheredFilesDirectory = new File(rpmTask.buildDir,
@@ -46,29 +45,11 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
 
         rpmBuilder = new Builder()
         rpmBuilder.setPackage(packageName, version, "1")
-        rpmBuilder.setPlatform(architecture, operatingSystem)
-    }
-
-    Architecture getArchitecture() {
-        String architectureName = distribution.platform.architecture.name
-
-        switch (architectureName) {
-            case "x86":
-                return Architecture.I386
-            case "x86-64":
-                return Architecture.X86_64
-            default:
-                String message = "Unsupported architecture $architecture"
-                throw new UnsupportedOperationException(message)
-        }
+        rpmBuilder.setPlatform(rpmTask.architecture, operatingSystem)
     }
 
     Os getOperatingSystem() {
         return Os.LINUX
-    }
-
-    String getVersion() {
-        return projectVersion.replaceAll("-", "_")
     }
 
     @Override
@@ -78,9 +59,15 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
         addArchiveFiles()
         addDependencies()
 
-        rpmBuilder.build(outputDirectory)
+        buildRpmFile()
 
         return new SimpleWorkResult(true)
+    }
+
+    protected void buildRpmFile() {
+        RandomAccessFile rpmFile = new RandomAccessFile(outputFile, "rw")
+
+        rpmBuilder.build(rpmFile.channel)
     }
 
     protected void addDependencies() {
