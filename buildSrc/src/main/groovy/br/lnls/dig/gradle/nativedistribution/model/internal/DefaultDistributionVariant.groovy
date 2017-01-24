@@ -1,8 +1,10 @@
 package br.lnls.dig.gradle.nativedistribution.model.internal
 
 import org.gradle.api.distribution.internal.DefaultDistribution
+import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.Task
+import org.gradle.language.nativeplatform.HeaderExportingSourceSet
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.Flavor
 import org.gradle.nativeplatform.NativeBinarySpec
@@ -51,6 +53,42 @@ public class DefaultDistributionVariant extends DefaultDistribution
             if (hasSysFilesSet(binary))
                 binariesWithSysFiles.add(binary)
         }
+    }
+
+    FileCollection getExecutableFiles() {
+        def executableFiles = executables.collect { it.executable.file }
+
+        return fileOperations.files(executableFiles)
+    }
+
+    FileCollection getSharedLibraryFiles() {
+        def libraryFiles = sharedLibraries.collect { it.sharedLibraryFile }
+
+        return fileOperations.files(libraryFiles)
+    }
+
+    FileCollection getExportedHeaders() {
+        def sourceSets = sharedLibraries.collect { library ->
+            library.inputs.withType(HeaderExportingSourceSet)
+        }
+
+        def headers = sourceSets.sum().collect { sourceSet ->
+            sourceSet.exportedHeaders
+        }
+
+        return headers.sum() ?: fileOperations.files()
+    }
+
+    FileCollection getSysFiles() {
+        def sysFilesSets = binariesWithSysFiles.collect { binary ->
+            def sourceSets = binary.inputs.findAll { sourceSet ->
+                sourceSet instanceof SysFilesSet
+            }
+
+            sourceSets.collect { it.source }.sum()
+        }
+
+        return sysFilesSets.sum() ?: fileOperations.files()
     }
 
     boolean hasSysFilesSet(NativeBinarySpec binary) {

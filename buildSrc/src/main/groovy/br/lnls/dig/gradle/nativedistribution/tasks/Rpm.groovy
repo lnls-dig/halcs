@@ -33,10 +33,10 @@ class Rpm extends AbstractArchiveTask {
 
     private File outputDirectory
 
-    private FileCollection executables
-    private FileCollection exportedHeaders
-    private FileCollection sharedLibraries
-    private FileCollection sysFiles
+    FileCollection executables
+    FileCollection exportedHeaders
+    FileCollection sharedLibraries
+    FileCollection sysFiles
     FileCollection unpackagedDependencies
 
     public Rpm() {
@@ -82,13 +82,13 @@ class Rpm extends AbstractArchiveTask {
         def source = super.getSource()
 
         if (distribution.usage == 'development')
-            source += getExportedHeaders()
+            source += exportedHeaders
         else
-            source += getSharedLibraries()
+            source += sharedLibraries
 
-        source += getExecutables()
-        source += getUnpackagedDependencies()
-        source += getSysFiles()
+        source += executables
+        source += unpackagedDependencies
+        source += sysFiles
 
         return source
     }
@@ -108,36 +108,10 @@ class Rpm extends AbstractArchiveTask {
     public void setDistribution(Distribution distribution) {
         this.distribution = distribution
 
-        collectExecutables()
-        collectExportedHeaders()
-        collectSharedLibraries()
-        collectSysFiles()
-    }
-
-    public FileCollection getExecutables() {
-        if (executables == null)
-            collectExecutables()
-
-        return executables
-    }
-
-    public void collectExecutables() {
-        def executableFiles = distribution.executables
-            .collect { it.executable.file }
-
-        executables = project.files(executableFiles)
-    }
-
-    public FileCollection getExportedHeaders() {
-        if (exportedHeaders == null)
-            collectExportedHeaders()
-
-        return exportedHeaders
-    }
-
-    protected FileCollection collectExportedHeaders() {
-        exportedHeaders =
-                collectExportedHeadersFromBinaries(distribution.sharedLibraries)
+        executables = distribution.executableFiles
+        exportedHeaders = distribution.exportedHeaders
+        sharedLibraries = distribution.sharedLibraryFiles
+        sysFiles = distribution.sysFiles
     }
 
     protected FileCollection collectExportedHeadersFromBinaries(
@@ -148,44 +122,6 @@ class Rpm extends AbstractArchiveTask {
             .sum()
             .collect { it.exportedHeaders }
             .sum() ?: project.files()
-    }
-
-    public FileCollection getSharedLibraries() {
-        if (sharedLibraries == null)
-            collectSharedLibraries()
-
-        return sharedLibraries
-    }
-
-    protected void collectSharedLibraries() {
-        def sharedLibraryFiles = distribution.sharedLibraries.collect {
-            it.sharedLibraryFile
-        }
-
-        sharedLibraries = project.files(sharedLibraryFiles)
-    }
-
-    public FileCollection getUnpackagedDependencies() {
-        return unpackagedDependencies
-    }
-
-    public FileCollection getSysFiles() {
-        if (sysFiles == null)
-            collectSysFiles()
-
-        return sysFiles
-    }
-
-    public void collectSysFiles() {
-        def sysFilesSets = distribution.binariesWithSysFiles.collect { binary ->
-            def sourceSets = binary.inputs.findAll { sourceSet ->
-                sourceSet instanceof SysFilesSet
-            }
-
-            sourceSets.collect { it.source }.sum()
-        }
-
-        sysFiles = sysFilesSets.sum() ?: project.files()
     }
 
     public void resolveDependencies(ProjectModelResolver resolver) {
