@@ -1,6 +1,5 @@
 package br.lnls.dig.gradle.distribution.model.internal
 
-import org.gradle.api.file.CopySpec
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.internal.DefaultPolymorphicDomainObjectContainer
 import org.gradle.api.internal.file.FileOperations
@@ -26,9 +25,9 @@ public class DefaultDistributionContainer
 
         registerFactory(interfaceType) { name ->
             def constructor = instanceType.getDeclaredConstructor(String,
-                    CopySpec)
+                    FileOperations)
 
-            return constructor.newInstance(name, fileOperations.copySpec())
+            return constructor.newInstance(name, fileOperations)
         }
     }
 }

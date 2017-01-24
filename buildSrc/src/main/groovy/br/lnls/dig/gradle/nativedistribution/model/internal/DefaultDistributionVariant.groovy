@@ -1,7 +1,7 @@
 package br.lnls.dig.gradle.nativedistribution.model.internal
 
 import org.gradle.api.distribution.internal.DefaultDistribution
-import org.gradle.api.file.CopySpec
+import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.Task
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.Flavor
@@ -24,12 +24,16 @@ public class DefaultDistributionVariant extends DefaultDistribution
     Set<SharedLibraryBinarySpec> sharedLibraries
     Set<NativeBinarySpec> binariesWithSysFiles
 
-    DefaultDistributionVariant(String name, CopySpec spec) {
-        super(name, spec)
+    private FileOperations fileOperations
+
+    DefaultDistributionVariant(String name, FileOperations fileOperations) {
+        super(name, fileOperations.copySpec())
 
         executables = new LinkedHashSet<>()
         sharedLibraries = new LinkedHashSet<>()
         binariesWithSysFiles = new LinkedHashSet<>()
+
+        this.fileOperations = fileOperations
     }
 
     void addBinaries(Iterable<NativeBinarySpec> binaries) {
