@@ -81,14 +81,12 @@ class Rpm extends AbstractArchiveTask {
     public FileCollection getSource() {
         def source = super.getSource()
 
+        source += unpackagedDependencies
+
         if (distribution.usage == 'development')
             source += exportedHeaders
         else
-            source += sharedLibraries
-
-        source += executables
-        source += unpackagedDependencies
-        source += sysFiles
+            source += sharedLibraries + executables + sysFiles
 
         return source
     }

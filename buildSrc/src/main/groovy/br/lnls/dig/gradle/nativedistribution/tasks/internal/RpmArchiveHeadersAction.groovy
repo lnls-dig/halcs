@@ -21,7 +21,7 @@ class RpmArchiveHeadersAction extends AbstractRpmArchiveAction  {
     }
 
     @Override
-    protected void addArchiveLibraryFiles() {
+    protected void addArchiveFiles() {
         exportedHeaders.each { headerFile -> addHeaderFile(headerFile) }
         unpackagedDependencies.each { headerFile -> addHeaderFile(headerFile) }
     }
