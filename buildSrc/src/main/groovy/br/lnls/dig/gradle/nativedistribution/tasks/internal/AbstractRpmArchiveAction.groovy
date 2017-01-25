@@ -12,6 +12,7 @@ import org.gradle.api.tasks.WorkResult
 import org.redline_rpm.Builder
 import org.redline_rpm.header.Os
 
+import br.lnls.dig.gradle.nativedistribution.model.internal.RpmDistribution
 import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
 
 abstract class AbstractRpmArchiveAction implements CopyAction {
@@ -19,7 +20,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     private File outputFile
 
     Builder rpmBuilder
-    Distribution distribution
+    RpmDistribution distribution
     FileCollection executables
     FileCollection sysFiles
     String installationPrefix
@@ -34,15 +35,15 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
         installationPrefix = rpmTask.installationPrefix
         outputFile = rpmTask.outputFile
         projectName = rpmTask.project.name
-        version = rpmTask.version
+        version = distribution.version
         dependencies = rpmTask.dependencies
 
         gatheredFilesDirectory = new File(rpmTask.buildDir,
                 "tmp/distributions/${distribution.name}DistRpm")
 
         rpmBuilder = new Builder()
-        rpmBuilder.setPackage(packageName, version, "1")
-        rpmBuilder.setPlatform(rpmTask.architecture, operatingSystem)
+        rpmBuilder.setPackage(packageName, distribution.version, "1")
+        rpmBuilder.setPlatform(distribution.architecture, operatingSystem)
     }
 
     Os getOperatingSystem() {

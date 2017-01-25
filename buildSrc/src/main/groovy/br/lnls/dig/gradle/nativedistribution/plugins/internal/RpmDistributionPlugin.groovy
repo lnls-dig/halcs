@@ -28,7 +28,7 @@ class RpmDistributionPlugin extends RuleSource {
                 task.dependsOn(distribution.buildTasks)
                 task.buildDir = buildDir
                 task.outputDirectory = new File(buildDir,
-                        "/distributions/$task.distribution.name")
+                        "/distributions/$distribution.name")
             }
         }
     }
@@ -52,7 +52,7 @@ class RpmDistributionPlugin extends RuleSource {
     @Mutate
     public void addDependencyBetweenDevelopmentAndRuntimeRpms(
             @Each Rpm rpmTask) {
-        if (rpmTask.distribution.usage == 'development') {
+        if (rpmTask.distribution.isDevelopment()) {
             rpmTask.dependsOn getRpmTaskWithLibrariesFor(rpmTask)
             rpmTask.addDependency(rpmTask.project.name,
                     rpmTask.project.version.toString())

@@ -16,15 +16,14 @@ import org.gradle.nativeplatform.NativeLibrarySpec
 import org.gradle.nativeplatform.SharedLibraryBinarySpec
 import org.gradle.platform.base.ComponentSpecContainer
 
-import org.redline_rpm.header.Architecture
-
+import br.lnls.dig.gradle.nativedistribution.model.internal.RpmDistribution
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.Dependency
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveHeadersAction
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveSharedLibrariesAction
 import br.lnls.dig.gradle.sysfiles.model.SysFilesSet
 
 class Rpm extends AbstractArchiveTask {
-    Distribution distribution
+    RpmDistribution distribution
     File buildDir
     String installationPrefix
 
@@ -48,29 +47,7 @@ class Rpm extends AbstractArchiveTask {
 
     @OutputFile
     public File getOutputFile() {
-        def suffix = distribution.usage == 'development' ? '-devel' : ''
-        def arch = architecture.toString().toLowerCase()
-        def outputFileName = "$project.name$suffix-$version-1.${arch}.rpm"
-
-        return new File(outputDirectory, outputFileName)
-    }
-
-    public String getVersion() {
-        return project.version.toString().replaceAll("-", "_")
-    }
-
-    Architecture getArchitecture() {
-        String architectureName = distribution.platform.architecture.name
-
-        switch (architectureName) {
-            case "x86":
-                return Architecture.I386
-            case "x86-64":
-                return Architecture.X86_64
-            default:
-                String message = "Unsupported architecture $architecture"
-                throw new UnsupportedOperationException(message)
-        }
+        return new File(outputDirectory, distribution.outputFileName)
     }
 
     public void setOutputDirectory(File outputDirectory) {
@@ -83,7 +60,7 @@ class Rpm extends AbstractArchiveTask {
 
         source += unpackagedDependencies
 
-        if (distribution.usage == 'development')
+        if (distribution.isDevelopment())
             source += exportedHeaders
         else
             source += sharedLibraries + executables + sysFiles
@@ -93,7 +70,7 @@ class Rpm extends AbstractArchiveTask {
 
     @Override
     protected CopyAction createCopyAction() {
-        if (distribution.usage == 'development')
+        if (distribution.isDevelopment())
             return new RpmArchiveHeadersAction(this)
         else
             return new RpmArchiveSharedLibrariesAction(this)
@@ -104,7 +81,7 @@ class Rpm extends AbstractArchiveTask {
     }
 
     public void setDistribution(Distribution distribution) {
-        this.distribution = distribution
+        this.distribution = new RpmDistribution(distribution, project)
 
         executables = distribution.executableFiles
         exportedHeaders = distribution.exportedHeaders
@@ -177,7 +154,7 @@ class Rpm extends AbstractArchiveTask {
     private void addDependencyToProjectRpm(String projectPath) {
         def projectName = projectPath.split(':').last()
 
-        if (distribution.usage == "development")
+        if (distribution.isDevelopment())
             projectName += "-devel"
 
         addDependency(projectName, project.version.toString())
@@ -188,7 +165,7 @@ class Rpm extends AbstractArchiveTask {
         def library = getDependencyLibrary(libraryName, projectModel)
         def libraryBinaries = getMatchingLibraryBinaries(library)
 
-        if (distribution.usage == "development")
+        if (distribution.isDevelopment())
             includeHeadersOfProjectLibraryDependency(libraryBinaries)
         else
             includeBinariesOfProjectLibraryDependency(libraryBinaries)
