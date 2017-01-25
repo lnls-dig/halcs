@@ -21,6 +21,15 @@ CFG ?= crude_defconfig
 
 # Get crude defconfig .cfg file
 CFG_FILES = $(CFG)/$(CFG_FILENAME)
+# Destination config filenames
+DEST_CFG_FILES = $(CFG_DIR)/$(CFG_FILENAME)
+
+# Check if config file exists
+ifneq ($(wildcard $(DEST_CFG_FILES)),)
+CFG_FILE_EXISTS = 1
+else
+CFG_FILE_EXISTS = 0
+endif
 
 .PHONY: all clean mrproper install uninstall
 
@@ -28,8 +37,13 @@ CFG_FILES = $(CFG)/$(CFG_FILENAME)
 all:
 
 install:
+ifeq ($(CFG_FILE_EXISTS),1)
+	@echo "Found config file at \"$(DEST_CFG_FILES)\". Skipping installation of config file."
+else
+	@echo "Config file not found at \"$(DEST_CFG_FILES)\". Installing config file."
 	@mkdir -m 755 -p $(CFG_DIR)
 	$(foreach cfg,$(CFG_FILES),install -m 755 $(cfg) $(CFG_DIR)/ $(CMDSEP))
+endif
 
 uninstall:
 	$(foreach cfg,$(CFG_FILES),rm -f $(CFG_DIR)/$(cfg) $(CMDSEP))
