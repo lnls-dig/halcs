@@ -631,7 +631,7 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 
     if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, true);
     }
     else if (streq (command, "$MGMT_MSG_SMIO")) {
         /* Register new SMIO */
@@ -751,7 +751,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     }
     else if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, true);
     }
     else if (streq (command, "$UNREGISTER_SMIO_ALL")) {
         /* Unregister all SMIOs */
