@@ -14,7 +14,7 @@ extern "C" {
 
 /* SMIO hash key length in chars */
 #define SMIO_HKEY_LEN                   8
-#define NODES_MAX_LEN                   20
+#define NODES_MAX_LEN                   100
 
 /* Node of sig_ops list */
 typedef struct {
