@@ -1,5 +1,4 @@
 apply plugin: 'br.lnls.dig.gradle.nativedistribution'
-apply plugin: 'br.lnls.dig.gradle.nativeinstall'
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 
 model {
