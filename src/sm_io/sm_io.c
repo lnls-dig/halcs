@@ -178,8 +178,8 @@ smio_err_e smio_destroy (smio_t **self_p)
         zsock_destroy (&self->pipe_frontend);
         zsock_destroy (&self->pipe_msg);
         /* Don't destroy pipe_mgmt as this is taken care of by the
-         * zactor infrastructure, s_thread_shim (void *args) on CZMQ 
-         * 3.0.2 src/zactor.c 
+         * zactor infrastructure, s_thread_shim (void *args) on CZMQ
+         * 3.0.2 src/zactor.c
          * zsock_destroy (&self->pipe_mgmt);
          */
         disp_table_destroy (&self->exp_ops_dtable);
@@ -255,7 +255,7 @@ static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
     (void) loop;
-    
+
     /* Arguments for command */
     char *command = NULL;
 
@@ -280,7 +280,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     else if (streq (command, "$MGMT_MSG_SMIO")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
                "received MGMT_MSG_SMIO command.\n");
-        
+
         /* Call SMIO MGMT callback, passing a zmsg_t argument */
         err = _smio_do_mgmt_msg (smio, recv_msg);
 
@@ -405,13 +405,13 @@ err_register_sm:
     return err;
 }
 
-smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id, 
+smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id,
     uint32_t dest_smio_inst, char *msg)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
 
-    int zerr = zsock_send (self->pipe_mgmt, "s48444s", "$MGMT_MSG_SMIO", 
+    int zerr = zsock_send (self->pipe_mgmt, "s48444s", "$MGMT_MSG_SMIO",
             self->id, self->base, self->inst_id, dest_smio_id, dest_smio_inst,
             msg);
     ASSERT_TEST(zerr == 0, "Could not send MGMT message", err_send_mgmt_msg,
