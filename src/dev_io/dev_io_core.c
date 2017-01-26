@@ -119,8 +119,8 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id, bool auto_inst_id);
-static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
-        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id,
         char *msg);
 static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
@@ -822,21 +822,21 @@ static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id
     return _devio_register_sm_raw(self, smio_id, base, 0, true);
 }
 
-static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
-        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id,
         char *msg)
 {
     assert (self);
     devio_err_e err = DEVIO_SUCCESS;
 
     /* Search for specified PIPE by using the dest_smio_id and dest_inst_id */
-    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self, 
+    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self,
         dest_smio_id);
     ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO "
             "for sending MGMT message", err_search_smio, DEVIO_ERR_NO_SMIO_ID);
 
     /* Get key to search in hash */
-    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler, 
+    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler,
         dest_inst_id);
     ASSERT_ALLOC (dest_smio_key, err_key_alloc);
 
