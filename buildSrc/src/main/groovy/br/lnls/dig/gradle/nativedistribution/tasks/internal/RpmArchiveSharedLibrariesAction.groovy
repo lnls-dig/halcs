@@ -7,14 +7,11 @@ import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
 
 class RpmArchiveSharedLibrariesAction extends AbstractRpmArchiveAction {
     Set<File> sharedLibraries
-    Set<File> unpackagedDependencies
 
     public RpmArchiveSharedLibrariesAction(Rpm rpmTask) {
         super(rpmTask)
 
         sharedLibraries = rpmTask.sharedLibraries.findAll { it.exists() }
-        unpackagedDependencies = rpmTask.unpackagedDependencies
-                .findAll { it.exists() }
     }
 
     @Override
@@ -45,10 +42,6 @@ class RpmArchiveSharedLibrariesAction extends AbstractRpmArchiveAction {
         String[] libraryVersionParts = libraryVersion.split("\\.")
 
         sharedLibraries.each { sharedLibrary ->
-            addSharedLibraryFile(sharedLibrary, libraryVersion)
-            addSharedLibraryLinks(sharedLibrary, libraryVersionParts)
-        }
-        unpackagedDependencies.each { sharedLibrary ->
             addSharedLibraryFile(sharedLibrary, libraryVersion)
             addSharedLibraryLinks(sharedLibrary, libraryVersionParts)
         }

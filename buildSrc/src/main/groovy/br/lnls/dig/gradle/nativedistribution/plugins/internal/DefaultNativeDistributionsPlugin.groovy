@@ -1,5 +1,9 @@
 package br.lnls.dig.gradle.nativedistribution.plugins
 
+import org.gradle.api.distribution.Distribution
+import org.gradle.api.internal.resolve.ProjectModelResolver
+import org.gradle.internal.service.ServiceRegistry
+import org.gradle.model.Each
 import org.gradle.model.ModelMap
 import org.gradle.model.Mutate
 import org.gradle.model.Path
@@ -51,6 +55,17 @@ class DefaultNativeDistributionsPlugin extends RuleSource {
             @Path("binaries") ModelMap<NativeBinarySpec> binaries) {
         distributions.all { distribution ->
             distribution.addBinaries(binaries)
+        }
+    }
+
+    @Mutate
+    public void resolveDistributionDependencies(
+            DistributionContainer distributions,
+            ServiceRegistry serviceRegistry) {
+        def projectModelResolver = serviceRegistry.get(ProjectModelResolver)
+
+        distributions.all { distribution ->
+            distribution.resolveDependencies(projectModelResolver)
         }
     }
 }

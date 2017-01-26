@@ -11,6 +11,8 @@ import org.gradle.platform.base.Platform
 
 import org.redline_rpm.header.Architecture
 
+import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmDependency
+
 public class RpmDistribution {
     private boolean development
     private Distribution distribution
@@ -36,6 +38,16 @@ public class RpmDistribution {
         def arch = architecture.toString().toLowerCase()
 
         return "$project.name$suffix-$version-1.${arch}.rpm"
+    }
+
+    Set<RpmDependency> getDependencies() {
+        def dependencies = new LinkedHashSet<RpmDependency>()
+
+        distribution.dependencies.each { dependency ->
+            dependencies.add(new RpmDependency(dependency))
+        }
+
+        return dependencies
     }
 
     Architecture getArchitecture() {

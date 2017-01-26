@@ -16,7 +16,6 @@ import org.gradle.nativeplatform.NativeLibrarySpec
 import org.gradle.nativeplatform.SharedLibraryBinarySpec
 import org.gradle.platform.base.ComponentSpecContainer
 
-import br.lnls.dig.gradle.nativedistribution.tasks.internal.Dependency
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveHeadersAction
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveSharedLibrariesAction
 import br.lnls.dig.gradle.sysfiles.model.SysFilesSet

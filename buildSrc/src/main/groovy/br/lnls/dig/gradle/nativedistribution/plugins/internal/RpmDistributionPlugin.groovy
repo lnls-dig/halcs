@@ -42,14 +42,6 @@ class RpmDistributionPlugin extends RuleSource {
     }
 
     @Mutate
-    public void processDetectedDependencies(@Each Rpm rpmTask,
-            ServiceRegistry serviceRegistry) {
-        def projectModelResolver = serviceRegistry.get(ProjectModelResolver)
-
-        rpmTask.resolveDependencies(projectModelResolver)
-    }
-
-    @Mutate
     public void addDependencyBetweenDevelopmentAndRuntimeRpms(
             @Each Rpm rpmTask) {
         if (rpmTask.distribution.isDevelopment()) {
@@ -91,13 +83,5 @@ class RpmDistributionPlugin extends RuleSource {
             @Each RpmInstall task) {
         if (task.distribution.usage == 'development')
             task.dependsOn getRpmTaskWithLibrariesFor(task)
-    }
-
-    @Mutate
-    public void processDetectedInstallationDependencies(
-            @Each RpmInstall task, ServiceRegistry serviceRegistry) {
-        def projectModelResolver = serviceRegistry.get(ProjectModelResolver)
-
-        task.resolveDependencies(projectModelResolver)
     }
 }

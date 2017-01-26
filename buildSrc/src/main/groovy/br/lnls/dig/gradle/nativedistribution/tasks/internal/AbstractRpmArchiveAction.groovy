@@ -26,7 +26,7 @@ abstract class AbstractRpmArchiveAction implements CopyAction {
     String installationPrefix
     String projectName
     String version
-    Set<Dependency> dependencies
+    Set<RpmDependency> dependencies
 
     public AbstractRpmArchiveAction(Rpm rpmTask) {
         distribution = rpmTask.distribution

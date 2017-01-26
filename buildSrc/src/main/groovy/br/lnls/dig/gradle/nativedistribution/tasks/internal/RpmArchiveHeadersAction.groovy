@@ -6,13 +6,11 @@ import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
 
 class RpmArchiveHeadersAction extends AbstractRpmArchiveAction  {
     FileCollection exportedHeaders
-    FileCollection unpackagedDependencies
 
     public RpmArchiveHeadersAction(Rpm rpmTask) {
         super(rpmTask)
 
         exportedHeaders = rpmTask.exportedHeaders
-        unpackagedDependencies = rpmTask.unpackagedDependencies
     }
 
     @Override
@@ -23,7 +21,6 @@ class RpmArchiveHeadersAction extends AbstractRpmArchiveAction  {
     @Override
     protected void addArchiveFiles() {
         exportedHeaders.each { headerFile -> addHeaderFile(headerFile) }
-        unpackagedDependencies.each { headerFile -> addHeaderFile(headerFile) }
     }
 
     private void addHeaderFile(File headerFile) {
