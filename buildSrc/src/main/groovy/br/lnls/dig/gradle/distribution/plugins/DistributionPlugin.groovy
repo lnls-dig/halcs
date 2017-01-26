@@ -38,7 +38,7 @@ class DistributionPlugin implements Plugin<Project> {
 
     public static class Rules extends RuleSource {
         @Model
-        public DistributionContainer createDistributionsContainer(
+        public DistributionContainer distributions(
                 ExtensionContainer extensions) {
             return extensions.getByType(DistributionContainer)
         }
