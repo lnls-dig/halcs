@@ -1,5 +1,7 @@
 package br.lnls.dig.gradle.nativedistribution.tasks.internal
 
+import org.gradle.api.Task
+
 import br.lnls.dig.gradle.nativedistribution.model.internal.Dependency
 
 import static org.redline_rpm.header.Flags.EQUAL
@@ -8,6 +10,8 @@ class RpmDependency implements Serializable {
     String name
     String version
     int versionFlag
+
+    String buildTask
 
     RpmDependency(String name, String version) {
         this.name = name
@@ -22,6 +26,11 @@ class RpmDependency implements Serializable {
 
         if (dependency.distribution.usage == 'development')
             name += '-devel'
+
+        def taskName = dependency.distribution.taskNameFor("distRpm")
+        def task = dependency.projectModel.find("tasks.$taskName", Task)
+
+        buildTask = task.path
     }
 
     boolean equals(Object other) {

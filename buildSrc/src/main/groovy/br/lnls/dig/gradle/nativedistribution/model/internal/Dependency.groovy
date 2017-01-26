@@ -4,13 +4,16 @@ import org.gradle.api.distribution.Distribution
 import org.gradle.model.internal.registry.ModelRegistry
 
 class Dependency implements Serializable {
+    Distribution distribution
+    ModelRegistry projectModel
     String projectPath
     String projectVersion
-    Distribution distribution
 
-    Dependency(String projectPath, String projectVersion, Distribution distribution) {
+    Dependency(String projectPath, String projectVersion,
+            ModelRegistry projectModel, Distribution distribution) {
         this.projectPath = projectPath
         this.projectVersion = projectVersion
+        this.projectModel = projectModel
         this.distribution = distribution
     }
 

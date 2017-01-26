@@ -23,6 +23,8 @@ import br.lnls.dig.gradle.nativedistribution.model.DistributionVariant
 import br.lnls.dig.gradle.nativedistribution.model.internal.Dependency
 import br.lnls.dig.gradle.sysfiles.model.SysFilesSet
 
+import static org.gradle.api.distribution.plugins.DistributionPlugin.MAIN_DISTRIBUTION_NAME
+
 public class DefaultDistributionVariant extends DefaultDistribution
         implements DistributionVariant {
     BuildType buildType
@@ -47,6 +49,13 @@ public class DefaultDistributionVariant extends DefaultDistribution
         dependencies = new LinkedHashSet<>()
 
         this.fileOperations = fileOperations
+    }
+
+    String taskNameFor(String suffix) {
+        if (name == MAIN_DISTRIBUTION_NAME)
+            return suffix
+        else
+            return name + suffix.capitalize()
     }
 
     void addBinaries(Iterable<NativeBinarySpec> binaries) {
@@ -151,9 +160,12 @@ public class DefaultDistributionVariant extends DefaultDistribution
         def project = projectModel.find("projectIdentifier", Object)
         def version = project?.version.toString()
 
-        if (distribution != null)
-            dependencies.add(new Dependency(projectPath, version, distribution))
-        else
+        if (distribution != null) {
+            def dependency = new Dependency(projectPath, version, projectModel,
+                    distribution)
+
+            dependencies.add(dependency)
+        } else
             includeFilesFromProjectLibraryDependency(libraryName, projectModel)
     }
 

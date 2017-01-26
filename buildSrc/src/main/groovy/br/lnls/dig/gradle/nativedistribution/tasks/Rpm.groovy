@@ -72,7 +72,16 @@ class Rpm extends AbstractArchiveTask {
             return new RpmArchiveSharedLibrariesAction(this)
     }
 
-    public addDependency(String name, String version) {
+    public void addDependencies(Iterable<RpmDependency> newDependencies) {
+        newDependencies.each { dependency ->
+            dependencies.add(dependency)
+
+            if (dependency.buildTask != null)
+                dependsOn dependency.buildTask
+        }
+    }
+
+    public void addDependency(String name, String version) {
         dependencies.add(new RpmDependency(name, version))
     }
 
@@ -84,6 +93,6 @@ class Rpm extends AbstractArchiveTask {
         sharedLibraries = distribution.sharedLibraryFiles
         sysFiles = distribution.sysFiles
 
-        dependencies += this.distribution.dependencies
+        addDependencies(this.distribution.dependencies)
     }
 }
