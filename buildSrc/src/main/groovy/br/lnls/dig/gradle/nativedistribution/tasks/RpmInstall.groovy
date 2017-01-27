@@ -32,10 +32,6 @@ public class RpmInstall extends Exec {
         maybeSetRpmFileArgument()
     }
 
-    public RpmDistribution getDistribution() {
-        return distribution
-    }
-
     private void processDependencies() {
         distribution.dependencies.each { dependency ->
             if (dependency.installTask != null)

@@ -47,7 +47,31 @@ public class RpmDistribution {
             dependencies.add(new RpmDependency(dependency))
         }
 
+        if (isDevelopment())
+            dependencies.add(dependencyToBaseRpm)
+
         return dependencies
+    }
+
+    RpmDependency getDependencyToBaseRpm() {
+        def dependency = new RpmDependency(project.name, version)
+        def developmentBuildTaskName = distribution.taskNameFor('distRpm')
+        def developmentInstallTaskName = distribution.taskNameFor('installRpm')
+
+        dependency.buildTask = baseRpmTaskName(developmentBuildTaskName)
+        dependency.installTask = baseRpmTaskName(developmentInstallTaskName)
+
+        return dependency
+    }
+
+    private String baseRpmTaskName(String developmentName) {
+        int developmentIndex = developmentName.lastIndexOf('Development')
+        int developmentEndIndex = developmentIndex + 'Development'.length()
+
+        String firstPart = developmentName.substring(0, developmentIndex)
+        String secondPart = developmentName.substring(developmentEndIndex)
+
+        return firstPart + secondPart
     }
 
     Architecture getArchitecture() {

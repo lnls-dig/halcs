@@ -26,26 +26,4 @@ class RpmDistributionPlugin extends RuleSource {
             }
         }
     }
-
-    @Mutate
-    public void addDependencyBetweenDevelopmentAndRuntimeRpms(
-            @Each Rpm rpmTask) {
-        if (rpmTask.distribution.isDevelopment()) {
-            rpmTask.dependsOn getRpmTaskWithLibrariesFor(rpmTask)
-            rpmTask.addDependency(rpmTask.project.name,
-                    rpmTask.project.version.toString())
-        }
-    }
-
-    private String getRpmTaskWithLibrariesFor(Task developmentRpmTask) {
-        String developmentName = developmentRpmTask.name
-
-        int developmentIndex = developmentName.lastIndexOf('Development')
-        int developmentEndIndex = developmentIndex + 'Development'.length()
-
-        String firstPart = developmentName.substring(0, developmentIndex)
-        String secondPart = developmentName.substring(developmentEndIndex)
-
-        return firstPart + secondPart
-    }
 }
