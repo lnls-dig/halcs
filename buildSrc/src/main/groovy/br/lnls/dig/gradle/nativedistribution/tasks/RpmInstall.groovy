@@ -10,10 +10,17 @@ import org.gradle.nativeplatform.NativeBinarySpec
 import br.lnls.dig.gradle.nativedistribution.model.internal.RpmDistribution
 
 public class RpmInstall extends Exec {
-    RpmDistribution distribution
+    private File rpmDirectory
+    private RpmDistribution distribution
+
+    public RpmInstall() {
+        commandLine 'rpm', '-Uvh', '--force'
+    }
 
     public void setRpmDirectory(File rpmDirectory) {
-        commandLine("bash", "-c", "rpm -Uvh --force $rpmDirectory/*")
+        this.rpmDirectory = rpmDirectory
+
+        maybeSetRpmFileArgument()
     }
 
     public void setDistribution(Distribution distribution) {
@@ -22,6 +29,11 @@ public class RpmInstall extends Exec {
         dependsOn distribution.taskNameFor("distRpm")
 
         processDependencies()
+        maybeSetRpmFileArgument()
+    }
+
+    public RpmDistribution getDistribution() {
+        return distribution
     }
 
     private void processDependencies() {
@@ -29,5 +41,10 @@ public class RpmInstall extends Exec {
             if (dependency.installTask != null)
                 dependsOn dependency.installTask
         }
+    }
+
+    private void maybeSetRpmFileArgument() {
+        if (distribution != null && rpmDirectory != null)
+            args "$rpmDirectory.path/$distribution.outputFileName"
     }
 }

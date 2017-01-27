@@ -28,7 +28,7 @@ class RpmInstallationPlugin extends RuleSource {
     @Mutate
     public void addDependencyBetweenDevelopmentAndRuntimeRpmInstallations(
             @Each RpmInstall task) {
-        if (task.distribution.usage == 'development')
+        if (task.distribution.isDevelopment())
             task.dependsOn getRpmTaskWithLibrariesFor(task)
     }
 
