@@ -8,33 +8,29 @@ import org.gradle.model.Path
 import org.gradle.model.RuleSource
 
 import br.lnls.dig.gradle.distribution.model.DistributionContainer
-import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
+import br.lnls.dig.gradle.nativedistribution.tasks.RpmInstall
 
-class RpmDistributionPlugin extends RuleSource {
+class RpmInstallationPlugin extends RuleSource {
     @Mutate
-    public void addNativeDistributionTasks(ModelMap<Task> tasks,
+    public void addInstallationTasks(ModelMap<Task> tasks,
             DistributionContainer distributions,
             @Path("buildDir") File buildDir) {
         distributions.all { distribution ->
-            tasks.create(distribution.taskNameFor("distRpm"), Rpm) {
-                    task ->
+            tasks.create(distribution.taskNameFor("installRpm"),
+                    RpmInstall) { task ->
+                task.dependsOn distribution.taskNameFor("distRpm")
                 task.distribution = distribution
-                task.dependsOn(distribution.buildTasks)
-                task.buildDir = buildDir
-                task.outputDirectory = new File(buildDir,
-                        "/distributions/$distribution.name")
+                task.rpmDirectory = new File(buildDir,
+                        "/distributions/$task.distribution.name")
             }
         }
     }
 
     @Mutate
-    public void addDependencyBetweenDevelopmentAndRuntimeRpms(
-            @Each Rpm rpmTask) {
-        if (rpmTask.distribution.isDevelopment()) {
-            rpmTask.dependsOn getRpmTaskWithLibrariesFor(rpmTask)
-            rpmTask.addDependency(rpmTask.project.name,
-                    rpmTask.project.version.toString())
-        }
+    public void addDependencyBetweenDevelopmentAndRuntimeRpmInstallations(
+            @Each RpmInstall task) {
+        if (task.distribution.usage == 'development')
+            task.dependsOn getRpmTaskWithLibrariesFor(task)
     }
 
     private String getRpmTaskWithLibrariesFor(Task developmentRpmTask) {

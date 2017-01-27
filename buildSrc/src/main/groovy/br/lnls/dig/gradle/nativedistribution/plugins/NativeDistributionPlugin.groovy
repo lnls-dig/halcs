@@ -14,5 +14,6 @@ class NativeDistributionPlugin implements Plugin<Project> {
         project.pluginManager.apply(CurrentPlatformPlugin)
         project.pluginManager.apply(DefaultNativeDistributionsPlugin)
         project.pluginManager.apply(RpmDistributionPlugin)
+        project.pluginManager.apply(RpmInstallationPlugin)
     }
 }
