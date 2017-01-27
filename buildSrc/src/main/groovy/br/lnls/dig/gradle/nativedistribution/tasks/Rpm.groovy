@@ -3,23 +3,15 @@ package br.lnls.dig.gradle.nativedistribution.tasks
 import org.gradle.api.distribution.Distribution
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.copy.CopyAction
-import org.gradle.api.internal.resolve.ProjectModelResolver
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
-import org.gradle.language.nativeplatform.DependentSourceSet
-import org.gradle.language.nativeplatform.HeaderExportingSourceSet
-import org.gradle.model.internal.registry.ModelRegistry
-import org.gradle.nativeplatform.NativeBinarySpec
-import org.gradle.nativeplatform.NativeLibrarySpec
-import org.gradle.nativeplatform.SharedLibraryBinarySpec
 
 import br.lnls.dig.gradle.nativedistribution.model.internal.RpmDistribution
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmDependency
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveHeadersAction
 import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmArchiveSharedLibrariesAction
-import br.lnls.dig.gradle.sysfiles.model.SysFilesSet
 
 class Rpm extends AbstractArchiveTask {
     RpmDistribution distribution
