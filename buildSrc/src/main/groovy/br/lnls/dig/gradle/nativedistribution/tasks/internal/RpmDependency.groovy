@@ -12,6 +12,7 @@ class RpmDependency implements Serializable {
     int versionFlag
 
     String buildTask
+    String installTask
 
     RpmDependency(String name, String version) {
         this.name = name
@@ -28,6 +29,7 @@ class RpmDependency implements Serializable {
             name += '-devel'
 
         buildTask = discoverTask(dependency, 'distRpm')
+        installTask = discoverTask(dependency, 'installRpm')
     }
 
     private String discoverTask(Dependency dependency, String taskSuffix) {
