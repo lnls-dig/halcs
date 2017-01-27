@@ -18,7 +18,6 @@ class RpmInstallationPlugin extends RuleSource {
         distributions.all { distribution ->
             tasks.create(distribution.taskNameFor("installRpm"),
                     RpmInstall) { task ->
-                task.dependsOn distribution.taskNameFor("distRpm")
                 task.distribution = distribution
                 task.rpmDirectory = new File(buildDir,
                         "/distributions/$distribution.name")
