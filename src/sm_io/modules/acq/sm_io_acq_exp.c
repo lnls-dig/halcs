@@ -514,12 +514,6 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
             err_get_acq_handler, -ACQ_ERR);
 
-    /* First step is to check if the FPGA is already doing an acquisition. If it
-     * is, then return an error. Otherwise proceed normally. */
-    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
-    ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
-            "Cannot change trigger type", err_acq_not_completed);
-
     /* Message is:
      * frame 0: operation code
      * frame 1: rw
@@ -545,6 +539,12 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
                 "Trigger type = 0x%08X\n", trigger_type_ret);
     }
     else {
+        /* Only check if the FPGA is already doing an acquisition if we are about
+         * to change it. If it is, then return an error. Otherwise proceed normally. */
+        err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+        ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
+                "Cannot change trigger type", err_acq_not_completed);
+
         err = _acq_set_trigger_type (self, trigger_type);
         ASSERT_TEST(err == -ACQ_OK, "Trigger type is not valid", err_acq_inv_trig);
     }
@@ -552,8 +552,8 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
     return err;
 
 err_acq_inv_trig:
-err_acq_get_trig:
 err_acq_not_completed:
+err_acq_get_trig:
 err_get_acq_handler:
     return err;
 }
