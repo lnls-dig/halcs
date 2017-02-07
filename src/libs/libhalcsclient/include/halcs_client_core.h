@@ -592,6 +592,25 @@ typedef struct {
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];
 
+/* Acquisition trigger types. Use this to safely configure the trigger
+ * and the halcs_client_trig_str () function to get trigger strings */
+enum _halcs_client_trig_e
+{
+    HALCS_CLIENT_TRIG_SKIP = 0,               /* No trigger configured */
+    HALCS_CLIENT_TRIG_EXTERNAL,               /* External trigger */
+    HALCS_CLIENT_TRIG_DATA_DRIVEN,            /* Data-driven (data offset) trigger */
+    HALCS_CLIENT_TRIG_SOFTWARE,               /* Software generated trigger */
+    HALCS_CLIENT_TRIG_END                     /* End of enum marker */
+};
+
+typedef enum _halcs_client_trig_e halcs_client_trig_e;
+
+/* Convert enumeration type to long string */
+const char * halcs_client_trig_str (halcs_client_trig_e err);
+
+/* Convert enumeration type to short string */
+const char * halcs_client_trig_sstr (halcs_client_trig_e err);
+
 /* Start acquisition on a specific channel with an specific number of samples,
  * through the use of acq_req_t structure.
  * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if the server
