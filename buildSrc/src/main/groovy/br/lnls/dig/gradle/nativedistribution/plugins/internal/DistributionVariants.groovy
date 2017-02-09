@@ -1,5 +1,6 @@
 package br.lnls.dig.gradle.nativedistribution.plugins.internal
 
+import org.gradle.api.internal.project.ProjectIdentifier
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.BuildTypeContainer
@@ -61,7 +62,8 @@ public class DistributionVariants {
     }
 
 
-    public void addTo(DistributionContainer distributions) {
+    public void addTo(DistributionContainer distributions,
+            ProjectIdentifier project) {
         def type = DistributionVariant
         def implementation = DefaultDistributionVariant
         def variations = createAllVariations()
@@ -70,6 +72,7 @@ public class DistributionVariants {
 
         variations.each { variation ->
             distributions.create(variation.name, type) { distribution ->
+                distribution.project = project
                 distribution.flavor = variation.flavor
                 distribution.platform = variation.platform
                 distribution.buildType = variation.buildType

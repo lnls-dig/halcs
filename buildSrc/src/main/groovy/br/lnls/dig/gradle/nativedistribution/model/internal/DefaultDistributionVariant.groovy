@@ -4,6 +4,7 @@ import org.gradle.api.distribution.Distribution
 import org.gradle.api.distribution.internal.DefaultDistribution
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.internal.project.ProjectIdentifier
 import org.gradle.api.internal.resolve.ProjectModelResolver
 import org.gradle.api.Task
 import org.gradle.language.nativeplatform.DependentSourceSet
@@ -27,6 +28,8 @@ import static org.gradle.api.distribution.plugins.DistributionPlugin.MAIN_DISTRI
 
 public class DefaultDistributionVariant extends DefaultDistribution
         implements DistributionVariant {
+    ProjectIdentifier project
+
     BuildType buildType
     Flavor flavor
     Platform platform

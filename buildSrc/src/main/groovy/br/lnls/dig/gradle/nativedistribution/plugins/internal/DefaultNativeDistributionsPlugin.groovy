@@ -1,6 +1,7 @@
 package br.lnls.dig.gradle.nativedistribution.plugins
 
 import org.gradle.api.distribution.Distribution
+import org.gradle.api.internal.project.ProjectIdentifier
 import org.gradle.api.internal.resolve.ProjectModelResolver
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.model.Each
@@ -22,7 +23,7 @@ import static org.gradle.api.distribution.plugins.DistributionPlugin.MAIN_DISTRI
 class DefaultNativeDistributionsPlugin extends RuleSource {
     @Mutate
     public void addDistributionsForBuildVariations(
-            DistributionContainer distributions,
+            DistributionContainer distributions, ProjectIdentifier project,
             BuildTypeContainer buildTypes, PlatformContainer platforms,
             FlavorContainer flavors,
             ModelMap<NativeLibrarySpec> nativeLibraries) {
@@ -32,7 +33,7 @@ class DefaultNativeDistributionsPlugin extends RuleSource {
         removeMainDistribution(distributions)
 
         DistributionVariants.from(buildTypes, platforms, flavors, usages)
-            .addTo(distributions)
+            .addTo(distributions, project)
     }
 
     private String[] getUsageVariations(boolean hasLibraries) {

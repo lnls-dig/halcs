@@ -1,6 +1,5 @@
 package br.lnls.dig.gradle.nativedistribution.model.internal
 
-import org.gradle.api.Project
 import org.gradle.api.distribution.Distribution
 import org.gradle.nativeplatform.BuildType
 import org.gradle.nativeplatform.Flavor
@@ -16,17 +15,21 @@ import br.lnls.dig.gradle.nativedistribution.tasks.internal.RpmDependency
 public class RpmDistribution {
     private boolean development
     private Distribution distribution
-    private Project project
 
-    RpmDistribution(Distribution distribution, Project project) {
+    RpmDistribution(Distribution distribution) {
         this.distribution = distribution
-        this.project = project
 
         development = distribution.usage == 'development'
     }
 
     String getName() {
         return distribution.name
+    }
+
+    String taskPathFor(String suffix) {
+        def taskName = distribution.taskNameFor(suffix)
+
+        return "$distribution.project.path:$taskName"
     }
 
     boolean isDevelopment() {
@@ -37,7 +40,7 @@ public class RpmDistribution {
         def suffix = distribution.usage == 'development' ? '-devel' : ''
         def arch = architecture.toString().toLowerCase()
 
-        return "$project.name$suffix-$version-1.${arch}.rpm"
+        return "$distribution.project.name$suffix-$version-1.${arch}.rpm"
     }
 
     Set<RpmDependency> getDependencies() {
@@ -54,12 +57,15 @@ public class RpmDistribution {
     }
 
     RpmDependency getDependencyToBaseRpm() {
-        def dependency = new RpmDependency(project.name, version)
+        def dependency = new RpmDependency(distribution.project.name, version)
         def developmentBuildTaskName = distribution.taskNameFor('distRpm')
         def developmentInstallTaskName = distribution.taskNameFor('installRpm')
+        def developmentUninstallTaskName =
+                distribution.taskNameFor('uninstallRpm')
 
         dependency.buildTask = baseRpmTaskName(developmentBuildTaskName)
         dependency.installTask = baseRpmTaskName(developmentInstallTaskName)
+        dependency.uninstallTask = baseRpmTaskName(developmentUninstallTaskName)
 
         return dependency
     }
@@ -71,7 +77,7 @@ public class RpmDistribution {
         String firstPart = developmentName.substring(0, developmentIndex)
         String secondPart = developmentName.substring(developmentEndIndex)
 
-        return "$project.path:$firstPart$secondPart"
+        return "$distribution.project.path:$firstPart$secondPart"
     }
 
     Architecture getArchitecture() {
@@ -89,7 +95,7 @@ public class RpmDistribution {
     }
 
     String getVersion() {
-        return project.version.toString().replaceAll("-", "_")
+        return distribution.project.version.toString().replaceAll("-", "_")
     }
 
     BuildType getBuildType() {

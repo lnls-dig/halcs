@@ -78,7 +78,7 @@ class Rpm extends AbstractArchiveTask {
     }
 
     public void setDistribution(Distribution distribution) {
-        this.distribution = new RpmDistribution(distribution, project)
+        this.distribution = new RpmDistribution(distribution)
 
         executables = distribution.executableFiles
         exportedHeaders = distribution.exportedHeaders

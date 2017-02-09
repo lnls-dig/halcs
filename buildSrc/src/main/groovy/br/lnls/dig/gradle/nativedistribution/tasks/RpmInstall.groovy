@@ -20,7 +20,7 @@ public class RpmInstall extends Exec {
     }
 
     public void setDistribution(Distribution distribution) {
-        this.distribution = new RpmDistribution(distribution, project)
+        this.distribution = new RpmDistribution(distribution)
 
         dependsOn distribution.taskNameFor("distRpm")
 
