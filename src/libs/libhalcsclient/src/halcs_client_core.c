@@ -272,11 +272,11 @@ halcs_client_err_e halcs_func_exec (halcs_client_t *self, const disp_op_t *func,
     /* Handling malformed messages */
     size_t msg_size = zmsg_size (report);
     ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
-            "Unexpected message received", err_msg);
+            "Unexpected message received", err_msg_size);
 
     /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
-    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg);
+    ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg_code);
     err = *(uint32_t *)zframe_data(err_code);
 
     zframe_t *data_size_frm = NULL;
@@ -308,10 +308,12 @@ err_null_data:
     zframe_destroy (&data_size_frm);
 err_null_data_size:
     zframe_destroy (&err_code);
-err_msg:
+err_msg_code:
     zmsg_destroy (&report);
-err_msg_alloc:
+err_msg_size:
+err_msg:
     zmsg_destroy (&msg);
+err_msg_alloc:
 err_null_exp:
 err_inv_param:
     return err;
