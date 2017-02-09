@@ -34,9 +34,9 @@ class RpmDependency implements Serializable {
 
     private String discoverTask(Dependency dependency, String taskSuffix) {
         def taskName = dependency.distribution.taskNameFor(taskSuffix)
-        def task = dependency.projectModel.find("tasks.$taskName", Task)
+        def taskPath = "$dependency.projectPath:$taskName"
 
-        return task?.path
+        return taskPath
     }
 
     boolean equals(Object other) {
