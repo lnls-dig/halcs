@@ -71,7 +71,7 @@ public class RpmDistribution {
         String firstPart = developmentName.substring(0, developmentIndex)
         String secondPart = developmentName.substring(developmentEndIndex)
 
-        return firstPart + secondPart
+        return "$project.path:$firstPart$secondPart"
     }
 
     Architecture getArchitecture() {
