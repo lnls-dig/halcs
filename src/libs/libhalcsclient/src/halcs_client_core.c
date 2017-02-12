@@ -133,6 +133,8 @@ void halcs_client_destroy (halcs_client_t **self_p)
         zuuid_destroy (&self->uuid);
         free (self);
         *self_p = NULL;
+
+        errhand_log_destroy ();
     }
 }
 
@@ -165,7 +167,7 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    errhand_set_log (log_file_name, log_mode);
+    errhand_log_new (log_file_name, log_mode);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBHALCSCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,

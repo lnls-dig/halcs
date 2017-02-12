@@ -121,7 +121,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    errhand_set_log (log_filename, DEVMNGR_DFLT_LOG_MODE);
+    errhand_log_new (log_filename, DEVMNGR_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEV_MNGR worker"
             " with \n\tdiscovery endpoint (ignored for now) %s, with logfile %s"
@@ -214,6 +214,8 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
 
         free (self);
         *self_p = NULL;
+
+        errhand_log_destroy ();
     }
 
     return DMNGR_SUCCESS;

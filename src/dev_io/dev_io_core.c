@@ -167,7 +167,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    errhand_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
+    errhand_log_new (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
             " with exported service %s, for a %s device \n\tlocated on %s,"
@@ -465,6 +465,8 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->log_file);
         free (self);
         *self_p = NULL;
+
+        errhand_log_destroy ();
     }
 
     return DEVIO_SUCCESS;
