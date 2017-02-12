@@ -4,6 +4,8 @@
 ![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
 [![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
 [![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/halcs.svg?style=flat)](COPYING)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=br.com.lnls.dig.halcs%3Asonarqube-integration)](https://sonarqube.com/dashboard/index/br.com.lnls.dig.halcs%3Asonarqube-integration)
+[![Technical debt ratio](https://sonarqube.com/api/badges/measure?key=br.com.lnls.dig.halcs%3Asonarqube-integration&metric=sqale_debt_ratio)](https://sonarqube.com/dashboard/index/br.com.lnls.dig.halcs%3Asonarqube-integration)
 
 Software for creating controlling daemons for devices
 
