@@ -1,11 +1,11 @@
 # Travis CI script
-
 language: c
 compiler:
 - clang
 - gcc
 
 sudo: false
+dist: trusty
 
 env:
 - BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
@@ -16,6 +16,13 @@ addons:
   apt:
     packages:
     - uuid-dev
+  sonarqube:
+    token:
+      secure: "AXQyy5C9NUv1aeIeVuLClBtLDkZsR4MDTFpIkzgrZX5fOVtVjyukeXfxk91GOtR76lGS5aX0WZLz+yMxsjFcGb49wigPSArZ91VE/UUPMZEIenjzObFdlz23a4GcfBtzTqzlChLNj3AaD80Jt9jUWXlLxTg+1p3FjWmmPS4Nu/VmtL9Nk5XdUwWNnptWWgmf0oL1n9ACRtpEhlBWd8HqzgxfGcT+WPo99TqFm/RZkngSMfgy9u4n1EBixxT7xVe0YVx1pke9hKCpHBMypLuARide/ZAcUf9OeuSgRlpa2+cY/Fn1P6MNfPGIaDbCZQ7PjN8CSJFjsGq+WpT3kNEw96+FHGU4z43eih1Cgo4q6XfezVkk5eLq7QQQVPGDN72VIj2oBAvXoWLxqpY5mA95Nw/rWWahsRScYap+gMHIDGpEwd54RvUMbZSgYTxLc74x6VCMW71JwB0UwUPt9UczVvUQirvPP7JtS4Th0WbFMAXPdOJE0l2F5/mBHbJyWPfD9PA5R/EYIpVkEG5kaZeYcBi0yqIXhW+yAlL6oiPNM28b0RNRkg8bsM0JZL7Vz/+b7+4rU4Ac4b47pCRWgnK6CpWL4C8FY9i0hzAyGq4SCoZPUEHY+Q8zMaGWnqcUePGsk/5bIAtu/Ot7OZcdF9HU3Pg0yeqDyXuyP4sG2q5Er3I="
+    branches:
+      - master
+      - devel
+      - sonarqube-integration
 
 before_install:
 - git submodule update --init --recursive
@@ -23,3 +30,8 @@ before_install:
 #   Build and check this project
 script:
 - ./ci_build.sh
+- sonar-scanner
+
+cache:
+  directories:
+    - '$HOME/.sonar/cache'
