@@ -129,16 +129,17 @@ static char *_hutils_concat_strings_raw (const char *str1, const char* str2,
     uint32_t num_sep_bytes = (with_sep)? SEPARATOR_BYTES : 0;
 
     char *str = NULL;
+    size_t str_len = strlen (str1) + strlen (str2) + strlen (str3) +
+        num_sep_bytes /* separator length */+ 1 /* \0 */;
     if (str3 != NULL) {
-        str = zmalloc (strlen (str1) + strlen (str2) + strlen (str3) +
-                num_sep_bytes /* separator length */+ 1 /* \0 */);
+        str = zmalloc (str_len);
         ASSERT_ALLOC(str, err_str3_alloc);
 
         if (with_sep) {
-            sprintf (str, "%s%c%s%s", str1, sep, str2, str3);
+            snprintf (str, str_len, "%s%c%s%s", str1, sep, str2, str3);
         }
         else {
-            sprintf (str, "%s%s%s", str1, str2, str3);
+            snprintf (str, str_len, "%s%s%s", str1, str2, str3);
         }
     }
     else {
@@ -147,10 +148,10 @@ static char *_hutils_concat_strings_raw (const char *str1, const char* str2,
         ASSERT_ALLOC(str, err_str2_alloc);
 
         if (with_sep) {
-            sprintf (str, "%s%c%s", str1, sep, str2);
+            snprintf (str, str_len, "%s%c%s", str1, sep, str2);
         }
         else {
-            sprintf (str, "%s%s", str1, str2);
+            snprintf (str, str_len, "%s%s", str1, str2);
         }
     }
 

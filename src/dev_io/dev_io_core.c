@@ -253,10 +253,15 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
 
     /* Concatenate recv'ed name with a llio identifier */
-    char *llio_name = zmalloc (sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1));
+    size_t llio_name_len = sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1);
+    size_t llio_name_len_rem = llio_name_len;
+    char *llio_name = zmalloc (llio_name_len);
     ASSERT_ALLOC(llio_name, err_llio_name_alloc);
-    strcat (llio_name, name);
-    strcat (llio_name, LLIO_STR);
+
+    strncat (llio_name, name, llio_name_len_rem);
+    llio_name_len_rem -= strlen(name);
+    strncat (llio_name, LLIO_STR, llio_name_len_rem);
+
     self->llio = llio_new (llio_name, endpoint_dev, reg_ops,
             verbose);
     ASSERT_ALLOC(self->llio, err_llio_alloc);
