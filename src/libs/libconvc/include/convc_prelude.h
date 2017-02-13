@@ -13,4 +13,9 @@
 #include <sys/types.h>
 #include <stdbool.h>
 
+/* Common macros */
+#ifndef UNUSED
+#define UNUSED(x) (void)x;
+#endif
+
 #endif

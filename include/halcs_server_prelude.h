@@ -22,6 +22,11 @@
 #include <czmq.h>
 #include <malamute.h>
 
+/* Common macros */
+#ifndef UNUSED
+#define UNUSED(x) (void)x;
+#endif
+
 /* Check for library versions */
 
 /* ZMQ */
