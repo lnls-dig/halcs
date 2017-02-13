@@ -7,7 +7,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <halcs_client.h>
+#include <acq_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
@@ -255,6 +255,7 @@ int main (int argc, char *argv [])
         goto err_halcs_set_acq_trig;
     }
 
+    const acq_chan_t *acq_chan = halcs_get_acq_chan (halcs_client);
     uint32_t num_samples_pre = num_samples;
     uint32_t num_samples_post = num_samples;
     uint32_t num_shots = 1;

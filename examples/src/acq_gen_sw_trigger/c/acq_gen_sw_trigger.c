@@ -7,7 +7,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <halcs_client.h>
+#include <acq_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 

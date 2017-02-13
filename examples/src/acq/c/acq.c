@@ -8,7 +8,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <halcs_client.h>
+#include <acq_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
@@ -305,6 +305,7 @@ int main (int argc, char *argv [])
         goto err_halcs_set_acq_trig;
     }
 
+    const acq_chan_t *acq_chan = halcs_get_acq_chan (halcs_client);
     uint32_t data_size = num_samples*acq_chan[chan].sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
     bool new_acq = true;
