@@ -51,7 +51,7 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_isla216p_t *self = (smch_isla216p_t *) zmalloc (sizeof *self);

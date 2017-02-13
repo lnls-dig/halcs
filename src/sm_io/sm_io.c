@@ -244,9 +244,9 @@ err_zsock_is:
 /* zloop handler for timer */
 static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 {
-    (void) loop;
-    (void) timer_id;
-    (void) arg;
+    UNUSED(loop);
+    UNUSED(timer_id);
+    UNUSED(arg);
 
     return 0;
 }
@@ -254,7 +254,7 @@ static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 /* zloop handler for CFG PIPE */
 static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     /* Arguments for command */
     char *command = NULL;
@@ -262,7 +262,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     smio_err_e err = SMIO_SUCCESS;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
-    (void) smio;
+    UNUSED(smio);
 
     /* Receive message */
     zmsg_t *recv_msg = zmsg_recv (reader);
@@ -306,7 +306,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for MSG PIPE */
 static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
     smio_err_e err = SMIO_SUCCESS;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
@@ -343,12 +343,12 @@ static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for PIPE backend */
 static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     char *command = NULL;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
-    (void) smio;
+    UNUSED(smio);
 
     /* Receive message */
     zmsg_t *recv_msg = zmsg_recv (reader);

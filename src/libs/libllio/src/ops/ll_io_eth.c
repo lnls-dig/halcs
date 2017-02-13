@@ -219,7 +219,7 @@ err_endpoint_set:
 /* Release ETH device */
 static int eth_release (llio_t *self, llio_endpoint_t *endpoint)
 {
-    (void) endpoint;
+    UNUSED(endpoint);
 
     if (!llio_get_endpoint_open (self)) {
         /* Nothing to close */
@@ -311,7 +311,7 @@ ssize_t eth_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *dat
 static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
         size_t size)
 {
-    (void) offs;
+    UNUSED(offs);
 
     ssize_t err = 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
@@ -327,7 +327,7 @@ err_dev_eth_handler:
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
         size_t size)
 {
-    (void) offs;
+    UNUSED(offs);
 
     ssize_t err = 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);

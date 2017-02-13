@@ -199,28 +199,28 @@ err_msg_alloc:
 /**** Read data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /**** Write data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /**** Read device information function pointer ****/
 /* int thsafe_zmq_client_read_info (smio_t *self, thsafe_dev_info_t *dev_info)
  *{
- *  (void) self;
- *  (void) dev_info;
+ *  UNUSED(self);
+ *  UNUSED(dev_info);
  *   return -1;
  *} */
 
@@ -228,7 +228,7 @@ ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, c
 
 int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode)
 {
-    (void) endpoint;
+    UNUSED(endpoint);
     assert (self);
 
     int ret = -1;

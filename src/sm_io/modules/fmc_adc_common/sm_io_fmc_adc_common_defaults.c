@@ -45,7 +45,7 @@
 smio_err_e fmc_adc_common_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
-    (void) log_file_name;
+    UNUSED(log_file_name);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc_adc_common_defaults] Configuring SMIO "
             "FMC_ADC_COMMON with default values ...\n");
     halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;

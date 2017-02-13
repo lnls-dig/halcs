@@ -189,10 +189,10 @@ int main (int argc, char *argv [])
     }
 #if 0
     err = halcs_set_fmc_clk_sel (halcs_client, service, 0x1);
-    (void) ad9510_data_read;
-    (void) err;
-    (void) ad9510_data;
-    (void) ad9510_addr;
+    UNUSED(ad9510_data_read);
+    UNUSED(err);
+    UNUSED(ad9510_data);
+    UNUSED(ad9510_addr);
 
 #endif
 err_halcs_exit:

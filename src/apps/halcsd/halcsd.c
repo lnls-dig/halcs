@@ -616,8 +616,8 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
     assert (pipe);
-(void) hints;
-(void) dev_id;
+UNUSED(hints);
+UNUSED(dev_id);
 
     devio_err_e err = DEVIO_SUCCESS;
 

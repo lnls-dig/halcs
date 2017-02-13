@@ -161,7 +161,7 @@ uint32_t halcs_client_get_timeout (halcs_client_t *self)
 static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, int timeout)
 {
-    (void) verbose;
+    UNUSED(verbose);
 
     assert (broker_endp);
 

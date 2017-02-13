@@ -55,7 +55,7 @@ static ssize_t _smch_24aa64_read_generic (smch_24aa64_t *self, uint16_t addr,
 smch_24aa64_t * smch_24aa64_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_24aa64_t *self = (smch_24aa64_t *) zmalloc (sizeof *self);

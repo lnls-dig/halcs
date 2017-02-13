@@ -342,7 +342,7 @@ err_adc_dly:
 
 #define FMC250M_4CH_ADC_DLY_FUNC_BODY(owner, args, ret, channel)                \
     do {                                                                        \
-        (void) ret;                                                             \
+        UNUSED(ret);                                                             \
         assert (owner);                                                         \
         assert (args);                                                          \
                                                                                 \
@@ -455,14 +455,14 @@ typedef smch_err_e (*smch_isla216p_func_fp) (smch_isla216p_t *self, uint32_t *pa
             /* Call specific function */                                           \
             if (rw) {                                                              \
                 WHEN(ISEMPTY(read_func))(                                          \
-                    (void) ret;                                                    \
+                    UNUSED(ret);                                                    \
                     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] " \
                             "ISLA216P read function not implemented\n");           \
                     err = -FMC250M_4CH_UNINPL;                                     \
                     return err;                                                    \
                 )                                                                  \
                 WHENNOT(ISEMPTY(read_func))(                                       \
-                    (void) param;                                                  \
+                    UNUSED(param);                                                  \
                     uint32_t value = 0;                                            \
                     serr = ((smch_isla216p_func_fp) read_func) (smch_isla216p, \
                             &value);                                               \
@@ -532,7 +532,7 @@ typedef smch_err_e (*smch_isla216p_func_fp2) (smch_isla216p_t *self, uint32_t *p
             /* Call specific function */                                           \
             if (rw) {                                                              \
                 WHEN(ISEMPTY(read_func))(                                          \
-                    (void) ret;                                                    \
+                    UNUSED(ret);                                                    \
                     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc250m_4ch_exp] " \
                             "ISLA216P read function not implemented\n");           \
                     err = -FMC250M_4CH_UNINPL;                                     \
@@ -705,15 +705,15 @@ static smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc250m_4ch_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc250m_4ch_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -721,15 +721,15 @@ smio_err_e fmc250m_4ch_deattach (smio_t *self)
 smio_err_e fmc250m_4ch_export_ops (smio_t *self,
         const disp_op_t** smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e fmc250m_4ch_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -738,8 +738,8 @@ smio_err_e fmc250m_4ch_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 

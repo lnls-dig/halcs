@@ -142,9 +142,9 @@ static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
 {
-    (void) sig;
-    (void) siginfo;
-    (void) context;
+    UNUSED(sig);
+    UNUSED(siginfo);
+    UNUSED(context);
     while (hutils_wait_chld () > 0);
 }
 
@@ -502,7 +502,7 @@ err_sdb_not_supp:
 static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self,
         uint32_t smio_id)
 {
-    (void) self;
+    UNUSED(self);
 
     const smio_mod_dispatch_t *smio_mod_handler;
 
@@ -567,9 +567,9 @@ err_zsock_is:
 /* zloop handler for timer */
 static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 {
-    (void) loop;
-    (void) timer_id;
-    (void) arg;
+    UNUSED(loop);
+    UNUSED(timer_id);
+    UNUSED(arg);
 
     return 0;
 }
@@ -577,10 +577,10 @@ static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 /* zloop handler for MSG PIPE */
 static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
-    (void) devio;
+    UNUSED(devio);
 
     /* We process as many messages as we can, to reduce the overhead
      * of polling and the reactor */
@@ -608,7 +608,7 @@ static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 
 static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
@@ -659,7 +659,7 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for CFG PIPE */
 static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     int err = 0;
     char *service_id = NULL;
@@ -716,7 +716,7 @@ err_poller_config_null_service:
 /* zloop handler for PIPE. */
 static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
@@ -783,12 +783,12 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for PIPE backend */
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     char *command = NULL;
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
-    (void) devio;
+    UNUSED(devio);
 
     /* Receive message */
     zmsg_t *recv_msg = zmsg_recv (reader);
@@ -1385,7 +1385,7 @@ static char *_devio_gen_smio_key (devio_t *self,
         const volatile smio_mod_dispatch_t *smio_mod_handler,
         uint32_t inst_id)
 {
-    (void) self;
+    UNUSED(self);
 
     char *key = NULL;
     char *inst_id_str = hutils_stringify_dec_key (inst_id);

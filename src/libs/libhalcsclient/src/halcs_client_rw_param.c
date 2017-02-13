@@ -76,7 +76,7 @@ err_param1_null:
 halcs_client_err_e param_client_recv_rw (halcs_client_t *self, char *service,
         zmsg_t **report)
 {
-    (void) service;
+    UNUSED(service);
     assert (report);
 
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;

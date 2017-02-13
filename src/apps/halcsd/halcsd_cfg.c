@@ -273,7 +273,7 @@ err_exit:
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id)
 {
-    (void) smio_inst_id;
+    UNUSED(smio_inst_id);
 
     assert (pipe);
 
@@ -304,7 +304,7 @@ static devio_err_e _spawn_be_platform_smios (void *pipe)
 
     /* ML605 specific */
 #if defined (__BOARD_ML605__)
-    (void) pipe;
+    UNUSED(pipe);
     /* AFCv3 spefific */
 #elif defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;

@@ -169,7 +169,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
             "[dev_mngr_core] Found a total of %u device(s)\n", num_devs_found);
     /* Supress compiler warnings if we are not debugging */
-    (void) num_devs_found;
+    UNUSED(num_devs_found);
 
     return self;
 
@@ -358,7 +358,7 @@ bool dmngr_is_broker_running (dmngr_t *self)
 
 dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
 {
-    (void) broker_endp;
+    UNUSED(broker_endp);
 
     assert (self);
     assert (broker_endp);

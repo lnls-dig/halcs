@@ -118,7 +118,7 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
         /* Call specific function */                                            \
         if (rw) {                                                               \
             WHEN(ISEMPTY(read_func))(                                           \
-                (void) ret;                                                     \
+                UNUSED(ret);                                                     \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
                         "AD9510 read function not implemented\n");              \
                 err = -FMC_ACTIVE_CLK_UNINPL;                                   \
@@ -164,7 +164,7 @@ err_get_fmcaclk_handler:                                                        
 
 static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self, uint32_t *param)
 {
-    (void) param;
+    UNUSED(param);
     return smch_ad9510_cfg_defaults (self);
 }
 
@@ -241,7 +241,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double *param);
 #define FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, read_func, write_func, \
         error_msg)                                                              \
     do {                                                                        \
-        (void) ret;                                                             \
+        UNUSED(ret);                                                             \
         assert (owner);                                                         \
         assert (args);                                                          \
                                                                                 \
@@ -258,7 +258,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double *param);
         /* Call specific function */                                            \
         if (rw) {                                                               \
             WHEN(ISEMPTY(read_func))(                                           \
-                (void) ret;                                                     \
+                UNUSED(ret);                                                     \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
                         "SI57x read function not implemented\n");               \
                 err = -FMC_ACTIVE_CLK_UNINPL;                                   \
@@ -322,7 +322,7 @@ FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(get_defaults)
 
 static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
 {
-    (void) ret;
+    UNUSED(ret);
     assert (owner);
     assert (args);
     int err = -FMC_ACTIVE_CLK_OK;
@@ -331,7 +331,7 @@ static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
     uint32_t inst_id = smio_get_inst_id (self);
 
     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
-    (void) rw;
+    UNUSED(rw);
 
     uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
@@ -380,14 +380,14 @@ typedef smch_err_e (*smch_ad9510_func_fp2) (smch_ad9510_t *self, uint32_t *addr,
             /* Call specific function */                                           \
             if (rw) {                                                              \
                 WHEN(ISEMPTY(read_func))(                                          \
-                    (void) ret;                                                    \
+                    UNUSED(ret);                                                    \
                     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
                             "AD9510 read function not implemented\n");             \
                     err = -FMC_ACTIVE_CLK_UNINPL;                                  \
                     return err;                                                    \
                 )                                                                  \
                 WHENNOT(ISEMPTY(read_func))(                                       \
-                    (void) param;                                                  \
+                    UNUSED(param);                                                  \
                     uint32_t value = 0;                                            \
                     serr = ((smch_ad9510_func_fp2) read_func) (smch_ad9510, &addr,  \
                             &value);                                               \
@@ -484,15 +484,15 @@ static smio_err_e _fmc_active_clk_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc_active_clk_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc_active_clk_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -500,15 +500,15 @@ smio_err_e fmc_active_clk_deattach (smio_t *self)
 smio_err_e fmc_active_clk_export_ops (smio_t *self,
         const disp_op_t** smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e fmc_active_clk_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -517,8 +517,8 @@ smio_err_e fmc_active_clk_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _fmc_active_clk_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 

@@ -58,7 +58,7 @@ static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_ad9510_t *self = (smch_ad9510_t *) zmalloc (sizeof *self);

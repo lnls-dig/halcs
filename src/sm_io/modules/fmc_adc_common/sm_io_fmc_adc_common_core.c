@@ -36,7 +36,7 @@
 /* Creates a new instance of Device Information */
 smio_fmc_adc_common_t * smio_fmc_adc_common_new (smio_t *parent)
 {
-    (void) parent;
+    UNUSED(parent);
 
     smio_fmc_adc_common_t *self = (smio_fmc_adc_common_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
