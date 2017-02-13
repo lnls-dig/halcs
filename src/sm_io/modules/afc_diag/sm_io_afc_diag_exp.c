@@ -191,11 +191,11 @@ smio_err_e afc_diag_do_op (void *self, void *msg)
 }
 
 const smio_ops_t afc_diag_ops = {
-    .attach             = afc_diag_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = afc_diag_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = afc_diag_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = afc_diag_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = afc_diag_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &afc_diag_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &afc_diag_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &afc_diag_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &afc_diag_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &afc_diag_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -279,9 +279,9 @@ err_afc_diag_handler:
 }
 
 const smio_bootstrap_ops_t afc_diag_bootstrap_ops = {
-    .init = afc_diag_init,
-    .shutdown = afc_diag_shutdown,
-    .config_defaults = afc_diag_config_defaults
+    .init            = &afc_diag_init,
+    .shutdown        = &afc_diag_shutdown,
+    .config_defaults = &afc_diag_config_defaults
 };
 
 SMIO_MOD_DECLARE(AFC_DIAG_DEVID, AFC_DIAG_NAME, afc_diag_bootstrap_ops)

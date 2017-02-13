@@ -1374,7 +1374,7 @@ err_inv_msg:
 }
 
 const disp_table_ops_t devio_disp_table_ops = {
-    .check_msg_args = _devio_check_msg_args
+    .check_msg_args = &_devio_check_msg_args
 };
 
 /************************************************************/

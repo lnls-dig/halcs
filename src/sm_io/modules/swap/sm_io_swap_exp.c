@@ -128,11 +128,11 @@ smio_err_e swap_do_op (void *self, void *msg)
 }
 
 const smio_ops_t swap_ops = {
-    .attach             = swap_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = swap_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = swap_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = swap_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = swap_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &swap_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &swap_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &swap_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &swap_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &swap_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -218,9 +218,9 @@ err_swap_handler:
 }
 
 const smio_bootstrap_ops_t swap_bootstrap_ops = {
-    .init = swap_init,
-    .shutdown = swap_shutdown,
-    .config_defaults = swap_config_defaults
+    .init            = &swap_init,
+    .shutdown        = &swap_shutdown,
+    .config_defaults = &swap_config_defaults
 };
 
 SMIO_MOD_DECLARE(SWAP_SDB_DEVID, SWAP_SDB_NAME, swap_bootstrap_ops)

@@ -87,7 +87,7 @@ RW_PARAM_FUNC(dsp, ds_monit_thres) {
 #define POS_CALC_DDS_CFG_TEST_DATA_MAX      1
 RW_PARAM_FUNC(dsp, pos_calc_cfg_test_data) {
     SET_GET_PARAM(dsp, 0x0, POS_CALC, DDS_CFG, TEST_DATA, SINGLE_BIT_PARAM,
-            POS_CALC_DDS_CFG_TEST_DATA_MIN, POS_CALC_DDS_CFG_TEST_DATA_MAX, 
+            POS_CALC_DDS_CFG_TEST_DATA_MIN, POS_CALC_DDS_CFG_TEST_DATA_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -254,11 +254,11 @@ smio_err_e dsp_do_op (void *self, void *msg)
 }
 
 const smio_ops_t dsp_ops = {
-    .attach             = dsp_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = dsp_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = dsp_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = dsp_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = dsp_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &dsp_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &dsp_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &dsp_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &dsp_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &dsp_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -342,9 +342,9 @@ err_dsp_handler:
 }
 
 const smio_bootstrap_ops_t dsp_bootstrap_ops = {
-    .init = dsp_init,
-    .shutdown = dsp_shutdown,
-    .config_defaults = dsp_config_defaults
+    .init            = &dsp_init,
+    .shutdown        = &dsp_shutdown,
+    .config_defaults = &dsp_config_defaults
 };
 
 SMIO_MOD_DECLARE(DSP_SDB_DEVID, DSP_SDB_NAME, dsp_bootstrap_ops)

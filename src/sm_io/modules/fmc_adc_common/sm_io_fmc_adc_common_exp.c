@@ -158,11 +158,11 @@ smio_err_e fmc_adc_common_do_op (void *self, void *msg)
 }
 
 const smio_ops_t fmc_adc_common_ops = {
-    .attach             = fmc_adc_common_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = fmc_adc_common_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = fmc_adc_common_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = fmc_adc_common_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = fmc_adc_common_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &fmc_adc_common_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &fmc_adc_common_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &fmc_adc_common_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &fmc_adc_common_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &fmc_adc_common_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -249,9 +249,9 @@ err_fmcacommon_handler:
 }
 
 const smio_bootstrap_ops_t fmc_adc_common_bootstrap_ops = {
-    .init = fmc_adc_common_init,
-    .shutdown = fmc_adc_common_shutdown,
-    .config_defaults = fmc_adc_common_config_defaults
+    .init            = &fmc_adc_common_init,
+    .shutdown        = &fmc_adc_common_shutdown,
+    .config_defaults = &fmc_adc_common_config_defaults
 };
 
 SMIO_MOD_DECLARE(FMC_ADC_COMMON_SDB_DEVID, FMC_ADC_COMMON_SDB_NAME, fmc_adc_common_bootstrap_ops)

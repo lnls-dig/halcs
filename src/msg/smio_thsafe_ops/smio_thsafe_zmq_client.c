@@ -553,21 +553,21 @@ err_null_recv_msg:
 
 /*************** Our constant structure **************/
 const smio_thsafe_client_ops_t smio_thsafe_client_zmq_ops = {
-    .thsafe_client_open           = thsafe_zmq_client_open,        /* Open device */
-    .thsafe_client_release        = thsafe_zmq_client_release,     /* Release device */
-    .thsafe_client_read_16        = thsafe_zmq_client_read_16,     /* Read 16-bit data */
-    .thsafe_client_read_32        = thsafe_zmq_client_read_32,     /* Read 32-bit data */
-    .thsafe_client_read_64        = thsafe_zmq_client_read_64,     /* Read 64-bit data */
-    .thsafe_client_write_16       = thsafe_zmq_client_write_16,    /* Write 16-bit data */
-    .thsafe_client_write_32       = thsafe_zmq_client_write_32,    /* Write 32-bit data */
-    .thsafe_client_write_64       = thsafe_zmq_client_write_64,    /* Write 64-bit data */
-    .thsafe_client_read_block     = thsafe_zmq_client_read_block,  /* Read arbitrary block size data,
+    .thsafe_client_open           = &thsafe_zmq_client_open,        /* Open device */
+    .thsafe_client_release        = &thsafe_zmq_client_release,     /* Release device */
+    .thsafe_client_read_16        = &thsafe_zmq_client_read_16,     /* Read 16-bit data */
+    .thsafe_client_read_32        = &thsafe_zmq_client_read_32,     /* Read 32-bit data */
+    .thsafe_client_read_64        = &thsafe_zmq_client_read_64,     /* Read 64-bit data */
+    .thsafe_client_write_16       = &thsafe_zmq_client_write_16,    /* Write 16-bit data */
+    .thsafe_client_write_32       = &thsafe_zmq_client_write_32,    /* Write 32-bit data */
+    .thsafe_client_write_64       = &thsafe_zmq_client_write_64,    /* Write 64-bit data */
+    .thsafe_client_read_block     = &thsafe_zmq_client_read_block,  /* Read arbitrary block size data,
                                                                         parameter size in bytes */
-    .thsafe_client_write_block    = thsafe_zmq_client_write_block, /* Write arbitrary block size data,
+    .thsafe_client_write_block    = &thsafe_zmq_client_write_block, /* Write arbitrary block size data,
                                                                         parameter size in bytes */
-    .thsafe_client_read_dma       = thsafe_zmq_client_read_dma,    /* Read arbitrary block size data via DMA,
+    .thsafe_client_read_dma       = &thsafe_zmq_client_read_dma,    /* Read arbitrary block size data via DMA,
      _                                                                  parameter size in bytes */
-    .thsafe_client_write_dma      = thsafe_zmq_client_write_dma    /* Write arbitrary block size data via DMA,
+    .thsafe_client_write_dma      = &thsafe_zmq_client_write_dma    /* Write arbitrary block size data via DMA,
                                                                         parameter size in bytes */
-    /*.thsafe_client_read_info      = thsafe_zmq_client_read_info */   /* Read device information data */
+    /*.thsafe_client_read_info      = &thsafe_zmq_client_read_info */   /* Read device information data */
 };

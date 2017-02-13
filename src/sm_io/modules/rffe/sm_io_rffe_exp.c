@@ -303,11 +303,11 @@ smio_err_e rffe_do_op (void *self, void *msg)
 }
 
 const smio_ops_t rffe_ops = {
-    .attach             = rffe_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = rffe_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = rffe_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = rffe_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = rffe_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &rffe_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &rffe_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &rffe_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &rffe_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &rffe_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -391,9 +391,9 @@ err_rffe_handler:
 }
 
 const smio_bootstrap_ops_t rffe_bootstrap_ops = {
-    .init = rffe_init,
-    .shutdown = rffe_shutdown,
-    .config_defaults = rffe_config_defaults
+    .init            = &rffe_init,
+    .shutdown        = &rffe_shutdown,
+    .config_defaults = &rffe_config_defaults
 };
 
 SMIO_MOD_DECLARE(RFFE_DEVID, RFFE_NAME, rffe_bootstrap_ops)

@@ -96,11 +96,11 @@ smio_err_e acq_pm_do_op (void *self, void *msg)
 }
 
 const smio_ops_t acq_pm_ops = {
-    .attach             = acq_pm_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = acq_pm_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = acq_pm_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = acq_pm_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = acq_pm_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &acq_pm_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &acq_pm_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &acq_pm_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &acq_pm_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &acq_pm_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -186,8 +186,8 @@ err_acq_pm_handler:
 }
 
 const smio_bootstrap_ops_t acq_pm_bootstrap_ops = {
-    .init = acq_pm_init,
-    .shutdown = acq_pm_shutdown
+    .init     = &acq_pm_init,
+    .shutdown = &acq_pm_shutdown
 };
 
 SMIO_MOD_DECLARE(ACQ_PM_SDB_DEVID, ACQ_PM_SDB_NAME, acq_pm_bootstrap_ops)

@@ -431,11 +431,11 @@ smio_err_e afc_timing_do_op (void *self, void *msg)
 }
 
 const smio_ops_t afc_timing_ops = {
-    .attach             = afc_timing_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = afc_timing_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = afc_timing_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = afc_timing_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = afc_timing_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &afc_timing_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &afc_timing_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &afc_timing_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &afc_timing_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &afc_timing_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -521,9 +521,9 @@ err_afc_timing_handler:
 }
 
 const smio_bootstrap_ops_t afc_timing_bootstrap_ops = {
-    .init = afc_timing_init,
-    .shutdown = afc_timing_shutdown,
-    .config_defaults = afc_timing_config_defaults
+    .init            = &afc_timing_init,
+    .shutdown        = &afc_timing_shutdown,
+    .config_defaults = &afc_timing_config_defaults
 };
 
 SMIO_MOD_DECLARE(AFC_TIMING_SDB_DEVID, AFC_TIMING_SDB_NAME, afc_timing_bootstrap_ops)

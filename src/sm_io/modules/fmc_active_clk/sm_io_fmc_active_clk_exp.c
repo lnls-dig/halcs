@@ -528,11 +528,11 @@ smio_err_e fmc_active_clk_do_op (void *self, void *msg)
 }
 
 const smio_ops_t fmc_active_clk_ops = {
-    .attach             = fmc_active_clk_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = fmc_active_clk_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = fmc_active_clk_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = fmc_active_clk_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = fmc_active_clk_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &fmc_active_clk_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &fmc_active_clk_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &fmc_active_clk_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &fmc_active_clk_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &fmc_active_clk_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -619,9 +619,9 @@ err_fmcaclk_handler:
 }
 
 const smio_bootstrap_ops_t fmc_active_clk_bootstrap_ops = {
-    .init = fmc_active_clk_init,
-    .shutdown = fmc_active_clk_shutdown,
-    .config_defaults = fmc_active_clk_config_defaults
+    .init            = &fmc_active_clk_init,
+    .shutdown        = &fmc_active_clk_shutdown,
+    .config_defaults = &fmc_active_clk_config_defaults
 };
 
 SMIO_MOD_DECLARE(FMC_ACTIVE_CLK_SDB_DEVID, FMC_ACTIVE_CLK_SDB_NAME, fmc_active_clk_bootstrap_ops)

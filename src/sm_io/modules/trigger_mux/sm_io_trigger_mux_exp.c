@@ -143,11 +143,11 @@ smio_err_e trigger_mux_do_op (void *self, void *msg)
 }
 
 const smio_ops_t trigger_mux_ops = {
-    .attach             = trigger_mux_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = trigger_mux_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = trigger_mux_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = trigger_mux_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = trigger_mux_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &trigger_mux_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &trigger_mux_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &trigger_mux_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &trigger_mux_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &trigger_mux_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -234,9 +234,9 @@ err_trig_iface_handler:
 }
 
 const smio_bootstrap_ops_t trigger_mux_bootstrap_ops = {
-    .init = trigger_mux_init,
-    .shutdown = trigger_mux_shutdown,
-    .config_defaults = trigger_mux_config_defaults
+    .init            = &trigger_mux_init,
+    .shutdown        = &trigger_mux_shutdown,
+    .config_defaults = &trigger_mux_config_defaults
 };
 
 SMIO_MOD_DECLARE(TRIGGER_MUX_SDB_DEVID, TRIGGER_MUX_SDB_NAME, trigger_mux_bootstrap_ops)

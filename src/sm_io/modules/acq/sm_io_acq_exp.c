@@ -810,11 +810,11 @@ smio_err_e acq_do_op (void *self, void *msg)
 }
 
 const smio_ops_t acq_ops = {
-    .attach             = acq_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = acq_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = acq_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = acq_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = acq_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &acq_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &acq_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &acq_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &acq_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &acq_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -900,8 +900,8 @@ err_acq_handler:
 }
 
 const smio_bootstrap_ops_t acq_bootstrap_ops = {
-    .init = acq_init,
-    .shutdown = acq_shutdown
+    .init     = &acq_init,
+    .shutdown = &acq_shutdown
 };
 
 SMIO_MOD_DECLARE(ACQ_SDB_DEVID, ACQ_SDB_NAME, acq_bootstrap_ops)

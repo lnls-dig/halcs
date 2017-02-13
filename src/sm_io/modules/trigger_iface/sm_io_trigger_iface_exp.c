@@ -179,11 +179,11 @@ smio_err_e trigger_iface_do_op (void *self, void *msg)
 }
 
 const smio_ops_t trigger_iface_ops = {
-    .attach             = trigger_iface_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = trigger_iface_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = trigger_iface_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = trigger_iface_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = trigger_iface_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &trigger_iface_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &trigger_iface_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &trigger_iface_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &trigger_iface_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &trigger_iface_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -270,9 +270,9 @@ err_trig_iface_handler:
 }
 
 const smio_bootstrap_ops_t trigger_iface_bootstrap_ops = {
-    .init = trigger_iface_init,
-    .shutdown = trigger_iface_shutdown,
-    .config_defaults = trigger_iface_config_defaults
+    .init            = &trigger_iface_init,
+    .shutdown        = &trigger_iface_shutdown,
+    .config_defaults = &trigger_iface_config_defaults
 };
 
 SMIO_MOD_DECLARE(TRIGGER_IFACE_SDB_DEVID, TRIGGER_IFACE_SDB_NAME, trigger_iface_bootstrap_ops)

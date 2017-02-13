@@ -747,7 +747,7 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
 {
     assert (owner);
     assert (msg);
-    
+
     smio_err_e err = SMIO_SUCCESS;
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_fmc250m_4ch_t *fmc250m = smio_get_handler (self);
@@ -821,12 +821,12 @@ smio_err_e fmc250m_4ch_do_mgmt_op (void *self, void *msg)
 }
 
 const smio_ops_t fmc250m_4ch_ops = {
-    .attach             = fmc250m_4ch_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = fmc250m_4ch_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = fmc250m_4ch_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = fmc250m_4ch_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = fmc250m_4ch_do_op,           /* Generic wrapper for handling specific operations */
-    .do_mgmt_op         = fmc250m_4ch_do_mgmt_op       /* Generic wrapper for handling internal SMIO operations */
+    .attach             = &fmc250m_4ch_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &fmc250m_4ch_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &fmc250m_4ch_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &fmc250m_4ch_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &fmc250m_4ch_do_op,           /* Generic wrapper for handling specific operations */
+    .do_mgmt_op         = &fmc250m_4ch_do_mgmt_op       /* Generic wrapper for handling internal SMIO operations */
 };
 
 /************************************************************/
@@ -913,9 +913,9 @@ err_fmc250m_handler:
 }
 
 const smio_bootstrap_ops_t fmc250m_4ch_bootstrap_ops = {
-    .init = fmc250m_4ch_init,
-    .shutdown = fmc250m_4ch_shutdown,
-    .config_defaults = fmc250m_4ch_config_defaults
+    .init            = &fmc250m_4ch_init,
+    .shutdown        = &fmc250m_4ch_shutdown,
+    .config_defaults = &fmc250m_4ch_config_defaults
 };
 
 SMIO_MOD_DECLARE(FMC250M_4CH_SDB_DEVID, FMC250M_4CH_SDB_NAME, fmc250m_4ch_bootstrap_ops)
