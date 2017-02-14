@@ -570,13 +570,12 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
-	echo $(LEDBG)
 	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
 
 scripts_uninstall:
-	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
 
 scripts_clean:
