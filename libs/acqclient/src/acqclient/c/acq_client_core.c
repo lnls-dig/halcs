@@ -37,191 +37,191 @@
 
 /****************** ACQ SMIO Functions ****************/
 
-static halcs_client_err_e _halcs_acq_start (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_start (halcs_client_t *self, char *service,
         acq_req_t *acq_req);
-static halcs_client_err_e _halcs_acq_check (halcs_client_t *self, char *service);
-static halcs_client_err_e _halcs_acq_check_timed (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_check (halcs_client_t *self, char *service);
+static halcs_client_err_e _acq_check_timed (halcs_client_t *self, char *service,
         int timeout);
-static halcs_client_err_e _halcs_acq_get_data_block (halcs_client_t *self,
+static halcs_client_err_e _acq_get_data_block (halcs_client_t *self,
         char *service, acq_trans_t *acq_trans);
-static halcs_client_err_e _halcs_acq_get_curve (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_get_curve (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans);
-static halcs_client_err_e _halcs_full_acq (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_full (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout);
-static halcs_client_err_e _halcs_full_acq_compat (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_full_compat (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq);
 
-halcs_client_err_e halcs_acq_start (halcs_client_t *self, char *service, acq_req_t *acq_req)
+halcs_client_err_e acq_start (halcs_client_t *self, char *service, acq_req_t *acq_req)
 {
-    return _halcs_acq_start (self, service, acq_req);
+    return _acq_start (self, service, acq_req);
 }
 
-halcs_client_err_e halcs_acq_check (halcs_client_t *self, char *service)
+halcs_client_err_e acq_check (halcs_client_t *self, char *service)
 {
-    return _halcs_acq_check (self, service);
+    return _acq_check (self, service);
 }
 
-halcs_client_err_e halcs_acq_check_timed (halcs_client_t *self, char *service,
+halcs_client_err_e acq_check_timed (halcs_client_t *self, char *service,
         int timeout)
 {
-    return _halcs_acq_check_timed (self, service, timeout);
+    return _acq_check_timed (self, service, timeout);
 }
 
-halcs_client_err_e halcs_acq_get_data_block (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_block (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans)
 {
-    return _halcs_acq_get_data_block (self, service, acq_trans);
+    return _acq_get_data_block (self, service, acq_trans);
 }
 
-halcs_client_err_e halcs_acq_get_curve (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_curve (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans)
 {
-    return _halcs_acq_get_curve (self, service, acq_trans);
+    return _acq_get_curve (self, service, acq_trans);
 }
 
-halcs_client_err_e halcs_full_acq (halcs_client_t *self, char *service,
+halcs_client_err_e acq_full (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout)
 {
-    return _halcs_full_acq (self, service, acq_trans, timeout);
+    return _acq_full (self, service, acq_trans, timeout);
 }
 
-halcs_client_err_e halcs_full_acq_compat (halcs_client_t *self, char *service,
+halcs_client_err_e acq_full_compat (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq)
 {
-    return _halcs_full_acq_compat (self, service, acq_trans, timeout, new_acq);
+    return _acq_full_compat (self, service, acq_trans, timeout, new_acq);
 }
 
-static halcs_client_err_e _halcs_acq_check_timed (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_check_timed (halcs_client_t *self, char *service,
         int timeout)
 {
     return func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE, service, NULL,
             NULL, timeout);
 }
 
-halcs_client_err_e halcs_set_acq_trig (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_trig (halcs_client_t *self, char *service,
         uint32_t trig)
 {
     return param_client_write (self, service, ACQ_OPCODE_CFG_TRIG, trig);
 }
 
-halcs_client_err_e halcs_get_acq_trig (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_trig (halcs_client_t *self, char *service,
         uint32_t *trig)
 {
     return param_client_read (self, service, ACQ_OPCODE_CFG_TRIG, trig);
 }
 
-halcs_client_err_e halcs_set_acq_data_trig_pol (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_data_trig_pol (halcs_client_t *self, char *service,
         uint32_t data_trig_pol)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_POL,
             data_trig_pol);
 }
 
-halcs_client_err_e halcs_get_acq_data_trig_pol (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_trig_pol (halcs_client_t *self, char *service,
         uint32_t *data_trig_pol)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_POL,
             data_trig_pol);
 }
 
-halcs_client_err_e halcs_set_acq_data_trig_sel (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_data_trig_sel (halcs_client_t *self, char *service,
         uint32_t data_trig_sel)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_SEL,
             data_trig_sel);
 }
 
-halcs_client_err_e halcs_get_acq_data_trig_sel (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_trig_sel (halcs_client_t *self, char *service,
         uint32_t *data_trig_sel)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_SEL,
             data_trig_sel);
 }
 
-halcs_client_err_e halcs_set_acq_data_trig_filt (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_data_trig_filt (halcs_client_t *self, char *service,
         uint32_t data_trig_filt)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_FILT,
             data_trig_filt);
 }
-halcs_client_err_e halcs_get_acq_data_trig_filt (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_trig_filt (halcs_client_t *self, char *service,
         uint32_t *data_trig_filt)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_FILT,
             data_trig_filt);
 }
 
-halcs_client_err_e halcs_set_acq_data_trig_thres (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_data_trig_thres (halcs_client_t *self, char *service,
         uint32_t data_trig_thres)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_THRES,
             data_trig_thres);
 }
 
-halcs_client_err_e halcs_get_acq_data_trig_thres (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_trig_thres (halcs_client_t *self, char *service,
         uint32_t *data_trig_thres)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_THRES,
             data_trig_thres);
 }
 
-halcs_client_err_e halcs_set_acq_hw_trig_dly (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_hw_trig_dly (halcs_client_t *self, char *service,
         uint32_t hw_trig_dly)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_TRIG_DLY,
             hw_trig_dly);
 }
 
-halcs_client_err_e halcs_get_acq_hw_trig_dly (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_hw_trig_dly (halcs_client_t *self, char *service,
         uint32_t *hw_trig_dly)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_TRIG_DLY,
             hw_trig_dly);
 }
 
-halcs_client_err_e halcs_set_acq_sw_trig (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_sw_trig (halcs_client_t *self, char *service,
         uint32_t sw_trig)
 {
     return param_client_write (self, service, ACQ_OPCODE_SW_TRIG,
             sw_trig);
 }
 
-halcs_client_err_e halcs_get_acq_sw_trig (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_sw_trig (halcs_client_t *self, char *service,
         uint32_t *sw_trig)
 {
     return param_client_read (self, service, ACQ_OPCODE_SW_TRIG,
             sw_trig);
 }
 
-halcs_client_err_e halcs_set_acq_fsm_stop (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_fsm_stop (halcs_client_t *self, char *service,
         uint32_t fsm_stop)
 {
     return param_client_write (self, service, ACQ_OPCODE_FSM_STOP,
             fsm_stop);
 }
 
-halcs_client_err_e halcs_get_acq_fsm_stop (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_fsm_stop (halcs_client_t *self, char *service,
         uint32_t *fsm_stop)
 {
     return param_client_read (self, service, ACQ_OPCODE_FSM_STOP,
             fsm_stop);
 }
 
-halcs_client_err_e halcs_set_acq_data_trig_chan (halcs_client_t *self, char *service,
+halcs_client_err_e acq_set_data_trig_chan (halcs_client_t *self, char *service,
         uint32_t data_trig_chan)
 {
     return param_client_write (self, service, ACQ_OPCODE_HW_DATA_TRIG_CHAN,
             data_trig_chan);
 }
 
-halcs_client_err_e halcs_get_acq_data_trig_chan (halcs_client_t *self, char *service,
+halcs_client_err_e acq_get_data_trig_chan (halcs_client_t *self, char *service,
         uint32_t *data_trig_chan)
 {
     return param_client_read (self, service, ACQ_OPCODE_HW_DATA_TRIG_CHAN,
             data_trig_chan);
 }
 
-static halcs_client_err_e _halcs_acq_start (halcs_client_t *self, char *service, acq_req_t *acq_req)
+static halcs_client_err_e _acq_start (halcs_client_t *self, char *service, acq_req_t *acq_req)
 {
     assert (self);
     assert (service);
@@ -237,18 +237,18 @@ static halcs_client_err_e _halcs_acq_start (halcs_client_t *self, char *service,
     halcs_client_err_e err = halcs_func_exec(self, func, service, write_val, NULL);
 
     /* Check if any error occurred */
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "halcs_data_acquire: Data acquire was "
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "acq_data_acquire: Data acquire was "
             "not requested correctly", err_data_acquire, HALCS_CLIENT_ERR_AGAIN);
 
     /* If we are here, then the request was successfully acquired*/
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_data_acquire: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_data_acquire: "
             "Data acquire was successfully required\n");
 
 err_data_acquire:
     return err;
 }
 
-static halcs_client_err_e _halcs_acq_check (halcs_client_t *self, char *service)
+static halcs_client_err_e _acq_check (halcs_client_t *self, char *service)
 {
     assert (self);
     assert (service);
@@ -268,7 +268,7 @@ static halcs_client_err_e _halcs_acq_check (halcs_client_t *self, char *service)
     return err;
 }
 
-static halcs_client_err_e _halcs_acq_get_data_block (halcs_client_t *self, char *service, acq_trans_t *acq_trans)
+static halcs_client_err_e _acq_get_data_block (halcs_client_t *self, char *service, acq_trans_t *acq_trans)
 {
     assert (self);
     assert (service);
@@ -298,7 +298,7 @@ static halcs_client_err_e _halcs_acq_get_data_block (halcs_client_t *self, char 
 
     /* Check if any error occurred */
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
-            "halcs_get_data_block: Data block was not acquired",
+            "acq_get_data_block: Data block was not acquired",
             err_get_data_block, HALCS_CLIENT_ERR_SERVER);
 
     /* Data size effectively returned */
@@ -312,16 +312,16 @@ static halcs_client_err_e _halcs_acq_get_data_block (halcs_client_t *self, char 
     acq_trans->block.bytes_read = read_size;
 
     /* Print some debug messages */
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_data_block: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_data_block: "
             "read_size: %u\n", read_size);
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_data_block: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_data_block: "
             "acq_trans->block.data: %p\n", acq_trans->block.data);
 
 err_get_data_block:
     return err;
 }
 
-static halcs_client_err_e _halcs_acq_get_curve (halcs_client_t *self, char *service, acq_trans_t *acq_trans)
+static halcs_client_err_e _acq_get_curve (halcs_client_t *self, char *service, acq_trans_t *acq_trans)
 {
     assert (self);
     assert (service);
@@ -329,14 +329,14 @@ static halcs_client_err_e _halcs_acq_get_curve (halcs_client_t *self, char *serv
     assert (acq_trans->block.data);
 
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
-    const acq_chan_t *acq_chan = halcs_get_acq_chan (self);
+    const acq_chan_t *acq_chan = acq_get_chan (self);
 
     uint32_t num_samples_shot = acq_trans->req.num_samples_pre +
         acq_trans->req.num_samples_post;
     uint32_t num_samples_multishot = num_samples_shot*acq_trans->req.num_shots;
     uint32_t n_max_samples = BLOCK_SIZE/acq_chan[acq_trans->req.chan].sample_size;
     uint32_t block_n_valid = num_samples_multishot / n_max_samples;
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_curve: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
             "block_n_valid = %u\n", block_n_valid);
 
     /* Total bytes read */
@@ -353,23 +353,23 @@ static halcs_client_err_e _halcs_acq_get_curve (halcs_client_t *self, char *serv
         }
 
         acq_trans->block.idx = block_n;
-        err = _halcs_acq_get_data_block (self, service, acq_trans);
+        err = _acq_get_data_block (self, service, acq_trans);
 
         /* Check for return code */
         ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
-                "_halcs_get_data_block failed. block_n is probably out of range",
-                err_halcs_get_data_block);
+                "_acq_get_data_block failed. block_n is probably out of range",
+                err_acq_get_data_block);
 
         total_bread += acq_trans->block.bytes_read;
         acq_trans->block.data = (uint32_t *)((uint8_t *)acq_trans->block.data + acq_trans->block.bytes_read);
         acq_trans->block.data_size -= acq_trans->block.bytes_read;
 
         /* Print some debug messages */
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_curve: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
                 "Total bytes read up to now: %u\n", total_bread);
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_curve: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
                 "Data pointer addr: %p\n", acq_trans->block.data);
-        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_curve: "
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
                 "Data buffer size: %u\n", acq_trans->block.data_size);
     }
 
@@ -378,15 +378,15 @@ static halcs_client_err_e _halcs_acq_get_curve (halcs_client_t *self, char *serv
     acq_trans->block.data_size = data_size;
     acq_trans->block.data = original_data_pt;
 
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] halcs_get_curve: "
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
             "Data curve of %u bytes was successfully acquired\n", total_bread);
 
 halcs_zsys_interrupted:
-err_halcs_get_data_block:
+err_acq_get_data_block:
     return err;
 }
 
-static halcs_client_err_e _halcs_full_acq (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_full (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout)
 {
     assert (self);
@@ -395,7 +395,7 @@ static halcs_client_err_e _halcs_full_acq (halcs_client_t *self, char *service,
     assert (acq_trans->block.data);
 
     /* Send Acquisition Request */
-    _halcs_acq_start (self, service, &acq_trans->req);
+    _acq_start (self, service, &acq_trans->req);
 
     /* Wait until the acquisition is finished */
     halcs_client_err_e err = func_polling (self, ACQ_NAME_CHECK_DATA_ACQUIRE,
@@ -409,7 +409,7 @@ static halcs_client_err_e _halcs_full_acq (halcs_client_t *self, char *service,
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] "
             "Data acquisition was successfully completed\n");
 
-    err = _halcs_acq_get_curve (self, service, acq_trans);
+    err = _acq_get_curve (self, service, acq_trans);
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get requested curve",
             err_get_curve, HALCS_CLIENT_ERR_SERVER);
 
@@ -419,13 +419,13 @@ err_check_data_acquire:
 }
 
 /* Wrapper to be compatible with old function behavior */
-static halcs_client_err_e _halcs_full_acq_compat (halcs_client_t *self, char *service,
+static halcs_client_err_e _acq_full_compat (halcs_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq)
 {
     if (new_acq) {
-        return _halcs_full_acq (self, service, acq_trans, timeout);
+        return _acq_full (self, service, acq_trans, timeout);
     }
     else {
-        return _halcs_acq_get_curve (self, service, acq_trans);
+        return _acq_get_curve (self, service, acq_trans);
     }
 }
