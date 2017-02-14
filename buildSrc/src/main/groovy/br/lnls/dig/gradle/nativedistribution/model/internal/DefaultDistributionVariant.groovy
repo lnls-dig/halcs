@@ -63,9 +63,9 @@ public class DefaultDistributionVariant extends DefaultDistribution
 
     void addBinaries(Iterable<NativeBinarySpec> binaries) {
         def compatibleBinaries = binaries.findAll() { binary ->
-            binary.buildType == buildType &&
-            binary.flavor == flavor &&
-            binary.targetPlatform == platform
+            binary.buildType.name == buildType.name &&
+            binary.flavor.name == flavor.name &&
+            binary.targetPlatform.name == platform.name
         }
 
         compatibleBinaries.each { binary ->
@@ -188,7 +188,7 @@ public class DefaultDistributionVariant extends DefaultDistribution
             ModelRegistry projectModel) {
         def library = getDependencyLibrary(libraryName, projectModel)
 
-        sharedLibraries += library.binaries.withType(SharedLibraryBinarySpec)
+        addBinaries(library.binaries)
     }
 
     private NativeLibrarySpec getDependencyLibrary(String libraryName,
