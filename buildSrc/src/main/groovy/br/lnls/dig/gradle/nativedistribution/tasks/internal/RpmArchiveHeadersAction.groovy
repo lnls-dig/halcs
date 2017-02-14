@@ -1,6 +1,7 @@
 package br.lnls.dig.gradle.nativedistribution.tasks.internal
 
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileVisitDetails
 
 import br.lnls.dig.gradle.nativedistribution.tasks.Rpm
 
@@ -20,12 +21,15 @@ class RpmArchiveHeadersAction extends AbstractRpmArchiveAction  {
 
     @Override
     protected void addArchiveFiles() {
-        exportedHeaders.each { headerFile -> addHeaderFile(headerFile) }
+        exportedHeaders.asFileTree.visit { fileDetails ->
+            if (!fileDetails.isDirectory())
+                addHeaderFile(fileDetails)
+        }
     }
 
-    private void addHeaderFile(File headerFile) {
-        def headerFilePath = "$installationPrefix/include/$headerFile.name"
+    private void addHeaderFile(FileVisitDetails header) {
+        def headerFilePath = "$installationPrefix/include/$header.relativePath"
 
-        rpmBuilder.addFile(headerFilePath, headerFile)
+        rpmBuilder.addFile(headerFilePath, header.file)
     }
 }
