@@ -38,7 +38,7 @@ INIT_SYSTEM=$(./get-init-system.sh)
 case ${INIT_SYSTEM} in
     "systemd")
         echo "Disabling systemd service "${SERVICE}
-        systemctl disable ${SERVICE}
+        systemctl disable ${SERVICE} || /bin/true
         ;;
     "upstart")
         echo "Disabling upstart service "${SERVICE}
