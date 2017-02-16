@@ -5,6 +5,7 @@ model {
                 c {
                     lib project: ':core:common', library: 'common'
                     lib project: ':core:sm_io', library: 'sm_io'
+                    lib project: ':core:sm_io_table', library: 'sm_io_table'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'
                     lib project: ':libs:halcsclient', library: 'halcsclient'

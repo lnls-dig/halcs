@@ -217,6 +217,7 @@ APPS_MKS = $(foreach mk,$(APPS),apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
 include $(SRC_DIR)/core/sm_io/sm_io.mk
+include $(SRC_DIR)/core/sm_io_table/sm_io_table.mk
 include $(SRC_DIR)/core/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/core/dev_io/dev_io.mk
 include $(SRC_DIR)/core/msg/msg.mk
@@ -232,6 +233,7 @@ boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Icore/common/include \
 	       -Icore/sm_io/include \
+	       -Icore/sm_io_table/include \
 	       -Iforeign/libsdbfs/include \
 	       -Ilibs/llio/include \
 	       -I${PREFIX}/include
