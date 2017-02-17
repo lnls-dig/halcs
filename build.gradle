@@ -19,10 +19,10 @@ allprojects {
 
         binaries {
             all {
-                cCompiler.args '-std=gnu99', '-O2'
+                cCompiler.args '-std=gnu99', '-O2', '-g'
                 cCompiler.args '-Wall', '-Wextra', '-Werror'
 
-                cCompiler.define 'ERRHAND_MIN_LEVEL=DBG_LVL_TRACE'
+                cCompiler.define 'ERRHAND_MIN_LEVEL=DBG_LVL_WARN'
                 cCompiler.define 'ERRHAND_SUBSYS_ON=(DBG_DEV_MNGR | ' +
                         'DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | ' +
                         'DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)'
