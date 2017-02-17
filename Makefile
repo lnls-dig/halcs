@@ -352,7 +352,7 @@ endif
 # Install just the driver and lib, not udev rules
 pcie_driver_install:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_install lib_driver_install
-	$(DEPMOD) -a
+	$(DEPMOD) -a $(KERNEL_VERSION)
 
 pcie_driver_uninstall:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_uninstall lib_driver_uninstall
