@@ -8,7 +8,7 @@ VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
     echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
-    echo "    [-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
+    echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
 }
 
 #######################################
