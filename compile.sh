@@ -135,7 +135,7 @@ CFG_FILENAME=/etc/halcs/halcs.cfg
 PREFIX=/usr/local
 CFG_DIR=${PREFIX}/etc/halcs
 # Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
-CFG=lnls_defconfig
+CFG=crude_defconfig
 export CFG
 
 COMMAND_DEPS="\
