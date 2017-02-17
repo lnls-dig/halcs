@@ -45,7 +45,7 @@
 smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
-    (void) log_file_name;
+    UNUSED(log_file_name);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc_active_clk_defaults] Configuring SMIO "
             "FMC_ACTIVE_CLK with default values ...\n");
     halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;

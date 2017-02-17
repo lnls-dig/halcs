@@ -103,7 +103,7 @@ static smpr_err_e smpr_proto_bsmp_destroy (smpr_proto_bsmp_t **self_p)
 /* Open BSMP protocol */
 static int bsmp_open (smpr_t *self, uint64_t base, void *args)
 {
-    (void) args;
+    UNUSED(args);
     assert (self);
 
     /* Create new bsmp */

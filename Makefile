@@ -73,8 +73,8 @@ PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 
 # PCIe driver stuff (pcie driver and library) relative
 # directory
-PCIE_DRIVER_VER = $(shell uname -r)
-DRIVER_OBJ = /lib/modules/$(PCIE_DRIVER_VER)/extra/pciDriver.ko
+KERNEL_VERSION ?= $(shell uname -r)
+DRIVER_OBJ = /lib/modules/$(KERNEL_VERSION)/extra/pciDriver.ko
 
 # Project libraries
 LIBERRHAND_DIR = libs/errhand
@@ -362,7 +362,7 @@ endif
 # Install just the driver and lib, not udev rules
 pcie_driver_install:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_install lib_driver_install
-	$(DEPMOD) -a
+	$(DEPMOD) -a $(KERNEL_VERSION)
 
 pcie_driver_uninstall:
 	$(MAKE) -C $(PCIE_DRIVER_DIR) core_driver_uninstall lib_driver_uninstall

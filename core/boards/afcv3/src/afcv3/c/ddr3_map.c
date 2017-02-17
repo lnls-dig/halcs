@@ -257,7 +257,27 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .max_samples = DDR3_MONIT1POS1_MAX_SAMPLES,
             .sample_size = DDR3_MONIT1POS1_SAMPLE_SIZE
         },
-    }
+    },
+    /*** Acquisition Core 2 Channel Parameters ***/
+    {
+        {
+            .id = ADC_CHAN_ID,
+            .start_addr = DDR3_ADC2_START_ADDR,
+            .end_addr = DDR3_ADC2_END_ADDR,
+            .max_samples = DDR3_ADC2_MAX_SAMPLES,
+            .sample_size = DDR3_ADC2_SAMPLE_SIZE
+        }
+    },
+    /*** Acquisition Core 3 Channel Parameters ***/
+    {
+        {
+            .id = ADC_CHAN_ID,
+            .start_addr = DDR3_ADC3_START_ADDR,
+            .end_addr = DDR3_ADC3_END_ADDR,
+            .max_samples = DDR3_ADC3_MAX_SAMPLES,
+            .sample_size = DDR3_ADC3_SAMPLE_SIZE
+        }
+    },
 };
 
 #endif

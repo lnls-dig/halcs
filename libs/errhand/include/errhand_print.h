@@ -21,8 +21,10 @@ void errhand_print (const char *fmt, ...) __attribute__((format(printf,1,2)));
 void errhand_print_vec (const char *fmt, const char *data, int len);
 void errhand_log_print (int dbg_lvl, const char *fmt, ...) __attribute__((format(printf,2,3)));
 /* Set the output logfile Defaults to STDOUT */
-void errhand_set_log_file (FILE *log_file);
-int errhand_set_log (const char *log_file_name, const char *mode);
+void errhand_log_file_new (FILE *log_file);
+int errhand_log_new (const char *log_file_name, const char *mode);
+void errhand_log_file_destroy ();
+int errhand_log_destroy ();
 void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
 
 /********************** Error handling macros  **********************/

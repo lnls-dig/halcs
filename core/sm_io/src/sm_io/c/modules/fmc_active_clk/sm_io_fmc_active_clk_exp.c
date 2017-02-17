@@ -118,7 +118,7 @@ typedef smch_err_e (*smch_ad9510_func_fp) (smch_ad9510_t *self, uint32_t *param)
         /* Call specific function */                                            \
         if (rw) {                                                               \
             WHEN(ISEMPTY(read_func))(                                           \
-                (void) ret;                                                     \
+                UNUSED(ret);                                                     \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
                         "AD9510 read function not implemented\n");              \
                 err = -FMC_ACTIVE_CLK_UNINPL;                                   \
@@ -164,7 +164,7 @@ err_get_fmcaclk_handler:                                                        
 
 static smch_err_e smch_ad9510_cfg_defaults_compat (smch_ad9510_t *self, uint32_t *param)
 {
-    (void) param;
+    UNUSED(param);
     return smch_ad9510_cfg_defaults (self);
 }
 
@@ -241,7 +241,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double *param);
 #define FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, read_func, write_func, \
         error_msg)                                                              \
     do {                                                                        \
-        (void) ret;                                                             \
+        UNUSED(ret);                                                             \
         assert (owner);                                                         \
         assert (args);                                                          \
                                                                                 \
@@ -258,7 +258,7 @@ typedef smch_err_e (*smch_si57x_func_fp) (smch_si57x_t *self, double *param);
         /* Call specific function */                                            \
         if (rw) {                                                               \
             WHEN(ISEMPTY(read_func))(                                           \
-                (void) ret;                                                     \
+                UNUSED(ret);                                                     \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
                         "SI57x read function not implemented\n");               \
                 err = -FMC_ACTIVE_CLK_UNINPL;                                   \
@@ -322,7 +322,7 @@ FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(get_defaults)
 
 static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
 {
-    (void) ret;
+    UNUSED(ret);
     assert (owner);
     assert (args);
     int err = -FMC_ACTIVE_CLK_OK;
@@ -331,7 +331,8 @@ static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
     uint32_t inst_id = smio_get_inst_id (self);
 
     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
-    (void) rw;
+    UNUSED(rw);
+
     uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk] "
@@ -346,6 +347,109 @@ static int _fmc_active_clk_rst_isla216p (void *owner, void *args, void *ret)
 
 err_send_mgmt_msg:
     return err;
+}
+
+/* Macros to avoid repetition of the function body AD9510 */
+typedef smch_err_e (*smch_ad9510_func_fp2) (smch_ad9510_t *self, uint32_t *addr,
+        uint32_t *param);
+
+#define FMC_ACTIVE_CLK_AD9510_FUNC_BODY2(owner, args, ret, max_addr, read_func, write_func,   \
+                error_msg)                                                         \
+        do {                                                                       \
+            assert (owner);                                                        \
+            assert (args);                                                         \
+                                                                                   \
+            int err = -FMC_ACTIVE_CLK_OK;                                          \
+            SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                         \
+            smio_fmc_active_clk_t *fmcaclk = smio_get_handler (self);              \
+            ASSERT_TEST(fmcaclk != NULL, "Could not get SMIO FMC130M handler",     \
+                    err_get_fmcaclk_handler, -FMC_ACTIVE_CLK_ERR);                 \
+            uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);               \
+            uint32_t addr = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);              \
+            uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);             \
+                                                                                   \
+            ASSERT_TEST(addr < max_addr, "Received AD9510 addr too big",           \
+                    err_rcv_addr, -FMC_ACTIVE_CLK_ERR);                            \
+                                                                                   \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] Calling " \
+                    "AD9510 function, for addr #%u\n", addr);                      \
+                                                                                   \
+            smch_ad9510_t *smch_ad9510 = SMIO_AD9510_HANDLER(fmcaclk);             \
+                                                                                   \
+            smch_err_e serr = SMCH_SUCCESS;                                        \
+            /* Call specific function */                                           \
+            if (rw) {                                                              \
+                WHEN(ISEMPTY(read_func))(                                          \
+                    UNUSED(ret);                                                    \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                            "AD9510 read function not implemented\n");             \
+                    err = -FMC_ACTIVE_CLK_UNINPL;                                  \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(read_func))(                                       \
+                    UNUSED(param);                                                  \
+                    uint32_t value = 0;                                            \
+                    serr = ((smch_ad9510_func_fp2) read_func) (smch_ad9510, &addr,  \
+                            &value);                                               \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC_ACTIVE_CLK_ERR;                                 \
+                    }                                                              \
+                    else {                                                         \
+                        *((uint32_t *) ret) = value;                               \
+                        err = sizeof (value);                                      \
+                        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                                "AD9510 function read value = 0x%08X\n", value);   \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+            else {                                                                 \
+                WHEN(ISEMPTY(write_func))(                                         \
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk_exp] " \
+                            "AD9510 write function not implemented\n");            \
+                    err = -FMC_ACTIVE_CLK_UNINPL;                                  \
+                    return err;                                                    \
+                )                                                                  \
+                WHENNOT(ISEMPTY(write_func))(                                      \
+                    serr = ((smch_ad9510_func_fp2) write_func) (smch_ad9510, &addr, \
+                            &param);                                               \
+                    if (serr != SMCH_SUCCESS) {                                    \
+                        err = -FMC_ACTIVE_CLK_ERR;                                 \
+                    }                                                              \
+                    else {                                                         \
+                        err = -FMC_ACTIVE_CLK_OK;                                  \
+                    }                                                              \
+                )                                                                  \
+            }                                                                      \
+                                                                                   \
+    err_rcv_addr:                                                                  \
+    err_get_fmcaclk_handler:                                                       \
+            return err;                                                            \
+        } while(0)
+
+static smch_err_e smch_ad9510_read_8_compat (smch_ad9510_t *self,
+        uint32_t *addr_arg, uint32_t *data_arg)
+{
+    uint8_t addr = *(uint8_t *) addr_arg;
+    uint8_t *data = (uint8_t * ) data_arg;
+    return smch_ad9510_read_8 (self, addr, data);
+}
+
+static smch_err_e smch_ad9510_write_8_compat (smch_ad9510_t *self,
+        uint32_t *addr_arg, uint32_t *data_arg)
+{
+    uint8_t addr = *(uint8_t *) addr_arg;
+    const uint8_t *data = (const uint8_t *) data_arg;
+    return smch_ad9510_write_8_update (self, addr, data);
+}
+
+/* AD9510 has valid addresses up to 0x5A */
+#define HALCS_FMC_ACTIVE_CLK_AD9510_MAX_ADDR           (0x5A)
+
+FMC_ACTIVE_CLK_AD9510_FUNC_NAME_HEADER(data)
+{
+    FMC_ACTIVE_CLK_AD9510_FUNC_BODY2(owner, args, ret, HALCS_FMC_ACTIVE_CLK_AD9510_MAX_ADDR,
+            smch_ad9510_read_8_compat, smch_ad9510_write_8_compat,
+            "Could not read/write AD9510");
 }
 
 /* Exported function pointers */
@@ -367,6 +471,7 @@ const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(freq),
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(get_defaults),
     _fmc_active_clk_rst_isla216p,
+    FMC_ACTIVE_CLK_AD9510_FUNC_NAME(data),
     NULL
 };
 
@@ -379,15 +484,15 @@ static smio_err_e _fmc_active_clk_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc_active_clk_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e fmc_active_clk_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -395,15 +500,15 @@ smio_err_e fmc_active_clk_deattach (smio_t *self)
 smio_err_e fmc_active_clk_export_ops (smio_t *self,
         const disp_op_t** smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e fmc_active_clk_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -412,8 +517,8 @@ smio_err_e fmc_active_clk_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _fmc_active_clk_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -423,11 +528,11 @@ smio_err_e fmc_active_clk_do_op (void *self, void *msg)
 }
 
 const smio_ops_t fmc_active_clk_ops = {
-    .attach             = fmc_active_clk_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = fmc_active_clk_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = fmc_active_clk_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = fmc_active_clk_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = fmc_active_clk_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &fmc_active_clk_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &fmc_active_clk_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &fmc_active_clk_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &fmc_active_clk_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &fmc_active_clk_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -514,9 +619,9 @@ err_fmcaclk_handler:
 }
 
 const smio_bootstrap_ops_t fmc_active_clk_bootstrap_ops = {
-    .init = fmc_active_clk_init,
-    .shutdown = fmc_active_clk_shutdown,
-    .config_defaults = fmc_active_clk_config_defaults
+    .init            = &fmc_active_clk_init,
+    .shutdown        = &fmc_active_clk_shutdown,
+    .config_defaults = &fmc_active_clk_config_defaults
 };
 
 SMIO_MOD_DECLARE(FMC_ACTIVE_CLK_SDB_DEVID, FMC_ACTIVE_CLK_SDB_NAME, fmc_active_clk_bootstrap_ops)

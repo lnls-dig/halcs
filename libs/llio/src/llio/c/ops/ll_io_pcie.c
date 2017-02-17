@@ -207,7 +207,7 @@ err_endpoint_set:
 /* Release PCIe device */
 static int pcie_release (llio_t *self, llio_endpoint_t *endpoint)
 {
-    (void) endpoint;
+    UNUSED(endpoint);
 
     if (!llio_get_endpoint_open (self)) {
         /* Nothing to close */
@@ -290,28 +290,28 @@ static ssize_t pcie_write_block (llio_t *self, uint64_t offs, size_t size, uint3
 /* Read data block from PCIe device, size in bytes */
 static ssize_t pcie_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /* Write data block from PCIe device, size in bytes */
 static ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /* Read PCIe device information */
 /*static int pcie_read_info (llio_t *self, llio_dev_info_t *dev_info)
 {
-    (void) self;
-    (void) dev_info;
+    UNUSED(self);
+    UNUSED(dev_info);
     return -1;
 }
 */

@@ -78,7 +78,7 @@ static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
 smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_si57x_t *self = (smch_si57x_t *) zmalloc (sizeof *self);

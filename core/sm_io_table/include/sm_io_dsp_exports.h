@@ -16,6 +16,7 @@ extern disp_op_t dsp_set_get_ksum_exp;
 extern disp_op_t dsp_set_get_ds_tbt_thres_exp;
 extern disp_op_t dsp_set_get_ds_fofb_thres_exp;
 extern disp_op_t dsp_set_get_ds_monit_thres_exp;
+extern disp_op_t dsp_set_get_cfg_test_data_exp;
 extern disp_op_t dsp_set_get_monit_amp_ch0_exp;
 extern disp_op_t dsp_set_get_monit_amp_ch1_exp;
 extern disp_op_t dsp_set_get_monit_amp_ch2_exp;

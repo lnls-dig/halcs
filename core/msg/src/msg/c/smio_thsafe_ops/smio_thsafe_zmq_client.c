@@ -199,28 +199,28 @@ err_msg_alloc:
 /**** Read data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /**** Write data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
-    (void) self;
-    (void) offs;
-    (void) size;
-    (void) data;
+    UNUSED(self);
+    UNUSED(offs);
+    UNUSED(size);
+    UNUSED(data);
     return -1;
 }
 
 /**** Read device information function pointer ****/
 /* int thsafe_zmq_client_read_info (smio_t *self, thsafe_dev_info_t *dev_info)
  *{
- *  (void) self;
- *  (void) dev_info;
+ *  UNUSED(self);
+ *  UNUSED(dev_info);
  *   return -1;
  *} */
 
@@ -228,7 +228,7 @@ ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, c
 
 int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode)
 {
-    (void) endpoint;
+    UNUSED(endpoint);
     assert (self);
 
     int ret = -1;
@@ -553,21 +553,21 @@ err_null_recv_msg:
 
 /*************** Our constant structure **************/
 const smio_thsafe_client_ops_t smio_thsafe_client_zmq_ops = {
-    .thsafe_client_open           = thsafe_zmq_client_open,        /* Open device */
-    .thsafe_client_release        = thsafe_zmq_client_release,     /* Release device */
-    .thsafe_client_read_16        = thsafe_zmq_client_read_16,     /* Read 16-bit data */
-    .thsafe_client_read_32        = thsafe_zmq_client_read_32,     /* Read 32-bit data */
-    .thsafe_client_read_64        = thsafe_zmq_client_read_64,     /* Read 64-bit data */
-    .thsafe_client_write_16       = thsafe_zmq_client_write_16,    /* Write 16-bit data */
-    .thsafe_client_write_32       = thsafe_zmq_client_write_32,    /* Write 32-bit data */
-    .thsafe_client_write_64       = thsafe_zmq_client_write_64,    /* Write 64-bit data */
-    .thsafe_client_read_block     = thsafe_zmq_client_read_block,  /* Read arbitrary block size data,
+    .thsafe_client_open           = &thsafe_zmq_client_open,        /* Open device */
+    .thsafe_client_release        = &thsafe_zmq_client_release,     /* Release device */
+    .thsafe_client_read_16        = &thsafe_zmq_client_read_16,     /* Read 16-bit data */
+    .thsafe_client_read_32        = &thsafe_zmq_client_read_32,     /* Read 32-bit data */
+    .thsafe_client_read_64        = &thsafe_zmq_client_read_64,     /* Read 64-bit data */
+    .thsafe_client_write_16       = &thsafe_zmq_client_write_16,    /* Write 16-bit data */
+    .thsafe_client_write_32       = &thsafe_zmq_client_write_32,    /* Write 32-bit data */
+    .thsafe_client_write_64       = &thsafe_zmq_client_write_64,    /* Write 64-bit data */
+    .thsafe_client_read_block     = &thsafe_zmq_client_read_block,  /* Read arbitrary block size data,
                                                                         parameter size in bytes */
-    .thsafe_client_write_block    = thsafe_zmq_client_write_block, /* Write arbitrary block size data,
+    .thsafe_client_write_block    = &thsafe_zmq_client_write_block, /* Write arbitrary block size data,
                                                                         parameter size in bytes */
-    .thsafe_client_read_dma       = thsafe_zmq_client_read_dma,    /* Read arbitrary block size data via DMA,
+    .thsafe_client_read_dma       = &thsafe_zmq_client_read_dma,    /* Read arbitrary block size data via DMA,
      _                                                                  parameter size in bytes */
-    .thsafe_client_write_dma      = thsafe_zmq_client_write_dma    /* Write arbitrary block size data via DMA,
+    .thsafe_client_write_dma      = &thsafe_zmq_client_write_dma    /* Write arbitrary block size data via DMA,
                                                                         parameter size in bytes */
-    /*.thsafe_client_read_info      = thsafe_zmq_client_read_info */   /* Read device information data */
+    /*.thsafe_client_read_info      = &thsafe_zmq_client_read_info */   /* Read device information data */
 };

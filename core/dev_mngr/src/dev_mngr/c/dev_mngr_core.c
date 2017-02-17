@@ -121,7 +121,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    errhand_set_log (log_filename, DEVMNGR_DFLT_LOG_MODE);
+    errhand_log_new (log_filename, DEVMNGR_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] Spawing DEV_MNGR worker"
             " with \n\tdiscovery endpoint (ignored for now) %s, with logfile %s"
@@ -169,7 +169,7 @@ dmngr_t * dmngr_new (char *name, char *endpoint, int verbose,
     DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_TRACE,
             "[dev_mngr_core] Found a total of %u device(s)\n", num_devs_found);
     /* Supress compiler warnings if we are not debugging */
-    (void) num_devs_found;
+    UNUSED(num_devs_found);
 
     return self;
 
@@ -214,6 +214,8 @@ dmngr_err_e dmngr_destroy (dmngr_t **self_p)
 
         free (self);
         *self_p = NULL;
+
+        errhand_log_destroy ();
     }
 
     return DMNGR_SUCCESS;
@@ -356,7 +358,7 @@ bool dmngr_is_broker_running (dmngr_t *self)
 
 dmngr_err_e dmngr_spawn_broker (dmngr_t *self, char *broker_endp)
 {
-    (void) broker_endp;
+    UNUSED(broker_endp);
 
     assert (self);
     assert (broker_endp);

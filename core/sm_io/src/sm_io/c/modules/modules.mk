@@ -5,6 +5,7 @@ include $(sm_io_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 		$(sm_io_modules_DIR)/fmc_adc_common/fmc_adc_common.mk \
 		$(sm_io_modules_DIR)/fmc_active_clk/fmc_active_clk.mk \
 		$(sm_io_modules_DIR)/acq/acq.mk \
+		$(sm_io_modules_DIR)/acq_pm/acq_pm.mk \
 		$(sm_io_modules_DIR)/dsp/dsp.mk \
 		$(sm_io_modules_DIR)/swap/swap.mk \
 		$(sm_io_modules_DIR)/rffe/rffe.mk \
@@ -18,6 +19,7 @@ sm_io_modules_OBJS = $(sm_io_fmc130m_4ch_OBJS) \
 					 $(sm_io_fmc_adc_common_OBJS) \
 					 $(sm_io_fmc_active_clk_OBJS) \
 					 $(sm_io_acq_OBJS) \
+					 $(sm_io_acq_pm_OBJS) \
 					 $(sm_io_dsp_OBJS) \
 					 $(sm_io_swap_OBJS) \
 					 $(sm_io_rffe_OBJS) \

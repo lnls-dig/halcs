@@ -35,7 +35,7 @@
 /* Creates a new instance of Device Information */
 smio_afc_diag_t * smio_afc_diag_new (smio_t *parent)
 {
-    (void) parent;
+    UNUSED(parent);
 
     smio_afc_diag_t *self = (smio_afc_diag_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);

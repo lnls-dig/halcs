@@ -388,15 +388,15 @@ static smio_err_e _afc_timing_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e afc_timing_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e afc_timing_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -404,15 +404,15 @@ smio_err_e afc_timing_deattach (smio_t *self)
 smio_err_e afc_timing_export_ops (smio_t *self,
         const disp_op_t **smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e afc_timing_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -420,8 +420,8 @@ smio_err_e afc_timing_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _afc_timing_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -431,11 +431,11 @@ smio_err_e afc_timing_do_op (void *self, void *msg)
 }
 
 const smio_ops_t afc_timing_ops = {
-    .attach             = afc_timing_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = afc_timing_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = afc_timing_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = afc_timing_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = afc_timing_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &afc_timing_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &afc_timing_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &afc_timing_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &afc_timing_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &afc_timing_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -521,9 +521,9 @@ err_afc_timing_handler:
 }
 
 const smio_bootstrap_ops_t afc_timing_bootstrap_ops = {
-    .init = afc_timing_init,
-    .shutdown = afc_timing_shutdown,
-    .config_defaults = afc_timing_config_defaults
+    .init            = &afc_timing_init,
+    .shutdown        = &afc_timing_shutdown,
+    .config_defaults = &afc_timing_config_defaults
 };
 
 SMIO_MOD_DECLARE(AFC_TIMING_SDB_DEVID, AFC_TIMING_SDB_NAME, afc_timing_bootstrap_ops)

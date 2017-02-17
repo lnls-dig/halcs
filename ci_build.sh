@@ -56,7 +56,7 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
     make check && make install ) || exit 1
 
 if [ -z "$GRADLE" ]; then
-    ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
 else
     export ${CONFIG_FLAGS[@]}
     ./gradlew $GRADLE -Prelease.stage=ci_release

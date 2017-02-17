@@ -51,7 +51,7 @@ static ssize_t _smch_isla216p_read_8 (smch_isla216p_t *self, uint8_t addr,
 smch_isla216p_t * smch_isla216p_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_isla216p_t *self = (smch_isla216p_t *) zmalloc (sizeof *self);
@@ -217,7 +217,7 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
     for (i = 0; i < SMCH_ISLA216P_WAIT_TRIES; ++i) {
         /* As per ISLA216P25 datasheet, page 28 */
         data = (ISLA216P_TEMP_CTL_PTAT_MODE_EN |
-                          ISLA216P_TEMP_CTL_ENABLE | 
+                          ISLA216P_TEMP_CTL_ENABLE |
                           ISLA216P_TEMP_CTL_DIVIDER_W(ISLA216P_TEMP_CTL_DIVIDER_REC_VALUE));
         rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
         ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not write to ISLA216P_REG_TEMP_CTL",
@@ -238,7 +238,7 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
         rw_err += _smch_isla216p_read_8 (self, ISLA216P_REG_TEMP_COUNTER_LOW, &temp_code_low);
         ASSERT_TEST(rw_err == sizeof(uint16_t), "Could not read temperature code",
                 err_smpr_write, SMCH_ERR_RW_SMPR);
-        
+
         /* Check if reading is valid */
         if (temp_code_high & ISLA216P_TEMP_CTL_VALID_READ) {
             *temp = ISLA216P_TEMP_COUNTER_R(temp_code_high, temp_code_low);

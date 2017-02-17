@@ -45,7 +45,7 @@
 smio_err_e fmc130m_4ch_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
-    (void) log_file_name;
+    UNUSED(log_file_name);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_defaults] Configuring SMIO "
             "FMC130M_4CH with default values ...\n");
     smio_err_e err = SMIO_SUCCESS;

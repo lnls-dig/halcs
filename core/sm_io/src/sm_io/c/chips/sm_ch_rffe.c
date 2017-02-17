@@ -49,7 +49,7 @@ struct _smch_rffe_t {
 smch_rffe_t * smch_rffe_new (smio_t *parent, const smpr_proto_ops_t *reg_ops,
         int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_rffe_t *self = (smch_rffe_t *) zmalloc (sizeof *self);

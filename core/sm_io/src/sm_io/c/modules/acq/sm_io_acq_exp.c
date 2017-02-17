@@ -71,7 +71,7 @@ static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
 
 static int _acq_data_acquire (void *owner, void *args, void *ret)
 {
-    (void) ret;
+    UNUSED(ret);
     assert (owner);
     assert (args);
     int err = -ACQ_OK;
@@ -234,7 +234,7 @@ err_get_acq_handler:
 
 static int _acq_check_data_acquire (void *owner, void *args, void *ret)
 {
-    (void) ret;
+    UNUSED(ret);
     assert (owner);
     assert (args);
     int err = -ACQ_OK;
@@ -502,7 +502,7 @@ static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
 
 static int _acq_cfg_trigger (void *owner, void *args, void *ret)
 {
-    (void) ret;
+    UNUSED(ret);
     assert (owner);
     assert (args);
     int err = -ACQ_OK;
@@ -513,12 +513,6 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
             err_get_acq_handler, -ACQ_ERR);
-
-    /* First step is to check if the FPGA is already doing an acquisition. If it
-     * is, then return an error. Otherwise proceed normally. */
-    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
-    ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
-            "Cannot change trigger type", err_acq_not_completed);
 
     /* Message is:
      * frame 0: operation code
@@ -545,6 +539,12 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
                 "Trigger type = 0x%08X\n", trigger_type_ret);
     }
     else {
+        /* Only check if the FPGA is already doing an acquisition if we are about
+         * to change it. If it is, then return an error. Otherwise proceed normally. */
+        err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+        ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
+                "Cannot change trigger type", err_acq_not_completed);
+
         err = _acq_set_trigger_type (self, trigger_type);
         ASSERT_TEST(err == -ACQ_OK, "Trigger type is not valid", err_acq_inv_trig);
     }
@@ -552,8 +552,8 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
     return err;
 
 err_acq_inv_trig:
-err_acq_get_trig:
 err_acq_not_completed:
+err_acq_get_trig:
 err_get_acq_handler:
     return err;
 }
@@ -767,15 +767,15 @@ static smio_err_e _acq_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e acq_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e acq_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -783,15 +783,15 @@ smio_err_e acq_deattach (smio_t *self)
 smio_err_e acq_export_ops (smio_t *self,
         const disp_op_t** smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e acq_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -799,8 +799,8 @@ smio_err_e acq_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _acq_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -810,11 +810,11 @@ smio_err_e acq_do_op (void *self, void *msg)
 }
 
 const smio_ops_t acq_ops = {
-    .attach             = acq_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = acq_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = acq_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = acq_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = acq_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &acq_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &acq_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &acq_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &acq_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &acq_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -900,8 +900,8 @@ err_acq_handler:
 }
 
 const smio_bootstrap_ops_t acq_bootstrap_ops = {
-    .init = acq_init,
-    .shutdown = acq_shutdown
+    .init     = &acq_init,
+    .shutdown = &acq_shutdown
 };
 
 SMIO_MOD_DECLARE(ACQ_SDB_DEVID, ACQ_SDB_NAME, acq_bootstrap_ops)

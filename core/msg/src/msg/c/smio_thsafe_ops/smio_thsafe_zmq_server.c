@@ -381,9 +381,9 @@ disp_op_t thsafe_zmq_server_write_block_exp = {
 /**** Read data block via DMA from device, size in bytes ****/
 static int _thsafe_zmq_server_read_dma (void *owner, void *args, void *ret)
 {
-    (void) owner;
-    (void) args;
-    (void) ret;
+    UNUSED(owner);
+    UNUSED(args);
+    UNUSED(ret);
     return -1;
 }
 
@@ -403,9 +403,9 @@ disp_op_t thsafe_zmq_server_read_dma_exp = {
 /**** Write data block via DMA from device, size in bytes ****/
 static int _thsafe_zmq_server_write_dma (void *owner, void *args, void *ret)
 {
-    (void) owner;
-    (void) args;
-    (void) ret;
+    UNUSED(owner);
+    UNUSED(args);
+    UNUSED(ret);
     return -1;
 }
 
@@ -425,9 +425,9 @@ disp_op_t thsafe_zmq_server_write_dma_exp = {
 /**** Read device information function pointer ****/
 /* int thsafe_zmq_server_read_info (void *owner, void *args, void *ret)
  *{
- *  (void) owner;
- *  (void) args;
- *  (void) ret;
+ *  UNUSED(owner);
+ *  UNUSED(args);
+ *  UNUSED(ret);
  *  return NULL;
  *} */
 

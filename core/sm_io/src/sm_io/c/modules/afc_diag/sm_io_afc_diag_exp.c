@@ -75,11 +75,11 @@ static int _afc_diag_info_rw (void *owner, void *args, void *ret,
     int err = -AFC_DIAG_OK;
     /* Unused parameter */
     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
-    (void) rw;
+    UNUSED(rw);
 
     /* Unused parameter */
     uint32_t param = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
-    (void) param;
+    UNUSED(param);
     uint32_t ret_size = DISP_GET_ASIZE(afc_diag_exp_ops [id]->retval);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:afc_diag_exp] Calling "
@@ -150,15 +150,15 @@ static smio_err_e _afc_diag_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e afc_diag_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e afc_diag_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -166,22 +166,22 @@ smio_err_e afc_diag_deattach (smio_t *self)
 smio_err_e afc_diag_export_ops (smio_t *self,
         const disp_op_t **smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e afc_diag_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 smio_err_e _afc_diag_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -191,11 +191,11 @@ smio_err_e afc_diag_do_op (void *self, void *msg)
 }
 
 const smio_ops_t afc_diag_ops = {
-    .attach             = afc_diag_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = afc_diag_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = afc_diag_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = afc_diag_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = afc_diag_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &afc_diag_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &afc_diag_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &afc_diag_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &afc_diag_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &afc_diag_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -279,9 +279,9 @@ err_afc_diag_handler:
 }
 
 const smio_bootstrap_ops_t afc_diag_bootstrap_ops = {
-    .init = afc_diag_init,
-    .shutdown = afc_diag_shutdown,
-    .config_defaults = afc_diag_config_defaults
+    .init            = &afc_diag_init,
+    .shutdown        = &afc_diag_shutdown,
+    .config_defaults = &afc_diag_config_defaults
 };
 
 SMIO_MOD_DECLARE(AFC_DIAG_DEVID, AFC_DIAG_NAME, afc_diag_bootstrap_ops)

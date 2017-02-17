@@ -393,6 +393,14 @@ halcs_client_err_e halcs_set_24aa64_data (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_24aa64_data (halcs_client_t *self, char *service,
         uint32_t addr, uint32_t *data);
 
+/* AD9510 Read/Write.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_ad9510_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t data);
+halcs_client_err_e halcs_get_ad9510_data (halcs_client_t *self, char *service,
+        uint32_t addr, uint32_t *data);
+
 /******************** FMC250M SMIO Functions ******************/
 
 /* The three set of group functions provide a low-lovel interface to the FPGA
@@ -584,6 +592,25 @@ typedef struct {
 /* Acquisition channel definitions */
 extern acq_chan_t acq_chan[END_CHAN_ID];
 
+/* Acquisition trigger types. Use this to safely configure the trigger
+ * and the halcs_client_trig_str () function to get trigger strings */
+enum _halcs_client_trig_e
+{
+    HALCS_CLIENT_TRIG_SKIP = 0,               /* No trigger configured */
+    HALCS_CLIENT_TRIG_EXTERNAL,               /* External trigger */
+    HALCS_CLIENT_TRIG_DATA_DRIVEN,            /* Data-driven (data offset) trigger */
+    HALCS_CLIENT_TRIG_SOFTWARE,               /* Software generated trigger */
+    HALCS_CLIENT_TRIG_END                     /* End of enum marker */
+};
+
+typedef enum _halcs_client_trig_e halcs_client_trig_e;
+
+/* Convert enumeration type to long string */
+const char * halcs_client_trig_str (halcs_client_trig_e err);
+
+/* Convert enumeration type to short string */
+const char * halcs_client_trig_sstr (halcs_client_trig_e err);
+
 /* Start acquisition on a specific channel with an specific number of samples,
  * through the use of acq_req_t structure.
  * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if the server
@@ -764,6 +791,16 @@ halcs_client_err_e halcs_set_ds_monit_thres (halcs_client_t *self, char *service
         uint32_t ds_monit_thres);
 halcs_client_err_e halcs_get_ds_monit_thres (halcs_client_t *self, char *service,
         uint32_t *ds_monit_thres);
+
+/* Test Data functions */
+/* These set of functions read (get) the test data enable.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_dsp_cfg_test_data (halcs_client_t *self, char *service,
+        uint32_t dsp_cfg_test_data);
+halcs_client_err_e halcs_get_dsp_cfg_test_data (halcs_client_t *self, char *service,
+        uint32_t *dsp_cfg_test_data);
 
 /* Monitoring Position values */
 /* These set of functions read (get) the Monitoring position values.

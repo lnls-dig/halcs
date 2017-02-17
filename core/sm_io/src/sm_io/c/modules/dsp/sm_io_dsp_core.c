@@ -35,7 +35,7 @@
 /* Creates a new instance of Device Information */
 smio_dsp_t * smio_dsp_new (smio_t *parent)
 {
-    (void) parent;
+    UNUSED(parent);
 
     smio_dsp_t *self = (smio_dsp_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);

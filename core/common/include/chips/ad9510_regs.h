@@ -178,6 +178,8 @@
                                                            AD9510_PLL_2_MUX_SEL_SIZE)
 #define AD9510_PLL_2_MUX_SEL_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_2_MUX_SEL_SHIFT, \
                                                                        AD9510_PLL_2_MUX_SEL_SIZE)
+#define AD9510_PLL_2_MUX_SEL_MIN                    0
+#define AD9510_PLL_2_MUX_SEL_MAX                    ((1 << AD9510_PLL_2_MUX_SEL_SIZE)-1)
 
 #define AD9510_PLL_2_PFD_POL_POS_SHIFT              6
 #define AD9510_PLL_2_PFD_POL_POS_SIZE               1
@@ -406,6 +408,8 @@
 #define AD9510_CLK_OPT_CLK2_PD_SIZE                 1
 #define AD9510_CLK_OPT_CLK2_PD                      WBGEN2_GEN_MASK(AD9510_CLK_OPT_CLK2_PD_SHIFT,\
                                                                         AD9510_CLK_OPT_CLK2_PD_SIZE)
+
+#define AD9510_CLK_OPT_CLK_PD_MASK                  (AD9510_CLK_OPT_CLK1_PD | AD9510_CLK_OPT_CLK2_PD)
 
 #define AD9510_CLK_OPT_PS_PD_SHIFT                  3
 #define AD9510_CLK_OPT_PS_PD_SIZE                   1

@@ -119,8 +119,8 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id, bool auto_inst_id);
-static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
-        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id,
         char *msg);
 static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
@@ -142,9 +142,9 @@ static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
 /* Default signal handlers */
 void devio_sigchld_h (int sig, siginfo_t *siginfo, void *context)
 {
-    (void) sig;
-    (void) siginfo;
-    (void) context;
+    UNUSED(sig);
+    UNUSED(siginfo);
+    UNUSED(context);
     while (hutils_wait_chld () > 0);
 }
 
@@ -167,7 +167,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
-    errhand_set_log (log_file_name, DEVIO_DFLT_LOG_MODE);
+    errhand_log_new (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
             " with exported service %s, for a %s device \n\tlocated on %s,"
@@ -253,10 +253,15 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
 
     /* Concatenate recv'ed name with a llio identifier */
-    char *llio_name = zmalloc (sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1));
+    size_t llio_name_len = sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1);
+    size_t llio_name_len_rem = llio_name_len;
+    char *llio_name = zmalloc (llio_name_len);
     ASSERT_ALLOC(llio_name, err_llio_name_alloc);
-    strcat (llio_name, name);
-    strcat (llio_name, LLIO_STR);
+
+    strncat (llio_name, name, llio_name_len_rem);
+    llio_name_len_rem -= strlen(name);
+    strncat (llio_name, LLIO_STR, llio_name_len_rem);
+
     self->llio = llio_new (llio_name, endpoint_dev, reg_ops,
             verbose);
     ASSERT_ALLOC(self->llio, err_llio_alloc);
@@ -465,6 +470,8 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->log_file);
         free (self);
         *self_p = NULL;
+
+        errhand_log_destroy ();
     }
 
     return DEVIO_SUCCESS;
@@ -495,7 +502,7 @@ err_sdb_not_supp:
 static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self,
         uint32_t smio_id)
 {
-    (void) self;
+    UNUSED(self);
 
     const smio_mod_dispatch_t *smio_mod_handler;
 
@@ -560,9 +567,9 @@ err_zsock_is:
 /* zloop handler for timer */
 static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 {
-    (void) loop;
-    (void) timer_id;
-    (void) arg;
+    UNUSED(loop);
+    UNUSED(timer_id);
+    UNUSED(arg);
 
     return 0;
 }
@@ -570,10 +577,10 @@ static int _devio_handle_timer (zloop_t *loop, int timer_id, void *arg)
 /* zloop handler for MSG PIPE */
 static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
-    (void) devio;
+    UNUSED(devio);
 
     /* We process as many messages as we can, to reduce the overhead
      * of polling and the reactor */
@@ -601,7 +608,7 @@ static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
 
 static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
@@ -631,7 +638,7 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 
     if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, true);
     }
     else if (streq (command, "$MGMT_MSG_SMIO")) {
         /* Register new SMIO */
@@ -652,7 +659,7 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for CFG PIPE */
 static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     int err = 0;
     char *service_id = NULL;
@@ -709,7 +716,7 @@ err_poller_config_null_service:
 /* zloop handler for PIPE. */
 static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
@@ -751,7 +758,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     }
     else if (streq (command, "$REGISTER_SMIO")) {
         /* Register new SMIO */
-        _devio_register_sm_raw (devio, smio_id, base, inst_id, false);
+        _devio_register_sm_raw (devio, smio_id, base, inst_id, true);
     }
     else if (streq (command, "$UNREGISTER_SMIO_ALL")) {
         /* Unregister all SMIOs */
@@ -776,12 +783,12 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 /* zloop handler for PIPE backend */
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args)
 {
-    (void) loop;
+    UNUSED(loop);
 
     char *command = NULL;
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
-    (void) devio;
+    UNUSED(devio);
 
     /* Receive message */
     zmsg_t *recv_msg = zmsg_recv (reader);
@@ -822,21 +829,21 @@ static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id
     return _devio_register_sm_raw(self, smio_id, base, 0, true);
 }
 
-static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id, 
-        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id, 
+static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
+        uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id,
         char *msg)
 {
     assert (self);
     devio_err_e err = DEVIO_SUCCESS;
 
     /* Search for specified PIPE by using the dest_smio_id and dest_inst_id */
-    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self, 
+    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self,
         dest_smio_id);
     ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO "
             "for sending MGMT message", err_search_smio, DEVIO_ERR_NO_SMIO_ID);
 
     /* Get key to search in hash */
-    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler, 
+    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler,
         dest_inst_id);
     ASSERT_ALLOC (dest_smio_key, err_key_alloc);
 
@@ -1367,7 +1374,7 @@ err_inv_msg:
 }
 
 const disp_table_ops_t devio_disp_table_ops = {
-    .check_msg_args = _devio_check_msg_args
+    .check_msg_args = &_devio_check_msg_args
 };
 
 /************************************************************/
@@ -1378,7 +1385,7 @@ static char *_devio_gen_smio_key (devio_t *self,
         const volatile smio_mod_dispatch_t *smio_mod_handler,
         uint32_t inst_id)
 {
-    (void) self;
+    UNUSED(self);
 
     char *key = NULL;
     char *inst_id_str = hutils_stringify_dec_key (inst_id);

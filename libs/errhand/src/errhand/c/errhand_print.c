@@ -88,17 +88,27 @@ void errhand_print_vec (const char *fmt, const char *data, int len)
     printf ("\n");
 }
 
-static void _errhand_set_log_file (FILE *log_file)
+static void _errhand_log_file_new (FILE *log_file)
 {
     _errhand_logfile = log_file;
 }
 
-void errhand_set_log_file (FILE *log_file)
+void errhand_log_file_new (FILE *log_file)
 {
-    _errhand_set_log_file (log_file);
+    _errhand_log_file_new (log_file);
 }
 
-int errhand_set_log (const char *log_file_name, const char *mode)
+static void _errhand_log_file_destroy ()
+{
+    _errhand_logfile = NULL;
+}
+
+void errhand_log_file_destroy ()
+{
+    _errhand_log_file_destroy ();
+}
+
+int errhand_log_new (const char *log_file_name, const char *mode)
 {
     int err = -1;    /* Error */
     FILE *log_file = NULL;
@@ -134,7 +144,15 @@ int errhand_set_log (const char *log_file_name, const char *mode)
         log_file = stdout;
     }
 
-    _errhand_set_log_file (log_file);
+    _errhand_log_file_new (log_file);
     return err;
 }
 
+int errhand_log_destroy ()
+{
+    int err = -1;
+
+    err = fclose (_errhand_logfile);
+    _errhand_log_file_destroy();
+    return err;
+}

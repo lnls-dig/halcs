@@ -83,6 +83,14 @@ RW_PARAM_FUNC(dsp, ds_monit_thres) {
             DS_MONIT_THRES_MIN, DS_MONIT_THRES_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define POS_CALC_DDS_CFG_TEST_DATA_MIN      0
+#define POS_CALC_DDS_CFG_TEST_DATA_MAX      1
+RW_PARAM_FUNC(dsp, pos_calc_cfg_test_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, DDS_CFG, TEST_DATA, SINGLE_BIT_PARAM,
+            POS_CALC_DDS_CFG_TEST_DATA_MIN, POS_CALC_DDS_CFG_TEST_DATA_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define POS_CALC_DSP_MONIT_AMP_CH0_R(val)       (val)
 #define POS_CALC_DSP_MONIT_AMP_CH0_W(val)       (val)
 #define POS_CALC_DSP_MONIT_AMP_CH0_MASK         ((1ULL<<32)-1)
@@ -181,6 +189,7 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, ds_tbt_thres),
     RW_PARAM_FUNC_NAME(dsp, ds_fofb_thres),
     RW_PARAM_FUNC_NAME(dsp, ds_monit_thres),
+    RW_PARAM_FUNC_NAME(dsp, pos_calc_cfg_test_data),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch0),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch1),
     RW_PARAM_FUNC_NAME(dsp, monit_amp_ch2),
@@ -202,15 +211,15 @@ static smio_err_e _dsp_do_op (void *owner, void *msg);
 /* Attach an instance of sm_io to dev_io function pointer */
 smio_err_e dsp_attach (smio_t *self, devio_t *parent)
 {
-    (void) self;
-    (void) parent;
+    UNUSED(self);
+    UNUSED(parent);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e dsp_deattach (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -218,15 +227,15 @@ smio_err_e dsp_deattach (smio_t *self)
 smio_err_e dsp_export_ops (smio_t *self,
         const disp_op_t **smio_exp_ops)
 {
-    (void) self;
-    (void) smio_exp_ops;
+    UNUSED(self);
+    UNUSED(smio_exp_ops);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
 /* Unexport (unregister) sm_io to handle operations function pointer */
 smio_err_e dsp_unexport_ops (smio_t *self)
 {
-    (void) self;
+    UNUSED(self);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -234,8 +243,8 @@ smio_err_e dsp_unexport_ops (smio_t *self)
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _dsp_do_op (void *owner, void *msg)
 {
-    (void) owner;
-    (void) msg;
+    UNUSED(owner);
+    UNUSED(msg);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -245,11 +254,11 @@ smio_err_e dsp_do_op (void *self, void *msg)
 }
 
 const smio_ops_t dsp_ops = {
-    .attach             = dsp_attach,          /* Attach sm_io instance to dev_io */
-    .deattach           = dsp_deattach,        /* Deattach sm_io instance to dev_io */
-    .export_ops         = dsp_export_ops,      /* Export sm_io operations to dev_io */
-    .unexport_ops       = dsp_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = dsp_do_op            /* Generic wrapper for handling specific operations */
+    .attach             = &dsp_attach,          /* Attach sm_io instance to dev_io */
+    .deattach           = &dsp_deattach,        /* Deattach sm_io instance to dev_io */
+    .export_ops         = &dsp_export_ops,      /* Export sm_io operations to dev_io */
+    .unexport_ops       = &dsp_unexport_ops,    /* Unexport sm_io operations to dev_io */
+    .do_op              = &dsp_do_op            /* Generic wrapper for handling specific operations */
 };
 
 /************************************************************/
@@ -333,9 +342,9 @@ err_dsp_handler:
 }
 
 const smio_bootstrap_ops_t dsp_bootstrap_ops = {
-    .init = dsp_init,
-    .shutdown = dsp_shutdown,
-    .config_defaults = dsp_config_defaults
+    .init            = &dsp_init,
+    .shutdown        = &dsp_shutdown,
+    .config_defaults = &dsp_config_defaults
 };
 
 SMIO_MOD_DECLARE(DSP_SDB_DEVID, DSP_SDB_NAME, dsp_bootstrap_ops)

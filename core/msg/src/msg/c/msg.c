@@ -337,7 +337,7 @@ static void _msg_send_client_response_mlm (RW_REPLY_TYPE reply_code, uint32_t re
         uint32_t *data_out, bool with_data_frame, mlm_client_t *worker,
         zframe_t *reply_to)
 {
-    (void) reply_to;
+    UNUSED(reply_to);
     zmsg_t *msg = _msg_create_client_response (reply_code, reply_size, data_out,
             with_data_frame);
     ASSERT_TEST(msg != NULL, "Could format client message",

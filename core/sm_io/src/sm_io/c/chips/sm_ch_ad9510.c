@@ -58,7 +58,7 @@ static smch_err_e _smch_ad9510_reg_update (smch_ad9510_t *self);
 smch_ad9510_t * smch_ad9510_new (smio_t *parent, uint64_t base,
         const smpr_proto_ops_t *reg_ops, int verbose)
 {
-    (void) verbose;
+    UNUSED(verbose);
     assert (parent);
 
     smch_ad9510_t *self = (smch_ad9510_t *) zmalloc (sizeof *self);
@@ -332,23 +332,28 @@ smch_err_e smch_ad9510_set_pll_b_div (smch_ad9510_t *self, uint32_t *div)
             SMCH_ERR_INV_FUNC_PARAM);
 
     uint8_t data = 0;
-    if (__div == 0) {
-        _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
+    /* Read bypass B divider*/
+    _smch_ad9510_read_8 (self, AD9510_REG_PLL_4, &data);
 
+    /* Check if we need to bypass the divider or not */
+    if (__div == 0) {
         data |= AD9510_PLL_4_B_BYPASS;
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
     }
     else {
-        /* Extract MSB part of the divider */
-        data = AD9510_PLL_B_MSB_COUNTER_W(__div >>
-                AD9510_PLL_B_LSB_COUNTER_SIZE);
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
-
-        /* Extract LSB part of the divider */
-        data = AD9510_PLL_B_LSB_COUNTER_W(__div);
-        _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+        data &= ~AD9510_PLL_4_B_BYPASS;
     }
 
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
+
+    /* Extract MSB part of the divider */
+    data = AD9510_PLL_B_MSB_COUNTER_W(__div >>
+            AD9510_PLL_B_LSB_COUNTER_SIZE);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_MSB_COUNTER, &data);
+
+    /* Extract LSB part of the divider */
+    data = AD9510_PLL_B_LSB_COUNTER_W(__div);
+    _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
+    
     _smch_ad9510_reg_update (self);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
@@ -455,6 +460,11 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
     smch_err_e err = SMCH_SUCCESS;
     uint32_t __mux = *mux;
 
+    ASSERT_TEST(/*__mux >= AD9510_PLL_2_MUX_SEL_MIN && */
+            __mux <= AD9510_PLL_2_MUX_SEL_MAX,
+            "Mux status is out of range", err_smpr_write,
+            SMCH_ERR_INV_FUNC_PARAM);
+
     uint8_t data = 0;
     _smch_ad9510_read_8 (self, AD9510_REG_PLL_2, &data);
 
@@ -466,6 +476,7 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_smpr_write:
     return err;
 }
 
@@ -677,15 +688,24 @@ smch_err_e smch_ad9510_set_pll_clk_sel (smch_ad9510_t *self, uint32_t *clk_num)
     uint8_t data = 0;
     _smch_ad9510_read_8 (self, AD9510_REG_CLK_OPT, &data);
 
+    /* Mask Power Down bits */
+    data &= ~AD9510_CLK_OPT_CLK_PD_MASK;
+    /* Select clock and power-down unused clock */
     switch (__clk_num) {
         case AD9510_PLL_CLK1_SEL:
             data |= AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK2_PD;
             break;
         case AD9510_PLL_CLK2_SEL:
             data &= ~AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK1_PD;
             break;
         default:
             data |= AD9510_CLK_OPT_SEL_CLK1;
+            /* Power down other clock */
+            data |= AD9510_CLK_OPT_CLK2_PD;
     }
 
     _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
@@ -777,7 +797,7 @@ static ssize_t _smch_ad9510_write_8 (smch_ad9510_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_write_block (self->spi, __addr_size, __addr,
             __data_size, &__data);
-    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not write to SMPR", err_smpr_write, -1);
 
 err_smpr_write:
@@ -806,7 +826,7 @@ static ssize_t _smch_ad9510_read_8 (smch_ad9510_t *self, uint8_t addr,
 
     ssize_t smpr_err = smpr_read_block (self->spi, __addr_size, __addr,
             __data_size, (uint32_t *) data);
-    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size, 
+    ASSERT_TEST(smpr_err > 0 && (size_t) smpr_err == __data_size,
             "Could not read to SMPR", err_read_write, -1);
 
 err_read_write:

@@ -34,6 +34,7 @@ typedef struct _smio_rffe_version_t smio_rffe_version_t;
 #include "sm_io_trigger_iface_codes.h"
 #include "sm_io_trigger_mux_codes.h"
 #include "sm_io_afc_timing_codes.h"
+#include "sm_io_acq_pm_codes.h"
 
 /* Include all function descriptors */
 #include "sm_io_fmc130m_4ch_exports.h"
@@ -48,6 +49,7 @@ typedef struct _smio_rffe_version_t smio_rffe_version_t;
 #include "sm_io_trigger_iface_exports.h"
 #include "sm_io_trigger_mux_exports.h"
 #include "sm_io_afc_timing_exports.h"
+#include "sm_io_acq_pm_exports.h"
 
 /* Merge all function descriptors in a single structure */
 extern const disp_op_t **smio_exp_ops [];

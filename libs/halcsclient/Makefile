@@ -113,7 +113,8 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/modules/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/afc_diag/sm_io_afc_diag_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/trigger_iface/sm_io_trigger_iface_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_exports.o \
-                $(SMIO_TABLE_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_exports.o
+                $(SMIO_TABLE_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
@@ -137,6 +138,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_SRC_DIR)/modules/afc_timing \
+           -I$(SMIO_SRC_DIR)/modules/acq_pm \
 		   -I$(SMIO_TABLE_DIR)/include \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
@@ -151,6 +153,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_timing \
+           -I$(SMIO_TABLE_SRC_DIR)/modules/acq_pm \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -187,6 +190,7 @@ $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_trigger_iface_codes.h \
 	$(SMIO_DIR)/include/sm_io_trigger_mux_codes.h \
 	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h \
+    $(SMIO_DIR)/include/sm_io_acq_pm_codes.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h \
@@ -200,6 +204,7 @@ $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h 
 	$(SMIO_TABLE_DIR)/include/sm_io_afc_diag_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_trigger_iface_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_trigger_mux_exports.h \
+    $(SMIO_TABLE_DIR)/include/sm_io_acq_pm_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_afc_timing_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
