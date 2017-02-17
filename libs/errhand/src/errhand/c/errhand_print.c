@@ -150,9 +150,12 @@ int errhand_log_new (const char *log_file_name, const char *mode)
 
 int errhand_log_destroy ()
 {
+#if 0
     int err = -1;
 
     err = fclose (_errhand_logfile);
     _errhand_log_file_destroy();
     return err;
+#endif
+    return 0;
 }
