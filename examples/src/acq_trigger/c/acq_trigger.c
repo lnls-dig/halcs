@@ -203,59 +203,64 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
+    acq_client_t *acq_client = acq_client_new (halcs_client);
+    if (acq_client == NULL) {
+        fprintf (stderr, "[client:acq]: acq_client could not be created\n");
+        goto err_acq_client_new;
+    }
 
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
     /* Change trigger type here if needed */
     uint32_t acq_trig = 2;
-    err = halcs_set_acq_trig (halcs_client, service, acq_trig);
+    err = acq_set_trig (acq_client, service, acq_trig);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_trig failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_trig failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t data_trig_thres = 200;
-    err = halcs_set_acq_data_trig_thres (halcs_client, service, data_trig_thres);
+    err = acq_set_data_trig_thres (acq_client, service, data_trig_thres);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_thres failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_data_trig_thres failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t data_trig_pol = 0;
-    err = halcs_set_acq_data_trig_pol (halcs_client, service, data_trig_pol);
+    err = acq_set_data_trig_pol (acq_client, service, data_trig_pol);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_pol failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_data_trig_pol failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t data_trig_sel = 0;
-    err = halcs_set_acq_data_trig_sel (halcs_client, service, data_trig_sel);
+    err = acq_set_data_trig_sel (acq_client, service, data_trig_sel);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_sel failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_data_trig_sel failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t data_trig_filt = 1;
-    err = halcs_set_acq_data_trig_filt (halcs_client, service, data_trig_filt);
+    err = acq_set_data_trig_filt (acq_client, service, data_trig_filt);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_filt failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_data_trig_filt failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t hw_trig_dly = 0;
-    err =  halcs_set_acq_hw_trig_dly (halcs_client, service, hw_trig_dly);
+    err =  acq_set_hw_trig_dly (acq_client, service, hw_trig_dly);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_hw_trig_dly failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_hw_trig_dly failed\n");
+        goto err_acq_set_trig;
     }
 
     uint32_t data_trig_chan = 6;
-    err =  halcs_set_acq_data_trig_chan (halcs_client, service, data_trig_chan);
+    err =  acq_set_data_trig_chan (acq_client, service, data_trig_chan);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_acq_data_trig_chan failed\n");
-        goto err_halcs_set_acq_trig;
+        fprintf (stderr, "[client:acq]: acq_set_data_trig_chan failed\n");
+        goto err_acq_set_trig;
     }
 
-    const acq_chan_t *acq_chan = halcs_get_acq_chan (halcs_client);
+    const acq_chan_t *acq_chan = acq_get_chan (acq_client);
     uint32_t num_samples_pre = num_samples;
     uint32_t num_samples_post = num_samples;
     uint32_t num_shots = 1;
@@ -274,20 +279,21 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    err = halcs_get_curve (halcs_client, service, &acq_trans,
-            500000, new_acq);
+    err = acq_full_compat (acq_client, service, &acq_trans, 500000, new_acq);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_get_curve failed\n");
-        goto err_halcs_get_curve;
+        fprintf (stderr, "[client:acq]: acq_full_compat failed\n");
+        goto err_acq_full_compat;
     }
 
-    //fprintf (stdout, "[client:acq]: halcs_get_curve was successfully executed\n");
+    //fprintf (stdout, "[client:acq]: acq_full_compat was successfully executed\n");
     fprintf (stdout, "clear\n");
     print_data (chan, data, acq_trans.block.bytes_read);
 
+err_acq_client_new:
+    acq_client_destroy (&acq_client);
 err_halcs_client_new:
-err_halcs_set_acq_trig:
-err_halcs_get_curve:
+err_acq_set_trig:
+err_acq_full_compat:
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;

@@ -22,6 +22,9 @@
 /* Internal libraries dependencies */
 #include "acq_chan.h"
 
+/* Opaque acq_client_t structure */
+typedef struct _acq_client_t acq_client_t;
+
 /* ACQ CLIENT */
 #include "acq_client_core.h"
 

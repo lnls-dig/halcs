@@ -112,16 +112,24 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
+    acq_client_t *acq_client = acq_client_new (halcs_client);
+    if (acq_client == NULL) {
+        fprintf (stderr, "[client:acq]: acq_client could not be created\n");
+        goto err_acq_client_new;
+    }
+
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
     /* Generate trigger */
     uint32_t sw_trig = 1;
-    err = halcs_set_acq_sw_trig (halcs_client, service, sw_trig);
+    err = acq_set_sw_trig (acq_client, service, sw_trig);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_acq_set_trig failed\n");
-        goto err_halcs_set_acq_sw_trig;
+        fprintf (stderr, "[client:acq]: acq_set_sw_trig failed\n");
+        goto err_acq_set_sw_trig;
     }
 
-err_halcs_set_acq_sw_trig:
+err_acq_set_sw_trig:
+err_acq_client_new:
+    acq_client_destroy (&acq_client);
 err_halcs_client_new:
     str_p = &board_number_str;
     free (*str_p);

@@ -558,21 +558,6 @@ halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *temp);
 
-/********************** ACQ SMIO Functions ********************/
-
-/* Acquisition channel definitions */
-typedef struct {
-    uint32_t chan;
-    uint32_t sample_size;
-} acq_chan_t;
-
-/* Get current acquisition channel */
-const acq_chan_t* halcs_get_acq_chan (const halcs_client_t *self);
-
-/* Set current acquisition channel. Responsibility over the acq_chan_t structure
- * memory remains with the caller. */
-void halcs_set_acq_chan (halcs_client_t *self, const acq_chan_t* channel);
-
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */

@@ -45,48 +45,12 @@ struct _halcs_client_t {
     mlm_client_t *mlm_client;                   /* Malamute client instance */
     int timeout;                                /* Timeout in msec for send/recv */
     zpoller_t *poller;                          /* Poller for receiving messages */
-    const acq_chan_t *acq_chan;                 /* Acquisition buffer table */
 };
 
 static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, int timeout);
 static halcs_client_err_e _func_polling (halcs_client_t *self, char *name,
         char *service, uint32_t *input, uint32_t *output, int timeout);
-
-/* Acquisition channel definitions for user's application */
-#if defined(__BOARD_ML605__)
-/* Global structure merging all of the channel's sample sizes */
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                        [1] = {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                        [2] = {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                        [3] = {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                        [4] = {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
-                                        [5] = {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
-                                        [6] = {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
-                                        [7] = {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
-                                    };
-#elif defined(__BOARD_AFCV3__)
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                        [1]   =  {.chan = ADCSWAP_CHAN_ID, .sample_size = ADCSWAP_SAMPLE_SIZE},
-                                        [2]   =  {.chan = MIXIQ_CHAN_ID, .sample_size = MIXIQ_SAMPLE_SIZE},
-                                        [3]   =  {.chan = DUMMY0_CHAN_ID, .sample_size = DUMMY0_SAMPLE_SIZE},
-                                        [4]   =  {.chan = TBTDECIMIQ_CHAN_ID, .sample_size = TBTDECIMIQ_SAMPLE_SIZE},
-                                        [5]   =  {.chan = DUMMY1_CHAN_ID, .sample_size = DUMMY1_SAMPLE_SIZE},
-                                        [6]   =  {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                        [7]   =  {.chan = TBTPHA_CHAN_ID, .sample_size = TBTPHA_SAMPLE_SIZE},
-                                        [8]   =  {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                        [9]   =  {.chan = FOFBDECIMIQ_CHAN_ID, .sample_size = FOFBDECIMIQ_SAMPLE_SIZE},
-                                        [10]  =  {.chan = DUMMY2_CHAN_ID, .sample_size = DUMMY2_SAMPLE_SIZE},
-                                        [11]  =  {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                        [12]  =  {.chan = FOFBPHA_CHAN_ID, .sample_size = FOFBPHA_SAMPLE_SIZE},
-                                        [13]  =  {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
-                                        [14]  =  {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
-                                        [15]  =  {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
-                                        [16]  =  {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
-                                    };
-#else
-#error "Unsupported board!"
-#endif
 
 
 /********************************************************/
@@ -127,7 +91,6 @@ void halcs_client_destroy (halcs_client_t **self_p)
     if (*self_p) {
         halcs_client_t *self = *self_p;
 
-        self->acq_chan = NULL;
         zpoller_destroy (&self->poller);
         mlm_client_destroy (&self->mlm_client);
         zuuid_destroy (&self->uuid);
@@ -205,8 +168,6 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
     ASSERT_TEST (self->poller != NULL, "Could not Initialize poller",
             err_init_poller);
 
-    /* Initialize acquisition table */
-    self->acq_chan = acq_chan;
     /* Initialize timeout */
     self->timeout = timeout;
 
@@ -1187,21 +1148,6 @@ PARAM_FUNC_CLIENT_WRITE2(adc250_dly3, type, val)
 {
     return param_client_write_raw (self, service, FMC250M_4CH_OPCODE_ADC_DLY3,
             type, val);
-}
-
-/********************** ACQ SMIO Functions ********************/
-
-/* Get current acquisition channel */
-const acq_chan_t* halcs_get_acq_chan (const halcs_client_t *self)
-{
-    return self->acq_chan;
-}
-
-/* Set current acquisition channel. Responsibility over the acq_chan_t structure
- * memory remains with the caller. */
-void halcs_set_acq_chan (halcs_client_t *self, const acq_chan_t *channel)
-{
-    self->acq_chan = channel;
 }
 
 /**************** DSP SMIO Functions ****************/
