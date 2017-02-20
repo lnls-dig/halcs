@@ -100,7 +100,11 @@ if [ "$COMPACT_INSTALL" != "yes" ] && [ "$COMPACT_INSTALL" != "no" ]; then
     exit 1
 fi
 
-TASKS=":apps:${APPS}:${BOARD}InstallRpm"
+if [ "$COMPACT_INSTALL" = "yes" ]; then
+    TASKS=":apps:${APPS}:${BOARD}InstallRpm"
+else
+    TASKS=":apps:${APPS}:${BOARD}DevelopmentInstallRpm"
+fi
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
     TASKS="$TASKS :examples:assemble"
