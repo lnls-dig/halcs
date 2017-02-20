@@ -129,14 +129,6 @@ AFE_RFFE_TYPE=2
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
 WITH_APP_CFG=n
-# Selects the install location of the config file
-CFG_FILENAME=/etc/halcs/halcs.cfg
-# Selects the install location of the config file
-PREFIX=/usr/local
-CFG_DIR=${PREFIX}/etc/halcs
-# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
-CFG=crude_defconfig
-export CFG
 
 COMMAND_DEPS="\
     make ${EXTRA_FLAGS} deps && \
@@ -166,11 +158,10 @@ COMMAND_CORE="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+    WITH_APP_CFG=${WITH_APP_CFG} && \
+    make \
     WITH_APP_CFG=${WITH_APP_CFG} \
-    CFG_DIR=${CFG_DIR} && \
-    make CFG=${CFG} \
-    WITH_APP_CFG=${WITH_APP_CFG} \
-    ${EXTRA_FLAGS} core_install cfg_install"
+    ${EXTRA_FLAGS} core_install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
@@ -216,4 +207,3 @@ do
         exit $rc
     fi
 done
-

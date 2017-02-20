@@ -42,21 +42,12 @@ SCRIPTS_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
-CFG_DIR ?= ${PREFIX}/etc/halcs
-export CFG_DIR
-# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
-# SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
-CFG ?= crude_defconfig
-export CFG
 
 # All of our supported boards
 SUPPORTED_ML605_BOARDS = ml605
 export SUPPORTED_ML605_BOARDS
 SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
-
-# Config filename
-CFG_FILENAME = halcs.cfg
 
 # Linker script
 LD_SCRIPT = linker/halcs.ld
@@ -300,14 +291,13 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	core_install core_uninstall core_clean core_mrproper \
 	tests tests_clean tests_mrproper \
-	examples examples_clean examples_mrproper \
-	cfg cfg_install cfg_uninstall cfg_clean cfg_mrproper
+	examples examples_clean examples_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: cfg $(OUT)
+all: $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
@@ -606,34 +596,18 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-cfg:
-	$(MAKE) -C cfg all
-
-cfg_install:
-	$(MAKE) -C cfg install
-
-cfg_uninstall:
-	$(MAKE) -C cfg uninstall
-
-cfg_clean:
-	$(MAKE) -C cfg clean
-
-cfg_mrproper:
-	$(MAKE) -C cfg mrproper
-
 install: core_install deps_install liberrhand_install libconvc_install \
     libsdbutils_install libhutils_install libdisptable_install libllio_install \
-    libhalcsclient_install cfg_install scripts_install
+    libhalcsclient_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
     libsdbutils_uninstall libhutils_uninstall libdisptable_uninstall libllio_uninstall \
-    libhalcsclient_uninstall cfg_uninstall scripts_uninstall
+    libhalcsclient_uninstall scripts_uninstall
 
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
     libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean examples_clean \
-    tests_clean cfg_clean scripts_clean
+    tests_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
-    libhalcsclient_mrproper examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
-
+    libhalcsclient_mrproper examples_mrproper tests_mrproper scripts_mrproper
