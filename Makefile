@@ -42,21 +42,12 @@ SCRIPTS_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
-CFG_DIR ?= ${PREFIX}/etc/halcs
-export CFG_DIR
-# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
-# SelectsGG which config file to install. Options are: crude_defconfig or lnls_defconfig
-CFG ?= crude_defconfig
-export CFG
 
 # All of our supported boards
 SUPPORTED_ML605_BOARDS = ml605
 export SUPPORTED_ML605_BOARDS
 SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
-
-# Config filename
-CFG_FILENAME = halcs.cfg
 
 # Linker script
 LD_SCRIPT = linker/halcs.ld
@@ -77,13 +68,13 @@ KERNEL_VERSION ?= $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VERSION)/extra/pciDriver.ko
 
 # Project libraries
-LIBERRHAND_DIR = src/libs/liberrhand
-LIBCONVC_DIR = src/libs/libconvc
-LIBHUTILS_DIR = src/libs/libhutils
-LIBDISPTABLE_DIR = src/libs/libdisptable
-LIBLLIO_DIR = src/libs/libllio
-LIBHALCSCLIENT_DIR = src/libs/libhalcsclient
-LIBSDBUTILS_DIR = src/libs/libsdbutils
+LIBERRHAND_DIR = libs/errhand
+LIBCONVC_DIR = libs/convc
+LIBHUTILS_DIR = libs/hutils
+LIBDISPTABLE_DIR = libs/disptable
+LIBLLIO_DIR = libs/llio
+LIBHALCSCLIENT_DIR = libs/halcsclient
+LIBSDBUTILS_DIR = libs/sdbutils
 LIBSDBFS_DIR = foreign/libsdbfs
 
 # General C/CPP flags
@@ -102,6 +93,10 @@ endif
 # Board selection
 ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_ML605_BOARDS)))
 CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
+endif
+
+ifeq ($(BOARD),afcv3_1)
+CFLAGS_USR += -D__BOARD_AFCV3_1__
 endif
 
 ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
@@ -206,28 +201,32 @@ LFLAGS = -Lforeign/libsdbfs
 OBJS_PLATFORM =
 
 # Source directory
-SRC_DIR = src
+SRC_DIR = .
 
 # Prepare "apps" include
-APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
+APPS_MKS = $(foreach mk,$(APPS),apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/sm_io/sm_io.mk
-include $(SRC_DIR)/dev_mngr/dev_mngr.mk
-include $(SRC_DIR)/dev_io/dev_io.mk
-include $(SRC_DIR)/msg/msg.mk
-include $(SRC_DIR)/revision/revision.mk
-include $(SRC_DIR)/boards/$(BOARD)/board.mk
-include $(SRC_DIR)/boards/common/common.mk
+include $(SRC_DIR)/core/sm_io/sm_io.mk
+include $(SRC_DIR)/core/sm_io_table/sm_io_table.mk
+include $(SRC_DIR)/core/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/core/dev_io/dev_io.mk
+include $(SRC_DIR)/core/msg/msg.mk
+include $(SRC_DIR)/core/revision/revision.mk
+include $(SRC_DIR)/core/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/core/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
+boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -Iinclude \
-	       -Iforeign/libsdbfs \
+	       -Icore/common/include \
+	       -Icore/sm_io/include \
+	       -Icore/sm_io_table/include \
+	       -Iforeign/libsdbfs/include \
+	       -Ilibs/llio/include \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -255,6 +254,8 @@ common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
                $(board_common_OBJS)
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
+
+apps_SCRIPTS = $(foreach app,$(APPS),$($(app)_SCRIPTS))
 
 .SECONDEXPANSION:
 
@@ -290,14 +291,13 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 	libbsmp libbsmp_install libbsmp_uninstall libbsmp_clean libbsmp_mrproper \
 	core_install core_uninstall core_clean core_mrproper \
 	tests tests_clean tests_mrproper \
-	examples examples_clean examples_mrproper \
-	cfg cfg_install cfg_uninstall cfg_clean cfg_mrproper
+	examples examples_clean examples_mrproper
 
 # Avoid deletion of intermediate files, such as objects
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: cfg $(OUT)
+all: $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
@@ -561,9 +561,12 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
+	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
 
 scripts_uninstall:
+	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
 
 scripts_clean:
@@ -593,34 +596,18 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-cfg:
-	$(MAKE) -C cfg all
-
-cfg_install:
-	$(MAKE) -C cfg install
-
-cfg_uninstall:
-	$(MAKE) -C cfg uninstall
-
-cfg_clean:
-	$(MAKE) -C cfg clean
-
-cfg_mrproper:
-	$(MAKE) -C cfg mrproper
-
 install: core_install deps_install liberrhand_install libconvc_install \
     libsdbutils_install libhutils_install libdisptable_install libllio_install \
-    libhalcsclient_install cfg_install scripts_install
+    libhalcsclient_install scripts_install
 
 uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall \
     libsdbutils_uninstall libhutils_uninstall libdisptable_uninstall libllio_uninstall \
-    libhalcsclient_uninstall cfg_uninstall scripts_uninstall
+    libhalcsclient_uninstall scripts_uninstall
 
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
     libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean examples_clean \
-    tests_clean cfg_clean scripts_clean
+    tests_clean scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
-    libhalcsclient_mrproper examples_mrproper tests_mrproper cfg_mrproper scripts_mrproper
-
+    libhalcsclient_mrproper examples_mrproper tests_mrproper scripts_mrproper

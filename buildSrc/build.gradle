@@ -1,0 +1,13 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile 'org.eclipse.jgit:org.eclipse.jgit:4.4.1.201607150455-r'
+    compile 'org.redline-rpm:redline:1.2.4'
+}

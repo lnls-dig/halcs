@@ -1,0 +1,26 @@
+include 'apps:halcsd'
+
+include 'core:boards:afcv3'
+include 'core:boards:afcv3_1'
+include 'core:boards:common'
+include 'core:boards:ml605'
+include 'core:common'
+include 'core:dev_io'
+include 'core:dev_mngr'
+include 'core:msg'
+include 'core:revision'
+include 'core:sm_io'
+include 'core:sm_io_table'
+
+include 'examples'
+
+include 'foreign:libbsmp'
+include 'foreign:libsdbfs'
+
+include 'libs:halcsclient'
+include 'libs:convc'
+include 'libs:disptable'
+include 'libs:errhand'
+include 'libs:hutils'
+include 'libs:llio'
+include 'libs:sdbutils'

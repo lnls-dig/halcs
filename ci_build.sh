@@ -10,8 +10,8 @@ BUILD_PREFIX=$PWD/tmp
 SCRIPTS_PREFIX=$PWD/tmp/etc
 
 LIBSODIUM_VER=1.0.3
-LIBZMQ_VER=v4.2.0
-LIBCZMQ_VER=v4.0.1
+LIBZMQ_VER=v4.2.1
+LIBCZMQ_VER=v4.0.2
 MALAMUTE_VER=v1.3
 
 CONFIG_FLAGS=()
@@ -55,4 +55,9 @@ git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
+if [ -z "$GRADLE" ]; then
 build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+else
+    export ${CONFIG_FLAGS[@]}
+    ./gradlew $GRADLE -Prelease.stage=ci_release
+fi

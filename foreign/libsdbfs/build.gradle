@@ -1,0 +1,11 @@
+model {
+    components {
+        sdbfs(NativeLibrarySpec) {
+            sources {
+                c {
+                    exportedHeaders.srcDir 'include'
+                }
+            }
+        }
+    }
+}

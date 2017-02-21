@@ -1,0 +1,16 @@
+apply plugin: 'br.lnls.dig.gradle.nativedistribution'
+apply plugin: 'br.lnls.dig.gradle.nativerelease'
+
+model {
+    components {
+        convc(NativeLibrarySpec) {
+            sources {
+                c {
+                    exportedHeaders.srcDir 'include'
+
+                    lib project: ':libs:errhand', library: 'errhand'
+                }
+            }
+        }
+    }
+}

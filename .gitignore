@@ -17,3 +17,16 @@ valgrind_report.txt
 # Libraries
 *.a
 *.so
+
+# Gradle local cache and output directory
+.gradle
+build
+
+# Directory for temporary files
+tmp
+
+# Directories of project dependencies
+czmq
+libsodium
+libzmq
+malamute

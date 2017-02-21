@@ -1,0 +1,72 @@
+allprojects {
+    apply plugin: 'c'
+    apply plugin: 'br.lnls.dig.gradle.assemblevarianttask'
+    apply plugin: 'br.lnls.dig.gradle.compilerflags'
+    apply plugin: br.lnls.dig.gradle.currentplatform.CurrentPlatformPlugin
+    apply plugin: 'br.lnls.dig.gradle.sanec'
+
+    model {
+        buildTypes {
+            debug
+            production
+        }
+
+        flavors {
+            afcv3
+            afcv3_1
+            ml605
+        }
+
+        binaries {
+            all {
+                cCompiler.args '-std=gnu99', '-O2', '-g'
+                cCompiler.args '-Wall', '-Wextra', '-Werror'
+
+                cCompiler.define 'ERRHAND_MIN_LEVEL=DBG_LVL_WARN'
+                cCompiler.define 'ERRHAND_SUBSYS_ON=(DBG_DEV_MNGR | ' +
+                        'DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | ' +
+                        'DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)'
+
+                if (buildType == buildTypes.debug)
+                    cCompiler.args '-g'
+
+                if (flavor == flavors.afcv3)
+                    cCompiler.define '__BOARD_AFCV3__'
+                else if (flavor == flavors.afcv3_1) {
+                    cCompiler.define '__BOARD_AFCV3__'
+                    cCompiler.define '__BOARD_AFCV3_1__'
+                } else if (flavor == flavors.ml605)
+                    cCompiler.define '__BOARD_ML605__'
+            }
+        }
+    }
+}
+
+task buildLibPcieDriver(type: Exec) {
+    commandLine 'make', 'lib_pcie_driver'
+    environment = ['PATH': System.getenv('PATH')]
+}
+
+task installLibPcieDriverHeaders(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/include/pcie/lib'
+    into 'tmp/include/pciDriver/lib'
+
+    include '*.h'
+}
+
+task installLibPcieDriverBinaries(type: Copy) {
+    dependsOn 'buildLibPcieDriver'
+
+    from 'foreign/pcie-driver/lib/pcie'
+    into 'tmp/lib'
+
+    include '*.so'
+    include '*.a'
+}
+
+task installLibPcieDriver {
+    dependsOn 'installLibPcieDriverHeaders'
+    dependsOn 'installLibPcieDriverBinaries'
+}

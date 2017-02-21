@@ -20,18 +20,19 @@ OBJDUMP         = $(CROSS_COMPILE)objdump
 ENDIAN := $(shell ./check-endian $(CC))
 
 override CFLAGS += -Wall -ggdb -O2
-override CFLAGS += -I../../include # for <sdb.h>
+override CFLAGS += -I../../core/common/include # for <sdb.h>
+override CFLAGS += -Iinclude
 override CFLAGS += -ffunction-sections -fdata-sections
 override CFLAGS += -Wno-pointer-sign
 override CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
 
 
 LIB = libsdbfs.a
-OBJS = glue.o access.o
+OBJS = src/sdbfs/c/glue.o src/sdbfs/c/access.o
 
 all: $(LIB)
 
-$(OBJS): $(wildcard *.h)
+$(OBJS): $(wildcard include/*.h) $(wildcard include/linux/*.h)
 
 $(LIB): $(OBJS)
 	$(AR) r $@ $(OBJS)
