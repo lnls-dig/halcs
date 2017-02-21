@@ -78,7 +78,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
         uint32_t __value;                                                       \
-        uint64_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
+        uint64_t addr = base_addr + CONCAT_NAME3(prefix, REG, reg);             \
         uint64_t smio_base_addr = smio_get_base (self);                         \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
                 "GET_PARAM_" #reg "_" #field ": reading from address 0x%"PRIx64 "\n", \
