@@ -18,6 +18,7 @@ include 'foreign:libbsmp'
 include 'foreign:libsdbfs'
 
 include 'libs:acqclient'
+include 'libs:bpmclient'
 include 'libs:halcsclient'
 include 'libs:convc'
 include 'libs:disptable'
