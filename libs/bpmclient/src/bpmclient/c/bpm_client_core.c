@@ -78,7 +78,7 @@ bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
     assert (acq_client);
     assert (service);
 
-    bpm_single_pass_t *self = calloc (sizeof (bpm_single_pass_t), 1);
+    bpm_single_pass_t *self = zmalloc (sizeof (bpm_single_pass_t));
 
     self->acq_client = acq_client;
     self->service = service;
@@ -186,7 +186,7 @@ static void _setup_transaction (bpm_single_pass_t *self,
 
     memcpy (&transaction->req, request, sizeof (transaction->req));
 
-    transaction->block.data = calloc(num_samples, sample_size);
+    transaction->block.data = zmalloc (num_samples * sample_size);
     transaction->block.data_size = num_samples * sample_size;
 }
 
