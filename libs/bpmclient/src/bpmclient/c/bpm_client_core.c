@@ -45,6 +45,7 @@ struct _bpm_single_pass_t {
     char *service;                          /* Acquisition client service */
     bpm_parameters_t* bpm_parameters;       /* BPM parameters */
     acq_req_t request;                      /* Acquisition request parameters */
+    acq_trans_t transaction;                /* Acquisition transaction */
     uint32_t threshold;                     /* Trigger threshold */
     uint32_t trigger_samples;               /* Trigger hysteresis filter */
 };
@@ -58,18 +59,17 @@ static halcs_client_err_e _configure_trigger(bpm_single_pass_t *self);
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
         uint32_t samples_post);
 
-static void _setup_transaction (bpm_single_pass_t *self,
-        acq_trans_t *transaction);
+static void _setup_transaction (bpm_single_pass_t *self);
 
 static void _process_single_pass_sample (bpm_single_pass_t *self,
-        void *buffer, bpm_sample_t *sample);
+        bpm_sample_t *sample);
 
 static double _squared_value (uint16_t adc_sample);
 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
 
-static void _release_transaction (acq_trans_t *transaction);
+static void _release_transaction (bpm_single_pass_t *self);
 
 bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
@@ -84,6 +84,7 @@ bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
     self->service = strdup (service);
 
     _configure_request (self, samples_pre, samples_post);
+    _setup_transaction (self);
 
     self->bpm_parameters = zmalloc (sizeof (*bpm_parameters));
     memcpy (self->bpm_parameters, bpm_parameters, sizeof (*bpm_parameters));
@@ -100,9 +101,13 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
 
     if (*self_p) {
         bpm_single_pass_t *self = *self_p;
+
+        _release_transaction (self);
+
         free (self->service);
         free (self->bpm_parameters);
         free (self);
+
         *self_p = NULL;
     }
 }
@@ -129,14 +134,10 @@ halcs_client_err_e bpm_single_pass_sample (bpm_single_pass_t *self,
     assert (self);
     assert (sample);
 
-    acq_trans_t transaction;
+    CHECK_ERR (acq_get_curve (self->acq_client, self->service,
+                &self->transaction));
 
-    _setup_transaction (self, &transaction);
-
-    CHECK_ERR (acq_get_curve (self->acq_client, self->service, &transaction));
-
-    _process_single_pass_sample (self, transaction.block.data, sample);
-    _release_transaction (&transaction);
+    _process_single_pass_sample (self, sample);
 
     return HALCS_CLIENT_SUCCESS;
 }
@@ -177,11 +178,11 @@ static halcs_client_err_e _configure_trigger(bpm_single_pass_t *self)
     return HALCS_CLIENT_SUCCESS;
 }
 
-static void _setup_transaction (bpm_single_pass_t *self,
-        acq_trans_t *transaction)
+static void _setup_transaction (bpm_single_pass_t *self)
 {
     const acq_chan_t *channels = acq_get_chan (self->acq_client);
     acq_req_t *request = &self->request;
+    acq_trans_t *transaction = &self->transaction;
 
     uint32_t num_samples = request->num_samples_pre + request->num_samples_post;
     uint32_t sample_size = channels[request->chan].sample_size;
@@ -195,7 +196,7 @@ static void _setup_transaction (bpm_single_pass_t *self,
 }
 
 static void _process_single_pass_sample (bpm_single_pass_t *self,
-        void *buffer, bpm_sample_t *sample)
+        bpm_sample_t *sample)
 {
     acq_req_t *request = &self->request;
     uint32_t num_samples = request->num_samples_pre + request->num_samples_post;
@@ -205,7 +206,7 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     double c = 0.0;
     double d = 0.0;
 
-    uint16_t *buffer_values = (uint16_t*) buffer;
+    uint16_t *buffer_values = (uint16_t*) self->transaction.block.data;
 
     for (uint32_t index = 0; index < num_samples; ++index) {
         a += _squared_value (buffer_values[0]);
@@ -251,8 +252,10 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     sample->sum = (uint32_t) (ksum * sum);
 }
 
-static void _release_transaction (acq_trans_t *transaction)
+static void _release_transaction (bpm_single_pass_t *self)
 {
+    acq_trans_t *transaction = &self->transaction;
+
     free (transaction->block.data);
 
     transaction->block.data = NULL;
