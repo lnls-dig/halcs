@@ -198,6 +198,10 @@ static void _setup_transaction (bpm_single_pass_t *self)
 static void _process_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample)
 {
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
+            "_process_single_pass_sample: Calculating position sample after "
+            "data acquisition\n");
+
     acq_req_t *request = &self->request;
     uint32_t num_samples = request->num_samples_pre + request->num_samples_post;
 
@@ -217,10 +221,18 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
         buffer_values += 4;
     }
 
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
+            "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
+            "(%f, %f, %f, %f)\n", a, b, c, d);
+
     a = sqrt(a);
     b = sqrt(b);
     c = sqrt(c);
     d = sqrt(d);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
+            "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
+            a, b, c, d);
 
     _calculate_bpm_sample (self->bpm_parameters, a, b, c, d, sample);
 }
@@ -250,6 +262,11 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     sample->y = (uint32_t) (ky * (a + b - c - d) / sum + offset_y);
     sample->q = (uint32_t) (kq * (a - b + c - d) / sum + offset_q);
     sample->sum = (uint32_t) (ksum * sum);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
+            "_calculate_bpm_sample: (X, Y, Q, SUM) = (%d, %d, %d, %d)\n",
+            sample->x, sample->y, sample->q, sample->sum);
+
 }
 
 static void _release_transaction (bpm_single_pass_t *self)
