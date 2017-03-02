@@ -85,7 +85,9 @@ bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
 
     _configure_request (self, samples_pre, samples_post);
 
-    self->bpm_parameters = bpm_parameters;
+    self->bpm_parameters = zmalloc (sizeof (*bpm_parameters));
+    memcpy (self->bpm_parameters, bpm_parameters, sizeof (*bpm_parameters));
+
     self->threshold = threshold;
     self->trigger_samples = trigger_samples;
 
@@ -99,6 +101,7 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
     if (*self_p) {
         bpm_single_pass_t *self = *self_p;
         free (self->service);
+        free (self->bpm_parameters);
         free (self);
         *self_p = NULL;
     }
