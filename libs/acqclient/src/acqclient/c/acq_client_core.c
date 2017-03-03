@@ -138,6 +138,36 @@ static halcs_client_err_e _acq_full (acq_client_t *self, char *service,
 static halcs_client_err_e _acq_full_compat (acq_client_t *self, char *service,
         acq_trans_t *acq_trans, int timeout, bool new_acq);
 
+/* Long string triggers */
+static const char *acq_client_trig_lstring [ACQ_CLIENT_TRIG_END] =
+{
+    [ACQ_CLIENT_TRIG_SKIP]           = "No trigger configured",
+    [ACQ_CLIENT_TRIG_EXTERNAL]       = "External Trigger",
+    [ACQ_CLIENT_TRIG_DATA_DRIVEN]    = "Data-driven Trigger",
+    [ACQ_CLIENT_TRIG_SOFTWARE]       = "Software Trigger",
+};
+
+/* Short string triggers */
+static const char *acq_client_trig_sstring [ACQ_CLIENT_TRIG_END] =
+{
+    [ACQ_CLIENT_TRIG_SKIP]           = "Skip",
+    [ACQ_CLIENT_TRIG_EXTERNAL]       = "External Trig",
+    [ACQ_CLIENT_TRIG_DATA_DRIVEN]    = "Data Trig",
+    [ACQ_CLIENT_TRIG_SOFTWARE]       = "Software Trig",
+};
+
+/* Convert enumeration type to long string */
+const char * acq_client_trig_lstr (acq_client_trig_e err)
+{
+    return acq_client_trig_lstring [err];
+}
+
+/* Convert enumeration type to short string */
+const char * acq_client_trig_sstr (acq_client_trig_e err)
+{
+    return acq_client_trig_sstring [err];
+}
+
 halcs_client_err_e acq_start (acq_client_t *self, char *service, acq_req_t *acq_req)
 {
     return _acq_start (self, service, acq_req);

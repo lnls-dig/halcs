@@ -48,6 +48,25 @@ typedef struct {
     acq_block_t block;                          /* Block or whole curve read */
 } acq_trans_t;
 
+/* Acquisition trigger types. Use this to safely configure the trigger
+ * and the acq_client_trig_str () function to get trigger strings */
+enum _acq_client_trig_e
+{
+    ACQ_CLIENT_TRIG_SKIP = 0,                   /* No trigger configured */
+    ACQ_CLIENT_TRIG_EXTERNAL,                   /* External trigger */
+    ACQ_CLIENT_TRIG_DATA_DRIVEN,                /* Data-driven (data offset) trigger */
+    ACQ_CLIENT_TRIG_SOFTWARE,                   /* Software generated trigger */
+    ACQ_CLIENT_TRIG_END                         /* End of enum marker */
+};
+
+typedef enum _acq_client_trig_e acq_client_trig_e;
+
+/* Convert enumeration type to long string */
+const char * acq_client_trig_str (acq_client_trig_e err);
+
+/* Convert enumeration type to short string */
+const char * acq_client_trig_sstr (acq_client_trig_e err);
+
 /* Create an instance of the acquisition client. This must be called
  * with a valid instance of a HALCS client. It is not thread-safe to
  * use both the acquisition client and the HALCS client in parallel */
