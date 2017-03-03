@@ -63,7 +63,7 @@ struct _bpm_single_pass_t {
 /************************ Our API ***********************/
 /********************************************************/
 
-static halcs_client_err_e _configure_trigger(bpm_single_pass_t *self);
+static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self);
 
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
         uint32_t samples_post);
@@ -261,10 +261,10 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
             "(%f, %f, %f, %f)\n", a, b, c, d);
 
-    a = sqrt(a);
-    b = sqrt(b);
-    c = sqrt(c);
-    d = sqrt(d);
+    a = sqrt (a);
+    b = sqrt (b);
+    c = sqrt (c);
+    d = sqrt (d);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
