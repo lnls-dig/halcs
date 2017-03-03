@@ -39,6 +39,11 @@
 #   define ADC_CHANNEL_ID_TO_USE ADC_CHAN_ID
 #endif
 
+#define EXTERNAL_TRIGGER 1
+#define DATA_TRIGGER 2
+#define POSITIVE_SLOPE 0
+#define FIRST_SAMPLE 0
+
 /* Our structure */
 struct _bpm_single_pass_t {
     acq_client_t *acq_client;               /* Acquisition client interface */
@@ -46,8 +51,12 @@ struct _bpm_single_pass_t {
     bpm_parameters_t* bpm_parameters;       /* BPM parameters */
     acq_req_t request;                      /* Acquisition request parameters */
     acq_trans_t transaction;                /* Acquisition transaction */
-    uint32_t threshold;                     /* Trigger threshold */
-    uint32_t trigger_samples;               /* Trigger hysteresis filter */
+
+    uint32_t trigger_type;                  /* Trigger source */
+    uint32_t trigger_slope;                 /* Trigger slope selection */
+    uint32_t trigger_hysteresis_samples;    /* Trigger hysteresis filter */
+    uint32_t trigger_active_sample;         /* Data sample to use as trigger */
+    uint32_t trigger_threshold;             /* Trigger threshold */
 };
 
 /********************************************************/
@@ -73,7 +82,7 @@ static void _release_transaction (bpm_single_pass_t *self);
 
 bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post, uint32_t threshold, uint32_t trigger_samples)
+        uint32_t samples_post)
 {
     assert (acq_client);
     assert (service);
@@ -89,8 +98,11 @@ bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
     self->bpm_parameters = zmalloc (sizeof (*bpm_parameters));
     memcpy (self->bpm_parameters, bpm_parameters, sizeof (*bpm_parameters));
 
-    self->threshold = threshold;
-    self->trigger_samples = trigger_samples;
+    self->trigger_type = DATA_TRIGGER;
+    self->trigger_slope = POSITIVE_SLOPE;
+    self->trigger_hysteresis_samples = 1;
+    self->trigger_active_sample = FIRST_SAMPLE;
+    self->trigger_threshold = 1;
 
     return self;
 }
@@ -110,6 +122,26 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
 
         *self_p = NULL;
     }
+}
+
+void bpm_single_pass_configure_trigger (bpm_single_pass_t *self,
+        uint32_t hysteresis_samples, uint32_t slope)
+{
+    self->trigger_slope = slope;
+    self->trigger_hysteresis_samples = hysteresis_samples;
+}
+
+void bpm_single_pass_configure_data_trigger (bpm_single_pass_t *self,
+        uint32_t threshold, uint32_t active_sample)
+{
+    self->trigger_type = DATA_TRIGGER;
+    self->trigger_threshold = threshold;
+    self->trigger_active_sample = active_sample;
+}
+
+void bpm_single_pass_configure_external_trigger (bpm_single_pass_t *self)
+{
+    self->trigger_type = EXTERNAL_TRIGGER;
 }
 
 halcs_client_err_e bpm_single_pass_start (bpm_single_pass_t *self)
@@ -155,25 +187,29 @@ static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
     request->chan = ADC_AFTER_UNSWAP;
 }
 
-static halcs_client_err_e _configure_trigger(bpm_single_pass_t *self)
+static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
 {
     acq_client_t* acq_client = self->acq_client;
     char *service = self->service;
 
-    const uint32_t DATA_TRIGGER = 2;
-    const uint32_t POSITIVE_SLOPE = 0;
-    const uint32_t FIRST_SAMPLE = 0;
-    const uint32_t ADC_AFTER_UNSWAP = ADC_CHANNEL_ID_TO_USE;
+    uint32_t trigger_type = self->trigger_type;
+    uint32_t slope = self->trigger_slope;
+    uint32_t hysteresis = self->trigger_hysteresis_samples;
 
-    uint32_t threshold = self->threshold;
-    uint32_t trigger_samples = self->trigger_samples;
+    CHECK_ERR (acq_set_trig (acq_client, service, trigger_type));
+    CHECK_ERR (acq_set_data_trig_pol (acq_client, service, slope));
+    CHECK_ERR (acq_set_data_trig_filt (acq_client, service, hysteresis));
 
-    CHECK_ERR (acq_set_trig (acq_client, service, DATA_TRIGGER));
-    CHECK_ERR (acq_set_data_trig_thres (acq_client, service, threshold));
-    CHECK_ERR (acq_set_data_trig_pol (acq_client, service, POSITIVE_SLOPE));
-    CHECK_ERR (acq_set_data_trig_sel (acq_client, service, FIRST_SAMPLE));
-    CHECK_ERR (acq_set_data_trig_filt (acq_client, service, trigger_samples));
-    CHECK_ERR (acq_set_data_trig_chan (acq_client, service, ADC_AFTER_UNSWAP));
+    if (trigger_type == DATA_TRIGGER) {
+        const uint32_t ADC_CHANNEL = ADC_CHANNEL_ID_TO_USE;
+
+        uint32_t threshold = self->trigger_threshold;
+        uint32_t active_sample = self->trigger_active_sample;
+
+        CHECK_ERR (acq_set_data_trig_thres (acq_client, service, threshold));
+        CHECK_ERR (acq_set_data_trig_sel (acq_client, service, active_sample));
+        CHECK_ERR (acq_set_data_trig_chan (acq_client, service, ADC_CHANNEL));
+    }
 
     return HALCS_CLIENT_SUCCESS;
 }

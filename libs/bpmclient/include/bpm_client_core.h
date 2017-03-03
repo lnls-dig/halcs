@@ -40,10 +40,22 @@ typedef struct {
 /* Prepare for a single-pass acquisition. */
 bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post, uint32_t threshold, uint32_t trigger_samples);
+        uint32_t samples_post);
 
 /* Free resources used for single-pass acquisition */
 void bpm_single_pass_destroy (bpm_single_pass_t **self_p);
+
+/* Configure generic trigger parameters: hysteresis filter samples and
+ * selection of rising or falling signal slope. */
+void bpm_single_pass_configure_trigger (bpm_single_pass_t *self,
+        uint32_t hysteresis_samples, uint32_t slope);
+
+/* Configure data threshold trigger parameters. */
+void bpm_single_pass_configure_data_trigger (bpm_single_pass_t *self,
+        uint32_t threshold, uint32_t active_sample);
+
+/* Prepare for an external hardware trigger. */
+void bpm_single_pass_configure_external_trigger (bpm_single_pass_t *self);
 
 /* Start single-pass acquisition */
 halcs_client_err_e bpm_single_pass_start (bpm_single_pass_t *self);
