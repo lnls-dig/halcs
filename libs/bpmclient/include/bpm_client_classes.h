@@ -19,6 +19,30 @@
 #include <halcs_client.h>
 #include <acq_client.h>
 
+/* version macros for compile-time API detection */
+
+#define BPM_CLIENT_VERSION_MAJOR 0
+#define BPM_CLIENT_VERSION_MINOR 1
+#define BPM_CLIENT_VERSION_PATCH 0
+
+#define BPM_CLIENT_MAKE_VERSION(major, minor, patch) \
+    ((major) * 10000 + (minor) * 100 + (patch))
+#define BPM_CLIENT_VERSION \
+    BPM_CLIENT_MAKE_VERSION(BPM_CLIENT_VERSION_MAJOR, BPM_CLIENT_VERSION_MINOR, \
+            BPM_CLIENT_VERSION_PATCH)
+
+#if defined (__WINDOWS__)
+#   if defined LIBBPM_CLIENT_STATIC
+#       define BPM_CLIENT_EXPORT
+#   elif defined LIBBPM_CLIENT_EXPORTS
+#       define BPM_CLIENT_EXPORT __declspec(dllexport)
+#   else
+#       define BPM_CLIENT_EXPORT __declspec(dllimport)
+#   endif
+#else
+#   define BPM_CLIENT_EXPORT
+#endif
+
 /* Opaque bpm_client_t structure */
 typedef struct _bpm_single_pass_t bpm_single_pass_t;
 
