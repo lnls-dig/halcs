@@ -39,8 +39,6 @@
 #   define ADC_CHANNEL_ID_TO_USE ADC_CHAN_ID
 #endif
 
-#define EXTERNAL_TRIGGER 1
-#define DATA_TRIGGER 2
 #define POSITIVE_SLOPE 0
 #define FIRST_SAMPLE 0
 
@@ -98,7 +96,7 @@ bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
     self->bpm_parameters = zmalloc (sizeof (*bpm_parameters));
     memcpy (self->bpm_parameters, bpm_parameters, sizeof (*bpm_parameters));
 
-    self->trigger_type = DATA_TRIGGER;
+    self->trigger_type = ACQ_CLIENT_TRIG_DATA_DRIVEN;
     self->trigger_slope = POSITIVE_SLOPE;
     self->trigger_hysteresis_samples = 1;
     self->trigger_active_sample = FIRST_SAMPLE;
@@ -134,14 +132,14 @@ void bpm_single_pass_configure_trigger (bpm_single_pass_t *self,
 void bpm_single_pass_configure_data_trigger (bpm_single_pass_t *self,
         uint32_t threshold, uint32_t active_sample)
 {
-    self->trigger_type = DATA_TRIGGER;
+    self->trigger_type = ACQ_CLIENT_TRIG_DATA_DRIVEN;
     self->trigger_threshold = threshold;
     self->trigger_active_sample = active_sample;
 }
 
 void bpm_single_pass_configure_external_trigger (bpm_single_pass_t *self)
 {
-    self->trigger_type = EXTERNAL_TRIGGER;
+    self->trigger_type = ACQ_CLIENT_TRIG_EXTERNAL;
 }
 
 halcs_client_err_e bpm_single_pass_start (bpm_single_pass_t *self)
@@ -200,7 +198,7 @@ static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
     CHECK_ERR (acq_set_data_trig_pol (acq_client, service, slope));
     CHECK_ERR (acq_set_data_trig_filt (acq_client, service, hysteresis));
 
-    if (trigger_type == DATA_TRIGGER) {
+    if (trigger_type == ACQ_CLIENT_TRIG_DATA_DRIVEN) {
         const uint32_t ADC_CHANNEL = ADC_CHANNEL_ID_TO_USE;
 
         uint32_t threshold = self->trigger_threshold;
