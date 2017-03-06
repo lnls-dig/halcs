@@ -291,13 +291,7 @@ int main (int argc, char *argv [])
     char service[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
 
-    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
-    if (halcs_client == NULL) {
-        fprintf (stderr, "[client:acq]: halcs_client could be created\n");
-        goto err_halcs_client_new;
-    }
-
-    acq_client_t *acq_client = acq_client_new (halcs_client);
+    acq_client_t *acq_client = acq_client_new (broker_endp, verbose, NULL);
     if (acq_client == NULL) {
         fprintf (stderr, "[client:acq]: acq_client could not be created\n");
         goto err_acq_client_new;
@@ -342,8 +336,6 @@ err_set_file_mode:
 err_acq_full_compat:
 err_acq_set_trig:
 err_acq_client_new:
-    acq_client_destroy (&acq_client);
-err_halcs_client_new:
     free (file_fmt_str);
     file_fmt_str = NULL;
     free (chan_str);
@@ -356,7 +348,7 @@ err_halcs_client_new:
     num_samples_str = NULL;
     free (broker_endp);
     broker_endp = NULL;
-    halcs_client_destroy (&halcs_client);
+    acq_client_destroy (&acq_client);
 
     return 0;
 }

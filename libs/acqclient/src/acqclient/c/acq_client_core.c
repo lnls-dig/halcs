@@ -76,17 +76,45 @@ acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC_CHAN_ID, .sample_s
 /************************ Our API ***********************/
 /********************************************************/
 
-acq_client_t *acq_client_new (halcs_client_t *halcs_client)
+static acq_client_t *_acq_client_new (halcs_client_t *halcs_client);
+
+acq_client_t *acq_client_new (char *broker_endp, int verbose,
+        const char *log_file_name)
 {
-    return acq_client_new_with_channel (halcs_client, acq_chan);
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose,
+            log_file_name);
+
+    return _acq_client_new (halcs_client);
 }
 
-/* Create an instance of the acquisition client. This must be called
- * with a valid instance of a HALCS client and can receive the acquisition
- * channel to use. It is not thread-safe to use both the acquisition client
- * and the HALCS client in parallel */
-acq_client_t *acq_client_new_with_channel (halcs_client_t *halcs_client,
-        const acq_chan_t *acq_chan)
+acq_client_t *acq_client_new_time (char *broker_endp, int verbose,
+        const char *log_file_name, int timeout)
+{
+    halcs_client_t *halcs_client = halcs_client_new_time (broker_endp, verbose,
+            log_file_name, timeout);
+
+    return _acq_client_new (halcs_client);
+}
+
+acq_client_t *acq_client_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode)
+{
+    halcs_client_t *halcs_client = halcs_client_new_log_mode (broker_endp,
+            verbose, log_file_name, log_mode);
+
+    return _acq_client_new (halcs_client);
+}
+
+acq_client_t *acq_client_new_log_mode_time (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode, int timeout)
+{
+    halcs_client_t *halcs_client = halcs_client_new_log_mode_time (broker_endp,
+            verbose, log_file_name, log_mode, timeout);
+
+    return _acq_client_new (halcs_client);
+}
+
+static acq_client_t *_acq_client_new (halcs_client_t *halcs_client)
 {
     assert (halcs_client);
 
@@ -104,6 +132,9 @@ void acq_client_destroy (acq_client_t **self_p)
 
     if (*self_p) {
         acq_client_t* self = *self_p;
+
+        halcs_client_destroy (&self->halcs_client);
+
         free (self);
         *self_p = NULL;
     }
