@@ -7,7 +7,7 @@ PartOf=halcs@%i.target
 [Service]
 EnvironmentFile=/etc/sysconfig/halcs-board
 ExecStartPre=/bin/mkdir -p /media/remote_logs
-ExecStart=/usr/local/bin/halcsd -f /usr/local/etc/halcs/halcs.cfg -n fe -t eth -i %i -b tcp://127.0.0.1:8978 -l /media/remote_logs
+ExecStart=/usr/local/bin/halcsd -f /usr/local/etc/halcs/halcs.cfg -n fe -t eth -i %i -b ipc:///tmp/malamute -l /media/remote_logs
 WorkingDirectory=/usr/local/bin
 TimeoutStopSec=2
 

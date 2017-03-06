@@ -228,7 +228,7 @@ for INSTANCE in ${INSTANCES[@]}
 do
     DAEMON=$DAEMONDIR/$DAEMON_NAME
     PIDFILE=$PIDDIR/$INSTANCE
-    DAEMON_ARGS="-f $CONFIG_DIR/$CONFIG -n be -t pcie -i $INSTANCE -e /dev/fpga-$INSTANCE -s 0 -b tcp://127.0.0.1:8978 -l $LOGDIR"
+    DAEMON_ARGS="-f $CONFIG_DIR/$CONFIG -n be -t pcie -i $INSTANCE -e /dev/fpga-$INSTANCE -s 0 -b ipc:///tmp/malamute -l $LOGDIR"
 
     #echo "INSTANCE: $INSTANCE"
     #echo "DAEMON_NAME: $DAEMON_NAME"
