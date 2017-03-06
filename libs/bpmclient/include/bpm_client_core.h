@@ -37,10 +37,41 @@ typedef struct {
     double sum;
 } bpm_sample_t;
 
-/* Prepare for a single-pass acquisition. */
-bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
+/* Create an instance of the single-pass acquisition client. The single-pass
+ * parameters are the service to connect to, the parameters of the BPM, and the
+ * number of samples to acquire before and after the trigger. */
+bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
+        const char *log_file_name, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post);
+
+/* Create an instance of the single-pass acquisition client. The single-pass
+ * parameters are the service to connect to, the parameters of the BPM, and the
+ * number of samples to acquire before and after the trigger. This variation
+ * allows specifying the send/recv timeout in ms. */
+bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
+        const char *log_file_name, int timeout, char *service,
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post);
+
+/* Create an instance of the single-pass acquisition client, with the log
+ * filemode specified by "log_mode" as in fopen () call. The single-pass
+ * parameters are the service to connect to, the parameters of the BPM, and the
+ * number of samples to acquire before and after the trigger. */
+bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode, char *service,
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post);
+
+/* Create an instance of the single-pass acquisition client, with the log
+ * filemode specified * by "log_mode" as in fopen () call, and the send/recv
+ * timeout in ms. The single-pass parameters are the service to connect to, the
+ * parameters of the BPM, and the number of samples to acquire before and after
+ * the trigger. */
+bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
+        int verbose, const char *log_file_name, const char *log_mode,
+        int timeout, char *service, bpm_parameters_t *bpm_parameters,
+        uint32_t samples_pre, uint32_t samples_post);
 
 /* Free resources used for single-pass acquisition */
 void bpm_single_pass_destroy (bpm_single_pass_t **self_p);

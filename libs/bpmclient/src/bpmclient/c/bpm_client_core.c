@@ -61,6 +61,10 @@ struct _bpm_single_pass_t {
 /************************ Our API ***********************/
 /********************************************************/
 
+static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
+        char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post);
+
 static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self);
 
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
@@ -78,8 +82,56 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
 
 static void _release_transaction (bpm_single_pass_t *self);
 
-bpm_single_pass_t *bpm_single_pass_new (acq_client_t *acq_client, char *service,
+bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
+        const char *log_file_name, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post)
+{
+    acq_client_t *acq_client = acq_client_new (broker_endp, verbose,
+        log_file_name);
+
+    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
+            samples_pre, samples_post);
+}
+
+bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
+        const char *log_file_name, int timeout, char *service,
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post)
+{
+    acq_client_t *acq_client = acq_client_new_time (broker_endp, verbose,
+        log_file_name, timeout);
+
+    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
+            samples_pre, samples_post);
+}
+
+bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
+        const char *log_file_name, const char *log_mode, char *service,
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        uint32_t samples_post)
+{
+    acq_client_t *acq_client = acq_client_new_log_mode (broker_endp, verbose,
+        log_file_name, log_mode);
+
+    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
+            samples_pre, samples_post);
+}
+
+bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
+        int verbose, const char *log_file_name, const char *log_mode,
+        int timeout, char *service, bpm_parameters_t *bpm_parameters,
+        uint32_t samples_pre, uint32_t samples_post)
+{
+    acq_client_t *acq_client = acq_client_new_log_mode_time (broker_endp,
+        verbose, log_file_name, log_mode, timeout);
+
+    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
+            samples_pre, samples_post);
+}
+
+static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
+        char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post)
 {
     assert (acq_client);
@@ -113,6 +165,7 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
         bpm_single_pass_t *self = *self_p;
 
         _release_transaction (self);
+        acq_client_destroy (&self->acq_client);
 
         free (self->service);
         free (self->bpm_parameters);
