@@ -6,7 +6,7 @@
 *.o
 
 # Dependency files
-*.d         # Ignore all dependency files
+*.d
 
 # Compiled python files
 *.pyc
