@@ -11,6 +11,8 @@ function usage() {
     echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
 }
 
+LIBSDIR="libs"
+
 #######################################
 # All of our Makefile options
 #######################################
@@ -187,6 +189,9 @@ else
 COMMAND_DRIVER=""
 fi
 
+# Meta target to remove copied headers
+COMMAND_CLEAN="make -C ${LIBSDIR}/halcsclient pre_clean"
+
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_DRIVER}"
@@ -194,6 +199,7 @@ COMMAND_ARRAY=(
     "${COMMAND_CORE}"
     "${COMMAND_EXAMPLES}"
     "${COMMAND_SYSTEM_INTEGRATION}"
+    "${COMMAND_CLEAN}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
