@@ -21,6 +21,7 @@ valgrind_report.txt
 # Libraries
 *.a
 *.so
+*.so.*
 
 # Gradle local cache and output directory
 .gradle
