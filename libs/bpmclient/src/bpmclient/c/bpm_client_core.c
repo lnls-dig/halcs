@@ -292,13 +292,13 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     double offset_y = parameters->offset_y;
     double offset_q = parameters->offset_q;
 
-    sample->x = (uint32_t) (kx * (a - b - c + d) / sum - offset_x);
-    sample->y = (uint32_t) (ky * (a + b - c - d) / sum - offset_y);
-    sample->q = (uint32_t) (kq * (a - b + c - d) / sum - offset_q);
-    sample->sum = (uint32_t) (ksum * sum);
+    sample->x = kx * (a - b - c + d) / sum - offset_x;
+    sample->y = ky * (a + b - c - d) / sum - offset_y;
+    sample->q = kq * (a - b + c - d) / sum - offset_q;
+    sample->sum = ksum * sum;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
-            "_calculate_bpm_sample: (X, Y, Q, SUM) = (%d, %d, %d, %d)\n",
+            "_calculate_bpm_sample: (X, Y, Q, SUM) = (%f, %f, %f, %f)\n",
             sample->x, sample->y, sample->q, sample->sum);
 
 }

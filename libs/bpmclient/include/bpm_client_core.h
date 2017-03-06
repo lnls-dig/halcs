@@ -31,10 +31,10 @@ typedef struct {
 
 /* BPM measurement sample */
 typedef struct {
-    uint32_t x;
-    uint32_t y;
-    uint32_t q;
-    uint32_t sum;
+    double x;
+    double y;
+    double q;
+    double sum;
 } bpm_sample_t;
 
 /* Prepare for a single-pass acquisition. */
