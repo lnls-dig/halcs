@@ -5,6 +5,10 @@
 *.bak
 *.o
 
+# Binaries
+dev_mngr
+halcsd
+
 # Dependency files
 *.d
 
