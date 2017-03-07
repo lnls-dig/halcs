@@ -90,8 +90,13 @@ bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
     acq_client_t *acq_client = acq_client_new (broker_endp, verbose,
         log_file_name);
 
+    ASSERT_ALLOC (acq_client, err_acq_client_new);
+
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
             samples_pre, samples_post);
+
+err_acq_client_new:
+    return NULL;
 }
 
 bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
@@ -102,8 +107,13 @@ bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
     acq_client_t *acq_client = acq_client_new_time (broker_endp, verbose,
         log_file_name, timeout);
 
+    ASSERT_ALLOC (acq_client, err_acq_client_new);
+
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
             samples_pre, samples_post);
+
+err_acq_client_new:
+    return NULL;
 }
 
 bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
@@ -114,8 +124,13 @@ bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
     acq_client_t *acq_client = acq_client_new_log_mode (broker_endp, verbose,
         log_file_name, log_mode);
 
+    ASSERT_ALLOC (acq_client, err_acq_client_new);
+
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
             samples_pre, samples_post);
+
+err_acq_client_new:
+    return NULL;
 }
 
 bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
@@ -126,15 +141,19 @@ bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
     acq_client_t *acq_client = acq_client_new_log_mode_time (broker_endp,
         verbose, log_file_name, log_mode, timeout);
 
+    ASSERT_ALLOC (acq_client, err_acq_client_new);
+
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
             samples_pre, samples_post);
+
+err_acq_client_new:
+    return NULL;
 }
 
 static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
         char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post)
 {
-    assert (acq_client);
     assert (service);
 
     bpm_single_pass_t *self = zmalloc (sizeof (bpm_single_pass_t));

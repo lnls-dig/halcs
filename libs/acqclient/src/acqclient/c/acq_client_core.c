@@ -84,7 +84,12 @@ acq_client_t *acq_client_new (char *broker_endp, int verbose,
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose,
             log_file_name);
 
+    ASSERT_ALLOC (halcs_client, err_halcs_client_new);
+
     return _acq_client_new (halcs_client);
+
+err_halcs_client_new:
+    return NULL;
 }
 
 acq_client_t *acq_client_new_time (char *broker_endp, int verbose,
@@ -93,7 +98,12 @@ acq_client_t *acq_client_new_time (char *broker_endp, int verbose,
     halcs_client_t *halcs_client = halcs_client_new_time (broker_endp, verbose,
             log_file_name, timeout);
 
+    ASSERT_ALLOC (halcs_client, err_halcs_client_new);
+
     return _acq_client_new (halcs_client);
+
+err_halcs_client_new:
+    return NULL;
 }
 
 acq_client_t *acq_client_new_log_mode (char *broker_endp, int verbose,
@@ -102,7 +112,12 @@ acq_client_t *acq_client_new_log_mode (char *broker_endp, int verbose,
     halcs_client_t *halcs_client = halcs_client_new_log_mode (broker_endp,
             verbose, log_file_name, log_mode);
 
+    ASSERT_ALLOC (halcs_client, err_halcs_client_new);
+
     return _acq_client_new (halcs_client);
+
+err_halcs_client_new:
+    return NULL;
 }
 
 acq_client_t *acq_client_new_log_mode_time (char *broker_endp, int verbose,
@@ -111,13 +126,16 @@ acq_client_t *acq_client_new_log_mode_time (char *broker_endp, int verbose,
     halcs_client_t *halcs_client = halcs_client_new_log_mode_time (broker_endp,
             verbose, log_file_name, log_mode, timeout);
 
+    ASSERT_ALLOC (halcs_client, err_halcs_client_new);
+
     return _acq_client_new (halcs_client);
+
+err_halcs_client_new:
+    return NULL;
 }
 
 static acq_client_t *_acq_client_new (halcs_client_t *halcs_client)
 {
-    assert (halcs_client);
-
     acq_client_t *self = zmalloc (sizeof *self);
 
     self->halcs_client = halcs_client;
