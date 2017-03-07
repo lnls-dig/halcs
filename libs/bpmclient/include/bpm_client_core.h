@@ -31,6 +31,10 @@ typedef struct {
 
 /* BPM measurement sample */
 typedef struct {
+    double a;
+    double b;
+    double c;
+    double d;
     double x;
     double y;
     double q;

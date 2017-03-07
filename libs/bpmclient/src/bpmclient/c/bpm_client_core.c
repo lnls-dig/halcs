@@ -376,15 +376,20 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     double offset_y = parameters->offset_y;
     double offset_q = parameters->offset_q;
 
+    sample->a = a;
+    sample->b = b;
+    sample->c = c;
+    sample->d = d;
     sample->x = kx * (a - b - c + d) / sum - offset_x;
     sample->y = ky * (a + b - c - d) / sum - offset_y;
     sample->q = kq * (a - b + c - d) / sum - offset_q;
     sample->sum = ksum * sum;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
-            "_calculate_bpm_sample: (X, Y, Q, SUM) = (%f, %f, %f, %f)\n",
+            "_calculate_bpm_sample: (A, B, C, D, X, Y, Q, SUM) = "
+            "(%f, %f, %f, %f, %f, %f, %f, %f)\n",
+            sample->a, sample->b, sample->c, sample->d,
             sample->x, sample->y, sample->q, sample->sum);
-
 }
 
 static void _release_transaction (bpm_single_pass_t *self)
