@@ -51,6 +51,8 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         self->acq_params[i].num_shots = num_shots;
         /* Default trigger address is the beggining of the channel address */
         self->acq_params[i].trig_addr = self->acq_buf[i].start_addr;
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Instance %u, "
+            "channel %u, start_addr = %08X\n", inst_id, i, self->acq_buf[i].start_addr);
     }
 
     /* initilize acquisition buffer areas. Defined in ddr3_map.h */
