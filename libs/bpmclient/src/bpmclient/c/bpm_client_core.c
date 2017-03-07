@@ -244,6 +244,18 @@ halcs_client_err_e bpm_single_pass_sample (bpm_single_pass_t *self,
     return HALCS_CLIENT_SUCCESS;
 }
 
+const acq_req_t *bpm_single_pass_get_acq_request (bpm_single_pass_t *self)
+{
+    assert (self);
+    return &self->request;
+}
+
+const acq_trans_t *bpm_single_pass_get_acq_transaction (bpm_single_pass_t *self)
+{
+    assert (self);
+    return &self->transaction;
+}
+
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
         uint32_t samples_post)
 {

@@ -98,6 +98,12 @@ halcs_client_err_e bpm_single_pass_check (bpm_single_pass_t *self);
 halcs_client_err_e bpm_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample);
 
+/* Get acquisition request structure */
+const acq_req_t *bpm_single_pass_get_acq_request (bpm_single_pass_t *self);
+
+/* Get acquisition transaction structure */
+const acq_trans_t *bpm_single_pass_get_acq_transaction (bpm_single_pass_t *self);
+
 #ifdef __cplusplus
 }
 #endif
