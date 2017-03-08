@@ -244,8 +244,8 @@ int main (int argc, char *argv [])
             continue;
         }
 
-        const acq_sp_trans_t * acq_sp_trans = bpm_single_pass_get_acq_sp_transaction (bpm_single_pass);
-        const int16_t *datap = (const int16_t *) acq_sp_trans->block.data;
+        const acq_trans_t * acq_trans = bpm_single_pass_get_acq_transaction (bpm_single_pass);
+        const int16_t *datap = (const int16_t *) acq_trans->block.data;
 
         uint32_t i;
         for (i = 0; i < num_samples+num_samples; ++i) {
