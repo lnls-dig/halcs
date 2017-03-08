@@ -15,8 +15,7 @@
 #define DFLT_NUM_SAMPLES            4096
 #define DFLT_CHAN_NUM               0
 
-#define DFLT_HALCS_NUMBER             0
-#define MAX_HALCS_NUMBER              1
+#define DFLT_HALCS_NUMBER           0
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -264,12 +263,6 @@ int main (int argc, char *argv [])
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
-
-        if (halcs_number > MAX_HALCS_NUMBER) {
-            fprintf (stderr, "[client:acq]: HALCS number too big! Defaulting to: %u\n",
-                    MAX_HALCS_NUMBER);
-            halcs_number = MAX_HALCS_NUMBER;
-        }
     }
 
     /* Set default file format */
