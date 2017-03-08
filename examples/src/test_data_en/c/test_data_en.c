@@ -125,7 +125,9 @@ int main (int argc, char *argv [])
     fprintf (stdout, "[client:test_data_en]: test_data_en = %u\n", test_data_en);
 
     char service[50];
+    char service_dsp[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC_ADC_COMMON%u", board_number, halcs_number);
+    snprintf (service_dsp, sizeof (service_dsp), "HALCS%u:DEVIO:DSP%u", board_number, halcs_number);
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
@@ -135,6 +137,7 @@ int main (int argc, char *argv [])
 
     /* Test data enable */
     halcs_set_adc_test_data_en (halcs_client, service, test_data_en);
+    halcs_set_dsp_cfg_test_data (halcs_client, service_dsp, test_data_en);
 
     /* Cleanup */
 err_halcs_client_new:
