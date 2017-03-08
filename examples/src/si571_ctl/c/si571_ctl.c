@@ -141,6 +141,12 @@ int main (int argc, char *argv [])
         goto err_halcs_set_freq;
     }
 
+    err = halcs_set_si571_oe (halcs_client, service, 0x1);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:si571_ctl]: Si571 Set Output Enable failed\n");
+        goto err_halcs_set_freq;
+    }
+
     double freq = 0;
     err = halcs_get_si571_freq (halcs_client, service, &freq);
     if (err != HALCS_CLIENT_SUCCESS){
