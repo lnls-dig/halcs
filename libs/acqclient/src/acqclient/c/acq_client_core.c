@@ -159,7 +159,7 @@ void acq_client_destroy (acq_client_t **self_p)
 }
 
 /* Get current acquisition channel */
-const acq_chan_t* acq_get_chan (const acq_client_t *self)
+const acq_chan_t* acq_get_chan (acq_client_t *self)
 {
     return self->acq_chan;
 }

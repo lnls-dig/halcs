@@ -98,7 +98,7 @@ acq_client_t *acq_client_new_log_mode_time (char *broker_endp, int verbose,
 void acq_client_destroy (acq_client_t **self_p);
 
 /* Get current acquisition channel */
-const acq_chan_t* acq_get_chan (const acq_client_t *self);
+const acq_chan_t* acq_get_chan (acq_client_t *self);
 
 /* Set current acquisition channel. Responsibility over the acq_chan_t structure
  * memory remains with the caller. */
