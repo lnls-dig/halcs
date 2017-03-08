@@ -7,7 +7,7 @@
 #define MEM_TOTAL_SIZE                  (1ULL << 31)            /* 2 GB reserved for position storage */
 #endif
 
-#define MEM_REGION_SIZE                 (MEM_TOTAL_SIZE / 32)
+#define MEM_REGION_SIZE                 (MEM_TOTAL_SIZE / 16)
 
 /* FPGA Specific */
 #define DDR3_PAYLOAD_SIZE               32                      /* In Bytes: Artix7 (AFCv3) */
