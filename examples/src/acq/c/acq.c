@@ -297,6 +297,8 @@ int main (int argc, char *argv [])
         goto err_acq_client_new;
     }
 
+    acq_set_fsm_stop (acq_client, service, 1);
+
     /* Set trigger to skip */
     uint32_t acq_trig = 0;
     halcs_client_err_e err = acq_set_trig (acq_client, service, acq_trig);
