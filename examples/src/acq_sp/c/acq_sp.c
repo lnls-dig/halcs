@@ -207,7 +207,8 @@ int main (int argc, char *argv [])
 
     uint32_t hyst = 1; 
     uint32_t slope = 1; 
-    bpm_single_pass_configure_trigger (bpm_single_pass, hyst, slope);
+    uint32_t delay = 0; 
+    bpm_single_pass_configure_trigger (bpm_single_pass, hyst, slope, delay);
 
     uint32_t thres = 500;
     uint32_t active_sample = 0;
