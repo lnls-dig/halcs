@@ -53,6 +53,7 @@ struct _bpm_single_pass_t {
     uint32_t trigger_type;                  /* Trigger source */
     uint32_t trigger_slope;                 /* Trigger slope selection */
     uint32_t trigger_hysteresis_samples;    /* Trigger hysteresis filter */
+    uint32_t trigger_delay;                 /* Trigger delay, in ADC clock cycles */
     uint32_t trigger_active_sample;         /* Data sample to use as trigger */
     uint32_t trigger_threshold;             /* Trigger threshold */
 };
@@ -170,6 +171,7 @@ static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
     self->trigger_type = ACQ_CLIENT_TRIG_DATA_DRIVEN;
     self->trigger_slope = POSITIVE_SLOPE;
     self->trigger_hysteresis_samples = 1;
+    self->trigger_delay = 0;
     self->trigger_active_sample = FIRST_SAMPLE;
     self->trigger_threshold = 1;
 
@@ -195,10 +197,11 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
 }
 
 void bpm_single_pass_configure_trigger (bpm_single_pass_t *self,
-        uint32_t hysteresis_samples, uint32_t slope)
+        uint32_t hysteresis_samples, uint32_t slope, uint32_t trigger_delay)
 {
     self->trigger_slope = slope;
     self->trigger_hysteresis_samples = hysteresis_samples;
+    self->trigger_delay = trigger_delay;
 }
 
 void bpm_single_pass_configure_data_trigger (bpm_single_pass_t *self,
@@ -277,10 +280,12 @@ static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
     uint32_t trigger_type = self->trigger_type;
     uint32_t slope = self->trigger_slope;
     uint32_t hysteresis = self->trigger_hysteresis_samples;
+    uint32_t delay = self->trigger_delay;
 
     CHECK_ERR (acq_set_trig (acq_client, service, trigger_type));
     CHECK_ERR (acq_set_data_trig_pol (acq_client, service, slope));
     CHECK_ERR (acq_set_data_trig_filt (acq_client, service, hysteresis));
+    CHECK_ERR (acq_set_hw_trig_dly (acq_client, service, delay));
 
     if (trigger_type == ACQ_CLIENT_TRIG_DATA_DRIVEN) {
         const uint32_t ADC_CHANNEL = ADC_CHANNEL_ID_TO_USE;

@@ -83,7 +83,7 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p);
 /* Configure generic trigger parameters: hysteresis filter samples and
  * selection of rising or falling signal slope. */
 void bpm_single_pass_configure_trigger (bpm_single_pass_t *self,
-        uint32_t hysteresis_samples, uint32_t slope);
+        uint32_t hysteresis_samples, uint32_t slope, uint32_t trigger_delay);
 
 /* Configure data threshold trigger parameters. */
 void bpm_single_pass_configure_data_trigger (bpm_single_pass_t *self,
