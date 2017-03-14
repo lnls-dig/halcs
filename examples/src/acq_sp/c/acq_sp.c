@@ -199,7 +199,7 @@ int main (int argc, char *argv [])
                                        .offset_q = 0
                                        };
     bpm_single_pass_t *bpm_single_pass = bpm_single_pass_new (broker_endp, verbose, NULL,
-        service, &bpm_parameters, num_samples, num_samples);
+        service, &bpm_parameters, num_samples, num_samples, 1);
     if (bpm_single_pass == NULL) {
         fprintf (stderr, "[client:acq_sp]: bpm_single_pass could not be created\n");
         goto err_bpm_single_pass_new;
