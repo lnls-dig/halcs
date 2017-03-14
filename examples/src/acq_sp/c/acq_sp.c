@@ -7,15 +7,14 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-#include <acq_client.h>
+#include <bpm_client.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
 #define DFLT_NUM_SAMPLES            4096
 #define DFLT_CHAN_NUM               0
 
-#define DFLT_HALCS_NUMBER             0
-#define MAX_HALCS_NUMBER              1
+#define DFLT_HALCS_NUMBER           0
 
 #define DFLT_BOARD_NUMBER           0
 
@@ -129,7 +128,7 @@ int main (int argc, char *argv [])
     /* Set default number samples */
     uint32_t num_samples;
     if (num_samples_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to number of samples: %u\n",
+        fprintf (stderr, "[client:acq_sp]: Setting default value to number of samples: %u\n",
                 DFLT_NUM_SAMPLES);
         num_samples = DFLT_NUM_SAMPLES;
     }
@@ -137,39 +136,39 @@ int main (int argc, char *argv [])
         num_samples = strtoul (num_samples_str, NULL, 10);
 
         if (num_samples < MIN_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too small! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq_sp]: Number of samples too small! Defaulting to: %u\n",
                     MIN_NUM_SAMPLES);
             num_samples = MIN_NUM_SAMPLES;
         }
         else if (num_samples > MAX_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq_sp]: Number of samples too big! Defaulting to: %u\n",
                     MAX_NUM_SAMPLES);
             num_samples = MAX_NUM_SAMPLES;
         }
     }
-    //fprintf (stdout, "[client:acq]: num_samples = %u\n", num_samples);
+    //fprintf (stdout, "[client:acq_sp]: num_samples = %u\n", num_samples);
 
     /* Set default channel */
     uint32_t chan;
     if (chan_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to 'chan'\n");
+        fprintf (stderr, "[client:acq_sp]: Setting default value to 'chan'\n");
         chan = DFLT_CHAN_NUM;
     }
     else {
         chan = strtoul (chan_str, NULL, 10);
 
         if (chan > END_CHAN_ID-1) {
-            fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq_sp]: Channel number too big! Defaulting to: %u\n",
                     MAX_NUM_CHANS);
             chan = END_CHAN_ID-1;
         }
     }
-    //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
+    //fprintf (stdout, "[client:acq_sp]: chan = %u\n", chan);
 
     /* Set default board number */
     uint32_t board_number;
     if (board_number_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to BOARD number: %u\n",
+        fprintf (stderr, "[client:acq_sp]: Setting default value to BOARD number: %u\n",
                 DFLT_BOARD_NUMBER);
         board_number = DFLT_BOARD_NUMBER;
     }
@@ -186,106 +185,82 @@ int main (int argc, char *argv [])
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
-
-        if (halcs_number > MAX_HALCS_NUMBER) {
-            fprintf (stderr, "[client:leds]: HALCS number too big! Defaulting to: %u\n",
-                    MAX_HALCS_NUMBER);
-            halcs_number = MAX_HALCS_NUMBER;
-        }
     }
 
     char service[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
 
-    acq_client_t *acq_client = acq_client_new (broker_endp, verbose, NULL);
-    if (acq_client == NULL) {
-        fprintf (stderr, "[client:acq]: acq_client could not be created\n");
-        goto err_acq_client_new;
+    bpm_parameters_t bpm_parameters = {.kx       = 10000000,
+                                       .ky       = 10000000,
+                                       .kq       = 10000000,
+                                       .ksum     = 1,
+                                       .offset_x = 0,
+                                       .offset_y = 0,
+                                       .offset_q = 0
+                                       };
+    bpm_single_pass_t *bpm_single_pass = bpm_single_pass_new (broker_endp, verbose, NULL,
+        service, &bpm_parameters, num_samples, num_samples, 1);
+    if (bpm_single_pass == NULL) {
+        fprintf (stderr, "[client:acq_sp]: bpm_single_pass could not be created\n");
+        goto err_bpm_single_pass_new;
     }
 
-    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
-    /* Change trigger type here if needed */
-    uint32_t acq_trig = 2;
-    err = acq_set_trig (acq_client, service, acq_trig);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_trig failed\n");
-        goto err_acq_set_trig;
+    uint32_t hyst = 1; 
+    uint32_t slope = 1; 
+    uint32_t delay = 0; 
+    bpm_single_pass_configure_trigger (bpm_single_pass, hyst, slope, delay);
+
+    uint32_t thres = 500;
+    uint32_t active_sample = 0;
+    bpm_single_pass_configure_data_trigger (bpm_single_pass,
+        thres, active_sample);
+
+    while (1) {
+        if (zsys_interrupted) {
+            break;
+        }
+        fprintf (stdout, "[client:acq_sp_sp]: starting new acq_spuisition\n");
+        halcs_client_err_e err = bpm_single_pass_start (bpm_single_pass);
+        if (err) {
+            fprintf (stderr, "[client:acq_sp]: bpm_single_pass_start error\n");
+            sleep (1);
+            continue;
+        }
+
+        fprintf (stdout, "[client:acq_sp]: checking for single pass event\n");
+        while (bpm_single_pass_check (bpm_single_pass) != HALCS_CLIENT_SUCCESS)  {
+            sleep (1);
+        }
+
+        if (zsys_interrupted) {
+            break;
+        }
+
+        fprintf (stdout, "[client:acq_sp]: calculating single_pass sample\n");
+        bpm_sample_t bpm_sample;
+        err = bpm_single_pass_sample (bpm_single_pass, &bpm_sample);
+        if (err) {
+            fprintf (stderr, "[client:acq_sp]: bpm_single_pass_sample error\n");
+            sleep (1);
+            continue;
+        }
+
+        const acq_trans_t * acq_trans = bpm_single_pass_get_acq_transaction (bpm_single_pass);
+        const int16_t *datap = (const int16_t *) acq_trans->block.data;
+
+        uint32_t i;
+        for (i = 0; i < num_samples+num_samples; ++i) {
+            fprintf (stdout, "[client:acq_sp_sp]: %d %d %d %d\n",
+            datap[4*i], datap[4*i+1], datap[4*i+2], datap[4*i+3]);
+        }
+
+        fprintf (stdout, "[client:acq_sp]: a,b,c,d,x,y,q,sum = (%f,%f,%f,%f,%f,%f,%f%f)\n",
+            bpm_sample.a, bpm_sample.b, bpm_sample.c, bpm_sample.d, 
+            bpm_sample.x, bpm_sample.y, bpm_sample.q, bpm_sample.sum);
+
     }
 
-    uint32_t data_trig_thres = 200;
-    err = acq_set_data_trig_thres (acq_client, service, data_trig_thres);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_data_trig_thres failed\n");
-        goto err_acq_set_trig;
-    }
-
-    uint32_t data_trig_pol = 0;
-    err = acq_set_data_trig_pol (acq_client, service, data_trig_pol);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_data_trig_pol failed\n");
-        goto err_acq_set_trig;
-    }
-
-    uint32_t data_trig_sel = 0;
-    err = acq_set_data_trig_sel (acq_client, service, data_trig_sel);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_data_trig_sel failed\n");
-        goto err_acq_set_trig;
-    }
-
-    uint32_t data_trig_filt = 1;
-    err = acq_set_data_trig_filt (acq_client, service, data_trig_filt);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_data_trig_filt failed\n");
-        goto err_acq_set_trig;
-    }
-
-    uint32_t hw_trig_dly = 0;
-    err =  acq_set_hw_trig_dly (acq_client, service, hw_trig_dly);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_hw_trig_dly failed\n");
-        goto err_acq_set_trig;
-    }
-
-    uint32_t data_trig_chan = 6;
-    err =  acq_set_data_trig_chan (acq_client, service, data_trig_chan);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_set_data_trig_chan failed\n");
-        goto err_acq_set_trig;
-    }
-
-    const acq_chan_t *acq_chan = acq_get_chan (acq_client);
-    uint32_t num_samples_pre = num_samples;
-    uint32_t num_samples_post = num_samples;
-    uint32_t num_shots = 1;
-    uint32_t data_size = (num_samples_pre+num_samples_post+100)*num_shots*
-        acq_chan[chan].sample_size;
-    uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
-    bool new_acq = true;
-    acq_trans_t acq_trans = {.req =   {
-                                        .num_samples_pre = num_samples_pre,
-                                        .num_samples_post = num_samples_post,
-                                        .num_shots = num_shots,
-                                        .chan = chan,
-                                      },
-                             .block = {
-                                        .data = data,
-                                        .data_size = data_size,
-                                      }
-                            };
-    err = acq_full_compat (acq_client, service, &acq_trans, 500000, new_acq);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: acq_full_compat failed\n");
-        goto err_acq_full_compat;
-    }
-
-    //fprintf (stdout, "[client:acq]: acq_full_compat was successfully executed\n");
-    fprintf (stdout, "clear\n");
-    print_data (chan, data, acq_trans.block.bytes_read);
-
-err_acq_client_new:
-err_acq_set_trig:
-err_acq_full_compat:
+err_bpm_single_pass_new:
     str_p = &chan_str;
     free (*str_p);
     chan_str = NULL;
@@ -301,7 +276,7 @@ err_acq_full_compat:
     str_p = &broker_endp;
     free (*str_p);
     broker_endp = NULL;
-    acq_client_destroy (&acq_client);
+    bpm_single_pass_destroy (&bpm_single_pass);
 
     return 0;
 }

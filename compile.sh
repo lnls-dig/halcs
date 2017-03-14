@@ -190,7 +190,9 @@ COMMAND_DRIVER=""
 fi
 
 # Meta target to remove copied headers
-COMMAND_CLEAN="make -C ${LIBSDIR}/halcsclient pre_clean"
+COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
+    make -C ${LIBSDIR}/bpmclient pre_clean &&
+    make -C ${LIBSDIR}/halcsclient pre_clean"
 
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"

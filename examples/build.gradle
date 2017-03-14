@@ -1,6 +1,7 @@
 model {
     components {
         acq(NativeExecutableSpec)
+        acq_sp(NativeExecutableSpec)
         acq_gen_sw_trigger(NativeExecutableSpec)
         acq_trigger(NativeExecutableSpec)
         ad9510_ctl(NativeExecutableSpec)
@@ -28,6 +29,8 @@ model {
                     lib project: ':core:common', library: 'common'
                     lib project: ':core:sm_io', library: 'sm_io', linkage: 'api'
                     lib project: ':core:sm_io_table', library: 'sm_io_table'
+                    lib project: ':libs:acqclient', library: 'acqclient'
+                    lib project: ':libs:bpmclient', library: 'bpmclient'
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:disptable', library: 'disptable'
                     lib project: ':libs:errhand', library: 'errhand'
