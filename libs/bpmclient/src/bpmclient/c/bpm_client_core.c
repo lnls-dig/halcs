@@ -64,12 +64,12 @@ struct _bpm_single_pass_t {
 
 static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
         char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post);
+        uint32_t samples_post, uint32_t num_shots);
 
 static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self);
 
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
-        uint32_t samples_post);
+        uint32_t samples_post, uint32_t num_shots);
 
 static void _setup_transaction (bpm_single_pass_t *self);
 
@@ -86,7 +86,7 @@ static void _release_transaction (bpm_single_pass_t *self);
 bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
         const char *log_file_name, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post)
+        uint32_t samples_post, uint32_t num_shots)
 {
     acq_client_t *acq_client = acq_client_new (broker_endp, verbose,
         log_file_name);
@@ -94,7 +94,7 @@ bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post);
+            samples_pre, samples_post, num_shots);
 
 err_acq_client_new:
     return NULL;
@@ -103,7 +103,7 @@ err_acq_client_new:
 bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
         const char *log_file_name, int timeout, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post)
+        uint32_t samples_post, uint32_t num_shots)
 {
     acq_client_t *acq_client = acq_client_new_time (broker_endp, verbose,
         log_file_name, timeout);
@@ -111,7 +111,7 @@ bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post);
+            samples_pre, samples_post, num_shots);
 
 err_acq_client_new:
     return NULL;
@@ -120,7 +120,7 @@ err_acq_client_new:
 bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
         const char *log_file_name, const char *log_mode, char *service,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post)
+        uint32_t samples_post, uint32_t num_shots)
 {
     acq_client_t *acq_client = acq_client_new_log_mode (broker_endp, verbose,
         log_file_name, log_mode);
@@ -128,7 +128,7 @@ bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post);
+            samples_pre, samples_post, num_shots);
 
 err_acq_client_new:
     return NULL;
@@ -137,7 +137,7 @@ err_acq_client_new:
 bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
         int verbose, const char *log_file_name, const char *log_mode,
         int timeout, char *service, bpm_parameters_t *bpm_parameters,
-        uint32_t samples_pre, uint32_t samples_post)
+        uint32_t samples_pre, uint32_t samples_post, uint32_t num_shots)
 {
     acq_client_t *acq_client = acq_client_new_log_mode_time (broker_endp,
         verbose, log_file_name, log_mode, timeout);
@@ -145,7 +145,7 @@ bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
     return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post);
+            samples_pre, samples_post, num_shots);
 
 err_acq_client_new:
     return NULL;
@@ -153,7 +153,7 @@ err_acq_client_new:
 
 static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
         char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
-        uint32_t samples_post)
+        uint32_t samples_post, uint32_t num_shots)
 {
     assert (service);
 
@@ -162,7 +162,7 @@ static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
     self->acq_client = acq_client;
     self->service = strdup (service);
 
-    _configure_request (self, samples_pre, samples_post);
+    _configure_request (self, samples_pre, samples_post, num_shots);
     _setup_transaction (self);
 
     self->bpm_parameters = zmalloc (sizeof (*bpm_parameters));
@@ -260,7 +260,7 @@ const acq_trans_t *bpm_single_pass_get_acq_transaction (bpm_single_pass_t *self)
 }
 
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
-        uint32_t samples_post)
+        uint32_t samples_post, uint32_t num_shots)
 {
     const uint32_t ADC_AFTER_UNSWAP = ADC_CHANNEL_ID_TO_USE;
 
@@ -268,7 +268,7 @@ static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
 
     request->num_samples_pre = samples_pre;
     request->num_samples_post = samples_post;
-    request->num_shots = 1;
+    request->num_shots = num_shots;
     request->chan = ADC_AFTER_UNSWAP;
 }
 
