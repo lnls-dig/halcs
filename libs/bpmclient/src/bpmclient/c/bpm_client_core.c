@@ -307,7 +307,8 @@ static void _setup_transaction (bpm_single_pass_t *self)
     acq_req_t *request = &self->request;
     acq_trans_t *transaction = &self->transaction;
 
-    uint32_t num_samples = request->num_samples_pre + request->num_samples_post;
+    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
+            request->num_shots;
     uint32_t sample_size = channels[request->chan].sample_size;
 
     assert (sample_size == 4 * sizeof (uint16_t));
@@ -326,7 +327,8 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             "data acquisition\n");
 
     acq_req_t *request = &self->request;
-    uint32_t num_samples = request->num_samples_pre + request->num_samples_post;
+    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
+            request->num_shots;
 
     double a = 0.0;
     double b = 0.0;
