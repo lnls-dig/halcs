@@ -9,11 +9,11 @@
 
 /* ADC */
 #define ADC_CHAN_ID                     0
-#define ADC_SAMPLE_SIZE                 8 /* 8 Bytes -> ADC = 16-bit / ADC1 = 16-bit ... */
+#define ADC_SAMPLE_SIZE                 16 /* 16 Bytes -> ADC = 32-bit / ADC1 = 32-bit ... */
 
 /* ADC SWAPPED (after the switching module) */
 #define ADCSWAP_CHAN_ID                 (ADC_CHAN_ID + 1)
-#define ADCSWAP_SAMPLE_SIZE             8 /* 8 Bytes -> ADCSWAP = 16-bit / ADCSWAP1 = 16-bit ... */
+#define ADCSWAP_SAMPLE_SIZE             16 /* 16 Bytes -> ADCSWAP = 32-bit / ADCSWAP1 = 32-bit ... */
 
 /* MIXER I/Q */
 #define MIXIQ_CHAN_ID                   (ADCSWAP_CHAN_ID + 1)
