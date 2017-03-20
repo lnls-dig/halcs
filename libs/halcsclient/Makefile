@@ -106,6 +106,7 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/modules/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/dsp/sm_io_dsp_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/fmcpico1m_4ch/sm_io_fmcpico1m_4ch_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc_adc_common/sm_io_fmc_adc_common_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/swap/sm_io_swap_exports.o \
@@ -128,6 +129,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules \
 	       -I$(SMIO_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_SRC_DIR)/modules/fmc250m_4ch \
+	       -I$(SMIO_SRC_DIR)/modules/fmcpico1m_4ch \
 	       -I$(SMIO_SRC_DIR)/modules/fmc_adc_common \
 	       -I$(SMIO_SRC_DIR)/modules/fmc_active_clk \
 	       -I$(SMIO_SRC_DIR)/modules/acq \
@@ -143,6 +145,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc250m_4ch \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmcpico1m_4ch \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc_adc_common \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc_active_clk \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/acq \
@@ -180,6 +183,7 @@ $(LIBNAME)_CODE_HEADERS = \
 
 $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_codes.h \
+	$(SMIO_DIR)/include/sm_io_fmcpico1m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_fmc_adc_common_codes.h \
 	$(SMIO_DIR)/include/sm_io_fmc_active_clk_codes.h \
 	$(SMIO_DIR)/include/sm_io_acq_codes.h \
@@ -195,6 +199,7 @@ $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 
 $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_fmc250m_4ch_exports.h \
+	$(SMIO_TABLE_DIR)/include/sm_io_fmcpico1m_4ch_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_fmc_adc_common_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_fmc_active_clk_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_acq_exports.h \

@@ -558,6 +558,66 @@ halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *temp);
 
+/********************** FMCPICO1M_4CH Functions ********************/
+
+/* FMC board LEDs Control */
+/* These set of functions read (get) or write (set) FMCPICO LEDs
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_fmcpico_led1 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_led1);
+halcs_client_err_e halcs_get_fmcpico_led1 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_led1);
+halcs_client_err_e halcs_set_fmcpico_led2 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_led2);
+halcs_client_err_e halcs_get_fmcpico_led2 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_led2);
+
+/* FMC board RNGs Control */
+/* These set of functions read (get) or write (set) FMCPICO RNGs
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_fmcpico_rng_r0 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_rng_r0);
+halcs_client_err_e halcs_get_fmcpico_rng_r0 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_rng_r0);
+halcs_client_err_e halcs_set_fmcpico_rng_r1 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_rng_r1);
+halcs_client_err_e halcs_get_fmcpico_rng_r1 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_rng_r1);
+halcs_client_err_e halcs_set_fmcpico_rng_r2 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_rng_r2);
+halcs_client_err_e halcs_get_fmcpico_rng_r2 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_rng_r2);
+halcs_client_err_e halcs_set_fmcpico_rng_r3 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_rng_r3);
+halcs_client_err_e halcs_get_fmcpico_rng_r3 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_rng_r3);
+
+/* RAW ADC data functions */
+/* These set of functions read (get) the RAW ADC values.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_fmcpico_adc_data0 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_adc_data0);
+halcs_client_err_e halcs_get_fmcpico_adc_data0 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_adc_data0);
+halcs_client_err_e halcs_set_fmcpico_adc_data1 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_adc_data1);
+halcs_client_err_e halcs_get_fmcpico_adc_data1 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_adc_data1);
+halcs_client_err_e halcs_set_fmcpico_adc_data2 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_adc_data2);
+halcs_client_err_e halcs_get_fmcpico_adc_data2 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_adc_data2);
+halcs_client_err_e halcs_set_fmcpico_adc_data3 (halcs_client_t *self, char *service,
+        uint32_t fmcpico_adc_data3);
+halcs_client_err_e halcs_get_fmcpico_adc_data3 (halcs_client_t *self, char *service,
+        uint32_t *fmcpico_adc_data3);
+
 /********************** DSP Functions ********************/
 
 /* K<direction> functions */

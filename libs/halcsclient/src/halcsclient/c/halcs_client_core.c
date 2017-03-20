@@ -1150,6 +1150,118 @@ PARAM_FUNC_CLIENT_WRITE2(adc250_dly3, type, val)
             type, val);
 }
 
+/**************** FMCPICO1M_4CH SMIO Functions ****************/
+
+/* Led1 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_led1)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_LED1, fmcpico_led1);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_led1)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_LED1, fmcpico_led1);
+}
+
+/* Led2 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_led2)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_LED2, fmcpico_led2);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_led2)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_LED2, fmcpico_led2);
+}
+
+/* Rng_R0 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_rng_r0)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R0, fmcpico_rng_r0);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_rng_r0)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R0, fmcpico_rng_r0);
+}
+
+/* Rng_R1 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_rng_r1)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R1, fmcpico_rng_r1);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_rng_r1)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R1, fmcpico_rng_r1);
+}
+
+/* Rng_R2 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_rng_r2)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R2, fmcpico_rng_r2);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_rng_r2)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R2, fmcpico_rng_r2);
+}
+
+/* Rng_R3 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_rng_r3)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R3, fmcpico_rng_r3);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_rng_r3)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_RNG_R3, fmcpico_rng_r3);
+}
+
+/* AdcData0 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_adc_data0)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA0, fmcpico_adc_data0);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_adc_data0)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA0, fmcpico_adc_data0);
+}
+
+/* AdcData1 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_adc_data1)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA1, fmcpico_adc_data1);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_adc_data1)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA1, fmcpico_adc_data1);
+}
+
+/* AdcData2 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_adc_data2)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA2, fmcpico_adc_data2);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_adc_data2)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA2, fmcpico_adc_data2);
+}
+
+/* AdcData3 functions */
+PARAM_FUNC_CLIENT_WRITE(fmcpico_adc_data3)
+{
+    return param_client_write (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA3, fmcpico_adc_data3);
+}
+
+PARAM_FUNC_CLIENT_READ(fmcpico_adc_data3)
+{
+    return param_client_read (self, service, FMCPICO1M_4CH_OPCODE_SET_GET_ADC_DATA3, fmcpico_adc_data3);
+}
+
 /**************** DSP SMIO Functions ****************/
 
 /* Kx functions */
