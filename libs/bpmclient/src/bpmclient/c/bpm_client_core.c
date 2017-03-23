@@ -76,7 +76,7 @@ static void _setup_transaction (bpm_single_pass_t *self);
 static void _process_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample);
 
-static double _squared_value (int16_t adc_sample);
+static double _squared_value (int32_t adc_sample);
 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
@@ -311,7 +311,7 @@ static void _setup_transaction (bpm_single_pass_t *self)
             request->num_shots;
     uint32_t sample_size = channels[request->chan].sample_size;
 
-    assert (sample_size == 4 * sizeof (uint16_t));
+    assert (sample_size == 4 * sizeof (int32_t));
 
     memcpy (&transaction->req, request, sizeof (transaction->req));
 
@@ -335,7 +335,7 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     double c = 0.0;
     double d = 0.0;
 
-    int16_t *buffer_values = (int16_t*) self->transaction.block.data;
+    int32_t *buffer_values = (int32_t*) self->transaction.block.data;
 
     for (uint32_t index = 0; index < num_samples; ++index) {
         a += _squared_value (buffer_values[0]);
@@ -362,7 +362,7 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     _calculate_bpm_sample (self->bpm_parameters, a, b, c, d, sample);
 }
 
-static double _squared_value (int16_t adc_sample)
+static double _squared_value (int32_t adc_sample)
 {
     double value = (double) adc_sample;
 
