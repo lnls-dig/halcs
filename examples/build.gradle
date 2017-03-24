@@ -1,6 +1,7 @@
 model {
     components {
         acq(NativeExecutableSpec)
+        acq_prop(NativeExecutableSpec)
         acq_sp(NativeExecutableSpec)
         acq_gen_sw_trigger(NativeExecutableSpec)
         acq_trigger(NativeExecutableSpec)
