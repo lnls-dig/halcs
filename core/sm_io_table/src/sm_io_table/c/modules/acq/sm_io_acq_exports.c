@@ -154,6 +154,58 @@ disp_op_t acq_hw_data_trig_chan_exp = {
     }
 };
 
+disp_op_t acq_ch_int_width_exp = {
+    .name = ACQ_NAME_CH_INT_WIDTH,
+    .opcode = ACQ_OPCODE_CH_INT_WIDTH,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_ch_num_coalesce_exp = {
+    .name = ACQ_NAME_CH_NUM_COALESCE,
+    .opcode = ACQ_OPCODE_CH_NUM_COALESCE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_ch_num_atoms_exp = {
+    .name = ACQ_NAME_CH_NUM_ATOMS,
+    .opcode = ACQ_OPCODE_CH_NUM_ATOMS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t acq_ch_atom_width_exp = {
+    .name = ACQ_NAME_CH_ATOM_WIDTH,
+    .opcode = ACQ_OPCODE_CH_ATOM_WIDTH,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *acq_exp_ops [] = {
     &acq_data_acquire_exp,
@@ -168,6 +220,10 @@ const disp_op_t *acq_exp_ops [] = {
     &acq_sw_trig_exp,
     &acq_fsm_stop_exp,
     &acq_hw_data_trig_chan_exp,
+    &acq_ch_int_width_exp,
+    &acq_ch_num_coalesce_exp,
+    &acq_ch_num_atoms_exp,
+    &acq_ch_atom_width_exp,
     NULL
 };
 

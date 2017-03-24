@@ -741,6 +741,46 @@ RW_PARAM_FUNC(acq, hw_data_trig_chan) {
             ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+/* This must match the FPGA maximum number of channels */
+#define ACQ_CORE_NUM_CHAN_DESC                      24
+#define ACQ_CORE_CHAN_DESC_OFFSET                   0x008 /* 2 32-bit registers */
+
+#define ACQ_CORE_INT_WIDTH_MIN                      0
+#define ACQ_CORE_INT_WIDTH_MAX                      ((1 << 16)-1)
+RW_PARAM_FUNC(acq, int_width) {
+    SET_GET_PARAM_CHANNEL(acq, 0x0, ACQ_CORE,
+            CH0_DESC, INT_WIDTH, ACQ_CORE_CHAN_DESC_OFFSET, ACQ_CORE_NUM_CHAN_DESC,
+            MULT_BIT_PARAM, ACQ_CORE_INT_WIDTH_MIN, ACQ_CORE_INT_WIDTH_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_CORE_NUM_COALESCE_MIN                   0
+#define ACQ_CORE_NUM_COALESCE_MAX                   ((1 << 16)-1)
+RW_PARAM_FUNC(acq, num_coalesce) {
+    SET_GET_PARAM_CHANNEL(acq, 0x0, ACQ_CORE,
+            CH0_DESC, NUM_COALESCE, ACQ_CORE_CHAN_DESC_OFFSET, ACQ_CORE_NUM_CHAN_DESC,
+            MULT_BIT_PARAM, ACQ_CORE_NUM_COALESCE_MIN, ACQ_CORE_NUM_COALESCE_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_CORE_NUM_ATOMS_MIN                      0
+#define ACQ_CORE_NUM_ATOMS_MAX                      ((1 << 16)-1)
+RW_PARAM_FUNC(acq, num_atoms) {
+    SET_GET_PARAM_CHANNEL(acq, 0x0, ACQ_CORE,
+            CH0_ATOM_DESC, NUM_ATOMS, ACQ_CORE_CHAN_DESC_OFFSET, ACQ_CORE_NUM_CHAN_DESC,
+            MULT_BIT_PARAM, ACQ_CORE_NUM_ATOMS_MIN, ACQ_CORE_NUM_ATOMS_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ACQ_CORE_ATOM_WIDTH_MIN                     0
+#define ACQ_CORE_ATOM_WIDTH_MAX                     ((1 << 16)-1)
+RW_PARAM_FUNC(acq, atom_width) {
+    SET_GET_PARAM_CHANNEL(acq, 0x0, ACQ_CORE,
+            CH0_ATOM_DESC, ATOM_WIDTH, ACQ_CORE_CHAN_DESC_OFFSET, ACQ_CORE_NUM_CHAN_DESC,
+            MULT_BIT_PARAM, ACQ_CORE_ATOM_WIDTH_MIN, ACQ_CORE_ATOM_WIDTH_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp acq_exp_fp [] = {
     _acq_data_acquire,
@@ -755,6 +795,10 @@ const disp_table_func_fp acq_exp_fp [] = {
     RW_PARAM_FUNC_NAME(acq, sw_trig),
     RW_PARAM_FUNC_NAME(acq, fsm_stop),
     RW_PARAM_FUNC_NAME(acq, hw_data_trig_chan),
+    RW_PARAM_FUNC_NAME(acq, int_width),
+    RW_PARAM_FUNC_NAME(acq, num_coalesce),
+    RW_PARAM_FUNC_NAME(acq, num_atoms),
+    RW_PARAM_FUNC_NAME(acq, atom_width),
     NULL
 };
 

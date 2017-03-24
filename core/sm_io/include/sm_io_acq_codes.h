@@ -43,7 +43,15 @@ struct _smio_acq_data_block_t {
 #define ACQ_NAME_FSM_STOP               "acq_fsm_stop"
 #define ACQ_OPCODE_HW_DATA_TRIG_CHAN    11
 #define ACQ_NAME_HW_DATA_TRIG_CHAN      "acq_hw_data_trig_chan"
-#define ACQ_OPCODE_END                  12
+#define ACQ_OPCODE_CH_INT_WIDTH         12
+#define ACQ_NAME_CH_INT_WIDTH           "acq_ch_int_width"
+#define ACQ_OPCODE_CH_NUM_COALESCE      13
+#define ACQ_NAME_CH_NUM_COALESCE        "acq_ch_num_coalesce"
+#define ACQ_OPCODE_CH_NUM_ATOMS         14
+#define ACQ_NAME_CH_NUM_ATOMS           "acq_ch_num_atoms"
+#define ACQ_OPCODE_CH_ATOM_WIDTH        15
+#define ACQ_NAME_CH_ATOM_WIDTH          "acq_ch_atom_width"
+#define ACQ_OPCODE_END                  16
 
 /* Messaging Reply OPCODES */
 #define ACQ_REPLY_TYPE                  uint32_t
