@@ -390,6 +390,56 @@ halcs_client_err_e acq_get_data_trig_chan (acq_client_t *self, char *service,
             ACQ_OPCODE_HW_DATA_TRIG_CHAN, data_trig_chan);
 }
 
+/****************** Acquisition Channel properties Functions ****************/
+
+PARAM_FUNC_CLIENT_WRITE2(acq_ch_int_width, chan, ch_int_width)
+{
+    return param_client_write2 (self, service, ACQ_OPCODE_CH_INT_WIDTH,
+            chan, ch_int_width);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(acq_ch_int_width, chan, ch_int_width)
+{
+    return param_client_write_read (self, service, ACQ_OPCODE_CH_INT_WIDTH,
+            chan, ch_int_width);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(acq_ch_num_coalesce, chan, ch_num_coalesce)
+{
+    return param_client_write2 (self, service, ACQ_OPCODE_CH_NUM_COALESCE,
+            chan, ch_num_coalesce);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(acq_ch_num_coalesce, chan, ch_num_coalesce)
+{
+    return param_client_write_read (self, service, ACQ_OPCODE_CH_NUM_COALESCE,
+            chan, ch_num_coalesce);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(acq_ch_num_atoms, chan, ch_num_atoms)
+{
+    return param_client_write2 (self, service, ACQ_OPCODE_CH_NUM_ATOMS,
+            chan, ch_num_atoms);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(acq_ch_num_atoms, chan, ch_num_atoms)
+{
+    return param_client_write_read (self, service, ACQ_OPCODE_CH_NUM_ATOMS,
+            chan, ch_num_atoms);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(acq_ch_atom_width, chan, ch_atom_width)
+{
+    return param_client_write2 (self, service, ACQ_OPCODE_CH_ATOM_WIDTH,
+            chan, ch_atom_width);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(acq_ch_atom_width, chan, ch_atom_width)
+{
+    return param_client_write_read (self, service, ACQ_OPCODE_CH_ATOM_WIDTH,
+            chan, ch_atom_width);
+}
+
 static halcs_client_err_e _acq_start (acq_client_t *self, char *service, acq_req_t *acq_req)
 {
     assert (self);
