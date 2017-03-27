@@ -97,11 +97,11 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         self->acq_buf[i].max_samples = max_samples;
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Channel properties, ACQ %u:\n"
-            "ID = %u\n"
-            "Start Addr = 0x%08X\n"
-            "End Addr = 0x%08X\n"
-            "Sample Size = %u\n"
-            "Max Samples = %u\n", 
+            "\tID = %u\n"
+            "\tStart Addr = 0x%08X\n"
+            "\tEnd Addr = 0x%08X\n"
+            "\tSample Size = %u\n"
+            "\tMax Samples = %u\n", 
             inst_id, self->acq_buf[i].id, self->acq_buf[i].start_addr, 
             self->acq_buf[i].end_addr, self->acq_buf[i].sample_size, self->acq_buf[i].max_samples);
     }
@@ -114,11 +114,11 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         /* Default trigger address is the beggining of the channel address */
         self->acq_params[i].trig_addr = self->acq_buf[i].start_addr;
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Acquisition parameters, ACQ %u:\n"
-            "ID = %u\n"
-            "Number of Samples Pre-Trigger = %u\n"
-            "Number of Samples Post-Trigger = %u\n"
-            "Number of Shots = %u\n"
-            "Trigger Address = 0x%08X\n", 
+            "\tID = %u\n"
+            "\tNumber of Samples Pre-Trigger = %u\n"
+            "\tNumber of Samples Post-Trigger = %u\n"
+            "\tNumber of Shots = %u\n"
+            "\tTrigger Address = 0x%08X\n", 
             inst_id, i, self->acq_params[i].num_samples_pre, self->acq_params[i].num_samples_post,
             self->acq_params[i].num_shots, self->acq_params[i].trig_addr);
     }
