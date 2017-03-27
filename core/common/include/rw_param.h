@@ -280,6 +280,17 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                     fmt_funcp, clr_field, smio_thsafe_client_read_32,           \
                     smio_thsafe_client_write_32)
 
+#define GET_PARAM_CHANNEL(self, module, base_addr, prefix, reg, field, chan_offset,   \
+        chan_num, single_bit, var, fmt_funcp)                                   \
+            GET_PARAM(self, module, (base_addr + (chan_num*chan_offset)),       \
+                    prefix, reg, field, single_bit, var, fmt_funcp)
+
+#define SET_PARAM_CHANNEL(self, module, base_addr, prefix, reg, field, chan_offset,   \
+        chan_num, single_bit, value, min, max, chk_funcp, clr_field)            \
+            SET_PARAM(self, module, (base_addr + (chan_num*chan_offset)),       \
+            prefix, reg, field, single_bit, value, min, max, chk_funcp,         \
+            clr_field)
+
 uint32_t check_param_limits (uint32_t value, uint32_t min, uint32_t max);
 
 #endif
