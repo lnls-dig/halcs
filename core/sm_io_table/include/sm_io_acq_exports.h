@@ -26,6 +26,7 @@ extern disp_op_t acq_ch_int_width_exp;
 extern disp_op_t acq_ch_num_coalesce_exp;
 extern disp_op_t acq_ch_num_atoms_exp;
 extern disp_op_t acq_ch_atom_width_exp;
+extern disp_op_t acq_ch_sample_size_exp;
 
 extern const disp_op_t *acq_exp_ops [];
 

@@ -51,7 +51,9 @@ struct _smio_acq_data_block_t {
 #define ACQ_NAME_CH_NUM_ATOMS           "acq_ch_num_atoms"
 #define ACQ_OPCODE_CH_ATOM_WIDTH        15
 #define ACQ_NAME_CH_ATOM_WIDTH          "acq_ch_atom_width"
-#define ACQ_OPCODE_END                  16
+#define ACQ_OPCODE_CH_SAMPLE_SIZE       16
+#define ACQ_NAME_CH_SAMPLE_SIZE         "acq_ch_sample_size"
+#define ACQ_OPCODE_END                  17
 
 /* Messaging Reply OPCODES */
 #define ACQ_REPLY_TYPE                  uint32_t

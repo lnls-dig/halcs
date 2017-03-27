@@ -206,6 +206,19 @@ disp_op_t acq_ch_atom_width_exp = {
     }
 };
 
+disp_op_t acq_ch_sample_size_exp = {
+    .name = ACQ_NAME_CH_SAMPLE_SIZE,
+    .opcode = ACQ_OPCODE_CH_SAMPLE_SIZE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *acq_exp_ops [] = {
     &acq_data_acquire_exp,
@@ -224,6 +237,7 @@ const disp_op_t *acq_exp_ops [] = {
     &acq_ch_num_coalesce_exp,
     &acq_ch_num_atoms_exp,
     &acq_ch_atom_width_exp,
+    &acq_ch_sample_size_exp,
     NULL
 };
 

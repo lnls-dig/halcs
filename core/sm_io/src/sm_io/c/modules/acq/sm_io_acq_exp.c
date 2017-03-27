@@ -777,6 +777,62 @@ RW_PARAM_FUNC(acq, atom_width) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+static int _acq_sample_size (void *owner, void *args, void *ret)
+{
+    UNUSED(ret);
+    assert (owner);
+    assert (args);
+    int err = -ACQ_OK;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
+            "Calling _acq_cfg_trigger\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_acq_t *acq = smio_get_handler (self);
+    ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
+            err_get_acq_handler, -ACQ_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw
+     * frame 2: channel number
+     * frame 3: value
+     */
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t channel_number = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    UNUSED(value);
+
+    /* channel required is out of the limit */
+    ASSERT_TEST(channel_number < ACQ_CORE_NUM_CHAN_DESC, "Channel number is not valid",
+            err_acq_get_chan, -ACQ_NUM_CHAN_OOR);
+
+    uint32_t sample_size = 0;
+    uint32_t int_ch_width = 0;
+    uint32_t num_coalesce = 0;
+    if (rw) {
+        /* Get channel properties */
+        GET_PARAM_CHANNEL(self, acq, 0x0, ACQ_CORE, CH0_DESC, INT_WIDTH,
+                ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, int_ch_width,
+                NO_FMT_FUNC);
+        GET_PARAM_CHANNEL(self, acq, 0x0, ACQ_CORE, CH0_DESC, NUM_COALESCE,
+		ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
+                NO_FMT_FUNC);
+        sample_size = int_ch_width/DDR3_BYTE_2_BIT * num_coalesce;
+
+        /* Return value to caller */
+        *((uint32_t *) ret) = sample_size;
+        err = sizeof (sample_size);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
+                "Sample size = %u\n", sample_size);
+    }
+
+    return err;
+
+err_acq_get_chan:
+err_get_acq_handler:
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp acq_exp_fp [] = {
     _acq_data_acquire,
@@ -795,6 +851,7 @@ const disp_table_func_fp acq_exp_fp [] = {
     RW_PARAM_FUNC_NAME(acq, num_coalesce),
     RW_PARAM_FUNC_NAME(acq, num_atoms),
     RW_PARAM_FUNC_NAME(acq, atom_width),
+    _acq_sample_size,
     NULL
 };
 
