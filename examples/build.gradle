@@ -8,6 +8,7 @@ model {
         ad9510_ctl(NativeExecutableSpec)
         adc_data(NativeExecutableSpec)
         adc_dly(NativeExecutableSpec)
+        adc250_dly(NativeExecutableSpec)
         dsp_swap(NativeExecutableSpec)
         fmc130m_4ch_ctl(NativeExecutableSpec)
         fmc130m_eeprom_ctl(NativeExecutableSpec)
