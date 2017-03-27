@@ -17,58 +17,42 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         {
             .id = ADC_CHAN_ID,
             .start_addr = DDR3_ADC0_START_ADDR,
-            .end_addr = DDR3_ADC0_END_ADDR,
-            .max_samples = DDR3_ADC0_MAX_SAMPLES,
-            .sample_size = DDR3_ADC0_SAMPLE_SIZE
+            .end_addr = DDR3_ADC0_END_ADDR
         },
         {
             .id = TBTAMP_CHAN_ID,
             .start_addr = DDR3_TBTAMP0_START_ADDR,
-            .end_addr = DDR3_TBTAMP0_END_ADDR,
-            .max_samples =  DDR3_TBTAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTAMP0_END_ADDR
         },
         {
             .id = TBTPOS_CHAN_ID,
             .start_addr = DDR3_TBTPOS0_START_ADDR,
-            .end_addr = DDR3_TBTPOS0_END_ADDR,
-            .max_samples =DDR3_TBTPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPOS0_END_ADDR
         },
         {
             .id = FOFBAMP_CHAN_ID,
             .start_addr = DDR3_FOFBAMP0_START_ADDR,
-            .end_addr = DDR3_FOFBAMP0_END_ADDR,
-            .max_samples =  DDR3_FOFBAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBAMP0_END_ADDR
         },
         {
             .id = FOFBPOS_CHAN_ID,
             .start_addr = DDR3_FOFBPOS0_START_ADDR,
-            .end_addr = DDR3_FOFBPOS0_END_ADDR,
-            .max_samples = DDR3_FOFBPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPOS0_END_ADDR
         },
         {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP0_START_ADDR,
-            .end_addr = DDR3_MONITAMP0_END_ADDR,
-            .max_samples = DDR3_MONITAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_MONITAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_MONITAMP0_END_ADDR
         },
         {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS0_START_ADDR,
-            .end_addr = DDR3_MONITPOS0_END_ADDR,
-            .max_samples = DDR3_MONITPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_MONITPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_MONITPOS0_END_ADDR
         },
         {
             .id = MONIT1POS_CHAN_ID,
             .start_addr = DDR3_MONIT1POS0_START_ADDR,
-            .end_addr = DDR3_MONIT1POS0_END_ADDR,
-            .max_samples = DDR3_MONIT1POS0_MAX_SAMPLES,
-            .sample_size = DDR3_MONIT1POS0_SAMPLE_SIZE
+            .end_addr = DDR3_MONIT1POS0_END_ADDR
         }
     }
 };

@@ -19,121 +19,87 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         {
             .id = ADC_CHAN_ID,
             .start_addr = DDR3_ADC0_START_ADDR,
-            .end_addr = DDR3_ADC0_END_ADDR,
-            .max_samples = DDR3_ADC0_MAX_SAMPLES,
-            .sample_size = DDR3_ADC0_SAMPLE_SIZE
+            .end_addr = DDR3_ADC0_END_ADDR
         },
         {
             .id = ADCSWAP_CHAN_ID,
             .start_addr = DDR3_ADCSWAP0_START_ADDR,
-            .end_addr = DDR3_ADCSWAP0_END_ADDR,
-            .max_samples = DDR3_ADCSWAP0_MAX_SAMPLES,
-            .sample_size = DDR3_ADCSWAP0_SAMPLE_SIZE
+            .end_addr = DDR3_ADCSWAP0_END_ADDR
         },
         {
             .id = MIXIQ_CHAN_ID,
             .start_addr = DDR3_MIXIQ0_START_ADDR,
-            .end_addr = DDR3_MIXIQ0_END_ADDR,
-            .max_samples = DDR3_MIXIQ0_MAX_SAMPLES,
-            .sample_size = DDR3_MIXIQ0_SAMPLE_SIZE
+            .end_addr = DDR3_MIXIQ0_END_ADDR
         },
         {
             .id = DUMMY0_CHAN_ID,
             .start_addr = DDR3_DUMMY00_START_ADDR,
-            .end_addr = DDR3_DUMMY00_END_ADDR,
-            .max_samples = DDR3_DUMMY00_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY00_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY00_END_ADDR
         },
         {
             .id = TBTDECIMIQ_CHAN_ID,
             .start_addr = DDR3_TBTDECIMIQ0_START_ADDR,
-            .end_addr = DDR3_TBTDECIMIQ0_END_ADDR,
-            .max_samples = DDR3_TBTDECIMIQ0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTDECIMIQ0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTDECIMIQ0_END_ADDR
         },
         {
             .id = DUMMY1_CHAN_ID,
             .start_addr = DDR3_DUMMY10_START_ADDR,
-            .end_addr = DDR3_DUMMY10_END_ADDR,
-            .max_samples = DDR3_DUMMY10_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY10_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY10_END_ADDR
         },
         {
             .id = TBTAMP_CHAN_ID,
             .start_addr = DDR3_TBTAMP0_START_ADDR,
-            .end_addr = DDR3_TBTAMP0_END_ADDR,
-            .max_samples = DDR3_TBTAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTAMP0_END_ADDR
         },
         {
             .id = TBTPHA_CHAN_ID,
             .start_addr = DDR3_TBTPHA0_START_ADDR,
-            .end_addr = DDR3_TBTPHA0_END_ADDR,
-            .max_samples = DDR3_TBTPHA0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPHA0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPHA0_END_ADDR
         },
         {
             .id = TBTPOS_CHAN_ID,
             .start_addr = DDR3_TBTPOS0_START_ADDR,
-            .end_addr = DDR3_TBTPOS0_END_ADDR,
-            .max_samples = DDR3_TBTPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPOS0_END_ADDR
         },
         {
             .id = FOFBDECIMIQ_CHAN_ID,
             .start_addr = DDR3_FOFBDECIMIQ0_START_ADDR,
-            .end_addr = DDR3_FOFBDECIMIQ0_END_ADDR,
-            .max_samples = DDR3_FOFBDECIMIQ0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBDECIMIQ0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBDECIMIQ0_END_ADDR
         },
         {
             .id = DUMMY2_CHAN_ID,
             .start_addr = DDR3_DUMMY20_START_ADDR,
-            .end_addr = DDR3_DUMMY20_END_ADDR,
-            .max_samples = DDR3_DUMMY20_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY20_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY20_END_ADDR
         },
         {
             .id = FOFBAMP_CHAN_ID,
             .start_addr = DDR3_FOFBAMP0_START_ADDR,
-            .end_addr = DDR3_FOFBAMP0_END_ADDR,
-            .max_samples = DDR3_FOFBAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBAMP0_END_ADDR
         },
         {
             .id = FOFBPHA_CHAN_ID,
             .start_addr = DDR3_FOFBPHA0_START_ADDR,
-            .end_addr = DDR3_FOFBPHA0_END_ADDR,
-            .max_samples = DDR3_FOFBPHA0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPHA0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPHA0_END_ADDR
         },
         {
             .id = FOFBPOS_CHAN_ID,
             .start_addr = DDR3_FOFBPOS0_START_ADDR,
-            .end_addr = DDR3_FOFBPOS0_END_ADDR,
-            .max_samples = DDR3_FOFBPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPOS0_END_ADDR
         },
         {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP0_START_ADDR,
-            .end_addr = DDR3_MONITAMP0_END_ADDR,
-            .max_samples = DDR3_MONITAMP0_MAX_SAMPLES,
-            .sample_size = DDR3_MONITAMP0_SAMPLE_SIZE
+            .end_addr = DDR3_MONITAMP0_END_ADDR
         },
         {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS0_START_ADDR,
-            .end_addr = DDR3_MONITPOS0_END_ADDR,
-            .max_samples = DDR3_MONITPOS0_MAX_SAMPLES,
-            .sample_size = DDR3_MONITPOS0_SAMPLE_SIZE
+            .end_addr = DDR3_MONITPOS0_END_ADDR
         },
         {
             .id = MONIT1POS_CHAN_ID,
             .start_addr = DDR3_MONIT1POS0_START_ADDR,
-            .end_addr = DDR3_MONIT1POS0_END_ADDR,
-            .max_samples = DDR3_MONIT1POS0_MAX_SAMPLES,
-            .sample_size = DDR3_MONIT1POS0_SAMPLE_SIZE
+            .end_addr = DDR3_MONIT1POS0_END_ADDR
         }
     },
     /*** Acquisition Core 1 Channel Parameters ***/
@@ -141,121 +107,87 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         {
             .id = ADC_CHAN_ID,
             .start_addr = DDR3_ADC1_START_ADDR,
-            .end_addr = DDR3_ADC1_END_ADDR,
-            .max_samples = DDR3_ADC1_MAX_SAMPLES,
-            .sample_size = DDR3_ADC1_SAMPLE_SIZE
+            .end_addr = DDR3_ADC1_END_ADDR
         },
         {
             .id = ADCSWAP_CHAN_ID,
             .start_addr = DDR3_ADCSWAP1_START_ADDR,
-            .end_addr = DDR3_ADCSWAP1_END_ADDR,
-            .max_samples = DDR3_ADCSWAP1_MAX_SAMPLES,
-            .sample_size = DDR3_ADCSWAP1_SAMPLE_SIZE
+            .end_addr = DDR3_ADCSWAP1_END_ADDR
         },
         {
             .id = MIXIQ_CHAN_ID,
             .start_addr = DDR3_MIXIQ1_START_ADDR,
-            .end_addr = DDR3_MIXIQ1_END_ADDR,
-            .max_samples = DDR3_MIXIQ1_MAX_SAMPLES,
-            .sample_size = DDR3_MIXIQ1_SAMPLE_SIZE
+            .end_addr = DDR3_MIXIQ1_END_ADDR
         },
         {
             .id = DUMMY0_CHAN_ID,
             .start_addr = DDR3_DUMMY01_START_ADDR,
-            .end_addr = DDR3_DUMMY01_END_ADDR,
-            .max_samples = DDR3_DUMMY01_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY01_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY01_END_ADDR
         },
         {
             .id = TBTDECIMIQ_CHAN_ID,
             .start_addr = DDR3_TBTDECIMIQ1_START_ADDR,
-            .end_addr = DDR3_TBTDECIMIQ1_END_ADDR,
-            .max_samples = DDR3_TBTDECIMIQ1_MAX_SAMPLES,
-            .sample_size = DDR3_TBTDECIMIQ1_SAMPLE_SIZE
+            .end_addr = DDR3_TBTDECIMIQ1_END_ADDR
         },
         {
             .id = DUMMY1_CHAN_ID,
             .start_addr = DDR3_DUMMY11_START_ADDR,
-            .end_addr = DDR3_DUMMY11_END_ADDR,
-            .max_samples = DDR3_DUMMY11_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY11_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY11_END_ADDR
         },
         {
             .id = TBTAMP_CHAN_ID,
             .start_addr = DDR3_TBTAMP1_START_ADDR,
-            .end_addr = DDR3_TBTAMP1_END_ADDR,
-            .max_samples = DDR3_TBTAMP1_MAX_SAMPLES,
-            .sample_size = DDR3_TBTAMP1_SAMPLE_SIZE
+            .end_addr = DDR3_TBTAMP1_END_ADDR
         },
         {
             .id = TBTPHA_CHAN_ID,
             .start_addr = DDR3_TBTPHA1_START_ADDR,
-            .end_addr = DDR3_TBTPHA1_END_ADDR,
-            .max_samples = DDR3_TBTPHA1_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPHA1_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPHA1_END_ADDR
         },
         {
             .id = TBTPOS_CHAN_ID,
             .start_addr = DDR3_TBTPOS1_START_ADDR,
-            .end_addr = DDR3_TBTPOS1_END_ADDR,
-            .max_samples = DDR3_TBTPOS1_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPOS1_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPOS1_END_ADDR
         },
         {
             .id = FOFBDECIMIQ_CHAN_ID,
             .start_addr = DDR3_FOFBDECIMIQ1_START_ADDR,
-            .end_addr = DDR3_FOFBDECIMIQ1_END_ADDR,
-            .max_samples = DDR3_FOFBDECIMIQ1_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBDECIMIQ1_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBDECIMIQ1_END_ADDR
         },
         {
             .id = DUMMY2_CHAN_ID,
             .start_addr = DDR3_DUMMY21_START_ADDR,
-            .end_addr = DDR3_DUMMY21_END_ADDR,
-            .max_samples = DDR3_DUMMY21_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY21_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY21_END_ADDR
         },
         {
             .id = FOFBAMP_CHAN_ID,
             .start_addr = DDR3_FOFBAMP1_START_ADDR,
-            .end_addr = DDR3_FOFBAMP1_END_ADDR,
-            .max_samples = DDR3_FOFBAMP1_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBAMP1_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBAMP1_END_ADDR
         },
         {
             .id = FOFBPHA_CHAN_ID,
             .start_addr = DDR3_FOFBPHA1_START_ADDR,
-            .end_addr = DDR3_FOFBPHA1_END_ADDR,
-            .max_samples = DDR3_FOFBPHA1_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPHA1_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPHA1_END_ADDR
         },
         {
             .id = FOFBPOS_CHAN_ID,
             .start_addr = DDR3_FOFBPOS1_START_ADDR,
-            .end_addr = DDR3_FOFBPOS1_END_ADDR,
-            .max_samples = DDR3_FOFBPOS1_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPOS1_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPOS1_END_ADDR
         },
         {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP1_START_ADDR,
-            .end_addr = DDR3_MONITAMP1_END_ADDR,
-            .max_samples = DDR3_MONITAMP1_MAX_SAMPLES,
-            .sample_size = DDR3_MONITAMP1_SAMPLE_SIZE
+            .end_addr = DDR3_MONITAMP1_END_ADDR
         },
         {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS1_START_ADDR,
-            .end_addr = DDR3_MONITPOS1_END_ADDR,
-            .max_samples = DDR3_MONITPOS1_MAX_SAMPLES,
-            .sample_size = DDR3_MONITPOS1_SAMPLE_SIZE
+            .end_addr = DDR3_MONITPOS1_END_ADDR
         },
         {
             .id = MONIT1POS_CHAN_ID,
             .start_addr = DDR3_MONIT1POS1_START_ADDR,
-            .end_addr = DDR3_MONIT1POS1_END_ADDR,
-            .max_samples = DDR3_MONIT1POS1_MAX_SAMPLES,
-            .sample_size = DDR3_MONIT1POS1_SAMPLE_SIZE
+            .end_addr = DDR3_MONIT1POS1_END_ADDR
         },
     },
     /*** Acquisition Core 2 Channel Parameters ***/
@@ -263,121 +195,87 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         {
             .id = ADC_CHAN_ID,
             .start_addr = DDR3_ADC2_START_ADDR,
-            .end_addr = DDR3_ADC2_END_ADDR,
-            .max_samples = DDR3_ADC2_MAX_SAMPLES,
-            .sample_size = DDR3_ADC2_SAMPLE_SIZE
+            .end_addr = DDR3_ADC2_END_ADDR
         },
         {
             .id = ADCSWAP_CHAN_ID,
             .start_addr = DDR3_ADCSWAP2_START_ADDR,
-            .end_addr = DDR3_ADCSWAP2_END_ADDR,
-            .max_samples = DDR3_ADCSWAP2_MAX_SAMPLES,
-            .sample_size = DDR3_ADCSWAP2_SAMPLE_SIZE
+            .end_addr = DDR3_ADCSWAP2_END_ADDR
         },
         {
             .id = MIXIQ_CHAN_ID,
             .start_addr = DDR3_MIXIQ2_START_ADDR,
-            .end_addr = DDR3_MIXIQ2_END_ADDR,
-            .max_samples = DDR3_MIXIQ2_MAX_SAMPLES,
-            .sample_size = DDR3_MIXIQ2_SAMPLE_SIZE
+            .end_addr = DDR3_MIXIQ2_END_ADDR
         },
         {
             .id = DUMMY0_CHAN_ID,
             .start_addr = DDR3_DUMMY02_START_ADDR,
-            .end_addr = DDR3_DUMMY02_END_ADDR,
-            .max_samples = DDR3_DUMMY02_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY02_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY02_END_ADDR
         },
         {
             .id = TBTDECIMIQ_CHAN_ID,
             .start_addr = DDR3_TBTDECIMIQ2_START_ADDR,
-            .end_addr = DDR3_TBTDECIMIQ2_END_ADDR,
-            .max_samples = DDR3_TBTDECIMIQ2_MAX_SAMPLES,
-            .sample_size = DDR3_TBTDECIMIQ2_SAMPLE_SIZE
+            .end_addr = DDR3_TBTDECIMIQ2_END_ADDR
         },
         {
             .id = DUMMY1_CHAN_ID,
             .start_addr = DDR3_DUMMY12_START_ADDR,
-            .end_addr = DDR3_DUMMY12_END_ADDR,
-            .max_samples = DDR3_DUMMY12_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY12_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY12_END_ADDR
         },
         {
             .id = TBTAMP_CHAN_ID,
             .start_addr = DDR3_TBTAMP2_START_ADDR,
-            .end_addr = DDR3_TBTAMP2_END_ADDR,
-            .max_samples = DDR3_TBTAMP2_MAX_SAMPLES,
-            .sample_size = DDR3_TBTAMP2_SAMPLE_SIZE
+            .end_addr = DDR3_TBTAMP2_END_ADDR
         },
         {
             .id = TBTPHA_CHAN_ID,
             .start_addr = DDR3_TBTPHA2_START_ADDR,
-            .end_addr = DDR3_TBTPHA2_END_ADDR,
-            .max_samples = DDR3_TBTPHA2_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPHA2_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPHA2_END_ADDR
         },
         {
             .id = TBTPOS_CHAN_ID,
             .start_addr = DDR3_TBTPOS2_START_ADDR,
-            .end_addr = DDR3_TBTPOS2_END_ADDR,
-            .max_samples = DDR3_TBTPOS2_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPOS2_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPOS2_END_ADDR
         },
         {
             .id = FOFBDECIMIQ_CHAN_ID,
             .start_addr = DDR3_FOFBDECIMIQ2_START_ADDR,
-            .end_addr = DDR3_FOFBDECIMIQ2_END_ADDR,
-            .max_samples = DDR3_FOFBDECIMIQ2_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBDECIMIQ2_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBDECIMIQ2_END_ADDR
         },
         {
             .id = DUMMY2_CHAN_ID,
             .start_addr = DDR3_DUMMY22_START_ADDR,
-            .end_addr = DDR3_DUMMY22_END_ADDR,
-            .max_samples = DDR3_DUMMY22_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY22_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY22_END_ADDR
         },
         {
             .id = FOFBAMP_CHAN_ID,
             .start_addr = DDR3_FOFBAMP2_START_ADDR,
-            .end_addr = DDR3_FOFBAMP2_END_ADDR,
-            .max_samples = DDR3_FOFBAMP2_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBAMP2_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBAMP2_END_ADDR
         },
         {
             .id = FOFBPHA_CHAN_ID,
             .start_addr = DDR3_FOFBPHA2_START_ADDR,
-            .end_addr = DDR3_FOFBPHA2_END_ADDR,
-            .max_samples = DDR3_FOFBPHA2_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPHA2_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPHA2_END_ADDR
         },
         {
             .id = FOFBPOS_CHAN_ID,
             .start_addr = DDR3_FOFBPOS2_START_ADDR,
-            .end_addr = DDR3_FOFBPOS2_END_ADDR,
-            .max_samples = DDR3_FOFBPOS2_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPOS2_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPOS2_END_ADDR
         },
         {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP2_START_ADDR,
-            .end_addr = DDR3_MONITAMP2_END_ADDR,
-            .max_samples = DDR3_MONITAMP2_MAX_SAMPLES,
-            .sample_size = DDR3_MONITAMP2_SAMPLE_SIZE
+            .end_addr = DDR3_MONITAMP2_END_ADDR
         },
         {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS2_START_ADDR,
-            .end_addr = DDR3_MONITPOS2_END_ADDR,
-            .max_samples = DDR3_MONITPOS2_MAX_SAMPLES,
-            .sample_size = DDR3_MONITPOS2_SAMPLE_SIZE
+            .end_addr = DDR3_MONITPOS2_END_ADDR
         },
         {
             .id = MONIT1POS_CHAN_ID,
             .start_addr = DDR3_MONIT1POS2_START_ADDR,
-            .end_addr = DDR3_MONIT1POS2_END_ADDR,
-            .max_samples = DDR3_MONIT1POS2_MAX_SAMPLES,
-            .sample_size = DDR3_MONIT1POS2_SAMPLE_SIZE
+            .end_addr = DDR3_MONIT1POS2_END_ADDR
         },
     },
     /*** Acquisition Core 3 Channel Parameters ***/
@@ -385,121 +283,87 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
         {
             .id = ADC_CHAN_ID,
             .start_addr = DDR3_ADC3_START_ADDR,
-            .end_addr = DDR3_ADC3_END_ADDR,
-            .max_samples = DDR3_ADC3_MAX_SAMPLES,
-            .sample_size = DDR3_ADC3_SAMPLE_SIZE
+            .end_addr = DDR3_ADC3_END_ADDR
         },
         {
             .id = ADCSWAP_CHAN_ID,
             .start_addr = DDR3_ADCSWAP3_START_ADDR,
-            .end_addr = DDR3_ADCSWAP3_END_ADDR,
-            .max_samples = DDR3_ADCSWAP3_MAX_SAMPLES,
-            .sample_size = DDR3_ADCSWAP3_SAMPLE_SIZE
+            .end_addr = DDR3_ADCSWAP3_END_ADDR
         },
         {
             .id = MIXIQ_CHAN_ID,
             .start_addr = DDR3_MIXIQ3_START_ADDR,
-            .end_addr = DDR3_MIXIQ3_END_ADDR,
-            .max_samples = DDR3_MIXIQ3_MAX_SAMPLES,
-            .sample_size = DDR3_MIXIQ3_SAMPLE_SIZE
+            .end_addr = DDR3_MIXIQ3_END_ADDR
         },
         {
             .id = DUMMY0_CHAN_ID,
             .start_addr = DDR3_DUMMY03_START_ADDR,
-            .end_addr = DDR3_DUMMY03_END_ADDR,
-            .max_samples = DDR3_DUMMY03_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY03_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY03_END_ADDR
         },
         {
             .id = TBTDECIMIQ_CHAN_ID,
             .start_addr = DDR3_TBTDECIMIQ3_START_ADDR,
-            .end_addr = DDR3_TBTDECIMIQ3_END_ADDR,
-            .max_samples = DDR3_TBTDECIMIQ3_MAX_SAMPLES,
-            .sample_size = DDR3_TBTDECIMIQ3_SAMPLE_SIZE
+            .end_addr = DDR3_TBTDECIMIQ3_END_ADDR
         },
         {
             .id = DUMMY1_CHAN_ID,
             .start_addr = DDR3_DUMMY13_START_ADDR,
-            .end_addr = DDR3_DUMMY13_END_ADDR,
-            .max_samples = DDR3_DUMMY13_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY13_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY13_END_ADDR
         },
         {
             .id = TBTAMP_CHAN_ID,
             .start_addr = DDR3_TBTAMP3_START_ADDR,
-            .end_addr = DDR3_TBTAMP3_END_ADDR,
-            .max_samples = DDR3_TBTAMP3_MAX_SAMPLES,
-            .sample_size = DDR3_TBTAMP3_SAMPLE_SIZE
+            .end_addr = DDR3_TBTAMP3_END_ADDR
         },
         {
             .id = TBTPHA_CHAN_ID,
             .start_addr = DDR3_TBTPHA3_START_ADDR,
-            .end_addr = DDR3_TBTPHA3_END_ADDR,
-            .max_samples = DDR3_TBTPHA3_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPHA3_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPHA3_END_ADDR
         },
         {
             .id = TBTPOS_CHAN_ID,
             .start_addr = DDR3_TBTPOS3_START_ADDR,
-            .end_addr = DDR3_TBTPOS3_END_ADDR,
-            .max_samples = DDR3_TBTPOS3_MAX_SAMPLES,
-            .sample_size = DDR3_TBTPOS3_SAMPLE_SIZE
+            .end_addr = DDR3_TBTPOS3_END_ADDR
         },
         {
             .id = FOFBDECIMIQ_CHAN_ID,
             .start_addr = DDR3_FOFBDECIMIQ3_START_ADDR,
-            .end_addr = DDR3_FOFBDECIMIQ3_END_ADDR,
-            .max_samples = DDR3_FOFBDECIMIQ3_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBDECIMIQ3_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBDECIMIQ3_END_ADDR
         },
         {
             .id = DUMMY2_CHAN_ID,
             .start_addr = DDR3_DUMMY23_START_ADDR,
-            .end_addr = DDR3_DUMMY23_END_ADDR,
-            .max_samples = DDR3_DUMMY23_MAX_SAMPLES,
-            .sample_size = DDR3_DUMMY23_SAMPLE_SIZE
+            .end_addr = DDR3_DUMMY23_END_ADDR
         },
         {
             .id = FOFBAMP_CHAN_ID,
             .start_addr = DDR3_FOFBAMP3_START_ADDR,
-            .end_addr = DDR3_FOFBAMP3_END_ADDR,
-            .max_samples = DDR3_FOFBAMP3_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBAMP3_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBAMP3_END_ADDR
         },
         {
             .id = FOFBPHA_CHAN_ID,
             .start_addr = DDR3_FOFBPHA3_START_ADDR,
-            .end_addr = DDR3_FOFBPHA3_END_ADDR,
-            .max_samples = DDR3_FOFBPHA3_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPHA3_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPHA3_END_ADDR
         },
         {
             .id = FOFBPOS_CHAN_ID,
             .start_addr = DDR3_FOFBPOS3_START_ADDR,
-            .end_addr = DDR3_FOFBPOS3_END_ADDR,
-            .max_samples = DDR3_FOFBPOS3_MAX_SAMPLES,
-            .sample_size = DDR3_FOFBPOS3_SAMPLE_SIZE
+            .end_addr = DDR3_FOFBPOS3_END_ADDR
         },
         {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP3_START_ADDR,
-            .end_addr = DDR3_MONITAMP3_END_ADDR,
-            .max_samples = DDR3_MONITAMP3_MAX_SAMPLES,
-            .sample_size = DDR3_MONITAMP3_SAMPLE_SIZE
+            .end_addr = DDR3_MONITAMP3_END_ADDR
         },
         {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS3_START_ADDR,
-            .end_addr = DDR3_MONITPOS3_END_ADDR,
-            .max_samples = DDR3_MONITPOS3_MAX_SAMPLES,
-            .sample_size = DDR3_MONITPOS3_SAMPLE_SIZE
+            .end_addr = DDR3_MONITPOS3_END_ADDR
         },
         {
             .id = MONIT1POS_CHAN_ID,
             .start_addr = DDR3_MONIT1POS3_START_ADDR,
-            .end_addr = DDR3_MONIT1POS3_END_ADDR,
-            .max_samples = DDR3_MONIT1POS3_MAX_SAMPLES,
-            .sample_size = DDR3_MONIT1POS3_SAMPLE_SIZE
+            .end_addr = DDR3_MONIT1POS3_END_ADDR
         },
     },
 };
