@@ -32,69 +32,47 @@ typedef enum {
     END_FILE_FMT
 } file_fmt_e;
 
-void print_data (uint32_t chan, uint32_t *data, uint32_t size, file_fmt_e file_fmt)
+void print_sample (uint8_t *data, uint32_t atom_size)
 {
-    /* FIXME: Make it more generic */
-    if (chan == 0 || chan == 1 /* Only ADC and ADC SWAP */ ) {
-        int16_t *raw_data16 = (int16_t *) data;
-        if (file_fmt == TEXT) {
-            for (uint32_t i = 0; i < (size/sizeof(uint16_t)) / 4; i++) {
-                if (zctx_interrupted) {
-                    break;
-                }
+    switch (atom_size) {
+        case 2:
+            printf ("%8d\t", *(int16_t *) data);
+        break;
 
-                printf ("%8d\t %8d\t %8d\t %8d\n",
-                        raw_data16[(i*4)],
-                        raw_data16[(i*4)+1],
-                        raw_data16[(i*4)+2],
-                        raw_data16[(i*4)+3]);
+        case 4:
+            printf ("%8d\t", *(int32_t *) data);
+        break;
+
+        case 8:
+            printf ("%8" PRId64 "\t", *(int64_t *) data);
+        break;
+
+        default:
+            printf ("%8d\t", *(int16_t *) data);
+        break;
+    }
+}
+
+void print_data (uint32_t *data, uint32_t sample_size, 
+    uint32_t atom_size, uint32_t num_atoms, uint32_t size, file_fmt_e file_fmt)
+{
+    uint8_t *raw_data = (uint8_t *) data;
+
+    if (file_fmt == TEXT) {
+        for (uint32_t i = 0; i < size/sample_size; i++) {
+            if (zctx_interrupted) {
+                break;
             }
-        }
-        else if (file_fmt == BINARY) {
-            fwrite (raw_data16, 2, size/2, stdout);
+    
+            for (uint32_t atom = 0; atom < num_atoms; ++atom) {
+                print_sample(raw_data + (atom_size)*((i*num_atoms)+atom), 
+                    atom_size);
+            }
+            printf ("\n");
         }
     }
-    else if (chan == 2 || chan == 4 || chan == 9 /* I/Q channels */ ) {
-        int32_t *raw_data32 = (int32_t *) data;
-        if (file_fmt == TEXT) {
-            for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 8; i++) {
-                if (zctx_interrupted) {
-                    break;
-                }
-
-                printf ("%8d\t %8d\t %8d\t %8d\t %8d\t %8d\t %8d\t %8d\n",
-                        raw_data32[(i*8)],
-                        raw_data32[(i*8)+1],
-                        raw_data32[(i*8)+2],
-                        raw_data32[(i*8)+3],
-                        raw_data32[(i*8)+4],
-                        raw_data32[(i*8)+5],
-                        raw_data32[(i*8)+6],
-                        raw_data32[(i*8)+7]);
-            }
-        }
-        else if (file_fmt == BINARY) {
-            fwrite (raw_data32, 8, size/8, stdout);
-        }
-    }
-    else {
-        int32_t *raw_data32 = (int32_t *) data;
-        if (file_fmt == TEXT) {
-            for (uint32_t i = 0; i < (size/sizeof(uint32_t)) / 4; i++) {
-                if (zctx_interrupted) {
-                    break;
-                }
-
-                printf ("%8d\t %8d\t %8d\t %8d\n",
-                        raw_data32[(i*4)],
-                        raw_data32[(i*4)+1],
-                        raw_data32[(i*4)+2],
-                        raw_data32[(i*4)+3]);
-            }
-        }
-        else if (file_fmt == BINARY) {
-            fwrite (raw_data32, 4, size/4, stdout);
-        }
+    else if (file_fmt == BINARY) {
+        fwrite (raw_data, atom_size, size/atom_size, stdout);
     }
 }
 
@@ -301,11 +279,19 @@ int main (int argc, char *argv [])
     }
 
     uint32_t req_ch_sample_size = 0;
+    uint32_t req_ch_atom_width = 0;
+    uint32_t req_ch_atom_size = 0;
+    uint32_t req_ch_num_atoms = 0;
     err = halcs_get_acq_ch_sample_size (acq_client, service, chan, &req_ch_sample_size);
+    err |= halcs_get_acq_ch_atom_width (acq_client, service, chan, &req_ch_atom_width);
+    err |= halcs_get_acq_ch_num_atoms (acq_client, service, chan, &req_ch_num_atoms);
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: getting channel properties failed\n");
         goto err_acq_get_prop;
     }
+
+    /* bit to byte */
+    req_ch_atom_size = req_ch_atom_width/8;
 
     uint32_t data_size = num_samples*req_ch_sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
@@ -331,7 +317,8 @@ int main (int argc, char *argv [])
         fprintf (stderr, "[client:acq]: Could not set output mode to binary\n");
         goto err_set_file_mode;
     }
-    print_data (chan, data, acq_trans.block.bytes_read, file_fmt);
+    print_data (data, req_ch_sample_size, req_ch_atom_size, 
+        req_ch_num_atoms, acq_trans.block.bytes_read, file_fmt);
 
 err_set_file_mode:
 err_acq_full_compat:
