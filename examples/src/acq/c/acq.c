@@ -300,8 +300,14 @@ int main (int argc, char *argv [])
         goto err_acq_set_trig;
     }
 
-    const acq_chan_t *acq_chan = acq_get_chan (acq_client);
-    uint32_t data_size = num_samples*acq_chan[chan].sample_size;
+    uint32_t req_ch_sample_size = 0;
+    err = halcs_get_acq_ch_sample_size (acq_client, service, chan, &req_ch_sample_size);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:acq]: getting channel properties failed\n");
+        goto err_acq_get_prop;
+    }
+
+    uint32_t data_size = num_samples*req_ch_sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
     bool new_acq = true;
     acq_trans_t acq_trans = {.req =   {
@@ -329,6 +335,7 @@ int main (int argc, char *argv [])
 
 err_set_file_mode:
 err_acq_full_compat:
+err_acq_get_prop:
 err_acq_set_trig:
 err_acq_client_new:
     free (file_fmt_str);

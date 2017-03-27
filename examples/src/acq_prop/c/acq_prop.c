@@ -171,6 +171,7 @@ int main (int argc, char *argv [])
     uint32_t ch_num_coalesce = 0;
     uint32_t ch_num_atoms = 0;
     uint32_t ch_atom_width = 0;
+    uint32_t ch_sample_size = 0;
     halcs_client_err_e err = halcs_get_acq_ch_int_width (acq_client, service,
           chan, &ch_int_width);
     err |= halcs_get_acq_ch_num_coalesce (acq_client, service,
@@ -179,14 +180,16 @@ int main (int argc, char *argv [])
           chan, &ch_num_atoms);
     err |= halcs_get_acq_ch_atom_width (acq_client, service,
           chan, &ch_atom_width);
+    err |= halcs_get_acq_ch_sample_size (acq_client, service,
+          chan, &ch_sample_size);
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq_prop]: Could not get acquistion channel properties\n");
         goto err_prop_get;
     }
 
     fprintf (stdout, "[client:acq_prop]: ch_int_width = %u, ch_num_coalesce = %u, "
-        " ch_num_atoms = %u, ch_atom_width = %u\n", ch_int_width, ch_num_coalesce, 
-        ch_num_atoms, ch_atom_width);
+        " ch_num_atoms = %u, ch_atom_width = %u, ch_sample_size = %u\n", ch_int_width, ch_num_coalesce, 
+        ch_num_atoms, ch_atom_width, ch_sample_size);
 
 err_prop_get:
 err_acq_client_new:
