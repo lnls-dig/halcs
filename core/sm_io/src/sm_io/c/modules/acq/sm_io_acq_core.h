@@ -16,6 +16,10 @@
  * context of the error */
 #define ACQ_CORE_MULTISHOT_MEM_SIZE         2048
 
+/* This must match the FPGA maximum number of channels */
+#define ACQ_CORE_NUM_CHAN_DESC              24
+#define ACQ_CORE_CHAN_DESC_OFFSET           0x008 /* 2 32-bit registers */
+
 typedef enum {
     TYPE_ACQ_CORE_SKIP=0,
     TYPE_ACQ_CORE_HW_PULSE=1,

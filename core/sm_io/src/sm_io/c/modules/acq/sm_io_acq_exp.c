@@ -741,10 +741,6 @@ RW_PARAM_FUNC(acq, hw_data_trig_chan) {
             ACQ_DATA_DRIVEN_CHAN_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-/* This must match the FPGA maximum number of channels */
-#define ACQ_CORE_NUM_CHAN_DESC                      24
-#define ACQ_CORE_CHAN_DESC_OFFSET                   0x008 /* 2 32-bit registers */
-
 #define ACQ_CORE_INT_WIDTH_MIN                      0
 #define ACQ_CORE_INT_WIDTH_MAX                      ((1 << 16)-1)
 RW_PARAM_FUNC(acq, int_width) {
