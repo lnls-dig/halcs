@@ -34,43 +34,7 @@
 /* Our structure */
 struct _acq_client_t {
     halcs_client_t *halcs_client;               /* HALCS client interface */
-    const acq_chan_t *acq_chan;                 /* Acquisition buffer table */
 };
-
-/* Acquisition channel definitions for user's application */
-#if defined(__BOARD_ML605__)
-/* Global structure merging all of the channel's sample sizes */
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0] = {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                        [1] = {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                        [2] = {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                        [3] = {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                        [4] = {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
-                                        [5] = {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
-                                        [6] = {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
-                                        [7] = {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
-                                    };
-#elif defined(__BOARD_AFCV3__)
-acq_chan_t acq_chan[END_CHAN_ID] =  {   [0]   =  {.chan = ADC_CHAN_ID, .sample_size = ADC_SAMPLE_SIZE},
-                                        [1]   =  {.chan = ADCSWAP_CHAN_ID, .sample_size = ADCSWAP_SAMPLE_SIZE},
-                                        [2]   =  {.chan = MIXIQ_CHAN_ID, .sample_size = MIXIQ_SAMPLE_SIZE},
-                                        [3]   =  {.chan = DUMMY0_CHAN_ID, .sample_size = DUMMY0_SAMPLE_SIZE},
-                                        [4]   =  {.chan = TBTDECIMIQ_CHAN_ID, .sample_size = TBTDECIMIQ_SAMPLE_SIZE},
-                                        [5]   =  {.chan = DUMMY1_CHAN_ID, .sample_size = DUMMY1_SAMPLE_SIZE},
-                                        [6]   =  {.chan = TBTAMP_CHAN_ID, .sample_size = TBTAMP_SAMPLE_SIZE},
-                                        [7]   =  {.chan = TBTPHA_CHAN_ID, .sample_size = TBTPHA_SAMPLE_SIZE},
-                                        [8]   =  {.chan = TBTPOS_CHAN_ID, .sample_size = TBTPOS_SAMPLE_SIZE},
-                                        [9]   =  {.chan = FOFBDECIMIQ_CHAN_ID, .sample_size = FOFBDECIMIQ_SAMPLE_SIZE},
-                                        [10]  =  {.chan = DUMMY2_CHAN_ID, .sample_size = DUMMY2_SAMPLE_SIZE},
-                                        [11]  =  {.chan = FOFBAMP_CHAN_ID, .sample_size = FOFBAMP_SAMPLE_SIZE},
-                                        [12]  =  {.chan = FOFBPHA_CHAN_ID, .sample_size = FOFBPHA_SAMPLE_SIZE},
-                                        [13]  =  {.chan = FOFBPOS_CHAN_ID, .sample_size = FOFBPOS_SAMPLE_SIZE},
-                                        [14]  =  {.chan = MONITAMP_CHAN_ID, .sample_size = MONITAMP_SAMPLE_SIZE},
-                                        [15]  =  {.chan = MONITPOS_CHAN_ID, .sample_size = MONITPOS_SAMPLE_SIZE},
-                                        [16]  =  {.chan = MONIT1POS_CHAN_ID, .sample_size = MONIT1POS_SAMPLE_SIZE}
-                                    };
-#else
-#error "Unsupported board!"
-#endif
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -139,7 +103,6 @@ static acq_client_t *_acq_client_new (halcs_client_t *halcs_client)
     acq_client_t *self = zmalloc (sizeof *self);
 
     self->halcs_client = halcs_client;
-    self->acq_chan = acq_chan;
 
     return self;
 }
@@ -156,19 +119,6 @@ void acq_client_destroy (acq_client_t **self_p)
         free (self);
         *self_p = NULL;
     }
-}
-
-/* Get current acquisition channel */
-const acq_chan_t* acq_get_chan (acq_client_t *self)
-{
-    return self->acq_chan;
-}
-
-/* Set current acquisition channel. Responsibility over the acq_chan_t structure
- * memory remains with the caller. */
-void acq_set_chan (acq_client_t *self, const acq_chan_t *channel)
-{
-    self->acq_chan = channel;
 }
 
 /****************** ACQ SMIO Functions ****************/
@@ -448,6 +398,20 @@ halcs_client_err_e halcs_get_acq_ch_atom_width (acq_client_t *self, char *servic
             chan, ch_atom_width);
 }
 
+halcs_client_err_e halcs_set_acq_ch_sample_size (acq_client_t *self, char *service,
+        uint32_t chan, uint32_t ch_sample_size)
+{
+    return param_client_write2 (self->halcs_client, service, ACQ_OPCODE_CH_SAMPLE_SIZE,
+            chan, ch_sample_size);
+}
+
+halcs_client_err_e halcs_get_acq_ch_sample_size (acq_client_t *self, char *service,
+        uint32_t chan, uint32_t *ch_sample_size)
+{
+    return param_client_write_read (self->halcs_client, service, ACQ_OPCODE_CH_SAMPLE_SIZE,
+            chan, ch_sample_size);
+}
+
 static halcs_client_err_e _acq_start (acq_client_t *self, char *service, acq_req_t *acq_req)
 {
     assert (self);
@@ -559,12 +523,18 @@ static halcs_client_err_e _acq_get_curve (acq_client_t *self, char *service, acq
     assert (acq_trans->block.data);
 
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
-    const acq_chan_t *acq_chan = self->acq_chan;
+    uint32_t req_chan = acq_trans->req.chan;
+    uint32_t req_ch_sample_size = 0;
+
+    err = halcs_get_acq_ch_sample_size (self, service, req_chan, &req_ch_sample_size);
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+            "Getting acquisition channel properties failed",
+            err_acq_get_ch_prop);
 
     uint32_t num_samples_shot = acq_trans->req.num_samples_pre +
         acq_trans->req.num_samples_post;
     uint32_t num_samples_multishot = num_samples_shot*acq_trans->req.num_shots;
-    uint32_t n_max_samples = BLOCK_SIZE/acq_chan[acq_trans->req.chan].sample_size;
+    uint32_t n_max_samples = BLOCK_SIZE/req_ch_sample_size;
     uint32_t block_n_valid = num_samples_multishot / n_max_samples;
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libacqclient] acq_get_curve: "
             "block_n_valid = %u\n", block_n_valid);
@@ -613,6 +583,7 @@ static halcs_client_err_e _acq_get_curve (acq_client_t *self, char *service, acq
 
 halcs_zsys_interrupted:
 err_acq_get_data_block:
+err_acq_get_ch_prop:
     return err;
 }
 

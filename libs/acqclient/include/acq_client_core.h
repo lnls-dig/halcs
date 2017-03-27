@@ -260,6 +260,11 @@ halcs_client_err_e halcs_set_acq_ch_atom_width (acq_client_t *self, char *servic
 halcs_client_err_e halcs_get_acq_ch_atom_width (acq_client_t *self, char *service,
         uint32_t chan, uint32_t *ch_atom_width);
 
+halcs_client_err_e halcs_set_acq_ch_sample_size (acq_client_t *self, char *service,
+        uint32_t chan, uint32_t ch_sample_size);
+halcs_client_err_e halcs_get_acq_ch_sample_size (acq_client_t *self, char *service,
+        uint32_t chan, uint32_t *ch_sample_size);
+
 #ifdef __cplusplus
 }
 #endif

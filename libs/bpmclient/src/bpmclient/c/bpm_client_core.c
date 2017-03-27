@@ -303,13 +303,18 @@ static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
 
 static void _setup_transaction (bpm_single_pass_t *self)
 {
-    const acq_chan_t *channels = acq_get_chan (self->acq_client);
+    acq_client_t* acq_client = self->acq_client;
+    char *service = self->service;
     acq_req_t *request = &self->request;
     acq_trans_t *transaction = &self->transaction;
+    uint32_t chan = self->request.chan;
+    uint32_t sample_size = 0;
 
     uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
             request->num_shots;
-    uint32_t sample_size = channels[request->chan].sample_size;
+    halcs_client_err_e err = halcs_get_acq_ch_sample_size (acq_client, service, chan, &sample_size);
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get sample size", 
+        err_get_acq_prop);
 
     assert (sample_size == 4 * sizeof (int32_t));
 
@@ -317,6 +322,9 @@ static void _setup_transaction (bpm_single_pass_t *self)
 
     transaction->block.data = zmalloc (num_samples * sample_size);
     transaction->block.data_size = num_samples * sample_size;
+
+err_get_acq_prop:
+    return;
 }
 
 static void _process_single_pass_sample (bpm_single_pass_t *self,
