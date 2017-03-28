@@ -76,7 +76,7 @@ static void _setup_transaction (bpm_single_pass_t *self);
 static void _process_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample);
 
-static double _squared_value (int32_t adc_sample);
+static double _squared_value (uint8_t *adc_sample, uint32_t atom_size);
 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
@@ -316,8 +316,6 @@ static void _setup_transaction (bpm_single_pass_t *self)
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get sample size", 
         err_get_acq_prop);
 
-    assert (sample_size == 4 * sizeof (int32_t));
-
     memcpy (&transaction->req, request, sizeof (transaction->req));
 
     transaction->block.data = zmalloc (num_samples * sample_size);
@@ -337,21 +335,30 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     acq_req_t *request = &self->request;
     uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
             request->num_shots;
-
     double a = 0.0;
     double b = 0.0;
     double c = 0.0;
     double d = 0.0;
+    uint32_t atom_width = 0;
+    uint32_t num_atoms = 0;
 
-    int32_t *buffer_values = (int32_t*) self->transaction.block.data;
+    int err = halcs_get_acq_ch_atom_width (self->acq_client, self->service, self->request.chan, &atom_width);
+    err |= halcs_get_acq_ch_num_atoms (self->acq_client, self->service, self->request.chan, &num_atoms);
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get channel properties", 
+        err_get_acq_prop);
+    ASSERT_TEST(num_atoms == 4, "Single-Pass processing is only valid for num_atoms = 4",
+        err_num_atoms);
 
-    for (uint32_t index = 0; index < num_samples; ++index) {
-        a += _squared_value (buffer_values[0]);
-        b += _squared_value (buffer_values[1]);
-        c += _squared_value (buffer_values[2]);
-        d += _squared_value (buffer_values[3]);
+    /* Convert bit to byte */
+    atom_width /= 8;
 
-        buffer_values += 4;
+    uint8_t *raw_data = (uint8_t*) self->transaction.block.data;
+
+    for (uint32_t i = 0; i < num_samples; ++i) {
+        a += _squared_value (raw_data + atom_width*((i*num_atoms)+0), atom_width);
+        b += _squared_value (raw_data + atom_width*((i*num_atoms)+1), atom_width);
+        c += _squared_value (raw_data + atom_width*((i*num_atoms)+2), atom_width);
+        d += _squared_value (raw_data + atom_width*((i*num_atoms)+3), atom_width);
     }
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
@@ -368,11 +375,37 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             a, b, c, d);
 
     _calculate_bpm_sample (self->bpm_parameters, a, b, c, d, sample);
+
+err_num_atoms:
+err_get_acq_prop:
+    return;
 }
 
-static double _squared_value (int32_t adc_sample)
+static double _squared_value (uint8_t *adc_sample, uint32_t atom_size)
 {
-    double value = (double) adc_sample;
+    double value = 0.0;
+    switch (atom_size) {
+        case 2:
+            value = (double) *(int16_t *) adc_sample;
+        break;
+
+        case 4:
+            value = (double) *(int32_t *) adc_sample;
+        break;
+
+        case 8:
+            value = (double) *(int64_t *) adc_sample;
+        break;
+
+        /* Invalid value */
+        default:
+            value = -1;
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libbpmclient] "
+                    "_squared_value: invalid atom_size = %u. "
+                    "Single Pass processing will be invalid\n",
+                    atom_size);
+        break;
+    }
 
     return value * value;
 }
