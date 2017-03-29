@@ -131,14 +131,20 @@ int main (int argc, char *argv [])
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
-        fprintf (stderr, "[client:fmc250m_sleep_adcs]: halcs_client could be created\n");
+        fprintf (stderr, "[client:fmc250m_sleep_adcs]: halcs_client could not be created\n");
         goto err_halcs_client_new;
     }
 
     halcs_client_err_e err = 0x0;
+    /* For safety, let's be sure ADCs are in PIN CONTROL mode */
+    for (i = 0; i < 4; ++i) {
+        err |= halcs_set_rst_modes_adc (halcs_client, service, i, 0x0);
+    } 
+    /* Reset ADCs and wake them up if needed */
     err |= halcs_set_rst_adcs (halcs_client, service, 0x1);
     err |= halcs_set_rst_div_adcs (halcs_client, service, 0x1);
     err |= halcs_set_sleep_adcs (halcs_client, service, sleep_adcs);
+    /* Go to Normal mode operation and set SPI to SDO active */
     for (i = 0; i < 4; ++i) {
         err |= halcs_set_rst_modes_adc (halcs_client, service, i, 0x1);
         err |= halcs_set_portconfig_adc (halcs_client, service, i, 0x81);
