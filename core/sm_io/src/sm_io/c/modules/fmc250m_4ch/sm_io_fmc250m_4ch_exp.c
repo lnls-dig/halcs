@@ -593,17 +593,23 @@ FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(test_mode)
             "Could not set/get ISLA216P test mode");
 }
 
-static smch_err_e smch_isla216p_rst_compat (smch_isla216p_t *self,
+static smch_err_e smch_isla216p_set_rst_compat (smch_isla216p_t *self,
         uint32_t *rst_arg)
 {
     uint8_t rst = *(uint8_t *) rst_arg;
     return smch_isla216p_set_rst (self, rst);
 }
 
+static smch_err_e smch_isla216p_get_rst_compat (smch_isla216p_t *self,
+        uint32_t *rst_arg)
+{
+    return smch_isla216p_get_rst (self, (uint8_t *) rst_arg);
+}
+
 FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(rst)
 {
     FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
-            /* No read function */, smch_isla216p_rst_compat,
+            smch_isla216p_get_rst_compat, smch_isla216p_set_rst_compat,
             "Could not set/get ISLA216P reset");
 }
 
