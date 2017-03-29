@@ -184,6 +184,23 @@ err_smpr_write:
     return err;
 }
 
+smch_err_e smch_isla216p_get_rst (smch_isla216p_t *self, uint8_t *rst_operation)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    uint8_t data = 0;
+    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_NAPSLP, &data);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not read from ISLA216P_REG_NAPSLP register",
+            err_smpr_read, SMCH_ERR_RW_SMPR);
+
+    *rst_operation = ISLA216P_NAPSLP_R(data);
+    SMCH_ISLA216P_WAIT_DFLT;
+
+err_smpr_read:
+    return err;
+}
+
 smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config)
 {
     smch_err_e err = SMCH_SUCCESS;
