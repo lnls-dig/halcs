@@ -17,6 +17,7 @@
 #define FMC250M_4CH_DFLT_SLEEP_ADCS                 0x0
 
 #define FMC250M_4CH_DFLT_RST_MODE_ADC               (ISLA216P_NAPSLP_NORMAL_OPERATION)
+#define FMC250M_4CH_PINCTRL_RST_MODE_ADC            (ISLA216P_NAPSLP_PIN_CONTROL)
 #define FMC250M_4CH_DFLT_PORTCONFIG_ADC             (ISLA216P_PORTCONFIG_SDO_ACTIVE)
 
 smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
