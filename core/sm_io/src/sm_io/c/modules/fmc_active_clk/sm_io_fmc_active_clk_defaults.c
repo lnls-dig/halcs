@@ -55,6 +55,18 @@ smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_FMC_ACTIVE_CLK_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
+    client_err = halcs_set_si571_defaults (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT_FACTORY);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not get Si571 defaults",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = halcs_set_si571_freq (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set Si571 frequency",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = halcs_set_si571_oe (config_client, service, FMC_ACTIVE_CLK_DFLT_SI571_OE);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not enable SI571 Output",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
     client_err = halcs_set_fmc_pll_function (config_client, service, FMC_ACTIVE_CLK_DFLT_PLL_FUNC);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set FMC PLL function",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
@@ -66,18 +78,6 @@ smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
     client_err = halcs_ad9510_cfg_defaults (config_client, service, 0);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS ||
             client_err == HALCS_CLIENT_ERR_AGAIN, "Could not configure AD9510",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_si571_defaults (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT_FACTORY);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not get Si571 defaults",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_si571_freq (config_client, service, FMC_ACTIVE_CLK_DFLT_SI57X_FOUT);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set Si571 frequency",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-    client_err = halcs_set_si571_oe (config_client, service, FMC_ACTIVE_CLK_DFLT_SI571_OE);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not enable SI571 Output",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     /* After everything is complete. Send message telling FMC250 to initialize */
