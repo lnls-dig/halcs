@@ -120,7 +120,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
-        uint64_t addr = base_addr | CONCAT_NAME3(prefix, REG, reg);             \
+        uint64_t addr = base_addr + CONCAT_NAME3(prefix, REG, reg);             \
         uint64_t smio_base_addr = smio_get_base (self);                         \
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
                 "SET_PARAM_" #reg "_" #field ": writing 0x%08x to address 0x%"PRIx64 "\n", \
