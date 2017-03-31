@@ -749,6 +749,9 @@ smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg)
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
+#define FMC250M_4CH_ISLA216P_INV_TEMP_CODE 	ISLA216P_TEMP_COUNTER_MASK
+#define FMC250M_4CH_ISLA216P_RST_MAX_TRIES      10
+
 smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
 {
     assert (owner);
@@ -784,28 +787,55 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_fmc250m_4ch_do_mgmt_op] Resetting ADCs\n");
         /* Reset ISLA216P. Do the same as the config_defaults () routine
          * would do. We call this late initialization */
+        uint32_t tries = 0;
+        bool init_err = true;
 
-        /* Let's be sure we are in PIN CONTROL before proceeding */
-        uint32_t i;
-        for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
-            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
-            smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_PINCTRL_RST_MODE_ADC);
+        for (tries = 0; tries < FMC250M_4CH_ISLA216P_RST_MAX_TRIES && init_err; ++tries) {
+            /* Let's be sure we are in PIN CONTROL before proceeding */
+            uint32_t i;
+            for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+                smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
+                smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_PINCTRL_RST_MODE_ADC);
+            }
+    
+            SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                    RST_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_ADCS, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+            SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                    RST_DIV_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_DIV_ADCS, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+            SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
+                    SLEEP_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_SLEEP_ADCS, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+    
+            for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+                smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
+                smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_DFLT_RST_MODE_ADC);
+                smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+    
+                /* Check if we can read ADC temperature code. If the code is 0x7FF it means the ADC
+                 * was not reset properly. Most likely due to ADC input clock not present */
+                uint16_t temp_code = FMC250M_4CH_ISLA216P_INV_TEMP_CODE;
+                smch_isla216p_get_temp (smch_isla216p, &temp_code);
+                /* Try resetting ADCs again */
+                if (temp_code == FMC250M_4CH_ISLA216P_INV_TEMP_CODE) {
+                    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_fmc250m_4ch_do_mgmt_op] ADC %u reported "
+                        "invalid temp. code in reset try %u\n", i, tries);
+                    init_err = true;
+                    /* Give some time for ADCs to settle */
+                    usleep (1000);
+                    break;
+                }
+                /* All ADCs reported good temperature codes */
+                init_err = false;
+            }
         }
 
-        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
-                RST_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_ADCS, /* min */, /* max */,
-                NO_CHK_FUNC, SET_FIELD);
-        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
-                RST_DIV_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_DIV_ADCS, /* min */, /* max */,
-                NO_CHK_FUNC, SET_FIELD);
-        SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
-                SLEEP_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_SLEEP_ADCS, /* min */, /* max */,
-                NO_CHK_FUNC, SET_FIELD);
-
-        for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
-            smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
-            smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_DFLT_RST_MODE_ADC);
-            smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+        if (init_err)  {
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_fmc250m_4ch_do_mgmt_op] Exceeded maximum ADC reset tryouts. "
+                "Some ADCs might not be reliable. Reset it manually!\n");
+            err = SMIO_ERR_CONFIG_DFLT;
+    
         }
     }
     else {
