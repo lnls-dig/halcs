@@ -187,8 +187,8 @@ err_self_alloc:
 
 /**************** General Function to call the others *********/
 
-halcs_client_err_e halcs_func_exec (halcs_client_t *self, const disp_op_t *func,
-        char *service, uint32_t *input, uint32_t *output)
+halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output, uint32_t output_size)
 {
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
     uint8_t *input8 = (uint8_t *) input;
@@ -261,8 +261,9 @@ halcs_client_err_e halcs_func_exec (halcs_client_t *self, const disp_op_t *func,
                 err_msg_fmt);
 
         uint32_t *data_out = (uint32_t *)zframe_data(data_frm);
-        /* Copy message contents to user */
-        memcpy (output8, data_out, data_size);
+        /* Copy only the user specified ammount of bytes if this is less than the message size */
+        uint32_t output8_size = (output_size > data_size)? data_size : output_size;
+        memcpy (output8, data_out, output8_size);
     }
 
 err_msg_fmt:
@@ -280,6 +281,14 @@ err_msg_alloc:
 err_null_exp:
 err_inv_param:
     return err;
+}
+
+halcs_client_err_e halcs_func_exec (halcs_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output)
+{
+    /* Use the specified size in disp_op_t structure */
+    uint32_t output_size = DISP_GET_ASIZE(func->retval);
+    return halcs_func_exec_size (self, func, service, input, output, output_size);
 }
 
 const disp_op_t *halcs_func_translate (char *name)

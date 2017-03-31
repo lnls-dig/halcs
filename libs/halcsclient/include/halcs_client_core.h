@@ -56,6 +56,8 @@ void halcs_client_destroy (halcs_client_t **self_p);
 /* General function to execute all the other modules functions */
 halcs_client_err_e halcs_func_exec (halcs_client_t *self, const disp_op_t *func,
         char *service, uint32_t *input, uint32_t *output);
+halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *func,
+        char *service, uint32_t *input, uint32_t *output, uint32_t output_size);
 
 /* Translate function's name and returns its structure */
 const disp_op_t* halcs_func_translate (char *name);
