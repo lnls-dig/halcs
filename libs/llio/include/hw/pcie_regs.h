@@ -8,6 +8,15 @@
 #ifndef _PCIE_REGS_H_
 #define _PCIE_REGS_H_
 
+/* Define 64-bit macros for PCIe */
+#ifndef __WBGEN2_PCIE_MACROS_DEFINED__
+#define __WBGEN2_PCIE_MACROS_DEFINED__
+#define WBGEN2_PCIE_GEN_MASK(offset, size) ((((uint64_t)1<<(size))-1) << (offset))
+#define WBGEN2_PCIE_GEN_WRITE(value, offset, size) (((value) & (((uint64_t)1<<(size))-1)) << (offset))
+#define WBGEN2_PCIE_GEN_READ(reg, offset, size) (((reg) >> (offset)) & (((uint64_t)1<<(size))-1))
+#define WBGEN2_PCIE_SIGN_EXTEND(value, bits) (((value) & ((uint64_t)1<<bits) ? ~(((uint64_t)1<<(bits))-1): 0 ) | (value))
+#endif
+
 /* Some FPGA PCIe constants */
 /* SDRAM is accesses via 32-bit BAR (32-bit addressing) */
 #define PCIE_SDRAM_PG_SHIFT                 0           /* bits */
@@ -66,6 +75,9 @@
 #define PCIE_CFG_REG_DMA_US_CTRL            (18 << WB_DWORD_ACC)
 #define PCIE_CFG_REG_DMA_US_STA             (19 << WB_DWORD_ACC)
 
+/* First register of the block*/
+#define PCIE_CFG_REG_DMA_US_BASE            PCIE_CFG_REG_DMA_US_PAH
+
 /* Downstream DMA channel Constants */
 #define PCIE_CFG_REG_DMA_DS_PAH             (20 << WB_DWORD_ACC)
 #define PCIE_CFG_REG_DMA_DS_PAL             (21 << WB_DWORD_ACC)
@@ -76,6 +88,153 @@
 #define PCIE_CFG_REG_DMA_DS_LENG            (26 << WB_DWORD_ACC)
 #define PCIE_CFG_REG_DMA_DS_CTRL            (27 << WB_DWORD_ACC)
 #define PCIE_CFG_REG_DMA_DS_STA             (28 << WB_DWORD_ACC)
+
+/* First register of the block*/
+#define PCIE_CFG_REG_DMA_DS_BASE            PCIE_CFG_REG_DMA_DS_PAH
+
+/* Offset DMA independent registers */
+#define PCIE_CFG_REG_DMA_PAH                (0 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_PAL                (1 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_HAH                (2 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_HAL                (3 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_BDAH               (4 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_BDAL               (5 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_LENG               (6 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_CTRL               (7 << WB_DWORD_ACC)
+#define PCIE_CFG_REG_DMA_STA                (8 << WB_DWORD_ACC)
+
+/* Bit definitions for PAH/PAL register for both US/DS DMA engines */
+
+#define PCIE_CFG_DMA_PAH_SIZE               32
+#define PCIE_CFG_DMA_PAH_SHIFT              32
+#define PCIE_CFG_DMA_PAH_MASK               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_PAH_SHIFT, \
+                                                        PCIE_CFG_DMA_PAH_SIZE)
+#define PCIE_CFG_DMA_PAH_W(value)           WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_PAH_SHIFT, \
+                                                        PCIE_CFG_DMA_PAH_SIZE)
+#define PCIE_CFG_DMA_PAH_R(reg)             WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_PAH_SHIFT, \
+                                                             PCIE_CFG_DMA_PAH_SIZE)
+
+#define PCIE_CFG_DMA_PAL_SIZE               32
+#define PCIE_CFG_DMA_PAL_SHIFT              0
+#define PCIE_CFG_DMA_PAL_MASK               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_PAL_SHIFT, \
+                                                        PCIE_CFG_DMA_PAL_SIZE)
+#define PCIE_CFG_DMA_PAL_W(value)           WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_PAL_SHIFT, \
+                                                        PCIE_CFG_DMA_PAL_SIZE)
+#define PCIE_CFG_DMA_PAL_R(reg)             WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_PAL_SHIFT, \
+                                                             PCIE_CFG_DMA_PAL_SIZE)
+
+/* Bit definitions for HAH/HAL register for both US/DS DMA engines */
+
+#define PCIE_CFG_DMA_HAH_SIZE               32
+#define PCIE_CFG_DMA_HAH_SHIFT              32
+#define PCIE_CFG_DMA_HAH_MASK               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_HAH_SHIFT, \
+                                                        PCIE_CFG_DMA_HAH_SIZE)
+#define PCIE_CFG_DMA_HAH_W(value)           WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_HAH_SHIFT, \
+                                                        PCIE_CFG_DMA_HAH_SIZE)
+#define PCIE_CFG_DMA_HAH_R(reg)             WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_HAH_SHIFT, \
+                                                             PCIE_CFG_DMA_HAH_SIZE)
+
+#define PCIE_CFG_DMA_HAL_SIZE               32
+#define PCIE_CFG_DMA_HAL_SHIFT              0
+#define PCIE_CFG_DMA_HAL_MASK               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_HAL_SHIFT, \
+                                                        PCIE_CFG_DMA_HAL_SIZE)
+#define PCIE_CFG_DMA_HAL_W(value)           WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_HAL_SHIFT, \
+                                                        PCIE_CFG_DMA_HAL_SIZE)
+#define PCIE_CFG_DMA_HAL_R(reg)             WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_HAL_SHIFT, \
+                                                             PCIE_CFG_DMA_HAL_SIZE)
+
+/* Bit definitions for BDAH/BDAL register for both US/DS DMA engines */
+
+#define PCIE_CFG_DMA_BDAH_SIZE              32
+#define PCIE_CFG_DMA_BDAH_SHIFT             32
+#define PCIE_CFG_DMA_BDAH_MASK              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_BDAH_SHIFT, \
+                                                       PCIE_CFG_DMA_BDAH_SIZE)
+#define PCIE_CFG_DMA_BDAH_W(value)          WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_BDAH_SHIFT, \
+                                                       PCIE_CFG_DMA_BDAH_SIZE)
+#define PCIE_CFG_DMA_BDAH_R(reg)            WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_BDAH_SHIFT, \
+                                                            PCIE_CFG_DMA_BDAH_SIZE)
+
+#define PCIE_CFG_DMA_BDAL_SIZE              32
+#define PCIE_CFG_DMA_BDAL_SHIFT             0
+#define PCIE_CFG_DMA_BDAL_MASK              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_BDAL_SHIFT, \
+                                                       PCIE_CFG_DMA_BDAL_SIZE)
+#define PCIE_CFG_DMA_BDAL_W(value)          WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_BDAL_SHIFT, \
+                                                       PCIE_CFG_DMA_BDAL_SIZE)
+#define PCIE_CFG_DMA_BDAL_R(reg)            WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_BDAL_SHIFT, \
+                                                            PCIE_CFG_DMA_BDAL_SIZE)
+
+/* Bit definitions for LENG register for both US/DS DMA engines */
+
+#define PCIE_CFG_DMA_LENG_SIZE              32
+#define PCIE_CFG_DMA_LENG_SHIFT             0
+#define PCIE_CFG_DMA_LENG_MASK              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_LENG_SHIFT, \
+                                                       PCIE_CFG_DMA_LENG_SIZE)
+#define PCIE_CFG_DMA_LENG_W(value)          WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_LENG_SHIFT, \
+                                                       PCIE_CFG_DMA_LENG_SIZE)
+#define PCIE_CFG_DMA_LENG_R(reg)            WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_LENG_SHIFT, \
+                                                            PCIE_CFG_DMA_LENG_SIZE)
+
+/* Bit definitions for CTRL register for both US/DS DMA engines */
+
+#define PCIE_CFG_DMA_CTRL_END_SIZE          1
+#define PCIE_CFG_DMA_CTRL_END_SHIFT         8
+#define PCIE_CFG_DMA_CTRL_END               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_END_SHIFT, \
+                                                    PCIE_CFG_DMA_CTRL_END_SIZE)
+
+#define PCIE_CFG_DMA_CTRL_AINC_SIZE         1
+#define PCIE_CFG_DMA_CTRL_AINC_SHIFT        15
+#define PCIE_CFG_DMA_CTRL_AINC              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_AINC_SHIFT, \
+                                                   PCIE_CFG_DMA_CTRL_AINC_SIZE)
+
+#define PCIE_CFG_DMA_CTRL_BAR_SIZE          2
+#define PCIE_CFG_DMA_CTRL_BAR_SHIFT         16
+#define PCIE_CFG_DMA_CTRL_BAR_MASK          WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_BAR_SHIFT, \
+                                                   PCIE_CFG_DMA_CTRL_BAR_SIZE)
+#define PCIE_CFG_DMA_CTRL_BAR_W(value)      WBGEN2_PCIE_GEN_WRITE(value, PCIE_CFG_DMA_CTRL_BAR_SHIFT, \
+                                                   PCIE_CFG_DMA_CTRL_BAR_SIZE)
+#define PCIE_CFG_DMA_CTRL_BAR_R(reg)        WBGEN2_PCIE_GEN_READ(reg, PCIE_CFG_DMA_CTRL_BAR_SHIFT, \
+                                                        PCIE_CFG_DMA_CTRL_BAR_SIZE)
+
+#define PCIE_CFG_DMA_CTRL_UPA_SIZE          1
+#define PCIE_CFG_DMA_CTRL_UPA_SHIFT         20
+#define PCIE_CFG_DMA_CTRL_UPA               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_UPA_SHIFT, \
+                                                    PCIE_CFG_DMA_CTRL_UPA_SIZE)
+
+#define PCIE_CFG_DMA_CTRL_LAST_SIZE         1
+#define PCIE_CFG_DMA_CTRL_LAST_SHIFT        24
+#define PCIE_CFG_DMA_CTRL_LAST              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_LAST_SHIFT, \
+                                                   PCIE_CFG_DMA_CTRL_LAST_SIZE)
+
+#define PCIE_CFG_DMA_CTRL_VALID_SIZE        1
+#define PCIE_CFG_DMA_CTRL_VALID_SHIFT       25
+#define PCIE_CFG_DMA_CTRL_VALID             WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_VALID_SHIFT, \
+                                                  PCIE_CFG_DMA_CTRL_VALID_SIZE)
+
+/* Bit definitions for STATUS (STA) register for both US/DS DMA engines */
+#define PCIE_CFG_DMA_STA_DONE_SIZE          1
+#define PCIE_CFG_DMA_STA_DONE_SHIFT         0
+#define PCIE_CFG_DMA_STA_DONE               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_STA_DONE_SHIFT, \
+                                                    PCIE_CFG_DMA_STA_DONE_SIZE)
+
+#define PCIE_CFG_DMA_STA_BUSY_SIZE          1
+#define PCIE_CFG_DMA_STA_BUSY_SHIFT         1
+#define PCIE_CFG_DMA_STA_BUSY               WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_STA_BUSY_SHIFT, \
+                                                    PCIE_CFG_DMA_STA_BUSY_SIZE)
+
+#define PCIE_CFG_DMA_STA_BDANULL_SIZE       1
+#define PCIE_CFG_DMA_STA_BDANULL_SHIFT      3
+#define PCIE_CFG_DMA_STA_BDANULL            WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_STA_BDANULL_SHIFT, \
+                                                  PCIE_CFG_DMA_STA_BDANULL_SIZE)
+
+#define PCIE_CFG_DMA_STA_TIMEOUT_SIZE       1
+#define PCIE_CFG_DMA_STA_TIMEOUT_SHIFT      4
+#define PCIE_CFG_DMA_STA_TIMEOUT            WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_STA_TIMEOUT_SHIFT, \
+                                                 PCIE_CFG_DMA_STA_TIMEOUT_SIZE)
+
+#define PCIE_CFG_DMA_STA_NALIGN_SIZE        1
+#define PCIE_CFG_DMA_STA_NALIGN_SHIFT       7
+#define PCIE_CFG_DMA_STA_NALIGN             WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_STA_NALIGN_SHIFT, \
+                                                  PCIE_CFG_DMA_STA_NALIGN_SIZE)
 
 /* Address for MRd channel control */
 #define PCIE_CFG_REG_MRD_CTRL               (29 << WB_DWORD_ACC)
@@ -253,5 +412,32 @@
 
 #define SET_WB_PG(bar0, num)                    \
     SET_PG(bar0, PCIE_CFG_REG_WB_PG, num)
+
+/* Undef WBGEN macros as we they might have already been
+ * set-up */
+#ifdef __WBGEN2_MACROS_DEFINED__
+#    undef __WBGEN2_MACROS_DEFINED__
+#endif
+#ifdef WBGEN2_GEN_MASK
+#    undef WBGEN2_GEN_MASK
+#endif
+#ifdef WBGEN2_GEN_WRITE
+#   undef WBGEN2_GEN_WRITE
+#endif
+#ifdef WBGEN2_GEN_READ
+#   undef WBGEN2_GEN_READ
+#endif
+#ifdef WBGEN2_SIGN_EXTEND
+#    undef WBGEN2_SIGN_EXTEND
+#endif
+
+/* define regular WBGEN macros as some modules rely on this */
+#ifndef __WBGEN2_MACROS_DEFINED__
+#define __WBGEN2_MACROS_DEFINED__
+#define WBGEN2_GEN_MASK(offset, size) (((1<<(size))-1) << (offset))
+#define WBGEN2_GEN_WRITE(value, offset, size) (((value) & ((1<<(size))-1)) << (offset))
+#define WBGEN2_GEN_READ(reg, offset, size) (((reg) >> (offset)) & ((1<<(size))-1))
+#define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
+#endif
 
 #endif
