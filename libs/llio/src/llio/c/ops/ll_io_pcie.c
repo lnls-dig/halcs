@@ -323,10 +323,16 @@ static ssize_t pcie_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t
 {
     assert (self);
     int err = sizeof (*data);
+    size_t size_clipped = size;
     ASSERT_TEST(llio_get_endpoint_open (self), "Could not perform RW operation. Device is not opened",
             err_endp_open, -1);
-    ASSERT_TEST(size < PCIE_DMA_KERNEL_BUFF_SIZE, "DMA size transaction is too large", 
-            err_size_too_large, -1);
+
+    /* Maximum DMA block size */
+    if (size > PCIE_DMA_KERNEL_BUFF_SIZE) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[pcie_read_dma] DMA size transaction is too large. "
+                "Clipping it to the maximum of %u bytes\n", PCIE_DMA_KERNEL_BUFF_SIZE);
+        size_clipped = PCIE_DMA_KERNEL_BUFF_SIZE;
+    }
 
     llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
     ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
@@ -336,17 +342,16 @@ static ssize_t pcie_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t
     int bar_no = PCIE_ADDR_BAR (offs);
     uint64_t full_offs = PCIE_ADDR_GEN (offs);
 
-    err = _pcie_configure_dma (self, full_offs, 0, size, bar_no, PCIE_DMA_US, true);
+    err = _pcie_configure_dma (self, full_offs, 0, size_clipped, bar_no, PCIE_DMA_US, true);
     ASSERT_TEST(err == 0, "Could not configure DMA", err_configure_dma, -1);
 
     /* Copy kernel memory to user buffer */
-    memcpy (data, dev_pcie->kmem_handle->mem, size);
-    err = size;
+    memcpy (data, dev_pcie->kmem_handle->mem, size_clipped);
+    err = size_clipped;
     return err;
 
 err_configure_dma:
 err_dev_pcie_handler:
-err_size_too_large:
 err_endp_open:
     return -1;
 }
@@ -356,10 +361,16 @@ static ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_
 {
     assert (self);
     int err = sizeof (*data);
+    size_t size_clipped = size;
     ASSERT_TEST(llio_get_endpoint_open (self), "Could not perform RW operation. Device is not opened",
             err_endp_open, -1);
-    ASSERT_TEST(size < PCIE_DMA_KERNEL_BUFF_SIZE, "DMA size transaction is too large", 
-            err_size_too_large, -1);
+    
+    /* Maximum DMA block size */
+    if (size > PCIE_DMA_KERNEL_BUFF_SIZE) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[pcie_read_dma] DMA size transaction is too large. "
+                "Clipping it to the maximum of %u bytes\n", PCIE_DMA_KERNEL_BUFF_SIZE);
+        size_clipped = PCIE_DMA_KERNEL_BUFF_SIZE;
+    }
 
     llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
     ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
@@ -370,16 +381,15 @@ static ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_
     uint64_t full_offs = PCIE_ADDR_GEN (offs);
 
     /* Copy user buffer to kernel memory */
-    memcpy (dev_pcie->kmem_handle->mem, data, size);
+    memcpy (dev_pcie->kmem_handle->mem, data, size_clipped);
 
-    err = _pcie_configure_dma (self, full_offs, 0, size, bar_no, PCIE_DMA_DS, true);
+    err = _pcie_configure_dma (self, full_offs, 0, size_clipped, bar_no, PCIE_DMA_DS, true);
     ASSERT_TEST(err == 0, "Could not configure DMA", err_configure_dma, -1);
-    err = size;
+    err = size_clipped;
     return err;
 
 err_configure_dma:
 err_dev_pcie_handler:
-err_size_too_large:
 err_endp_open:
     return -1;
 }
