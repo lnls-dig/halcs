@@ -309,6 +309,11 @@
 #define ISLA216P_TEMP_COUNTER_LOW_R(reg)            WBGEN2_GEN_READ(reg, ISLA216P_TEMP_COUNTER_LOW_SHIFT, \
                                                                             ISLA216P_TEMP_COUNTER_LOW_SIZE)
 
+/* Definition for register "fake"ISLA216P_REG_TEMP_COUNTER register */
+#define ISLA216P_TEMP_COUNTER_SHIFT                 0
+#define ISLA216P_TEMP_COUNTER_SIZE                  (ISLA216P_TEMP_COUNTER_HIGH_SIZE + ISLA216P_TEMP_COUNTER_LOW_SIZE) 
+#define ISLA216P_TEMP_COUNTER_MASK                  WBGEN2_GEN_MASK(ISLA216P_TEMP_COUNTER_SHIFT, \
+                                                                            ISLA216P_TEMP_COUNTER_SIZE)
 #define ISLA216P_TEMP_COUNTER_R(high, low)          (ISLA216P_TEMP_COUNTER_HIGH_R(high) << ISLA216P_TEMP_COUNTER_LOW_SIZE | \
                                                      ISLA216P_TEMP_COUNTER_LOW_R(low))
 
