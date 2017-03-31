@@ -80,8 +80,8 @@ static uint64_t _pcie_dma_base_addr (llio_t *self, pcie_dev_dma_type_e dma_type)
 static int _pcie_configure_dma (llio_t *self, uint64_t device_addr, 
     uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type, bool block);
 static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type);
-static int _pcie_set_dma (llio_t *self, uint64_t device_addr,
-        uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type);
+static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint64_t device_addr, size_t size, int bar_no, uint64_t next_bda);
 static int _pcie_wait_dma (llio_t *self, pcie_dev_dma_type_e dma_type, bool block);
 static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type);
 static int _pcie_timeout_reset (llio_t *self);
@@ -765,8 +765,8 @@ static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type)
 
 }
 
-static int _pcie_set_dma (llio_t *self, uint64_t device_addr,
-        uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type)
+static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint64_t device_addr, size_t size, int bar_no, uint64_t next_bda)
 {
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "[ll_io_pcie:_pcie_reset_dma] Setting DMA engine\n");
