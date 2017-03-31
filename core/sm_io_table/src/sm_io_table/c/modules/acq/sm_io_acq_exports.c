@@ -37,7 +37,8 @@ disp_op_t acq_check_data_acquire_exp = {
 disp_op_t acq_get_data_block_exp = {
     .name = ACQ_NAME_GET_DATA_BLOCK,
     .opcode = ACQ_OPCODE_GET_DATA_BLOCK,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, smio_acq_data_block_t),
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(smio_acq_data_block_t) + BLOCK_SIZE),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),

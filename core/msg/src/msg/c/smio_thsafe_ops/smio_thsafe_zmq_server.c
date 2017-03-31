@@ -318,7 +318,8 @@ disp_op_t thsafe_zmq_server_read_block_exp = {
     .name = THSAFE_NAME_READ_BLOCK,
     .opcode = THSAFE_OPCODE_READ_BLOCK,
     .func_fp = _thsafe_zmq_server_read_block,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
@@ -342,7 +343,8 @@ disp_op_t thsafe_zmq_server_write_block_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
         DISP_ARG_END
     }
 };
@@ -358,7 +360,8 @@ disp_op_t thsafe_zmq_server_read_dma_exp = {
     .name = THSAFE_NAME_READ_DMA,
     .opcode = THSAFE_OPCODE_READ_DMA,
     .func_fp = _thsafe_zmq_server_read_dma,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
@@ -382,7 +385,8 @@ disp_op_t thsafe_zmq_server_write_dma_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
         DISP_ARG_END
     }
 };
