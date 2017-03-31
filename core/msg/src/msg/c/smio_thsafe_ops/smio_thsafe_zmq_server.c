@@ -30,6 +30,14 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_server:zmq]",     \
             msg_err_str (err_type))
 
+typedef ssize_t (*llio_read_function_fp) (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*llio_write_function_fp) (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
+
+static int _thsafe_zmq_server_read_block_generic (void *owner, void *args, void *ret, 
+        llio_read_function_fp llio_read_func);
+static int _thsafe_zmq_server_write_block_generic (void *owner, void *args, void *ret,
+        llio_write_function_fp llio_write_func);
+
 /**** Open device ****/
 static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
 {
@@ -302,22 +310,8 @@ disp_op_t thsafe_zmq_server_write_64_exp = {
 /**** Read data block from device function pointer, size in bytes ****/
 static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
 {
-    assert (owner);
-    assert (args);
-    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
-    llio_t *llio = devio_get_llio (self);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
-    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
-    size_t read_bsize = *(size_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %"PRIu64", "
-            "size = %zd\n", offset, read_bsize);
-    /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_block (llio, offset, read_bsize,
-            (uint32_t *) ret);
-
-    return llio_ret;
+    return _thsafe_zmq_server_read_block_generic (owner, args, ret,
+        llio_read_block);
 }
 
 disp_op_t thsafe_zmq_server_read_block_exp = {
@@ -336,33 +330,8 @@ disp_op_t thsafe_zmq_server_read_block_exp = {
 /**** Write data block from device function pointer, size in bytes ****/
 static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 {
-    assert (owner);
-    assert (args);
-    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
-    llio_t *llio = devio_get_llio (self);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
-    THSAFE_MSG_ZMQ_ARG_TYPE offset_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
-    uint64_t offset = *(uint64_t *) GEN_MSG_ZMQ_ARG_DATA(offset_arg);
-    /* We now own the argument and must clean it after use */
-    THSAFE_MSG_ZMQ_ARG_TYPE data_write_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
-    uint32_t *data_write = (uint32_t *)
-        ((zmq_server_data_block_t *) THSAFE_MSG_ZMQ_ARG_DATA(data_write_arg))->data;
-    uint32_t data_write_size = THSAFE_MSG_ZMQ_ARG_SIZE(data_write_arg);
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Arg is %u bytes\n",
-            data_write_size);
-
-    /* We must accept every block size. So, we just perform the actual LLIO
-     * operation */
-    int32_t llio_ret = llio_write_block (llio, offset, data_write_size,
-            data_write);
-    *(int32_t *) ret = llio_ret;
-
-    /* Cleanup arguments that we now own */
-    THSAFE_MSG_CLENUP_ARG(&offset_arg);
-    THSAFE_MSG_CLENUP_ARG(&data_write_arg);
-
-    return sizeof (int32_t);
+    return _thsafe_zmq_server_write_block_generic (owner, args, ret,
+        llio_write_block);
 }
 
 disp_op_t thsafe_zmq_server_write_block_exp = {
@@ -381,10 +350,8 @@ disp_op_t thsafe_zmq_server_write_block_exp = {
 /**** Read data block via DMA from device, size in bytes ****/
 static int _thsafe_zmq_server_read_dma (void *owner, void *args, void *ret)
 {
-    UNUSED(owner);
-    UNUSED(args);
-    UNUSED(ret);
-    return -1;
+    return _thsafe_zmq_server_read_block_generic (owner, args, ret,
+        llio_read_dma);
 }
 
 disp_op_t thsafe_zmq_server_read_dma_exp = {
@@ -403,10 +370,8 @@ disp_op_t thsafe_zmq_server_read_dma_exp = {
 /**** Write data block via DMA from device, size in bytes ****/
 static int _thsafe_zmq_server_write_dma (void *owner, void *args, void *ret)
 {
-    UNUSED(owner);
-    UNUSED(args);
-    UNUSED(ret);
-    return -1;
+    return _thsafe_zmq_server_write_block_generic (owner, args, ret,
+        llio_write_dma);
 }
 
 disp_op_t thsafe_zmq_server_write_dma_exp = {
@@ -430,6 +395,60 @@ disp_op_t thsafe_zmq_server_write_dma_exp = {
  *  UNUSED(ret);
  *  return NULL;
  *} */
+
+/*************** Static functions **************/
+static int _thsafe_zmq_server_read_block_generic (void *owner, void *args, void *ret, 
+        llio_read_function_fp llio_read_func)
+{
+    assert (owner);
+    assert (args);
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_read_block\n");
+    uint64_t offset = *(uint64_t *) THSAFE_MSG_ZMQ_FIRST_ARG(args);
+    size_t read_bsize = *(size_t *) THSAFE_MSG_ZMQ_NEXT_ARG(args);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %"PRIu64", "
+            "size = %zd\n", offset, read_bsize);
+    /* Call llio to perform the actual operation */
+    int32_t llio_ret = (llio_read_func) (llio, offset, read_bsize,
+            (uint32_t *) ret);
+
+    return llio_ret;
+}
+
+static int _thsafe_zmq_server_write_block_generic (void *owner, void *args, void *ret,
+        llio_write_function_fp llio_write_func)
+{
+    assert (owner);
+    assert (args);
+    DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
+    llio_t *llio = devio_get_llio (self);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Calling thsafe_write_block\n");
+    THSAFE_MSG_ZMQ_ARG_TYPE offset_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
+    uint64_t offset = *(uint64_t *) GEN_MSG_ZMQ_ARG_DATA(offset_arg);
+    /* We now own the argument and must clean it after use */
+    THSAFE_MSG_ZMQ_ARG_TYPE data_write_arg = THSAFE_MSG_ZMQ_POP_NEXT_ARG(args);
+    uint32_t *data_write = (uint32_t *)
+        ((zmq_server_data_block_t *) THSAFE_MSG_ZMQ_ARG_DATA(data_write_arg))->data;
+    uint32_t data_write_size = THSAFE_MSG_ZMQ_ARG_SIZE(data_write_arg);
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Arg is %u bytes\n",
+            data_write_size);
+
+    /* We must accept every block size. So, we just perform the actual LLIO
+     * operation */
+    int32_t llio_ret = (llio_write_func) (llio, offset, data_write_size,
+            data_write);
+    *(int32_t *) ret = llio_ret;
+
+    /* Cleanup arguments that we now own */
+    THSAFE_MSG_CLENUP_ARG(&offset_arg);
+    THSAFE_MSG_CLENUP_ARG(&data_write_arg);
+
+    return sizeof (int32_t);
+}
 
 /*************** Our constant structure **************/
 
