@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 /* Somewhat arbitrary maximum block size for read_block funtions */
-#define ZMQ_SERVER_BLOCK_SIZE       131072
+#define ZMQ_SERVER_BLOCK_SIZE       (1 * (1 << 20))
 
 typedef struct {
     /* This field is not used */
