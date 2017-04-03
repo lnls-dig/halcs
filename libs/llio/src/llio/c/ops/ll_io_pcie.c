@@ -83,7 +83,10 @@ static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type);
 static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
         uint64_t device_addr, size_t size, int bar_no, uint64_t next_bda);
 static int _pcie_wait_dma (llio_t *self, pcie_dev_dma_type_e dma_type, bool block);
+static int _pcie_get_dma_status_reg (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint32_t *status);
 static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type);
+static int _pcie_check_dma_busy (llio_t *self, pcie_dev_dma_type_e dma_type);
 static int _pcie_timeout_reset (llio_t *self);
 static int _pcie_reset_fpga (llio_t *self);
 
@@ -747,7 +750,13 @@ static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "[ll_io_pcie:_pcie_configure_dma] Configuring DMA\n");
 
-    int err = _pcie_reset_dma (self, dma_type);
+    /* Before starting a new DMA transaction we need to check if
+     * it's not busy */
+    int err = _pcie_check_dma_busy (self, dma_type);
+    ASSERT_TEST(err == 0, "DMA is busy. Aborting DMA transaction",
+            err_busy_dma);
+
+    err = _pcie_reset_dma (self, dma_type);
     ASSERT_TEST(err == 0, "Could not reset DMA", err_reset_dma);
 
     err = _pcie_set_dma (self, dma_type, device_addr, size, bar_no, next_bda);
@@ -759,6 +768,7 @@ static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
 err_wait_dma:
 err_set_dma:
 err_reset_dma:
+err_busy_dma:
     return err;
 }
 
@@ -826,10 +836,11 @@ err_dev_pcie_handler:
     return err;
 }
 
-static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type)
+static int _pcie_get_dma_status_reg (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint32_t *status)
 {
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-            "[ll_io_pcie:_pcie_check_dma_completion] Getting DMA completion status\n");
+            "[ll_io_pcie:_pcie_get_dma_status_reg] Getting DMA status register\n");
 
     uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
     int err = 0;
@@ -837,23 +848,66 @@ static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_typ
     uint32_t data = 0;
     err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_STA, &data, READ_FROM_BAR)
             == sizeof (uint32_t) ? 0 : 1;
-    ASSERT_TEST(err == 0, "Could not read DMA status register", err_read_dma_reg);
+    ASSERT_TEST(err == 0, "Could not read DMA status register", err_read_dma_reg,
+            -1);
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-            "[ll_io_pcie:_pcie_check_dma_completion] DMA status = 0x%08X\n", data);
+            "[ll_io_pcie:_pcie_get_dma_status_reg] DMA status = 0x%08X\n", data);
+
+    *status = data;
+    return err;
+
+err_read_dma_reg:
+    return err;
+}
+
+static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_completion] Getting DMA completion status\n");
+
+    uint32_t status = 0;
+    int err = _pcie_get_dma_status_reg (self, dma_type, &status);
+    ASSERT_TEST(err == 0, "Could not check DMA completion bit", err_read_dma_reg,
+            -1);
 
     /* Check for status done bit */
-    if (data & PCIE_CFG_DMA_STA_DONE) {
+    if (status & PCIE_CFG_DMA_STA_DONE) {
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                 "[ll_io_pcie:_pcie_check_dma_completion] DMA engine done\n");
         return 0;
     }
 
     /* Check for timeout bit */
-    if (data & PCIE_CFG_DMA_STA_TIMEOUT) {
+    if (status & PCIE_CFG_DMA_STA_TIMEOUT) {
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                 "[ll_io_pcie:_pcie_check_dma_completion] DMA engine timeout\n");
         return -1;
     }
+
+err_read_dma_reg:
+    return err;
+}
+
+static int _pcie_check_dma_busy (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_busy] Getting DMA busy status\n");
+
+    uint32_t status = 0;
+    int err = _pcie_get_dma_status_reg (self, dma_type, &status);
+    ASSERT_TEST(err == 0, "Could not check DMA busy bit", err_read_dma_reg,
+            -1);
+
+    /* Check for status done bit */
+    if (status & PCIE_CFG_DMA_STA_BUSY) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_check_dma_busy] DMA engine busy\n");
+        return -1;
+    }
+
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_busy] DMA engine not busy\n");
+    return 0;
 
 err_read_dma_reg:
     return err;
