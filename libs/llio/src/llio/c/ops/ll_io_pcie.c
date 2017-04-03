@@ -778,11 +778,10 @@ static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type)
             "[ll_io_pcie:_pcie_reset_dma] Reseting DMA engine\n");
 
     uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
-    uint64_t offs = dma_base_addr | PCIE_CFG_REG_DMA_CTRL;
+    uint64_t offs = dma_base_addr + PCIE_CFG_REG_DMA_CTRL;
     /* We must write the reset pattern + the valid bit */
     uint32_t data = PCIE_CFG_DMA_CTRL_VALID_SHIFT | PCIE_CFG_TX_CTRL_CHANNEL_RST;
     return (_pcie_rw_32 (self, offs, &data, WRITE_TO_BAR) == sizeof (uint32_t) ? 0 : 1);
-
 }
 
 static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
