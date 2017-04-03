@@ -918,7 +918,11 @@ static int _pcie_wait_dma (llio_t *self, pcie_dev_dma_type_e dma_type, bool bloc
             "[ll_io_pcie:_pcie_wait_dma] Waiting for DMA engine\n");
     int err = 0;
     /*FIXME. Should we insert a maximum number of wait tries? */
-    while ((err = _pcie_check_dma_completion (self, dma_type)) && block);
+    /* FIXME 2: For now, we must check the DONE and BUSY bits.
+     * The DONE bit is always 1, so maybe we need to check
+     * FPGA reset signal */
+    while ((err = (_pcie_check_dma_completion (self, dma_type) ||
+                   _pcie_check_dma_busy (self, dma_type))) && block);
 
     return err;
 }
