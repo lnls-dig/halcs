@@ -820,7 +820,7 @@ static int _acq_sample_size (void *owner, void *args, void *ret)
                 ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, int_ch_width,
                 NO_FMT_FUNC);
         GET_PARAM_CHANNEL(self, acq, 0x0, ACQ_CORE, CH0_DESC, NUM_COALESCE,
-		ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
+                ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
                 NO_FMT_FUNC);
         sample_size = int_ch_width/DDR3_BYTE_2_BIT * num_coalesce;
 

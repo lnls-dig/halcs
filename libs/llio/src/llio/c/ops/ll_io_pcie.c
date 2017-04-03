@@ -77,7 +77,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
 static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size,
         uint32_t *data, int rw);
 static uint64_t _pcie_dma_base_addr (llio_t *self, pcie_dev_dma_type_e dma_type);
-static int _pcie_configure_dma (llio_t *self, uint64_t device_addr, 
+static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
     uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type, bool block);
 static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type);
 static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
@@ -364,7 +364,7 @@ static ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_
     size_t size_clipped = size;
     ASSERT_TEST(llio_get_endpoint_open (self), "Could not perform RW operation. Device is not opened",
             err_endp_open, -1);
-    
+
     /* Maximum DMA block size */
     if (size > PCIE_DMA_KERNEL_BUFF_SIZE) {
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[pcie_read_dma] DMA size transaction is too large. "
@@ -741,7 +741,7 @@ static uint64_t _pcie_dma_base_addr (llio_t *self, pcie_dev_dma_type_e dma_type)
 }
 
 
-static int _pcie_configure_dma (llio_t *self, uint64_t device_addr, 
+static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
     uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type, bool block)
 {
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
@@ -788,7 +788,7 @@ static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
     uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
 
     uint32_t data = PCIE_CFG_DMA_PAH_R(device_addr);
-    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_PAH, &data, WRITE_TO_BAR) 
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_PAH, &data, WRITE_TO_BAR)
             == sizeof (uint32_t) ? 0 : 1;
     data = PCIE_CFG_DMA_PAL_R(device_addr);
     err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_PAL, &data, WRITE_TO_BAR)
