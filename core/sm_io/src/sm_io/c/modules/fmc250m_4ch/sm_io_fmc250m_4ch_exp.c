@@ -816,9 +816,9 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
                 /* Check if we can read ADC temperature code. If the code is 0x7FF it means the ADC
                  * was not reset properly. Most likely due to ADC input clock not present */
                 uint16_t temp_code = FMC250M_4CH_ISLA216P_INV_TEMP_CODE;
-                smch_isla216p_get_temp (smch_isla216p, &temp_code);
+                smch_err_e serr = smch_isla216p_get_temp (smch_isla216p, &temp_code);
                 /* Try resetting ADCs again */
-                if (temp_code == FMC250M_4CH_ISLA216P_INV_TEMP_CODE) {
+                if (serr != SMCH_SUCCESS || temp_code == FMC250M_4CH_ISLA216P_INV_TEMP_CODE) {
                     DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_fmc250m_4ch_do_mgmt_op] ADC %u reported "
                         "invalid temp. code in reset try %u\n", i, tries);
                     init_err = true;
