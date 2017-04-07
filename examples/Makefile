@@ -53,7 +53,7 @@ endif
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS = -lhalcsclient -lerrhand -lhutils -lmlm -lczmq -lzmq
+LIBS = -lbpmclient -lacqclient -lhalcsclient -lerrhand -lhutils -lmlm -lczmq -lzmq
 # General library flags -L<libdir>
 LFLAGS =
 
@@ -66,13 +66,17 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Every .c file will must be a separate example
-examples_SRC = $(wildcard *.c)
+examples_DIRS = $(wildcard src/*)
+examples_SRC = $(foreach dir,$(examples_DIRS),$(wildcard $(dir)/c/*.c))
 OUT = $(basename $(examples_SRC))
 
 all: $(OUT)
 
 %: %.c
 	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
+
+# For compatibility
+install:
 
 #BAD
 clean:

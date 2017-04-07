@@ -8,8 +8,10 @@ VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
     echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
-    echo "    [-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
+    echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
 }
+
+LIBSDIR="libs"
 
 #######################################
 # All of our Makefile options
@@ -129,14 +131,6 @@ AFE_RFFE_TYPE=2
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
 WITH_APP_CFG=n
-# Selects the install location of the config file
-CFG_FILENAME=/etc/halcs/halcs.cfg
-# Selects the install location of the config file
-PREFIX=/usr/local
-CFG_DIR=${PREFIX}/etc/halcs
-# Selects which config file to install. Options are: crude_defconfig or lnls_defconfig
-CFG=lnls_defconfig
-export CFG
 
 COMMAND_DEPS="\
     make ${EXTRA_FLAGS} deps && \
@@ -166,11 +160,10 @@ COMMAND_CORE="\
     FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
     WITH_DEV_MNGR=${WITH_DEV_MNGR} \
     AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+    WITH_APP_CFG=${WITH_APP_CFG} && \
+    make \
     WITH_APP_CFG=${WITH_APP_CFG} \
-    CFG_DIR=${CFG_DIR} && \
-    make CFG=${CFG} \
-    WITH_APP_CFG=${WITH_APP_CFG} \
-    ${EXTRA_FLAGS} core_install cfg_install"
+    ${EXTRA_FLAGS} core_install"
 
 if [ "$WITH_EXAMPLES" = "yes" ]; then
 COMMAND_EXAMPLES="\
@@ -196,6 +189,11 @@ else
 COMMAND_DRIVER=""
 fi
 
+# Meta target to remove copied headers
+COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
+    make -C ${LIBSDIR}/bpmclient pre_clean &&
+    make -C ${LIBSDIR}/halcsclient pre_clean"
+
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
     "${COMMAND_DRIVER}"
@@ -203,6 +201,7 @@ COMMAND_ARRAY=(
     "${COMMAND_CORE}"
     "${COMMAND_EXAMPLES}"
     "${COMMAND_SYSTEM_INTEGRATION}"
+    "${COMMAND_CLEAN}"
 )
 
 for i in "${COMMAND_ARRAY[@]}"
@@ -216,4 +215,3 @@ do
         exit $rc
     fi
 done
-

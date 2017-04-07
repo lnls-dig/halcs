@@ -1,10 +1,37 @@
+# Text editors swap/temporary files
 *~
 *.swp
 *.orig
 *.bak
 *.o
+
+# Binaries
+dev_mngr
+halcsd
+
+# Dependency files
 *.d
+
+# Compiled python files
 *.pyc
+
+# Reports
 valgrind_report.txt
+
+# Libraries
 *.a
 *.so
+*.so.*
+
+# Gradle local cache and output directory
+.gradle
+build
+
+# Directory for temporary files
+tmp
+
+# Directories of project dependencies
+czmq
+libsodium
+libzmq
+malamute

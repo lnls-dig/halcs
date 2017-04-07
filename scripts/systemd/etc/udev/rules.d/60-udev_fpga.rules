@@ -1,3 +1,1 @@
-# Permissions for the fpga devices
-
-KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", TAG+="systemd", ENV{SYSTEMD_WANTS}+="halcs@%c.target"
+../../../../../apps/halcsd/src/systemd/sysfiles/etc/udev/rules.d/60-udev_fpga.rules

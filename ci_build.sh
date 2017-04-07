@@ -10,10 +10,9 @@ BUILD_PREFIX=$PWD/tmp
 SCRIPTS_PREFIX=$PWD/tmp/etc
 
 LIBSODIUM_VER=1.0.3
-LIBZMQ_VER=v4.2.0-pre
-LIBCZMQ_VER=v3.0.2
-MALAMUTE_VER=v1.0
-ZYRE_VER=v1.1.0
+LIBZMQ_VER=v4.2.1
+LIBCZMQ_VER=v4.0.2
+MALAMUTE_VER=v1.3
 
 CONFIG_FLAGS=()
 CONFIG_FLAGS+=("CFLAGS=-I${BUILD_PREFIX}/include")
@@ -42,7 +41,7 @@ git clone --branch=${LIBSODIUM_VER} git://github.com/jedisct1/libsodium.git &&
     make check && make install ) || exit 1
 
 #   libzmq
-git clone --branch=${LIBZMQ_VER} git://github.com/lnls-dig/libzmq.git &&
+git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git &&
 ( cd libzmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
@@ -51,14 +50,14 @@ git clone --branch=${LIBCZMQ_VER} git://github.com/zeromq/czmq.git &&
 ( cd czmq; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-#   Zyre
-git clone --branch=${ZYRE_VER} git://github.com/zeromq/zyre.git &&
-( cd zyre; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
-    make check && make install ) || exit 1
-
 #   Malamute
 git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git &&
 ( cd malamute; ./autogen.sh && ./configure  "${CONFIG_OPTS[@]}" &&
     make check && make install ) || exit 1
 
-./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+if [ -z "$GRADLE" ]; then
+build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+else
+    export ${CONFIG_FLAGS[@]}
+    ./gradlew $GRADLE -Prelease.stage=ci_release
+fi

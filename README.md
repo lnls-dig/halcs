@@ -1,12 +1,11 @@
 # Hardware Abstraction Layer for Control Systems
 
-To keep things tidy, old issues will be kept on
-the old repository: https://github.com/lnls-dig/bpm-sw/issues
-
 [![Build Status](https://travis-ci.org/lnls-dig/halcs.svg)](https://travis-ci.org/lnls-dig/halcs)
 ![Latest tag](https://img.shields.io/github/tag/lnls-dig/halcs.svg?style=flat)
 [![Latest release](https://img.shields.io/github/release/lnls-dig/halcs.svg?style=flat)](https://github.com/lnls-dig/halcs/releases)
 [![GPL License 3.0](https://img.shields.io/github/license/lnls-dig/halcs.svg?style=flat)](COPYING)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=br.com.lnls.dig.halcs%3Adevel)](https://sonarqube.com/dashboard/index/br.com.lnls.dig.halcs%3Adevel)
+[![Technical debt ratio](https://sonarqube.com/api/badges/measure?key=br.com.lnls.dig.halcs%3Adevel&metric=sqale_debt_ratio)](https://sonarqube.com/dashboard/index/br.com.lnls.dig.halcs%3Adevel)
 
 Software for creating controlling daemons for devices
 
@@ -43,7 +42,7 @@ the binaries or executing the instructions below:
 
 ## Cloning this repository
 
-	git clone --recursive https://github.com/lerwys/halcs.git
+	git clone --recursive https://github.com/lnls-dig/halcs.git
 
 ## PCIe Installation Instructions
 
