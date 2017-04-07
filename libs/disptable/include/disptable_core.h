@@ -48,6 +48,7 @@ typedef enum {
  * Encoding of argument type and size in one word */
 #define __DISP_ARG_ENCODE(atype, asize) (((atype) << 24) | (asize))
 #define DISP_ARG_ENCODE(atype, type) __DISP_ARG_ENCODE(atype, sizeof(type))
+#define DISP_ARG_ENCODE_RAW(atype, asize) __DISP_ARG_ENCODE(atype, asize)
 #define DISP_GET_ATYPE(word) ((word) >> 24)
 #define DISP_GET_ASIZE(word) ((word) & 0xFFFFFF)
 #define DISP_ARG_END __DISP_ARG_ENCODE(DISP_ATYPE_NONE, 0) /* zero */

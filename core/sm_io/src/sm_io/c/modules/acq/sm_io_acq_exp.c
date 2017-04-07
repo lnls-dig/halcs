@@ -441,8 +441,13 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* Here we must use the "raw" version, as we can't have
      * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
-    ssize_t valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
+    ssize_t valid_bytes = smio_thsafe_raw_client_read_dma (self, LARGE_MEM_ADDR | addr_i,
             reply_size, (uint32_t *) data_block->data);
+    /* Try reading block-by-block if DMA fails for some reason */
+    if (valid_bytes < 0) {
+        valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
+                reply_size, (uint32_t *) data_block->data);
+    }
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "%zd bytes read\n", valid_bytes);
 
@@ -815,7 +820,7 @@ static int _acq_sample_size (void *owner, void *args, void *ret)
                 ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, int_ch_width,
                 NO_FMT_FUNC);
         GET_PARAM_CHANNEL(self, acq, 0x0, ACQ_CORE, CH0_DESC, NUM_COALESCE,
-		ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
+                ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
                 NO_FMT_FUNC);
         sample_size = int_ch_width/DDR3_BYTE_2_BIT * num_coalesce;
 

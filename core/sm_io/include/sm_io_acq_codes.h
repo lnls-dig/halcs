@@ -11,8 +11,8 @@
 #include "acq_chan_gen_defs.h"
 
 struct _smio_acq_data_block_t {
-    uint32_t valid_bytes;           /* how much of the BLOCK_SIZE bytes are valid */
-    uint8_t data[BLOCK_SIZE];       /* data buffer */
+    uint32_t valid_bytes;                /* how much of the BLOCK_SIZE bytes are valid */
+    uint8_t data[];                      /* data buffer */
 };
 
 /* Messaging OPCODES */

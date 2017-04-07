@@ -34,6 +34,7 @@
 /* Our structure */
 struct _acq_client_t {
     halcs_client_t *halcs_client;               /* HALCS client interface */
+    smio_acq_data_block_t *acq_block;           /* Acquisition block data */
 };
 
 /********************************************************/
@@ -101,10 +102,18 @@ err_halcs_client_new:
 static acq_client_t *_acq_client_new (halcs_client_t *halcs_client)
 {
     acq_client_t *self = zmalloc (sizeof *self);
+    ASSERT_ALLOC(self, err_self_alloc);
+    self->acq_block = zmalloc(sizeof *self->acq_block + BLOCK_SIZE);
+    ASSERT_ALLOC(self->acq_block, err_alloc_acq_block);
 
     self->halcs_client = halcs_client;
 
     return self;
+
+err_alloc_acq_block:
+    free (self);
+err_self_alloc:
+    return NULL;
 }
 
 void acq_client_destroy (acq_client_t **self_p)
@@ -116,6 +125,7 @@ void acq_client_destroy (acq_client_t **self_p)
 
         halcs_client_destroy (&self->halcs_client);
 
+        free (self->acq_block);
         free (self);
         *self_p = NULL;
     }
@@ -474,7 +484,7 @@ static halcs_client_err_e _acq_get_data_block (acq_client_t *self, char *service
     write_val[0] = acq_trans->req.chan;
     write_val[1] = acq_trans->block.idx;
 
-    smio_acq_data_block_t read_val[1];
+    smio_acq_data_block_t *acq_block = self->acq_block;
 
     /* Sent Message is:
      * frame 0: operation code
@@ -483,7 +493,7 @@ static halcs_client_err_e _acq_get_data_block (acq_client_t *self, char *service
 
     const disp_op_t* func = halcs_func_translate(ACQ_NAME_GET_DATA_BLOCK);
     err = halcs_func_exec(self->halcs_client, func, service, write_val,
-            (uint32_t *) read_val);
+            (uint32_t *) acq_block);
 
     /* Message is:
      * frame 0: error code
@@ -496,11 +506,11 @@ static halcs_client_err_e _acq_get_data_block (acq_client_t *self, char *service
             err_get_data_block, HALCS_CLIENT_ERR_SERVER);
 
     /* Data size effectively returned */
-    uint32_t read_size = (acq_trans->block.data_size < read_val->valid_bytes) ?
-        acq_trans->block.data_size : read_val->valid_bytes;
+    uint32_t read_size = (acq_trans->block.data_size < acq_block->valid_bytes) ?
+        acq_trans->block.data_size : acq_block->valid_bytes;
 
     /* Copy message contents to user */
-    memcpy (acq_trans->block.data, read_val->data, read_size);
+    memcpy (acq_trans->block.data, acq_block->data, read_size);
 
     /* Inform user about the number of bytes effectively copied */
     acq_trans->block.bytes_read = read_size;

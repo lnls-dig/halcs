@@ -30,6 +30,14 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_server:zmq]",     \
             msg_err_str (err_type))
 
+typedef ssize_t (*llio_read_function_fp) (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*llio_write_function_fp) (llio_t *self, uint64_t offs, size_t size, uint32_t *data);
+
+static int _thsafe_zmq_server_read_block_generic (void *owner, void *args, void *ret, 
+        llio_read_function_fp llio_read_func);
+static int _thsafe_zmq_server_write_block_generic (void *owner, void *args, void *ret,
+        llio_write_function_fp llio_write_func);
+
 /**** Open device ****/
 static int _thsafe_zmq_server_open (void *owner, void *args, void *ret)
 {
@@ -302,6 +310,100 @@ disp_op_t thsafe_zmq_server_write_64_exp = {
 /**** Read data block from device function pointer, size in bytes ****/
 static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
 {
+    return _thsafe_zmq_server_read_block_generic (owner, args, ret,
+        llio_read_block);
+}
+
+disp_op_t thsafe_zmq_server_read_block_exp = {
+    .name = THSAFE_NAME_READ_BLOCK,
+    .opcode = THSAFE_OPCODE_READ_BLOCK,
+    .func_fp = _thsafe_zmq_server_read_block,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
+        DISP_ARG_END
+    }
+};
+
+/**** Write data block from device function pointer, size in bytes ****/
+static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
+{
+    return _thsafe_zmq_server_write_block_generic (owner, args, ret,
+        llio_write_block);
+}
+
+disp_op_t thsafe_zmq_server_write_block_exp = {
+    .name = THSAFE_NAME_WRITE_BLOCK,
+    .opcode = THSAFE_OPCODE_WRITE_BLOCK,
+    .func_fp = _thsafe_zmq_server_write_block,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
+        DISP_ARG_END
+    }
+};
+
+/**** Read data block via DMA from device, size in bytes ****/
+static int _thsafe_zmq_server_read_dma (void *owner, void *args, void *ret)
+{
+    return _thsafe_zmq_server_read_block_generic (owner, args, ret,
+        llio_read_dma);
+}
+
+disp_op_t thsafe_zmq_server_read_dma_exp = {
+    .name = THSAFE_NAME_READ_DMA,
+    .opcode = THSAFE_OPCODE_READ_DMA,
+    .func_fp = _thsafe_zmq_server_read_dma,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
+        DISP_ARG_END
+    }
+};
+
+/**** Write data block via DMA from device, size in bytes ****/
+static int _thsafe_zmq_server_write_dma (void *owner, void *args, void *ret)
+{
+    return _thsafe_zmq_server_write_block_generic (owner, args, ret,
+        llio_write_dma);
+}
+
+disp_op_t thsafe_zmq_server_write_dma_exp = {
+    .name = THSAFE_NAME_WRITE_DMA,
+    .opcode = THSAFE_OPCODE_WRITE_DMA,
+    .func_fp = _thsafe_zmq_server_write_dma,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT, 
+            sizeof(zmq_server_data_block_t) + ZMQ_SERVER_BLOCK_SIZE),
+        DISP_ARG_END
+    }
+};
+
+/**** Read device information function pointer ****/
+/* int thsafe_zmq_server_read_info (void *owner, void *args, void *ret)
+ *{
+ *  UNUSED(owner);
+ *  UNUSED(args);
+ *  UNUSED(ret);
+ *  return NULL;
+ *} */
+
+/*************** Static functions **************/
+static int _thsafe_zmq_server_read_block_generic (void *owner, void *args, void *ret, 
+        llio_read_function_fp llio_read_func)
+{
     assert (owner);
     assert (args);
     DEVIO_OWNER_TYPE *self = DEVIO_EXP_OWNER(owner);
@@ -314,27 +416,14 @@ static int _thsafe_zmq_server_read_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_server:zmq] Offset = %"PRIu64", "
             "size = %zd\n", offset, read_bsize);
     /* Call llio to perform the actual operation */
-    int32_t llio_ret = llio_read_block (llio, offset, read_bsize,
+    int32_t llio_ret = (llio_read_func) (llio, offset, read_bsize,
             (uint32_t *) ret);
 
     return llio_ret;
 }
 
-disp_op_t thsafe_zmq_server_read_block_exp = {
-    .name = THSAFE_NAME_READ_BLOCK,
-    .opcode = THSAFE_OPCODE_READ_BLOCK,
-    .func_fp = _thsafe_zmq_server_read_block,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
-        DISP_ARG_END
-    }
-};
-
-/**** Write data block from device function pointer, size in bytes ****/
-static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
+static int _thsafe_zmq_server_write_block_generic (void *owner, void *args, void *ret,
+        llio_write_function_fp llio_write_func)
 {
     assert (owner);
     assert (args);
@@ -354,7 +443,7 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 
     /* We must accept every block size. So, we just perform the actual LLIO
      * operation */
-    int32_t llio_ret = llio_write_block (llio, offset, data_write_size,
+    int32_t llio_ret = (llio_write_func) (llio, offset, data_write_size,
             data_write);
     *(int32_t *) ret = llio_ret;
 
@@ -364,72 +453,6 @@ static int _thsafe_zmq_server_write_block (void *owner, void *args, void *ret)
 
     return sizeof (int32_t);
 }
-
-disp_op_t thsafe_zmq_server_write_block_exp = {
-    .name = THSAFE_NAME_WRITE_BLOCK,
-    .opcode = THSAFE_OPCODE_WRITE_BLOCK,
-    .func_fp = _thsafe_zmq_server_write_block,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
-        DISP_ARG_END
-    }
-};
-
-/**** Read data block via DMA from device, size in bytes ****/
-static int _thsafe_zmq_server_read_dma (void *owner, void *args, void *ret)
-{
-    UNUSED(owner);
-    UNUSED(args);
-    UNUSED(ret);
-    return -1;
-}
-
-disp_op_t thsafe_zmq_server_read_dma_exp = {
-    .name = THSAFE_NAME_READ_DMA,
-    .opcode = THSAFE_OPCODE_READ_DMA,
-    .func_fp = _thsafe_zmq_server_read_dma,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, size_t),
-        DISP_ARG_END
-    }
-};
-
-/**** Write data block via DMA from device, size in bytes ****/
-static int _thsafe_zmq_server_write_dma (void *owner, void *args, void *ret)
-{
-    UNUSED(owner);
-    UNUSED(args);
-    UNUSED(ret);
-    return -1;
-}
-
-disp_op_t thsafe_zmq_server_write_dma_exp = {
-    .name = THSAFE_NAME_WRITE_DMA,
-    .opcode = THSAFE_OPCODE_WRITE_DMA,
-    .func_fp = _thsafe_zmq_server_write_dma,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT64, uint64_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_VAR, zmq_server_data_block_t),
-        DISP_ARG_END
-    }
-};
-
-/**** Read device information function pointer ****/
-/* int thsafe_zmq_server_read_info (void *owner, void *args, void *ret)
- *{
- *  UNUSED(owner);
- *  UNUSED(args);
- *  UNUSED(ret);
- *  return NULL;
- *} */
 
 /*************** Our constant structure **************/
 

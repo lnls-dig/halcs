@@ -36,6 +36,10 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
         uint32_t size);
 static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, const uint8_t *data,
         uint32_t size);
+static ssize_t _thsafe_zmq_client_read_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+        size_t size, uint32_t *data);
+static ssize_t _thsafe_zmq_client_write_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+        size_t size, const uint32_t *data);
 static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
         uint32_t size, bool accept_empty_data);
 
@@ -87,133 +91,25 @@ ssize_t thsafe_zmq_client_write_64 (smio_t *self, uint64_t offs, const uint64_t 
 /**** Read data block from device function pointer, size in bytes ****/
 ssize_t thsafe_zmq_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    assert (self);
-    ssize_t ret_size = -1;
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_msg_alloc);
-    uint32_t opcode = THSAFE_OPCODE_READ_BLOCK;
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_read_block\n");
-
-    /* Message is:
-     * frame 0: READ_BLOCK opcode
-     * frame 1: offset
-     * frame 2: number of bytes to be read */
-    int zerr = zmsg_addmem (send_msg, &opcode, sizeof (opcode));
-    ASSERT_TEST(zerr == 0, "Could not add READ opcode in message",
-            err_add_opcode);
-    zerr = zmsg_addmem (send_msg, &offs, sizeof (offs));
-    ASSERT_TEST(zerr == 0, "Could not add offset in message",
-            err_add_offset);
-    zerr = zmsg_addmem (send_msg, &size, sizeof (size));
-    ASSERT_TEST(zerr == 0, "Could not add size in message",
-            err_add_size);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
-#ifdef LOCAL_MSG_DBG
-    errhand_log_print_zmq_msg (send_msg);
-#endif
-
-    zerr = zmsg_send (&send_msg, pipe_msg);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
-
-    /* Message is:
-     * frame 0: reply code
-     * frame 1: return code
-     * frame 2: data */
-    ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) data, size, true);
-
-err_send_msg:
-err_add_size:
-err_add_offset:
-err_add_opcode:
-err_get_pipe_msg:
-    zmsg_destroy (&send_msg);
-err_msg_alloc:
-    return ret_size;
+    return _thsafe_zmq_client_read_block_generic (self, THSAFE_OPCODE_READ_BLOCK, offs, size, data);
 }
 
 /**** Write data block from device function pointer, size in bytes ****/
 ssize_t thsafe_zmq_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
-    assert (self);
-    zmsg_t *send_msg = zmsg_new ();
-    ASSERT_ALLOC(send_msg, err_msg_alloc);
-    uint32_t opcode = THSAFE_OPCODE_WRITE_BLOCK;
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_write_block\n");
-
-    /* Message is:
-     * frame 0: WRITE_BLOCK opcode
-     * frame 1: offset
-     * frame 2: data to be written
-     * */
-    int zerr = zmsg_addmem (send_msg, &opcode, sizeof (opcode));
-    ASSERT_TEST(zerr == 0, "Could not add WRITE opcode in message",
-            err_add_opcode);
-    zerr = zmsg_addmem (send_msg, &offs, sizeof (offs));
-    ASSERT_TEST(zerr == 0, "Could not add offset in message",
-            err_add_offset);
-    zerr = zmsg_addmem (send_msg, data, size);
-    ASSERT_TEST(zerr == 0, "Could not add data in message",
-            err_add_data);
-
-    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
-#ifdef LOCAL_MSG_DBG
-    errhand_log_print_zmq_msg (send_msg);
-#endif
-
-    zerr = zmsg_send (&send_msg, pipe_msg);
-    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
-
-    /* Message is:
-     * frame 0: reply code
-     * frame 1: return code
-     * frame 2: data */
-    uint32_t ret_data = 0;
-    ssize_t ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) &ret_data,
-            sizeof (ret_data), false);
-    ASSERT_TEST(ret_size == sizeof (ret_data), "Data size does not match the expected",
-            err_data_size);
-
-    zmsg_destroy (&send_msg);
-    return ret_data;
-
-err_data_size:
-err_send_msg:
-err_add_data:
-err_add_offset:
-err_add_opcode:
-err_get_pipe_msg:
-    zmsg_destroy (&send_msg);
-err_msg_alloc:
-    return -1;
+    return _thsafe_zmq_client_write_block_generic (self, THSAFE_OPCODE_WRITE_BLOCK, offs, size, data);
 }
 
 /**** Read data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    UNUSED(self);
-    UNUSED(offs);
-    UNUSED(size);
-    UNUSED(data);
-    return -1;
+    return _thsafe_zmq_client_read_block_generic (self, THSAFE_OPCODE_READ_DMA, offs, size, data);
 }
 
 /**** Write data block via DMA from device, size in bytes ****/
 ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
 {
-    UNUSED(self);
-    UNUSED(offs);
-    UNUSED(size);
-    UNUSED(data);
-    return -1;
+    return _thsafe_zmq_client_write_block_generic (self, THSAFE_OPCODE_WRITE_DMA, offs, size, data);
 }
 
 /**** Read device information function pointer ****/
@@ -412,6 +308,116 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, co
     zerr = zmsg_send (&send_msg, pipe_msg);
     ASSERT_TEST(zerr == 0, "Could not send message",
             err_send_msg);
+
+    /* Message is:
+     * frame 0: reply code
+     * frame 1: return code
+     * frame 2: data */
+    uint32_t ret_data = 0;
+    ssize_t ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) &ret_data,
+            sizeof (ret_data), false);
+    ASSERT_TEST(ret_size == sizeof (ret_data), "Data size does not match the expected",
+            err_data_size);
+
+    zmsg_destroy (&send_msg);
+    return ret_data;
+
+err_data_size:
+err_send_msg:
+err_add_data:
+err_add_offset:
+err_add_opcode:
+err_get_pipe_msg:
+    zmsg_destroy (&send_msg);
+err_msg_alloc:
+    return -1;
+}
+
+static ssize_t _thsafe_zmq_client_read_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+        size_t size, uint32_t *data)
+{
+    assert (self);
+    ssize_t ret_size = -1;
+    zmsg_t *send_msg = zmsg_new ();
+    ASSERT_ALLOC(send_msg, err_msg_alloc);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_read_block\n");
+
+    /* Message is:
+     * frame 0: READ_BLOCK opcode
+     * frame 1: offset
+     * frame 2: number of bytes to be read */
+    int zerr = zmsg_addmem (send_msg, &opcode, sizeof (opcode));
+    ASSERT_TEST(zerr == 0, "Could not add READ opcode in message",
+            err_add_opcode);
+    zerr = zmsg_addmem (send_msg, &offs, sizeof (offs));
+    ASSERT_TEST(zerr == 0, "Could not add offset in message",
+            err_add_offset);
+    zerr = zmsg_addmem (send_msg, &size, sizeof (size));
+    ASSERT_TEST(zerr == 0, "Could not add size in message",
+            err_add_size);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
+#ifdef LOCAL_MSG_DBG
+    errhand_log_print_zmq_msg (send_msg);
+#endif
+
+    zerr = zmsg_send (&send_msg, pipe_msg);
+    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
+
+    /* Message is:
+     * frame 0: reply code
+     * frame 1: return code
+     * frame 2: data */
+    ret_size = _thsafe_zmq_client_recv_rw (self, (uint8_t *) data, size, true);
+
+err_send_msg:
+err_add_size:
+err_add_offset:
+err_add_opcode:
+err_get_pipe_msg:
+    zmsg_destroy (&send_msg);
+err_msg_alloc:
+    return ret_size;
+}
+
+static ssize_t _thsafe_zmq_client_write_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+        size_t size, const uint32_t *data)
+{
+    assert (self);
+    zmsg_t *send_msg = zmsg_new ();
+    ASSERT_ALLOC(send_msg, err_msg_alloc);
+    zsock_t *pipe_msg = smio_get_pipe_msg (self);
+    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
+            err_get_pipe_msg);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_write_block\n");
+
+    /* Message is:
+     * frame 0: WRITE_BLOCK opcode
+     * frame 1: offset
+     * frame 2: data to be written
+     * */
+    int zerr = zmsg_addmem (send_msg, &opcode, sizeof (opcode));
+    ASSERT_TEST(zerr == 0, "Could not add WRITE opcode in message",
+            err_add_opcode);
+    zerr = zmsg_addmem (send_msg, &offs, sizeof (offs));
+    ASSERT_TEST(zerr == 0, "Could not add offset in message",
+            err_add_offset);
+    zerr = zmsg_addmem (send_msg, data, size);
+    ASSERT_TEST(zerr == 0, "Could not add data in message",
+            err_add_data);
+
+    DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Sending message:\n");
+#ifdef LOCAL_MSG_DBG
+    errhand_log_print_zmq_msg (send_msg);
+#endif
+
+    zerr = zmsg_send (&send_msg, pipe_msg);
+    ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
      * frame 0: reply code

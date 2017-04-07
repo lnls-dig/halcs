@@ -45,6 +45,8 @@
 #define PCIE_TIMEOUT_PATT_INIT                  0xFF
 /* Number of timeout pattern bytes in a row to detect a timeout */
 #define PCIE_TIMEOUT_PATT_SIZE                  32
+/* Number of kernel memory bytes to alloc on initialization */
+#define PCIE_DMA_KERNEL_BUFF_SIZE               (1 * (1 << 20)) /* in bytes */
 
 /* Device endpoint */
 typedef struct {
@@ -55,7 +57,15 @@ typedef struct {
     uint32_t bar2_size;                 /* PCIe BAR2 size */
     uint64_t *bar4;                     /* PCIe BAR4 */
     uint32_t bar4_size;                 /* PCIe BAR4 size */
+
+    /* DMA */
+    pd_kmem_t *kmem_handle;             /* Kernel memory handler */
 } llio_dev_pcie_t;
+
+typedef enum {
+    PCIE_DMA_US = 0,
+    PCIE_DMA_DS
+} pcie_dev_dma_type_e;
 
 static uint32_t pcie_timeout_patt [PCIE_TIMEOUT_PATT_SIZE];
 
@@ -66,8 +76,19 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
         uint32_t *data, uint32_t size, int rw);
 static ssize_t _pcie_rw_block (llio_t *self, uint64_t offs, size_t size,
         uint32_t *data, int rw);
-static ssize_t _pcie_timeout_reset (llio_t *self);
-static ssize_t _pcie_reset_fpga (llio_t *self);
+static uint64_t _pcie_dma_base_addr (llio_t *self, pcie_dev_dma_type_e dma_type);
+static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
+    uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type, bool block);
+static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type);
+static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint64_t device_addr, size_t size, int bar_no, uint64_t next_bda);
+static int _pcie_wait_dma (llio_t *self, pcie_dev_dma_type_e dma_type, bool block);
+static int _pcie_get_dma_status_reg (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint32_t *status);
+static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type);
+static int _pcie_check_dma_busy (llio_t *self, pcie_dev_dma_type_e dma_type);
+static int _pcie_timeout_reset (llio_t *self);
+static int _pcie_reset_fpga (llio_t *self);
 
 /************ Our methods implementation **********/
 
@@ -79,6 +100,8 @@ static llio_dev_pcie_t * llio_dev_pcie_new (const char *dev_entry)
 
     self->dev = (pd_device_t *) zmalloc (sizeof *self->dev);
     ASSERT_ALLOC (self->dev, err_dev_pcie_alloc);
+    self->kmem_handle = (pd_kmem_t *) zmalloc (sizeof *self->kmem_handle);
+    ASSERT_ALLOC (self->kmem_handle, err_kmem_handle);
 
     /* FIXME: hardcoded dev number */
     /* TODO: should we use llio_endpoint_get to get the endpoint name? */
@@ -112,8 +135,13 @@ static llio_dev_pcie_t * llio_dev_pcie_new (const char *dev_entry)
     memset (&pcie_timeout_patt, PCIE_TIMEOUT_PATT_INIT, sizeof (pcie_timeout_patt));
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_pcie] Created instance of llio_dev_pcie\n");
 
+    /* Initialize Kernel buffers */
+    void *mem = pd_allocKernelMemory(self->dev, PCIE_DMA_KERNEL_BUFF_SIZE, self->kmem_handle);
+    ASSERT_ALLOC(mem, err_kernel_alloc);
+
     return self;
 
+err_kernel_alloc:
 err_bar4_size:
 err_bar2_size:
 err_bar0_size:
@@ -125,6 +153,8 @@ err_bar2_alloc:
 err_bar0_alloc:
     pd_close (self->dev);
 err_dev_pcie_open:
+    free (self->kmem_handle);
+err_kmem_handle:
     free (self->dev);
 err_dev_pcie_alloc:
     free (self);
@@ -138,12 +168,16 @@ static llio_err_e llio_dev_pcie_destroy (llio_dev_pcie_t **self_p)
     if (*self_p) {
         llio_dev_pcie_t *self = *self_p;
 
+        /* Free kernel memory */
+        pd_freeKernelMemory (self->kmem_handle);
+
         /* Unmap all bars first and then destroy the remaining structures */
         pd_unmapBAR (self->dev, BAR4NO, self->bar4);
         pd_unmapBAR (self->dev, BAR2NO, self->bar2);
         pd_unmapBAR (self->dev, BAR0NO, self->bar0);
         pd_close (self->dev);
 
+        free (self->kmem_handle);
         free (self->dev);
         free (self);
 
@@ -290,20 +324,76 @@ static ssize_t pcie_write_block (llio_t *self, uint64_t offs, size_t size, uint3
 /* Read data block from PCIe device, size in bytes */
 static ssize_t pcie_read_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    UNUSED(self);
-    UNUSED(offs);
-    UNUSED(size);
-    UNUSED(data);
+    assert (self);
+    int err = sizeof (*data);
+    size_t size_clipped = size;
+    ASSERT_TEST(llio_get_endpoint_open (self), "Could not perform RW operation. Device is not opened",
+            err_endp_open, -1);
+
+    /* Maximum DMA block size */
+    if (size > PCIE_DMA_KERNEL_BUFF_SIZE) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[pcie_read_dma] DMA size transaction is too large. "
+                "Clipping it to the maximum of %u bytes\n", PCIE_DMA_KERNEL_BUFF_SIZE);
+        size_clipped = PCIE_DMA_KERNEL_BUFF_SIZE;
+    }
+
+    llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
+            err_dev_pcie_handler, -1);
+
+    /* Determine which bar to operate on */
+    int bar_no = PCIE_ADDR_BAR (offs);
+    uint64_t full_offs = PCIE_ADDR_GEN (offs);
+
+    err = _pcie_configure_dma (self, full_offs, 0, size_clipped, bar_no, PCIE_DMA_US, true);
+    ASSERT_TEST(err == 0, "Could not configure DMA", err_configure_dma, -1);
+
+    /* Copy kernel memory to user buffer */
+    memcpy (data, dev_pcie->kmem_handle->mem, size_clipped);
+    err = size_clipped;
+    return err;
+
+err_configure_dma:
+err_dev_pcie_handler:
+err_endp_open:
     return -1;
 }
 
 /* Write data block from PCIe device, size in bytes */
 static ssize_t pcie_write_dma (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    UNUSED(self);
-    UNUSED(offs);
-    UNUSED(size);
-    UNUSED(data);
+    assert (self);
+    int err = sizeof (*data);
+    size_t size_clipped = size;
+    ASSERT_TEST(llio_get_endpoint_open (self), "Could not perform RW operation. Device is not opened",
+            err_endp_open, -1);
+
+    /* Maximum DMA block size */
+    if (size > PCIE_DMA_KERNEL_BUFF_SIZE) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[pcie_read_dma] DMA size transaction is too large. "
+                "Clipping it to the maximum of %u bytes\n", PCIE_DMA_KERNEL_BUFF_SIZE);
+        size_clipped = PCIE_DMA_KERNEL_BUFF_SIZE;
+    }
+
+    llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
+            err_dev_pcie_handler, -1);
+
+    /* Determine which bar to operate on */
+    int bar_no = PCIE_ADDR_BAR (offs);
+    uint64_t full_offs = PCIE_ADDR_GEN (offs);
+
+    /* Copy user buffer to kernel memory */
+    memcpy (dev_pcie->kmem_handle->mem, data, size_clipped);
+
+    err = _pcie_configure_dma (self, full_offs, 0, size_clipped, bar_no, PCIE_DMA_DS, true);
+    ASSERT_TEST(err == 0, "Could not configure DMA", err_configure_dma, -1);
+    err = size_clipped;
+    return err;
+
+err_configure_dma:
+err_dev_pcie_handler:
+err_endp_open:
     return -1;
 }
 
@@ -632,24 +722,229 @@ err_endp_open:
     return err;
 }
 
-static ssize_t _pcie_timeout_reset (llio_t *self)
+static uint64_t _pcie_dma_base_addr (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    UNUSED(self);
+
+    uint64_t dma_base_addr = 0;
+    switch (dma_type) {
+        case PCIE_DMA_US:
+            dma_base_addr = PCIE_CFG_REG_DMA_US_BASE;
+        break;
+
+        case PCIE_DMA_DS:
+            dma_base_addr = PCIE_CFG_REG_DMA_DS_BASE;
+        break;
+
+        default:
+            dma_base_addr = PCIE_CFG_REG_DMA_US_BASE;
+    }
+
+    return dma_base_addr;
+}
+
+
+static int _pcie_configure_dma (llio_t *self, uint64_t device_addr,
+    uint64_t next_bda, size_t size, int bar_no, pcie_dev_dma_type_e dma_type, bool block)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_configure_dma] Configuring DMA\n");
+
+    /* Before starting a new DMA transaction we need to check if
+     * it's not busy */
+    int err = _pcie_check_dma_busy (self, dma_type);
+    ASSERT_TEST(err == 0, "DMA is busy. Aborting DMA transaction",
+            err_busy_dma);
+
+    err = _pcie_reset_dma (self, dma_type);
+    ASSERT_TEST(err == 0, "Could not reset DMA", err_reset_dma);
+
+    err = _pcie_set_dma (self, dma_type, device_addr, size, bar_no, next_bda);
+    ASSERT_TEST(err == 0, "Could not set DMA", err_set_dma);
+
+    err = _pcie_wait_dma (self, dma_type, block);
+    ASSERT_TEST(err == 0, "Could not wait DMA", err_wait_dma);
+
+err_wait_dma:
+err_set_dma:
+err_reset_dma:
+err_busy_dma:
+    return err;
+}
+
+static int _pcie_reset_dma (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_reset_dma] Reseting DMA engine\n");
+
+    uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
+    uint64_t offs = dma_base_addr + PCIE_CFG_REG_DMA_CTRL;
+    /* We must write the reset pattern + the valid bit */
+    uint32_t data = PCIE_CFG_DMA_CTRL_VALID_SHIFT | PCIE_CFG_TX_CTRL_CHANNEL_RST;
+    return (_pcie_rw_32 (self, offs, &data, WRITE_TO_BAR) == sizeof (uint32_t) ? 0 : 1);
+}
+
+static int _pcie_set_dma (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint64_t device_addr, size_t size, int bar_no, uint64_t next_bda)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_reset_dma] Setting DMA engine\n");
+
+    int err = 0;
+    llio_dev_pcie_t *dev_pcie = llio_get_dev_handler (self);
+    ASSERT_TEST(dev_pcie != NULL, "Could not get PCIe handler",
+            err_dev_pcie_handler, -1);
+    uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
+
+    uint32_t data = PCIE_CFG_DMA_PAH_R(device_addr);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_PAH, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+    data = PCIE_CFG_DMA_PAL_R(device_addr);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_PAL, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+
+    data = PCIE_CFG_DMA_HAH_R(dev_pcie->kmem_handle->pa);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_HAH, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+    data = PCIE_CFG_DMA_HAL_R(dev_pcie->kmem_handle->pa);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_HAL, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+
+    data = PCIE_CFG_DMA_BDAH_R(next_bda);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_BDAH, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+    data = PCIE_CFG_DMA_BDAL_R(next_bda);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_BDAL, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+
+    data = PCIE_CFG_DMA_LENG_R(size);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_LENG, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+
+    /* Write Control register at the end, as it starts the DMA */
+    data = PCIE_CFG_DMA_CTRL_VALID | PCIE_CFG_DMA_CTRL_LAST | \
+            PCIE_CFG_DMA_CTRL_AINC | PCIE_CFG_DMA_CTRL_BAR_W(bar_no);
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_CTRL, &data, WRITE_TO_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+
+    ASSERT_TEST(err == 0, "Could not set DMA registers", err_set_dma_regs);
+    return err;
+
+err_set_dma_regs:
+err_dev_pcie_handler:
+    return err;
+}
+
+static int _pcie_get_dma_status_reg (llio_t *self, pcie_dev_dma_type_e dma_type,
+        uint32_t *status)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_get_dma_status_reg] Getting DMA status register\n");
+
+    uint64_t dma_base_addr = BAR0_ADDR | _pcie_dma_base_addr (self, dma_type);
+    int err = 0;
+
+    uint32_t data = 0;
+    err |= _pcie_rw_32 (self, dma_base_addr + PCIE_CFG_REG_DMA_STA, &data, READ_FROM_BAR)
+            == sizeof (uint32_t) ? 0 : 1;
+    ASSERT_TEST(err == 0, "Could not read DMA status register", err_read_dma_reg,
+            -1);
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_get_dma_status_reg] DMA status = 0x%08X\n", data);
+
+    *status = data;
+    return err;
+
+err_read_dma_reg:
+    return err;
+}
+
+static int _pcie_check_dma_completion (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_completion] Getting DMA completion status\n");
+
+    uint32_t status = 0;
+    int err = _pcie_get_dma_status_reg (self, dma_type, &status);
+    ASSERT_TEST(err == 0, "Could not check DMA completion bit", err_read_dma_reg,
+            -1);
+
+    /* Check for status done bit */
+    if (status & PCIE_CFG_DMA_STA_DONE) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_check_dma_completion] DMA engine done\n");
+        return 0;
+    }
+
+    /* Check for timeout bit */
+    if (status & PCIE_CFG_DMA_STA_TIMEOUT) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_check_dma_completion] DMA engine timeout\n");
+        return -1;
+    }
+
+err_read_dma_reg:
+    return err;
+}
+
+static int _pcie_check_dma_busy (llio_t *self, pcie_dev_dma_type_e dma_type)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_busy] Getting DMA busy status\n");
+
+    uint32_t status = 0;
+    int err = _pcie_get_dma_status_reg (self, dma_type, &status);
+    ASSERT_TEST(err == 0, "Could not check DMA busy bit", err_read_dma_reg,
+            -1);
+
+    /* Check for status done bit */
+    if (status & PCIE_CFG_DMA_STA_BUSY) {
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                "[ll_io_pcie:_pcie_check_dma_busy] DMA engine busy\n");
+        return -1;
+    }
+
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_check_dma_busy] DMA engine not busy\n");
+    return 0;
+
+err_read_dma_reg:
+    return err;
+}
+
+static int _pcie_wait_dma (llio_t *self, pcie_dev_dma_type_e dma_type, bool block)
+{
+    DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+            "[ll_io_pcie:_pcie_wait_dma] Waiting for DMA engine\n");
+    int err = 0;
+    /*FIXME. Should we insert a maximum number of wait tries? */
+    /* FIXME 2: For now, we must check the DONE and BUSY bits.
+     * The DONE bit is always 1, so maybe we need to check
+     * FPGA reset signal */
+    while ((err = (_pcie_check_dma_completion (self, dma_type) ||
+                   _pcie_check_dma_busy (self, dma_type))) && block);
+
+    return err;
+}
+
+static int _pcie_timeout_reset (llio_t *self)
 {
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "[ll_io_pcie:_pcie_timeout_reset] Reseting timeout\n");
 
     uint64_t offs = BAR0_ADDR | PCIE_CFG_REG_TX_CTRL;
     uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
-    return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
+    return (_pcie_rw_32 (self, offs, &data, WRITE_TO_BAR) == sizeof (uint32_t) ? 0 : 1);
 }
 
-static ssize_t _pcie_reset_fpga (llio_t *self)
+static int _pcie_reset_fpga (llio_t *self)
 {
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
             "[ll_io_pcie:_pcie_reset_fpga] Reseting FPGA\n");
 
     uint64_t offs = BAR0_ADDR | PCIE_CFG_REG_EB_STACON;
     uint32_t data = PCIE_CFG_TX_CTRL_CHANNEL_RST;
-    return _pcie_rw_32 (self, offs, &data, WRITE_TO_BAR);
+    return (_pcie_rw_32 (self, offs, &data, WRITE_TO_BAR) ==  sizeof (uint32_t) ? 0 : 1);
 }
 
 const llio_ops_t llio_ops_pcie = {
