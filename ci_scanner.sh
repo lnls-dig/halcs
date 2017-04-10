@@ -4,7 +4,7 @@
 set -x
 
 if [ -z "$GRADLE" ]; then
-    sonnar-scanner
+    sonar-scanner
 else
     ./gradlew sonarqube
 fi
