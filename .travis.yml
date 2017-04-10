@@ -38,7 +38,7 @@ before_install:
 #   Build and check this project
 script:
 - ./ci_build.sh
-- sonar-scanner
+- ./ci_scanner.sh
 
 cache:
   directories:
