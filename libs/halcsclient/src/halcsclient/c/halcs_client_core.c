@@ -948,6 +948,13 @@ PARAM_FUNC_CLIENT_WRITE_READ(temp_adc, chan, temp)
             chan, temp);
 }
 
+/* ISLA216P calibration status */
+PARAM_FUNC_CLIENT_WRITE_READ(cal_status_adc, chan, cal_status)
+{
+    return param_client_write_read (self, service, FMC250M_4CH_OPCODE_CAL_STATUS,
+            chan, cal_status);
+}
+
 /****************** FMC250M Delay Value Functions ****************/
 
 /* ADC delay value 0 */

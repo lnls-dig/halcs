@@ -560,6 +560,10 @@ halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *temp);
 
+/* get ISLA216P calibration status */
+halcs_client_err_e halcs_get_cal_status_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *cal_status);
+
 /********************** FMCPICO1M_4CH Functions ********************/
 
 /* FMC board LEDs Control */
