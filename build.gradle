@@ -1,9 +1,41 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.3"
+    }
+}
+
 allprojects {
     apply plugin: 'c'
     apply plugin: 'br.lnls.dig.gradle.assemblevarianttask'
     apply plugin: 'br.lnls.dig.gradle.compilerflags'
     apply plugin: br.lnls.dig.gradle.currentplatform.CurrentPlatformPlugin
     apply plugin: 'br.lnls.dig.gradle.sanec'
+
+    /* We only want to apply the sonarqube plugin if we are running standalone (vs as a subproject) */
+    if (rootProject == project) {
+        apply plugin: 'org.sonarqube'
+    }
+
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "br.com.lnls.dig.halcs"
+            property "sonar.projectName", "HALCS Hardware Abstraction Layer for Control Systems"
+            property "sonar.projectVersion", "v0.5"
+
+            property "sonar.links.homepage", "https://github.com/lnls-dig/halcs"
+            property "sonar.links.ci", "https://travis-ci.org/lnls-dig/halcs"
+            property "sonar.links.scm", "https://github.com/lnls-dig/halcs"
+            property "sonar.links.issue", "https://github.com/lnls-dig/halcs/issues"
+
+            property "sonar.cfamily.build-wrapper-output", "bw-output"
+            property "sonar.cfamily.gcov.reportsPath", "."
+        }
+    }
 
     model {
         buildTypes {
