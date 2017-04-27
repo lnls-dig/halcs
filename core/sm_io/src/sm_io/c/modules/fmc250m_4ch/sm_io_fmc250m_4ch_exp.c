@@ -723,10 +723,10 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
 static smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg);
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e fmc250m_4ch_attach (smio_t *self, devio_t *parent)
+smio_err_e fmc250m_4ch_attach (smio_t *self, void *args)
 {
     UNUSED(self);
-    UNUSED(parent);
+    UNUSED(args);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 

@@ -44,7 +44,6 @@ struct _smio_t {
     char *service;                      /* Exported service name */
     /* int verbose; */                  /* Print activity to stdout */
     mlm_client_t *worker;               /* zeroMQ Malamute client (worker) */
-    devio_t *parent;                    /* Pointer back to parent dev_io */
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
@@ -185,7 +184,6 @@ smio_err_e smio_destroy (smio_t **self_p)
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
-        self->parent = NULL;
         free (self->service);
         free (self->name);
 
@@ -455,13 +453,12 @@ const disp_table_ops_t smio_disp_table_ops = {
 /************************************************************/
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e smio_attach (smio_t *self, devio_t *parent)
+smio_err_e smio_attach (smio_t *self, void *args)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-    self->parent = parent;
 
-    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, args);
     ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error",
         err_func);
 
@@ -474,7 +471,6 @@ smio_err_e smio_deattach (smio_t *self)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-    self->parent = NULL;
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
     ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error",

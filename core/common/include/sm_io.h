@@ -42,7 +42,7 @@ extern "C" {
     SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, smio_mod_handler, self, ## __VA_ARGS__)
 
 /* Attach an instance of sm_io to dev_io function pointer */
-typedef smio_err_e (*attach_fp)(smio_t *self, devio_t *parent);
+typedef smio_err_e (*attach_fp)(smio_t *self, void *args);
 /* Deattach an instance of sm_io to dev_io function pointer */
 typedef smio_err_e (*deattach_fp)(smio_t *self);
 /* Export (register) sm_io to handle operations function pointer */
@@ -107,7 +107,7 @@ typedef struct {
 
 /* Thread boot args structure */
 typedef struct {
-    struct _devio_t *parent;                                    /* Pointer back to devo parent */
+    void *args;                                                 /* Generic arguments for SMIO */
     volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
     zsock_t *pipe_msg;                                          /* Message PIPE to actor */
     char *broker;                                               /* Endpoint to connect to broker */
@@ -182,7 +182,7 @@ zsock_t *smio_get_pipe_mgmt (smio_t *self);
 /************************************************************/
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e smio_attach (smio_t *self, struct _devio_t *parent);
+smio_err_e smio_attach (smio_t *self, void *args);
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e smio_deattach (smio_t *self);
 /* Export (Register) sm_io to handle specific operations */
