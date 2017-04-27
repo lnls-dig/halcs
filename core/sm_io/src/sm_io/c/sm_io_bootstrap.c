@@ -65,7 +65,7 @@ void smio_startup (zsock_t *pipe, void *args)
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Atach this SMIO instance to its parent */
-    smio_err_e err = smio_attach (self, th_args->parent);
+    smio_err_e err = smio_attach (self, th_args->args);
     ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
 
     /* Call SMIO init function to finish initializing its internal strucutres */

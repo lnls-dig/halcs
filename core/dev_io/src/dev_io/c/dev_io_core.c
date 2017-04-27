@@ -945,6 +945,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
      * to clear this structure after using it! */
     th_boot_args_t *th_args = zmalloc (sizeof *th_args);
     ASSERT_ALLOC (th_args, err_th_args_alloc);
+    th_args->args = NULL;
     th_args->smio_handler = smio_mod_handler;
     th_args->pipe_msg = pipe_msg_backend;
     th_args->broker = self->endpoint_broker;
