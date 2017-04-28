@@ -903,8 +903,13 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Search for the SMIO */
     smio_mod_handler = _devio_search_sm_by_id (self, smio_id);
-    ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO",
-            err_search_smio);
+    if (smio_mod_handler == NULL) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:register_sm] Could not find specified SMIO with id = %u\n",
+                smio_id);
+        err = DEVIO_ERR_ALLOC;
+        goto err_search_smio;
+    }
 
     /* Found! Call bootstrap code and insert in
      * hash table */
