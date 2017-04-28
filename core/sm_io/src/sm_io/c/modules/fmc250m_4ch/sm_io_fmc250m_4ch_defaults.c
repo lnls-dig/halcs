@@ -72,6 +72,13 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_FMC250M_4CH_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
+    uint32_t i = 0;
+    for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
+        client_err = halcs_set_rst_modes_adc (config_client, service, i, FMC250M_4CH_PINCTRL_RST_MODE_ADC);
+        ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set ADCs to PIN Control",
+                err_param_set, SMIO_ERR_CONFIG_DFLT);
+    }
+
     client_err = halcs_set_rst_adcs (config_client, service, FMC250M_4CH_DFLT_RST_ADCS);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not reset ADCs",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
@@ -88,7 +95,6 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
      * After resetting the ADCs with halcs_set_rst_adcs (), all of its functions are
      * reset, even SPI mode. So, we need to restore the 4-wire mode with halcs_set_portconfig_adc ()
      */
-    uint32_t i = 0;
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         client_err = halcs_set_rst_modes_adc (config_client, service, i, FMC250M_4CH_DFLT_RST_MODE_ADC);
         client_err |= halcs_set_portconfig_adc (config_client, service, i, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
