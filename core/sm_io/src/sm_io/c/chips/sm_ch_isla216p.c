@@ -279,8 +279,10 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
         }
     }
 
-    ASSERT_TEST((i < SMCH_ISLA216P_WAIT_TRIES), "Could not read valid temperature counter",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
+    if (i >= SMCH_ISLA216P_WAIT_TRIES) {
+        err = SMCH_ERR_RW_SMPR;
+        goto err_smpr_write;
+    }
 
     /* Power-down temperature counter again, as per ISLA216P datahsheet */
     data = ISLA216P_TEMP_CTL_PD;
