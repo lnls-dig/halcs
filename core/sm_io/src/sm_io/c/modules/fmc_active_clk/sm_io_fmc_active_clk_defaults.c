@@ -76,8 +76,7 @@ smio_err_e fmc_active_clk_config_defaults (char *broker_endp, char *service,
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     client_err = halcs_ad9510_cfg_defaults (config_client, service, 0);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS ||
-            client_err == HALCS_CLIENT_ERR_AGAIN, "Could not configure AD9510",
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not configure AD9510",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
     /* After everything is complete. Send message telling FMC250 to initialize */
