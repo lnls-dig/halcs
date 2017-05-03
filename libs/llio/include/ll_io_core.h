@@ -14,6 +14,8 @@ extern "C" {
 
 /* Open device function pointer */
 typedef int (*open_fp)(llio_t *self, llio_endpoint_t *endpoint);
+/* Reset device function pointer */
+typedef int (*reset_fp)(llio_t *self);
 /* Release device function pointer */
 typedef int (*release_fp)(llio_t *self, llio_endpoint_t *endpoint);
 /* Read data from device function pointers */
@@ -40,6 +42,7 @@ typedef struct {
 
     /* Operations */
     open_fp open;                   /* Open device */
+    reset_fp reset;                 /* Reset device */
     release_fp release;             /* Release device */
     read_16_fp read_16;             /* Read 16-bit data */
     read_32_fp read_32;             /* Read 32-bit data */
@@ -98,6 +101,8 @@ uint64_t llio_get_sdb_prefix_addr (llio_t *self);
 
 /* Open device */
 int llio_open (llio_t *self, llio_endpoint_t *endpoint);
+/* Reset device */
+int llio_reset (llio_t *self);
 /* Release device */
 int llio_release (llio_t *self, llio_endpoint_t *endpoint);
 /* Read data from device */

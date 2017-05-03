@@ -265,6 +265,10 @@ static llio_err_e _llio_unregister_ops (const llio_ops_t **ops)
 int llio_open (llio_t *self, llio_endpoint_t *endpoint)
     LLIO_FUNC_WRAPPER (open, endpoint)
 
+/**** Reset device ****/
+int llio_reset (llio_t *self)
+    LLIO_FUNC_WRAPPER (reset)
+
 /**** Release device ****/
 int llio_release (llio_t *self, llio_endpoint_t *endpoint)
     LLIO_FUNC_WRAPPER (release, endpoint)
