@@ -297,6 +297,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     /* Invalid message received. Discard message and continue normally */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
             "received an invalid command\n");
+    free (command);
     zmsg_destroy (&recv_msg);
     return 0;
 }
@@ -369,6 +370,7 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
                 "received an invalid command\n");
     }
 
+    free (command);
     zmsg_destroy (&recv_msg);
     return 0;
 }
