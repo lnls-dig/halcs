@@ -36,8 +36,8 @@
             halcs_client_err_str (err_type))
 
 #define HALCSCLIENT_DFLT_LOG_MODE             "w"
-#define HALCSCLIENT_MLM_CONNECT_TIMEOUT       1000        /* in ms */
-#define HALCSCLIENT_DFLT_TIMEOUT              1000        /* in ms */
+#define HALCSCLIENT_MLM_CONNECT_TIMEOUT       5000        /* in ms */
+#define HALCSCLIENT_DFLT_TIMEOUT              5000        /* in ms */
 
 /* Our structure */
 struct _halcs_client_t {
