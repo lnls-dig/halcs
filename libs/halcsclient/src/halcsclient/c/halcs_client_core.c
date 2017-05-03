@@ -132,6 +132,9 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
      * We accept NULL as a parameter, meaning to suppress all messages */
     errhand_log_new (log_file_name, log_mode);
 
+    /* No CZMQ logs by default */
+    zsys_set_logstream (NULL);
+
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBHALCSCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
             (log_file_name == NULL) ? "NULL" : log_file_name);
