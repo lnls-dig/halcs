@@ -126,6 +126,7 @@ static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
+static devio_err_e _devio_reset_llio_raw (devio_t *self);
 
 /* FIXME: Only valid for PCIe devices */
 static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
@@ -771,6 +772,10 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         /* Unregister SMIO */
         _devio_unregister_sm_raw (devio, smio_key);
     }
+    else if (streq (command, "$RESET_LLIO")) {
+        /* Reset LLIO */
+        _devio_reset_llio_raw (devio);
+    }
     else {
         /* Invalid message received. Discard message and continue normally */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
@@ -1177,6 +1182,35 @@ devio_err_e devio_unregister_all_sm (void *pipe)
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_unregister_sm_all:
+    return err;
+}
+
+devio_err_e devio_reset_llio (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$RESET_LLIO");
+    ASSERT_TEST(zerr == 0, "Could not reset LLIO", err_reset_llio,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_reset_llio:
+    return err;
+}
+
+static devio_err_e _devio_reset_llio_raw (devio_t *self)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    llio_err_e lerr = llio_reset (self->llio);
+    if (lerr != LLIO_SUCCESS) {
+        err = DEVIO_ERR_MOD_LLIO;
+        goto err_llio_reset;
+    }
+
+    return err;
+err_llio_reset:
     return err;
 }
 
