@@ -724,12 +724,14 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     uint32_t smio_id;
     uint64_t base;
     uint32_t inst_id;
+    char *smio_key = NULL;
 
     /* This command expects one of the following */
     /* Command: (string) $REGISTER_SMIO
      * Arg1:    (uint32_t) smio_id
      * Arg2:    (uint64_t) base
      * Arg3:    (uint32_t) inst_id
+     * Arg4:    (string)   smio_key
      *
      * Command: (string) $TERM
      *
@@ -738,7 +740,8 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
      * additional pointers are zeroed.
      * */
 
-    int zerr = zsock_recv (reader, "s484", &command, &smio_id, &base, &inst_id);
+    int zerr = zsock_recv (reader, "s484s", &command, &smio_id, &base, &inst_id,
+            &smio_key);
     if (zerr == -1) {
         return 0; /* Malformed message */
     }
@@ -764,11 +767,9 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         /* Unregister all SMIOs */
         _devio_unregister_all_sm_raw (devio);
     }
-    /* FIXME: Will not work, as the second parameter is a string and we expect
-     * something different */
     else if (streq (command, "$UNREGISTER_SMIO")) {
         /* Unregister SMIO */
-        _devio_unregister_sm_raw (devio, NULL);
+        _devio_unregister_sm_raw (devio, smio_key);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -777,6 +778,7 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     }
 
     free (command);
+    free (smio_key);
     return 0;
 }
 
@@ -1142,7 +1144,8 @@ devio_err_e devio_unregister_sm (void *pipe, const char *smio_key)
     assert (pipe);
     devio_err_e err = DEVIO_SUCCESS;
 
-    int zerr = zsock_send (pipe, "ss", "$UNREGISTER_SMIO", smio_key);
+    /* The 484 picture is unused for this command. So, we put 0s */
+    int zerr = zsock_send (pipe, "s484s", "$UNREGISTER_SMIO", 0, 0, 0, smio_key);
     ASSERT_TEST(zerr == 0, "Could not unregister SMIOs", err_unregister_sm,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
