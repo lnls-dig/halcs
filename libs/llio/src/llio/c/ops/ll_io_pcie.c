@@ -241,7 +241,7 @@ err_endpoint_set:
 /* Open PCIe device */
 static int pcie_reset (llio_t *self)
 {
-    int err = -1;
+    int err = 0;
     ASSERT_TEST(llio_get_endpoint_open (self), "Could not reset LLIO. Device is not opened",
             err_endp_open, -1);
 
