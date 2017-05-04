@@ -511,6 +511,33 @@ int main (int argc, char *argv[])
         goto err_plat_devio;
     }
 
+    /* FIXME. Currently we have an issue with some SMIOs
+     * initialization.
+     *
+     * If the SMIOs are somewhat dependant, we might need
+     * to reconfigure them again once they are all up and ready.
+     * That's because the default configuration of some of them
+     * (called in smio_config_defaults) might depend on another
+     * SMIO initialization.
+     *
+     * Even worse, in FPGAs, some SMIOs might need an stable clock
+     * to be able to configure themselves, but some projects
+     * employ a dynamic clock configured on-thr-fly by the SMIO.
+     * So, some SMIOs might not even be able to initialize before
+     * this other SMIO configure the FPGA clock.
+     *
+     * Using a more brute-force solution we do the following:
+     *
+     * 1) We reset the endpoint here (not done here as most of 
+     *   our endpoints need to recreate its SMCH instances to be 
+     *   able to communicate and we don't do that on reconfigure,
+     *   only on create)
+     * 2) Tell the SMIOs to reconfigure themselves
+     * */
+
+    /* Reconfigure all SMIOs */
+    devio_reconfigure_all_sm (server);
+
     /*  Accept and print any message back from server */
     while (true) {
         char *message = zstr_recv (server);
@@ -616,8 +643,8 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
     assert (pipe);
-UNUSED(hints);
-UNUSED(dev_id);
+    UNUSED(hints);
+    UNUSED(dev_id);
 
     devio_err_e err = DEVIO_SUCCESS;
 

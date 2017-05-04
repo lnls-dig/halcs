@@ -1125,6 +1125,7 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
                 smio_full_base_addr, 0, true);
     }
 
+#if 0
     /* FIXME. Currently we have an issue with some SMIOs
      * initialization.
      *
@@ -1142,7 +1143,10 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
      *
      * Using a more brute-force solution we do the following:
      *
-     * 1) We reset the endpoint here
+     * 1) We reset the endpoint here (not done here as most of 
+     *   our endpoints need to recreate its SMCH instances to be 
+     *   able to communicate and we don't do that on reconfigure,
+     *   only on create)
      * 2) Tell the SMIOs to reconfigure themselves
      * */
     err = _devio_reset_llio_raw (self);
@@ -1151,11 +1155,14 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
     err = _devio_reconfigure_all_sm_raw (self);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could reconfigure registered SMIOs",
             err_reconfigure_smios);
+#endif
 
     return err;
 
+#if 0
 err_reconfigure_smios:
 err_reset_llio:
+#endif
 err_sdb_not_supp:
     return err;
 }
