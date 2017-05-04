@@ -74,6 +74,9 @@ devio_err_e devio_register_sm_by_id (void *pipe, uint32_t smio_id);
 devio_err_e devio_register_all_sm (void *pipe);
 devio_err_e devio_unregister_sm (void *pipe, const char *smio_key);
 devio_err_e devio_unregister_all_sm (void *pipe);
+/* Reconfigure SMIOs by calling registered callbacks */
+devio_err_e devio_reconfigure_sm (void *pipe, const char *smio_key);
+devio_err_e devio_reconfigure_all_sm (void *pipe);
 /* Reset associated LLIO*/
 devio_err_e devio_reset_llio (void *pipe);
 

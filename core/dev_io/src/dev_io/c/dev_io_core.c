@@ -100,6 +100,7 @@ static char *_devio_gen_smio_key_auto (devio_t *self,
 /* Do the SMIO operation */
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg);
 static devio_err_e _devio_destroy_actor (devio_t *self, zactor_t **actor);
+static devio_err_e _devio_reconfigure_actor (devio_t *self, zactor_t **actor);
 static devio_err_e _devio_destroy_smio (devio_t *self, zhashx_t *smio_h, const char *smio_key);
 static devio_err_e _devio_destroy_smio_all (devio_t *self, zhashx_t *smio_h);
 
@@ -126,6 +127,8 @@ static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
+static devio_err_e _devio_reconfigure_sm_raw (devio_t *self, const char *smio_key);
+static devio_err_e _devio_reconfigure_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reset_llio_raw (devio_t *self);
 
 /* FIXME: Only valid for PCIe devices */
@@ -772,6 +775,14 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         /* Unregister SMIO */
         _devio_unregister_sm_raw (devio, smio_key);
     }
+    else if (streq (command, "$RECONFIGURE_SMIO_ALL")) {
+        /* Reconfigure all SMIOs */
+        _devio_reconfigure_all_sm_raw (devio);
+    }
+    else if (streq (command, "$RECONFIGURE_SMIO")) {
+        /* Reconfigure SMIO */
+        _devio_reconfigure_sm_raw (devio, smio_key);
+    }
     else if (streq (command, "$RESET_LLIO")) {
         /* Reset LLIO */
         _devio_reset_llio_raw (devio);
@@ -1185,6 +1196,75 @@ err_unregister_sm_all:
     return err;
 }
 
+devio_err_e devio_reconfigure_sm (void *pipe, const char *smio_key)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s484s", "$RECONFIGURE_SMIO", 0, 0, 0,
+            smio_key);
+    ASSERT_TEST(zerr == 0, "Could not reconfigure SMIO", err_reconfigure_sm,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_reconfigure_sm:
+    return err;
+}
+
+static devio_err_e _devio_reconfigure_sm_raw (devio_t *self, const char *smio_key)
+{
+    assert (self);
+
+    devio_err_e err = DEVIO_SUCCESS;
+    /* Lookup SMIO reference in hash table */
+    zactor_t **actor = (zactor_t **) zhashx_lookup (self->sm_io_cfg_h, smio_key);
+    ASSERT_TEST (actor != NULL, "Could not find SMIO CFG registered with this ID",
+            err_hash_lookup, DEVIO_ERR_SMIO_DESTROY);
+
+    err = _devio_reconfigure_actor (self, actor);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not send self-destruct message to "
+            "PIPE management", err_send_msg, DEVIO_ERR_SMIO_DESTROY);
+
+err_send_msg:
+err_hash_lookup:
+    return err;
+}
+
+devio_err_e devio_reconfigure_all_sm (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$RECONFIGURE_SMIO_ALL");
+    ASSERT_TEST(zerr == 0, "Could not reconfigure all SMIOs", err_reconfigure_sm_all,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_reconfigure_sm_all:
+    return err;
+}
+
+static devio_err_e _devio_reconfigure_all_sm_raw (devio_t *self)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* Get all hash keys */
+    zlistx_t *hash_keys = zhashx_keys (self->sm_io_cfg_h);
+    ASSERT_ALLOC (hash_keys, err_hash_keys_alloc, DEVIO_ERR_ALLOC);
+    char *hash_item = zlistx_first (hash_keys);
+
+    /* Iterate over all keys removing each of one */
+    for (; hash_item != NULL; hash_item = zlistx_next (hash_keys)) {
+        err = _devio_reconfigure_sm_raw (self, hash_item);
+        ASSERT_TEST (err == DEVIO_SUCCESS, "Could not destroy SMIO "
+                "instance", err_smio_destroy, DEVIO_ERR_SMIO_DESTROY);
+    }
+
+err_smio_destroy:
+    zlistx_destroy (&hash_keys);
+err_hash_keys_alloc:
+    return err;
+}
+
 devio_err_e devio_reset_llio (void *pipe)
 {
     assert (pipe);
@@ -1475,6 +1555,23 @@ static char *_devio_gen_smio_key_auto (devio_t *self,
 
 err_key_alloc:
     return key;
+}
+
+static devio_err_e _devio_reconfigure_actor (devio_t *self, zactor_t **actor)
+{
+    assert (self);
+    assert (actor);
+    assert (*actor);
+
+    devio_err_e err = DEVIO_SUCCESS;
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Reconfiguring actor %p\n", *actor);
+
+    /* Resolve actor into sock_t */
+    zsock_t *sock = zactor_sock (*actor);
+    /* Send message to actor */
+    zstr_sendx (sock, "RECONFIGURE SMIO", NULL);
+
+    return err;
 }
 
 static devio_err_e _devio_do_smio_op (devio_t *self, void *msg)
