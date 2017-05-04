@@ -135,12 +135,12 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
     /* No CZMQ logs by default */
     zsys_set_logstream (NULL);
 
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBHALCSCLIENT"
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] Spawing LIBHALCSCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
             (log_file_name == NULL) ? "NULL" : log_file_name);
 
     /* Print Software info */
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] HALCS Client version %s,"
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] HALCS Client version %s,"
             " Build by: %s, %s\n",
             revision_get_build_version (),
             revision_get_build_user_name (),
