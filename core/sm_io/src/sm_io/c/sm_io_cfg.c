@@ -218,9 +218,6 @@ static int _smio_cfg_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     /* We expect a smio instance as reference */
     smio_cfg_t *smio_cfg = (smio_cfg_t *) args;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
-            "received a message over PIPE\n", smio_cfg->service);
-
     /* Receive message */
     zmsg_t *recv_msg = zmsg_recv (reader);
     if (recv_msg == NULL) {
