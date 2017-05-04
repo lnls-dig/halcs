@@ -1125,6 +1125,37 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
                 smio_full_base_addr, 0, true);
     }
 
+    /* FIXME. Currently we have an issue with some SMIOs
+     * initialization.
+     *
+     * If the SMIOs are somewhat dependant, we might need
+     * to reconfigure them again once they are all up and ready.
+     * That's because the default configuration of some of them
+     * (called in smio_config_defaults) might depend on another
+     * SMIO initialization.
+     *
+     * Even worse, in FPGAs, some SMIOs might need an stable clock
+     * to be able to configure themselves, but some projects
+     * employ a dynamic clock configured on-thr-fly by the SMIO.
+     * So, some SMIOs might not even be able to initialize before
+     * this other SMIO configure the FPGA clock.
+     *
+     * Using a more brute-force solution we do the following:
+     *
+     * 1) We reset the endpoint here
+     * 2) Tell the SMIOs to reconfigure themselves
+     * */
+    err = _devio_reset_llio_raw (self);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not reset LLIO endpoint",
+            err_reset_llio);
+    err = _devio_reconfigure_all_sm_raw (self);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could reconfigure registered SMIOs",
+            err_reconfigure_smios);
+
+    return err;
+
+err_reconfigure_smios:
+err_reset_llio:
 err_sdb_not_supp:
     return err;
 }
