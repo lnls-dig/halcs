@@ -30,7 +30,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io_cfg_defaults]",                          \
             smio_err_str (err_type))
 
-#define SMIO_CFG_DEFAULTS_POLLER_TIMEOUT                100000     /* in msec */
+#define SMIO_CFG_DEFAULTS_POLLER_TIMEOUT                2000       /* in msec */
 #define SMIO_CFG_DEFAULTS_POLLER_NTIMES                 1          /* execute and exit */
 
 /* Main class object that every sm_io_cfg_defaults must implement */
