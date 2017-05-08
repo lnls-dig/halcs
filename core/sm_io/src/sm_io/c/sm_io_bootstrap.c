@@ -44,9 +44,6 @@ void smio_startup (zsock_t *pipe, void *args)
     zsock_t *pipe_msg = th_args->pipe_msg;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
-    /* Signal parent we are ready */
-    zsock_signal (pipe_mgmt, 0);
-
     /* We must export our service as the combination of the
      * devio name (coming from devio parent) and our own name ID
      * followed by an optional parameter coming from priv pointer */
@@ -63,6 +60,15 @@ void smio_startup (zsock_t *pipe, void *args)
 
     smio_t *self = smio_new (th_args, pipe_mgmt, pipe_msg, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
+
+    /* Signal parent we are ready. It's important to signal the parent only
+     * after we have register to the broker, as we must expire a possible
+     * existing client with the same address before the config_defaults
+     * actor send the messages to the old client reference.
+     * However, we can't signal the parent after SMIO init function, as
+     * it probably send messages to DEVIO/LLIO and we won't be able to poll
+     * them if we are waiting here. */
+    zsock_signal (pipe_mgmt, 0);
 
     /* Atach this SMIO instance to its parent */
     smio_err_e err = smio_attach (self, th_args->args);
