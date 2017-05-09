@@ -144,6 +144,15 @@ halcs_client_err_e halcs_get_fmc_clk_sel (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_set_rst_isla216p (halcs_client_t *self, char *service,
         uint32_t rst_isla216p);
 
+/* RST SWAP Functions. Set the SWAP module to reset itself
+ * 0: nothing
+ * 1: reset SWAP module
+ *
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_rst_swap (halcs_client_t *self, char *service,
+        uint32_t rst_swap);
+
 /* ADC LTC2208 Control */
 /* These set of functions read (get) or write (set) some ADC LTC2208
  * functionalities. Check LTC2208 datasheet for details.

@@ -427,6 +427,12 @@ PARAM_FUNC_CLIENT_WRITE(rst_isla216p)
             rst_isla216p);
 }
 
+PARAM_FUNC_CLIENT_WRITE(rst_swap)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_SWAP,
+            rst_swap);
+}
+
 PARAM_FUNC_CLIENT_WRITE(si571_oe)
 {
     return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_OE, si571_oe);
