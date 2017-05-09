@@ -130,6 +130,7 @@ static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reconfigure_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_reconfigure_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reset_llio_raw (devio_t *self);
+static devio_err_e _devio_check_send_cfg_done (devio_t *self);
 
 /* FIXME: Only valid for PCIe devices */
 static int _devio_read_llio_block (struct sdbfs *fs, int offset, void *buf,
@@ -708,6 +709,9 @@ err_poller_config_null_service:
     free (service_id);
     service_id = NULL;
     zmsg_destroy (&recv_msg);
+
+    /* Check if all registered config actors are done */
+    err = _devio_check_send_cfg_done (devio);
 
     /* TODO. Do we really need to exit on error? */
     if (err != 0) {
@@ -1329,6 +1333,27 @@ static devio_err_e _devio_reset_llio_raw (devio_t *self)
 
     return err;
 err_llio_reset:
+    return err;
+}
+
+static devio_err_e _devio_check_send_cfg_done (devio_t *self)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+    int zerr = 0;
+
+    /* When all CFG actors exits send message to PIPE telling this */
+    if (zhashx_size (self->sm_io_cfg_h) == 0) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[dev_io_core:_devio_check_send_cfg_done] "
+                "Sending $SMIO_CFG_DONE over PIPE to DEVIO loop\n");
+        zerr = zstr_sendx (self->pipe, "$SMIO_CFG_DONE", NULL);
+        ASSERT_TEST (zerr == 0, "Could not send $SMIO_CFG_DONE over PIPE",
+                err_send_smio_cfg_done);
+    }
+
+    return err;
+
+err_send_smio_cfg_done:
     return err;
 }
 
