@@ -113,6 +113,63 @@ smio_err_e swap_unexport_ops (smio_t *self)
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
+smio_err_e _swap_do_mgmt_op (void *owner, void *msg)
+{
+    assert (owner);
+    assert (msg);
+
+    smio_err_e err = SMIO_SUCCESS;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    GEN_MSG_ZMQ_TYPE *recv_msg = GEN_MSG_ZMQ(msg);
+    uint32_t my_inst_id = smio_get_inst_id (self);
+
+    /* We expect the following */
+    /*
+     * Arg1:    (uint32_t) smio_id
+     * Arg2:    (uint64_t) base
+     * Arg3:    (uint32_t) inst_id
+     * Arg4:    (uint32_t) dest_smio_id
+     * Arg5:    (uint32_t) dest_inst_id
+     * Arg6:    (string)   message
+     * */
+    STR_MSG_ZMQ_TYPE *smio_id_str = STR_MSG_ZMQ_FIRST_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *base_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *inst_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *dest_smio_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE * dest_inst_id_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+    STR_MSG_ZMQ_TYPE *mgmt_msg_zmq_str = STR_MSG_ZMQ_NEXT_ARG(recv_msg);
+
+    /* Conversions */
+    uint32_t inst_id = strtol(inst_id_str, NULL, 10);
+
+    /* Check if FMC_ACTIVE_CLK SMIO sent this message */
+    if (inst_id == my_inst_id && streq (mgmt_msg_zmq_str, "INIT_OK")) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_FATAL, "[sm_io:_swap_do_mgmt_op] Resetting module\n");
+            SET_PARAM(self, swap, 0x0, BPM_SWAP, CTRL,
+                    SWAP_DIV_F, MULT_BIT_PARAM, SWAP_DFLT_DIV_CLK, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+            SET_PARAM(self, swap, 0x0, BPM_SWAP, CTRL,
+                    MODE, MULT_BIT_PARAM, SWAP_DFLT_SW, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+            SET_PARAM(self, swap, 0x0, BPM_SWAP, DLY,
+                    DESWAP, MULT_BIT_PARAM, SWAP_DFLT_SW_DLY, /* min */, /* max */,
+                    NO_CHK_FUNC, SET_FIELD);
+    }
+    else {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_swap_do_mgmt_op] Unexpected message received\n");
+    }
+
+    /* Clenup strings */
+    STR_MSG_ZMQ_CLENUP_ARG(smio_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(base_str);
+    STR_MSG_ZMQ_CLENUP_ARG(inst_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(dest_smio_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(dest_inst_id_str);
+    STR_MSG_ZMQ_CLENUP_ARG(mgmt_msg_zmq_str);
+
+    return err;
+}
+
 /* Generic wrapper for receiving opcodes and arguments to specific funtions function pointer */
 /* FIXME: Code repetition! _devio_do_smio_op () function does almost the same!!! */
 smio_err_e _swap_do_op (void *owner, void *msg)
@@ -127,12 +184,18 @@ smio_err_e swap_do_op (void *self, void *msg)
     return _swap_do_op (self, msg);
 }
 
+smio_err_e swap_do_mgmt_op (void *self, void *msg)
+{
+    return _swap_do_mgmt_op (self, msg);
+}
+
 const smio_ops_t swap_ops = {
     .attach             = &swap_attach,          /* Attach sm_io instance to dev_io */
     .deattach           = &swap_deattach,        /* Deattach sm_io instance to dev_io */
     .export_ops         = &swap_export_ops,      /* Export sm_io operations to dev_io */
     .unexport_ops       = &swap_unexport_ops,    /* Unexport sm_io operations to dev_io */
-    .do_op              = &swap_do_op            /* Generic wrapper for handling specific operations */
+    .do_op              = &swap_do_op,           /* Generic wrapper for handling specific operations */
+    .do_mgmt_op         = &swap_do_mgmt_op       /* Generic wrapper for handling internal SMIO operations */
 };
 
 /************************************************************/
