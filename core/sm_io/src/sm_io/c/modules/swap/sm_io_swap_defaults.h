@@ -12,14 +12,8 @@
 #define SWAP_DFLT_SW                    1               /* 1 is switching in direct state
                                                             No switching */
 
-#define SWAP_DFLT_SW_DLY                21              /* in ADC counts */
-
-#define _SWAP_DFLT_DIV_CLK              980             /* in ADC counts */
-
-/* This parameter was not supposed to be like this. We need to divide by 2,
- * because the RFFE uses the FPGA switching clock as a trigger to regenerate
- * it internally */
-#define SWAP_DFLT_DIV_CLK               (_SWAP_DFLT_DIV_CLK/2)   /* in ADC counts */
+#define SWAP_DFLT_SW_DLY                30              /* in ADC counts */
+#define SWAP_DFLT_DIV_CLK               980             /* in ADC counts */
 
 /************************** Gain Default Values ******************************/
 
