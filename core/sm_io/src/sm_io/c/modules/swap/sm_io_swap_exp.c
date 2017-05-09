@@ -144,7 +144,7 @@ smio_err_e _swap_do_mgmt_op (void *owner, void *msg)
 
     /* Check if FMC_ACTIVE_CLK SMIO sent this message */
     if (inst_id == my_inst_id && streq (mgmt_msg_zmq_str, "INIT_OK")) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_FATAL, "[sm_io:_swap_do_mgmt_op] Resetting module\n");
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_swap_do_mgmt_op] Resetting module\n");
             SET_PARAM(self, swap, 0x0, BPM_SWAP, CTRL,
                     SWAP_DIV_F, MULT_BIT_PARAM, SWAP_DFLT_DIV_CLK, /* min */, /* max */,
                     NO_CHK_FUNC, SET_FIELD);
