@@ -473,11 +473,8 @@ int main (int argc, char *argv[])
             broker_endp, verbose, devio_log_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 
-    /* We don't need it anymore */
-    free (dev_entry);
-    dev_entry = NULL;
-
-    /* Print SDB devices */
+    /* Print SDB devices. FIXME. This must be called before zactor_new,
+     * as it access LLIO layer unsafely */
     devio_print_info (devio);
 
     /*  Start DEVIO loop */
@@ -496,12 +493,6 @@ int main (int argc, char *argv[])
                 "server\n");
         goto err_server;
     }
-
-    /* TODO: Implement and Send SPAWN messages to spawn SMIOs */
-
-    /* Spawn associated DEVIOs */
-    free (broker_endp);
-    broker_endp = NULL;
 
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
@@ -526,17 +517,45 @@ int main (int argc, char *argv[])
      * So, some SMIOs might not even be able to initialize before
      * this other SMIO configure the FPGA clock.
      *
-     * Using a more brute-force solution we do the following:
+     * Using a more brute-force solution we used to do the following:
      *
      * 1) We reset the endpoint here (not done here as most of 
      *   our endpoints need to recreate its SMCH instances to be 
      *   able to communicate and we don't do that on reconfigure,
      *   only on create)
      * 2) Tell the SMIOs to reconfigure themselves
+     *
+     * But this posed complications as we could reset the endpoint
+     * without re-creating the SMIOs. So, to simplify this we just 
+     * destroy the DEVIO and recreate it.
+     *
      * */
 
-    /* Reconfigure all SMIOs */
-    devio_reconfigure_all_sm (server);
+    /* Wait until all SMIO configuration is executed */
+    while (true) {
+        char *message = zstr_recv (server);
+        if (message == NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Interrupted while waiting for $SMIO_CFG_DONE\n");
+            goto smio_cfg_done_err;
+        }
+
+        if (streq (message, "$SMIO_CFG_DONE")) {
+            free (message);
+            break;
+        }
+        free (message);
+    }
+
+    /* Destroy everything */
+    zactor_destroy (&server);
+    devio_destroy (&devio);
+
+    /* And recreate everything */
+    devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
+            broker_endp, verbose, devio_log_filename);
+    server = zactor_new (devio_loop, devio);
+    _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
+            dev_id);
 
     /*  Accept and print any message back from server */
     while (true) {
@@ -551,6 +570,7 @@ int main (int argc, char *argv[])
         }
     }
 
+smio_cfg_done_err:
 err_plat_devio:
     zactor_destroy (&server);
 err_server:
