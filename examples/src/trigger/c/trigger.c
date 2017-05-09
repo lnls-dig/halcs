@@ -343,6 +343,25 @@ int main (int argc, char *argv [])
                 goto err_halcs_set;
             }
         }
+
+        /* Read all parameters from this channel */
+        uint32_t arg = 0;
+        halcs_get_trigger_rcv_src (halcs_client, service_mux, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_rcv_src: %u\n", arg);
+        halcs_get_trigger_rcv_in_sel (halcs_client, service_mux, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_rcv_in_sel: %u\n", arg);
+        halcs_get_trigger_transm_src (halcs_client, service_mux, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_transm_src: %u\n", arg);
+        halcs_get_trigger_transm_out_sel (halcs_client, service_mux, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_transm_out_sel: %u\n", arg);
+        halcs_get_trigger_rcv_len (halcs_client, service_iface, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_rcv_len: %u\n", arg);
+        halcs_get_trigger_transm_len (halcs_client, service_iface, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_transm_len: %u\n", arg);
+        halcs_get_trigger_dir (halcs_client, service_iface, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_dir: %u\n", arg);
+        halcs_get_trigger_dir_pol (halcs_client, service_iface, chan, &arg);
+        fprintf (stderr, "[client:trigger]: halcs_get_trigger_dir_pol: %u\n", arg);
     }
 
 err_halcs_set:
