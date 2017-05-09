@@ -349,6 +349,35 @@ err_send_mgmt_msg:
     return err;
 }
 
+static int _fmc_active_clk_rst_swap (void *owner, void *args, void *ret)
+{
+    UNUSED(ret);
+    assert (owner);
+    assert (args);
+    int err = -FMC_ACTIVE_CLK_OK;
+    smio_err_e serr = SMIO_SUCCESS;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    uint32_t inst_id = smio_get_inst_id (self);
+
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    UNUSED(rw);
+
+    uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc_active_clk] "
+            "Calling _fmc_active_clk_rst_swap\n");
+
+    /* Tell FMC250M_4CH that we have initialized */
+    if (value == 0x1) {
+        serr = smio_send_mgmt_msg (self, 0x12897592, inst_id, "INIT_OK");
+        ASSERT_TEST(serr == SMIO_SUCCESS, "Could not send MGMT message to SWAP", err_send_mgmt_msg,
+               -FMC_ACTIVE_CLK_ERR);
+    }
+
+err_send_mgmt_msg:
+    return err;
+}
+
 /* Macros to avoid repetition of the function body AD9510 */
 typedef smch_err_e (*smch_ad9510_func_fp2) (smch_ad9510_t *self, uint32_t *addr,
         uint32_t *param);
@@ -471,6 +500,7 @@ const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(freq),
     FMC_ACTIVE_CLK_SI571_FUNC_NAME(get_defaults),
     _fmc_active_clk_rst_isla216p,
+    _fmc_active_clk_rst_swap,
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(data),
     NULL
 };
