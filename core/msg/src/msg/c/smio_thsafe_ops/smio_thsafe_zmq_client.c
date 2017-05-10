@@ -30,6 +30,8 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_client:zmq]",     \
             msg_err_str (err_type))
 
+#define SMIO_THSAFE_MSG_POLLER_TIMEOUT          1000 /* ms */
+
 static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self);
 int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode);
 static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uint8_t *data,
@@ -448,11 +450,19 @@ static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_zmq_client_recv_confirmation\n");
 
     assert (self);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
+    zpoller_t *poller = smio_get_poller (self);
+    ASSERT_TEST(poller != NULL, "Could not get SMIO Poller",
+            err_get_poller);
+
     /* Wait for response */
-    zmsg_t *recv_msg = zmsg_recv (pipe_msg);
+    void *sock = zpoller_wait (poller, SMIO_THSAFE_MSG_POLLER_TIMEOUT);
+    ASSERT_TEST(sock != NULL, "Could not wait on SMIO poller. Interrupted or expired",
+            err_poller_wait);
+
+    /* With activiy on socker, just receive the message */
+    zmsg_t *recv_msg = zmsg_recv (sock);
+    ASSERT_TEST(recv_msg != NULL, "Could not receive PIPE message. Interrupted",
+            err_get_recv_msg);
     /* Do not pop the message, just set a cursor to it */
     zframe_t *reply_frame = zmsg_first (recv_msg);
 
@@ -486,7 +496,9 @@ err_reply_code_not_ok:
 err_null_raw_data:
 err_recv_data:
     zmsg_destroy (&recv_msg);
-err_get_pipe_msg:
+err_get_recv_msg:
+err_poller_wait:
+err_get_poller:
     return NULL;
 }
 
