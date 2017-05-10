@@ -53,6 +53,7 @@ struct _smio_t {
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
+    zpoller_t *poller;                  /* Poller for internal DEVIO <-> SMIO sockets */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -128,6 +129,10 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
      * interrupting the loop to check for rebuilds */
     _smio_engine_handle_socket (self, self->pipe_backend, _smio_handle_pipe_backend);
 
+    /* Set-up poller for internal DEVIO <-> SMIO sockets */
+    self->poller = zpoller_new (self->pipe_msg, NULL);
+    ASSERT_TEST(self->poller != NULL, "Could not create zpoller", err_poller_alloc);
+
     /* Initialize SMIO base address */
     self->base = args->base;
 
@@ -146,6 +151,8 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
+    zpoller_destroy (&self->poller);
+err_poller_alloc:
     zloop_timer_end (self->loop, self->timer_id);
 err_timer_alloc:
     zloop_destroy (&self->loop);
@@ -171,6 +178,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
+        zpoller_destroy (&self->poller);
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
@@ -662,6 +670,12 @@ const smio_thsafe_client_ops_t *smio_get_thsafe_client_ops (smio_t *self)
 {
     assert (self);
     return self->thsafe_client_ops;
+}
+
+zpoller_t *smio_get_poller (smio_t *self)
+{
+    assert (self);
+    return self->poller;
 }
 
 /**************** Static Functions ***************/

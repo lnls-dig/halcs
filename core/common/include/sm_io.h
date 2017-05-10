@@ -176,6 +176,8 @@ mlm_client_t *smio_get_worker (smio_t *self);
 zsock_t *smio_get_pipe_msg (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
+/* Get poller */
+zpoller_t *smio_get_poller (smio_t *self);
 
 /************************************************************/
 /**************** Smio OPS generic methods API **************/
