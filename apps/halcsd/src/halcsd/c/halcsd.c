@@ -546,17 +546,6 @@ int main (int argc, char *argv[])
         free (message);
     }
 
-    /* Destroy everything */
-    zactor_destroy (&server);
-    devio_destroy (&devio);
-
-    /* And recreate everything */
-    devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
-            broker_endp, verbose, devio_log_filename);
-    server = zactor_new (devio_loop, devio);
-    _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
-            dev_id);
-
     /*  Accept and print any message back from server */
     while (true) {
         char *message = zstr_recv (server);
