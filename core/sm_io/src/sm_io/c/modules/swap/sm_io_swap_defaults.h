@@ -9,7 +9,7 @@
 #define _SWAP_DEFAULTS_H_
 
 /******************** Switching Clock Default Values **************************/
-#define SWAP_DFLT_SW                    1               /* 1 is switching in direct state
+#define SWAP_DFLT_SW                    3               /* 1 is switching in direct state
                                                             No switching */
 
 #define SWAP_DFLT_SW_DLY                30              /* in ADC counts */
