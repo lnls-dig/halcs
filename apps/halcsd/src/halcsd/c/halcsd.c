@@ -546,6 +546,10 @@ int main (int argc, char *argv[])
         free (message);
     }
 
+    /* Now that everything is ready spawn INIT SMIO so clients can 
+     * be sure HALCS is ready to go */
+    devio_register_sm (server, 0xdc64e778, 0, 0);
+
     /*  Accept and print any message back from server */
     while (true) {
         char *message = zstr_recv (server);
