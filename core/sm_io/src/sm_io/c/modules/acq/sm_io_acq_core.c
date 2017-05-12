@@ -78,6 +78,11 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
                 ACQ_CORE_CHAN_DESC_OFFSET, i, MULT_BIT_PARAM, atom_width,
                 NO_FMT_FUNC);
 
+        ASSERT_TEST(int_ch_width > 0, "Invalid int_ch_width property", err_int_ch_width);
+        ASSERT_TEST(num_coalesce > 0, "Invalid num_coalesce property", err_num_coalesce);
+        ASSERT_TEST(num_atoms > 0, "Invalid num_atoms property", err_num_atoms);
+        ASSERT_TEST(atom_width > 0, "Invalid atom_width property", err_atom_width);
+
         /* These are exported to clients so they know how to split the array */
         UNUSED(num_atoms);
         UNUSED(atom_width);
@@ -131,7 +136,11 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 
     return self;
 
+err_atom_width:
+err_num_atoms:
+err_num_coalesce:
 err_acq_buf_alloc:
+err_int_ch_width:
     free (self);
 err_self_alloc:
     return NULL;
