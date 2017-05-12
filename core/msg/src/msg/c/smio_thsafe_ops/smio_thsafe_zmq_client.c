@@ -30,7 +30,7 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_client:zmq]",     \
             msg_err_str (err_type))
 
-#define SMIO_THSAFE_MSG_POLLER_TIMEOUT          1000 /* ms */
+#define SMIO_THSAFE_MSG_POLLER_TIMEOUT          5000 /* ms */
 
 static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self);
 int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode);
