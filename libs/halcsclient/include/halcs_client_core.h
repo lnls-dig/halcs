@@ -1272,6 +1272,17 @@ halcs_client_err_e afc_timing_set_afc_hs_div (halcs_client_t *self, char *servic
 halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *service,
         uint32_t *afc_hs_div);
 
+/********************** INIT Functions ********************/
+
+/* Init Check function */
+/* This function is used so a client can be sure everything is initialized properly
+ * and a HALCS is ready go. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+
+halcs_client_err_e halcs_get_init_check (halcs_client_t *self, char *service,
+        uint32_t *init_check_out);
+
 #ifdef __cplusplus
 }
 #endif

@@ -2404,3 +2404,11 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_hs_div)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
 }
 
+/**************** INIT SMIO Functions ****************/
+
+/* Init function */
+PARAM_FUNC_CLIENT_READ(init_check)
+{
+    return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
+}
+
