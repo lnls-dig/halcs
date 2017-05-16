@@ -15,11 +15,12 @@ extern "C" {
 /* Somewhat arbitrary maximum block size for read_block funtions */
 #define ZMQ_SERVER_BLOCK_SIZE       (1 * (1 << 20))
 
+/* We want a flexible array member but we can't do it*/
 typedef struct {
-    /* This field is not used */
-    uint32_t valid_bytes_dummy;
-    uint8_t data[];
+    uint8_t data[1];
 } zmq_server_data_block_t;
+
+#define ZMQ_SERVER_DATA_BLOCK_DATA_SIZE 1
 
 /* For use by smio_t general structure */
 extern const disp_op_t *smio_thsafe_zmq_server_ops [];
