@@ -130,7 +130,7 @@ smio_err_e smio_loop (smio_t *self);
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id);
 /* Send MGMT message */
-smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id, 
+smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id,
     uint32_t dest_smio_inst, char *msg);
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
@@ -176,6 +176,8 @@ mlm_client_t *smio_get_worker (smio_t *self);
 zsock_t *smio_get_pipe_msg (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
+/* Get poller */
+zpoller_t *smio_get_poller (smio_t *self);
 
 /************************************************************/
 /**************** Smio OPS generic methods API **************/

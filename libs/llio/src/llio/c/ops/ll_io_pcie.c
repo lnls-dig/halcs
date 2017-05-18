@@ -238,6 +238,24 @@ err_endpoint_set:
     return err;
 }
 
+/* Open PCIe device */
+static int pcie_reset (llio_t *self)
+{
+    int err = 0;
+    ASSERT_TEST(llio_get_endpoint_open (self), "Could not reset LLIO. Device is not opened",
+            err_endp_open, -1);
+
+    /* Reset FPGA */
+    _pcie_reset_fpga (self);
+    /* Reset PCIe Timeout */
+    _pcie_timeout_reset (self);
+
+    return err;
+
+err_endp_open:
+    return err;
+}
+
 /* Release PCIe device */
 static int pcie_release (llio_t *self, llio_endpoint_t *endpoint)
 {
@@ -950,6 +968,7 @@ static int _pcie_reset_fpga (llio_t *self)
 const llio_ops_t llio_ops_pcie = {
     .name           = "PCIE",           /* Operations name */
     .open           = pcie_open,        /* Open device */
+    .reset          = pcie_reset,       /* Reset device */
     .release        = pcie_release,     /* Release device */
     .read_16        = NULL,             /* Read 16-bit data */
     .read_32        = pcie_read_32,     /* Read 32-bit data */

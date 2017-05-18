@@ -826,6 +826,11 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
                 smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
                 smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_DFLT_RST_MODE_ADC);
                 smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+                usleep (1000);
+                smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_RESET_ADC);
+                usleep (1000);
+                smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+                usleep (1000);
 
                 /* Check if we can read ADC temperature code. If the code is 0x7FF it means the ADC
                  * was not reset properly. Most likely due to ADC input clock not present */

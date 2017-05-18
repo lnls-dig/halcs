@@ -132,12 +132,15 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
      * We accept NULL as a parameter, meaning to suppress all messages */
     errhand_log_new (log_file_name, log_mode);
 
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBHALCSCLIENT"
+    /* No CZMQ logs by default */
+    zsys_set_logstream (NULL);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] Spawing LIBHALCSCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
             (log_file_name == NULL) ? "NULL" : log_file_name);
 
     /* Print Software info */
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] HALCS Client version %s,"
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] HALCS Client version %s,"
             " Build by: %s, %s\n",
             revision_get_build_version (),
             revision_get_build_user_name (),
@@ -422,6 +425,12 @@ PARAM_FUNC_CLIENT_WRITE(rst_isla216p)
 {
     return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P,
             rst_isla216p);
+}
+
+PARAM_FUNC_CLIENT_WRITE(rst_swap)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_SWAP,
+            rst_swap);
 }
 
 PARAM_FUNC_CLIENT_WRITE(si571_oe)
@@ -2393,5 +2402,13 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_hs_div)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_hs_div)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
+}
+
+/**************** INIT SMIO Functions ****************/
+
+/* Init function */
+PARAM_FUNC_CLIENT_READ(init_check)
+{
+    return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
 }
 

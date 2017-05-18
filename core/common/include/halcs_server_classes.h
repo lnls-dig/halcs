@@ -106,6 +106,8 @@ typedef struct _smio_mod_dispatch_t smio_mod_dispatch_t;
 typedef enum _smio_err_e smio_err_e;
 /* Opaque smio_t structure */
 typedef struct _smio_t smio_t;
+/* Opaque smio_cfg_t structure */
+typedef struct _smio_cfg_t smio_cfg_t;
 
 /* Forward msg_err_e declaration enumeration */
 typedef enum _msg_err_e msg_err_e;
@@ -166,6 +168,7 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "sm_io_bootstrap.h"
 #include "sm_io_mod_dispatch.h"
 #include "sm_io.h"
+#include "sm_io_cfg.h"
 
 /* MSG */
 #include "msg_macros.h"

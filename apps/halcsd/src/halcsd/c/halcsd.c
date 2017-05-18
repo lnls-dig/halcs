@@ -473,11 +473,8 @@ int main (int argc, char *argv[])
             broker_endp, verbose, devio_log_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 
-    /* We don't need it anymore */
-    free (dev_entry);
-    dev_entry = NULL;
-
-    /* Print SDB devices */
+    /* Print SDB devices. FIXME. This must be called before zactor_new,
+     * as it access LLIO layer unsafely */
     devio_print_info (devio);
 
     /*  Start DEVIO loop */
@@ -497,12 +494,6 @@ int main (int argc, char *argv[])
         goto err_server;
     }
 
-    /* TODO: Implement and Send SPAWN messages to spawn SMIOs */
-
-    /* Spawn associated DEVIOs */
-    free (broker_endp);
-    broker_endp = NULL;
-
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
             dev_id);
@@ -510,6 +501,54 @@ int main (int argc, char *argv[])
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] _spawn_platform_smios error!\n");
         goto err_plat_devio;
     }
+
+    /* FIXME. Currently we have an issue with some SMIOs
+     * initialization.
+     *
+     * If the SMIOs are somewhat dependant, we might need
+     * to reconfigure them again once they are all up and ready.
+     * That's because the default configuration of some of them
+     * (called in smio_config_defaults) might depend on another
+     * SMIO initialization.
+     *
+     * Even worse, in FPGAs, some SMIOs might need an stable clock
+     * to be able to configure themselves, but some projects
+     * employ a dynamic clock configured on-thr-fly by the SMIO.
+     * So, some SMIOs might not even be able to initialize before
+     * this other SMIO configure the FPGA clock.
+     *
+     * Using a more brute-force solution we used to do the following:
+     *
+     * 1) We reset the endpoint here (not done here as most of 
+     *   our endpoints need to recreate its SMCH instances to be 
+     *   able to communicate and we don't do that on reconfigure,
+     *   only on create)
+     * 2) Tell the SMIOs to reconfigure themselves
+     *
+     * But this posed complications as we could reset the endpoint
+     * without re-creating the SMIOs. So, to simplify this we just 
+     * destroy the DEVIO and recreate it.
+     *
+     * */
+
+    /* Wait until all SMIO configuration is executed */
+    while (true) {
+        char *message = zstr_recv (server);
+        if (message == NULL) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Interrupted while waiting for $SMIO_CFG_DONE\n");
+            goto smio_cfg_done_err;
+        }
+
+        if (streq (message, "$SMIO_CFG_DONE")) {
+            free (message);
+            break;
+        }
+        free (message);
+    }
+
+    /* Now that everything is ready spawn INIT SMIO so clients can 
+     * be sure HALCS is ready to go */
+    devio_register_sm (server, 0xdc64e778, 0, 0);
 
     /*  Accept and print any message back from server */
     while (true) {
@@ -524,6 +563,7 @@ int main (int argc, char *argv[])
         }
     }
 
+smio_cfg_done_err:
 err_plat_devio:
     zactor_destroy (&server);
 err_server:
@@ -616,8 +656,8 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
 {
     assert (pipe);
-UNUSED(hints);
-UNUSED(dev_id);
+    UNUSED(hints);
+    UNUSED(dev_id);
 
     devio_err_e err = DEVIO_SUCCESS;
 

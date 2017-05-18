@@ -98,6 +98,10 @@ smio_err_e fmc250m_4ch_config_defaults (char *broker_endp, char *service,
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         client_err = halcs_set_rst_modes_adc (config_client, service, i, FMC250M_4CH_DFLT_RST_MODE_ADC);
         client_err |= halcs_set_portconfig_adc (config_client, service, i, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+        usleep (1000);
+        client_err |= halcs_set_portconfig_adc (config_client, service, i, FMC250M_4CH_DFLT_RESET_ADC);
+        usleep (1000);
+        client_err |= halcs_set_portconfig_adc (config_client, service, i, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
         ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set ADCs to default parameters",
                 err_param_set, SMIO_ERR_CONFIG_DFLT);
     }
