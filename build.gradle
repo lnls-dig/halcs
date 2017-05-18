@@ -32,6 +32,8 @@ allprojects {
             property "sonar.links.scm", "https://github.com/lnls-dig/halcs"
             property "sonar.links.issue", "https://github.com/lnls-dig/halcs/issues"
 
+            property "sonar.branch", "devel"
+
             property "sonar.cfamily.build-wrapper-output", "bw-output"
             property "sonar.cfamily.gcov.reportsPath", "."
         }
