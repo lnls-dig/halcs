@@ -5,6 +5,4 @@ set -x
 
 if [ -z "$GRADLE" ]; then
     sonar-scanner
-else
-    ./gradlew sonarqube
 fi
