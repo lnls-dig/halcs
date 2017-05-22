@@ -169,7 +169,7 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
     smch_err_e err = SMCH_SUCCESS;
     double frequency = *freq;
 
-    ASSERT_TEST(frequency > 0, "Invalid frequency (0 Hz)", err_exit);
+    ASSERT_TEST(frequency > 1.0, "Invalid frequency (<= 1 Hz)", err_exit);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
             "frequency to %f Hz\n", frequency);
