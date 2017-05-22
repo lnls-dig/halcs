@@ -2,7 +2,6 @@
 
 language: c
 compiler:
-- clang
 - gcc
 
 sudo: false
@@ -17,8 +16,6 @@ matrix:
   include:
   - compiler: gcc
     env: GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
-  - compiler: clang
-    env: GRADLE="installLibPcieDriver assemble"
 
 addons:
   apt:
