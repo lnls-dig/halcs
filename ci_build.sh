@@ -86,7 +86,7 @@ CONFIG_FLAGS+=("CXXFLAGS=-I${BUILD_PREFIX}/include")
 CONFIG_FLAGS+=("LDFLAGS=-L${BUILD_PREFIX}/lib")
 
 KERNEL_FLAGS=()
-KERNEL_FLAGS+=("INSTALLDIR=${BUILD_PREFIX}/lib/modules/$(shell uname -r)/extra")
+KERNEL_FLAGS+=("INSTALLDIR=${BUILD_PREFIX}/lib/modules/$(uname -r)/extra")
 KERNEL_FLAGS+=("INSTALLHDRDIR=${BUILD_PREFIX}/include/pciDriver/driver")
 
 HALCS_OPTS=()
