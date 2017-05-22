@@ -40,6 +40,7 @@ script:
 - ./ci_scanner.sh
 
 cache:
+  ccache: true
   directories:
     - '$HOME/.sonar/cache'
 
