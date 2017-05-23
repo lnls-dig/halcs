@@ -99,6 +99,7 @@ CONFIG_OPTS=()
 CONFIG_OPTS+=(${CONFIG_FLAGS[@]})
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
+CONFIG_OPTS+=("--with-docs=no")
 
 # CCache CCACHE_PATH setup
 if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
@@ -179,10 +180,25 @@ cd libsodium
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 
+git --no-pager log --oneline -n1o
+
 # Build/Install
-./autogen.sh
-./configure --prefix=$BUILD_PREFIX
-make check
+if [ -e autogen.sh ]; then
+    ./autogen.sh 2> /dev/null
+fi
+if [ -e buildconf ]; then
+    ./buildconf 2> /dev/null
+fi
+if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+    libtoolize --copy --force && \
+        aclocal -I . && \
+        autoheader && \
+        automake --add-missing --copy && \
+        autoconf || \
+        autoreconf -fiv
+fi
+./configure "${CONFIG_OPTS[@]}"
+make -j4
 make install
 cd "${BASE_PWD}"
 
@@ -197,10 +213,25 @@ cd libzmq
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 
+git --no-pager log --oneline -n1o
+
 # Build/Install
-./autogen.sh
+if [ -e autogen.sh ]; then
+    ./autogen.sh 2> /dev/null
+fi
+if [ -e buildconf ]; then
+    ./buildconf 2> /dev/null
+fi
+if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+    libtoolize --copy --force && \
+        aclocal -I . && \
+        autoheader && \
+        automake --add-missing --copy && \
+        autoconf || \
+        autoreconf -fiv
+fi
 ./configure "${CONFIG_OPTS[@]}"
-make check
+make -j4
 make install
 cd "${BASE_PWD}"
 
@@ -215,10 +246,25 @@ cd czmq
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 
+git --no-pager log --oneline -n1o
+
 # Build/Install
-./autogen.sh
+if [ -e autogen.sh ]; then
+    ./autogen.sh 2> /dev/null
+fi
+if [ -e buildconf ]; then
+    ./buildconf 2> /dev/null
+fi
+if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+    libtoolize --copy --force && \
+        aclocal -I . && \
+        autoheader && \
+        automake --add-missing --copy && \
+        autoconf || \
+        autoreconf -fiv
+fi
 ./configure "${CONFIG_OPTS[@]}"
-make check
+make -j4
 make install
 cd "${BASE_PWD}"
 
@@ -233,9 +279,25 @@ cd malamute
 CCACHE_BASEDIR=${PWD}
 export CCACHE_BASEDIR
 
-./autogen.sh
+git --no-pager log --oneline -n1o
+
+# Build/Install
+if [ -e autogen.sh ]; then
+    ./autogen.sh 2> /dev/null
+fi
+if [ -e buildconf ]; then
+    ./buildconf 2> /dev/null
+fi
+if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+    libtoolize --copy --force && \
+        aclocal -I . && \
+        autoheader && \
+        automake --add-missing --copy && \
+        autoconf || \
+        autoreconf -fiv
+fi
 ./configure "${CONFIG_OPTS[@]}"
-make check
+make -j4
 make install
 cd "${BASE_PWD}"
 
