@@ -369,7 +369,7 @@ zmsg_t *param_client_recv_timeout (halcs_client_t *self, char *service)
          * we can expect a message for a service 1, but receive the message
          * for the service 2. One workaround to this is to use a single
          * instance of the library per service */
-        if (mlm_sender != service) {
+        if (!streq (mlm_sender, service)) {
             /* free received message and warn caller */ 
             zmsg_destroy (&msg);
             DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
