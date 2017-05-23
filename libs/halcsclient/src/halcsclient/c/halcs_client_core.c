@@ -227,7 +227,7 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &msg);
 
     /* Receive report */
-    zmsg_t *report = param_client_recv_timeout (self);
+    zmsg_t *report = param_client_recv_timeout (self, service);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
 
     /* Message is:

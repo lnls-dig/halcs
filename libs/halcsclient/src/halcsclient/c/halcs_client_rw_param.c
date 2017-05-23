@@ -85,7 +85,7 @@ halcs_client_err_e param_client_recv_rw (halcs_client_t *self, char *service,
     mlm_client_t *client = halcs_get_mlm_client (self);
     ASSERT_TEST(client != NULL, "Could not get HALCS client handler", err_get_handler,
             HALCS_CLIENT_ERR_SERVER);
-    *report = param_client_recv_timeout (self);
+    *report = param_client_recv_timeout (self, service);
     ASSERT_TEST(*report != NULL, "Could not receive message", err_null_msg,
             HALCS_CLIENT_ERR_SERVER);
 
@@ -117,7 +117,7 @@ halcs_client_err_e param_client_write_gen (halcs_client_t *self, char *service,
     size_t msg_size = zmsg_size (report);
     if (msg_size != MSG_ERR_CODE_SIZE) {
             DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
-                    "param_client_write_gen: msg_size = %u != %u\n", msg_size, MSG_ERR_CODE_SIZE);
+                    "param_client_write_gen: msg_size = %zu != %u\n", msg_size, MSG_ERR_CODE_SIZE);
     }
     ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
 
@@ -227,7 +227,8 @@ halcs_client_err_e param_client_read_gen (halcs_client_t *self, char *service,
     size_t msg_size = zmsg_size (report);
     if (msg_size != MSG_ERR_CODE_SIZE && msg_size != MSG_FULL_SIZE) {
             DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
-                    "param_client_read_gen: msg_size = %u != %u and != %u\n", msg_size, MSG_ERR_CODE_SIZE, MSG_FULL_SIZE);
+                    "param_client_read_gen: msg_size = %zu != %u and != %u\n", 
+                     msg_size, MSG_ERR_CODE_SIZE, MSG_FULL_SIZE);
     }
     ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
             "Unexpected message received", err_msg);
@@ -333,7 +334,7 @@ halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *s
 
 /********************* Utility functions ************************************/
 /* Wait for message to arrive up to timeout msecs */
-zmsg_t *param_client_recv_timeout (halcs_client_t *self)
+zmsg_t *param_client_recv_timeout (halcs_client_t *self, char *service)
 {
     zmsg_t *msg = NULL;
 
@@ -358,7 +359,27 @@ zmsg_t *param_client_recv_timeout (halcs_client_t *self)
 
     /* Check for activity socket */
     if (which == msgpipe) {
-        msg = mlm_client_recv (halcs_get_mlm_client (self));
+        mlm_client_t *mlm_client = halcs_get_mlm_client (self);
+        msg = mlm_client_recv (mlm_client);
+        const char *mlm_sender = mlm_client_sender (mlm_client);
+
+        /* Check if the message is for the service we are expecting.
+         * This can happen, for instance, if the same client is used to
+         * talk to more than 1 service. Depending on the server load,
+         * we can expect a message for a service 1, but receive the message
+         * for the service 2. One workaround to this is to use a single
+         * instance of the library per service */
+        if (mlm_sender != service) {
+            /* free received message and warn caller */ 
+            zmsg_destroy (&msg);
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                    "param_client_recv_timeout: Unexpected sender %s, waiting for %s\n",
+                     mlm_sender, service);
+        }
+    }
+    else {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                "param_client_recv_timeout: poller returned invalid socket to recv ()\n");
     }
 
 err_poller_invalid:
