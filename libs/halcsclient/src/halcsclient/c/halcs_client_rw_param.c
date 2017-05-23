@@ -115,6 +115,10 @@ halcs_client_err_e param_client_write_gen (halcs_client_t *self, char *service,
 
     /* Handling malformed messages */
     size_t msg_size = zmsg_size (report);
+    if (msg_size != MSG_ERR_CODE_SIZE) {
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                    "param_client_write_gen: msg_size = %u != %u\n", msg_size, MSG_ERR_CODE_SIZE);
+    }
     ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE, "Unexpected message received", err_msg);
 
     /* Get message contents */
@@ -221,6 +225,10 @@ halcs_client_err_e param_client_read_gen (halcs_client_t *self, char *service,
 
     /* Handling malformed messages */
     size_t msg_size = zmsg_size (report);
+    if (msg_size != MSG_ERR_CODE_SIZE && msg_size != MSG_FULL_SIZE) {
+            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                    "param_client_read_gen: msg_size = %u != %u and != %u\n", msg_size, MSG_ERR_CODE_SIZE, MSG_FULL_SIZE);
+    }
     ASSERT_TEST(msg_size == MSG_ERR_CODE_SIZE || msg_size == MSG_FULL_SIZE,
             "Unexpected message received", err_msg);
 
