@@ -45,6 +45,9 @@
 #define LLIO_ETH_REGEX_ADDR_HIT             2
 #define LLIO_ETH_REGEX_PORT_HIT             3
 
+#define LLIO_ETH_MAX_RECONNECT_TRIES        -1 /* infinite */
+#define LLIO_ETH_SECS_BEFORE_RECONNECT       2
+
 /* Device endpoint */
 typedef struct {
     llio_eth_type_e type;
@@ -59,9 +62,9 @@ static void *_get_in_addr(struct sockaddr *sa);
 static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
-        size_t size);
+        size_t size, bool auto_reconnect);
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
-        size_t size);
+        size_t size, bool auto_reconnect);
 
 /************ Our methods implementation **********/
 
@@ -260,81 +263,141 @@ err_dev_eth_handler:
 static ssize_t eth_read_16 (llio_t *self, uint64_t offs, uint16_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 /* Write data to Eth device */
 static ssize_t eth_write_16 (llio_t *self, uint64_t offs, const uint16_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 /* Read data block from Eth device, size in bytes */
 static ssize_t eth_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    return _eth_read_generic (self, offs, data, size);
+    return _eth_read_generic (self, offs, data, size, true);
 }
 
 /* Write data block to Eth device, size in bytes */
 ssize_t eth_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    return _eth_write_generic (self, offs, data, size);
+    return _eth_write_generic (self, offs, data, size, true);
 }
 
 /******************************* Static Functions *****************************/
 
 static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
-        size_t size)
+        size_t size, bool auto_reconnect)
 {
     UNUSED(offs);
 
     ssize_t err = 0;
+    size_t retries = (auto_reconnect) ? LLIO_ETH_MAX_RECONNECT_TRIES : 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
 
     err = _eth_recvall (dev_eth->fd, (uint8_t *) data, size);
+    /* If we got an error, try reconnecting and try up to
+     * LLIO_ETH_MAX_RECONNECT_TRIES or forever if retries == -1*/
+    while (err < 0) {
+        if (retries == 0) {
+            break;
+        }
+
+        /* Only decrement if we are in finite waiting mode */
+        if (retries > 0) {
+            retries--;
+        }
+        /* Wait a while before trying again */
+        sleep (LLIO_ETH_SECS_BEFORE_RECONNECT);
+
+        /* cleanup and try again */
+        close (dev_eth->fd);
+        err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
+                dev_eth->hostname, dev_eth->port);
+        /* keep retrying */
+        if (err < 0) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_eth] Error connecting to endpoint during recv (). "
+                    "Retrying in %u seconds\n",
+                    LLIO_ETH_SECS_BEFORE_RECONNECT);
+            continue;
+        }
+
+        err = _eth_recvall (dev_eth->fd, (uint8_t *) data, size);
+    }
 
 err_dev_eth_handler:
     return err;
 }
 
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
-        size_t size)
+        size_t size, bool auto_reconnect)
 {
     UNUSED(offs);
 
     ssize_t err = 0;
+    size_t retries = (auto_reconnect) ? LLIO_ETH_MAX_RECONNECT_TRIES : 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
 
     err = _eth_sendall (dev_eth->fd, (uint8_t *) data, size);
+    /* If we got an error, try reconnecting and try up to
+     * LLIO_ETH_MAX_RECONNECT_TRIES or forever if retries == -1*/
+    while (err < 0) {
+        if (retries == 0) {
+            break;
+        }
+
+        /* Only decrement if we are in finite waiting mode */
+        if (retries > 0) {
+            retries--;
+        }
+        /* Wait a while before trying again */
+        sleep (LLIO_ETH_SECS_BEFORE_RECONNECT);
+
+        /* cleanup and try again */
+        close (dev_eth->fd);
+        err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
+                dev_eth->hostname, dev_eth->port);
+        /* keep retrying */
+        if (err < 0) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_eth] Error connecting to endpoint during send (). "
+                    "Retrying in %u seconds\n",
+                    LLIO_ETH_SECS_BEFORE_RECONNECT);
+            continue;
+        }
+
+        err = _eth_sendall (dev_eth->fd, (uint8_t *) data, size);
+    }
 
 err_dev_eth_handler:
     return err;
