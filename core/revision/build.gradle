@@ -12,6 +12,8 @@ model {
         revision(NativeLibrarySpec) {
             sources {
                 c {
+                    exportedHeaders.srcDir 'include'
+
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:errhand', library: 'errhand'
                     lib project: ':libs:hutils', library: 'hutils'

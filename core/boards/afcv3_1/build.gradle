@@ -4,6 +4,7 @@ model {
             sources {
                 c {
                     lib project: ':core:common', library: 'common'
+                    lib project: ':core:revision', library: 'revision'
                     lib project: ':core:sm_io', library: 'sm_io', linkage: 'api'
                     lib project: ':core:sm_io_table', library: 'sm_io_table'
                     lib project: ':foreign:libbsmp', library: 'bsmp'

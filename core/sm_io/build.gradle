@@ -21,6 +21,7 @@ model {
                     lib project: ':core:boards:afcv3_1', library: 'afcv3_1'
                     lib project: ':core:boards:ml605', library: 'ml605'
                     lib project: ':core:common', library: 'common', linkage: 'api'
+                    lib project: ':core:revision', library: 'revision'
                     lib project: ':core:sm_io_table', library: 'sm_io_table'
                     lib project: ':foreign:libbsmp', library: 'bsmp'
                     lib project: ':foreign:libsdbfs', library: 'sdbfs'

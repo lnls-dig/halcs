@@ -225,6 +225,7 @@ boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
 	       -Icore/common/include \
+	       -Icore/revision/include \
 	       -Icore/sm_io/include \
 	       -Icore/sm_io_table/include \
 	       -Iforeign/libsdbfs/include \
