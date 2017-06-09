@@ -1,3 +1,5 @@
+import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
+
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 
@@ -14,4 +16,9 @@ model {
             }
         }
     }
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'HUTILS_VERSION_'
+    file project.file('include/hutils_classes.h')
 }
