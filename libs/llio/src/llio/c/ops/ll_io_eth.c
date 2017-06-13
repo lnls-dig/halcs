@@ -412,11 +412,11 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN];
-    long arg; 
-    fd_set myset; 
-    struct timeval tv; 
-    int valopt; 
-    socklen_t lon; 
+    long arg;
+    fd_set myset;
+    struct timeval tv;
+    int valopt;
+    socklen_t lon;
     int yes = 1;
 
     /* Ignored for now */
@@ -450,7 +450,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         ASSERT_TEST (rv == 0, "Could not set endpoint options",
                 err_setsockopt, -1);
 
-        /* Set non-blocking connection. Based on 
+        /* Set non-blocking connection. Based on
          * http://developerweb.net/viewtopic.php?id=3196 */
         arg = fcntl (*fd, F_GETFL, NULL);
         ASSERT_TEST (arg >= 0, "Could not get socket FD options",
@@ -463,13 +463,13 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         /* Trying to connect with timeout */
         rv = connect(*fd, p->ai_addr, p->ai_addrlen);
         if (rv < 0) {
-            if (errno != EINPROGRESS) { 
+            if (errno != EINPROGRESS) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error connecting is not EINPROGRESS: %d - %s\n", errno, strerror(errno));
                 close (*fd);
                 *fd = -1;
                 continue;
-            } 
+            }
 
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_eth] EINPROGRESS in connect() - selecting\n");
@@ -479,7 +479,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
             FD_SET (*fd, &myset);
 
             rv = select (*fd+1, NULL, &myset, NULL, &tv);
-            if (rv < 0) { 
+            if (rv < 0) {
                DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                        "[ll_io_eth] Error connecting: %d - %s\n", errno, strerror(errno));
                err = -1;
@@ -493,12 +493,12 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
                goto err_select2;
             }
 
-            /* Check if socket is opened succesfully */ 
-            lon = sizeof(int); 
+            /* Check if socket is opened succesfully */
+            lon = sizeof(int);
             rv = getsockopt (*fd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon);
             ASSERT_TEST (rv >= 0, "Could not get socket options",
                 err_getsockopt, -1);
-            if (valopt) { 
+            if (valopt) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error in delayed connection:%d - %s\n", valopt, strerror(valopt));
                 err = -1;
@@ -585,8 +585,8 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
     size_t total = 0;        /* how many bytes we've recv */
     size_t bytesleft = len; /* how many we have left to recv */
     ssize_t n;
-    fd_set myset; 
-    struct timeval tv; 
+    fd_set myset;
+    struct timeval tv;
     int rv = 0;
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Receiving %zu bytes\n", len);
@@ -598,7 +598,7 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
         FD_SET (fd, &myset);
 
         rv = select (fd+1, &myset, NULL, NULL, &tv);
-        if (rv < 0) { 
+        if (rv < 0) {
            DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                    "[ll_io_eth] Error on recv select (): %d - %s\n", errno, strerror(errno));
            return -1;
