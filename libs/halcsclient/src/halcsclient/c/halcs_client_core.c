@@ -1751,8 +1751,9 @@ halcs_client_err_e halcs_get_afc_diag_build_revision (halcs_client_t *self, char
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1761,8 +1762,9 @@ halcs_client_err_e halcs_get_afc_diag_build_date (halcs_client_t *self, char *se
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1771,8 +1773,9 @@ halcs_client_err_e halcs_get_afc_diag_build_user_name (halcs_client_t *self, cha
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1781,8 +1784,9 @@ halcs_client_err_e halcs_get_afc_diag_build_user_email (halcs_client_t *self, ch
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
