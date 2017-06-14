@@ -5,6 +5,7 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
+#include "revision.h"
 #include "hutils.h"
 
 #define HALCS_VERSION_MAJOR_STR STRINGIFY(HALCS_VERSION_MAJOR)

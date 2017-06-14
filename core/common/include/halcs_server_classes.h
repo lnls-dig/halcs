@@ -33,17 +33,6 @@
 #include "acq_chan_gen_defs.h"
 #include "ddr3_map_structs.h"
 
-/* HALCS version macros for compile-time API detection */
-
-#define HALCS_VERSION_MAJOR 0
-#define HALCS_VERSION_MINOR 5
-#define HALCS_VERSION_PATCH 1
-
-#define HALCS_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define HALCS_VERSION \
-    HALCS_MAKE_VERSION(HALCS_VERSION_MAJOR, HALCS_VERSION_MINOR, HALCS_VERSION_PATCH)
-
 #if defined (__WINDOWS__)
 #   if defined LIBHALCS_STATIC
 #       define HALCS_EXPORT

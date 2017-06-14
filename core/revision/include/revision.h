@@ -6,20 +6,20 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#ifndef _REVISION_
-#define _REVISION_
+#ifndef _REVISION_H_
+#define _REVISION_H_
 
 /* HALCS version macros for compile-time API detection */
 
-#define HALCS_CLIENT_VERSION_MAJOR 0
-#define HALCS_CLIENT_VERSION_MINOR 5
-#define HALCS_CLIENT_VERSION_PATCH 1
+#define HALCS_VERSION_MAJOR 0
+#define HALCS_VERSION_MINOR 5
+#define HALCS_VERSION_PATCH 1
 
-#define HALCS_CLIENT_MAKE_VERSION(major, minor, patch) \
+#define HALCS_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
-#define HALCS_CLIENT_VERSION \
-    HALCS_CLIENT_MAKE_VERSION(HALCS_CLIENT_VERSION_MAJOR, HALCS_CLIENT_VERSION_MINOR, \
-            HALCS_CLIENT_VERSION_PATCH)
+#define HALCS_VERSION \
+    HALCS_MAKE_VERSION(HALCS_VERSION_MAJOR, HALCS_VERSION_MINOR, \
+            HALCS_VERSION_PATCH)
 
 #ifdef __cplusplus
 extern "C" {
