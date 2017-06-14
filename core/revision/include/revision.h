@@ -9,6 +9,8 @@
 #ifndef _REVISION_H_
 #define _REVISION_H_
 
+#include <stddef.h>
+
 /* HALCS version macros for compile-time API detection */
 
 #define HALCS_VERSION_MAJOR 0
