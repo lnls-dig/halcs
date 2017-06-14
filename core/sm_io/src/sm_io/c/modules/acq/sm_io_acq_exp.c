@@ -62,7 +62,7 @@ static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type)
 static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
         uint64_t acq_size_bytes, uint64_t start_mem_space_addr,
         uint64_t end_mem_space_addr);
-static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+static uint64_t _acq_get_read_block_addr_start (uint64_t start_addr, uint64_t offset,
         uint64_t channel_start_addr, uint64_t end_mem_space_addr);
 
 /************************************************************/
@@ -299,10 +299,11 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] "
             "Calling _acq_get_data_block\n");
 
+    int err = -ACQ_OK;
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
     smio_acq_t *acq = smio_get_handler (self);
     ASSERT_TEST(acq != NULL, "Could not get SMIO ACQ handler",
-            err_get_acq_handler);
+            err_get_acq_handler, -ACQ_ERR);
 
     /* Message is:
      * frame 0: channel
@@ -384,17 +385,17 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
         return -ACQ_BLOCK_OOR;
     }   /* Last valid data conditions check done */
 
-    uint32_t reply_size;
+    uint32_t reply_size_full;
     if (block_n == block_n_valid && over_samples > 0){
-        reply_size = over_samples*channel_sample_size;
+        reply_size_full = over_samples*channel_sample_size;
     }
     else { /* if block_n < block_n_valid */
-        reply_size = BLOCK_SIZE;
+        reply_size_full = BLOCK_SIZE;
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "Reading block %u of channel %u with %u valid samples\n",
-            block_n, chan, reply_size);
+            block_n, chan, reply_size_full);
 
     /* For all modes the start valid address is given by:
      * start_addr = trigger_addr -
@@ -421,7 +422,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* Forth step is to calculate the offset from the start_addr, taking care
      * for wraps in the end of the current memory space */
-    uint64_t addr_i = _acq_get_read_block_addr (start_addr, block_n * BLOCK_SIZE,
+    uint64_t addr_i = _acq_get_read_block_addr_start (start_addr, block_n * BLOCK_SIZE,
             channel_start_addr, end_mem_space_addr);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block:\n"
             "\tBlock %u of channel %u:\n"
@@ -439,33 +440,58 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     smio_acq_data_block_t *data_block = (smio_acq_data_block_t *) ret;
 
-    /* Here we must use the "raw" version, as we can't have
-     * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
-    ssize_t valid_bytes = smio_thsafe_raw_client_read_dma (self, LARGE_MEM_ADDR | addr_i,
-            reply_size, (uint32_t *) data_block->data);
-    /* Try reading block-by-block if DMA fails for some reason */
-    if (valid_bytes < 0) {
-        valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_i,
-                reply_size, (uint32_t *) data_block->data);
+    uint32_t num_bytes_read = 0;
+    ssize_t valid_bytes = 0;
+    uint64_t addr_start = addr_i;
+    uint64_t rem_mem_space = end_mem_space_addr - addr_start;
+    for ( ; 
+            num_bytes_read < reply_size_full; 
+            num_bytes_read += valid_bytes) {
+        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)? 
+                rem_mem_space : reply_size_full-num_bytes_read;
+
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
+                "Reading %u bytes from address 0x%"PRIx64"\n"
+                "\twith remaining memory space 0x%"PRIx64"\n"
+                "\twith end memory space 0x%08X\n", 
+                bytes_to_read, addr_start, 
+                rem_mem_space, 
+                end_mem_space_addr);
+
+        /* Here we must use the "raw" version, as we can't have
+         * LARGE_MEM_ADDR mangled with the bas address of this SMIO */
+        valid_bytes = smio_thsafe_raw_client_read_dma (self, LARGE_MEM_ADDR | addr_start,
+                bytes_to_read, (uint32_t *)((uint8_t *) data_block->data + num_bytes_read));
+        /* Try reading block-by-block if DMA fails for some reason */
+        if (valid_bytes < 0) {
+            valid_bytes = smio_thsafe_raw_client_read_block (self, LARGE_MEM_ADDR | addr_start,
+                    bytes_to_read, (uint32_t *)((uint8_t *) data_block->data + num_bytes_read));
+        }
+
+        ASSERT_TEST(valid_bytes == bytes_to_read, "Could not read data block completely",
+                err_read_data_block, -ACQ_COULD_NOT_READ);
+        addr_start += valid_bytes;
+        if (addr_start >= end_mem_space_addr) {
+            addr_start = channel_start_addr;
+        }
+
+        rem_mem_space = end_mem_space_addr - addr_start;
     }
+
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "%zd bytes read\n", valid_bytes);
+            "%u bytes read\n", num_bytes_read);
 
     /* Check if we could read successfully */
     int retf = 0;
-    if (valid_bytes >= 0) {
-        data_block->valid_bytes = (uint32_t) valid_bytes;
-        retf = valid_bytes + (ssize_t) sizeof (data_block->valid_bytes);
-    }
-    else {
-        data_block->valid_bytes = 0;
-        retf = -ACQ_COULD_NOT_READ;
-    }
+    data_block->valid_bytes = (uint32_t) num_bytes_read;
+    retf = num_bytes_read + (ssize_t) sizeof (data_block->valid_bytes);
 
     return retf;
 
+err_read_data_block:
+    data_block->valid_bytes = 0;
 err_get_acq_handler:
-    return -ACQ_ERR;
+    return err;
 }
 
 static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
@@ -487,7 +513,7 @@ static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
     return addr;
 }
 
-static uint64_t _acq_get_read_block_addr (uint64_t start_addr, uint64_t offset,
+static uint64_t _acq_get_read_block_addr_start (uint64_t start_addr, uint64_t offset,
         uint64_t channel_start_addr, uint64_t end_mem_space_addr)
 {
     uint64_t addr = 0;
