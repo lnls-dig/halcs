@@ -7,6 +7,8 @@ plugins {
     id 'org.ajoberstar.release-opinion' version '1.7.1'
 }
 
+apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
+apply plugin: 'br.lnls.dig.gradle.nativerelease'
 apply plugin: com.janitovff.grgit.config.GitConfigPlugin
 
 model {
@@ -40,6 +42,6 @@ release {
 }
 
 task updateVersionMacros(type: UpdateSemVerMacrosTask) {
-    macroPrefix 'HALCS_CLIENT_VERSION_'
+    macroPrefix 'HALCS_VERSION_'
     file project.file('include/revision.h')
 }

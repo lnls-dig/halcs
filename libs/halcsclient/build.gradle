@@ -1,4 +1,5 @@
 import org.ajoberstar.gradle.git.release.opinion.Strategies
+import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 
 plugins {
     id 'org.ajoberstar.grgit' version '1.7.1'
@@ -35,6 +36,11 @@ model {
             }
         }
     }
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'HALCS_CLIENT_VERSION_'
+    file project.file('include/halcs_client_classes.h')
 }
 
 release {
