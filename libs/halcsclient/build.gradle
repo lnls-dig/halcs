@@ -38,15 +38,15 @@ model {
     }
 }
 
-task updateVersionMacros(type: UpdateSemVerMacrosTask) {
-    macroPrefix 'HALCS_CLIENT_VERSION_'
-    file project.file('include/halcs_client_classes.h')
-}
-
 release {
     versionStrategy Strategies.FINAL.copyWith(
         name: 'ci_release',
         stages: ['ci_release'] as SortedSet,
         allowDirtyRepo: true
     )
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'HALCS_CLIENT_VERSION_'
+    file project.file('include/halcs_client_classes.h')
 }
