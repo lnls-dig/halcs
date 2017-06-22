@@ -1,7 +1,5 @@
-plugins {
-    id 'org.ajoberstar.grgit' version '1.7.1'
-    id 'org.ajoberstar.release-opinion' version '1.7.1'
-}
+apply plugin: 'org.ajoberstar.grgit'
+apply plugin: 'org.ajoberstar.release-opinion'
 
 model {
     components {
