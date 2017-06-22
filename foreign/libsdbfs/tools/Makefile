@@ -22,7 +22,7 @@ override CFLAGS += -Wall -ggdb
 override CFLAGS += -I.. -I../include -I../include/linux
 CFLAGS_LNLS = -DERRHAND_DBG=$(ERRHAND_DBG) -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL) \
 	-DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
-LDFLAGS = -L.. -lsdbfs
+override LDFLAGS += -L.. -lsdbfs
 LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
 PROG = gensdbfs sdb-read sdb-read-lnls sdb-extract
