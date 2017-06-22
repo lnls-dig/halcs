@@ -9,6 +9,11 @@ STRIP           = $(CROSS_COMPILE)strip
 OBJCOPY         = $(CROSS_COMPILE)objcopy
 OBJDUMP         = $(CROSS_COMPILE)objdump
 
+CMDSEP = ;
+
+# install prefix
+PREFIX ?= /usr
+
 ERRHAND_DBG ?= y
 ERRHAND_MIN_LEVEL ?= DBG_LVL_ERR
 ERRHAND_SUBSYS_ON ?= "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
@@ -35,5 +40,11 @@ $(PROG): ../libsdbfs.a
 clean:
 	rm -f $(PROG) *.o *~ core
 
+install:
+	$(foreach prog,$(PROG),install -m 755 $(prog) $(PREFIX)/bin/ $(CMDSEP))
+
+uninstall:
+	$(foreach prog,$(PROG),rm -f $(PREFIX)/bin/$(prog) $(CMDSEP))
+
 # add the other unused targets, so the rule in ../Makefile works
-modules install modules_install:
+modules modules_install:
