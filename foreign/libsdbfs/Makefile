@@ -26,8 +26,8 @@ PREFIX ?= /usr
 ENDIAN := $(shell ./check-endian $(CC))
 
 override CFLAGS += -Wall -ggdb -O2
-override CFLAGS += -I../../core/common/include # for <sdb.h>
 override CFLAGS += -Iinclude
+override CFLAGS += -Iinclude/linux # for <sdb.h>
 override CFLAGS += -ffunction-sections -fdata-sections
 override CFLAGS += -Wno-pointer-sign
 override CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
