@@ -231,6 +231,14 @@ int main (int argc, char *argv [])
         fprintf (stdout, "[client:swap]: halcs_set_sw_dly was successfully executed\n");
     }
 
+    uint32_t arg = 0;
+    halcs_get_sw (halcs_client, service_swap, &arg);
+    fprintf (stdout, "[client:swap]: halcs_get_sw: %u\n", arg);
+    halcs_get_div_clk (halcs_client, service_swap, &arg);
+    fprintf (stdout, "[client:swap]: halcs_get_div_clk: %u\n", arg);
+    halcs_get_sw_dly (halcs_client, service_swap, &arg);
+    fprintf (stdout, "[client:swap]: halcs_get_sw_dly: %u\n", arg);
+
 err_halcs_client_new:
 err_halcs_exit:
 err_halcs_get:

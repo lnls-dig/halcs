@@ -1,3 +1,5 @@
+import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
+
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 
@@ -18,4 +20,9 @@ model {
             }
         }
     }
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'LL_IO_VERSION_'
+    file project.file('include/ll_io_classes.h')
 }

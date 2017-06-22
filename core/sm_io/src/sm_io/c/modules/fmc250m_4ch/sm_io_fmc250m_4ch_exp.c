@@ -664,6 +664,19 @@ FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(temp)
             "Could not set/get temperature");
 }
 
+static smch_err_e smch_isla216p_cal_status_compat (smch_isla216p_t *self,
+        uint32_t *cal_status_arg)
+{
+    uint8_t *cal_status_code = (uint8_t *) cal_status_arg;
+    return smch_isla216p_get_cal_status (self, cal_status_code);
+}
+
+FMC250M_4CH_ISLA216P_FUNC_NAME_HEADER(cal_status)
+{
+    FMC250M_4CH_ISLA216P_FUNC_BODY(owner, args, ret, HALCS_FMC250M_4CH_ISLA216P_MAX_CHANNEL,
+            smch_isla216p_cal_status_compat, /* No write function */,
+            "Could not set/get cal_statuserature");
+}
 
 /* Exported function pointers */
 const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
@@ -699,6 +712,7 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
     FMC250M_4CH_ISLA216P_FUNC_NAME(portconfig),
     FMC250M_4CH_ISLA216P_FUNC_NAME(reg),
     FMC250M_4CH_ISLA216P_FUNC_NAME(temp),
+    FMC250M_4CH_ISLA216P_FUNC_NAME(cal_status),
     NULL
 };
 
@@ -709,10 +723,10 @@ const disp_table_func_fp fmc250m_4ch_exp_fp [] = {
 static smio_err_e _fmc250m_4ch_do_op (void *owner, void *msg);
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e fmc250m_4ch_attach (smio_t *self, devio_t *parent)
+smio_err_e fmc250m_4ch_attach (smio_t *self, void *args)
 {
     UNUSED(self);
-    UNUSED(parent);
+    UNUSED(args);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 
@@ -797,7 +811,7 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
                 smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
                 smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_PINCTRL_RST_MODE_ADC);
             }
-    
+
             SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
                     RST_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_RST_ADCS, /* min */, /* max */,
                     NO_CHK_FUNC, SET_FIELD);
@@ -807,12 +821,17 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
             SET_PARAM(self, fmc250m_4ch, 0x0, WB_FMC_250M_4CH_CSR, ADC_CTL,
                     SLEEP_ADCS, SINGLE_BIT_PARAM, FMC250M_4CH_DFLT_SLEEP_ADCS, /* min */, /* max */,
                     NO_CHK_FUNC, SET_FIELD);
-    
+
             for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
                 smch_isla216p_t *smch_isla216p = SMIO_ISLA216P_HANDLER(fmc250m, i);
                 smch_isla216p_set_rst (smch_isla216p, FMC250M_4CH_DFLT_RST_MODE_ADC);
                 smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
-    
+                usleep (1000);
+                smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_RESET_ADC);
+                usleep (1000);
+                smch_isla216p_set_portconfig (smch_isla216p, FMC250M_4CH_DFLT_PORTCONFIG_ADC);
+                usleep (1000);
+
                 /* Check if we can read ADC temperature code. If the code is 0x7FF it means the ADC
                  * was not reset properly. Most likely due to ADC input clock not present */
                 uint16_t temp_code = FMC250M_4CH_ISLA216P_INV_TEMP_CODE;
@@ -835,7 +854,7 @@ smio_err_e _fmc250m_4ch_do_mgmt_op (void *owner, void *msg)
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_fmc250m_4ch_do_mgmt_op] Exceeded maximum ADC reset tryouts. "
                 "Some ADCs might not be reliable. Reset it manually!\n");
             err = SMIO_ERR_CONFIG_DFLT;
-    
+
         }
     }
     else {

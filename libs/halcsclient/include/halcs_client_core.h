@@ -144,6 +144,15 @@ halcs_client_err_e halcs_get_fmc_clk_sel (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_set_rst_isla216p (halcs_client_t *self, char *service,
         uint32_t rst_isla216p);
 
+/* RST SWAP Functions. Set the SWAP module to reset itself
+ * 0: nothing
+ * 1: reset SWAP module
+ *
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_rst_swap (halcs_client_t *self, char *service,
+        uint32_t rst_swap);
+
 /* ADC LTC2208 Control */
 /* These set of functions read (get) or write (set) some ADC LTC2208
  * functionalities. Check LTC2208 datasheet for details.
@@ -559,6 +568,10 @@ halcs_client_err_e halcs_get_reg_adc (halcs_client_t *self, char *service,
 /* get ISLA216P temperature */
 halcs_client_err_e halcs_get_temp_adc (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *temp);
+
+/* get ISLA216P calibration status */
+halcs_client_err_e halcs_get_cal_status_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *cal_status);
 
 /********************** FMCPICO1M_4CH Functions ********************/
 
@@ -1258,6 +1271,17 @@ halcs_client_err_e afc_timing_set_afc_hs_div (halcs_client_t *self, char *servic
         uint32_t afc_hs_div);
 halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *service,
         uint32_t *afc_hs_div);
+
+/********************** INIT Functions ********************/
+
+/* Init Check function */
+/* This function is used so a client can be sure everything is initialized properly
+ * and a HALCS is ready go. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+
+halcs_client_err_e halcs_get_init_check (halcs_client_t *self, char *service,
+        uint32_t *init_check_out);
 
 #ifdef __cplusplus
 }

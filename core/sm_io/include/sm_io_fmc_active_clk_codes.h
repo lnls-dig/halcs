@@ -46,9 +46,11 @@
 #define FMC_ACTIVE_CLK_NAME_SI571_GET_DEFAULTS             "fmc_active_clk_si571_get_defaults"
 #define FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P                 16
 #define FMC_ACTIVE_CLK_NAME_RST_ISLA216P                   "fmc_active_clk_rst_isla216p"
-#define FMC_ACTIVE_CLK_OPCODE_AD9510_DATA                  17
+#define FMC_ACTIVE_CLK_OPCODE_RST_SWAP                     17
+#define FMC_ACTIVE_CLK_NAME_RST_SWAP                       "fmc_active_clk_rst_swap"
+#define FMC_ACTIVE_CLK_OPCODE_AD9510_DATA                  18
 #define FMC_ACTIVE_CLK_NAME_AD9510_DATA                    "fmc130m_4ch_ad9510_data"
-#define FMC_ACTIVE_CLK_OPCODE_END                          18
+#define FMC_ACTIVE_CLK_OPCODE_END                          19
 
 /* Messaging Reply OPCODES */
 #define FMC_ACTIVE_CLK_REPLY_TYPE                          uint32_t

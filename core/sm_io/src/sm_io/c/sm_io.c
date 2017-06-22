@@ -44,7 +44,6 @@ struct _smio_t {
     char *service;                      /* Exported service name */
     /* int verbose; */                  /* Print activity to stdout */
     mlm_client_t *worker;               /* zeroMQ Malamute client (worker) */
-    devio_t *parent;                    /* Pointer back to parent dev_io */
     void *smio_handler;                 /* Generic pointer to a device handler. This
                                             must be cast to a specific type by the
                                             devices functions */
@@ -54,6 +53,7 @@ struct _smio_t {
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
+    zpoller_t *poller;                  /* Poller for internal DEVIO <-> SMIO sockets */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -129,6 +129,10 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
      * interrupting the loop to check for rebuilds */
     _smio_engine_handle_socket (self, self->pipe_backend, _smio_handle_pipe_backend);
 
+    /* Set-up poller for internal DEVIO <-> SMIO sockets */
+    self->poller = zpoller_new (self->pipe_msg, NULL);
+    ASSERT_TEST(self->poller != NULL, "Could not create zpoller", err_poller_alloc);
+
     /* Initialize SMIO base address */
     self->base = args->base;
 
@@ -147,6 +151,8 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
+    zpoller_destroy (&self->poller);
+err_poller_alloc:
     zloop_timer_end (self->loop, self->timer_id);
 err_timer_alloc:
     zloop_destroy (&self->loop);
@@ -172,6 +178,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
+        zpoller_destroy (&self->poller);
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
@@ -185,7 +192,6 @@ smio_err_e smio_destroy (smio_t **self_p)
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
-        self->parent = NULL;
         free (self->service);
         free (self->name);
 
@@ -299,6 +305,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     /* Invalid message received. Discard message and continue normally */
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
             "received an invalid command\n");
+    free (command);
     zmsg_destroy (&recv_msg);
     return 0;
 }
@@ -371,6 +378,7 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
                 "received an invalid command\n");
     }
 
+    free (command);
     zmsg_destroy (&recv_msg);
     return 0;
 }
@@ -455,13 +463,12 @@ const disp_table_ops_t smio_disp_table_ops = {
 /************************************************************/
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e smio_attach (smio_t *self, devio_t *parent)
+smio_err_e smio_attach (smio_t *self, void *args)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-    self->parent = parent;
 
-    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, parent);
+    err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, attach, args);
     ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"attach\" function error",
         err_func);
 
@@ -474,7 +481,6 @@ smio_err_e smio_deattach (smio_t *self)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-    self->parent = NULL;
 
     err = SMIO_FUNC_OPS_NOFAIL_WRAPPER(err, deattach);
     ASSERT_TEST(err == SMIO_SUCCESS, "Registered SMIO \"deattach\" function error",
@@ -664,6 +670,12 @@ const smio_thsafe_client_ops_t *smio_get_thsafe_client_ops (smio_t *self)
 {
     assert (self);
     return self->thsafe_client_ops;
+}
+
+zpoller_t *smio_get_poller (smio_t *self)
+{
+    assert (self);
+    return self->poller;
 }
 
 /**************** Static Functions ***************/

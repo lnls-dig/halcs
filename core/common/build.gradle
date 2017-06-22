@@ -1,3 +1,6 @@
+apply plugin: 'org.ajoberstar.grgit'
+apply plugin: 'org.ajoberstar.release-opinion'
+
 model {
     components {
         common(NativeLibrarySpec) {
@@ -5,6 +8,7 @@ model {
                 c {
                     exportedHeaders.srcDir 'include'
 
+                    lib project: ':core:revision', library: 'revision', linkage: 'api'
                     lib project: ':core:sm_io', library: 'sm_io'
                     lib project: ':libs:llio', library: 'llio'
                     lib project: ':libs:sdbutils', library: 'sdbutils'

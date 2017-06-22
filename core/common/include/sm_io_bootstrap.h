@@ -29,15 +29,6 @@ typedef struct {
     smio_config_defaults_fp config_defaults;
 } smio_bootstrap_ops_t;
 
-/* Config thread args structure */
-typedef struct {
-    volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
-    uint32_t inst_id;                                           /* SMIO instance ID */
-    char *broker;                                               /* Endpoint to connect to broker */
-    char *service;                                              /* Full name of the exported service */
-    char *log_file;                                             /* Thread log file */
-} th_config_args_t;
-
 /************************************************************/
 /************************ Our methods ***********************/
 /************************************************************/

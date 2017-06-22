@@ -36,8 +36,8 @@
             halcs_client_err_str (err_type))
 
 #define HALCSCLIENT_DFLT_LOG_MODE             "w"
-#define HALCSCLIENT_MLM_CONNECT_TIMEOUT       1000        /* in ms */
-#define HALCSCLIENT_DFLT_TIMEOUT              1000        /* in ms */
+#define HALCSCLIENT_MLM_CONNECT_TIMEOUT       5000        /* in ms */
+#define HALCSCLIENT_DFLT_TIMEOUT              5000        /* in ms */
 
 /* Our structure */
 struct _halcs_client_t {
@@ -132,12 +132,15 @@ static halcs_client_t *_halcs_client_new (char *broker_endp, int verbose,
      * We accept NULL as a parameter, meaning to suppress all messages */
     errhand_log_new (log_file_name, log_mode);
 
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] Spawing LIBHALCSCLIENT"
+    /* No CZMQ logs by default */
+    zsys_set_logstream (NULL);
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] Spawing LIBHALCSCLIENT"
             " with broker address %s, with logfile on %s ...\n", broker_endp,
             (log_file_name == NULL) ? "NULL" : log_file_name);
 
     /* Print Software info */
-    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_INFO, "[libclient] HALCS Client version %s,"
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libclient] HALCS Client version %s,"
             " Build by: %s, %s\n",
             revision_get_build_version (),
             revision_get_build_user_name (),
@@ -224,7 +227,7 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
     mlm_client_sendto (self->mlm_client, service, NULL, NULL, 0, &msg);
 
     /* Receive report */
-    zmsg_t *report = param_client_recv_timeout (self);
+    zmsg_t *report = param_client_recv_timeout (self, service);
     ASSERT_TEST(report != NULL, "Report received is NULL", err_msg);
 
     /* Message is:
@@ -422,6 +425,12 @@ PARAM_FUNC_CLIENT_WRITE(rst_isla216p)
 {
     return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_ISLA216P,
             rst_isla216p);
+}
+
+PARAM_FUNC_CLIENT_WRITE(rst_swap)
+{
+    return param_client_write (self, service, FMC_ACTIVE_CLK_OPCODE_RST_SWAP,
+            rst_swap);
 }
 
 PARAM_FUNC_CLIENT_WRITE(si571_oe)
@@ -946,6 +955,13 @@ PARAM_FUNC_CLIENT_WRITE_READ(temp_adc, chan, temp)
 {
     return param_client_write_read (self, service, FMC250M_4CH_OPCODE_TEMP,
             chan, temp);
+}
+
+/* ISLA216P calibration status */
+PARAM_FUNC_CLIENT_WRITE_READ(cal_status_adc, chan, cal_status)
+{
+    return param_client_write_read (self, service, FMC250M_4CH_OPCODE_CAL_STATUS,
+            chan, cal_status);
 }
 
 /****************** FMC250M Delay Value Functions ****************/
@@ -1735,8 +1751,9 @@ halcs_client_err_e halcs_get_afc_diag_build_revision (halcs_client_t *self, char
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_REVISION,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1745,8 +1762,9 @@ halcs_client_err_e halcs_get_afc_diag_build_date (halcs_client_t *self, char *se
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_DATE,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1755,8 +1773,9 @@ halcs_client_err_e halcs_get_afc_diag_build_user_name (halcs_client_t *self, cha
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_NAME,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -1765,8 +1784,9 @@ halcs_client_err_e halcs_get_afc_diag_build_user_email (halcs_client_t *self, ch
         struct _smio_afc_diag_revision_data_t *revision_data)
 {
     uint32_t rw = READ_MODE;
+    uint32_t dummy = 0;
     return param_client_read_gen (self, service, AFC_DIAG_OPCODE_GET_BUILD_USER_EMAIL,
-            rw, revision_data, sizeof (*revision_data), NULL, 0, NULL, 0,
+            rw, &dummy, sizeof (dummy), NULL, 0, NULL, 0,
             revision_data, sizeof (*revision_data));
 }
 
@@ -2386,5 +2406,13 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_hs_div)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_hs_div)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
+}
+
+/**************** INIT SMIO Functions ****************/
+
+/* Init function */
+PARAM_FUNC_CLIENT_READ(init_check)
+{
+    return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
 }
 

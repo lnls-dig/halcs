@@ -1,12 +1,27 @@
 /*
- * Copyright (C) 2015 LNLS (www.lnls.br)
- * Author: Lucas Russo <lucas.russo@lnls.br>
+ * Copyright (C) 2017 LNLS (www.lnls.br)
+ * Authors: Lucas Russo <lucas.russo@lnls.br>
+ *          Janito Vaqueiro Ferreira Filho <janito.filho@gmail.com>
  *
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#ifndef _REVISION_
-#define _REVISION_
+#ifndef _REVISION_H_
+#define _REVISION_H_
+
+#include <stddef.h>
+
+/* HALCS version macros for compile-time API detection */
+
+#define HALCS_VERSION_MAJOR 0
+#define HALCS_VERSION_MINOR 5
+#define HALCS_VERSION_PATCH 1
+
+#define HALCS_MAKE_VERSION(major, minor, patch) \
+    ((major) * 10000 + (minor) * 100 + (patch))
+#define HALCS_VERSION \
+    HALCS_MAKE_VERSION(HALCS_VERSION_MAJOR, HALCS_VERSION_MINOR, \
+            HALCS_VERSION_PATCH)
 
 #ifdef __cplusplus
 extern "C" {

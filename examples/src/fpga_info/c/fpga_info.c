@@ -152,6 +152,13 @@ int main (int argc, char *argv [])
     }
     fprintf (stdout, "[client:afc_diag]: Build user email: %s\n", (char *) rev_data.data);
 
+    err = halcs_get_afc_diag_build_revision (halcs_client, service_afc_diag, &rev_data);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:afc_diag]: halcs_get_afc_diag_build_revision failed\n");
+        goto err_halcs_get;
+    }
+    fprintf (stdout, "[client:afc_diag]: Build revision: %s\n", (char *) rev_data.data);
+
 err_halcs_client_new:
 err_halcs_get:
     halcs_client_destroy (&halcs_client);

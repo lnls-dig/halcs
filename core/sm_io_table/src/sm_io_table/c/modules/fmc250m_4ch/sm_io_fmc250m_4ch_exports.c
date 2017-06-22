@@ -401,6 +401,19 @@ disp_op_t fmc250m_4ch_temp_exp = {
     }
 };
 
+disp_op_t fmc250m_4ch_cal_status_exp = {
+    .name = FMC250M_4CH_NAME_CAL_STATUS,
+    .opcode = FMC250M_4CH_OPCODE_CAL_STATUS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_adc_data0_exp,
@@ -435,6 +448,7 @@ const disp_op_t *fmc250m_4ch_exp_ops [] = {
     &fmc250m_4ch_portconfig_exp,
     &fmc250m_4ch_reg_exp,
     &fmc250m_4ch_temp_exp,
+    &fmc250m_4ch_cal_status_exp,
     NULL
 };
 

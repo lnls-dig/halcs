@@ -143,7 +143,7 @@ halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *s
         uint32_t operation, double param1, double *param_out);
 
 /* Utility functions */
-zmsg_t *param_client_recv_timeout (halcs_client_t *self);
+zmsg_t *param_client_recv_timeout (halcs_client_t *self, char *service);
 
 #ifdef __cplusplus
 }

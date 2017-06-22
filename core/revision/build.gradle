@@ -1,10 +1,11 @@
 import org.ajoberstar.gradle.git.release.opinion.Strategies
 
-plugins {
-    id 'org.ajoberstar.grgit' version '1.6.0'
-    id 'org.ajoberstar.release-opinion' version '1.6.0'
-}
+import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 
+apply plugin: 'org.ajoberstar.grgit'
+apply plugin: 'org.ajoberstar.release-opinion'
+apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
+apply plugin: 'br.lnls.dig.gradle.nativerelease'
 apply plugin: com.janitovff.grgit.config.GitConfigPlugin
 
 model {
@@ -12,6 +13,8 @@ model {
         revision(NativeLibrarySpec) {
             sources {
                 c {
+                    exportedHeaders.srcDir 'include'
+
                     lib project: ':libs:convc', library: 'convc'
                     lib project: ':libs:errhand', library: 'errhand'
                     lib project: ':libs:hutils', library: 'hutils'
@@ -33,4 +36,9 @@ release {
         stages: ['ci_release'] as SortedSet,
         allowDirtyRepo: true
     )
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'HALCS_VERSION_'
+    file project.file('include/revision.h')
 }

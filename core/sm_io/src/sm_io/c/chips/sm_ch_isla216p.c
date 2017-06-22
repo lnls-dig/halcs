@@ -164,6 +164,24 @@ err_smpr_read:
     return err;
 }
 
+smch_err_e smch_isla216p_get_cal_status (smch_isla216p_t *self, uint8_t *cal_status)
+{
+    uint8_t __cal_status = 0;
+    smch_err_e err = SMCH_SUCCESS;
+    ssize_t rw_err = -1;
+
+    rw_err = _smch_isla216p_read_8 (self, ISLA216P_REG_CALSTATUS, &__cal_status);
+    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not read from CAL_STATUS register",
+            err_smpr_read, SMCH_ERR_RW_SMPR);
+
+    SMCH_ISLA216P_WAIT_DFLT;
+
+    *cal_status = __cal_status & ISLA216P_CALCSTATUS_CALCDONE;
+
+err_smpr_read:
+    return err;
+}
+
 smch_err_e smch_isla216p_set_rst (smch_isla216p_t *self, uint8_t rst_operation)
 {
     smch_err_e err = SMCH_SUCCESS;
@@ -222,16 +240,14 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
     ssize_t rw_err = -1;
     uint8_t data = 0;
 
-    /* Reset counter */
-#if 0
-    data = ISLA216P_TEMP_CTL_RESET;
-    rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
-    ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not reset temperature counter",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
-#endif
-
     uint32_t i = 0;
     for (i = 0; i < SMCH_ISLA216P_WAIT_TRIES; ++i) {
+
+        data = ISLA216P_TEMP_CTL_RESET;
+        rw_err = _smch_isla216p_write_8 (self, ISLA216P_REG_TEMP_CTL, &data);
+        ASSERT_TEST(rw_err == sizeof(uint8_t), "Could not reset temperature counter",
+                err_smpr_write, SMCH_ERR_RW_SMPR);
+
         /* As per ISLA216P25 datasheet, page 28 */
         data = (ISLA216P_TEMP_CTL_PTAT_MODE_EN |
                           ISLA216P_TEMP_CTL_ENABLE |
@@ -263,8 +279,10 @@ smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp)
         }
     }
 
-    ASSERT_TEST((i < SMCH_ISLA216P_WAIT_TRIES), "Could not read valid temperature counter",
-            err_smpr_write, SMCH_ERR_RW_SMPR);
+    if (i >= SMCH_ISLA216P_WAIT_TRIES) {
+        err = SMCH_ERR_RW_SMPR;
+        goto err_smpr_write;
+    }
 
     /* Power-down temperature counter again, as per ISLA216P datahsheet */
     data = ISLA216P_TEMP_CTL_PD;

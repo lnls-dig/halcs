@@ -97,10 +97,10 @@ const disp_table_func_fp trigger_mux_exp_fp [] = {
 static smio_err_e _trigger_mux_do_op (void *owner, void *msg);
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e trigger_mux_attach (smio_t *self, devio_t *parent)
+smio_err_e trigger_mux_attach (smio_t *self, void *args)
 {
     UNUSED(self);
-    UNUSED(parent);
+    UNUSED(args);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 

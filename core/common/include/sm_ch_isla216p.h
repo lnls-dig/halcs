@@ -40,6 +40,8 @@ smch_err_e smch_isla216p_get_rst (smch_isla216p_t *self, uint8_t *rst_operation)
 smch_err_e smch_isla216p_set_portconfig (smch_isla216p_t *self, uint8_t config);
 /* Read temperature code */
 smch_err_e smch_isla216p_get_temp (smch_isla216p_t *self, uint16_t *temp);
+/* Read calibration status */
+smch_err_e smch_isla216p_get_cal_status (smch_isla216p_t *self, uint8_t *cal_status);
 
 #ifdef __cplusplus
 }

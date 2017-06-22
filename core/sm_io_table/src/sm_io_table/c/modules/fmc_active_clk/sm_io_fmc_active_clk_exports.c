@@ -214,6 +214,18 @@ disp_op_t fmc_active_clk_rst_isla216p_exp = {
     }
 };
 
+disp_op_t fmc_active_clk_rst_swap_exp = {
+    .name = FMC_ACTIVE_CLK_NAME_RST_SWAP,
+    .opcode = FMC_ACTIVE_CLK_OPCODE_RST_SWAP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t fmc_active_clk_ad9510_data_exp = {
     .name = FMC_ACTIVE_CLK_NAME_AD9510_DATA,
     .opcode = FMC_ACTIVE_CLK_OPCODE_AD9510_DATA,
@@ -246,6 +258,7 @@ const disp_op_t *fmc_active_clk_exp_ops [] = {
     &fmc_active_clk_si571_freq_exp,
     &fmc_active_clk_si571_get_defaults_exp,
     &fmc_active_clk_rst_isla216p_exp,
+    &fmc_active_clk_rst_swap_exp,
     &fmc_active_clk_ad9510_data_exp,
     NULL
 };

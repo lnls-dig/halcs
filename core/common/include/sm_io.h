@@ -42,7 +42,7 @@ extern "C" {
     SMIO_DISPATCH_FUNC_WRAPPER_GEN(func_name, smio_mod_handler, self, ## __VA_ARGS__)
 
 /* Attach an instance of sm_io to dev_io function pointer */
-typedef smio_err_e (*attach_fp)(smio_t *self, devio_t *parent);
+typedef smio_err_e (*attach_fp)(smio_t *self, void *args);
 /* Deattach an instance of sm_io to dev_io function pointer */
 typedef smio_err_e (*deattach_fp)(smio_t *self);
 /* Export (register) sm_io to handle operations function pointer */
@@ -107,7 +107,7 @@ typedef struct {
 
 /* Thread boot args structure */
 typedef struct {
-    struct _devio_t *parent;                                    /* Pointer back to devo parent */
+    void *args;                                                 /* Generic arguments for SMIO */
     volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
     zsock_t *pipe_msg;                                          /* Message PIPE to actor */
     char *broker;                                               /* Endpoint to connect to broker */
@@ -130,7 +130,7 @@ smio_err_e smio_loop (smio_t *self);
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id);
 /* Send MGMT message */
-smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id, 
+smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id,
     uint32_t dest_smio_inst, char *msg);
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
@@ -176,13 +176,15 @@ mlm_client_t *smio_get_worker (smio_t *self);
 zsock_t *smio_get_pipe_msg (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
+/* Get poller */
+zpoller_t *smio_get_poller (smio_t *self);
 
 /************************************************************/
 /**************** Smio OPS generic methods API **************/
 /************************************************************/
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e smio_attach (smio_t *self, struct _devio_t *parent);
+smio_err_e smio_attach (smio_t *self, void *args);
 /* Deattach an instance of sm_io to dev_io function pointer */
 smio_err_e smio_deattach (smio_t *self);
 /* Export (Register) sm_io to handle specific operations */

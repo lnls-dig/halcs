@@ -1,3 +1,5 @@
+import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
+
 apply plugin: 'br.lnls.dig.gradle.nativedistribution'
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 
@@ -13,4 +15,9 @@ model {
             }
         }
     }
+}
+
+task updateVersionMacros(type: UpdateSemVerMacrosTask) {
+    macroPrefix 'CONVC_VERSION_'
+    file project.file('include/convc_classes.h')
 }

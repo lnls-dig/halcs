@@ -186,7 +186,7 @@
 #define PCIE_CFG_DMA_CTRL_AINC              WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_AINC_SHIFT, \
                                                    PCIE_CFG_DMA_CTRL_AINC_SIZE)
 
-#define PCIE_CFG_DMA_CTRL_BAR_SIZE          2
+#define PCIE_CFG_DMA_CTRL_BAR_SIZE          3
 #define PCIE_CFG_DMA_CTRL_BAR_SHIFT         16
 #define PCIE_CFG_DMA_CTRL_BAR_MASK          WBGEN2_PCIE_GEN_MASK(PCIE_CFG_DMA_CTRL_BAR_SHIFT, \
                                                    PCIE_CFG_DMA_CTRL_BAR_SIZE)

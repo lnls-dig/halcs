@@ -33,17 +33,6 @@
 #include "acq_chan_gen_defs.h"
 #include "ddr3_map_structs.h"
 
-/* HALCS version macros for compile-time API detection */
-
-#define HALCS_VERSION_MAJOR 0
-#define HALCS_VERSION_MINOR 1
-#define HALCS_VERSION_PATCH 0
-
-#define HALCS_MAKE_VERSION(major, minor, patch) \
-    ((major) * 10000 + (minor) * 100 + (patch))
-#define HALCS_VERSION \
-    HALCS_MAKE_VERSION(HALCS_VERSION_MAJOR, HALCS_VERSION_MINOR, HALCS_VERSION_PATCH)
-
 #if defined (__WINDOWS__)
 #   if defined LIBHALCS_STATIC
 #       define HALCS_EXPORT
@@ -106,6 +95,8 @@ typedef struct _smio_mod_dispatch_t smio_mod_dispatch_t;
 typedef enum _smio_err_e smio_err_e;
 /* Opaque smio_t structure */
 typedef struct _smio_t smio_t;
+/* Opaque smio_cfg_t structure */
+typedef struct _smio_cfg_t smio_cfg_t;
 
 /* Forward msg_err_e declaration enumeration */
 typedef enum _msg_err_e msg_err_e;
@@ -166,6 +157,7 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "sm_io_bootstrap.h"
 #include "sm_io_mod_dispatch.h"
 #include "sm_io.h"
+#include "sm_io_cfg.h"
 
 /* MSG */
 #include "msg_macros.h"

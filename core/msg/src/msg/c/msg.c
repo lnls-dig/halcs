@@ -186,7 +186,8 @@ msg_err_e msg_check_gen_zmq_args (const disp_op_t *disp_op, zmsg_t *zmq_msg)
                  GEN_MSG_ZMQ_ARG_SIZE(zmq_arg) != DISP_GET_ASIZE(*args_it))) {
             DBE_DEBUG (DBG_MSG | DBG_LVL_ERR,
                     "[msg] Invalid size of argument #%u"
-                    " received for function \"%s\"\n", i, disp_op->name);
+                    " received for function \"%s\". Expected %u, got %zu\n", 
+                    i, disp_op->name, DISP_GET_ASIZE(*args_it), GEN_MSG_ZMQ_ARG_SIZE(zmq_arg));
             err = MSG_ERR_INV_SIZE_ARG;
             goto err_inv_size_args;
         }

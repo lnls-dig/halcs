@@ -113,10 +113,10 @@ const disp_table_func_fp fmc_adc_common_exp_fp [] = {
 static smio_err_e _fmc_adc_common_do_op (void *owner, void *msg);
 
 /* Attach an instance of sm_io to dev_io function pointer */
-smio_err_e fmc_adc_common_attach (smio_t *self, devio_t *parent)
+smio_err_e fmc_adc_common_attach (smio_t *self, void *args)
 {
     UNUSED(self);
-    UNUSED(parent);
+    UNUSED(args);
     return SMIO_ERR_FUNC_NOT_IMPL;
 }
 

@@ -9,15 +9,20 @@ STRIP           = $(CROSS_COMPILE)strip
 OBJCOPY         = $(CROSS_COMPILE)objcopy
 OBJDUMP         = $(CROSS_COMPILE)objdump
 
+CMDSEP = ;
+
+# install prefix
+PREFIX ?= /usr
+
 ERRHAND_DBG ?= y
 ERRHAND_MIN_LEVEL ?= DBG_LVL_ERR
 ERRHAND_SUBSYS_ON ?= "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
 
-CFLAGS = -Wall -ggdb
-CFLAGS += -I.. -I../../../include
+override CFLAGS += -Wall -ggdb
+override CFLAGS += -I.. -I../include -I../include/linux
 CFLAGS_LNLS = -DERRHAND_DBG=$(ERRHAND_DBG) -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL) \
 	-DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
-LDFLAGS = -L.. -lsdbfs
+override LDFLAGS += -L.. -lsdbfs
 LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
 PROG = gensdbfs sdb-read sdb-read-lnls sdb-extract
@@ -35,5 +40,11 @@ $(PROG): ../libsdbfs.a
 clean:
 	rm -f $(PROG) *.o *~ core
 
+install:
+	$(foreach prog,$(PROG),install -m 755 $(prog) $(PREFIX)/bin/ $(CMDSEP))
+
+uninstall:
+	$(foreach prog,$(PROG),rm -f $(PREFIX)/bin/$(prog) $(CMDSEP))
+
 # add the other unused targets, so the rule in ../Makefile works
-modules install modules_install:
+modules modules_install:

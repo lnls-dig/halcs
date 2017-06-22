@@ -45,6 +45,10 @@
 #define LLIO_ETH_REGEX_ADDR_HIT             2
 #define LLIO_ETH_REGEX_PORT_HIT             3
 
+#define LLIO_ETH_MAX_RECONNECT_TRIES         1
+#define LLIO_ETH_SECS_BEFORE_RECONNECT       1
+#define LLIO_ETH_SECS_BEFORE_RECV_TIMEOUT    1
+
 /* Device endpoint */
 typedef struct {
     llio_eth_type_e type;
@@ -59,9 +63,9 @@ static void *_get_in_addr(struct sockaddr *sa);
 static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
-        size_t size);
+        size_t size, bool auto_reconnect);
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
-        size_t size);
+        size_t size, bool auto_reconnect);
 
 /************ Our methods implementation **********/
 
@@ -236,6 +240,7 @@ static int eth_release (llio_t *self, llio_endpoint_t *endpoint)
      * is initialized on eth_open (), so the proper place to
      * destroy it is here, not on llio_dev_eth_destroy () */
     close (dev_eth->fd);
+    dev_eth->fd = -1;
 
     /* Deattach specific device handler to generic one */
     lerr = llio_dev_eth_destroy (&dev_eth);
@@ -260,81 +265,139 @@ err_dev_eth_handler:
 static ssize_t eth_read_16 (llio_t *self, uint64_t offs, uint16_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_read_32 (llio_t *self, uint64_t offs, uint32_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_read_64 (llio_t *self, uint64_t offs, uint64_t *data)
 {
     return _eth_read_generic (self, offs, (uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 /* Write data to Eth device */
 static ssize_t eth_write_16 (llio_t *self, uint64_t offs, const uint16_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_write_32 (llio_t *self, uint64_t offs, const uint32_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 static ssize_t eth_write_64 (llio_t *self, uint64_t offs, const uint64_t *data)
 {
     return _eth_write_generic (self, offs, (const uint32_t *) data,
-            sizeof (*data));
+            sizeof (*data), true);
 }
 
 /* Read data block from Eth device, size in bytes */
 static ssize_t eth_read_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    return _eth_read_generic (self, offs, data, size);
+    return _eth_read_generic (self, offs, data, size, true);
 }
 
 /* Write data block to Eth device, size in bytes */
 ssize_t eth_write_block (llio_t *self, uint64_t offs, size_t size, uint32_t *data)
 {
-    return _eth_write_generic (self, offs, data, size);
+    return _eth_write_generic (self, offs, data, size, true);
 }
 
 /******************************* Static Functions *****************************/
 
 static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
-        size_t size)
+        size_t size, bool auto_reconnect)
 {
     UNUSED(offs);
 
     ssize_t err = 0;
+    size_t retries = (auto_reconnect) ? LLIO_ETH_MAX_RECONNECT_TRIES : 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
 
     err = _eth_recvall (dev_eth->fd, (uint8_t *) data, size);
+    /* If we got an error, try reconnecting and try up to
+     * LLIO_ETH_MAX_RECONNECT_TRIES or forever if retries == -1*/
+    while (err < 0) {
+        if (retries == 0) {
+            break;
+        }
+
+        /* Only decrement if we are in finite waiting mode */
+        if (retries > 0) {
+            retries--;
+        }
+
+        /* cleanup and try again */
+        close (dev_eth->fd);
+        dev_eth->fd = -1;
+        err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
+                dev_eth->hostname, dev_eth->port);
+        /* keep retrying */
+        if (err < 0) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_eth] Error connecting to endpoint during recv (). "
+                    "Retrying in %u seconds\n",
+                    LLIO_ETH_SECS_BEFORE_RECONNECT);
+            continue;
+        }
+
+        err = _eth_recvall (dev_eth->fd, (uint8_t *) data, size);
+    }
 
 err_dev_eth_handler:
     return err;
 }
 
 static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *data,
-        size_t size)
+        size_t size, bool auto_reconnect)
 {
     UNUSED(offs);
 
     ssize_t err = 0;
+    size_t retries = (auto_reconnect) ? LLIO_ETH_MAX_RECONNECT_TRIES : 0;
     llio_dev_eth_t *dev_eth = llio_get_dev_handler (self);
     ASSERT_TEST(dev_eth != NULL, "Could not get ETH handler",
             err_dev_eth_handler, -1);
 
     err = _eth_sendall (dev_eth->fd, (uint8_t *) data, size);
+    /* If we got an error, try reconnecting and try up to
+     * LLIO_ETH_MAX_RECONNECT_TRIES or forever if retries == -1*/
+    while (err < 0) {
+        if (retries == 0) {
+            break;
+        }
+
+        /* Only decrement if we are in finite waiting mode */
+        if (retries > 0) {
+            retries--;
+        }
+
+        /* cleanup and try again */
+        close (dev_eth->fd);
+        dev_eth->fd = -1;
+        err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
+                dev_eth->hostname, dev_eth->port);
+        /* keep retrying */
+        if (err < 0) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_eth] Error connecting to endpoint during send (). "
+                    "Retrying in %u seconds\n",
+                    LLIO_ETH_SECS_BEFORE_RECONNECT);
+            continue;
+        }
+
+        err = _eth_sendall (dev_eth->fd, (uint8_t *) data, size);
+    }
 
 err_dev_eth_handler:
     return err;
@@ -349,6 +412,11 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN];
+    long arg;
+    fd_set myset;
+    struct timeval tv;
+    int valopt;
+    socklen_t lon;
     int yes = 1;
 
     /* Ignored for now */
@@ -382,17 +450,75 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
         ASSERT_TEST (rv == 0, "Could not set endpoint options",
                 err_setsockopt, -1);
 
-        if (connect(*fd, p->ai_addr, p->ai_addrlen) == -1) {
-            DBE_DEBUG (DBG_LL_IO | DBG_LVL_ERR,
-                    "[ll_io_eth] Error executing connect: %s\n", strerror(errno));
-            close(*fd);
-            continue;
+        /* Set non-blocking connection. Based on
+         * http://developerweb.net/viewtopic.php?id=3196 */
+        arg = fcntl (*fd, F_GETFL, NULL);
+        ASSERT_TEST (arg >= 0, "Could not get socket FD options",
+            err_get_fcntl, -1);
+        arg |= O_NONBLOCK;
+        rv = fcntl (*fd, F_SETFL, arg);
+        ASSERT_TEST (rv >= 0, "Could not set socket FD options",
+            err_set_fcntl, -1);
+
+        /* Trying to connect with timeout */
+        rv = connect(*fd, p->ai_addr, p->ai_addrlen);
+        if (rv < 0) {
+            if (errno != EINPROGRESS) {
+                DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                        "[ll_io_eth] Error connecting is not EINPROGRESS: %d - %s\n", errno, strerror(errno));
+                close (*fd);
+                *fd = -1;
+                continue;
+            }
+
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                    "[ll_io_eth] EINPROGRESS in connect() - selecting\n");
+            tv.tv_sec = LLIO_ETH_SECS_BEFORE_RECONNECT;
+            tv.tv_usec = 0;
+            FD_ZERO (&myset);
+            FD_SET (*fd, &myset);
+
+            rv = select (*fd+1, NULL, &myset, NULL, &tv);
+            if (rv < 0) {
+               DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                       "[ll_io_eth] Error connecting: %d - %s\n", errno, strerror(errno));
+               err = -1;
+               goto err_select1;
+            }
+
+            if (rv == 0) {
+               DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                       "[ll_io_eth] Timeout in connecting\n");
+               err = -1;
+               goto err_select2;
+            }
+
+            /* Check if socket is opened succesfully */
+            lon = sizeof(int);
+            rv = getsockopt (*fd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon);
+            ASSERT_TEST (rv >= 0, "Could not get socket options",
+                err_getsockopt, -1);
+            if (valopt) {
+                DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                        "[ll_io_eth] Error in delayed connection:%d - %s\n", valopt, strerror(valopt));
+                err = -1;
+                goto err_valopt;
+            }
         }
 
         break;
     }
 
     ASSERT_TEST (p != NULL, "Could not connect", err_connect, -1);
+
+    /* Set sock to blocking-mode again */
+    arg = fcntl (*fd, F_GETFL, NULL);
+    ASSERT_TEST (arg >= 0, "Could not get socket FD options",
+        err_get_fcntl2, -1);
+    arg &= (~O_NONBLOCK);
+    rv = fcntl (*fd, F_SETFL, arg);
+    ASSERT_TEST (rv >= 0, "Could not set socket FD options",
+        err_set_fcntl2, -1);
 
     inet_ntop(p->ai_family, _get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
@@ -403,9 +529,18 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
 
     return err;
 
+err_set_fcntl2:
+err_get_fcntl2:
 err_connect:
-    close (*fd);
+err_valopt:
+err_getsockopt:
+err_select2:
+err_select1:
+err_set_fcntl:
+err_get_fcntl:
 err_setsockopt:
+    close (*fd);
+    *fd = -1;
 err_getaddrinfo:
 err_unsup:
     return err;
@@ -450,10 +585,31 @@ static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len)
     size_t total = 0;        /* how many bytes we've recv */
     size_t bytesleft = len; /* how many we have left to recv */
     ssize_t n;
+    fd_set myset;
+    struct timeval tv;
+    int rv = 0;
 
     DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Receiving %zu bytes\n", len);
 
     while (total < len) {
+        tv.tv_sec = LLIO_ETH_SECS_BEFORE_RECV_TIMEOUT;
+        tv.tv_usec = 0;
+        FD_ZERO (&myset);
+        FD_SET (fd, &myset);
+
+        rv = select (fd+1, &myset, NULL, NULL, &tv);
+        if (rv < 0) {
+           DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                   "[ll_io_eth] Error on recv select (): %d - %s\n", errno, strerror(errno));
+           return -1;
+        }
+
+        if (rv == 0) {
+           DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                   "[ll_io_eth] Timeout on recv (). Aborting...\n");
+           return -1;
+        }
+
         n = recv (fd, (char *) buf+total, bytesleft, 0);
         DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE, "[ll_io_eth] Received %zd bytes\n", n);
 
