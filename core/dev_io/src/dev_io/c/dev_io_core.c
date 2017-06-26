@@ -267,6 +267,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     int err = llio_open (self->llio, NULL);
     ASSERT_TEST(err==0, "Error opening device!", err_llio_open);
 
+    /* Specifically ask to reset the device */
+    llio_reset (self->llio);
+
     /* We can free llio_name now, as llio copies the string */
     free (llio_name);
     llio_name = NULL; /* Avoid double free error */
@@ -1126,8 +1129,8 @@ static devio_err_e _devio_register_all_sm_raw (devio_t *self)
      *
      * Using a more brute-force solution we do the following:
      *
-     * 1) We reset the endpoint here (not done here as most of 
-     *   our endpoints need to recreate its SMCH instances to be 
+     * 1) We reset the endpoint here (not done here as most of
+     *   our endpoints need to recreate its SMCH instances to be
      *   able to communicate and we don't do that on reconfigure,
      *   only on create)
      * 2) Tell the SMIOs to reconfigure themselves
