@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 
-#include <sdb.h>
+#include <linux/sdb.h>
 #include "gensdbfs.h"
 
 /*
