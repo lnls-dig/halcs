@@ -20,7 +20,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <ll_io.h>
-#include <pcie_regs.h>
+#include <hw/pcie_regs.h>
 
 #include "libsdbfs.h"
 
