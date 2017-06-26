@@ -78,6 +78,7 @@ static int list_device(struct sdb_device *d, int depth, int base)
 	static int warned;
 	char *warn;
 	int i, ret;
+    unsigned int ui;
 
 	c = &d->sdb_component;
 	p = &c->product;
@@ -140,8 +141,8 @@ static int list_device(struct sdb_device *d, int depth, int base)
 			return 0;
 		printf("synthesis-name: %.16s\n", s->syn_name);
 		printf("  commit-id: ");
-		for (i = 0; i < sizeof(s->commit_id); i++)
-			printf("%02x", s->commit_id[i]);
+		for (ui = 0; ui < sizeof(s->commit_id); ui++)
+			printf("%02x", s->commit_id[ui]);
 		printf("\n");
 
 		/* Some of the following fields are sometimes empty */
@@ -181,11 +182,11 @@ static int list_device(struct sdb_device *d, int depth, int base)
 	/* long listing of unknown record */
 	printf("Unknown-record:\n");
 	data = (void *)d;
-	for (i = 0; i < sizeof(struct sdb_empty); i++)
+	for (ui = 0; ui < sizeof(struct sdb_empty); ui++)
 		printf("%s%02x%c",
-		       (i & 0xf) == 0 ? "   " : "",
-		       data[i],
-		       (i & 0xf) == 0xf ? '\n' : ' ');
+		       (ui & 0xf) == 0 ? "   " : "",
+		       data[ui],
+		       (ui & 0xf) == 0xf ? '\n' : ' ');
 	return ret;
 }
 
