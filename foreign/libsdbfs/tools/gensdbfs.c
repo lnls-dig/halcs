@@ -46,7 +46,7 @@ static inline unsigned long SDB_ALIGN(unsigned long x)
 static void __fill_product(struct sdb_product *p, char *name, time_t t,
 			   int record_type)
 {
-	int len = strlen(name);
+	size_t len = strlen(name);
 
 	if (len > sizeof(p->name)) {
 		fprintf(stderr, "%s: truncating filename \"%s\"\n",
