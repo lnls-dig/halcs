@@ -226,11 +226,6 @@ static int pcie_open (llio_t *self, llio_endpoint_t *endpoint)
     /* Set SDB prefix adress */
     llio_set_sdb_prefix_addr (self, BAR4_ADDR);
 
-    /* Reset FPGA */
-    _pcie_reset_fpga (self);
-    /* Reset PCIe Timeout */
-    _pcie_timeout_reset (self);
-
     return err;
 
 err_dev_handler_alloc:
