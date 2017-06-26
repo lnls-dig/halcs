@@ -303,7 +303,7 @@ int main(int argc, char **argv)
 	stbuf.st_size += pagesize - 1;
 	stbuf.st_size &= ~(pagesize - 1);
 	mapaddr = mmap(0,
-		       opt_memsize ? opt_memsize : stbuf.st_size,
+		       opt_memsize ? opt_memsize : (size_t)stbuf.st_size,
 		       PROT_READ, MAP_PRIVATE, fileno(f),
 		       opt_memaddr /* 0 by default */);
 	if (mapaddr == MAP_FAILED)
