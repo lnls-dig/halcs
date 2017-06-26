@@ -58,7 +58,7 @@ static void __fill_product(struct sdb_product *p, char *name, time_t t,
 	memcpy(&p->device_id, p->name, sizeof(p->device_id));
 	p->vendor_id = DEFAULT_VENDOR; /* changed by config, possibly */
 	p->version = htonl(1); /* FIXME: version of gensdbfs */
-	/* FIXME: date */
+	(void)(t); /* FIXME: date */
 	p->record_type = record_type;
 }
 
