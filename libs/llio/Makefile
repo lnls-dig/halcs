@@ -107,10 +107,12 @@ $(LIBNAME)_CODE_HEADERS = \
 	$(INCLUDE_DIR)/ll_io_endpoint.h \
 	$(INCLUDE_DIR)/ll_io_pcie.h \
 	$(INCLUDE_DIR)/ll_io_eth_utils.h \
-	$(INCLUDE_DIR)/ll_io_eth.h \
-	$(INCLUDE_DIR)/hw/pcie_regs.h
+	$(INCLUDE_DIR)/ll_io_eth.h
 
 $(LIBNAME)_HEADERS = $($(LIBNAME)_CODE_HEADERS)
+
+$(LIBNAME)_HW_HEADERS = \
+	$(INCLUDE_DIR)/hw/pcie_regs.h
 
 OBJS_all = $(common_OBJS) $($(LIBNAME)_OBJS)
 
@@ -176,6 +178,8 @@ install:
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
 	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
 	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
+	mkdir -p $(PREFIX)/include/hw
+	$(foreach header,$($(LIBNAME)_HW_HEADERS),install -m 755 $(header) $(PREFIX)/include/hw $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
@@ -184,6 +188,9 @@ uninstall:
 	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
 		$(PREFIX)/include/$(header) $(CMDSEP))
+	$(foreach header,$(notdir $($(LIBNAME)_HW_HEADERS)),rm -f \
+		$(PREFIX)/include/hw/$(header) $(CMDSEP))
+	rmdir --ignore-fail-on-non-empty $(PREFIX)/include/hw
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

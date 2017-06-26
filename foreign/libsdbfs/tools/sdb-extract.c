@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/stat.h>
@@ -52,9 +53,9 @@ static int create_file(struct sdbfs *fs, struct sdb_device *d, FILE *cfgf)
 		name[strlen(name) - 1] = '\0';
 
 	/* Print cfgfile information */
-	fprintf(cfgf, "%s\n" "\tvendor = 0x%016llx\n" "\tdevice = 0x%08x\n",
+	fprintf(cfgf, "%s\n" "\tvendor = 0x%016" PRIx64 "\n" "\tdevice = 0x%08x\n",
 		name, ntohll(p->vendor_id), ntohl(p->device_id));
-	fprintf(cfgf, "\tposition = 0x%llx\n", ntohll(c->addr_first));
+	fprintf(cfgf, "\tposition = 0x%" PRIx64 "\n", ntohll(c->addr_first));
 	if (ntohl(d->bus_specific) & SDB_DATA_WRITE) {
 		fprintf(cfgf, "\twrite = 1\n");
 		mode |= 0222;

@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 
-#include <sdb.h>
+#include <linux/sdb.h>
 #include "gensdbfs.h"
 
 /*
@@ -46,7 +46,7 @@ static inline unsigned long SDB_ALIGN(unsigned long x)
 static void __fill_product(struct sdb_product *p, char *name, time_t t,
 			   int record_type)
 {
-	int len = strlen(name);
+	size_t len = strlen(name);
 
 	if (len > sizeof(p->name)) {
 		fprintf(stderr, "%s: truncating filename \"%s\"\n",
@@ -58,7 +58,7 @@ static void __fill_product(struct sdb_product *p, char *name, time_t t,
 	memcpy(&p->device_id, p->name, sizeof(p->device_id));
 	p->vendor_id = DEFAULT_VENDOR; /* changed by config, possibly */
 	p->version = htonl(1); /* FIXME: version of gensdbfs */
-	/* FIXME: date */
+	(void)(t); /* FIXME: date */
 	p->record_type = record_type;
 }
 
