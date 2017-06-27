@@ -18,9 +18,9 @@
 
 /* HALCS version macros for compile-time API detection */
 
-#define LL_IO_VERSION_MAJOR 0
-#define LL_IO_VERSION_MINOR 5
-#define LL_IO_VERSION_PATCH 1
+#define LL_IO_VERSION_MAJOR 1
+#define LL_IO_VERSION_MINOR 0
+#define LL_IO_VERSION_PATCH 0
 
 #define LL_IO_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

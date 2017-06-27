@@ -7,5 +7,45 @@ model {
                 }
             }
         }
+        gensdbfs(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib library: 'sdbfs'
+                    source.srcDir 'tools'
+                    source.include 'gensdbfs.c'
+                }
+            }
+        }
+        sdb_extract(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib library: 'sdbfs'
+                    source.srcDir 'tools'
+                    source.include 'sdb-extract.c'
+                }
+            }
+        }
+        sdb_read(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib library: 'sdbfs'
+                    source.srcDir 'tools'
+                    source.include 'sdb-read.c'
+                }
+            }
+        }
+        sdb_read_lnls(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib project: ':libs:convc', library: 'convc'
+                    lib project: ':libs:errhand', library: 'errhand'
+                    lib project: ':libs:llio', library: 'llio'
+
+                    lib library: 'sdbfs'
+                    source.srcDir 'tools'
+                    source.include 'sdb-read-lnls.c'
+                }
+            }
+        }
     }
 }
