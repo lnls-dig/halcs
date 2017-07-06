@@ -61,9 +61,6 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);
 
-/* Read specific information about the device. Typically,
- * this is stored in the SDB structure inside the device */
-devio_err_e devio_print_info (devio_t *self);
 /* Register an specific sm_io module to this device */
 devio_err_e devio_register_sm (void *pipe, uint32_t smio_id,
         uint64_t base, uint32_t inst_id);
@@ -79,6 +76,9 @@ devio_err_e devio_reconfigure_sm (void *pipe, const char *smio_key);
 devio_err_e devio_reconfigure_all_sm (void *pipe);
 /* Reset associated LLIO*/
 devio_err_e devio_reset_llio (void *pipe);
+/* Read specific information about the device. Typically,
+ * this is stored in the SDB structure inside the device */
+devio_err_e devio_print_info (void *pipe);
 
 /* Poll all PIPE sockets */
 void devio_loop (zsock_t *pipe, void *args);

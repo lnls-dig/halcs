@@ -128,6 +128,7 @@ static devio_err_e _devio_unregister_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reconfigure_sm_raw (devio_t *self, const char *smio_key);
 static devio_err_e _devio_reconfigure_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reset_llio_raw (devio_t *self);
+static devio_err_e _devio_print_info_raw (devio_t *self);
 static devio_err_e _devio_check_send_cfg_done (devio_t *self);
 
 /* FIXME: Only valid for PCIe devices */
@@ -474,28 +475,6 @@ devio_err_e devio_destroy (devio_t **self_p)
     return DEVIO_SUCCESS;
 }
 
-/* Read specific information about the device. Typically,
- * this is stored in the SDB structure inside the device */
-devio_err_e devio_print_info (devio_t *self)
-{
-    assert (self);
-    devio_err_e err = DEVIO_SUCCESS;
-
-    /* FIXME: Only valid for PCIe devices */
-    ASSERT_TEST (streq (llio_get_ops_name (self->llio), "PCIE"),
-            "SDB is only supported for PCIe devices",
-            err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
-
-    /* Print SDB */
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-            "[devio_print_info] SDB information:\n");
-    sdbutils_do_list (self->sdbfs, 1);
-    return err;
-
-err_sdb_not_supp:
-    return err;
-}
-
 static volatile const smio_mod_dispatch_t *_devio_search_sm_by_id (devio_t *self,
         uint32_t smio_id)
 {
@@ -773,10 +752,14 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
         /* Reset LLIO */
         _devio_reset_llio_raw (devio);
     }
+    else if (streq (command, "$PRINT_INFO")) {
+        /* Print DEVIO information */
+        _devio_print_info_raw (devio);
+    }
     else {
         /* Invalid message received. Discard message and continue normally */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
-                "received an invalid command\n");
+                "received an invalid command: %s\n", command);
     }
 
     free (command);
@@ -820,7 +803,7 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 }
 
 /************************************************************/
-/*********************** API methods ************************/
+/********************** PIPE methods ************************/
 /************************************************************/
 
 /* Register a specific sm_io module to this device */
@@ -1317,6 +1300,46 @@ static devio_err_e _devio_reset_llio_raw (devio_t *self)
 err_llio_reset:
     return err;
 }
+
+
+/* Read specific information about the device. Typically,
+ * this is stored in the SDB structure inside the device */
+static devio_err_e _devio_print_info_raw (devio_t *self)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* FIXME: Only valid for PCIe devices */
+    ASSERT_TEST (streq (llio_get_ops_name (self->llio), "PCIE"),
+            "SDB is only supported for PCIe devices",
+            err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
+
+    /* Print SDB */
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+            "[devio_print_info] SDB information:\n");
+    sdbutils_do_list (self->sdbfs, 1);
+    return err;
+
+err_sdb_not_supp:
+    return err;
+}
+
+devio_err_e devio_print_info (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$PRINT_INFO");
+    ASSERT_TEST(zerr == 0, "Could not print DEVIO info", err_print_info,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_print_info:
+    return err;
+}
+
+/************************************************************/
+/*********************** API methods ************************/
+/************************************************************/
 
 static devio_err_e _devio_check_send_cfg_done (devio_t *self)
 {
