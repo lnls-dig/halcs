@@ -88,6 +88,44 @@ void errhand_print_vec (const char *fmt, const char *data, int len)
     printf ("\n");
 }
 
+FILE *errhand_log_open (const char *log_file_name, const char *mode)
+{
+    FILE *log_file = NULL;
+
+    if (log_file_name) {
+        if (streq(log_file_name, "stdout")) {
+            log_file = stdout;
+        }
+        else if (streq(log_file_name, "stderr")) {
+            log_file = stderr;
+        }
+        else {
+            if (mode == NULL) {
+                /* Be conservative if no mode is specified */
+                log_file = fopen (log_file_name, "a");
+            }
+            else {
+                log_file = fopen (log_file_name, mode);
+            }
+
+            if (log_file == NULL) {
+                log_file = stdout;
+            }
+        }
+    }
+    else {
+        /* Default to stdout */
+        log_file = stdout;
+    }
+
+    return log_file;
+}
+
+int errhand_log_close (FILE *log_file)
+{
+    return fclose (log_file);
+}
+
 static void _errhand_log_file_new (FILE *log_file)
 {
     _errhand_logfile = log_file;
@@ -110,39 +148,8 @@ void errhand_log_file_destroy ()
 
 int errhand_log_new (const char *log_file_name, const char *mode)
 {
-    int err = -1;    /* Error */
-    FILE *log_file = NULL;
-
-    if (log_file_name) {
-        if (streq(log_file_name, "stdout")) {
-            log_file = stdout;
-            err = 1;
-        }
-        else if (streq(log_file_name, "stderr")) {
-            log_file = stderr;
-            err = 2;
-        }
-        else {
-            if (mode == NULL) {
-                /* Be conservative if no mode is specified */
-                log_file = fopen (log_file_name, "a");
-            }
-            else {
-                log_file = fopen (log_file_name, mode);
-            }
-
-            err = 0;
-
-            if (log_file == NULL) {
-                log_file = stdout;
-                err = 2;
-            }
-        }
-    }
-    else {
-        /* Default to stdout */
-        log_file = stdout;
-    }
+    int err = 0;
+    FILE *log_file = errhand_log_open (log_file_name, mode);
 
     _errhand_log_file_new (log_file);
     return err;
@@ -153,7 +160,7 @@ int errhand_log_destroy ()
 #if 0
     int err = -1;
 
-    err = fclose (_errhand_logfile);
+    err = errhand_log_close (_errhand_logfile);
     _errhand_log_file_destroy();
     return err;
 #endif
