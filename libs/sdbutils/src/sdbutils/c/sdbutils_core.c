@@ -30,6 +30,17 @@
     CHECK_HAL_ERR(err, HAL_UTILS, "[sdbutils:utils]",                           \
             sdbutils_err_str (err_type))
 
+#define __SDBUTILS_PRINT(stream, format, ...)                                   \
+    ({                                                                          \
+        if (stream) {                                                           \
+            fprintf (stream, format, ## __VA_ARGS__);                           \
+        }                                                                       \
+        else {                                                                  \
+            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE, format,   \
+                ## __VA_ARGS__);                                                \
+        }                                                                       \
+    })
+
 /*******************************************************************/
 /*********************  SDB Utilities functions ********************/
 /*******************************************************************/
@@ -38,8 +49,8 @@
  * git://ohwr.org/hdl-core-lib/fpga-config-space.git */
 
 /* Boring ascii representation of a device */
-sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
-        int opt_long)
+sdbutils_err_e sdbutils_list_device_file (struct sdb_device *d, int depth, int base,
+        int opt_long, FILE *stream)
 {
     sdbutils_err_e err = SDBUTILS_SUCCESS;
     struct sdb_product *p;
@@ -61,43 +72,43 @@ sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
         case sdb_type_device:
         case sdb_type_bridge:
             if (!opt_long) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%.19s\n", p->name);
+                __SDBUTILS_PRINT(stream, "%.19s\n", p->name);
                 return SDBUTILS_SUCCESS;
             }
 
             /* hack: show directory level looking at the internals */
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%016llx:%08x @ %08llx-%08llx ",
+            __SDBUTILS_PRINT(stream, "%016llx:%08x @ %08llx-%08llx ",
                     (long long)ntohll(p->vendor_id), ntohl(p->device_id),
                     (long long)base + ntohll(c->addr_first),
                     (long long)base + ntohll(c->addr_last));
             for (i = 0; i < depth; i++) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    ");
+                __SDBUTILS_PRINT(stream, "    ");
             }
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%.19s\n", p->name);
+            __SDBUTILS_PRINT(stream, "%.19s\n", p->name);
 
             return SDBUTILS_SUCCESS;
 
             /* A product, but not a component (no address range) */
         case sdb_type_integration:
             if (!opt_long) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%.19s\n", p->name);
+                __SDBUTILS_PRINT(stream, "%.19s\n", p->name);
                 return SDBUTILS_SUCCESS;
             }
 
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%016llx:%08x                     ",
+            __SDBUTILS_PRINT(stream, "%016llx:%08x                     ",
                     (long long)ntohll(p->vendor_id), ntohl(p->device_id));
             /* like above, show directory level */
             for (i = 0; i < depth; i++) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    ");
+                __SDBUTILS_PRINT(stream, "    ");
             }
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%.19s\n", p->name);
+            __SDBUTILS_PRINT(stream, "%.19s\n", p->name);
 
             return SDBUTILS_SUCCESS;
 
             /* Just a string */
         case sdb_type_repo_url:
             if (opt_long) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "repo-url: %.63s\n",
+                __SDBUTILS_PRINT(stream, "repo-url: %.63s\n",
                         ((struct sdb_repo_url *)d)->repo_url);
             }
             return SDBUTILS_SUCCESS;
@@ -108,26 +119,26 @@ sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
                 return SDBUTILS_SUCCESS;
             }
 
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "synthesis-name: %.16s\n", s->syn_name);
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    commit-id: ");
+            __SDBUTILS_PRINT(stream, "synthesis-name: %.16s\n", s->syn_name);
+            __SDBUTILS_PRINT(stream, "    commit-id: ");
             for (i = 0; i < (int) sizeof(s->commit_id); i++) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%02x", s->commit_id[i]);
+                __SDBUTILS_PRINT(stream, "%02x", s->commit_id[i]);
             }
-            DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "\n");
+            __SDBUTILS_PRINT(stream, "\n");
 
             /* Some of the following fields are sometimes empty */
             if (s->tool_name[0] && s->tool_name[0] != ' ') {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    tool-name: %.8s\n", s->tool_name);
+                __SDBUTILS_PRINT(stream, "    tool-name: %.8s\n", s->tool_name);
             }
             if (s->tool_version) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    tool-version: 0x%08x\n",
+                __SDBUTILS_PRINT(stream, "    tool-version: 0x%08x\n",
                         ntohl(s->tool_version));
             }
             if (s->date) {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    build-date: %08x\n", ntohl(s->date));
+                __SDBUTILS_PRINT(stream, "    build-date: %08x\n", ntohl(s->date));
             }
             if (s->user_name[0] && s->tool_name[0] != ' ') {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "    build-user: %.15s\n", s->user_name);
+                __SDBUTILS_PRINT(stream, "    build-user: %.15s\n", s->user_name);
             }
             return SDBUTILS_SUCCESS;
 
@@ -148,16 +159,16 @@ sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
     DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_WARN, "Unknown record type 0x%02x\n",
         p->record_type);
     if (!opt_long) {
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "Unknown-record\n");
+        __SDBUTILS_PRINT(stream, "Unknown-record\n");
         return err;
     }
 
     /* long listing of unknown record */
-    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "Unknown-record:\n");
+    __SDBUTILS_PRINT(stream, "Unknown-record:\n");
     data = (void *)d;
 
     for (i = 0; i < (int) sizeof(struct sdb_empty); i++) {
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%s%02x%c",
+        __SDBUTILS_PRINT(stream, "%s%02x%c",
                 (i & 0xf) == 0 ? "   " : "",
                 data[i],
                 (i & 0xf) == 0xf ? '\n' : ' ');
@@ -166,14 +177,21 @@ sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
     return err;
 }
 
-sdbutils_err_e sdbutils_do_list (struct sdbfs *fs, int opt_long)
+sdbutils_err_e sdbutils_list_device (struct sdb_device *d, int depth, int base,
+        int opt_long)
+{
+    return sdbutils_list_device_file (d, depth, base, opt_long, NULL);
+}
+
+sdbutils_err_e sdbutils_do_list_file (struct sdbfs *fs, int opt_long, FILE *stream)
 {
     sdbutils_err_e err = SDBUTILS_SUCCESS;
     struct sdb_device *d;
     int new = 1;
 
     while ( (d = sdbfs_scan(fs, new)) != NULL) {
-        err = sdbutils_list_device (d, fs->depth, fs->base[fs->depth], opt_long);
+        err = sdbutils_list_device_file (d, fs->depth, fs->base[fs->depth], opt_long, 
+                stream);
         ASSERT_TEST(err == SDBUTILS_SUCCESS, "Could not list device",
                 err_list_device, SDBUTILS_ERR_ALLOC);
         new = 0;
@@ -183,7 +201,12 @@ err_list_device:
     return err;
 }
 
-sdbutils_err_e sdbutils_do_cat_name (struct sdbfs *fs, char *name)
+sdbutils_err_e sdbutils_do_list (struct sdbfs *fs, int opt_long)
+{
+    return sdbutils_do_list_file (fs, opt_long, NULL);
+}
+
+sdbutils_err_e sdbutils_do_cat_name_file (struct sdbfs *fs, char *name, FILE *stream)
 {
     sdbutils_err_e err = SDBUTILS_SUCCESS;
     char buf[4096];
@@ -204,7 +227,7 @@ sdbutils_err_e sdbutils_do_cat_name (struct sdbfs *fs, char *name)
 
         memcpy (name, buf, i);
         name [namesize] = '\0';
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%s\n", name);
+        __SDBUTILS_PRINT(stream, "%s\n", name);
     }
 
     sdbfs_close(fs);
@@ -213,7 +236,13 @@ err_open_name:
     return err;
 }
 
-sdbutils_err_e sdbutils_do_cat_id (struct sdbfs *fs, uint64_t vendor, uint32_t dev)
+sdbutils_err_e sdbutils_do_cat_name (struct sdbfs *fs, char *name)
+{
+    return sdbutils_do_cat_name_file (fs, name, NULL);
+}
+
+sdbutils_err_e sdbutils_do_cat_id_file (struct sdbfs *fs, uint64_t vendor, uint32_t dev,
+        FILE *stream)
 {
     sdbutils_err_e err = SDBUTILS_SUCCESS;
     char buf[4096];
@@ -234,13 +263,18 @@ sdbutils_err_e sdbutils_do_cat_id (struct sdbfs *fs, uint64_t vendor, uint32_t d
 
         memcpy (name, buf, i);
         name [namesize] = '\0';
-        DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO | DBG_LVL_SIMPLE , "%s\n", name);
+        __SDBUTILS_PRINT(stream, "%s\n", name);
     }
 
     sdbfs_close (fs);
 
 err_open_id:
     return err;
+}
+
+sdbutils_err_e sdbutils_do_cat_id (struct sdbfs *fs, uint64_t vendor, uint32_t dev)
+{
+    return sdbutils_do_cat_id_file (fs, vendor, dev, NULL);
 }
 
 struct sdb_device *sdbutils_next_device (struct sdbfs *fs)
