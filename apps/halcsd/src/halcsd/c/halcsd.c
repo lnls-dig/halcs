@@ -34,14 +34,27 @@
 #define LOG_FILENAME_LEN            50
 /* This composes the log filename as "halcsd%u_fe%u.log" or
  * "halcsd%u_be%u.log" */
+#define DEVIO_LOG_PREFIX_PATTERN    "%s/"
 #define DEVIO_LOG_RADICAL_PATTERN   "halcsd%u"
 #define DEVIO_LOG_DEVIO_MODEL_TYPE  "%s"
 #define DEVIO_LOG_INST_TYPE         "%u"
 #define DEVIO_LOG_SUFFIX            "log"
-#define DEVIO_LOG_FILENAME_PATTERN \
+#define DEVIO_LOG_FILENAME_PATTERN  \
+                                    DEVIO_LOG_PREFIX_PATTERN \
                                     DEVIO_LOG_RADICAL_PATTERN "_" \
                                     DEVIO_LOG_DEVIO_MODEL_TYPE \
                                     DEVIO_LOG_INST_TYPE "." \
+                                    DEVIO_LOG_SUFFIX
+
+/* This composes the INFO filename as "halcsd%u_fe%u_info.log" or
+ * "halcsd%u_be%u_info.log" */
+#define DEVIO_LOG_INFO_TYPE         "info"
+#define DEVIO_LOG_INFO_FILENAME_PATTERN  \
+                                    DEVIO_LOG_PREFIX_PATTERN \
+                                    DEVIO_LOG_RADICAL_PATTERN "_" \
+                                    DEVIO_LOG_DEVIO_MODEL_TYPE \
+                                    DEVIO_LOG_INST_TYPE "_" \
+                                    DEVIO_LOG_INFO_TYPE "." \
                                     DEVIO_LOG_SUFFIX
 
 /* Arbitrary hard limit for the maximum number of AFE DEVIOs
@@ -56,13 +69,14 @@
 #define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
 #define EPICS_HALCS_RUN_SCRIPT_NAME       "./run.sh"
 
-#define DEVIO_LIBHALCSCLIENT_LOG_MODE    "a"
-#define DEVIO_KILL_CFG_SIGNAL       SIGINT
+#define DEVIO_LIBHALCSCLIENT_LOG_MODE   "a"
+#define DEVIO_KILL_CFG_SIGNAL           SIGINT
+#define FRONTEND_ENDPOINT_PREFIX        "ipc:///tmp/halcs-pipe"
 
 static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
         zhashx_t *hints, char **dev_entry);
-static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
-        const char *devio_type, uint32_t smio_inst_id);
+static char *_create_log_filename (char *log_prefix, char *log_filename_pattern, 
+        uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
 static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id);
@@ -462,15 +476,22 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Creating DEVIO instance ...\n");
 
     /* Create LOG filename path */
-    char *devio_log_filename = _create_log_filename (log_prefix, dev_id,
-            devio_type_str, fe_smio_id);
+    char *devio_log_filename = _create_log_filename (log_prefix, 
+            DEVIO_LOG_FILENAME_PATTERN, dev_id, devio_type_str, 
+            fe_smio_id);
     ASSERT_ALLOC (devio_log_filename, err_devio_log_filename_alloc);
+
+    /* Create LOG DEVIO info path */
+    char *devio_log_info_filename = _create_log_filename (log_prefix, 
+            DEVIO_LOG_INFO_FILENAME_PATTERN, dev_id, devio_type_str, 
+            fe_smio_id);
+    ASSERT_ALLOC (devio_log_info_filename, err_devio_log_info_filename_alloc);
 
     char devio_service_str [DEVIO_SERVICE_LEN];
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:DEVIO", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
-            broker_endp, verbose, devio_log_filename);
+            broker_endp, verbose, devio_log_filename, devio_log_info_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 
     /*  Start DEVIO loop */
@@ -490,8 +511,10 @@ int main (int argc, char *argv[])
         goto err_server;
     }
 
-    /* Print SDB devices */
+    /* Print SDB devices into generic log */
     devio_print_info (server);
+    /* Print SDB devices into log_info */
+    devio_print_info_log (server);
 
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
@@ -549,6 +572,28 @@ int main (int argc, char *argv[])
      * be sure HALCS is ready to go */
     devio_register_sm (server, 0xdc64e778, 0, 0);
 
+#if 0
+    /* Expose our PIPE port to IPC so other clients can query the server */
+    zactor_t *proxy = zactor_new (zproxy, NULL);
+    ASSERT_ALLOC (proxy, err_proxy_alloc, DEVIO_ERR_ALLOC);
+
+    const char *backend_endpoint = zsock_endpoint (devio_get_pipe (devio));
+    char frontend_endpoint [50];
+    snprintf (frontend_endpoint, sizeof (frontend_endpoint), "%s%u", 
+        FRONTEND_ENDPOINT_PREFIX, full_dev_id);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Backend (server) endpoint: %s\n", 
+        backend_endpoint);
+    printf ("[halcsd] Backend (server) endpoint: %s\n", backend_endpoint);
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Frontend (clients) endpoint: %s\n", 
+        frontend_endpoint);
+    printf ("[halcsd] Frontend (server) endpoint: %s\n", frontend_endpoint);
+    zstr_sendx (proxy, "FRONTEND", "ROUTER", frontend_endpoint, NULL);
+    zsock_wait (proxy);
+    zstr_sendx (proxy, "BACKEND", "PAIR", backend_endpoint, NULL);
+    zsock_wait (proxy);
+#endif
+
+#if 1
     /*  Accept and print any message back from server */
     while (true) {
         char *message = zstr_recv (server);
@@ -561,13 +606,19 @@ int main (int argc, char *argv[])
             break;
         }
     }
+#endif
 
+#if 0
+err_proxy_alloc:
+#endif
 smio_cfg_done_err:
 err_plat_devio:
     zactor_destroy (&server);
 err_server:
     devio_destroy (&devio);
 err_devio_alloc:
+    free (devio_log_info_filename);
+err_devio_log_info_filename_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
 #if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
@@ -629,8 +680,8 @@ err_cfg_exit:
     return err;
 }
 
-static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
-        const char *devio_type, uint32_t smio_inst_id)
+static char *_create_log_filename (char *log_prefix, char *log_filename_pattern, 
+        uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id)
 {
     /* Set up logdir */
     char *devio_log_filename = zmalloc (LOG_FILENAME_LEN * sizeof (char));
@@ -638,7 +689,7 @@ static char *_create_log_filename (char *log_prefix, uint32_t dev_id,
 
     /* TODO: Check for the validity of the log filename */
     int errs = snprintf (devio_log_filename, LOG_FILENAME_LEN,
-            "%s/"DEVIO_LOG_FILENAME_PATTERN, log_prefix,
+            log_filename_pattern, log_prefix,
             dev_id, devio_type, smio_inst_id);
     ASSERT_TEST (errs >= 0 && errs < LOG_FILENAME_LEN,
             "Could not generate DEVIO LOG filename", err_devio_log_gen);

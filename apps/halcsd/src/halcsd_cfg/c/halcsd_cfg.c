@@ -218,7 +218,7 @@ int main (int argc, char *argv[])
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:DEVIO_CFG", dev_id);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
-            broker_endp, verbose, log_filename);
+            broker_endp, verbose, log_filename, NULL);
 
     if (devio == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd_cfg] devio_new error!\n");
