@@ -473,10 +473,6 @@ int main (int argc, char *argv[])
             broker_endp, verbose, devio_log_filename);
     ASSERT_ALLOC (devio, err_devio_alloc);
 
-    /* Print SDB devices. FIXME. This must be called before zactor_new,
-     * as it access LLIO layer unsafely */
-    devio_print_info (devio);
-
     /*  Start DEVIO loop */
 
     /* Step 1: Loop though all the SDB records and intialize (boot) the
@@ -493,6 +489,9 @@ int main (int argc, char *argv[])
                 "server\n");
         goto err_server;
     }
+
+    /* Print SDB devices */
+    devio_print_info (server);
 
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
