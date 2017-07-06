@@ -53,6 +53,7 @@ struct _devio_t {
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
     uint32_t id;                        /* ID number of this instance */
+    char *log_info_file;                /* Log filename for DEVIO INFO messages */
     char *log_file;                     /* Log filename for tracing and debugging */
     char *endpoint_broker;              /* Broker location to connect to */
     int verbose;                        /* Print activity to stdout */
@@ -129,6 +130,7 @@ static devio_err_e _devio_reconfigure_sm_raw (devio_t *self, const char *smio_ke
 static devio_err_e _devio_reconfigure_all_sm_raw (devio_t *self);
 static devio_err_e _devio_reset_llio_raw (devio_t *self);
 static devio_err_e _devio_print_info_raw (devio_t *self);
+static devio_err_e _devio_print_info_log_raw (devio_t *self);
 static devio_err_e _devio_check_send_cfg_done (devio_t *self);
 
 /* FIXME: Only valid for PCIe devices */
@@ -162,7 +164,7 @@ static devio_sig_handler_t devio_sigchld_handler =
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
-        const char *log_file_name)
+        const char *log_file_name, const char *log_info_file_name)
 {
     assert (name);
     assert (endpoint_dev);
@@ -192,10 +194,16 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     if (log_file_name != NULL) {
         self->log_file = strdup (log_file_name);
     }
-
     ASSERT_TEST((self->log_file == NULL && log_file_name == NULL)
             || (self->log_file != NULL && log_file_name != NULL),
             "Error setting log file!", err_log_file);
+
+    if (log_info_file_name != NULL) {
+        self->log_info_file = strdup (log_info_file_name);
+    }
+    ASSERT_TEST((self->log_info_file == NULL && log_info_file_name == NULL)
+            || (self->log_info_file != NULL && log_info_file_name != NULL),
+            "Error setting log file!", err_log_info_file);
 
     /* Initialize the sockets structure to talk to nodes */
     self->pipes_mgmt = zmalloc (sizeof (*self->pipes_mgmt) * NODES_MAX_LEN);
@@ -368,6 +376,8 @@ err_pipes_config_alloc:
 err_pipes_msg_alloc:
     free (self->pipes_mgmt);
 err_pipes_mgmt_alloc:
+    free (self->log_info_file);
+err_log_info_file:
     free (self->log_file);
 err_log_file:
     free (self);
@@ -465,6 +475,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         free (self->pipes_config);
         free (self->pipes_msg);
         free (self->pipes_mgmt);
+        free (self->log_info_file);
         free (self->log_file);
         free (self);
         *self_p = NULL;
@@ -755,6 +766,10 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     else if (streq (command, "$PRINT_INFO")) {
         /* Print DEVIO information */
         _devio_print_info_raw (devio);
+    }
+    else if (streq (command, "$PRINT_INFO_LOG")) {
+        /* Print DEVIO information into INFO LOG */
+        _devio_print_info_log_raw (devio);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -1301,10 +1316,8 @@ err_llio_reset:
     return err;
 }
 
-
-/* Read specific information about the device. Typically,
- * this is stored in the SDB structure inside the device */
-static devio_err_e _devio_print_info_raw (devio_t *self)
+static devio_err_e _devio_print_sdb_list_raw (devio_t *self, 
+        const char *log_file_name, const char *mode)
 {
     assert (self);
     devio_err_e err = DEVIO_SUCCESS;
@@ -1314,14 +1327,32 @@ static devio_err_e _devio_print_info_raw (devio_t *self)
             "SDB is only supported for PCIe devices",
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
+    /* errhand_log_open accepts NULL of the log_file_name and
+     * returns stdout as the FILE * stream. However, for 
+     * sdbutils_do_list_file () we'd better use NULL as NULL,
+     * so it can identify to use the log functions instead */
+    FILE *log_file = NULL; 
+    if (log_file_name != NULL) {
+        log_file = errhand_log_open (log_file_name, mode); 
+    }
     /* Print SDB */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
             "[devio_print_info] SDB information:\n");
-    sdbutils_do_list (self->sdbfs, 1);
+    sdbutils_do_list_file (self->sdbfs, 1, log_file);
+    if (log_file_name != NULL) {
+        errhand_log_close (log_file);
+    }
     return err;
 
 err_sdb_not_supp:
     return err;
+}
+
+/* Read specific information about the device. Typically,
+ * this is stored in the SDB structure inside the device */
+static devio_err_e _devio_print_info_raw (devio_t *self)
+{
+    return _devio_print_sdb_list_raw (self, NULL, "a");
 }
 
 devio_err_e devio_print_info (void *pipe)
@@ -1331,6 +1362,24 @@ devio_err_e devio_print_info (void *pipe)
 
     int zerr = zsock_send (pipe, "s", "$PRINT_INFO");
     ASSERT_TEST(zerr == 0, "Could not print DEVIO info", err_print_info,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_print_info:
+    return err;
+}
+
+static devio_err_e _devio_print_info_log_raw (devio_t *self)
+{
+    return _devio_print_sdb_list_raw (self, self->log_info_file, "w");
+}
+
+devio_err_e devio_print_info_log (void *pipe)
+{
+    assert (pipe);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    int zerr = zsock_send (pipe, "s", "$PRINT_INFO_LOG");
+    ASSERT_TEST(zerr == 0, "Could not print DEVIO info log", err_print_info,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_print_info:

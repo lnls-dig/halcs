@@ -55,9 +55,9 @@ typedef struct {
 /***************** Our methods *****************/
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
+devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
-        const char *log_file_name);
+        const char *log_file_name, const char *log_info_file_name);
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);
 
@@ -79,6 +79,10 @@ devio_err_e devio_reset_llio (void *pipe);
 /* Read specific information about the device. Typically,
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (void *pipe);
+/* Read specific information about the device and print it
+ * to INFO log. Typically, this is stored in the SDB structure 
+ * inside the device */
+devio_err_e devio_print_info_log (void *pipe);
 
 /* Poll all PIPE sockets */
 void devio_loop (zsock_t *pipe, void *args);
