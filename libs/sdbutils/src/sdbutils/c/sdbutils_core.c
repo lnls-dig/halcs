@@ -190,7 +190,7 @@ sdbutils_err_e sdbutils_do_list_file (struct sdbfs *fs, int opt_long, FILE *stre
     int new = 1;
 
     while ( (d = sdbfs_scan(fs, new)) != NULL) {
-        err = sdbutils_list_device_file (d, fs->depth, fs->base[fs->depth], opt_long, 
+        err = sdbutils_list_device_file (d, fs->depth, fs->base[fs->depth], opt_long,
                 stream);
         ASSERT_TEST(err == SDBUTILS_SUCCESS, "Could not list device",
                 err_list_device, SDBUTILS_ERR_ALLOC);

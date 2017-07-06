@@ -1316,7 +1316,7 @@ err_llio_reset:
     return err;
 }
 
-static devio_err_e _devio_print_sdb_list_raw (devio_t *self, 
+static devio_err_e _devio_print_sdb_list_raw (devio_t *self,
         const char *log_file_name, const char *mode)
 {
     assert (self);
@@ -1328,12 +1328,12 @@ static devio_err_e _devio_print_sdb_list_raw (devio_t *self,
             err_sdb_not_supp, DEVIO_ERR_FUNC_NOT_IMPL);
 
     /* errhand_log_open accepts NULL of the log_file_name and
-     * returns stdout as the FILE * stream. However, for 
+     * returns stdout as the FILE * stream. However, for
      * sdbutils_do_list_file () we'd better use NULL as NULL,
      * so it can identify to use the log functions instead */
-    FILE *log_file = NULL; 
+    FILE *log_file = NULL;
     if (log_file_name != NULL) {
-        log_file = errhand_log_open (log_file_name, mode); 
+        log_file = errhand_log_open (log_file_name, mode);
     }
     /* Print SDB */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,

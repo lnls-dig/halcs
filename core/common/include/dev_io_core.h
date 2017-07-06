@@ -80,7 +80,7 @@ devio_err_e devio_reset_llio (void *pipe);
  * this is stored in the SDB structure inside the device */
 devio_err_e devio_print_info (void *pipe);
 /* Read specific information about the device and print it
- * to INFO log. Typically, this is stored in the SDB structure 
+ * to INFO log. Typically, this is stored in the SDB structure
  * inside the device */
 devio_err_e devio_print_info_log (void *pipe);
 

@@ -28,7 +28,7 @@ sdbutils_err_e sdbutils_do_cat_name_file (struct sdbfs *fs, char *name, FILE *st
 
 /* Search for device Vendor/ID and print device */
 sdbutils_err_e sdbutils_do_cat_id (struct sdbfs *fs, uint64_t vendor, uint32_t dev);
-sdbutils_err_e sdbutils_do_cat_id_file (struct sdbfs *fs, uint64_t vendor, uint32_t dev, 
+sdbutils_err_e sdbutils_do_cat_id_file (struct sdbfs *fs, uint64_t vendor, uint32_t dev,
         FILE *stream);
 
 /* Return next device on current SDB position */
