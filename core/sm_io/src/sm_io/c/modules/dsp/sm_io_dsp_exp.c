@@ -181,6 +181,48 @@ RW_PARAM_FUNC(dsp, monit_updt) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+static int _dsp_monit_amp_pos (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+    int err = -DSP_OK;
+    RW_REPLY_TYPE rw_err = RW_OK;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp] "
+            "Calling _dsp_monit_amp_pos\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_dsp_t *dsp = smio_get_handler (self);
+    ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",
+            err_get_dsp_handler, -DSP_ERR);
+
+    /* 
+     * Message is:
+     * frame 0: operation code
+     */
+    smio_dsp_data_t *data = (smio_dsp_data_t *) ret;
+
+    rw_err |= GET_PARAM(self, dsp, 0x0, POS_CALC,
+            DSP_MONIT_AMP_CH0, /* field = NULL */, MULT_BIT_PARAM, 
+            data->amp_ch0, NO_FMT_FUNC);
+    rw_err |= GET_PARAM(self, dsp, 0x0, POS_CALC,
+            DSP_MONIT_AMP_CH1, /* field = NULL */, MULT_BIT_PARAM, 
+            data->amp_ch1, NO_FMT_FUNC);
+    rw_err |= GET_PARAM(self, dsp, 0x0, POS_CALC,
+            DSP_MONIT_AMP_CH2, /* field = NULL */, MULT_BIT_PARAM, 
+            data->amp_ch2, NO_FMT_FUNC);
+    rw_err |= GET_PARAM(self, dsp, 0x0, POS_CALC,
+            DSP_MONIT_AMP_CH3, /* field = NULL */, MULT_BIT_PARAM, 
+            data->amp_ch3, NO_FMT_FUNC);
+    ASSERT_TEST(rw_err == RW_OK, "Could not get MONIT. amp/pos parameters", 
+        err_exit, -DSP_ERR);
+
+    return sizeof (*data);
+
+err_get_dsp_handler:
+err_exit:
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -199,6 +241,7 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_pos_q),
     RW_PARAM_FUNC_NAME(dsp, monit_pos_sum),
     RW_PARAM_FUNC_NAME(dsp, monit_updt),
+    _dsp_monit_amp_pos,
     NULL
 };
 

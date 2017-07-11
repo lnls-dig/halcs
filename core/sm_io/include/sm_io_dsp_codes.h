@@ -8,6 +8,17 @@
 #ifndef _SM_IO_DSP_CODES_H_
 #define _SM_IO_DSP_CODES_H_
 
+struct _smio_dsp_data_t {
+    uint32_t amp_ch0;                    /* Amplitude CH0 */
+    uint32_t amp_ch1;                    /* Amplitude CH1 */
+    uint32_t amp_ch2;                    /* Amplitude CH2 */
+    uint32_t amp_ch3;                    /* Amplitude CH3 */
+    int32_t pos_x;                       /* Position X */
+    int32_t pos_y;                       /* Position Y */
+    int32_t pos_q;                       /* Position Q */
+    uint32_t pos_sum;                    /* Position Sum */
+};
+
 /* Messaging OPCODES */
 #define DSP_OPCODE_TYPE                     uint32_t
 #define DSP_OPCODE_SIZE                     (sizeof (DSP_OPCODE_TYPE))
@@ -44,6 +55,15 @@
 #define DSP_NAME_SET_GET_MONIT_POS_SUM      "dsp_set_get_monit_pos_sum"
 #define DSP_OPCODE_SET_GET_MONIT_UPDT       15
 #define DSP_NAME_SET_GET_MONIT_UPDT         "dsp_set_get_monit_updt"
-#define DSP_OPCODE_END                      16
+#define DSP_OPCODE_SET_GET_MONIT_AMP_POS    16
+#define DSP_NAME_SET_GET_MONIT_AMP_POS      "dsp_set_get_monit_amp_pos"
+#define DSP_OPCODE_END                      17
+
+/* Messaging Reply OPCODES */
+#define DSP_REPLY_TYPE                      uint32_t
+#define DSP_REPLY_SIZE                      (sizeof (DSP_REPLY_TYPE))
+
+#define DSP_OK                              0   /* Operation was successful */
+#define DSP_ERR                             1   /* Generic error */
 
 #endif
