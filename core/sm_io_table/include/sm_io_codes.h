@@ -16,6 +16,8 @@
 typedef struct _smio_acq_data_block_t smio_acq_data_block_t;
 /* Forward smio_afc_diag_revision_data_t declaration structure */
 typedef struct _smio_afc_diag_revision_data_t smio_afc_diag_revision_data_t;
+/* Forward smio_dsp_data_t declaration structure */
+typedef struct _smio_dsp_data_t smio_dsp_data_t;
 /* Forward smio_rffe_data_block_t declaration structure */
 typedef struct _smio_rffe_data_block_t smio_rffe_data_block_t;
 /* Forward smio_rffe_version_t declaration structure */

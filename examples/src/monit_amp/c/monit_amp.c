@@ -115,44 +115,27 @@ int main (int argc, char *argv [])
         fprintf (stderr, "[client:acq]: halcs_set_monit_updt failed\n");
         goto err_set_monit_updt;
     }
-
-    uint32_t monit_amp;
-    err = halcs_get_monit_amp_ch0 (halcs_client, service,
-            &monit_amp);
+    
+    smio_dsp_data_t dsp_data;
+    err = halcs_get_monit_amp_pos (halcs_client, service, &dsp_data);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_get_monit_amp_ch0 failed\n");
+        fprintf (stderr, "[client:monit_amp]: halcs_get_monit_amp_pos failed\n");
         goto err_get_monit_amp;
     }
 
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch0 = %u\n", monit_amp);
+    fprintf (stdout, "[client:monit_amp]: \n"
+              "monitoring amplitude ch0 = %u\n"
+              "monitoring amplitude ch1 = %u\n"
+              "monitoring amplitude ch2 = %u\n"
+              "monitoring amplitude ch3 = %u\n", 
+              dsp_data.amp_ch0,
+              dsp_data.amp_ch1,
+              dsp_data.amp_ch2,
+              dsp_data.amp_ch3);
 
-    err = halcs_get_monit_amp_ch1 (halcs_client, service, &monit_amp);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_get_monit_amp_ch1 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch1 = %u\n", monit_amp);
-
-    err = halcs_get_monit_amp_ch2 (halcs_client, service, &monit_amp);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_get_monit_amp_ch2 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch2 = %u\n", monit_amp);
-
-    err = halcs_get_monit_amp_ch3 (halcs_client, service, &monit_amp);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_get_monit_amp_ch3 failed\n");
-        goto err_get_monit_amp;
-    }
-
-    fprintf (stdout, "[client:monit_amp]: monitoring amplitude ch3 = %u\n", monit_amp);
-
-err_halcs_client_new:
 err_get_monit_amp:
 err_set_monit_updt:
+err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
     str_p = &board_number_str;
     free (*str_p);
