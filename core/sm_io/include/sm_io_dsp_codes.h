@@ -13,10 +13,12 @@ struct _smio_dsp_data_t {
     uint32_t amp_ch1;                    /* Amplitude CH1 */
     uint32_t amp_ch2;                    /* Amplitude CH2 */
     uint32_t amp_ch3;                    /* Amplitude CH3 */
+    uint32_t new_amp_data;               /* Do we have new AMP data? */
     int32_t pos_x;                       /* Position X */
     int32_t pos_y;                       /* Position Y */
     int32_t pos_q;                       /* Position Q */
     uint32_t pos_sum;                    /* Position Sum */
+    uint32_t new_pos_data;               /* Do we have new POS data? */
 };
 
 /* Messaging OPCODES */
