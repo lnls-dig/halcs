@@ -108,16 +108,8 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    uint32_t monit_updt = 1;
-    halcs_client_err_e err = halcs_set_monit_updt (halcs_client, service,
-            monit_updt);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: halcs_set_monit_updt failed\n");
-        goto err_set_monit_updt;
-    }
-    
     smio_dsp_data_t dsp_data;
-    err = halcs_get_monit_amp_pos (halcs_client, service, &dsp_data);
+    halcs_client_err_e err = halcs_get_monit_amp_pos (halcs_client, service, &dsp_data);
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:monit_amp]: halcs_get_monit_amp_pos failed\n");
         goto err_get_monit_amp;
@@ -134,7 +126,6 @@ int main (int argc, char *argv [])
               dsp_data.amp_ch3);
 
 err_get_monit_amp:
-err_set_monit_updt:
 err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
     str_p = &board_number_str;
