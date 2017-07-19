@@ -608,7 +608,7 @@ smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en)
         }
         /* Output enabled */
         else {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
                     "[sm_ch:ad9510] Output #%u is going to be enabled\n", i);
             data = (data & ~AD9510_LVPECL_OUT_PDOWN_MASK) |
                 AD9510_LVPECL_OUT_PDOWN_W(0x00); /* Power up */
@@ -624,7 +624,7 @@ smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en)
 
         /* Output disabled */
         if ((__out_en & AD9510_OUTPUT_EN_LSB_MASK) == 0) {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
                     "[sm_ch:ad9510] Output #%u is going to be enabled\n", i);
             data |= AD9510_LVDS_CMOS_PDOWN;
         }
