@@ -14,15 +14,17 @@
 
 #define FMC_ADC_COMMON_OPCODE_LEDS                          0
 #define FMC_ADC_COMMON_NAME_LEDS                            "fmc_adc_common_leds"
-#define FMC_ADC_COMMON_OPCODE_TEST_DATA_EN                  1
+#define FMC_ADC_COMMON_OPCODE_MMCM_RST                      1
+#define FMC_ADC_COMMON_NAME_MMCM_RST                        "fmc_adc_common_mmcm_rst"
+#define FMC_ADC_COMMON_OPCODE_TEST_DATA_EN                  2
 #define FMC_ADC_COMMON_NAME_TEST_DATA_EN                    "fmc_adc_common_adc_test_data_en"
-#define FMC_ADC_COMMON_OPCODE_TRIG_DIR                      2
+#define FMC_ADC_COMMON_OPCODE_TRIG_DIR                      3
 #define FMC_ADC_COMMON_NAME_TRIG_DIR                        "fmc_adc_common_trig_dir"
-#define FMC_ADC_COMMON_OPCODE_TRIG_TERM                     3
+#define FMC_ADC_COMMON_OPCODE_TRIG_TERM                     4
 #define FMC_ADC_COMMON_NAME_TRIG_TERM                       "fmc_adc_common_trig_term"
-#define FMC_ADC_COMMON_OPCODE_TRIG_VAL                      4
+#define FMC_ADC_COMMON_OPCODE_TRIG_VAL                      5
 #define FMC_ADC_COMMON_NAME_TRIG_VAL                        "fmc_adc_common_trig_val"
-#define FMC_ADC_COMMON_OPCODE_END                           5
+#define FMC_ADC_COMMON_OPCODE_END                           6
 
 /* Messaging Reply OPCODES */
 #define FMC_ADC_COMMON_REPLY_TYPE                           uint32_t

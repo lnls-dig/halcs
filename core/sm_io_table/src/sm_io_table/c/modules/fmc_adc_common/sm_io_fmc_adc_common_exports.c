@@ -22,6 +22,18 @@ disp_op_t fmc_adc_common_leds_exp = {
     }
 };
 
+disp_op_t fmc_adc_common_mmcm_rst_exp = {
+    .name = FMC_ADC_COMMON_NAME_MMCM_RST,
+    .opcode = FMC_ADC_COMMON_OPCODE_MMCM_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t fmc_adc_common_test_data_en_exp = {
     .name = FMC_ADC_COMMON_NAME_TEST_DATA_EN,
     .opcode = FMC_ADC_COMMON_OPCODE_TEST_DATA_EN,
@@ -73,6 +85,7 @@ disp_op_t fmc_adc_common_trig_val_exp = {
 /* Exported function description */
 const disp_op_t *fmc_adc_common_exp_ops [] = {
     &fmc_adc_common_leds_exp,
+    &fmc_adc_common_mmcm_rst_exp,
     &fmc_adc_common_test_data_en_exp,
     &fmc_adc_common_trig_dir_exp,
     &fmc_adc_common_trig_term_exp,

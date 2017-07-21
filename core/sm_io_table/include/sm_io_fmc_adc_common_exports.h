@@ -11,6 +11,7 @@
 #include "disptable.h"
 
 extern disp_op_t fmc_adc_common_leds_exp;
+extern disp_op_t fmc_adc_common_mmcm_rst_exp;
 extern disp_op_t fmc_adc_common_test_data_en_exp;
 extern disp_op_t fmc_adc_common_trig_dir_exp;
 extern disp_op_t fmc_adc_common_trig_term_exp;

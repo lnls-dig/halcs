@@ -54,6 +54,16 @@ RW_PARAM_FUNC(fmc_adc_common, leds) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+
+#define HALCS_FMC_ADC_COMMON_MMCM_RST_MIN                 0       /* No effect */
+#define HALCS_FMC_ADC_COMMON_MMCM_RST_MAX                 1       /* Reset MMCM. Must clear the bit after a while */
+RW_PARAM_FUNC(fmc_adc_common, mmcm_rst) {
+    SET_GET_PARAM(fmc_adc_common, 0x0, WB_FMC_ADC_COMMON_CSR,
+            MONITOR, MMCM_RST, SINGLE_BIT_PARAM,
+            HALCS_FMC_ADC_COMMON_MMCM_RST_MIN, HALCS_FMC_ADC_COMMON_MMCM_RST_MAX, 
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /***************************** FPGA Control ***************************/
 
 #define HALCS_FMC_ADC_COMMON_TEST_DATA_EN_MIN             0 /* TEST data enable off */
@@ -99,6 +109,7 @@ RW_PARAM_FUNC(fmc_adc_common, trig_val) {
 /* Exported function pointers */
 const disp_table_func_fp fmc_adc_common_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc_adc_common, leds),
+    RW_PARAM_FUNC_NAME(fmc_adc_common, mmcm_rst),
     RW_PARAM_FUNC_NAME(fmc_adc_common, test_data_en),
     RW_PARAM_FUNC_NAME(fmc_adc_common, trig_dir),
     RW_PARAM_FUNC_NAME(fmc_adc_common, trig_term),
