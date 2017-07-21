@@ -96,6 +96,14 @@ halcs_client_err_e halcs_get_fmc_leds (halcs_client_t *self, char *service,
 /* Macros for compatibility */
 #define halcs_blink_leds halcs_set_fmc_leds
 
+/* MMCM Reset. Sets or clears the reset to FMC ADC MMCM.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc_mmcm_rst (halcs_client_t *self, char *service,
+        uint32_t adc_mmcm_rst);
+halcs_client_err_e halcs_get_adc_mmcm_rst (halcs_client_t *self, char *service,
+        uint32_t *adc_mmcm_rst);
+
 /* Simple AD9510 Config test.
  * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
  * if server could not complete the request */
