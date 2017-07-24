@@ -127,7 +127,9 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
+    char service_common[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, halcs_number);
+    snprintf (service_common, sizeof (service_common), "HALCS%u:DEVIO:FMC_ADC_COMMON%u", board_number, halcs_number);
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
@@ -156,8 +158,18 @@ int main (int argc, char *argv [])
 
     printf ("Freq: %f\n", freq);
 
-err_halcs_client_new:
+    /* Always reset MMCM when changing frequency */
+    err = halcs_set_adc_mmcm_rst (halcs_client, service_common, 1);
+    usleep (1000);
+    err |= halcs_set_adc_mmcm_rst (halcs_client, service_common, 0);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:si571_ctl]: MMCM reset failed\n");
+        goto err_halcs_mmcm_rst;
+    }
+
+err_halcs_mmcm_rst:
 err_halcs_set_freq:
+err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
 
     str_p = &si571_freq_str;

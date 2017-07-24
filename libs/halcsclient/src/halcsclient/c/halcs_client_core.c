@@ -339,6 +339,16 @@ PARAM_FUNC_CLIENT_READ(fmc_leds)
             fmc_leds);
 }
 
+PARAM_FUNC_CLIENT_WRITE(adc_mmcm_rst)
+{
+    return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_MMCM_RST, adc_mmcm_rst);
+}
+
+PARAM_FUNC_CLIENT_READ(adc_mmcm_rst)
+{
+     return param_client_read (self, service, FMC_ADC_COMMON_OPCODE_MMCM_RST, adc_mmcm_rst);
+}
+
 PARAM_FUNC_CLIENT_WRITE(adc_test_data_en)
 {
     return param_client_write (self, service, FMC_ADC_COMMON_OPCODE_TEST_DATA_EN, adc_test_data_en);

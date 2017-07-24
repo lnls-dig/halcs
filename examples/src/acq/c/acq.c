@@ -25,6 +25,7 @@
 #define MAX_NUM_CHANS               (1 << 8)
 
 #define DFLT_FILE_FMT               0
+#define DFLT_NEWACQ_NUM             1
 
 typedef enum {
     TEXT = 0,
@@ -81,15 +82,16 @@ static struct option long_options[] =
     {"help",                no_argument,         NULL, 'h'},
     {"brokerendp",          required_argument,   NULL, 'b'},
     {"verbose",             no_argument,         NULL, 'v'},
-    {"halcsnumber",           required_argument,   NULL, 's'},
+    {"halcsnumber",         required_argument,   NULL, 's'},
     {"boardslot",           required_argument,   NULL, 'o'},
     {"channumber",          required_argument,   NULL, 'c'},
     {"numsamples",          required_argument,   NULL, 'n'},
     {"filefmt",             required_argument,   NULL, 'f'},
+    {"newacq",              required_argument,   NULL, 'a'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:n:f:";
+static const char* shortopt = "hb:vo:s:c:n:f:a:";
 
 void print_help (char *program_name)
 {
@@ -111,7 +113,8 @@ void print_help (char *program_name)
             "                                     13 -> FOFB Pos; 14 -> Monit Amp; 15 -> Monit Pha; 16 -> Monit Pos]\n"
             "  -n  --numsamples <Number of samples> Number of samples\n"
             "  -f  --filefmt <Output format = [0 = text | 1=binary]>\n"
-            "                                       Output format\n",
+            "                                       Output format\n"
+            "  -a  --newcq <Trigger new acquisition = [0 = no | 1 = yes]\n",
             program_name);
 }
 
@@ -123,6 +126,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
     char *chan_str = NULL;
+    char *new_acq_str = NULL;
     char *file_fmt_str = NULL;
     int opt;
 
@@ -157,6 +161,10 @@ int main (int argc, char *argv [])
 
             case 'n':
                 num_samples_str = strdup (optarg);
+                break;
+
+            case 'a':
+                new_acq_str = strdup (optarg);
                 break;
 
             case 'f':
@@ -259,6 +267,20 @@ int main (int argc, char *argv [])
         }
     }
 
+    /* Set new_acq */
+    uint32_t new_acq;
+    if (new_acq_str == NULL) {
+        new_acq = DFLT_NEWACQ_NUM;
+    }
+    else {
+        new_acq = strtoul (new_acq_str, NULL, 10);
+
+        if (new_acq != 0 && new_acq != 1) {
+            fprintf (stderr, "[client:acq]: Newacq parameter is invalid\n");
+            exit (1);
+        }
+    }
+
     char service[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
 
@@ -295,7 +317,7 @@ int main (int argc, char *argv [])
 
     uint32_t data_size = num_samples*req_ch_sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
-    bool new_acq = true;
+    bool new_acq_arg = new_acq;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples_pre = num_samples,
                                         .num_samples_post = 0,
@@ -307,7 +329,7 @@ int main (int argc, char *argv [])
                                         .data_size = data_size,
                                       }
                             };
-    err = acq_full_compat (acq_client, service, &acq_trans, 50000, new_acq);
+    err = acq_full_compat (acq_client, service, &acq_trans, 50000, new_acq_arg);
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: acq_full_compat failed\n");
         goto err_acq_full_compat;
