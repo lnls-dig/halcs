@@ -191,7 +191,7 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_LSB_COUNTER, &data);
 
     /* Power-up LVPECL outputs */
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
             "[sm_ch:ad9510] Powering up LVPECL outputs 0-3\n");
     data = AD9510_LVPECL_OUT_LVL_W(0x02) /* 810 mV output */ |
         AD9510_LVPECL_OUT_PDOWN_W(0x0) /* Do not power down */;
@@ -201,14 +201,14 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_LVPECL_OUT3, &data);
 
     /* Power-up LVCMOS/LVDS output 4 (DEBUG) */
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
             "[sm_ch:ad9510] Powering up LVDS/CMOS output 4\n");
     data = AD9510_LVDS_CMOS_CURR_W(0x1) /* 3.5 mA, 100 Ohm */ & (
         ~AD9510_LVDS_CMOS_PDOWN /* Do not power down */);
     _smch_ad9510_write_8 (self, AD9510_REG_LVDS_CMOS_OUT4, &data);
 
     /* Power-down LVCMOS/LVDS outputs 5-7*/
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
             "[sm_ch:ad9510] Powering down LVDS/CMOS outputs 5-7\n");
     data = AD9510_LVDS_CMOS_CURR_W(0x1) /* 3.5 mA, 100 Ohm */ | (
         AD9510_LVDS_CMOS_PDOWN /* Power down */);
@@ -601,7 +601,7 @@ smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en)
 
         /* Output disabled */
         if ((__out_en & AD9510_OUTPUT_EN_LSB_MASK) == 0) {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
                     "[sm_ch:ad9510] Output #%u is going to be disabled\n", i);
             data = (data & ~AD9510_LVPECL_OUT_PDOWN_MASK) |
                 AD9510_LVPECL_OUT_PDOWN_W(0x02); /* Safe power down */
@@ -630,7 +630,7 @@ smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en)
         }
         /* Output enabled */
         else {
-            DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO,
+            DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE,
                     "[sm_ch:ad9510] Output #%u is going to be enabled\n", i);
             data &= ~AD9510_LVDS_CMOS_PDOWN;
         }

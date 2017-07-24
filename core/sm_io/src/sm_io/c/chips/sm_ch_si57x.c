@@ -343,7 +343,7 @@ static smch_err_e _smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
     tmp = (tmp << 8) + SI57X_RFREQ4_RFREQ_7_0_R(divs[5]);
     *rfreq = tmp;
 
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:si57x_get_divs]\n"
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_divs]\n"
             "\tRFREQ = %"PRIu64", HS_DIV = %u, N1 = %u\n", *rfreq, *hs_div, *n1);
 
 err_exit:
