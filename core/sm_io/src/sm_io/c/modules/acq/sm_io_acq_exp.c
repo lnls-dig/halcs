@@ -101,7 +101,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     /* channel required is out of the limit */
-    if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
+    if (chan > acq->num_chan-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
         return -ACQ_NUM_CHAN_OOR;
@@ -316,7 +316,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "chan = %u, block_n = %u\n", chan, block_n);
 
     /* channel required is out of the limit */
-    if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
+    if (chan > acq->num_chan-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
 
@@ -767,7 +767,7 @@ RW_PARAM_FUNC(acq, fsm_stop) {
 }
 
 #define ACQ_DATA_DRIVEN_CHAN_MIN                    0
-#define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
+#define ACQ_DATA_DRIVEN_CHAN_MAX                    ((1<<5)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_chan) {
     SET_GET_PARAM(acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL,
             DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,
