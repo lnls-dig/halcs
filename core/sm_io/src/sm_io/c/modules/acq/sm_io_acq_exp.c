@@ -446,18 +446,18 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t valid_bytes = 0;
     uint64_t addr_start = addr_i;
     uint64_t rem_mem_space = end_mem_space_addr - addr_start;
-    for ( ; 
-            num_bytes_read < reply_size_full; 
+    for ( ;
+            num_bytes_read < reply_size_full;
             num_bytes_read += valid_bytes) {
-        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)? 
+        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)?
                 rem_mem_space : reply_size_full-num_bytes_read;
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
                 "Reading %u bytes from address 0x%"PRIx64"\n"
                 "\twith remaining memory space 0x%"PRIx64"\n"
-                "\twith end memory space 0x%08X\n", 
-                bytes_to_read, addr_start, 
-                rem_mem_space, 
+                "\twith end memory space 0x%08X\n",
+                bytes_to_read, addr_start,
+                rem_mem_space,
                 end_mem_space_addr);
 
         /* Here we must use the "raw" version, as we can't have

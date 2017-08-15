@@ -46,7 +46,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 
     /* Get the number of acquisition channels. If 0, this register is probably
      * unimplemented in gateware, so default it to the board END_CHAN_ID */
-    GET_PARAM(parent, acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL, 
+    GET_PARAM(parent, acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL,
             NUM_CHAN, MULT_BIT_PARAM, self->num_chan, NO_FMT_FUNC);
     if (self->num_chan == 0) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Number of channels is 0. "
@@ -103,7 +103,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         first_addr = acq_buf_start_addr;
         /* This is the last possible address to store a sample. be safe in case
          * this is a dummy area with 0 bytes space */
-        last_addr = ((acq_buf_end_addr - sample_size) > acq_buf_start_addr)? 
+        last_addr = ((acq_buf_end_addr - sample_size) > acq_buf_start_addr)?
             (acq_buf_end_addr - sample_size) : acq_buf_start_addr;
         max_samples = (last_addr - first_addr) / sample_size;
 
@@ -118,8 +118,8 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
             "\tStart Addr = 0x%08X\n"
             "\tEnd Addr = 0x%08X\n"
             "\tSample Size = %u\n"
-            "\tMax Samples = %u\n", 
-            inst_id, self->acq_buf[i].id, self->acq_buf[i].start_addr, 
+            "\tMax Samples = %u\n",
+            inst_id, self->acq_buf[i].id, self->acq_buf[i].start_addr,
             self->acq_buf[i].end_addr, self->acq_buf[i].sample_size, self->acq_buf[i].max_samples);
     }
 
@@ -135,7 +135,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
             "\tNumber of Samples Pre-Trigger = %u\n"
             "\tNumber of Samples Post-Trigger = %u\n"
             "\tNumber of Shots = %u\n"
-            "\tTrigger Address = 0x%08X\n", 
+            "\tTrigger Address = 0x%08X\n",
             inst_id, i, self->acq_params[i].num_samples_pre, self->acq_params[i].num_samples_post,
             self->acq_params[i].num_shots, self->acq_params[i].trig_addr);
     }
