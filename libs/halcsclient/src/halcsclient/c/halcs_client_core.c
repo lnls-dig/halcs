@@ -602,6 +602,18 @@ PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_defaults)
             si571_defaults);
 }
 
+PARAM_FUNC_CLIENT_WRITE_DOUBLE(si571_fstartup)
+{
+    return param_client_write_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_FSTARTUP,
+            si571_fstartup);
+}
+
+PARAM_FUNC_CLIENT_READ_DOUBLE(si571_fstartup)
+{
+    return param_client_read_double (self, service, FMC_ACTIVE_CLK_OPCODE_SI571_FSTARTUP,
+            si571_fstartup);
+}
+
 /**************** FMC 130M SMIO Functions ****************/
 
 /* ADC LTC2208 RAND */
