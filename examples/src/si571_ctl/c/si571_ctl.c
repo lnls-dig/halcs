@@ -12,7 +12,7 @@
 
 #define DFLT_BOARD_NUMBER           0
 
-#define DFLT_SI571_FREQ             100000000.000   /* 100 MHz */
+#define DFLT_SI571_FREQ             1000000.000     /* 1 MHz */
 #define MAX_SI571_FREQ              1000000000.000  /* 1GHz */
 
 void print_help (char *program_name)
