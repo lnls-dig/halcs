@@ -40,6 +40,10 @@ smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout);
 smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq);
 /* Get current frequency */
 smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq);
+/* Set startup frequency */
+smch_err_e smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup);
+/* Get startup frequency */
+double smch_si57x_get_fstartup (smch_si57x_t *self);
 
 #ifdef __cplusplus
 }

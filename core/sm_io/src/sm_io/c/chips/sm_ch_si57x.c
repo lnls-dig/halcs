@@ -49,6 +49,7 @@ struct _smch_si57x_t {
     unsigned int hs_div;            /* High Speed divider value */
     uint64_t rfreq;                 /* RFreq value */
     double frequency;               /* Output crystal frequency */
+    double fstartup;                /* Startup frequency, This depends on the crystal part number*/
 };
 
 static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
@@ -73,6 +74,8 @@ static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
 static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
         uint64_t *out_rfreq, unsigned int *out_n1, unsigned int *out_hs_div);
 static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
+static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup);
+static double _smch_si57x_get_fstartup (smch_si57x_t *self);
 
 /* Creates a new instance of the SMCH SI57X */
 smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
@@ -97,6 +100,7 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
     self->hs_div    = SMCH_SI57X_DFLT_HSDIV;
     self->rfreq     = SMCH_SI57X_DFLT_RFREQ;
     self->frequency = SMCH_SI57X_DFLT_FREQUENCY;
+    self->fstartup  = SMCH_SI57X_DFLT_FACTORY;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:si57x] Created instance of SMCH\n");
     return self;
@@ -216,6 +220,23 @@ smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
 
     *freq = frequency;
     return err;
+}
+
+smch_err_e smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ASSERT_TEST(fstartup > 1000000.0, "Invalid startup frequency (<= 1 MHz)", 
+        err_exit, SMCH_ERR_RW_SMPR);
+    err = _smch_si57x_set_fstartup (self, fstartup);
+    return err;
+
+err_exit:
+   return err;
+}
+
+double smch_si57x_get_fstartup (smch_si57x_t *self)
+{
+    return _smch_si57x_get_fstartup (self);
 }
 
 /***************** Static functions *****************/
@@ -369,7 +390,7 @@ static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     err = _smch_si57x_get_divs (self, &self->rfreq, &self->n1, &self->hs_div);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not get divider values", err_exit);
 
-    uint64_t fdco = SI57X_FOUT_FACTORY_DFLT * self->n1 * self->hs_div;
+    uint64_t fdco = self->fstartup * self->n1 * self->hs_div;
     self->fxtal = (double) (fdco << SI57X_RFREQ_FRAC_SIZE) / (double) (self->rfreq);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_defaults] fxtal: %f, "
@@ -517,3 +538,25 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
     return err;
 }
 
+static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
+{
+    assert (self);
+    smch_err_e err = SMCH_SUCCESS;
+    self->fstartup = fstartup;
+
+    /* On changing the startup frequency, we need to recalculate the Si57x 
+     * register values */
+    err = _smch_si57x_get_defaults (self, self->fstartup);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not return to Si57x defaults after "
+            "changing fstartup", err_exit);
+    return err;
+
+err_exit:
+    return err;
+}
+
+static double _smch_si57x_get_fstartup (smch_si57x_t *self)
+{
+    assert (self);
+    return self->fstartup;
+}
