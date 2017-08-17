@@ -413,14 +413,10 @@ static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
     err = _smch_si57x_write_8 (self, SI57X_REG_FREEZE_DCO, &__data);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not freeze DCO", err_exit);
 
-    SMCH_SI57X_WAIT_DFLT;
-
     /* Write frequency registers to Chip (for 20ppm and 50ppm devices) */
     err = _smch_si57x_write_block (self, SI57X_REG_START, data, size);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not write frequency registers to chip",
             err_exit);
-
-    SMCH_SI57X_WAIT_DFLT;
 
     /* Unfreeze DCO */
     __data &= ~SI57X_FREEZE_DCO;
@@ -431,8 +427,6 @@ static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
     __data = SI57X_CONTROL_NEWFREQ;
     err = _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &__data);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not apply new frequency", err_exit);
-
-    SMCH_SI57X_WAIT_DFLT;
 
     err = _smch_si57x_wait_new_freq (self);
     ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
