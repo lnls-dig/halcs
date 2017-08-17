@@ -239,6 +239,18 @@ disp_op_t fmc_active_clk_ad9510_data_exp = {
     }
 };
 
+disp_op_t fmc_active_clk_si571_fstartup_exp = {
+    .name = FMC_ACTIVE_CLK_NAME_SI571_FSTARTUP,
+    .opcode = FMC_ACTIVE_CLK_OPCODE_SI571_FSTARTUP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_DOUBLE, double),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *fmc_active_clk_exp_ops [] = {
     &fmc_active_clk_si571_oe_exp,
@@ -260,6 +272,7 @@ const disp_op_t *fmc_active_clk_exp_ops [] = {
     &fmc_active_clk_rst_isla216p_exp,
     &fmc_active_clk_rst_swap_exp,
     &fmc_active_clk_ad9510_data_exp,
+    &fmc_active_clk_si571_fstartup_exp,
     NULL
 };
 

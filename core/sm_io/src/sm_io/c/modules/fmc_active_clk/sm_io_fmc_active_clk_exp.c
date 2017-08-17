@@ -481,6 +481,25 @@ FMC_ACTIVE_CLK_AD9510_FUNC_NAME_HEADER(data)
             "Could not read/write AD9510");
 }
 
+static smch_err_e smch_si57x_get_fstartup_compat (smch_si57x_t *self, double *param)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    double fstartup = smch_si57x_get_fstartup (self);
+    *param = fstartup;
+    return err;
+}
+
+static smch_err_e smch_si57x_set_fstartup_compat (smch_si57x_t *self, double *param)
+{
+    return smch_si57x_set_fstartup (self, *param);
+}
+
+FMC_ACTIVE_CLK_SI571_FUNC_NAME_HEADER(fstartup)
+{
+    FMC_ACTIVE_CLK_SI571_FUNC_BODY(owner, args, ret, smch_si57x_get_fstartup_compat,
+            smch_si57x_set_fstartup_compat, "Could not set/get SI571 startup frequency");
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fmc_active_clk, si571_oe),
@@ -502,6 +521,7 @@ const disp_table_func_fp fmc_active_clk_exp_fp [] = {
     _fmc_active_clk_rst_isla216p,
     _fmc_active_clk_rst_swap,
     FMC_ACTIVE_CLK_AD9510_FUNC_NAME(data),
+    FMC_ACTIVE_CLK_SI571_FUNC_NAME(fstartup),
     NULL
 };
 
