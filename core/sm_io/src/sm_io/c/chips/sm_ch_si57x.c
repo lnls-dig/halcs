@@ -383,8 +383,8 @@ static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     uint8_t data = SI57X_CONTROL_RECALL;
     _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
 
-    /* Si57x takes up to 30ms to return to initial conditions. To be safe, use 300ms */
-    SMCH_SI57X_WAIT(300000);
+    /* Si57x takes up to 30ms to return to initial conditions. */
+    SMCH_SI57X_WAIT(30000);
 
     /* Read dividers */
     err = _smch_si57x_get_divs (self, &self->rfreq, &self->n1, &self->hs_div);
