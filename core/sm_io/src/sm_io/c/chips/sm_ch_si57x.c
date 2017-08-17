@@ -458,7 +458,8 @@ static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self)
             break;
         }
 
-        SMCH_SI57X_WAIT_DFLT;
+        /* Wait 10 us between tries */
+        SMCH_SI57X_WAIT(10);
         tries++;
         ASSERT_TEST(tries < SMCH_SI57X_WAIT_TRIES, "Frequency transfer timeout", err_exit,
                 SMCH_ERR_TIMEOUT);
