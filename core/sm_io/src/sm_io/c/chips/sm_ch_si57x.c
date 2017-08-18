@@ -186,13 +186,13 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
      * setting will cause th output to stop/glitch */
     if (((fabs(frequency - self->frequency) * 10000LL) / self->frequency) < 35) {
         DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq] Configuring "
-                "frequency using _smch_si57x_set_freq_small, as fabs(%f - %f) * 10000LL) / %f < 35\n", 
+                "frequency using _smch_si57x_set_freq_small, as fabs(%f - %f) * 10000LL) / %f < 35\n",
                 frequency, self->frequency, self->frequency);
         err = _smch_si57x_set_freq_small (self, freq);
     }
     else {
         DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq] Configuring "
-                "frequency using _smch_si57x_set_freq_any, as fabs(%f - %f) * 10000LL) / %f >= 35\n", 
+                "frequency using _smch_si57x_set_freq_any, as fabs(%f - %f) * 10000LL) / %f >= 35\n",
                 frequency, self->frequency, self->frequency);
         err = _smch_si57x_set_freq_any (self, freq);
     }
@@ -209,7 +209,7 @@ static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq)
 {
     assert (self);
     assert (freq);
-    
+
     smch_err_e err = SMCH_SUCCESS;
     double frequency = *freq;
 
@@ -308,7 +308,7 @@ smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
 smch_err_e smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
 {
     smch_err_e err = SMCH_SUCCESS;
-    ASSERT_TEST(fstartup > 1000000.0, "Invalid startup frequency (<= 1 MHz)", 
+    ASSERT_TEST(fstartup > 1000000.0, "Invalid startup frequency (<= 1 MHz)",
         err_exit, SMCH_ERR_RW_SMPR);
     err = _smch_si57x_set_fstartup (self, fstartup);
     return err;
@@ -608,7 +608,7 @@ static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
     smch_err_e err = SMCH_SUCCESS;
     self->fstartup = fstartup;
 
-    /* On changing the startup frequency, we need to recalculate the Si57x 
+    /* On changing the startup frequency, we need to recalculate the Si57x
      * register values */
     err = _smch_si57x_get_defaults (self, self->fstartup);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not return to Si57x defaults after "
