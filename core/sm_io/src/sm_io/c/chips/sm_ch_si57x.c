@@ -185,13 +185,13 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
     /* Check if we can use the small frequency setting. Using the large frequency
      * setting will cause th output to stop/glitch */
     if (((fabs(frequency - self->frequency) * 10000LL) / self->frequency) < 35) {
-        DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq] Configuring "
+        DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
                 "frequency using _smch_si57x_set_freq_small, as fabs(%f - %f) * 10000LL) / %f < 35\n",
                 frequency, self->frequency, self->frequency);
         err = _smch_si57x_set_freq_small (self, freq);
     }
     else {
-        DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq] Configuring "
+        DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
                 "frequency using _smch_si57x_set_freq_any, as fabs(%f - %f) * 10000LL) / %f >= 35\n",
                 frequency, self->frequency, self->frequency);
         err = _smch_si57x_set_freq_any (self, freq);
@@ -230,7 +230,7 @@ static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq)
     err = _smch_si57x_wait_new_freq (self);
     ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
 
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq_small] Setup new "
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq_small] Setup new "
             "frequency completed\n");
 
 err_exit:
@@ -280,7 +280,7 @@ static smch_err_e _smch_si57x_set_freq_any (smch_si57x_t *self, double *freq)
     err = _smch_si57x_wait_new_freq (self);
     ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
 
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_WARN, "[sm_ch:si57x_set_freq_raw] Setup new "
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq_raw] Setup new "
             "frequency completed\n");
 
 err_exit:
