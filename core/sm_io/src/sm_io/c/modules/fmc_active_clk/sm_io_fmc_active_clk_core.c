@@ -35,6 +35,10 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io_fmc_active_clk_core]",                    \
             smio_err_str (err_type))
 
+/* FMC ACTIVE CLOCK chip addresses */
+const uint32_t fmc_active_clk_si571_addr = 0x55;
+const uint32_t fmc_active_clk_ad9510_addr = 0x01;
+
 /* Creates a new instance of Device Information */
 smio_fmc_active_clk_t * smio_fmc_active_clk_new (smio_t *parent)
 {

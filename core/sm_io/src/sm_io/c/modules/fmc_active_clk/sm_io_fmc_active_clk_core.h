@@ -11,6 +11,9 @@
 #define SMIO_AD9510_HANDLER(smio_handler) ((smch_ad9510_t *) smio_handler->smch_ad9510)
 #define SMIO_SI57X_HANDLER(smio_handler) ((smch_si57x_t *) smio_handler->smch_si571)
 
+extern const uint32_t fmc_active_clk_si571_addr;
+extern const uint32_t fmc_active_clk_ad9510_addr;
+
 typedef struct {
     smpr_spi_t *smpr_spi_ad9510;                /* SPI protocol handler */
     smch_ad9510_t *smch_ad9510;                 /* AD9510 chip handler */
