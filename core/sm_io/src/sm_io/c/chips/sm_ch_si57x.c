@@ -49,6 +49,7 @@ struct _smch_si57x_t {
     unsigned int hs_div;            /* High Speed divider value */
     uint64_t rfreq;                 /* RFreq value */
     double frequency;               /* Output crystal frequency */
+    double fstartup;                /* Startup frequency, This depends on the crystal part number*/
 };
 
 static smch_err_e _smch_si57x_write_8 (smch_si57x_t *self, uint8_t addr,
@@ -65,14 +66,18 @@ static smch_err_e _smch_si57x_read_block (smch_si57x_t *self, uint8_t addr,
 static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr,
         uint8_t *data, size_t size);
 
+static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq);
+static smch_err_e _smch_si57x_set_freq_any (smch_si57x_t *self, double *freq);
+
 static smch_err_e _smch_si57x_get_divs (smch_si57x_t *self, uint64_t *rfreq,
         unsigned int *n1, unsigned int *hs_div);
 static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout);
-static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
-        size_t size);
+static smch_err_e _smch_si57x_update_rfreq_raw (smch_si57x_t *self);
 static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
         uint64_t *out_rfreq, unsigned int *out_n1, unsigned int *out_hs_div);
 static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self);
+static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup);
+static double _smch_si57x_get_fstartup (smch_si57x_t *self);
 
 /* Creates a new instance of the SMCH SI57X */
 smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
@@ -97,6 +102,7 @@ smch_si57x_t * smch_si57x_new (smio_t *parent, uint64_t base,
     self->hs_div    = SMCH_SI57X_DFLT_HSDIV;
     self->rfreq     = SMCH_SI57X_DFLT_RFREQ;
     self->frequency = SMCH_SI57X_DFLT_FREQUENCY;
+    self->fstartup  = SMCH_SI57X_DFLT_FACTORY;
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_INFO, "[sm_ch:si57x] Created instance of SMCH\n");
     return self;
@@ -169,10 +175,75 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
     smch_err_e err = SMCH_SUCCESS;
     double frequency = *freq;
 
-    ASSERT_TEST(frequency > 1.0, "Invalid frequency (<= 1 Hz)", err_exit);
+    ASSERT_TEST(frequency >= SI57X_MIN_FREQ &&
+            frequency <= SI57X_MAX_FREQ, "Unsupported Si57x frequency", err_exit,
+            SMCH_ERR_RW_SMPR);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
             "frequency to %f Hz\n", frequency);
+
+    /* Check if we can use the small frequency setting. Using the large frequency
+     * setting will cause th output to stop/glitch */
+    if (((fabs(frequency - self->frequency) * 10000LL) / self->frequency) < 35) {
+        DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
+                "frequency using _smch_si57x_set_freq_small, as fabs(%f - %f) * 10000LL) / %f < 35\n",
+                frequency, self->frequency, self->frequency);
+        err = _smch_si57x_set_freq_small (self, freq);
+    }
+    else {
+        DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq] Configuring "
+                "frequency using _smch_si57x_set_freq_any, as fabs(%f - %f) * 10000LL) / %f >= 35\n",
+                frequency, self->frequency, self->frequency);
+        err = _smch_si57x_set_freq_any (self, freq);
+    }
+
+    self->frequency = frequency;
+    return err;
+
+err_exit:
+    return err;
+}
+
+
+static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq)
+{
+    assert (self);
+    assert (freq);
+
+    smch_err_e err = SMCH_SUCCESS;
+    double frequency = *freq;
+
+    self->rfreq = DIV_ROUND_CLOSEST(self->rfreq * frequency, self->frequency);
+
+    uint8_t data = SI57X_CONTROL_FREEZE_M;
+    err = _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not freeze M", err_exit);
+
+    err = _smch_si57x_update_rfreq_raw (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could update RFREQ", err_exit);
+
+    data = 0;
+    err = _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not unfreeze M", err_exit);
+
+    /* Applying a new frequency (small change) can take up to 100us */
+    err = _smch_si57x_wait_new_freq (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
+
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq_small] Setup new "
+            "frequency completed\n");
+
+err_exit:
+    return err;
+}
+
+static smch_err_e _smch_si57x_set_freq_any (smch_si57x_t *self, double *freq)
+{
+    assert (self);
+    assert (freq);
+
+    smch_err_e err = SMCH_SUCCESS;
+    double frequency = *freq;
 
     /* Get optimal divider values */
     err = _smch_si57x_calc_divs (self, frequency, &self->rfreq, &self->n1,
@@ -180,21 +251,37 @@ smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not calculate optimal divider values",
             err_exit);
 
-    /* Format divider values */
-    uint8_t divs[SI57X_NUM_DIV_REGS];
-    divs[0] = SI57X_HS_N1_HS_W(self->hs_div - SI57X_HS_N1_HS_OFFSET) |
-        (((self->n1 - 1) >> SI57X_HS_N1_N1_6_2_SHIFT_MSB) & SI57X_HS_N1_N1_6_2_MASK);
-    divs[1] = SI57X_N1_RFREQ0_N1_1_0_W(self->n1 - 1) |
-        SI57X_N1_RFREQ0_RFREQ_37_32_W(self->rfreq >> 32);
-    divs[2] = SI57X_RFREQ1_RFREQ_31_24_W(self->rfreq >> 24);
-    divs[3] = SI57X_RFREQ2_RFREQ_23_16_W(self->rfreq >> 16);
-    divs[4] = SI57X_RFREQ3_RFREQ_15_8_W(self->rfreq >> 8);
-    divs[5] = SI57X_RFREQ4_RFREQ_7_0_W(self->rfreq);
-
     /* Setup new frequency */
-    err = _smch_si57x_set_freq_raw (self, divs, SI57X_NUM_DIV_REGS);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set new frequency",
-            err_exit);
+
+    /* Freeze DCO */
+    uint8_t data = SI57X_FREEZE_DCO;
+    err = _smch_si57x_write_8 (self, SI57X_REG_FREEZE_DCO, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not freeze DCO", err_exit);
+
+    /* HS/N1 div */
+    data = SI57X_HS_N1_HS_W(self->hs_div - SI57X_HS_N1_HS_OFFSET) |
+        (((self->n1 - 1) >> SI57X_HS_N1_N1_6_2_SHIFT_MSB) & SI57X_HS_N1_N1_6_2_MASK);
+    err = _smch_si57x_write_8 (self, SI57X_REG_HS_N1, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could write HS/N1", err_exit);
+
+    err = _smch_si57x_update_rfreq_raw (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could update RFREQ", err_exit);
+
+    /* Unfreeze DCO */
+    data = ~SI57X_FREEZE_DCO;
+    err = _smch_si57x_write_8 (self, SI57X_REG_FREEZE_DCO, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not unfreeze DCO", err_exit);
+
+    /* Apply new frequency. Must be down within 10 ms. So, hurry up! */
+    data = SI57X_CONTROL_NEWFREQ;
+    err = _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not apply new frequency", err_exit);
+
+    err = _smch_si57x_wait_new_freq (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
+
+    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq_raw] Setup new "
+            "frequency completed\n");
 
 err_exit:
     return err;
@@ -216,6 +303,23 @@ smch_err_e smch_si57x_get_freq (smch_si57x_t *self, double *freq)
 
     *freq = frequency;
     return err;
+}
+
+smch_err_e smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
+{
+    smch_err_e err = SMCH_SUCCESS;
+    ASSERT_TEST(fstartup > 1000000.0, "Invalid startup frequency (<= 1 MHz)",
+        err_exit, SMCH_ERR_RW_SMPR);
+    err = _smch_si57x_set_fstartup (self, fstartup);
+    return err;
+
+err_exit:
+   return err;
+}
+
+double smch_si57x_get_fstartup (smch_si57x_t *self)
+{
+    return _smch_si57x_get_fstartup (self);
 }
 
 /***************** Static functions *****************/
@@ -362,14 +466,14 @@ static smch_err_e _smch_si57x_get_defaults (smch_si57x_t *self, double fout)
     uint8_t data = SI57X_CONTROL_RECALL;
     _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &data);
 
-    /* Si57x takes up to 30ms to return to initial conditions. To be safe, use 300ms */
-    SMCH_SI57X_WAIT(300000);
+    /* Si57x takes up to 30ms to return to initial conditions. */
+    SMCH_SI57X_WAIT(30000);
 
     /* Read dividers */
     err = _smch_si57x_get_divs (self, &self->rfreq, &self->n1, &self->hs_div);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not get divider values", err_exit);
 
-    uint64_t fdco = SI57X_FOUT_FACTORY_DFLT * self->n1 * self->hs_div;
+    uint64_t fdco = self->fstartup * self->n1 * self->hs_div;
     self->fxtal = (double) (fdco << SI57X_RFREQ_FRAC_SIZE) / (double) (self->rfreq);
 
     DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_get_defaults] fxtal: %f, "
@@ -381,43 +485,23 @@ err_exit:
     return err;
 }
 
-static smch_err_e _smch_si57x_set_freq_raw (smch_si57x_t *self, uint8_t *data,
-        size_t size)
+static smch_err_e _smch_si57x_update_rfreq_raw (smch_si57x_t *self)
 {
     assert (self);
     smch_err_e err = SMCH_SUCCESS;
 
-    /* Freeze DCO */
-    uint8_t __data = SI57X_FREEZE_DCO;
-    err = _smch_si57x_write_8 (self, SI57X_REG_FREEZE_DCO, &__data);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not freeze DCO", err_exit);
+    uint8_t divs[SI57X_NUM_RFREQ_REGS];
+    divs[0] = SI57X_N1_RFREQ0_N1_1_0_W(self->n1 - 1) |
+        SI57X_N1_RFREQ0_RFREQ_37_32_W(self->rfreq >> 32);
+    divs[1] = SI57X_RFREQ1_RFREQ_31_24_W(self->rfreq >> 24);
+    divs[2] = SI57X_RFREQ2_RFREQ_23_16_W(self->rfreq >> 16);
+    divs[3] = SI57X_RFREQ3_RFREQ_15_8_W(self->rfreq >> 8);
+    divs[4] = SI57X_RFREQ4_RFREQ_7_0_W(self->rfreq);
 
-    SMCH_SI57X_WAIT_DFLT;
-
-    /* Write frequency registers to Chip (for 20ppm and 50ppm devices) */
-    err = _smch_si57x_write_block (self, SI57X_REG_START, data, size);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not write frequency registers to chip",
+    /* Write RFREQ registers to Chip (for 20ppm and 50ppm devices) */
+    err = _smch_si57x_write_block (self, SI57X_REG_N1_RFREQ0, divs, ARRAY_SIZE(divs));
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not write RFREQ registers to chip",
             err_exit);
-
-    SMCH_SI57X_WAIT_DFLT;
-
-    /* Unfreeze DCO */
-    __data &= ~SI57X_FREEZE_DCO;
-    err = _smch_si57x_write_8 (self, SI57X_REG_FREEZE_DCO, &__data);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not unfreeze DCO", err_exit);
-
-    /* Apply new frequency. Must be down within 10 ms. So, hurry up! */
-    __data = SI57X_CONTROL_NEWFREQ;
-    err = _smch_si57x_write_8 (self, SI57X_REG_CONTROL, &__data);
-    ASSERT_TEST(err == SMCH_SUCCESS, "Could not apply new frequency", err_exit);
-
-    SMCH_SI57X_WAIT_DFLT;
-
-    err = _smch_si57x_wait_new_freq (self);
-    ASSERT_TEST(err == SMCH_SUCCESS, "New frequency setting timeout", err_exit);
-
-    DBE_DEBUG (DBG_SM_CH | DBG_LVL_TRACE, "[sm_ch:si57x_set_freq_raw] Setup new "
-            "frequency completed\n");
 
 err_exit:
     return err;
@@ -443,7 +527,8 @@ static smch_err_e _smch_si57x_wait_new_freq (smch_si57x_t *self)
             break;
         }
 
-        SMCH_SI57X_WAIT_DFLT;
+        /* Wait 10 us between tries */
+        SMCH_SI57X_WAIT(10);
         tries++;
         ASSERT_TEST(tries < SMCH_SI57X_WAIT_TRIES, "Frequency transfer timeout", err_exit,
                 SMCH_ERR_TIMEOUT);
@@ -517,3 +602,25 @@ static smch_err_e _smch_si57x_calc_divs (smch_si57x_t *self, double frequency,
     return err;
 }
 
+static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
+{
+    assert (self);
+    smch_err_e err = SMCH_SUCCESS;
+    self->fstartup = fstartup;
+
+    /* On changing the startup frequency, we need to recalculate the Si57x
+     * register values */
+    err = _smch_si57x_get_defaults (self, self->fstartup);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not return to Si57x defaults after "
+            "changing fstartup", err_exit);
+    return err;
+
+err_exit:
+    return err;
+}
+
+static double _smch_si57x_get_fstartup (smch_si57x_t *self)
+{
+    assert (self);
+    return self->fstartup;
+}

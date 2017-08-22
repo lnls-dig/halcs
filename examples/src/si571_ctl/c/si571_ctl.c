@@ -12,7 +12,7 @@
 
 #define DFLT_BOARD_NUMBER           0
 
-#define DFLT_SI571_FREQ             100000000.000   /* 100 MHz */
+#define DFLT_SI571_FREQ             1000000.000     /* 1 MHz */
 #define MAX_SI571_FREQ              1000000000.000  /* 1GHz */
 
 void print_help (char *program_name)
@@ -23,7 +23,8 @@ void print_help (char *program_name)
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
             "\t-halcs <HALCS number = [0|1]>\n"
             "\t-b <broker_endpoint> Broker endpoint\n"
-            "\t-freq <frequency> Si571 frequency\n",
+            "\t-freq <frequency> Si571 frequency\n"
+            "\t-fstartup <startup frequency> Si571 startup frequency\n",
             program_name);
 }
 
@@ -34,6 +35,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
     char *si571_freq_str = NULL;
+    char *si571_fstartup_str = NULL;
     char **str_p = NULL;
 
     if (argc < 2) {
@@ -66,6 +68,10 @@ int main (int argc, char *argv [])
         else if (streq(argv[i], "-freq"))
         {
             str_p = &si571_freq_str;
+        }
+        else if (streq(argv[i], "-fstartup"))
+        {
+            str_p = &si571_fstartup_str;
         }
         else if (streq (argv[i], "-b")) {
             str_p = &broker_endp;
@@ -126,6 +132,12 @@ int main (int argc, char *argv [])
         }
     }
 
+    /* Set default fstartup */
+    double si571_fstartup;
+    if (si571_fstartup_str != NULL) {
+        si571_fstartup = strtod (si571_fstartup_str, NULL);
+    }
+
     char service[50];
     char service_common[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:FMC_ACTIVE_CLK%u", board_number, halcs_number);
@@ -135,6 +147,14 @@ int main (int argc, char *argv [])
     if (halcs_client == NULL) {
         fprintf (stderr, "[client:acq]: halcs_client could be created\n");
         goto err_halcs_client_new;
+    }
+
+    if (si571_fstartup_str != NULL) {
+        halcs_client_err_e err = halcs_set_si571_fstartup (halcs_client, service, si571_fstartup);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:si571_ctl]: Si571 Set startup frequency failed\n");
+            goto err_halcs_set_fstartup;
+        }
     }
 
     halcs_client_err_e err = halcs_set_si571_freq (halcs_client, service, si571_freq);
@@ -169,9 +189,13 @@ int main (int argc, char *argv [])
 
 err_halcs_mmcm_rst:
 err_halcs_set_freq:
+err_halcs_set_fstartup:
 err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
 
+    str_p = &si571_fstartup_str;
+    free (*str_p);
+    si571_fstartup_str = NULL;
     str_p = &si571_freq_str;
     free (*str_p);
     si571_freq_str = NULL;

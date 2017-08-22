@@ -29,6 +29,7 @@ extern disp_op_t fmc_active_clk_si571_get_defaults_exp;
 extern disp_op_t fmc_active_clk_rst_isla216p_exp;
 extern disp_op_t fmc_active_clk_rst_swap_exp;
 extern disp_op_t fmc_active_clk_ad9510_data_exp;
+extern disp_op_t fmc_active_clk_si571_fstartup_exp;
 
 extern const disp_op_t *fmc_active_clk_exp_ops [];
 

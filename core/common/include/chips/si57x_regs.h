@@ -189,6 +189,7 @@
 #define SI57X_REG_START                                     SI57X_REG_HS_N1
 
 #define SI57X_NUM_DIV_REGS                                  6
+#define SI57X_NUM_RFREQ_REGS                                5
 
 #endif
 

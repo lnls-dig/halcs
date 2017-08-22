@@ -404,6 +404,10 @@ halcs_client_err_e halcs_get_si571_freq (halcs_client_t *self, char *service,
         double *si571_freq);
 halcs_client_err_e halcs_set_si571_defaults (halcs_client_t *self, char *service,
         double si571_defaults);
+halcs_client_err_e halcs_set_si571_fstartup (halcs_client_t *self, char *service,
+        double si571_fstartup);
+halcs_client_err_e halcs_get_si571_fstartup (halcs_client_t *self, char *service,
+        double *si571_fstartup);
 
 /* FMC EEPROM Read/Write.
  * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if

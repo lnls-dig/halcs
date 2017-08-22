@@ -101,7 +101,7 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     /* channel required is out of the limit */
-    if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
+    if (chan > acq->num_chan-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
         return -ACQ_NUM_CHAN_OOR;
@@ -316,7 +316,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "chan = %u, block_n = %u\n", chan, block_n);
 
     /* channel required is out of the limit */
-    if (chan > SMIO_ACQ_NUM_CHANNELS-1) {
+    if (chan > acq->num_chan-1) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq] data_acquire: "
                 "Channel required is out of the maximum limit\n");
 
@@ -446,18 +446,18 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t valid_bytes = 0;
     uint64_t addr_start = addr_i;
     uint64_t rem_mem_space = end_mem_space_addr - addr_start;
-    for ( ; 
-            num_bytes_read < reply_size_full; 
+    for ( ;
+            num_bytes_read < reply_size_full;
             num_bytes_read += valid_bytes) {
-        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)? 
+        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)?
                 rem_mem_space : reply_size_full-num_bytes_read;
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
                 "Reading %u bytes from address 0x%"PRIx64"\n"
                 "\twith remaining memory space 0x%"PRIx64"\n"
-                "\twith end memory space 0x%08X\n", 
-                bytes_to_read, addr_start, 
-                rem_mem_space, 
+                "\twith end memory space 0x%08X\n",
+                bytes_to_read, addr_start,
+                rem_mem_space,
                 end_mem_space_addr);
 
         /* Here we must use the "raw" version, as we can't have
@@ -767,7 +767,7 @@ RW_PARAM_FUNC(acq, fsm_stop) {
 }
 
 #define ACQ_DATA_DRIVEN_CHAN_MIN                    0
-#define ACQ_DATA_DRIVEN_CHAN_MAX                    (SMIO_ACQ_NUM_CHANNELS-1)
+#define ACQ_DATA_DRIVEN_CHAN_MAX                    ((1<<5)-1)
 RW_PARAM_FUNC(acq, hw_data_trig_chan) {
     SET_GET_PARAM(acq, 0x0, ACQ_CORE, ACQ_CHAN_CTL,
             DTRIG_WHICH, MULT_BIT_PARAM, ACQ_DATA_DRIVEN_CHAN_MIN,

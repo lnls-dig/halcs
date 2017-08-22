@@ -15,6 +15,7 @@
 #define SMCH_SI57X_DFLT_HSDIV                   0
 #define SMCH_SI57X_DFLT_RFREQ                   0ULL
 #define SMCH_SI57X_DFLT_FREQUENCY               SI57X_FOUT_FACTORY_DFLT
+#define SMCH_SI57X_DFLT_FACTORY                 SI57X_FOUT_FACTORY_DFLT
 
 #endif
 
