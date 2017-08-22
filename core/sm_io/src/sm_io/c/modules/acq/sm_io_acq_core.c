@@ -34,8 +34,6 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io_acq_core]",                               \
             smio_err_str (err_type))
 
-#define TEST_END_CHAN_ID 1
-
 /* Creates a new instance of Device Information */
 smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         uint32_t num_samples_post, uint32_t num_shots)
