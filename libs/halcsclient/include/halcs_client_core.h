@@ -1303,6 +1303,74 @@ halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *servic
 halcs_client_err_e halcs_get_init_check (halcs_client_t *self, char *service,
         uint32_t *init_check_out);
 
+/********************** TIM RCV Functions ********************/
+
+/* DMTD Number of averages function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_phase_meas_navg (halcs_client_t *self, char *service,
+        uint32_t phase_meas_navg);
+halcs_client_err_e halcs_get_phase_meas_navg (halcs_client_t *self, char *service,
+        uint32_t *phase_meas_navg);
+
+/* DMTD A deglitcher threshold. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_a_deglitcher_thres (halcs_client_t *self, char *service,
+        uint32_t dmtd_a_deglitcher_thres);
+halcs_client_err_e halcs_get_dmtd_a_deglitcher_thres (halcs_client_t *self, char *service,
+        uint32_t *dmtd_a_deglitcher_thres);
+
+/* DMTD B deglitcher threshold. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_b_deglitcher_thres (halcs_client_t *self, char *service,
+        uint32_t dmtd_b_deglitcher_thres);
+halcs_client_err_e halcs_get_dmtd_b_deglitcher_thres (halcs_client_t *self, char *service,
+        uint32_t *dmtd_b_deglitcher_thres);
+
+/* DMTD Phase measurement function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_phase_meas (halcs_client_t *self, char *service,
+        uint32_t phase_meas);
+halcs_client_err_e halcs_get_phase_meas (halcs_client_t *self, char *service,
+        uint32_t *phase_meas);
+
+/* DMTD A Frequency measurement function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_a_freq (halcs_client_t *self, char *service,
+        uint32_t dmtd_a_freq);
+halcs_client_err_e halcs_get_dmtd_a_freq (halcs_client_t *self, char *service,
+        uint32_t *dmtd_a_freq);
+
+/* DMTD A Frequency valid function. New frequncy values are update on each
+ * valid output by this function. After reading the frequency value, write
+ * 0 to this. The functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_a_valid (halcs_client_t *self, char *service,
+        uint32_t dmtd_a_valid);
+halcs_client_err_e halcs_get_dmtd_a_valid (halcs_client_t *self, char *service,
+        uint32_t *dmtd_a_valid);
+
+/* DMTD B Frequency measurement function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_b_freq (halcs_client_t *self, char *service,
+        uint32_t dmtd_b_freq);
+halcs_client_err_e halcs_get_dmtd_b_freq (halcs_client_t *self, char *service,
+        uint32_t *dmtd_b_freq);
+
+/* DMTD B Frequency valid function. New frequncy values are update on each
+ * valid output by this function. After reading the frequency value, write
+ * 0 to this. The functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_dmtd_b_valid (halcs_client_t *self, char *service,
+        uint32_t dmtd_b_valid);
+halcs_client_err_e halcs_get_dmtd_b_valid (halcs_client_t *self, char *service,
+        uint32_t *dmtd_b_valid);
+
 #ifdef __cplusplus
 }
 #endif
