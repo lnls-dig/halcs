@@ -54,12 +54,21 @@ smio_err_e tim_rcv_config_defaults (char *broker_endp, char *service,
     halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
             log_file_name, SMIO_TIM_RCV_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
-    UNUSED (client_err);
 
-#if 0
+    client_err = halcs_set_phase_meas_navg (config_client, service, TIM_RCV_DFLT_PHASE_MEAS_NAVG);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set phase meas number of averages",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = halcs_set_dmtd_a_deglitcher_thres (config_client, service, TIM_RCV_DFLT_DMTD_A_DEGLITCH_THRES);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set DMTD A deglitcher threshold",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = halcs_set_dmtd_b_deglitcher_thres (config_client, service, TIM_RCV_DFLT_DMTD_B_DEGLITCH_THRES);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set DMTD B deglitcher threshold",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
 err_param_set:
     halcs_client_destroy (&config_client);
-#endif
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:tim_rcv_defaults] Exiting Config thread %s\n",
         service);
