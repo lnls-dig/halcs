@@ -43,6 +43,10 @@ extern "C" {
 /* Trigger Mux Components */
 #define WB_TRIGGER_MUX_RAW_REG_OFFS                 0x0000
 
+/* AFC MGMT Component */
+#define AFC_MGMT_CTRL_RAW_REGS_OFFS                 0x0000
+#define AFC_MGMT_SI57X_RAW_I2C_OFFS                 0x0100
+
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
 
@@ -78,6 +82,10 @@ extern "C" {
 
 /* Trigger Mux Components */
 #define WB_TRIGGER_MUX_REG_OFFS                     (WB_TRIGGER_MUX_RAW_REG_OFFS)
+
+/* AFC_MGMT Component */
+#define AFC_MGMT_CTRL_REGS_OFFS                     (AFC_MGMT_CTRL_RAW_REGS_OFFS)
+#define AFC_MGMT_SI57X_I2C_OFFS                     (AFC_MGMT_SI57X_RAW_I2C_OFFS)
 
 /* The following is a bit of a hack.
  * We employ a generic API for talking to the hardware.
