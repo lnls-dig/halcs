@@ -24,6 +24,7 @@ model {
         test_data_en(NativeExecutableSpec)
         timing(NativeExecutableSpec)
         trigger(NativeExecutableSpec)
+        tim_rcv(NativeExecutableSpec)
 
         all {
             sources {
