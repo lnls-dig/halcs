@@ -29,7 +29,7 @@ extern "C" {
 
 /* DSP Components */
 #define DSP_CTRL_RAW_REGS_OFFS                      0x0000
-#define DSP_HALCS_RAW_SWAP_OFFS                       0x0100
+#define DSP_HALCS_RAW_SWAP_OFFS                     0x0100
 
 /* AFC DIAG Components */
 #define WB_AFC_DIAG_CTRL_RAW_REGS_OFFS              0x0000
