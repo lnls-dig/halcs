@@ -47,6 +47,9 @@ extern "C" {
 #define AFC_MGMT_CTRL_RAW_REGS_OFFS                 0x0000
 #define AFC_MGMT_SI57X_RAW_I2C_OFFS                 0x0100
 
+/* Timing Receiver Component */
+#define TIM_RCV_RAW_REGS_OFFS                       0x0000
+
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
 
@@ -86,6 +89,9 @@ extern "C" {
 /* AFC_MGMT Component */
 #define AFC_MGMT_CTRL_REGS_OFFS                     (AFC_MGMT_CTRL_RAW_REGS_OFFS)
 #define AFC_MGMT_SI57X_I2C_OFFS                     (AFC_MGMT_SI57X_RAW_I2C_OFFS)
+
+/* Timing Receiver Component */
+#define TIM_RCV_REGS_OFFS                           (TIM_RCV_RAW_REGS_OFFS)
 
 /* The following is a bit of a hack.
  * We employ a generic API for talking to the hardware.
