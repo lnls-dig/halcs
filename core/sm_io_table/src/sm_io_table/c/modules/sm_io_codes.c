@@ -23,6 +23,7 @@ const disp_op_t **smio_exp_ops [] = {
     afc_timing_exp_ops,
     init_exp_ops,
     acq_pm_exp_ops,
+    tim_rcv_exp_ops,
     NULL
 };
 
