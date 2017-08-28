@@ -26,7 +26,7 @@ allprojects {
         properties {
             property "sonar.projectKey", "br.com.lnls.dig.halcs"
             property "sonar.projectName", "HALCS Hardware Abstraction Layer for Control Systems"
-            property "sonar.projectVersion", "v0.5"
+            property "sonar.projectVersion", "v1.0.0"
 
             property "sonar.links.homepage", "https://github.com/lnls-dig/halcs"
             property "sonar.links.ci", "https://travis-ci.org/lnls-dig/halcs"
