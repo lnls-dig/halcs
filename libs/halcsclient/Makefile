@@ -116,7 +116,9 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/modules/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_exports.o \
-                $(SMIO_TABLE_SRC_DIR)/modules/init/sm_io_init_exports.o
+                $(SMIO_TABLE_SRC_DIR)/modules/init/sm_io_init_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
@@ -143,6 +145,8 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules/afc_timing \
 	       -I$(SMIO_SRC_DIR)/modules/acq_pm \
 	       -I$(SMIO_SRC_DIR)/modules/init \
+	       -I$(SMIO_SRC_DIR)/modules/afc_mgmt \
+	       -I$(SMIO_SRC_DIR)/modules/tim_rcv \
 	       -I$(SMIO_TABLE_DIR)/include \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
@@ -160,6 +164,8 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_timing \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/acq_pm \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/init \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -199,6 +205,8 @@ $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h \
 	$(SMIO_DIR)/include/sm_io_acq_pm_codes.h \
 	$(SMIO_DIR)/include/sm_io_init_codes.h \
+	$(SMIO_DIR)/include/sm_io_afc_mgmt_codes.h \
+	$(SMIO_DIR)/include/sm_io_tim_rcv_codes.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h \
@@ -215,6 +223,8 @@ $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h 
 	$(SMIO_TABLE_DIR)/include/sm_io_trigger_mux_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_acq_pm_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_init_exports.h \
+	$(SMIO_TABLE_DIR)/include/sm_io_afc_mgmt_exports.h \
+	$(SMIO_TABLE_DIR)/include/sm_io_tim_rcv_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_afc_timing_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO

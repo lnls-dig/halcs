@@ -1498,7 +1498,7 @@ halcs_client_err_e halcs_get_monit_amp_pos (halcs_client_t *self, char *service,
     const disp_op_t* func = &dsp_set_get_monit_amp_pos_exp;
     halcs_client_err_e err = halcs_func_exec(self, func, service,
             NULL, (uint32_t *)dsp_data);
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get Monit. AMP/POS", 
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get Monit. AMP/POS",
             err_get_amp_pos_data);
 
     return err;
@@ -2458,3 +2458,91 @@ PARAM_FUNC_CLIENT_READ(init_check)
     return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
 }
 
+/**************** TIM RCV SMIO Functions ****************/
+
+/* DMTD Number of averages function */
+PARAM_FUNC_CLIENT_WRITE(phase_meas_navg)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_PHASE_MEAS_NAVG, phase_meas_navg);
+}
+
+PARAM_FUNC_CLIENT_READ(phase_meas_navg)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_PHASE_MEAS_NAVG, phase_meas_navg);
+}
+/* DMTD A deglitcher threshold function */
+PARAM_FUNC_CLIENT_WRITE(dmtd_a_deglitcher_thres)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_A_DEGLITCHER_THRES, dmtd_a_deglitcher_thres);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_a_deglitcher_thres)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_A_DEGLITCHER_THRES, dmtd_a_deglitcher_thres);
+}
+
+/* DMTD B deglitcher threshold function */
+PARAM_FUNC_CLIENT_WRITE(dmtd_b_deglitcher_thres)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_B_DEGLITCHER_THRES, dmtd_b_deglitcher_thres);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_b_deglitcher_thres)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_B_DEGLITCHER_THRES, dmtd_b_deglitcher_thres);
+}
+
+/* DMTD Phase measurement function */
+PARAM_FUNC_CLIENT_WRITE(phase_meas)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_PHASE_MEAS, phase_meas);
+}
+
+PARAM_FUNC_CLIENT_READ(phase_meas)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_PHASE_MEAS, phase_meas);
+}
+
+/* DMTD A frequency measurement */
+PARAM_FUNC_CLIENT_WRITE(dmtd_a_freq)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_A_FREQ, dmtd_a_freq);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_a_freq)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_A_FREQ, dmtd_a_freq);
+}
+
+/* DMTD A frequency valid */
+PARAM_FUNC_CLIENT_WRITE(dmtd_a_valid)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_A_VALID, dmtd_a_valid);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_a_valid)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_A_VALID, dmtd_a_valid);
+}
+
+/* DMTD B frequency measurement */
+PARAM_FUNC_CLIENT_WRITE(dmtd_b_freq)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_B_FREQ, dmtd_b_freq);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_b_freq)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_B_FREQ, dmtd_b_freq);
+}
+
+/* DMTD B frequency valid */
+PARAM_FUNC_CLIENT_WRITE(dmtd_b_valid)
+{
+    return param_client_write (self, service, TIM_RCV_OPCODE_DMTD_B_VALID, dmtd_b_valid);
+}
+
+PARAM_FUNC_CLIENT_READ(dmtd_b_valid)
+{
+    return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_B_VALID, dmtd_b_valid);
+}
