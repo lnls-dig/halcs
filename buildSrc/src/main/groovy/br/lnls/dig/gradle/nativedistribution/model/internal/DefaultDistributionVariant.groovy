@@ -158,6 +158,7 @@ public class DefaultDistributionVariant extends DefaultDistribution
             ProjectModelResolver resolver) {
         def projectPath = specification.get("project")
         def libraryName = specification.get("library")
+        def linkageType = specification.get("linkage")
         def projectModel = resolver.resolveProjectModel(projectPath)
         def distribution = getProjectDistribution(projectPath, projectModel)
         def project = projectModel.find("projectIdentifier", Object)
@@ -168,7 +169,7 @@ public class DefaultDistributionVariant extends DefaultDistribution
                     distribution)
 
             dependencies.add(dependency)
-        } else
+        } else if (linkageType != "api")
             includeFilesFromProjectLibraryDependency(libraryName, projectModel)
     }
 
