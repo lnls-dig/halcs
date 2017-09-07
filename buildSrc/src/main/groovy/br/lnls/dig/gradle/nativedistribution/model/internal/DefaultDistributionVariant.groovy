@@ -122,8 +122,12 @@ public class DefaultDistributionVariant extends DefaultDistribution
 
     @Override
     public Set<Task> getBuildTasks() {
-        return executables.collect { it.buildTask }
-            + sharedLibraries.collect { it.buildTask }
+        def buildTasks = new HashSet<Task>()
+
+        buildTasks.addAll(executables.collect { it.buildTask })
+        buildTasks.addAll(sharedLibraries.collect { it.buildTask })
+
+        return buildTasks
     }
 
     void resolveDependencies(ProjectModelResolver resolver) {

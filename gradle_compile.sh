@@ -5,12 +5,13 @@ VALID_APPS_STR="Valid values are: \"halcsd\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
+VALID_WITH_HALCS_STR="Valid values are: \"yes\" or \"no\"."
 VALID_COMPACT_INSTALL_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
     echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
     echo "    [-l <with library linking = yes/no>] [-d <with driver = yes/no>]"
-    echo "    [-c <compact install = yes/no>] [-x <extra flags>]"
+    echo "    [-f <with HALCS = yes/no>] [-c <compact install = yes/no>] [-x <extra flags>]"
 }
 
 #######################################
@@ -22,11 +23,12 @@ APPS=
 WITH_EXAMPLES="no"
 WITH_SYSTEM_INTEGRATION="yes"
 WITH_DRIVER="no"
+WITH_HALCS="yes"
 COMPACT_INSTALL="no"
 EXTRA_FLAGS=
 
 # Get command line options
-while getopts ":b:a:e:l:x:d:c:" opt; do
+while getopts ":b:a:e:l:x:d:f:c:" opt; do
     case $opt in
         b)
             BOARD=$OPTARG
@@ -45,6 +47,9 @@ while getopts ":b:a:e:l:x:d:c:" opt; do
             ;;
         d)
             WITH_DRIVER=$OPTARG
+            ;;
+        f)
+            WITH_HALCS=$OPTARG
             ;;
         c)
             COMPACT_INSTALL=$OPTARG
@@ -95,6 +100,11 @@ if [ "$WITH_DRIVER" != "yes" ] && [ "$WITH_DRIVER" != "no" ]; then
     exit 1
 fi
 
+if [ "$WITH_HALCS" != "yes" ] && [ "$WITH_HALCS" != "no" ]; then
+    echo "Unsupported driver option. "$VALID_WITH_HALCS_STR
+    exit 1
+fi
+
 if [ "$COMPACT_INSTALL" != "yes" ] && [ "$COMPACT_INSTALL" != "no" ]; then
     echo "Unsupported compact install option. "$VALID_COMPACT_INSTALL_STR
     exit 1
@@ -119,17 +129,20 @@ if [ "$WITH_DRIVER" = "yes" ]; then
     make ${EXTRA_FLAGS} pcie_driver pcie_driver_install || exit 1
 fi
 
-for lib in $(find libs -maxdepth 1 -mindepth 1 -type d); do
-    LIB="$(echo $lib | sed -e 's|libs/||')"
+# Install HALCS only if requested
+if [ "$WITH_HALCS" = "yes" ]; then
+    for lib in $(find libs -maxdepth 1 -mindepth 1 -type d); do
+        LIB="$(echo $lib | sed -e 's|libs/||')"
 
-    if [ "$COMPACT_INSTALL" = "yes" ]; then
-        TASKS="$TASKS :libs:${LIB}:${BOARD}InstallRpm"
-    else
-        TASKS="$TASKS :libs:${LIB}:${BOARD}DevelopmentInstallRpm"
-    fi
-done
+        if [ "$COMPACT_INSTALL" = "yes" ]; then
+            TASKS="$TASKS :libs:${LIB}:${BOARD}InstallRpm"
+        else
+            TASKS="$TASKS :libs:${LIB}:${BOARD}DevelopmentInstallRpm"
+        fi
+    done
 
-./gradlew $TASKS
+    ./gradlew $TASKS
+fi
 
 if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
     ldconfig
