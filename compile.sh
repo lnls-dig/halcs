@@ -5,10 +5,12 @@ VALID_APPS_STR="Valid values are: \"halcsd\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
+VALID_WITH_HALCS_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
     echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
-    echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]"
+    echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>]"
+    echo "    [-f <with HALCS = yes/no>] [-x <extra flags>]"
 }
 
 LIBSDIR="libs"
@@ -22,10 +24,11 @@ APPS=
 WITH_EXAMPLES="no"
 WITH_SYSTEM_INTEGRATION="no"
 WITH_DRIVER="no"
+WITH_HALCS="yes"
 EXTRA_FLAGS=
 
 # Get command line options
-while getopts ":b:a:e:l:x:d:" opt; do
+while getopts ":b:a:e:l:x:d:f:" opt; do
     case $opt in
         b)
             BOARD=$OPTARG
@@ -44,6 +47,9 @@ while getopts ":b:a:e:l:x:d:" opt; do
             ;;
         d)
             WITH_DRIVER=$OPTARG
+            ;;
+        f)
+            WITH_HALCS=$OPTARG
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -102,6 +108,11 @@ if [ "$WITH_DRIVER" != "yes" ] && [ "$WITH_DRIVER" != "no" ]; then
     exit 1
 fi
 
+if [ "$WITH_HALCS" != "yes" ] && [ "$WITH_HALCS" != "no" ]; then
+    echo "Unsupported driver option. "$VALID_WITH_HALCS_STR
+    exit 1
+fi
+
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE=n
@@ -132,67 +143,80 @@ AFE_RFFE_TYPE=2
 # synthesized.
 WITH_APP_CFG=n
 
-COMMAND_DEPS="\
-    make ${EXTRA_FLAGS} deps && \
-    make ${EXTRA_FLAGS} deps_install"
+# Install HALCS only if requested
+if [ "$WITH_HALCS" = "yes" ]; then
+    COMMAND_DEPS="\
+        make ${EXTRA_FLAGS} deps && \
+        make ${EXTRA_FLAGS} deps_install"
 
-COMMAND_LIBS="\
-    make \
-    ${EXTRA_FLAGS} \
-    BOARD=${BOARD} \
-    ERRHAND_DBG=${ERRHAND_DBG} \
-    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
-    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-    LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
-    libs_compile_install"
+    COMMAND_LIBS="\
+        make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
+        libs_compile_install"
 
-COMMAND_CORE="\
-    make \
-    ${EXTRA_FLAGS} \
-    BOARD=${BOARD} \
-    APPS=${APPS} \
-    SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
-    ERRHAND_DBG=${ERRHAND_DBG} \
-    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
-    ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-    LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
-    FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
-    FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
-    WITH_DEV_MNGR=${WITH_DEV_MNGR} \
-    AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-    WITH_APP_CFG=${WITH_APP_CFG} && \
-    make \
-    WITH_APP_CFG=${WITH_APP_CFG} \
-    ${EXTRA_FLAGS} core_install"
+    COMMAND_CORE="\
+        make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        APPS=${APPS} \
+        SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
+        FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
+        WITH_DEV_MNGR=${WITH_DEV_MNGR} \
+        AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+        WITH_APP_CFG=${WITH_APP_CFG} && \
+        make \
+        WITH_APP_CFG=${WITH_APP_CFG} \
+        ${EXTRA_FLAGS} core_install"
 
-if [ "$WITH_EXAMPLES" = "yes" ]; then
-COMMAND_EXAMPLES="\
-    make ${EXTRA_FLAGS} examples"
+    if [ "$WITH_EXAMPLES" = "yes" ]; then
+    COMMAND_EXAMPLES="\
+        make ${EXTRA_FLAGS} examples"
+    else
+    COMMAND_EXAMPLES=""
+    fi
 else
-COMMAND_EXAMPLES=""
+    COMMAND_DEPS=""
+    COMMAND_LIBS=""
+    COMMAND_CORE=""
+    COMMAND_EXAMPLES=""
 fi
 
-if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
-COMMAND_SYSTEM_INTEGRATION="\
-    make scripts_install && \
-    ldconfig"
-else
-COMMAND_SYSTEM_INTEGRATION=""
+if [ "$WITH_HALCS" = "yes" ]; then
+    if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
+        COMMAND_SYSTEM_INTEGRATION="\
+            make scripts_install && \
+            ldconfig"
+    else
+        COMMAND_SYSTEM_INTEGRATION=""
+    fi
 fi
 
 if [ "$WITH_DRIVER" = "yes" ]; then
-COMMAND_DRIVER="\
-    make ${EXTRA_FLAGS} pcie_driver && \
-    make ${EXTRA_FLAGS} pcie_driver_install"
-
+    COMMAND_DRIVER="\
+        make ${EXTRA_FLAGS} pcie_driver && \
+        make ${EXTRA_FLAGS} pcie_driver_install"
 else
-COMMAND_DRIVER=""
+    COMMAND_DRIVER=""
 fi
 
-# Meta target to remove copied headers
-COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
-    make -C ${LIBSDIR}/bpmclient pre_clean &&
-    make -C ${LIBSDIR}/halcsclient pre_clean"
+if [ "$WITH_HALCS" = "yes" ]; then
+    # Meta target to remove copied headers
+    COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
+        make -C ${LIBSDIR}/bpmclient pre_clean &&
+        make -C ${LIBSDIR}/halcsclient pre_clean"
+else
+    COMMAND_CLEAN=""
+fi
 
 COMMAND_ARRAY=(
     "${COMMAND_DEPS}"
