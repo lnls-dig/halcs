@@ -39,7 +39,7 @@
 
 #define PCIE_TIMEOUT_MAX_TRIES                  32
 /* Wait between reads/writes, in usecs */
-#define PCIE_TIMEOUT_WAIT                       100000
+#define PCIE_TIMEOUT_WAIT                       1000
 
 /* Timeout byte pattern */
 #define PCIE_TIMEOUT_PATT_INIT                  0xFF
