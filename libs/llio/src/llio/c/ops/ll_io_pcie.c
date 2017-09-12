@@ -67,7 +67,7 @@ typedef enum {
     PCIE_DMA_DS
 } pcie_dev_dma_type_e;
 
-static uint32_t pcie_timeout_patt [PCIE_TIMEOUT_PATT_SIZE];
+static uint8_t pcie_timeout_patt [PCIE_TIMEOUT_PATT_SIZE];
 
 static ssize_t _pcie_rw_32 (llio_t *self, uint64_t offs, uint32_t *data, int rw);
 static ssize_t _pcie_rw_bar2_block_raw (llio_t *self, uint32_t pg_start, uint64_t pg_offs,
