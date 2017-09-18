@@ -50,7 +50,7 @@
 #define LLIO_ETH_SECS_BEFORE_RECV_TIMEOUT    1
 
 /* Max retries when opening the ETH connection */
-#define LLIO_ETH_MAX_OPEN_RECONNECT_TRIES    50
+#define LLIO_ETH_MAX_OPEN_RECONNECT_TRIES    300
 #define LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT  1
 
 /* Device endpoint */
