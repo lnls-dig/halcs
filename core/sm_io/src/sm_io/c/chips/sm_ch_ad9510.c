@@ -230,7 +230,9 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
 
     /* Update registers */
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     SMCH_AD9510_WAIT_DFLT;
 
     /* Clock dividers OUT0 - OUT7
@@ -270,7 +272,9 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
 
     /* Update registers */
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     SMCH_AD9510_WAIT_DFLT;
 
     /* Software sync */
@@ -278,14 +282,19 @@ smch_err_e smch_ad9510_cfg_defaults (smch_ad9510_t *self)
     _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
 
     /* Update registers */
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     SMCH_AD9510_WAIT_DFLT;
 
     data &= ~AD9510_FUNCTION_SYNC_REG;
     _smch_ad9510_write_8 (self, AD9510_REG_FUNCTION, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -302,10 +311,13 @@ smch_err_e smch_ad9510_set_pll_a_div (smch_ad9510_t *self, uint32_t *div)
     uint8_t data = AD9510_PLL_A_COUNTER_W(__div);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_A_COUNTER, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -354,10 +366,13 @@ smch_err_e smch_ad9510_set_pll_b_div (smch_ad9510_t *self, uint32_t *div)
     data = AD9510_PLL_B_LSB_COUNTER_W(__div);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_B_LSB_COUNTER, &data);
     
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -398,10 +413,13 @@ smch_err_e smch_ad9510_set_pll_prescaler (smch_ad9510_t *self, uint32_t *pre)
         AD9510_PLL_4_PRESCALER_P_W(__pre);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
     return err;
 }
 
@@ -437,10 +455,13 @@ smch_err_e smch_ad9510_set_pll_pdown (smch_ad9510_t *self, uint32_t *pdown)
         AD9510_PLL_4_PLL_PDOWN_W(__pdown);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_4, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -472,10 +493,13 @@ smch_err_e smch_ad9510_set_mux_status (smch_ad9510_t *self, uint32_t *mux)
         AD9510_PLL_2_MUX_SEL_W(__mux);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_2, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -506,10 +530,13 @@ smch_err_e smch_ad9510_set_r_div (smch_ad9510_t *self, uint32_t *div)
     data = AD9510_PLL_R_LSB_COUNTER_W(__div);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_R_LSB_COUNTER, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -554,10 +581,13 @@ smch_err_e smch_ad9510_set_cp_current (smch_ad9510_t *self, uint32_t *cp_current
             __cp_current/AD9510_PLL3_CP_CURRENT_MIN - 1);
     _smch_ad9510_write_8 (self, AD9510_REG_PLL_3, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -637,10 +667,13 @@ smch_err_e smch_ad9510_set_outputs (smch_ad9510_t *self, uint32_t *out_en)
         _smch_ad9510_write_8 (self, AD9510_REG_OUTPUT_START+i, &data);
     }
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
@@ -710,10 +743,13 @@ smch_err_e smch_ad9510_set_pll_clk_sel (smch_ad9510_t *self, uint32_t *clk_num)
 
     _smch_ad9510_write_8 (self, AD9510_REG_CLK_OPT, &data);
 
-    _smch_ad9510_reg_update (self);
+    err = _smch_ad9510_reg_update (self);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not update AD9510 registers",
+            err_reg_update);
     /* Wait for reset to complete */
     SMCH_AD9510_WAIT_DFLT;
 
+err_reg_update:
 err_smpr_write:
     return err;
 }
