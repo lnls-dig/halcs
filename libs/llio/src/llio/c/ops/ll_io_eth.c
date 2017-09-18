@@ -487,6 +487,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
             if (errno != EINPROGRESS) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error connecting is not EINPROGRESS: %d - %s\n", errno, strerror(errno));
+                sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
                 close (*fd);
                 *fd = -1;
                 continue;
