@@ -337,6 +337,7 @@ halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *s
 zmsg_t *param_client_recv_timeout (halcs_client_t *self, char *service)
 {
     zmsg_t *msg = NULL;
+    const char *mlm_sender = NULL;
 
     /* Get poller and timeout from client */
     uint32_t timeout = halcs_client_get_timeout (self);
@@ -360,21 +361,32 @@ zmsg_t *param_client_recv_timeout (halcs_client_t *self, char *service)
     /* Check for activity socket */
     if (which == msgpipe) {
         mlm_client_t *mlm_client = halcs_get_mlm_client (self);
-        msg = mlm_client_recv (mlm_client);
-        const char *mlm_sender = mlm_client_sender (mlm_client);
 
-        /* Check if the message is for the service we are expecting.
-         * This can happen, for instance, if the same client is used to
-         * talk to more than 1 service. Depending on the server load,
-         * we can expect a message for a service 1, but receive the message
-         * for the service 2. One workaround to this is to use a single
-         * instance of the library per service */
-        if (!streq (mlm_sender, service)) {
-            /* free received message and warn caller */ 
-            zmsg_destroy (&msg);
-            DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
-                    "param_client_recv_timeout: Unexpected sender %s, waiting for %s\n",
-                     mlm_sender, service);
+        /* If we received an unexpected message, the receive buffer will 
+         * mostly likely have additonal messages that were sent by other 
+         * services. In this case, as we are acting as a synchronous protocol, 
+         * keep unpacking the receive buffer until our service string matches 
+         * the one we are expecting */
+        while (zsock_events (msgpipe) & ZMQ_POLLIN) {
+            msg = mlm_client_recv (mlm_client);
+            mlm_sender = mlm_client_sender (mlm_client);
+
+            /* Check if the message is for the service we are expecting.
+             * This can happen, for instance, if the same client is used to
+             * talk to more than 1 service. Depending on the server load,
+             * we can expect a message for a service 1, but receive the message
+             * for the service 2. One workaround to this is to use a single
+             * instance of the library per service */
+            if (!streq (mlm_sender, service)) {
+                /* free received message and warn caller */ 
+                zmsg_destroy (&msg);
+                DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                        "param_client_recv_timeout: Unexpected sender %s, waiting for %s\n",
+                         mlm_sender, service);
+            }
+            else {
+                break;
+            }
         }
     }
     else {
