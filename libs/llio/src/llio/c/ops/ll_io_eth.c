@@ -200,7 +200,9 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
         dev_eth->port, LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
     while (err < 0) {
         ASSERT_TEST(retries != 0, "No more retries in connecting to endpoint", err_retries_eth_conn);
-
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                "[ll_io_eth] Error on connection to endpoint the first time, retrying (%zu/%u)\n", LLIO_ETH_MAX_OPEN_RECONNECT_TRIES-retries, 
+                    LLIO_ETH_MAX_OPEN_RECONNECT_TRIES);
         /* Only decrement if we are in finite waiting mode */
         if (retries > 0) {
             retries--;
