@@ -52,6 +52,15 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         self->num_chan = END_CHAN_ID;
     }
 
+    /* Get the number of multishot RAM size. If 0, this register is probably
+     * unimplemented in gateware, so default it to the old value */
+    GET_PARAM(parent, acq, 0x0, ACQ_CORE, SHOTS,
+            MULTISHOT_RAM_SIZE, MULT_BIT_PARAM, self->multishot_ram_size, NO_FMT_FUNC);
+    if (self->multishot_ram_size == 0) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:acq_core] Multishot RAM size is 0. "
+            "It will not be possible to perform multishot acquisitions for this module\n");
+    }
+
     /* Initialize acq_buf */
     self->acq_buf = (acq_buf_t *) zmalloc ((sizeof *self->acq_buf) * self->num_chan);
     ASSERT_ALLOC (self->acq_buf, err_acq_buf_alloc);

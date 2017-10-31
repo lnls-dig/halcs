@@ -43,6 +43,7 @@ typedef struct {
     acq_params_t acq_params[END_CHAN_ID];   /* Parameters for each channel */
     uint32_t curr_chan;                     /* Current channel being acquired */
     uint32_t num_chan;                      /* Numbert of acquisition channels */
+    uint32_t multishot_ram_size;            /* Multishot RAM size, in acquistion words */
     acq_buf_t *acq_buf;                     /* Channel properties */
 } smio_acq_t;
 
