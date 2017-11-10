@@ -49,6 +49,10 @@
 #define LLIO_ETH_SECS_BEFORE_RECONNECT       1
 #define LLIO_ETH_SECS_BEFORE_RECV_TIMEOUT    1
 
+/* Max retries when opening the ETH connection */
+#define LLIO_ETH_MAX_OPEN_RECONNECT_TRIES    300
+#define LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT  1
+
 /* Device endpoint */
 typedef struct {
     llio_eth_type_e type;
@@ -58,7 +62,7 @@ typedef struct {
 } llio_dev_eth_t;
 
 static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
-        char* port);
+        char* port, int secs_before_reconnect);
 static void *_get_in_addr(struct sockaddr *sa);
 static ssize_t _eth_sendall (int fd, uint8_t *buf, size_t len);
 static ssize_t _eth_recvall (int fd, uint8_t *buf, size_t len);
@@ -191,8 +195,26 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
     ASSERT_TEST(dev_eth != NULL, "Could not allocate dev_handler",
             err_dev_handler_alloc, -1);
 
+    size_t retries = LLIO_ETH_MAX_OPEN_RECONNECT_TRIES;
     err = _llio_eth_conn (&dev_eth->fd, dev_eth->type, dev_eth->hostname,
-        dev_eth->port);
+        dev_eth->port, LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
+    while (err < 0) {
+        ASSERT_TEST(retries != 0, "No more retries in connecting to endpoint", err_retries_eth_conn);
+        DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                "[ll_io_eth] Error on connection to endpoint the first time, retrying (%zu/%u)\n", LLIO_ETH_MAX_OPEN_RECONNECT_TRIES-retries, 
+                    LLIO_ETH_MAX_OPEN_RECONNECT_TRIES);
+        /* Only decrement if we are in finite waiting mode */
+        if (retries > 0) {
+            retries--;
+        }
+
+        /* cleanup and try again */
+        close (dev_eth->fd);
+        dev_eth->fd = -1;
+        err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
+                dev_eth->hostname, dev_eth->port, LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
+    }
+
     ASSERT_TEST(err == 0, "Could not connect to endpoint", err_eth_conn);
 
     llio_set_dev_handler (self, dev_eth);
@@ -207,6 +229,7 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
             llio_get_endpoint_name (self));
 
 err_eth_conn:
+err_retries_eth_conn:
 err_dev_handler_alloc:
 err_endp_port_retrieve:
 err_endp_addr_retrieve:
@@ -341,7 +364,7 @@ static ssize_t _eth_read_generic (llio_t *self, uint64_t offs, uint32_t *data,
         close (dev_eth->fd);
         dev_eth->fd = -1;
         err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
-                dev_eth->hostname, dev_eth->port);
+                dev_eth->hostname, dev_eth->port, LLIO_ETH_SECS_BEFORE_RECONNECT);
         /* keep retrying */
         if (err < 0) {
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
@@ -386,7 +409,7 @@ static ssize_t _eth_write_generic (llio_t *self, uint64_t offs, const uint32_t *
         close (dev_eth->fd);
         dev_eth->fd = -1;
         err = _llio_eth_conn (&dev_eth->fd, dev_eth->type,
-                dev_eth->hostname, dev_eth->port);
+                dev_eth->hostname, dev_eth->port, LLIO_ETH_SECS_BEFORE_RECONNECT);
         /* keep retrying */
         if (err < 0) {
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
@@ -406,7 +429,7 @@ err_dev_eth_handler:
 /******************************* Helper Functions *****************************/
 
 static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
-        char* port)
+        char* port, int secs_before_reconnect)
 {
     int err = 0;
     struct addrinfo hints, *servinfo, *p;
@@ -466,6 +489,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
             if (errno != EINPROGRESS) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error connecting is not EINPROGRESS: %d - %s\n", errno, strerror(errno));
+                sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
                 close (*fd);
                 *fd = -1;
                 continue;
@@ -473,7 +497,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
 
             DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
                     "[ll_io_eth] EINPROGRESS in connect() - selecting\n");
-            tv.tv_sec = LLIO_ETH_SECS_BEFORE_RECONNECT;
+            tv.tv_sec = secs_before_reconnect;
             tv.tv_usec = 0;
             FD_ZERO (&myset);
             FD_SET (*fd, &myset);

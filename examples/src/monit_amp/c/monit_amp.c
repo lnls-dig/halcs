@@ -116,14 +116,14 @@ int main (int argc, char *argv [])
     }
 
     fprintf (stdout, "[client:monit_amp]: \n"
-              "monitoring amplitude ch0 = %u\n"
-              "monitoring amplitude ch1 = %u\n"
-              "monitoring amplitude ch2 = %u\n"
-              "monitoring amplitude ch3 = %u\n", 
-              dsp_data.amp_ch0,
-              dsp_data.amp_ch1,
-              dsp_data.amp_ch2,
-              dsp_data.amp_ch3);
+              "monitoring amplitude ch0 = %d\n"
+              "monitoring amplitude ch1 = %d\n"
+              "monitoring amplitude ch2 = %d\n"
+              "monitoring amplitude ch3 = %d\n", 
+              (int32_t) dsp_data.amp_ch0,
+              (int32_t) dsp_data.amp_ch1,
+              (int32_t) dsp_data.amp_ch2,
+              (int32_t) dsp_data.amp_ch3);
 
 err_get_monit_amp:
 err_halcs_client_new:

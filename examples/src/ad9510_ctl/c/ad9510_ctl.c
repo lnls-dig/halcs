@@ -224,6 +224,15 @@ int main (int argc, char *argv [])
         }
     }
 
+    uint32_t r_div = 0;
+    halcs_client_err_e err = halcs_get_ad9510_r_div (halcs_client, service, &r_div);
+    if (err != HALCS_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:ad9510_ctl]: Error executing halcs_get_ad9510_r_div: error %s\n", halcs_client_err_str (err));
+    }
+    else {
+        fprintf (stdout, "[client:ad9510_ctl]: r_div = %u\n", r_div);
+    }
+
 err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
 
