@@ -303,3 +303,36 @@ struct sdb_device *sdbutils_next_device (struct sdbfs *fs)
 
     return NULL;
 }
+
+struct sdb_device *sdbutils_get_sdb_device (struct sdbfs *fs, uint64_t vendor,
+        uint32_t dev, int num_device_skip)
+{
+    int device_count = 0;
+    struct sdb_device *d;
+    struct sdb_product *p;
+    struct sdb_component *c;
+
+    sdbfs_scan(fs, 1); /* new scan: get the interconnect and igore it */
+    while ((d = sdbutils_next_device (fs)) != NULL) {
+        c = &d->sdb_component;
+        p = &c->product;
+
+        /* Device found */
+        if ((unsigned long long)ntohll(p->vendor_id) == vendor &&
+                ntohl(p->device_id) == dev) {
+            device_count++;
+
+            /* And we have skipped num_device_skip devices */
+            if (device_count > num_device_skip) {
+                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE, "[sdbutils] Device "
+                        "vid = 0x%"PRIx64", did = 0x%08x, instance = %d found\n"
+                        "\tname = %.19s, abi_class = %02X, abi_major = %01X, abi_minor = %01X\n",
+                        ntohll(p->vendor_id), ntohl(p->device_id), num_device_skip, p->name, 
+                        d->abi_class, d->abi_ver_major, d->abi_ver_minor);
+                return d;
+            }
+        }
+    }
+
+    return NULL;
+}
