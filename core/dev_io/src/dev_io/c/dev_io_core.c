@@ -127,6 +127,8 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
         uint64_t base, uint32_t inst_id, uint32_t dest_smio_id, uint32_t dest_inst_id,
         char *msg);
+static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
+        uint32_t inst_id, uint64_t vid, uint32_t did);
 static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
@@ -601,6 +603,8 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     uint32_t inst_id;
     uint32_t dest_smio_id;
     uint32_t dest_inst_id;
+    uint64_t vid;
+    uint32_t did;
     char *msg = NULL;
 
     /* This command expects the following or less (depending on command) */
@@ -611,9 +615,11 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
      * Arg4:    (uint32_t) dest_smio_id
      * Arg5:    (uint32_t) dest_inst_id
      * Arg6:    (string)   message
+     * Arg7:    (uint64_t) vendor_id
+     * Arg8:    (uint32_t) device_id
      * */
-    int zerr = zsock_recv (reader, "s48444s", &command, &smio_id, &base, &inst_id,
-        &dest_smio_id, &dest_inst_id, &msg);
+    int zerr = zsock_recv (reader, "s48444s84", &command, &smio_id, &base, &inst_id,
+        &dest_smio_id, &dest_inst_id, &msg, &vid, &did);
     if (zerr == -1) {
         return 0; /* Malformed message */
     }
@@ -627,10 +633,14 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
         _devio_send_smio_mgmt_msg_raw (devio, smio_id, base, inst_id, dest_smio_id,
             dest_inst_id, msg);
     }
+    else if (streq (command, "$SDB_DEVICE_INFO")) {
+        /* Get specific SDB info */
+        _devio_send_sdb_info_raw (devio, smio_id, inst_id, vid, did);
+    }
     else {
         /* Invalid message received. Discard message and continue normally */
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe_mgmt] PIPE "
-                "received an invalid command\n");
+                "received an invalid command: %s\n", command);
     }
 
     free (command);
@@ -877,11 +887,54 @@ static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_i
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
 err_send_mgmt_msg:
-err_inv_key:
-    free (dest_smio_key);
-err_key_alloc:
-err_search_smio:
+err_get_smio_actor:
     return err;
+}
+
+static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
+        uint32_t inst_id, uint64_t vid, uint32_t did)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    zactor_t *dest_smio_actor = _devio_get_pipe_from_smio_id (self, smio_id, inst_id);
+    ASSERT_TEST(dest_smio_actor != NULL, "Could not get actor to send SDB info",
+            err_get_smio_actor,  DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+    /* Get SDB info */
+    struct sdb_device* sdb_device = sdbutils_get_sdb_device (self->sdbfs, vid,
+        did, inst_id);
+    ASSERT_TEST(sdb_device != NULL, "Could not get SDB device", err_sdb_device,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
+                    "_devio_send_sdb_info_raw: sending message to actor with:\n"
+                    "sdb_device->abi_class = %02X, sdb_device->abi_ver_major = %01X,"
+            "sdb_device->abi_ver_minor = %01X, sdb_device->bus_specific = %04X\n",
+            sdb_device->abi_class, sdb_device->abi_ver_major,
+            sdb_device->abi_ver_minor, sdb_device->bus_specific);
+
+    /* Send message */
+    int zerr = zsock_send (dest_smio_actor, "s2114", "$SDB_DEVICE_INFO",
+            sdb_device->abi_class, sdb_device->abi_ver_major,
+            sdb_device->abi_ver_minor, sdb_device->bus_specific);
+    ASSERT_TEST(zerr == 0, "Could not send SDB device info message", err_send_sdb_info_msg,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_send_sdb_info_msg:
+err_sdb_device:
+err_get_smio_actor:
+    return err;
+}
+
+/* Register a specific sm_io module to this device */
+static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id)
+{
+    uint64_t base = sdbfs_find_id(self->sdbfs, LNLS_VENDOR_ID, smio_id);
+
+    /* Register the sm_io module using the retrieved base address, and
+     * automatically assign an instance id to it */
+    return _devio_register_sm_raw(self, smio_id, base, 0, true);
 }
 
 devio_err_e devio_register_sm_by_id (void *pipe, uint32_t smio_id)
