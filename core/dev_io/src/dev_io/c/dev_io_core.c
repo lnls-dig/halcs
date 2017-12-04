@@ -117,6 +117,11 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
         zloop_reader_fn handler);
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
+/* Utilities */
+static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
+        uint32_t inst_id);
+
+/* PIPE methods */
 static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id, bool auto_inst_id);
 static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
@@ -821,14 +826,37 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 /********************** PIPE methods ************************/
 /************************************************************/
 
-/* Register a specific sm_io module to this device */
-static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id)
+static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
+        uint32_t inst_id)
 {
-    uint64_t base = sdbfs_find_id(self->sdbfs, LNLS_VENDOR_ID, smio_id);
+    zactor_t **smio_actor_p = NULL;
+    zactor_t *smio_actor = NULL;
 
-    /* Register the sm_io module using the retrieved base address, and
-     * automatically assign an instance id to it */
-    return _devio_register_sm_raw(self, smio_id, base, 0, true);
+    /* Search for specified PIPE by using the smio_id and inst_id */
+    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self,
+        smio_id);
+    ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO "
+            "from SMIO ID", err_search_smio);
+
+    /* Get key to search in hash */
+    char *smio_key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
+    ASSERT_ALLOC (smio_key, err_key_alloc);
+
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
+                    "_devio_get_pipe_from_smio_id: smio_key %s\n", smio_key);
+
+    /* Finally, do the lookup */
+    smio_actor_p = (zactor_t **) zhashx_lookup (self->sm_io_h, smio_key);
+    ASSERT_TEST (smio_actor_p != NULL, "Could not find SMIO PIPE from SMIO ID",
+            err_inv_key);
+
+    smio_actor = *smio_actor_p;
+
+err_inv_key:
+    free (smio_key);
+err_key_alloc:
+err_search_smio:
+    return smio_actor;
 }
 
 static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_id,
@@ -838,25 +866,12 @@ static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_i
     assert (self);
     devio_err_e err = DEVIO_SUCCESS;
 
-    /* Search for specified PIPE by using the dest_smio_id and dest_inst_id */
-    const volatile smio_mod_dispatch_t *smio_mod_handler = _devio_search_sm_by_id (self,
-        dest_smio_id);
-    ASSERT_TEST (smio_mod_handler != NULL, "Could not find specified SMIO "
-            "for sending MGMT message", err_search_smio, DEVIO_ERR_NO_SMIO_ID);
-
-    /* Get key to search in hash */
-    char *dest_smio_key = _devio_gen_smio_key (self, smio_mod_handler,
-        dest_inst_id);
-    ASSERT_ALLOC (dest_smio_key, err_key_alloc);
-
-    /* Finally, do the lookup */
-    zactor_t **dest_smio_actor = (zactor_t **) zhashx_lookup (self->sm_io_h, dest_smio_key);
-    ASSERT_TEST (dest_smio_actor != NULL,
-            "Could not find destination SMIO PIPE for sending MGMT message",
-            err_inv_key);
+    zactor_t *dest_smio_actor = _devio_get_pipe_from_smio_id (self, dest_smio_id, dest_inst_id);
+    ASSERT_TEST(dest_smio_actor != NULL, "Could not get actor to send MGMT message",
+            err_get_smio_actor,  DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
     /* Send message */
-    int zerr = zsock_send (*dest_smio_actor, "s48444s", "$MGMT_MSG_SMIO", smio_id,
+    int zerr = zsock_send (dest_smio_actor, "s48444s", "$MGMT_MSG_SMIO", smio_id,
         base, inst_id, dest_smio_id, dest_inst_id, msg);
     ASSERT_TEST(zerr == 0, "Could not send MGMT message", err_send_mgmt_msg,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
