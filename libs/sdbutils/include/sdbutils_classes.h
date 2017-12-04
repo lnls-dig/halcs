@@ -39,7 +39,7 @@
 
 /* Known vendor IDs */
 
-#define LNLS_VENDOR_ID      0x1215
+#define LNLS_VENDOR_ID      0x1000000000001215
 
 /* Opaque class structures to allow forward references */
 
