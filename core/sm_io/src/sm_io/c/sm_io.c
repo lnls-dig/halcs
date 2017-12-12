@@ -446,9 +446,10 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
     ASSERT_TEST(zerr == 0, "Could not send SDB_DEVICE_INFO message", err_send_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
 
-    /* Wait for reply. Note here we expect the reply over a different socket, 
-     * as the self->pipe_mgmt is used for callbacks and we want to receive the message
-     * exactly here and wait for a reply */
+    /* Wait for reply. Note here we expect the reply over the same socket, 
+     * event though the receiving channel was registered in a zloop engine.
+     * The zloop reader was canceled before and will be reinserted in the engine
+     * in after receving the message */
     char command[50];
     zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class, 
         &sdbutils_info->abi_ver_major, &sdbutils_info->abi_ver_minor, &sdbutils_info->bus_specific);
