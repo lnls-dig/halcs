@@ -160,7 +160,16 @@ public class DefaultDistributionVariant extends DefaultDistribution
 
     private void addDetectedDependencySpecification(Map specification,
             ProjectModelResolver resolver) {
-        def projectPath = specification.get("project")
+        def projectPath =  specification.get("project")
+
+        if (projectPath != null && projectPath != project.path) {
+            addDetectedExternalDependencySpecification(projectPath,
+                specification, resolver)
+        }
+    }
+
+    private void addDetectedExternalDependencySpecification(String projectPath,
+            Map specification, ProjectModelResolver resolver) {
         def libraryName = specification.get("library")
         def linkageType = specification.get("linkage")
         def projectModel = resolver.resolveProjectModel(projectPath)
@@ -169,10 +178,7 @@ public class DefaultDistributionVariant extends DefaultDistribution
         def version = project?.version.toString()
 
         if (distribution != null) {
-            def dependency = new Dependency(projectPath, version, projectModel,
-                    distribution)
-
-            dependencies.add(dependency)
+            dependencies.add(new Dependency(projectPath, version, distribution))
         } else if (linkageType != "api")
             includeFilesFromProjectLibraryDependency(libraryName, projectModel)
     }
