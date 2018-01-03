@@ -51,4 +51,10 @@ model {
             }
         }
     }
+
+    binaries {
+        withType(NativeExecutableBinarySpec) {
+            linker.args '-lczmq', '-lpcidriver'
+        }
+    }
 }
