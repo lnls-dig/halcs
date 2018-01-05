@@ -20,6 +20,8 @@ model {
             }
         }
         sdb_extract(NativeExecutableSpec) {
+            baseName = 'sdb-extract'
+
             sources {
                 c {
                     lib library: 'sdbfs'
@@ -29,6 +31,8 @@ model {
             }
         }
         sdb_read(NativeExecutableSpec) {
+            baseName = 'sdb-read'
+
             sources {
                 c {
                     lib library: 'sdbfs'
@@ -38,6 +42,8 @@ model {
             }
         }
         sdb_read_lnls(NativeExecutableSpec) {
+            baseName = 'sdb-read-lnls'
+
             sources {
                 c {
                     lib project: ':libs:convc', library: 'convc'
