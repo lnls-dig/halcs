@@ -25,7 +25,7 @@
 /* version macros for compile-time API detection */
 
 #define ACQ_CLIENT_VERSION_MAJOR 1
-#define ACQ_CLIENT_VERSION_MINOR 0
+#define ACQ_CLIENT_VERSION_MINOR 2
 #define ACQ_CLIENT_VERSION_PATCH 0
 
 #define ACQ_CLIENT_MAKE_VERSION(major, minor, patch) \

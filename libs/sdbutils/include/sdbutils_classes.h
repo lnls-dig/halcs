@@ -16,7 +16,7 @@
 /* version macros for compile-time API detection */
 
 #define SDBUTILS_VERSION_MAJOR 1
-#define SDBUTILS_VERSION_MINOR 0
+#define SDBUTILS_VERSION_MINOR 2
 #define SDBUTILS_VERSION_PATCH 0
 
 #define SDBUTILS_MAKE_VERSION(major, minor, patch) \
@@ -39,7 +39,7 @@
 
 /* Known vendor IDs */
 
-#define LNLS_VENDOR_ID      0x1215
+#define LNLS_VENDOR_ID      0x1000000000001215
 
 /* Opaque class structures to allow forward references */
 

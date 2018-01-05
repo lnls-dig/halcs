@@ -429,6 +429,40 @@ err_send_mgmt_msg:
     return err;
 }
 
+smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
+    uint32_t smio_inst, uint64_t vid, uint32_t did, 
+    sdbutils_info_t *sdbutils_info)
+{
+    assert (self);
+    smio_err_e err = SMIO_SUCCESS;
+
+    /* Cancel zloop on pipe_mgmt, as we will receive the message in the following
+     * receive in a blocking call */
+    zloop_reader_end (self->loop, self->pipe_mgmt);
+
+    int zerr = zsock_send (self->pipe_mgmt, "s48444s84", "$SDB_DEVICE_INFO",
+            smio_id, self->base, smio_inst, 0x0, 0x0,
+            "", vid, did);
+    ASSERT_TEST(zerr == 0, "Could not send SDB_DEVICE_INFO message", err_send_sdb_info_msg,
+            SMIO_ERR_REGISTER_SM);
+
+    /* Wait for reply. Note here we expect the reply over the same socket, 
+     * event though the receiving channel was registered in a zloop engine.
+     * The zloop reader was canceled before and will be reinserted in the engine
+     * in after receving the message */
+    char command[50];
+    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class, 
+        &sdbutils_info->abi_ver_major, &sdbutils_info->abi_ver_minor, &sdbutils_info->bus_specific);
+    ASSERT_TEST(zerr == 0, "Could not receive SDB_DEVICE_INFO message", err_recv_sdb_info_msg,
+            SMIO_ERR_REGISTER_SM);
+
+err_recv_sdb_info_msg:
+err_send_sdb_info_msg:
+    /* Re-register pipe_mgmt in zloop */
+    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
+    return err;
+}
+
 /************************************************************/
 /***************** Dispatch table callbacks *****************/
 /************************************************************/

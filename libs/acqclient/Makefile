@@ -302,7 +302,7 @@ pre_clean:
 	$(foreach header,$(PWD)/$($(LIBNAME)_INST_SMIO_HEADERS), \
 		rm -f $(header) $(CMDSEP))
 
-install:
+install: all
 	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
