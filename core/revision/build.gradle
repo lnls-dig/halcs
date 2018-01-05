@@ -1,4 +1,5 @@
 import org.ajoberstar.gradle.git.release.opinion.Strategies
+import org.ajoberstar.gradle.git.release.semver.RebuildVersionStrategy
 
 import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 
@@ -36,6 +37,8 @@ release {
         stages: ['ci_release'] as SortedSet,
         allowDirtyRepo: true
     )
+
+    defaultVersionStrategy = RebuildVersionStrategy.INSTANCE
 }
 
 task updateVersionMacros(type: UpdateSemVerMacrosTask) {
