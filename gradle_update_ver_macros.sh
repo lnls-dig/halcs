@@ -7,4 +7,4 @@ else
     exit 1
 fi
 
-./gradlew updateVersionMacros -Prelease.scope="$scope" -Prelease.stage=ci_release
+./gradlew updateVersionMacros -Prelease.scope="$scope"
