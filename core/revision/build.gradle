@@ -1,5 +1,10 @@
-import org.ajoberstar.gradle.git.release.opinion.Strategies
-import org.ajoberstar.gradle.git.release.semver.RebuildVersionStrategy
+import org.ajoberstar.gradle.git.release.base.ReleasePluginExtension
+import org.ajoberstar.gradle.git.release.base.ReleaseVersion
+import org.ajoberstar.gradle.git.release.base.VersionStrategy
+import org.ajoberstar.grgit.Commit
+import org.ajoberstar.grgit.Grgit
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 
@@ -32,16 +37,52 @@ model {
 }
 
 release {
-    versionStrategy Strategies.FINAL.copyWith(
-        name: 'ci_release',
-        stages: ['ci_release'] as SortedSet,
-        allowDirtyRepo: true
-    )
-
-    defaultVersionStrategy = RebuildVersionStrategy.INSTANCE
+    versionStrategy new CiReleaseVersionStrategy()
 }
 
 task updateVersionMacros(type: UpdateSemVerMacrosTask) {
     macroPrefix 'HALCS_VERSION_'
     file project.file('include/revision.h')
+}
+
+class CiReleaseVersionStrategy implements VersionStrategy {
+    private static final Logger logger =
+        LoggerFactory.getLogger(CiReleaseVersionStrategy)
+
+    @Override
+    String getName() {
+        return "ci_release"
+    }
+
+    @Override
+    boolean selector(Project project, Grgit grgit) {
+        String message = "" +
+            "status: ${grgit.status().clean}\n" +
+            "staged: ${grgit.status().staged.allChanges.size()}\n" +
+            "unstaged: ${grgit.status().unstaged.allChanges}\n" +
+            "conflicts: ${grgit.status().conflicts.size()}\n"
+        throw new RuntimeException("STOP: $message")
+        // Check if current HEAD is tagged
+        getHeadVersion(project, grgit) != null
+    }
+
+    @Override
+    ReleaseVersion infer(Project project, Grgit grgit) {
+        String version = getHeadVersion(project, grgit)
+        def releaseVersion = new ReleaseVersion(version, version, false)
+        logger.info('Inferred version {} by strategy {}', releaseVersion, name)
+        return releaseVersion
+    }
+
+    private String getHeadVersion(Project project, Grgit grgit) {
+        def tagStrategy = project.extensions.getByType(ReleasePluginExtension).tagStrategy
+        Commit head = grgit.head()
+        return grgit.tag.list().findAll {
+            it.commit == head
+        }.collect {
+            tagStrategy.parseTag(it)
+        }.findAll {
+            it != null
+        }.max()?.toString()
+    }
 }
