@@ -37,7 +37,9 @@ model {
 }
 
 release {
-    versionStrategy new CiReleaseVersionStrategy()
+    def test = new CiReleaseVersionStrategy()
+    versionStrategy test
+    defaultVersionStrategy = test
 }
 
 task updateVersionMacros(type: UpdateSemVerMacrosTask) {
