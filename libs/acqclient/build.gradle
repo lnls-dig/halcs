@@ -3,6 +3,7 @@ import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 apply plugin: com.janitovff.grgit.config.GitConfigPlugin
+apply plugin: 'org.ajoberstar.grgit'
 
 model {
     components {
