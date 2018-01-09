@@ -306,7 +306,7 @@ if [ -z "$GRADLE" ]; then
     build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
 else
     export ${CONFIG_FLAGS[@]}
-    ./gradlew $GRADLE -Prelease.stage=ci_release
+    ./gradlew $GRADLE
 fi
 
 # Get CCache statistics

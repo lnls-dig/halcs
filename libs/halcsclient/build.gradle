@@ -1,11 +1,9 @@
-import org.ajoberstar.gradle.git.release.opinion.Strategies
 import br.lnls.dig.gradle.updatesemvermacrostask.UpdateSemVerMacrosTask
 
-apply plugin: 'org.ajoberstar.grgit'
-apply plugin: 'org.ajoberstar.release-opinion'
 apply plugin: br.lnls.dig.gradle.nativedistribution.plugins.NativeDistributionPlugin
 apply plugin: 'br.lnls.dig.gradle.nativerelease'
 apply plugin: com.janitovff.grgit.config.GitConfigPlugin
+apply plugin: 'org.ajoberstar.grgit'
 
 model {
     components {
@@ -33,14 +31,6 @@ model {
             }
         }
     }
-}
-
-release {
-    versionStrategy Strategies.FINAL.copyWith(
-        name: 'ci_release',
-        stages: ['ci_release'] as SortedSet,
-        allowDirtyRepo: true
-    )
 }
 
 task updateVersionMacros(type: UpdateSemVerMacrosTask) {
