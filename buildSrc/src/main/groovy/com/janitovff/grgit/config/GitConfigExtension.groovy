@@ -8,7 +8,7 @@ class GitConfigExtension {
     private Config config
 
     GitConfigExtension(Project project) {
-        project.rootProject.plugins.withId('org.ajoberstar.grgit') {
+        project.plugins.withId('org.ajoberstar.grgit') {
             this.setConfig(project.grgit.repository.jgit.repository.config)
         }
     }
