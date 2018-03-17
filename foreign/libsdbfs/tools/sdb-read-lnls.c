@@ -39,7 +39,7 @@ static void help(void)
 }
 
 struct sdbr_drvdata {
-    llio_t *llio;
+	llio_t *llio;
 };
 
 /*
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 	fs->name = fsname; /* not mandatory */
 	fs->blocksize = 256; /* only used for writing, actually */
 	fs->entrypoint = opt_entry;
-    fs->read = do_read;
+	fs->read = do_read;
 
 	if (opt_verbose)
 		fs->flags |= SDBFS_F_VERBOSE;
@@ -307,8 +307,8 @@ int main(int argc, char **argv)
 	else
 		err = do_cat_id(fs, int64, int32);
 
-    llio_destroy(&((struct sdbr_drvdata *)fs->drvdata)->llio);
-    free(fs->drvdata);
+	llio_destroy(&((struct sdbr_drvdata *)fs->drvdata)->llio);
+	free(fs->drvdata);
 	sdbfs_dev_destroy(fs);
 	return err;
 }
