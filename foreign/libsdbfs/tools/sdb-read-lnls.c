@@ -307,6 +307,7 @@ int main(int argc, char **argv)
 	else
 		err = do_cat_id(fs, int64, int32);
 
+	llio_release(((struct sdbr_drvdata *)fs->drvdata)->llio, NULL);
 	llio_destroy(&((struct sdbr_drvdata *)fs->drvdata)->llio);
 	free(fs->drvdata);
 	sdbfs_dev_destroy(fs);
