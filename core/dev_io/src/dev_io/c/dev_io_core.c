@@ -41,6 +41,10 @@
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 #define DEVIO_LINGER_TIME                   100         /* in ms */
 
+
+/* Our SIGHUP guard variable */
+volatile sig_atomic_t _devio_sighup = 0;
+
 struct _devio_t {
     /* General information */
     zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
@@ -168,6 +172,24 @@ static devio_sig_handler_t devio_sigchld_handler =
     .devio_sig_h = devio_sigchld_h
 };
 
+void devio_sighup_h (int sig, siginfo_t *siginfo, void *context)
+{
+    UNUSED(sig);
+    UNUSED(siginfo);
+    UNUSED(context);
+
+    /* Set a guard variable and let the default devio loop
+     * take care of handling this */
+    _devio_sighup = 1;
+}
+
+/* SIGHUP default handler */
+static devio_sig_handler_t devio_sighup_handler =
+{
+    .signal = SIGHUP,
+    .devio_sig_h = devio_sighup_h
+};
+
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
@@ -261,6 +283,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     devio_err_e derr = devio_set_sig_handler (self, &devio_sigchld_handler);
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting signal handlers", err_set_sig_handlers);
+    derr = devio_set_sig_handler (self, &devio_sighup_handler);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting SIGHUP signal handlers",
+            err_set_sig_handlers);
 
     derr = _devio_register_sig_handlers (self);
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
