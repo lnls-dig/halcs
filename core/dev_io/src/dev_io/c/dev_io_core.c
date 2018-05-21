@@ -41,6 +41,7 @@
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 #define DEVIO_LINGER_TIME                   100         /* in ms */
 
+#define DEVIO_DFLT_MONITOR_INTERVAL         1000        /* /n ms */
 
 /* Our SIGHUP guard variable */
 volatile sig_atomic_t _devio_sighup = 0;
@@ -125,6 +126,8 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
 static int _devio_engine_set_monitor (devio_t *devio, size_t interval,
         zloop_timer_fn monitor);
 static devio_err_e _devio_engine_cancel_monitor (devio_t* devio, int identifier);
+static int _devio_handle_sighup (zloop_t *loop, int timer_id, void *argument);
+
 /* Utilities */
 static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
         uint32_t inst_id);
@@ -295,6 +298,10 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     derr = _devio_register_sig_handlers (self);
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers",
             err_sig_handlers);
+
+    /* Set monitor to watch signal variables */
+    _devio_engine_set_monitor (self, DEVIO_DFLT_MONITOR_INTERVAL,
+            _devio_handle_sighup);
 
     /* Concatenate recv'ed name with a llio identifier */
     size_t llio_name_len = sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1);
@@ -899,6 +906,25 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
     }
 
     zmsg_destroy (&recv_msg);
+    return 0;
+}
+
+/************************************************************/
+/********************* zmonitor handlers ********************/
+/************************************************************/
+static int _devio_handle_sighup (zloop_t *loop, int timer_id, void *argument)
+{
+    UNUSED(loop);
+    UNUSED(timer_id);
+
+    devio_t *self = (devio_t *) argument;
+    /* SIGHUP signal occured */
+    if (_devio_sighup == 1) {
+        /* Close log and reopen it */
+        errhand_log_destroy ();
+        errhand_log_new (self->log_file, DEVIO_DFLT_LOG_MODE);
+        _devio_sighup = 0;
+    }
     return 0;
 }
 
