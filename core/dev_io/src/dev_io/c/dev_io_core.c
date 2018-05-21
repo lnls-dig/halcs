@@ -207,6 +207,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     assert (reg_ops);
     assert (endpoint_broker);
 
+    /* Just satisfy compilers that complain for unused functions */
+    _devio_engine_cancel_monitor (NULL, 0);
+
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
     errhand_log_new (log_file_name, DEVIO_DFLT_LOG_MODE);
