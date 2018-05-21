@@ -282,13 +282,15 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     _devio_set_spawn_clhd_handler (self, &hutils_spawn_chld);
 
     devio_err_e derr = devio_set_sig_handler (self, &devio_sigchld_handler);
-    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting signal handlers", err_set_sig_handlers);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting SIGCHLD signal handlers",
+            err_set_sig_handlers);
     derr = devio_set_sig_handler (self, &devio_sighup_handler);
     ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting SIGHUP signal handlers",
             err_set_sig_handlers);
 
     derr = _devio_register_sig_handlers (self);
-    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers",
+            err_sig_handlers);
 
     /* Concatenate recv'ed name with a llio identifier */
     size_t llio_name_len = sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1);
