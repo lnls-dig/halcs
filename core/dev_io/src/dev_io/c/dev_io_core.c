@@ -1529,6 +1529,11 @@ llio_t *devio_get_llio (devio_t *self)
     return self->llio;
 }
 
+/* Register signal handlers for specified signals. Bear in mind that you can't,
+ * by default register handlers for SIGINT/SIGTERM as they are automatically
+ * managed by CZMQ library. If needed, you can call zsys_handler_set () and CZMQ
+ * will disable its signal handling for those signals, but zctx_interrupt and
+ * zsys_interrupt will not work as expected anymore. */
 devio_err_e devio_set_sig_handler (devio_t *self, devio_sig_handler_t *sig_handler)
 {
     assert (self);
