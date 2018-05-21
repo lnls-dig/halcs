@@ -1658,7 +1658,7 @@ static devio_err_e _devio_register_sig_handlers (devio_t *self)
         int err = sigaction (sig_handler->signal, &act, NULL);
         CHECK_ERR(err, DEVIO_ERR_SIGACTION);
 
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n",
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] registered signal %d\n",
                 sig_handler->signal);
 
         sig_handler = (devio_sig_handler_t *)
