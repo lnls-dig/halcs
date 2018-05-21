@@ -121,6 +121,10 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
         zloop_reader_fn handler);
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
+/* Handle monitors */
+static int _devio_engine_set_monitor (devio_t *devio, size_t interval,
+        zloop_timer_fn monitor);
+static devio_err_e _devio_engine_cancel_monitor (devio_t* devio, int identifier);
 /* Utilities */
 static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
         uint32_t inst_id);
@@ -578,6 +582,45 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
 
 err_zloop_reader:
 err_zsock_is:
+    return err;
+}
+
+/* From Malamute https://github.com/zeromq/malamute/blob/master/src/mlm_server_engine.inc
+ *
+ * Register monitor function that will be called at regular intervals
+ * by the server engine. Returns an identifier that can be used to cancel it. */
+
+static int _devio_engine_set_monitor (devio_t *devio, size_t interval,
+        zloop_timer_fn monitor)
+{
+    int err = -1;
+
+    if (devio) {
+        devio_t *self = (devio_t *) devio;
+        err = zloop_timer (self->loop, interval, 0, monitor, self);
+        ASSERT_TEST(err >= 0, "Could not register zloop_timer",
+                err_zloop_timer, -1);
+    }
+
+err_zloop_timer:
+    return err;
+}
+
+/* From Malamute https://github.com/zeromq/malamute/blob/master/src/mlm_server_engine.inc
+ *
+ * Cancel the monitor function with the given identifier. */
+static devio_err_e _devio_engine_cancel_monitor (devio_t* devio, int identifier)
+{
+    int err = -1;
+
+    if (devio) {
+        devio_t *self = (devio_t *) devio;
+        err = zloop_timer_end (self->loop, identifier);
+        ASSERT_TEST(err >= 0, "Could not deregister zloop_timer",
+                err_zloop_timer, -1);
+    }
+
+err_zloop_timer:
     return err;
 }
 
