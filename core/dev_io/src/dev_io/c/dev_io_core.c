@@ -852,9 +852,6 @@ static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
     char *smio_key = _devio_gen_smio_key (self, smio_mod_handler, inst_id);
     ASSERT_ALLOC (smio_key, err_key_alloc);
 
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
-                    "_devio_get_pipe_from_smio_id: smio_key %s\n", smio_key);
-
     /* Finally, do the lookup */
     smio_actor_p = (zactor_t **) zhashx_lookup (self->sm_io_h, smio_key);
     ASSERT_TEST (smio_actor_p != NULL, "Could not find SMIO PIPE from SMIO ID",
