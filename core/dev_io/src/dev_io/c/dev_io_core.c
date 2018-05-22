@@ -1558,17 +1558,17 @@ void signal_actor (zsock_t *pipe, void *args)
         switch (sig_caught)
         {
             /* Reopen Logs */
-            case SIGUSR1: 
+            case SIGUSR1:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR1!\n");
                 errhand_reallog_destroy ();
                 errhand_log_new (self->log_file, DEVIO_DFLT_LOG_MODE);
                 break;
             /* Undefined */
-            case SIGUSR2: 
+            case SIGUSR2:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR2!\n");
                 break;
             /* Undefined */
-            case SIGHUP: 
+            case SIGHUP:
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGHUP!\n");
                 break;
         }
@@ -1584,7 +1584,7 @@ void devio_loop (zsock_t *pipe, void *args)
     devio_t *self = (devio_t *) args;
     self->pipe = pipe;
 
-    /* Unblock signals for this thread only. We can't use the regular 
+    /* Unblock signals for this thread only. We can't use the regular
      * signal handlers as all thread will inherit and we want only
      * this thread to treat them */
     sigset_t signal_mask;
