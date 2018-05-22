@@ -192,9 +192,11 @@ LIBS = -lm -lzmq -lczmq -lmlm
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
 PROJECT_LIBS_NAME = liberrhand libconvc libhutils libdisptable libllio libhalcsclient \
-                    libacqclient libbpmclient libsdbutils  libsdbfs libpcidriver
+                    libacqclient libbpmclient libsdbutils  libsdbfs libpcidriver \
+					libpthread
 PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
-               -lacqclient -lbpmclient -lsdbutils -lsdbfs -lpcidriver
+               -lacqclient -lbpmclient -lsdbutils -lsdbfs -lpcidriver \
+			   -lpthread
 
 # General library flags -L<libdir>
 LFLAGS = -Lforeign/libsdbfs
