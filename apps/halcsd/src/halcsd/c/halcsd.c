@@ -136,6 +136,18 @@ int main (int argc, char *argv[])
     char *cfg_file = NULL;
     int opt;
 
+    /* Block signals in all of the threads, if not otherwise stated */
+    static sigset_t signal_mask;
+    sigemptyset (&signal_mask);
+    sigaddset (&signal_mask, SIGUSR1);
+    sigaddset (&signal_mask, SIGUSR2);
+    sigaddset (&signal_mask, SIGHUP);
+    int rc = pthread_sigmask (SIG_BLOCK, &signal_mask, NULL);
+    if (rc != 0) {
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Could not block sigmask: %d\n", rc); 
+        goto err_sigmask;
+    }
+
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
         /* Get the user selected options */
         switch (opt) {
@@ -645,6 +657,7 @@ err_cfg_load:
     zhashx_destroy (&devio_hints);
 err_devio_hints_alloc:
 err_cfg_not_found:
+err_sigmask:
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Exiting ...\n");
     return 0;
 }
