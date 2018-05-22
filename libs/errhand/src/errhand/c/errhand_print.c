@@ -41,12 +41,6 @@ void errhand_print (const char *fmt, ...)
  * Must be called with the mutex held */
 static void _errhand_log_write (char *errhand_lvl_str, char *msg, bool verbose)
 {
-    ERRHAND_MUTEX_LOCK(_logfile_mutex);
-    /* Default to stdout */
-    if (!_errhand_logfile) {
-        _errhand_logfile = stdout;
-    }
-
     time_t curtime = time (NULL);
     struct tm *loctime = localtime (&curtime);
     char date [ERRHAND_DATE_LENGTH];
@@ -61,8 +55,15 @@ static void _errhand_log_write (char *errhand_lvl_str, char *msg, bool verbose)
         snprintf (log_text, ERRHAND_TEXT_LENGTH, "%s", msg);
     }
 
-    fprintf (_errhand_logfile, "%s", log_text);
-    fflush (_errhand_logfile);
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    /* Only open/close functions should modify global _errhand_logfile */
+    FILE *local_errhand_logfile = _errhand_logfile;
+    /* Default to stdout */
+    if (!local_errhand_logfile) {
+        local_errhand_logfile = stdout;
+    }
+    fprintf (local_errhand_logfile, "%s", log_text);
+    fflush (local_errhand_logfile);
     ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
 }
 
@@ -88,12 +89,14 @@ void errhand_log_print (int errhand_lvl, const char *fmt, ...)
 void errhand_log_print_zmq_msg (zmsg_t *msg)
 {
     ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    /* Only open/close functions should modify global _errhand_logfile */
+    FILE *local_errhand_logfile = _errhand_logfile;
     /* Default to stdout */
-    if (!_errhand_logfile) {
-        _errhand_logfile = stdout;
+    if (!local_errhand_logfile) {
+        local_errhand_logfile = stdout;
     }
 
-    errhand_lprint_zmq_msg (msg, _errhand_logfile);
+    errhand_lprint_zmq_msg (msg, local_errhand_logfile);
     ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
 }
 
