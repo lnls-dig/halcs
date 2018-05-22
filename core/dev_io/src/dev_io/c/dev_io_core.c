@@ -1535,6 +1535,46 @@ err_send_smio_cfg_done:
     return err;
 }
 
+/* Signal actor to catch signals block by every other
+ * thread, but this one */
+void signal_actor (zsock_t *pipe, void *args)
+{
+    /* Initialize */
+    devio_t *self = (devio_t *) args;
+
+    /* Tell parent we are initializing */
+    zsock_signal (pipe, 0);
+
+    sigset_t sig_mask;
+    sigemptyset (&sig_mask);
+    sigaddset (&sig_mask, SIGUSR1);
+    sigaddset (&sig_mask, SIGUSR2);
+    sigaddset (&sig_mask, SIGHUP);
+
+    int sig_caught;
+
+    while (!zsys_interrupted) {
+        sigwait (&sig_mask, &sig_caught);
+        switch (sig_caught)
+        {
+            /* Reopen Logs */
+            case SIGUSR1: 
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR1!\n");
+                errhand_reallog_destroy ();
+                errhand_log_new (self->log_file, DEVIO_DFLT_LOG_MODE);
+                break;
+            /* Undefined */
+            case SIGUSR2: 
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR2!\n");
+                break;
+            /* Undefined */
+            case SIGHUP: 
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGHUP!\n");
+                break;
+        }
+    }
+}
+
 /* Main devio loop implemented as actor */
 void devio_loop (zsock_t *pipe, void *args)
 {
@@ -1544,11 +1584,22 @@ void devio_loop (zsock_t *pipe, void *args)
     devio_t *self = (devio_t *) args;
     self->pipe = pipe;
 
+    /* Unblock signals for this thread only. We can't use the regular 
+     * signal handlers as all thread will inherit and we want only
+     * this thread to treat them */
+    sigset_t signal_mask;
+    sigemptyset (&signal_mask);
+    pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
+
     /* Tell parent we are initializing */
     zsock_signal (pipe, 0);
 
     /* Set-up server register commands handler */
     _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
+
+    /* Initialize signal handlers for specific signals */
+    zactor_t *server = zactor_new (signal_actor, self);
+    UNUSED(server);
 
     /* Run reactor until there's a termination signal */
     zloop_start (self->loop);
