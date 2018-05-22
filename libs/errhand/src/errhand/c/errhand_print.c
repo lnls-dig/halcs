@@ -193,7 +193,7 @@ int errhand_log_destroy ()
     return 0;
 }
 
-/* Must only be called when absolutely sure no one is using 
+/* Must only be called when absolutely sure no one is using
  * the logfile */
 void errhand_reallog_destroy ()
 {
