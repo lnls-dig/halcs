@@ -186,6 +186,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     assert (endpoint_broker);
 
     /* Just satisfy compilers that complain for unused functions */
+    _devio_engine_set_monitor (NULL, 0, NULL);
     _devio_engine_cancel_monitor (NULL, 0);
 
     /* Set logfile available for all dev_mngr and dev_io instances.
