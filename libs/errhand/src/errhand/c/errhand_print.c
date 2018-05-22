@@ -171,20 +171,40 @@ int errhand_log_new (const char *log_file_name, const char *mode)
 {
     ERRHAND_MUTEX_LOCK(_logfile_mutex);
     int err = 0;
-    FILE *log_file = errhand_log_open (log_file_name, mode);
+    /* Only one file can be opened */
+    if (_errhand_logfile) {
+        goto exit;
+    }
 
+    FILE *log_file = errhand_log_open (log_file_name, mode);
     _errhand_log_file_new (log_file);
+
+    /* So we can be safe handlers will be safely destroyed */
+    atexit (errhand_reallog_destroy);
+
+exit:
     ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
     return err;
 }
 
+/* Dummy function provided just for compatibility */
 int errhand_log_destroy ()
 {
-    ERRHAND_MUTEX_LOCK(_logfile_mutex);
-    int err = -1;
+    return 0;
+}
 
-    err = errhand_log_close (_errhand_logfile);
+/* Must only be called when absolutely sure no one is using 
+ * the logfile */
+void errhand_reallog_destroy ()
+{
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    if (!_errhand_logfile) {
+        goto exit;
+    }
+
+    errhand_log_close (_errhand_logfile);
     _errhand_log_file_destroy();
+
+exit:
     ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
-    return err;
 }
