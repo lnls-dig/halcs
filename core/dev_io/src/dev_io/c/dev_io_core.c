@@ -41,6 +41,8 @@
 #define DEVIO_MAX_DESTRUCT_MSG_TRIES        10
 #define DEVIO_LINGER_TIME                   100         /* in ms */
 
+#define DEVIO_DFLT_MONITOR_INTERVAL         1000        /* /n ms */
+
 struct _devio_t {
     /* General information */
     zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
@@ -117,6 +119,11 @@ static devio_err_e _devio_engine_handle_socket (devio_t *devio, void *sock,
         zloop_reader_fn handler);
 static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
+/* Handle monitors */
+static int _devio_engine_set_monitor (devio_t *devio, size_t interval,
+        zloop_timer_fn monitor);
+static devio_err_e _devio_engine_cancel_monitor (devio_t* devio, int identifier);
+
 /* Utilities */
 static zactor_t *_devio_get_pipe_from_smio_id (devio_t *self, uint32_t smio_id,
         uint32_t inst_id);
@@ -177,6 +184,10 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     assert (endpoint_dev);
     assert (reg_ops);
     assert (endpoint_broker);
+
+    /* Just satisfy compilers that complain for unused functions */
+    _devio_engine_set_monitor (NULL, 0, NULL);
+    _devio_engine_cancel_monitor (NULL, 0);
 
     /* Set logfile available for all dev_mngr and dev_io instances.
      * We accept NULL as a parameter, meaning to suppress all messages */
@@ -260,10 +271,12 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     _devio_set_spawn_clhd_handler (self, &hutils_spawn_chld);
 
     devio_err_e derr = devio_set_sig_handler (self, &devio_sigchld_handler);
-    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting signal handlers", err_set_sig_handlers);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error setting SIGCHLD signal handlers",
+            err_set_sig_handlers);
 
     derr = _devio_register_sig_handlers (self);
-    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers", err_sig_handlers);
+    ASSERT_TEST(derr==DEVIO_SUCCESS, "Error registering setting up signal handlers",
+            err_sig_handlers);
 
     /* Concatenate recv'ed name with a llio identifier */
     size_t llio_name_len = sizeof (char)*(strlen(name)+strlen(LLIO_STR)+1);
@@ -554,6 +567,45 @@ err_zsock_is:
     return err;
 }
 
+/* From Malamute https://github.com/zeromq/malamute/blob/master/src/mlm_server_engine.inc
+ *
+ * Register monitor function that will be called at regular intervals
+ * by the server engine. Returns an identifier that can be used to cancel it. */
+
+static int _devio_engine_set_monitor (devio_t *devio, size_t interval,
+        zloop_timer_fn monitor)
+{
+    int err = -1;
+
+    if (devio) {
+        devio_t *self = (devio_t *) devio;
+        err = zloop_timer (self->loop, interval, 0, monitor, self);
+        ASSERT_TEST(err >= 0, "Could not register zloop_timer",
+                err_zloop_timer, -1);
+    }
+
+err_zloop_timer:
+    return err;
+}
+
+/* From Malamute https://github.com/zeromq/malamute/blob/master/src/mlm_server_engine.inc
+ *
+ * Cancel the monitor function with the given identifier. */
+static devio_err_e _devio_engine_cancel_monitor (devio_t* devio, int identifier)
+{
+    int err = -1;
+
+    if (devio) {
+        devio_t *self = (devio_t *) devio;
+        err = zloop_timer_end (self->loop, identifier);
+        ASSERT_TEST(err >= 0, "Could not deregister zloop_timer",
+                err_zloop_timer, -1);
+    }
+
+err_zloop_timer:
+    return err;
+}
+
 /************************************************************/
 /********************** zloop handlers **********************/
 /************************************************************/
@@ -831,6 +883,10 @@ static int _devio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *arg
     zmsg_destroy (&recv_msg);
     return 0;
 }
+
+/************************************************************/
+/********************* zmonitor handlers ********************/
+/************************************************************/
 
 /************************************************************/
 /********************** PIPE methods ************************/
@@ -1476,6 +1532,46 @@ err_send_smio_cfg_done:
     return err;
 }
 
+/* Signal actor to catch signals block by every other
+ * thread, but this one */
+void signal_actor (zsock_t *pipe, void *args)
+{
+    /* Initialize */
+    devio_t *self = (devio_t *) args;
+
+    /* Tell parent we are initializing */
+    zsock_signal (pipe, 0);
+
+    sigset_t sig_mask;
+    sigemptyset (&sig_mask);
+    sigaddset (&sig_mask, SIGUSR1);
+    sigaddset (&sig_mask, SIGUSR2);
+    sigaddset (&sig_mask, SIGHUP);
+
+    int sig_caught;
+
+    while (!zsys_interrupted) {
+        sigwait (&sig_mask, &sig_caught);
+        switch (sig_caught)
+        {
+            /* Reopen Logs */
+            case SIGUSR1:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGUSR1!\n");
+                errhand_reallog_destroy ();
+                errhand_log_new (self->log_file, DEVIO_DFLT_LOG_MODE);
+                break;
+            /* Undefined */
+            case SIGUSR2:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGUSR2!\n");
+                break;
+            /* Undefined */
+            case SIGHUP:
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGHUP!\n");
+                break;
+        }
+    }
+}
+
 /* Main devio loop implemented as actor */
 void devio_loop (zsock_t *pipe, void *args)
 {
@@ -1485,11 +1581,22 @@ void devio_loop (zsock_t *pipe, void *args)
     devio_t *self = (devio_t *) args;
     self->pipe = pipe;
 
+    /* Unblock signals for this thread only. We can't use the regular
+     * signal handlers as all thread will inherit and we want only
+     * this thread to treat them */
+    sigset_t signal_mask;
+    sigemptyset (&signal_mask);
+    pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
+
     /* Tell parent we are initializing */
     zsock_signal (pipe, 0);
 
     /* Set-up server register commands handler */
     _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
+
+    /* Initialize signal handlers for specific signals */
+    zactor_t *server = zactor_new (signal_actor, self);
+    UNUSED(server);
 
     /* Run reactor until there's a termination signal */
     zloop_start (self->loop);
@@ -1526,6 +1633,11 @@ llio_t *devio_get_llio (devio_t *self)
     return self->llio;
 }
 
+/* Register signal handlers for specified signals. Bear in mind that you can't,
+ * by default register handlers for SIGINT/SIGTERM as they are automatically
+ * managed by CZMQ library. If needed, you can call zsys_handler_set () and CZMQ
+ * will disable its signal handling for those signals, but zctx_interrupt and
+ * zsys_interrupt will not work as expected anymore. */
 devio_err_e devio_set_sig_handler (devio_t *self, devio_sig_handler_t *sig_handler)
 {
     assert (self);
@@ -1551,7 +1663,7 @@ static devio_err_e _devio_register_sig_handlers (devio_t *self)
         int err = sigaction (sig_handler->signal, &act, NULL);
         CHECK_ERR(err, DEVIO_ERR_SIGACTION);
 
-        DBE_DEBUG (DBG_DEV_MNGR | DBG_LVL_INFO, "[dev_mngr_core] registered signal %d\n",
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] registered signal %d\n",
                 sig_handler->signal);
 
         sig_handler = (devio_sig_handler_t *)

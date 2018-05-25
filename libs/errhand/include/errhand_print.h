@@ -28,6 +28,7 @@ int errhand_log_new (const char *log_file_name, const char *mode);
 void errhand_log_file_destroy ();
 int errhand_log_destroy ();
 void errhand_log_print_zmq_msg (struct _zmsg_t *msg);
+void errhand_reallog_destroy ();
 
 /********************** Error handling macros  **********************/
 

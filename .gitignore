@@ -4,6 +4,7 @@
 *.orig
 *.bak
 *.o
+*tags
 
 # Binaries
 dev_mngr

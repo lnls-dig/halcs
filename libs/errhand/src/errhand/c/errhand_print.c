@@ -11,8 +11,21 @@
 #define ERRHAND_DATE_LENGTH             20
 #define ERRHAND_TEXT_LENGTH             1024
 
+/* TODO: We should not be using mutexes really. The correct
+ * design is probably to create a socket to send/recv
+ * messages from all the threads and treat them accordingly */
+typedef pthread_mutex_t errhand_mutex_t;
+
+#define ERRHAND_MUTEX_INITIALIZER   PTHREAD_MUTEX_INITIALIZER
+#define ERRHAND_MUTEX_INIT(m)       pthread_mutex_init (&m, NULL);
+#define ERRHAND_MUTEX_LOCK(m)       pthread_mutex_lock (&m);
+#define ERRHAND_MUTEX_UNLOCK(m)     pthread_mutex_unlock (&m);
+#define ERRHAND_MUTEX_DESTROY(m)    pthread_mutex_destroy (&m);
+
 /* Our logfile */
 static FILE *_errhand_logfile = NULL;
+/* Mutex to guard out logfile handler */
+static errhand_mutex_t _logfile_mutex = ERRHAND_MUTEX_INITIALIZER;
 
 void errhand_print (const char *fmt, ...)
 {
@@ -24,14 +37,10 @@ void errhand_print (const char *fmt, ...)
 }
 
 /* Based on CZMQ s_log () function. Available in
- * https://github.com/zeromq/czmq/blob/master/src/zsys.c */
+ * https://github.com/zeromq/czmq/blob/master/src/zsys.c.
+ * Must be called with the mutex held */
 static void _errhand_log_write (char *errhand_lvl_str, char *msg, bool verbose)
 {
-    /* Default to stdout */
-    if (!_errhand_logfile) {
-        _errhand_logfile = stdout;
-    }
-
     time_t curtime = time (NULL);
     struct tm *loctime = localtime (&curtime);
     char date [ERRHAND_DATE_LENGTH];
@@ -46,8 +55,16 @@ static void _errhand_log_write (char *errhand_lvl_str, char *msg, bool verbose)
         snprintf (log_text, ERRHAND_TEXT_LENGTH, "%s", msg);
     }
 
-    fprintf (_errhand_logfile, "%s", log_text);
-    fflush (_errhand_logfile);
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    /* Only open/close functions should modify global _errhand_logfile */
+    FILE *local_errhand_logfile = _errhand_logfile;
+    /* Default to stdout */
+    if (!local_errhand_logfile) {
+        local_errhand_logfile = stdout;
+    }
+    fprintf (local_errhand_logfile, "%s", log_text);
+    fflush (local_errhand_logfile);
+    ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
 }
 
 /* Based on CZMQ zsys_error () function. Available in
@@ -71,12 +88,16 @@ void errhand_log_print (int errhand_lvl, const char *fmt, ...)
 
 void errhand_log_print_zmq_msg (zmsg_t *msg)
 {
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    /* Only open/close functions should modify global _errhand_logfile */
+    FILE *local_errhand_logfile = _errhand_logfile;
     /* Default to stdout */
-    if (!_errhand_logfile) {
-        _errhand_logfile = stdout;
+    if (!local_errhand_logfile) {
+        local_errhand_logfile = stdout;
     }
 
-    errhand_lprint_zmq_msg (msg, _errhand_logfile);
+    errhand_lprint_zmq_msg (msg, local_errhand_logfile);
+    ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
 }
 
 void errhand_print_vec (const char *fmt, const char *data, int len)
@@ -148,21 +169,42 @@ void errhand_log_file_destroy ()
 
 int errhand_log_new (const char *log_file_name, const char *mode)
 {
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
     int err = 0;
-    FILE *log_file = errhand_log_open (log_file_name, mode);
+    /* Only one file can be opened */
+    if (_errhand_logfile) {
+        goto exit;
+    }
 
+    FILE *log_file = errhand_log_open (log_file_name, mode);
     _errhand_log_file_new (log_file);
+
+    /* So we can be safe handlers will be safely destroyed */
+    atexit (errhand_reallog_destroy);
+
+exit:
+    ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
     return err;
 }
 
+/* Dummy function provided just for compatibility */
 int errhand_log_destroy ()
 {
-#if 0
-    int err = -1;
-
-    err = errhand_log_close (_errhand_logfile);
-    _errhand_log_file_destroy();
-    return err;
-#endif
     return 0;
+}
+
+/* Must only be called when absolutely sure no one is using
+ * the logfile */
+void errhand_reallog_destroy ()
+{
+    ERRHAND_MUTEX_LOCK(_logfile_mutex);
+    if (!_errhand_logfile) {
+        goto exit;
+    }
+
+    errhand_log_close (_errhand_logfile);
+    _errhand_log_file_destroy();
+
+exit:
+    ERRHAND_MUTEX_UNLOCK(_logfile_mutex);
 }
