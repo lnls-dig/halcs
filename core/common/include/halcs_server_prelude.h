@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <signal.h>
 
 /* zeroMQ libraries */
 #include <zmq.h>

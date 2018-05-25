@@ -293,7 +293,7 @@
 #define AD9510_PLL_R_COUNTER_R(reg)                 WBGEN2_GEN_READ(reg, AD9510_PLL_R_COUNTER_SHIFT, \
                                                                        AD9510_PLL_R_COUNTER_SIZE)
 
-#define AD9510_REG_PLL_5                            0x0A
+#define AD9510_REG_PLL_5                            0x0D
 
 /* Definition for register AD9510_REG_PLL_5 */
 #define AD9510_PLL_5_ANTI_BL_PW_SIZE                2
