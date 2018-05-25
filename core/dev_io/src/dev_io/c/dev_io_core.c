@@ -1559,17 +1559,17 @@ void signal_actor (zsock_t *pipe, void *args)
         {
             /* Reopen Logs */
             case SIGUSR1:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR1!\n");
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGUSR1!\n");
                 errhand_reallog_destroy ();
                 errhand_log_new (self->log_file, DEVIO_DFLT_LOG_MODE);
                 break;
             /* Undefined */
             case SIGUSR2:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGUSR2!\n");
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGUSR2!\n");
                 break;
             /* Undefined */
             case SIGHUP:
-                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] CAUGHT SIGHUP!\n");
+                DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[dev_io] Caught SIGHUP!\n");
                 break;
         }
     }
