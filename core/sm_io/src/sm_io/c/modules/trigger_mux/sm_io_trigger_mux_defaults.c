@@ -65,13 +65,13 @@ smio_err_e trigger_mux_config_defaults (char *broker_endp, char *service,
     }
 
     /* Switching Trigger. Change it to correct parameters */
-    client_err = halcs_set_trigger_rcv_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err = halcs_set_trigger_rcv_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN,
         TRIGGER_MUX_SW_CLK_DFLT_RCV_SRC);
-    client_err |= halcs_set_trigger_rcv_in_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_rcv_in_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN,
         TRIGGER_MUX_SW_CLK_DFLT_RCV_IN_SEL);
-    client_err |= halcs_set_trigger_transm_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_transm_src (config_client, service, TRIGGER_MUX_SW_CLK_CHAN,
         TRIGGER_MUX_SW_CLK_DFLT_TRANSM_SRC);
-    client_err |= halcs_set_trigger_transm_out_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN, 
+    client_err |= halcs_set_trigger_transm_out_sel (config_client, service, TRIGGER_MUX_SW_CLK_CHAN,
         TRIGGER_MUX_SW_CLK_DFLT_TRANSM_IN_SEL);
 
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could set trigger mux defaults",
