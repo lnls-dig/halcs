@@ -213,6 +213,125 @@ disp_op_t dsp_set_get_monit_amp_pos_exp = {
     }
 };
 
+disp_op_t dsp_set_get_monit1_amp_ch0_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_AMP_CH0,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_AMP_CH0,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_amp_ch1_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_AMP_CH1,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_AMP_CH1,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_amp_ch2_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_AMP_CH2,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_AMP_CH2,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_amp_ch3_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_AMP_CH3,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_AMP_CH3,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_pos_x_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_POS_X,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_POS_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_pos_y_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_POS_Y,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_POS_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_pos_q_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_POS_Q,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_POS_Q,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_pos_sum_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_POS_SUM,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_POS_SUM,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_updt_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_UPDT,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_UPDT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_amp_pos_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_AMP_POS,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_AMP_POS,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+            sizeof(smio_dsp_data_t)),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -232,6 +351,16 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_monit_pos_sum_exp,
     &dsp_set_get_monit_updt_exp,
     &dsp_set_get_monit_amp_pos_exp,
+    &dsp_set_get_monit1_amp_ch0_exp,
+    &dsp_set_get_monit1_amp_ch1_exp,
+    &dsp_set_get_monit1_amp_ch2_exp,
+    &dsp_set_get_monit1_amp_ch3_exp,
+    &dsp_set_get_monit1_pos_x_exp,
+    &dsp_set_get_monit1_pos_y_exp,
+    &dsp_set_get_monit1_pos_q_exp,
+    &dsp_set_get_monit1_pos_sum_exp,
+    &dsp_set_get_monit1_updt_exp,
+    &dsp_set_get_monit1_amp_pos_exp,
     NULL
 };
 
