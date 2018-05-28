@@ -196,21 +196,21 @@ static int _dsp_monit_amp_pos (void *owner, void *args, void *ret)
     ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",
             err_get_dsp_handler, -DSP_ERR);
 
-    /* 
+    /*
      * Message is:
      * frame 0: operation code
      */
-    
+
     smio_dsp_data_t *data = (smio_dsp_data_t *) ret;
     data->new_amp_data = false;
     data->new_pos_data = false;
 
     /* Check if FIFO is empty before reading from it */
     GET_PARAM(self, dsp, 0x0, POS_CALC,
-        AMPFIFO_CSR, EMPTY, SINGLE_BIT_PARAM, 
+        AMPFIFO_CSR, EMPTY, SINGLE_BIT_PARAM,
         ampfifo_empty, NO_FMT_FUNC);
     GET_PARAM(self, dsp, 0x0, POS_CALC,
-        POSFIFO_CSR, EMPTY, SINGLE_BIT_PARAM, 
+        POSFIFO_CSR, EMPTY, SINGLE_BIT_PARAM,
         posfifo_empty, NO_FMT_FUNC);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp] "
@@ -220,31 +220,31 @@ static int _dsp_monit_amp_pos (void *owner, void *args, void *ret)
 
     if (!ampfifo_empty) {
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            AMPFIFO_R0, MONIT_AMP_CH0, MULT_BIT_PARAM, 
+            AMPFIFO_R0, MONIT_AMP_CH0, MULT_BIT_PARAM,
             data->amp_ch0, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            AMPFIFO_R1, MONIT_AMP_CH1, MULT_BIT_PARAM, 
+            AMPFIFO_R1, MONIT_AMP_CH1, MULT_BIT_PARAM,
             data->amp_ch1, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            AMPFIFO_R2, MONIT_AMP_CH2, MULT_BIT_PARAM, 
+            AMPFIFO_R2, MONIT_AMP_CH2, MULT_BIT_PARAM,
             data->amp_ch2, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            AMPFIFO_R3, MONIT_AMP_CH3, MULT_BIT_PARAM, 
+            AMPFIFO_R3, MONIT_AMP_CH3, MULT_BIT_PARAM,
             data->amp_ch3, NO_FMT_FUNC);
     }
 
     if (!posfifo_empty) {
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            POSFIFO_R0, MONIT_POS_X, MULT_BIT_PARAM, 
+            POSFIFO_R0, MONIT_POS_X, MULT_BIT_PARAM,
             data->pos_x, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            POSFIFO_R1, MONIT_POS_Y, MULT_BIT_PARAM, 
+            POSFIFO_R1, MONIT_POS_Y, MULT_BIT_PARAM,
             data->pos_y, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            POSFIFO_R2, MONIT_POS_Q, MULT_BIT_PARAM, 
+            POSFIFO_R2, MONIT_POS_Q, MULT_BIT_PARAM,
             data->pos_q, NO_FMT_FUNC);
         GET_PARAM(self, dsp, 0x0, POS_CALC,
-            POSFIFO_R3, MONIT_POS_SUM, MULT_BIT_PARAM, 
+            POSFIFO_R3, MONIT_POS_SUM, MULT_BIT_PARAM,
             data->pos_sum, NO_FMT_FUNC);
     }
 
