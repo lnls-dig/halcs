@@ -59,7 +59,27 @@ struct _smio_dsp_data_t {
 #define DSP_NAME_SET_GET_MONIT_UPDT         "dsp_set_get_monit_updt"
 #define DSP_OPCODE_SET_GET_MONIT_AMP_POS    16
 #define DSP_NAME_SET_GET_MONIT_AMP_POS      "dsp_set_get_monit_amp_pos"
-#define DSP_OPCODE_END                      17
+#define DSP_OPCODE_SET_GET_MONIT1_AMP_CH0   17
+#define DSP_NAME_SET_GET_MONIT1_AMP_CH0     "dsp_set_get_monit1_amp_ch0"
+#define DSP_OPCODE_SET_GET_MONIT1_AMP_CH1   18
+#define DSP_NAME_SET_GET_MONIT1_AMP_CH1     "dsp_set_get_monit1_amp_ch1"
+#define DSP_OPCODE_SET_GET_MONIT1_AMP_CH2   19
+#define DSP_NAME_SET_GET_MONIT1_AMP_CH2     "dsp_set_get_monit1_amp_ch2"
+#define DSP_OPCODE_SET_GET_MONIT1_AMP_CH3   20
+#define DSP_NAME_SET_GET_MONIT1_AMP_CH3     "dsp_set_get_monit1_amp_ch3"
+#define DSP_OPCODE_SET_GET_MONIT1_POS_X     21
+#define DSP_NAME_SET_GET_MONIT1_POS_X       "dsp_set_get_monit1_pos_x"
+#define DSP_OPCODE_SET_GET_MONIT1_POS_Y     22
+#define DSP_NAME_SET_GET_MONIT1_POS_Y       "dsp_set_get_monit1_pos_y"
+#define DSP_OPCODE_SET_GET_MONIT1_POS_Q     23
+#define DSP_NAME_SET_GET_MONIT1_POS_Q       "dsp_set_get_monit1_pos_q"
+#define DSP_OPCODE_SET_GET_MONIT1_POS_SUM   24
+#define DSP_NAME_SET_GET_MONIT1_POS_SUM     "dsp_set_get_monit1_pos_sum"
+#define DSP_OPCODE_SET_GET_MONIT1_UPDT      25
+#define DSP_NAME_SET_GET_MONIT1_UPDT        "dsp_set_get_monit1_updt"
+#define DSP_OPCODE_SET_GET_MONIT1_AMP_POS   26
+#define DSP_NAME_SET_GET_MONIT1_AMP_POS     "dsp_set_get_monit1_amp_pos"
+#define DSP_OPCODE_END                      27
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
