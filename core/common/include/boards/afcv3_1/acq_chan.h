@@ -49,17 +49,20 @@
 /* FOFB POS */
 #define FOFBPOS_CHAN_ID                 (FOFBPHA_CHAN_ID + 1)
 
+/* MONIT1 AMP */
+#define MONIT1AMP_CHAN_ID               (FOFBPOS_CHAN_ID + 1)
+
+/* MONIT1 POS */
+#define MONIT1POS_CHAN_ID               (MONIT1AMP_CHAN_ID + 1)
+
 /* MONIT AMP */
-#define MONITAMP_CHAN_ID                (FOFBPOS_CHAN_ID + 1)
+#define MONITAMP_CHAN_ID                (MONIT1POS_CHAN_ID + 1)
 
 /* MONIT POS */
 #define MONITPOS_CHAN_ID                (MONITAMP_CHAN_ID + 1)
 
-/* MONIT1 POS */
-#define MONIT1POS_CHAN_ID               (MONITPOS_CHAN_ID + 1)
-
 /* End of channels placeholder */
-#define END_CHAN_ID                     (MONIT1POS_CHAN_ID + 1)
+#define END_CHAN_ID                     (MONITPOS_CHAN_ID + 1)
 
 #endif
 

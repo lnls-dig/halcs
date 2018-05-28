@@ -87,6 +87,16 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .end_addr = DDR3_FOFBPOS0_END_ADDR
         },
         {
+            .id = MONIT1AMP_CHAN_ID,
+            .start_addr = DDR3_MONIT1AMP0_START_ADDR,
+            .end_addr = DDR3_MONIT1AMP0_END_ADDR
+        },
+        {
+            .id = MONIT1POS_CHAN_ID,
+            .start_addr = DDR3_MONIT1POS0_START_ADDR,
+            .end_addr = DDR3_MONIT1POS0_END_ADDR
+        },
+        {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP0_START_ADDR,
             .end_addr = DDR3_MONITAMP0_END_ADDR
@@ -96,11 +106,6 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .start_addr = DDR3_MONITPOS0_START_ADDR,
             .end_addr = DDR3_MONITPOS0_END_ADDR
         },
-        {
-            .id = MONIT1POS_CHAN_ID,
-            .start_addr = DDR3_MONIT1POS0_START_ADDR,
-            .end_addr = DDR3_MONIT1POS0_END_ADDR
-        }
     },
     /*** Acquisition Core 1 Channel Parameters ***/
     {
@@ -175,6 +180,16 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .end_addr = DDR3_FOFBPOS1_END_ADDR
         },
         {
+            .id = MONIT1AMP_CHAN_ID,
+            .start_addr = DDR3_MONIT1AMP1_START_ADDR,
+            .end_addr = DDR3_MONIT1AMP1_END_ADDR
+        },
+        {
+            .id = MONIT1POS_CHAN_ID,
+            .start_addr = DDR3_MONIT1POS1_START_ADDR,
+            .end_addr = DDR3_MONIT1POS1_END_ADDR
+        },
+        {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP1_START_ADDR,
             .end_addr = DDR3_MONITAMP1_END_ADDR
@@ -183,11 +198,6 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS1_START_ADDR,
             .end_addr = DDR3_MONITPOS1_END_ADDR
-        },
-        {
-            .id = MONIT1POS_CHAN_ID,
-            .start_addr = DDR3_MONIT1POS1_START_ADDR,
-            .end_addr = DDR3_MONIT1POS1_END_ADDR
         },
     },
     /*** Acquisition Core 2 Channel Parameters ***/
@@ -263,6 +273,16 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .end_addr = DDR3_FOFBPOS2_END_ADDR
         },
         {
+            .id = MONIT1AMP_CHAN_ID,
+            .start_addr = DDR3_MONIT1AMP2_START_ADDR,
+            .end_addr = DDR3_MONIT1AMP2_END_ADDR
+        },
+        {
+            .id = MONIT1POS_CHAN_ID,
+            .start_addr = DDR3_MONIT1POS2_START_ADDR,
+            .end_addr = DDR3_MONIT1POS2_END_ADDR
+        },
+        {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP2_START_ADDR,
             .end_addr = DDR3_MONITAMP2_END_ADDR
@@ -271,11 +291,6 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS2_START_ADDR,
             .end_addr = DDR3_MONITPOS2_END_ADDR
-        },
-        {
-            .id = MONIT1POS_CHAN_ID,
-            .start_addr = DDR3_MONIT1POS2_START_ADDR,
-            .end_addr = DDR3_MONIT1POS2_END_ADDR
         },
     },
     /*** Acquisition Core 3 Channel Parameters ***/
@@ -351,6 +366,16 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .end_addr = DDR3_FOFBPOS3_END_ADDR
         },
         {
+            .id = MONIT1AMP_CHAN_ID,
+            .start_addr = DDR3_MONIT1AMP3_START_ADDR,
+            .end_addr = DDR3_MONIT1AMP3_END_ADDR
+        },
+        {
+            .id = MONIT1POS_CHAN_ID,
+            .start_addr = DDR3_MONIT1POS3_START_ADDR,
+            .end_addr = DDR3_MONIT1POS3_END_ADDR
+        },
+        {
             .id = MONITAMP_CHAN_ID,
             .start_addr = DDR3_MONITAMP3_START_ADDR,
             .end_addr = DDR3_MONITAMP3_END_ADDR
@@ -359,11 +384,6 @@ const acq_buf_t __acq_buf[NUM_ACQ_CORE_SMIOS][END_CHAN_ID] = {
             .id = MONITPOS_CHAN_ID,
             .start_addr = DDR3_MONITPOS3_START_ADDR,
             .end_addr = DDR3_MONITPOS3_END_ADDR
-        },
-        {
-            .id = MONIT1POS_CHAN_ID,
-            .start_addr = DDR3_MONIT1POS3_START_ADDR,
-            .end_addr = DDR3_MONIT1POS3_END_ADDR
         },
     },
 };
