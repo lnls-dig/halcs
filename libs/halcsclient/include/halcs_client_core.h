@@ -759,6 +759,70 @@ halcs_client_err_e halcs_get_monit_updt (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_monit_amp_pos (halcs_client_t *self, char *service,
         struct _smio_dsp_data_t *dsp_data);
 
+/* Monitoring 1 Position values */
+/* These set of functions read (get) the Monitoring position values.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_monit1_pos_x (halcs_client_t *self, char *service,
+        uint32_t monit1_pos_x);
+halcs_client_err_e halcs_get_monit1_pos_x (halcs_client_t *self, char *service,
+        uint32_t *monit1_pos_x);
+halcs_client_err_e halcs_set_monit1_pos_y (halcs_client_t *self, char *service,
+        uint32_t monit1_pos_y);
+halcs_client_err_e halcs_get_monit1_pos_y (halcs_client_t *self, char *service,
+        uint32_t *monit1_pos_y);
+halcs_client_err_e halcs_set_monit1_pos_q (halcs_client_t *self, char *service,
+        uint32_t monit1_pos_q);
+halcs_client_err_e halcs_get_monit1_pos_q (halcs_client_t *self, char *service,
+        uint32_t *monit1_pos_q);
+halcs_client_err_e halcs_set_monit1_pos_sum (halcs_client_t *self, char *service,
+        uint32_t monit1_pos_sum);
+halcs_client_err_e halcs_get_monit1_pos_sum (halcs_client_t *self, char *service,
+        uint32_t *monit1_pos_sum);
+
+/* Monitoring 1 Amplitude values */
+/* These set of functions read (get) the Monitoring amplitude values.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_monit1_amp_ch0 (halcs_client_t *self, char *service,
+        uint32_t monit1_amp_ch0);
+halcs_client_err_e halcs_get_monit1_amp_ch0 (halcs_client_t *self, char *service,
+        uint32_t *monit1_amp_ch0);
+halcs_client_err_e halcs_set_monit1_amp_ch1 (halcs_client_t *self, char *service,
+        uint32_t monit1_amp_ch1);
+halcs_client_err_e halcs_get_monit1_amp_ch1 (halcs_client_t *self, char *service,
+        uint32_t *monit1_amp_ch1);
+halcs_client_err_e halcs_set_monit1_amp_ch2 (halcs_client_t *self, char *service,
+        uint32_t monit1_amp_ch2);
+halcs_client_err_e halcs_get_monit1_amp_ch2 (halcs_client_t *self, char *service,
+        uint32_t *monit1_amp_ch2);
+halcs_client_err_e halcs_set_monit1_amp_ch3 (halcs_client_t *self, char *service,
+        uint32_t monit1_amp_ch3);
+halcs_client_err_e halcs_get_monit1_amp_ch3 (halcs_client_t *self, char *service,
+        uint32_t *monit1_amp_ch3);
+
+/* Monitoring 1 Update values */
+/* These set of functions read (get) the Monitoring update value, which
+ * effectively updates the AMP/POS values in the FPGA. After this,
+ * reading AMP/POS values are guaranteed to stay fixed until the next
+ * update.
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_monit1_updt (halcs_client_t *self, char *service,
+        uint32_t monit1_updt);
+halcs_client_err_e halcs_get_monit1_updt (halcs_client_t *self, char *service,
+        uint32_t *monit1_updt);
+
+/* Get Monitoring 1 Amp/Pos values */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors) */
+halcs_client_err_e halcs_get_monit1_amp_pos (halcs_client_t *self, char *service,
+        struct _smio_dsp_data_t *dsp_data);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */
