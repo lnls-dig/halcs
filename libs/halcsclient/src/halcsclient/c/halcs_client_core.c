@@ -1507,6 +1507,125 @@ err_get_amp_pos_data:
     return err;
 }
 
+/* Monitoring 1 Amplitude channel 0 value */
+PARAM_FUNC_CLIENT_WRITE(monit1_amp_ch0)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH0, monit1_amp_ch0);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_amp_ch0)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH0, monit1_amp_ch0);
+}
+
+/* Monitoring 1 Amplitude channel 1 value */
+PARAM_FUNC_CLIENT_WRITE(monit1_amp_ch1)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH1, monit1_amp_ch1);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_amp_ch1)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH1, monit1_amp_ch1);
+}
+
+/* Monitoring 1 Amplitude channel 2 value */
+PARAM_FUNC_CLIENT_WRITE(monit1_amp_ch2)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH2, monit1_amp_ch2);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_amp_ch2)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH2, monit1_amp_ch2);
+}
+
+/* Monitoring 1 Amplitude channel 3 value */
+PARAM_FUNC_CLIENT_WRITE(monit1_amp_ch3)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH3, monit1_amp_ch3);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_amp_ch3)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_AMP_CH3, monit1_amp_ch3);
+}
+
+/* Monitoring 1 Position X value */
+PARAM_FUNC_CLIENT_WRITE(monit1_pos_x)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_X, monit1_pos_x);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_pos_x)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_X, monit1_pos_x);
+}
+
+/* Monitoring 1 Position Y value */
+PARAM_FUNC_CLIENT_WRITE(monit1_pos_y)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_Y, monit1_pos_y);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_pos_y)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_Y, monit1_pos_y);
+}
+
+/* Monitoring 1 Position Q value */
+PARAM_FUNC_CLIENT_WRITE(monit1_pos_q)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_Q, monit1_pos_q);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_pos_q)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_Q, monit1_pos_q);
+}
+
+/* Monitoring 1 Position Sum value */
+PARAM_FUNC_CLIENT_WRITE(monit1_pos_sum)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_SUM, monit1_pos_sum);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_pos_sum)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_POS_SUM, monit1_pos_sum);
+}
+
+/* Monitoring 1 Update value */
+PARAM_FUNC_CLIENT_WRITE(monit1_updt)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_UPDT, monit1_updt);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_updt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_UPDT, monit1_updt);
+}
+
+/* Monitoring 1 AMP/POS funcion */
+halcs_client_err_e halcs_get_monit1_amp_pos (halcs_client_t *self, char *service,
+        struct _smio_dsp_data_t *dsp_data)
+{
+    assert (self);
+    assert (service);
+
+    /* Use the direct function table pointer to speed up the process */
+    const disp_op_t* func = &dsp_set_get_monit1_amp_pos_exp;
+    halcs_client_err_e err = halcs_func_exec(self, func, service,
+            NULL, (uint32_t *)dsp_data);
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get Monit. AMP/POS",
+            err_get_amp_pos_data);
+
+    return err;
+
+err_get_amp_pos_data:
+    return err;
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */

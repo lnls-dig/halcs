@@ -16,7 +16,7 @@
 #define TRIGGER_MUX_DFLT_TRANSM_IN_SEL            0      /* Trigger Index 0 */
 
 /* FIXME. This shoulw be somewhere else*/
-#define TRIGGER_MUX_SW_CLK_CHAN                   17     /* Trigger Channel */
+#define TRIGGER_MUX_SW_CLK_CHAN                   18     /* Trigger Channel */
 #define TRIGGER_MUX_SW_CLK_DFLT_RCV_SRC           1      /* FPGA Internal */
 #define TRIGGER_MUX_SW_CLK_DFLT_RCV_IN_SEL        1      /* Trigger Index 1 */
 #define TRIGGER_MUX_SW_CLK_DFLT_TRANSM_SRC        0      /* FPGA Internal */

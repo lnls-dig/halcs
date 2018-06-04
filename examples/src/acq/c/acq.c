@@ -54,7 +54,7 @@ void print_sample (uint8_t *data, uint32_t atom_size)
     }
 }
 
-void print_data (uint32_t *data, uint32_t sample_size, 
+void print_data (uint32_t *data, uint32_t sample_size,
     uint32_t atom_size, uint32_t num_atoms, uint32_t size, file_fmt_e file_fmt)
 {
     uint8_t *raw_data = (uint8_t *) data;
@@ -64,9 +64,9 @@ void print_data (uint32_t *data, uint32_t sample_size,
             if (zctx_interrupted) {
                 break;
             }
-    
+
             for (uint32_t atom = 0; atom < num_atoms; ++atom) {
-                print_sample(raw_data + (atom_size)*((i*num_atoms)+atom), 
+                print_sample(raw_data + (atom_size)*((i*num_atoms)+atom),
                     atom_size);
             }
             printf ("\n");
@@ -110,7 +110,8 @@ void print_help (char *program_name)
             "                                     4 -> TBT Decim IQ; 5 -> DUMMY1; 6 -> TBT Amp;\n"
             "                                     7 -> TBT Phase; 8 -> TBT Pos; 9 -> FOFB Decim IQ;\n"
             "                                     10 -> DUMMY2; 11 -> FOFB Amp; 12 -> FOFB Pha;\n"
-            "                                     13 -> FOFB Pos; 14 -> Monit Amp; 15 -> Monit Pha; 16 -> Monit Pos]\n"
+            "                                     13 -> FOFB Pos; 14 -> Monit. 1 Amp; 15 -> Monit. 1 Pos;\n"
+            "                                     16 -> Monit. Amp; 17 -> Monit. Pos]\n"
             "  -n  --numsamples <Number of samples> Number of samples\n"
             "  -f  --filefmt <Output format = [0 = text | 1=binary]>\n"
             "                                       Output format\n"
@@ -339,7 +340,7 @@ int main (int argc, char *argv [])
         fprintf (stderr, "[client:acq]: Could not set output mode to binary\n");
         goto err_set_file_mode;
     }
-    print_data (data, req_ch_sample_size, req_ch_atom_size, 
+    print_data (data, req_ch_sample_size, req_ch_atom_size,
         req_ch_num_atoms, acq_trans.block.bytes_read, file_fmt);
 
 err_set_file_mode:
