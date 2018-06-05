@@ -1626,6 +1626,39 @@ err_get_amp_pos_data:
     return err;
 }
 
+/* Switching Tag Enable */
+PARAM_FUNC_CLIENT_WRITE(sw_tag_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_SW_TAG_EN, sw_tag_en);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_tag_en)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_TAG_EN, sw_tag_en);
+}
+
+/* Switching Data Mask Enable */
+PARAM_FUNC_CLIENT_WRITE(sw_data_mask_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_EN, sw_data_mask_en);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_data_mask_en)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_EN, sw_data_mask_en);
+}
+
+/* Switching Data Mask Samples */
+PARAM_FUNC_CLIENT_WRITE(sw_data_mask_samples)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES, sw_data_mask_samples);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_data_mask_samples)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES, sw_data_mask_samples);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */

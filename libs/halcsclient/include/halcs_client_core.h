@@ -823,6 +823,27 @@ halcs_client_err_e halcs_get_monit1_updt (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_monit1_amp_pos (halcs_client_t *self, char *service,
         struct _smio_dsp_data_t *dsp_data);
 
+/* Switching Tag Enable. This sets/gets the tag synchronization */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_sw_tag_en (halcs_client_t *self, char *service,
+        uint32_t sw_tag_en);
+halcs_client_err_e halcs_get_sw_tag_en (halcs_client_t *self, char *service,
+        uint32_t *sw_tag_en);
+
+/* Switching Data Mask Enable. This sets/gets the Switching masking of samples*/
+halcs_client_err_e halcs_set_sw_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t sw_data_mask_en);
+halcs_client_err_e halcs_get_sw_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t *sw_data_mask_en);
+
+/* Switching Data Mask. This sets/gets the Switching mask to the specified number of samples*/
+halcs_client_err_e halcs_set_sw_data_mask_samples (halcs_client_t *self, char *service,
+        uint32_t sw_data_mask_samples);
+halcs_client_err_e halcs_get_sw_data_mask_samples (halcs_client_t *self, char *service,
+        uint32_t *sw_data_mask_samples);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */
