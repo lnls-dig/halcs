@@ -332,6 +332,42 @@ disp_op_t dsp_set_get_monit1_amp_pos_exp = {
     }
 };
 
+disp_op_t dsp_set_get_sw_tag_en_exp = {
+    .name = DSP_NAME_SET_GET_SW_TAG_EN,
+    .opcode = DSP_OPCODE_SET_GET_SW_TAG_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_sw_data_mask_en_exp = {
+    .name = DSP_NAME_SET_GET_SW_DATA_MASK_EN,
+    .opcode = DSP_OPCODE_SET_GET_SW_DATA_MASK_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_sw_data_mask_samples_exp = {
+    .name = DSP_NAME_SET_GET_SW_DATA_MASK_SAMPLES,
+    .opcode = DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -361,6 +397,9 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_monit1_pos_sum_exp,
     &dsp_set_get_monit1_updt_exp,
     &dsp_set_get_monit1_amp_pos_exp,
+    &dsp_set_get_sw_tag_en_exp,
+    &dsp_set_get_sw_data_mask_en_exp,
+    &dsp_set_get_sw_data_mask_samples_exp,
     NULL
 };
 

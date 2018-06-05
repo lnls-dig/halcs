@@ -79,7 +79,13 @@ struct _smio_dsp_data_t {
 #define DSP_NAME_SET_GET_MONIT1_UPDT        "dsp_set_get_monit1_updt"
 #define DSP_OPCODE_SET_GET_MONIT1_AMP_POS   26
 #define DSP_NAME_SET_GET_MONIT1_AMP_POS     "dsp_set_get_monit1_amp_pos"
-#define DSP_OPCODE_END                      27
+#define DSP_OPCODE_SET_GET_SW_TAG_EN        27
+#define DSP_NAME_SET_GET_SW_TAG_EN          "dsp_set_get_sw_tag_en"
+#define DSP_OPCODE_SET_GET_SW_DATA_MASK_EN  28
+#define DSP_NAME_SET_GET_SW_DATA_MASK_EN    "dsp_set_get_sw_data_mask_en"
+#define DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES  29
+#define DSP_NAME_SET_GET_SW_DATA_MASK_SAMPLES    "dsp_set_get_sw_data_mask_samples"
+#define DSP_OPCODE_END                      30
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
