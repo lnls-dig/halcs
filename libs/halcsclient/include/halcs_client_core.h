@@ -1209,6 +1209,12 @@ halcs_client_err_e afc_timing_set_evt_code_6 (halcs_client_t *self, char *servic
 halcs_client_err_e afc_timing_get_evt_code_6 (halcs_client_t *self, char *service,
         uint32_t *evt_code_6);
 
+/* Event code channel 7 functions */
+halcs_client_err_e afc_timing_set_evt_code_7 (halcs_client_t *self, char *service,
+        uint32_t evt_code_7);
+halcs_client_err_e afc_timing_get_evt_code_7 (halcs_client_t *self, char *service,
+        uint32_t *evt_code_7);
+
 /* Event delay channel 0 functions */
 halcs_client_err_e afc_timing_set_evt_delay_0 (halcs_client_t *self, char *service,
         uint32_t evt_delay_0);
@@ -1251,6 +1257,12 @@ halcs_client_err_e afc_timing_set_evt_delay_6 (halcs_client_t *self, char *servi
 halcs_client_err_e afc_timing_get_evt_delay_6 (halcs_client_t *self, char *service,
         uint32_t *evt_delay_6);
 
+/* Event delay channel 7 functions */
+halcs_client_err_e afc_timing_set_evt_delay_7 (halcs_client_t *self, char *service,
+        uint32_t evt_delay_7);
+halcs_client_err_e afc_timing_get_evt_delay_7 (halcs_client_t *self, char *service,
+        uint32_t *evt_delay_7);
+
 /* Event width channel 0 functions */
 halcs_client_err_e afc_timing_set_evt_width_0 (halcs_client_t *self, char *service,
         uint32_t evt_width_0);
@@ -1292,6 +1304,12 @@ halcs_client_err_e afc_timing_set_evt_width_6 (halcs_client_t *self, char *servi
         uint32_t evt_width_6);
 halcs_client_err_e afc_timing_get_evt_width_6 (halcs_client_t *self, char *service,
         uint32_t *evt_width_6);
+
+/* Event width channel 7 functions */
+halcs_client_err_e afc_timing_set_evt_width_7 (halcs_client_t *self, char *service,
+        uint32_t evt_width_7);
+halcs_client_err_e afc_timing_get_evt_width_7 (halcs_client_t *self, char *service,
+        uint32_t *evt_width_7);
 
 /* Proportional Gain of Frequency feedback functions */
 halcs_client_err_e afc_timing_set_freq_kp (halcs_client_t *self, char *service,

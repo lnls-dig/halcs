@@ -1,4 +1,4 @@
-/*
+  /*
  * Copyright (C) 2014 LNLS (www.lnls.br)
  * Author: Joao Brito <joao.brito@lnls.br>
  *
@@ -34,6 +34,8 @@
 #define AFC_TIMING_NAME_SET_GET_EVT_IN5             "afc_timing_set_get_evt_code_5"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_IN6           9
 #define AFC_TIMING_NAME_SET_GET_EVT_IN6             "afc_timing_set_get_evt_code_6"
+#define AFC_TIMING_OPCODE_SET_GET_EVT_IN7           38
+#define AFC_TIMING_NAME_SET_GET_EVT_IN7             "afc_timing_set_get_evt_code_7"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_DLY0          10
 #define AFC_TIMING_NAME_SET_GET_EVT_DLY0            "afc_timing_set_get_evt_delay_0"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_DLY1          11
@@ -48,6 +50,8 @@
 #define AFC_TIMING_NAME_SET_GET_EVT_DLY5            "afc_timing_set_get_evt_delay_5"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_DLY6          16
 #define AFC_TIMING_NAME_SET_GET_EVT_DLY6            "afc_timing_set_get_evt_delay_6"
+#define AFC_TIMING_OPCODE_SET_GET_EVT_DLY7          39
+#define AFC_TIMING_NAME_SET_GET_EVT_DLY7            "afc_timing_set_get_evt_delay_7"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_WDT0          17
 #define AFC_TIMING_NAME_SET_GET_EVT_WDT0            "afc_timing_set_get_evt_width_0"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_WDT1          18
@@ -62,6 +66,8 @@
 #define AFC_TIMING_NAME_SET_GET_EVT_WDT5            "afc_timing_set_get_evt_width_5"
 #define AFC_TIMING_OPCODE_SET_GET_EVT_WDT6          23
 #define AFC_TIMING_NAME_SET_GET_EVT_WDT6            "afc_timing_set_get_evt_width_6"
+#define AFC_TIMING_OPCODE_SET_GET_EVT_WDT7          40
+#define AFC_TIMING_NAME_SET_GET_EVT_WDT7            "afc_timing_set_get_evt_width_7"
 #define AFC_TIMING_OPCODE_SET_GET_FREQ_KP           24
 #define AFC_TIMING_NAME_SET_GET_FREQ_KP             "afc_timing_set_get_freq_kp"
 #define AFC_TIMING_OPCODE_SET_GET_FREQ_KI           25
@@ -90,7 +96,7 @@
 #define AFC_TIMING_NAME_SET_GET_AFC_N1              "afc_timing_set_get_afc_n1"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV        37
 #define AFC_TIMING_NAME_SET_GET_AFC_HS_DIV          "afc_timing_set_get_afc_hs_div"
-#define AFC_TIMING_OPCODE_END                       38
+#define AFC_TIMING_OPCODE_END                       41
 
 #endif
 

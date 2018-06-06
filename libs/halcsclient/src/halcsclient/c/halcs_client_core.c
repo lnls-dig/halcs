@@ -2294,6 +2294,17 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_6)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN6, evt_code_6);
 }
 
+/* Event Code Channel 7 functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN7, evt_code_7);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN7, evt_code_7);
+}
+
 /* Event Delay Channel 0 functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_0)
 {
@@ -2371,6 +2382,17 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_6)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY6, evt_delay_6);
 }
 
+/* Event Delay Channel 7 functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY7, evt_delay_7);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY7, evt_delay_7);
+}
+
 /* Event Width Channel 0 functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_0)
 {
@@ -2446,6 +2468,17 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_6)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_6)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT6, evt_width_6);
+}
+
+/* Event Width Channel 7 functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT7, evt_width_7);
+}
+
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT7, evt_width_7);
 }
 
 /* Proportional Gain of Frequency feedback functions */

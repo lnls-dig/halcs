@@ -130,6 +130,18 @@ disp_op_t afc_timing_set_get_evt_code_6_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_evt_code_7_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_EVT_IN7,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_IN7,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_evt_delay_0_exp = {
     .name = AFC_TIMING_NAME_SET_GET_EVT_DLY0,
     .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_DLY0,
@@ -214,6 +226,18 @@ disp_op_t afc_timing_set_get_evt_delay_6_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_evt_delay_7_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_EVT_DLY7,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_DLY7,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_evt_width_0_exp = {
     .name = AFC_TIMING_NAME_SET_GET_EVT_WDT0,
     .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_WDT0,
@@ -289,6 +313,18 @@ disp_op_t afc_timing_set_get_evt_width_5_exp = {
 disp_op_t afc_timing_set_get_evt_width_6_exp = {
     .name = AFC_TIMING_NAME_SET_GET_EVT_WDT6,
     .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_WDT6,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_evt_width_7_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_EVT_WDT7,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_EVT_WDT7,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
