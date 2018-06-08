@@ -383,6 +383,30 @@ DSP_MONIT_FUNC_NAME_HEADER(monit1_amp_pos)
     DSP_MONIT_FUNC_BODY(owner, args, ret, MONIT1);
 }
 
+#define POS_CALC_SW_TAG_EN_MIN                  0
+#define POS_CALC_SW_TAG_EN_MAX                  1
+RW_PARAM_FUNC(dsp, sw_tag_en) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, SW_TAG, EN,
+            SINGLE_BIT_PARAM, POS_CALC_SW_TAG_EN_MIN, POS_CALC_SW_TAG_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_SW_DATA_MASK_EN_MIN            0
+#define POS_CALC_SW_DATA_MASK_EN_MAX            1
+RW_PARAM_FUNC(dsp, sw_data_mask_en) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, SW_DATA_MASK, EN,
+            SINGLE_BIT_PARAM, POS_CALC_SW_DATA_MASK_EN_MIN, POS_CALC_SW_DATA_MASK_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_SW_DATA_MASK_SAMPLES_MIN       0
+#define POS_CALC_SW_DATA_MASK_SAMPLES_MAX       ((1<<16ULL)-1)
+RW_PARAM_FUNC(dsp, sw_data_mask_samples) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, SW_DATA_MASK, SAMPLES,
+            MULT_BIT_PARAM, POS_CALC_SW_DATA_MASK_SAMPLES_MIN, POS_CALC_SW_DATA_MASK_SAMPLES_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -412,6 +436,9 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit1_pos_sum),
     RW_PARAM_FUNC_NAME(dsp, monit1_updt),
     DSP_MONIT_FUNC_NAME(monit1_amp_pos),
+    RW_PARAM_FUNC_NAME(dsp, sw_tag_en),
+    RW_PARAM_FUNC_NAME(dsp, sw_data_mask_en),
+    RW_PARAM_FUNC_NAME(dsp, sw_data_mask_samples),
     NULL
 };
 
