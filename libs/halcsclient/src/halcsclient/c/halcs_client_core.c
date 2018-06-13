@@ -2199,437 +2199,1672 @@ exit:
 
 /**************** AFC Timing SMIO Functions ****************/
 
-/* Fiber link status function */
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, link_status)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_LINK_STATUS, link_status);
 }
 
-/* RX enabled function */
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rxen_status)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RXEN_STATUS, rxen_status);
 }
 
-/* Reference Clock output locked */
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, ref_clk_locked)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_REF_CLK_LOCKED, ref_clk_locked);
 }
 
-/* Event Code Channel 0 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en0)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN0, evt_code_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN0, amc_en0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN0, amc_en0);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol0)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN0, evt_code_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL0, amc_pol0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL0, amc_pol0);
 }
 
-/* Event Code Channel 1 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log0)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN1, evt_code_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG0, amc_log0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG0, amc_log0);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl0)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN1, evt_code_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL0, amc_itl0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL0, amc_itl0);
 }
 
-/* Event Code Channel 2 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src0)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN2, evt_code_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC0, amc_src0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC0, amc_src0);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses0)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN2, evt_code_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES0, amc_pulses0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES0, amc_pulses0);
 }
 
-/* Event Code Channel 3 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt0)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN3, evt_code_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT0, amc_evt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT0, amc_evt0);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly0)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN3, evt_code_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY0, amc_dly0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY0, amc_dly0);
 }
 
-/* Event Code Channel 4 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt0)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN4, evt_code_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT0, amc_wdt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT0, amc_wdt0);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en1)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN4, evt_code_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN1, amc_en1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN1, amc_en1);
 }
 
-/* Event Code Channel 5 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol1)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN5, evt_code_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL1, amc_pol1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL1, amc_pol1);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log1)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN5, evt_code_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG1, amc_log1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG1, amc_log1);
 }
 
-/* Event Code Channel 6 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl1)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN6, evt_code_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL1, amc_itl1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL1, amc_itl1);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src1)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN6, evt_code_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC1, amc_src1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC1, amc_src1);
 }
 
-/* Event Code Channel 7 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_code_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses1)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN7, evt_code_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES1, amc_pulses1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES1, amc_pulses1);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_code_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt1)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_IN7, evt_code_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT1, amc_evt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT1, amc_evt1);
 }
 
-/* Event Delay Channel 0 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly1)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY0, evt_delay_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY1, amc_dly1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY1, amc_dly1);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt1)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY0, evt_delay_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT1, amc_wdt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT1, amc_wdt1);
 }
 
-/* Event Delay Channel 1 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en2)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY1, evt_delay_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN2, amc_en2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN2, amc_en2);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol2)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY1, evt_delay_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL2, amc_pol2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL2, amc_pol2);
 }
 
-/* Event Delay Channel 2 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log2)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY2, evt_delay_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG2, amc_log2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG2, amc_log2);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl2)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY2, evt_delay_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL2, amc_itl2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL2, amc_itl2);
 }
 
-/* Event Delay Channel 3 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src2)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY3, evt_delay_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC2, amc_src2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC2, amc_src2);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses2)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY3, evt_delay_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES2, amc_pulses2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES2, amc_pulses2);
 }
 
-/* Event Delay Channel 4 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt2)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY4, evt_delay_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT2, amc_evt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT2, amc_evt2);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly2)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY4, evt_delay_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY2, amc_dly2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY2, amc_dly2);
 }
 
-/* Event Delay Channel 5 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt2)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY5, evt_delay_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT2, amc_wdt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT2, amc_wdt2);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en3)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY5, evt_delay_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN3, amc_en3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN3, amc_en3);
 }
 
-/* Event Delay Channel 6 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol3)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY6, evt_delay_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL3, amc_pol3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL3, amc_pol3);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log3)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY6, evt_delay_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG3, amc_log3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG3, amc_log3);
 }
 
-/* Event Delay Channel 7 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_delay_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl3)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY7, evt_delay_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL3, amc_itl3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL3, amc_itl3);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_delay_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src3)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_DLY7, evt_delay_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC3, amc_src3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC3, amc_src3);
 }
 
-/* Event Width Channel 0 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses3)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT0, evt_width_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES3, amc_pulses3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES3, amc_pulses3);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_0)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt3)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT0, evt_width_0);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT3, amc_evt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT3, amc_evt3);
 }
 
-/* Event Width Channel 1 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly3)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT1, evt_width_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY3, amc_dly3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY3, amc_dly3);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_1)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt3)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT1, evt_width_1);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT3, amc_wdt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT3, amc_wdt3);
 }
 
-/* Event Width Channel 2 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en4)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT2, evt_width_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN4, amc_en4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN4, amc_en4);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_2)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol4)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT2, evt_width_2);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL4, amc_pol4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL4, amc_pol4);
 }
 
-/* Event Width Channel 3 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log4)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT3, evt_width_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG4, amc_log4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG4, amc_log4);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_3)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl4)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT3, evt_width_3);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL4, amc_itl4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL4, amc_itl4);
 }
 
-/* Event Width Channel 4 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src4)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT4, evt_width_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC4, amc_src4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC4, amc_src4);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_4)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses4)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT4, evt_width_4);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES4, amc_pulses4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES4, amc_pulses4);
 }
 
-/* Event Width Channel 5 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt4)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT5, evt_width_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT4, amc_evt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT4, amc_evt4);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_5)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly4)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT5, evt_width_5);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY4, amc_dly4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY4, amc_dly4);
 }
 
-/* Event Width Channel 6 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt4)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT6, evt_width_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT4, amc_wdt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT4, amc_wdt4);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_6)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en5)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT6, evt_width_6);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN5, amc_en5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN5, amc_en5);
 }
 
-/* Event Width Channel 7 functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evt_width_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol5)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT7, evt_width_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL5, amc_pol5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL5, amc_pol5);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evt_width_7)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log5)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVT_WDT7, evt_width_7);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG5, amc_log5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG5, amc_log5);
 }
 
-/* Proportional Gain of Frequency feedback functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, freq_kp)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl5)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_KP, freq_kp);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL5, amc_itl5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL5, amc_itl5);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, freq_kp)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src5)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_KP, freq_kp);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC5, amc_src5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC5, amc_src5);
 }
 
-/* Integral Gain of Frequency feedback functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, freq_ki)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses5)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_KI, freq_ki);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES5, amc_pulses5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES5, amc_pulses5);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, freq_ki)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt5)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_KI, freq_ki);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT5, amc_evt5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT5, amc_evt5);
 }
 
-/* Proportional Gain of Phase feedback functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, phase_kp)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly5)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_KP, phase_kp);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY5, amc_dly5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY5, amc_dly5);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_kp)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt5)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_KP, phase_kp);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT5, amc_wdt5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT5, amc_wdt5);
 }
 
-/* Integral Gain of Phase feedback functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, phase_ki)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en6)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_KI, phase_ki);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN6, amc_en6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN6, amc_en6);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_ki)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol6)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_KI, phase_ki);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL6, amc_pol6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL6, amc_pol6);
 }
 
-/* Phase Setpoint functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, phase_set)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log6)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_SET, phase_set);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG6, amc_log6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG6, amc_log6);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, phase_set)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl6)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_PHASE_SET, phase_set);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL6, amc_itl6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL6, amc_itl6);
 }
 
-/* Average Exponent functions */
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, avg_exponent)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src6)
 {
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT, avg_exponent);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC6, amc_src6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC6, amc_src6);
 }
 
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, avg_exponent)
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses6)
 {
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AVG_EXPONENT, avg_exponent);
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES6, amc_pulses6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES6, amc_pulses6);
 }
 
-/* RTM Si570 rfreq[37-19] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt6)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT6, amc_evt6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT6, amc_evt6);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly6)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY6, amc_dly6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY6, amc_dly6);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt6)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT6, amc_wdt6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT6, amc_wdt6);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN7, amc_en7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_en7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN7, amc_en7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pol7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL7, amc_pol7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pol7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_POL7, amc_pol7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_log7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG7, amc_log7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_log7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_LOG7, amc_log7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_itl7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL7, amc_itl7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_itl7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_ITL7, amc_itl7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC7, amc_src7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC7, amc_src7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES7, amc_pulses7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_pulses7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES7, amc_pulses7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_evt7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT7, amc_evt7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_evt7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EVT7, amc_evt7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dly7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY7, amc_dly7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dly7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DLY7, amc_dly7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_wdt7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT7, amc_wdt7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_wdt7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_WDT7, amc_wdt7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_en0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN0, fmc1_en0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_en0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN0, fmc1_en0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pol0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL0, fmc1_pol0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pol0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL0, fmc1_pol0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_log0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG0, fmc1_log0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_log0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG0, fmc1_log0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_itl0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL0, fmc1_itl0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_itl0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL0, fmc1_itl0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_src0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC0, fmc1_src0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_src0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC0, fmc1_src0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pulses0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES0, fmc1_pulses0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pulses0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES0, fmc1_pulses0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_evt0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT0, fmc1_evt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_evt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT0, fmc1_evt0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_dly0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY0, fmc1_dly0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_dly0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY0, fmc1_dly0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_wdt0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT0, fmc1_wdt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_wdt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT0, fmc1_wdt0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_en1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN1, fmc1_en1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_en1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN1, fmc1_en1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pol1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL1, fmc1_pol1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pol1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL1, fmc1_pol1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_log1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG1, fmc1_log1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_log1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG1, fmc1_log1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_itl1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL1, fmc1_itl1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_itl1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL1, fmc1_itl1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_src1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC1, fmc1_src1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_src1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC1, fmc1_src1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pulses1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES1, fmc1_pulses1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pulses1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES1, fmc1_pulses1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_evt1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT1, fmc1_evt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_evt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT1, fmc1_evt1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_dly1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY1, fmc1_dly1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_dly1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY1, fmc1_dly1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_wdt1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT1, fmc1_wdt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_wdt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT1, fmc1_wdt1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_en2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN2, fmc1_en2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_en2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN2, fmc1_en2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pol2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL2, fmc1_pol2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pol2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL2, fmc1_pol2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_log2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG2, fmc1_log2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_log2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG2, fmc1_log2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_itl2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL2, fmc1_itl2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_itl2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL2, fmc1_itl2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_src2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC2, fmc1_src2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_src2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC2, fmc1_src2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pulses2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES2, fmc1_pulses2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pulses2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES2, fmc1_pulses2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_evt2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT2, fmc1_evt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_evt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT2, fmc1_evt2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_dly2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY2, fmc1_dly2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_dly2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY2, fmc1_dly2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_wdt2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT2, fmc1_wdt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_wdt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT2, fmc1_wdt2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_en3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN3, fmc1_en3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_en3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN3, fmc1_en3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pol3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL3, fmc1_pol3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pol3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL3, fmc1_pol3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_log3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG3, fmc1_log3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_log3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG3, fmc1_log3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_itl3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL3, fmc1_itl3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_itl3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL3, fmc1_itl3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_src3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC3, fmc1_src3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_src3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC3, fmc1_src3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pulses3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES3, fmc1_pulses3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pulses3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES3, fmc1_pulses3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_evt3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT3, fmc1_evt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_evt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT3, fmc1_evt3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_dly3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY3, fmc1_dly3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_dly3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY3, fmc1_dly3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_wdt3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT3, fmc1_wdt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_wdt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT3, fmc1_wdt3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_en4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN4, fmc1_en4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_en4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EN4, fmc1_en4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pol4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL4, fmc1_pol4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pol4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_POL4, fmc1_pol4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_log4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG4, fmc1_log4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_log4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_LOG4, fmc1_log4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_itl4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL4, fmc1_itl4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_itl4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_ITL4, fmc1_itl4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_src4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC4, fmc1_src4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_src4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_SRC4, fmc1_src4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_pulses4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES4, fmc1_pulses4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_pulses4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES4, fmc1_pulses4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_evt4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT4, fmc1_evt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_evt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_EVT4, fmc1_evt4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_dly4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY4, fmc1_dly4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_dly4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DLY4, fmc1_dly4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc1_wdt4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT4, fmc1_wdt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc1_wdt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_WDT4, fmc1_wdt4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_en0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN0, fmc2_en0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_en0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN0, fmc2_en0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pol0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL0, fmc2_pol0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pol0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL0, fmc2_pol0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_log0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG0, fmc2_log0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_log0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG0, fmc2_log0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_itl0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL0, fmc2_itl0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_itl0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL0, fmc2_itl0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_src0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC0, fmc2_src0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_src0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC0, fmc2_src0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pulses0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES0, fmc2_pulses0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pulses0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES0, fmc2_pulses0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_evt0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT0, fmc2_evt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_evt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT0, fmc2_evt0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_dly0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY0, fmc2_dly0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_dly0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY0, fmc2_dly0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_wdt0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT0, fmc2_wdt0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_wdt0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT0, fmc2_wdt0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_en1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN1, fmc2_en1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_en1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN1, fmc2_en1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pol1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL1, fmc2_pol1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pol1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL1, fmc2_pol1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_log1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG1, fmc2_log1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_log1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG1, fmc2_log1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_itl1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL1, fmc2_itl1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_itl1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL1, fmc2_itl1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_src1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC1, fmc2_src1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_src1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC1, fmc2_src1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pulses1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES1, fmc2_pulses1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pulses1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES1, fmc2_pulses1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_evt1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT1, fmc2_evt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_evt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT1, fmc2_evt1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_dly1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY1, fmc2_dly1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_dly1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY1, fmc2_dly1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_wdt1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT1, fmc2_wdt1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_wdt1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT1, fmc2_wdt1);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_en2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN2, fmc2_en2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_en2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN2, fmc2_en2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pol2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL2, fmc2_pol2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pol2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL2, fmc2_pol2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_log2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG2, fmc2_log2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_log2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG2, fmc2_log2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_itl2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL2, fmc2_itl2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_itl2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL2, fmc2_itl2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_src2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC2, fmc2_src2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_src2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC2, fmc2_src2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pulses2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES2, fmc2_pulses2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pulses2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES2, fmc2_pulses2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_evt2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT2, fmc2_evt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_evt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT2, fmc2_evt2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_dly2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY2, fmc2_dly2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_dly2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY2, fmc2_dly2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_wdt2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT2, fmc2_wdt2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_wdt2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT2, fmc2_wdt2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_en3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN3, fmc2_en3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_en3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN3, fmc2_en3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pol3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL3, fmc2_pol3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pol3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL3, fmc2_pol3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_log3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG3, fmc2_log3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_log3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG3, fmc2_log3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_itl3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL3, fmc2_itl3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_itl3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL3, fmc2_itl3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_src3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC3, fmc2_src3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_src3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC3, fmc2_src3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pulses3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES3, fmc2_pulses3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pulses3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES3, fmc2_pulses3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_evt3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT3, fmc2_evt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_evt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT3, fmc2_evt3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_dly3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY3, fmc2_dly3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_dly3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY3, fmc2_dly3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_wdt3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT3, fmc2_wdt3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_wdt3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT3, fmc2_wdt3);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_en4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN4, fmc2_en4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_en4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EN4, fmc2_en4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pol4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL4, fmc2_pol4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pol4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_POL4, fmc2_pol4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_log4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG4, fmc2_log4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_log4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_LOG4, fmc2_log4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_itl4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL4, fmc2_itl4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_itl4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_ITL4, fmc2_itl4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_src4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC4, fmc2_src4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_src4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_SRC4, fmc2_src4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_pulses4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES4, fmc2_pulses4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_pulses4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES4, fmc2_pulses4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_evt4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT4, fmc2_evt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_evt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_EVT4, fmc2_evt4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_dly4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY4, fmc2_dly4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_dly4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DLY4, fmc2_dly4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, fmc2_wdt4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT4, fmc2_wdt4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, fmc2_wdt4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_WDT4, fmc2_wdt4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_freq_kp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_FREQ_KP, rtm_freq_kp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_freq_kp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_FREQ_KP, rtm_freq_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_freq_ki)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_FREQ_KI, rtm_freq_ki);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_freq_ki)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_FREQ_KI, rtm_freq_ki);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_kp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KP, rtm_phase_kp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_kp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KP, rtm_phase_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_ki)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KI, rtm_phase_ki);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_ki)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KI, rtm_phase_ki);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_set)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET, rtm_phase_set);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_set)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET, rtm_phase_set);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_navg)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG, rtm_phase_navg);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_navg)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG, rtm_phase_navg);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_div_exp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_DIV_EXP, rtm_phase_div_exp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_div_exp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_DIV_EXP, rtm_phase_div_exp);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_rfreq_hi)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI, rtm_rfreq_hi);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_rfreq_hi)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_HI, rtm_rfreq_hi);
 }
 
-/* RTM Si570 rfreq[18-0] functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_rfreq_lo)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO, rtm_rfreq_lo);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_rfreq_lo)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_RFREQ_LO, rtm_rfreq_lo);
 }
 
-/* RTM Si570 n1 functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_n1)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_N1, rtm_n1);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_n1)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_N1, rtm_n1);
 }
 
-/* RTM Si570 hs_div functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_hs_div)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV, rtm_hs_div);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_hs_div)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_HS_DIV, rtm_hs_div);
 }
 
-/* AFC Si570 rfreq[37-19] functions */
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_freq_kp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_FREQ_KP, afc_freq_kp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_freq_kp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_FREQ_KP, afc_freq_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_freq_ki)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_FREQ_KI, afc_freq_ki);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_freq_ki)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_FREQ_KI, afc_freq_ki);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_kp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KP, afc_phase_kp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_kp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KP, afc_phase_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_ki)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI, afc_phase_ki);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_ki)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI, afc_phase_ki);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_set)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET, afc_phase_set);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_set)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET, afc_phase_set);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_navg)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_NAVG, afc_phase_navg);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_navg)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_NAVG, afc_phase_navg);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_div_exp)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_DIV_EXP, afc_phase_div_exp);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_div_exp)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_DIV_EXP, afc_phase_div_exp);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_rfreq_hi)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI, afc_rfreq_hi);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_rfreq_hi)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_HI, afc_rfreq_hi);
 }
 
-/* AFC Si570 rfreq[18-0] functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_rfreq_lo)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO, afc_rfreq_lo);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_rfreq_lo)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_RFREQ_LO, afc_rfreq_lo);
 }
 
-/* AFC Si570 n1 functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_n1)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_N1, afc_n1);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_n1)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_N1, afc_n1);
 }
 
-/* AFC Si570 hs_div functions */
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_hs_div)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);
 }
-
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_hs_div)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV, afc_hs_div);

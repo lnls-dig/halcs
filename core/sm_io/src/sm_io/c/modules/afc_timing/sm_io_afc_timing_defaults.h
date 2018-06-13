@@ -7,7 +7,7 @@
 
 #ifndef _AFC_TIMING_DEFAULTS_H_
 #define _AFC_TIMING_DEFAULTS_H_
-
+/*
 #define AFC_TIMING_DFLT_PHASE_SET                                        0x5b
 #define AFC_TIMING_DFLT_DDMTD_AVG_EXP                                    0x8
 #define AFC_TIMING_DFLT_RTM_RFREQ_HI                                     0x57d2
@@ -43,7 +43,7 @@
 #define AFC_TIMING_DFLT_EVT_WDT4                                         0x5
 #define AFC_TIMING_DFLT_EVT_WDT5                                         0x5
 #define AFC_TIMING_DFLT_EVT_WDT6                                         0x5
-
+*/
 smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
         const char *log_file_name);
 

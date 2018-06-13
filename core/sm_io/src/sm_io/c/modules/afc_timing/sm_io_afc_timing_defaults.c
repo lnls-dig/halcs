@@ -48,13 +48,13 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
     UNUSED(log_file_name);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:afc_timing_defaults] Configuring SMIO "
             "AFC_TIMING with default values ...\n");
-    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
+//    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
     smio_err_e err = SMIO_SUCCESS;
 
     halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
             log_file_name, SMIO_AFC_TIMING_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
-
+/*
     client_err = afc_timing_set_evt_code_0 (config_client, service, AFC_TIMING_DFLT_EVT_IN0);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set channel 0 event code",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
@@ -196,7 +196,7 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
 err_param_set:
-    halcs_client_destroy (&config_client);
+    halcs_client_destroy (&config_client);*/
 err_alloc_client:
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:afc_timing_defaults] Exiting Config thread %s\n",
         service);
