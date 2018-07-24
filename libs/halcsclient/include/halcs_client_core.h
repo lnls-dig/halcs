@@ -1199,6 +1199,11 @@ halcs_client_err_e afc_timing_set_amc_src0 (halcs_client_t *self, char *service,
 halcs_client_err_e afc_timing_get_amc_src0 (halcs_client_t *self, char *service,
         uint32_t *amc_src0);
 
+halcs_client_err_e afc_timing_set_amc_dir0 (halcs_client_t *self, char *service,
+        uint32_t amc_dir0);
+halcs_client_err_e afc_timing_get_amc_dir0 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir0);
+
 halcs_client_err_e afc_timing_set_amc_pulses0 (halcs_client_t *self, char *service,
         uint32_t amc_pulses0);
 halcs_client_err_e afc_timing_get_amc_pulses0 (halcs_client_t *self, char *service,
@@ -1243,6 +1248,11 @@ halcs_client_err_e afc_timing_set_amc_src1 (halcs_client_t *self, char *service,
         uint32_t amc_src1);
 halcs_client_err_e afc_timing_get_amc_src1 (halcs_client_t *self, char *service,
         uint32_t *amc_src1);
+
+halcs_client_err_e afc_timing_set_amc_dir1 (halcs_client_t *self, char *service,
+        uint32_t amc_dir1);
+halcs_client_err_e afc_timing_get_amc_dir1 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir1);
 
 halcs_client_err_e afc_timing_set_amc_pulses1 (halcs_client_t *self, char *service,
         uint32_t amc_pulses1);
@@ -1289,6 +1299,11 @@ halcs_client_err_e afc_timing_set_amc_src2 (halcs_client_t *self, char *service,
 halcs_client_err_e afc_timing_get_amc_src2 (halcs_client_t *self, char *service,
         uint32_t *amc_src2);
 
+halcs_client_err_e afc_timing_set_amc_dir2 (halcs_client_t *self, char *service,
+        uint32_t amc_dir2);
+halcs_client_err_e afc_timing_get_amc_dir2 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir2);
+
 halcs_client_err_e afc_timing_set_amc_pulses2 (halcs_client_t *self, char *service,
         uint32_t amc_pulses2);
 halcs_client_err_e afc_timing_get_amc_pulses2 (halcs_client_t *self, char *service,
@@ -1333,6 +1348,11 @@ halcs_client_err_e afc_timing_set_amc_src3 (halcs_client_t *self, char *service,
         uint32_t amc_src3);
 halcs_client_err_e afc_timing_get_amc_src3 (halcs_client_t *self, char *service,
         uint32_t *amc_src3);
+
+halcs_client_err_e afc_timing_set_amc_dir3 (halcs_client_t *self, char *service,
+        uint32_t amc_dir3);
+halcs_client_err_e afc_timing_get_amc_dir3 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir3);
 
 halcs_client_err_e afc_timing_set_amc_pulses3 (halcs_client_t *self, char *service,
         uint32_t amc_pulses3);
@@ -1379,6 +1399,11 @@ halcs_client_err_e afc_timing_set_amc_src4 (halcs_client_t *self, char *service,
 halcs_client_err_e afc_timing_get_amc_src4 (halcs_client_t *self, char *service,
         uint32_t *amc_src4);
 
+halcs_client_err_e afc_timing_set_amc_dir4 (halcs_client_t *self, char *service,
+        uint32_t amc_dir4);
+halcs_client_err_e afc_timing_get_amc_dir4 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir4);
+
 halcs_client_err_e afc_timing_set_amc_pulses4 (halcs_client_t *self, char *service,
         uint32_t amc_pulses4);
 halcs_client_err_e afc_timing_get_amc_pulses4 (halcs_client_t *self, char *service,
@@ -1423,6 +1448,11 @@ halcs_client_err_e afc_timing_set_amc_src5 (halcs_client_t *self, char *service,
         uint32_t amc_src5);
 halcs_client_err_e afc_timing_get_amc_src5 (halcs_client_t *self, char *service,
         uint32_t *amc_src5);
+
+halcs_client_err_e afc_timing_set_amc_dir5 (halcs_client_t *self, char *service,
+        uint32_t amc_dir5);
+halcs_client_err_e afc_timing_get_amc_dir5 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir5);
 
 halcs_client_err_e afc_timing_set_amc_pulses5 (halcs_client_t *self, char *service,
         uint32_t amc_pulses5);
@@ -1469,6 +1499,11 @@ halcs_client_err_e afc_timing_set_amc_src6 (halcs_client_t *self, char *service,
 halcs_client_err_e afc_timing_get_amc_src6 (halcs_client_t *self, char *service,
         uint32_t *amc_src6);
 
+halcs_client_err_e afc_timing_set_amc_dir6 (halcs_client_t *self, char *service,
+        uint32_t amc_dir6);
+halcs_client_err_e afc_timing_get_amc_dir6 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir6);
+
 halcs_client_err_e afc_timing_set_amc_pulses6 (halcs_client_t *self, char *service,
         uint32_t amc_pulses6);
 halcs_client_err_e afc_timing_get_amc_pulses6 (halcs_client_t *self, char *service,
@@ -1513,6 +1548,11 @@ halcs_client_err_e afc_timing_set_amc_src7 (halcs_client_t *self, char *service,
         uint32_t amc_src7);
 halcs_client_err_e afc_timing_get_amc_src7 (halcs_client_t *self, char *service,
         uint32_t *amc_src7);
+
+halcs_client_err_e afc_timing_set_amc_dir7 (halcs_client_t *self, char *service,
+        uint32_t amc_dir7);
+halcs_client_err_e afc_timing_get_amc_dir7 (halcs_client_t *self, char *service,
+        uint32_t *amc_dir7);
 
 halcs_client_err_e afc_timing_set_amc_pulses7 (halcs_client_t *self, char *service,
         uint32_t amc_pulses7);

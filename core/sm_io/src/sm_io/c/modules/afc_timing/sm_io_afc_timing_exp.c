@@ -95,6 +95,11 @@ RW_PARAM_FUNC(afc_timing, amc_src0) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(afc_timing, amc_dir0) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC0, DIR, SINGLE_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define TIMING_AMC0_PULSES_GLOBAL_MASK                  (0xffffffff)
 #define TIMING_AMC0_PULSES_GLOBAL_W(val)                (val)
 #define TIMING_AMC0_PULSES_GLOBAL_R(val)                (val)
@@ -150,6 +155,11 @@ RW_PARAM_FUNC(afc_timing, amc_itl1) {
 
 RW_PARAM_FUNC(afc_timing, amc_src1) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC1, SRC, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, amc_dir1) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC1, DIR, SINGLE_BIT_PARAM,
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -211,6 +221,11 @@ RW_PARAM_FUNC(afc_timing, amc_src2) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(afc_timing, amc_dir2) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC2, DIR, SINGLE_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define TIMING_AMC2_PULSES_GLOBAL_MASK                  (0xffffffff)
 #define TIMING_AMC2_PULSES_GLOBAL_W(val)                (val)
 #define TIMING_AMC2_PULSES_GLOBAL_R(val)                (val)
@@ -266,6 +281,11 @@ RW_PARAM_FUNC(afc_timing, amc_itl3) {
 
 RW_PARAM_FUNC(afc_timing, amc_src3) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC3, SRC, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, amc_dir3) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC3, DIR, SINGLE_BIT_PARAM,
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -327,6 +347,11 @@ RW_PARAM_FUNC(afc_timing, amc_src4) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(afc_timing, amc_dir4) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC4, DIR, SINGLE_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define TIMING_AMC4_PULSES_GLOBAL_MASK                  (0xffffffff)
 #define TIMING_AMC4_PULSES_GLOBAL_W(val)                (val)
 #define TIMING_AMC4_PULSES_GLOBAL_R(val)                (val)
@@ -382,6 +407,11 @@ RW_PARAM_FUNC(afc_timing, amc_itl5) {
 
 RW_PARAM_FUNC(afc_timing, amc_src5) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC5, SRC, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, amc_dir5) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC5, DIR, SINGLE_BIT_PARAM,
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -443,6 +473,11 @@ RW_PARAM_FUNC(afc_timing, amc_src6) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(afc_timing, amc_dir6) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC6, DIR, SINGLE_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 #define TIMING_AMC6_PULSES_GLOBAL_MASK                  (0xffffffff)
 #define TIMING_AMC6_PULSES_GLOBAL_W(val)                (val)
 #define TIMING_AMC6_PULSES_GLOBAL_R(val)                (val)
@@ -498,6 +533,11 @@ RW_PARAM_FUNC(afc_timing, amc_itl7) {
 
 RW_PARAM_FUNC(afc_timing, amc_src7) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC7, SRC, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(afc_timing, amc_dir7) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, AMC7, DIR, SINGLE_BIT_PARAM,
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -1156,7 +1196,7 @@ RW_PARAM_FUNC(afc_timing, rtm_phase_navg) {
             TIMING_NAVG_MIN, TIMING_NAVG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_DIV_EXP_MIN 1
+#define TIMING_DIV_EXP_MIN 0
 #define TIMING_DIV_EXP_MAX 0x1F
 RW_PARAM_FUNC(afc_timing, rtm_phase_div_exp) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM_MAF, DIV_EXP, MULT_BIT_PARAM,
@@ -1226,15 +1266,11 @@ RW_PARAM_FUNC(afc_timing, afc_phase_set) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_NAVG_MIN 1
-#define TIMING_NAVG_MAX 0xFFF
 RW_PARAM_FUNC(afc_timing, afc_phase_navg) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_MAF, NAVG, MULT_BIT_PARAM,
             TIMING_NAVG_MIN, TIMING_NAVG_MAX, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_DIV_EXP_MIN 1
-#define TIMING_DIV_EXP_MAX 0x1F
 RW_PARAM_FUNC(afc_timing, afc_phase_div_exp) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_MAF, DIV_EXP, MULT_BIT_PARAM,
             TIMING_DIV_EXP_MIN, TIMING_DIV_EXP_MAX,
@@ -1277,6 +1313,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src0),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly0),
@@ -1286,6 +1323,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log1),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl1),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src1),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir1),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses1),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt1),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly1),
@@ -1295,6 +1333,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log2),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl2),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src2),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir2),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses2),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt2),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly2),
@@ -1304,6 +1343,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log3),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl3),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src3),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir3),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses3),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt3),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly3),
@@ -1313,6 +1353,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log4),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl4),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src4),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir4),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses4),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt4),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly4),
@@ -1322,6 +1363,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log5),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl5),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src5),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir5),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses5),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt5),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly5),
@@ -1331,6 +1373,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log6),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl6),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src6),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir6),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses6),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt6),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly6),
@@ -1340,6 +1383,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, amc_log7),
     RW_PARAM_FUNC_NAME(afc_timing, amc_itl7),
     RW_PARAM_FUNC_NAME(afc_timing, amc_src7),
+    RW_PARAM_FUNC_NAME(afc_timing, amc_dir7),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pulses7),
     RW_PARAM_FUNC_NAME(afc_timing, amc_evt7),
     RW_PARAM_FUNC_NAME(afc_timing, amc_dly7),

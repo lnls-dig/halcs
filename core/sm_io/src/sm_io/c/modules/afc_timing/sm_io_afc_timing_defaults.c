@@ -91,11 +91,11 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set RTM Si570 rfreq[19-0]",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_rtm_rfreq_n1 (config_client, service, AFC_TIMING_DFLT_RTM_N1);
+    client_err = afc_timing_set_rtm_n1 (config_client, service, AFC_TIMING_DFLT_RTM_N1);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set RTM Si570 n1",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_rtm_rfreq_hs_div (config_client, service, AFC_TIMING_DFLT_RTM_HS_DIV);
+    client_err = afc_timing_set_rtm_hs_div (config_client, service, AFC_TIMING_DFLT_RTM_HS_DIV);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set RTM Si570 hs_div",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
@@ -107,11 +107,11 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set AFC Si570 rfreq[19-0]",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_afc_rfreq_n1 (config_client, service, AFC_TIMING_DFLT_AFC_N1);
+    client_err = afc_timing_set_afc_n1 (config_client, service, AFC_TIMING_DFLT_AFC_N1);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set AFC Si570 n1",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_afc_rfreq_hs_div (config_client, service, AFC_TIMING_DFLT_AFC_HS_DIV);
+    client_err = afc_timing_set_afc_hs_div (config_client, service, AFC_TIMING_DFLT_AFC_HS_DIV);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set AFC Si570 hs_div",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 

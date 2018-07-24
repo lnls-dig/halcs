@@ -106,6 +106,18 @@ disp_op_t afc_timing_set_get_amc_src0_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_amc_dir0_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR0,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR0,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_pulses0_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_PULSES0,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_PULSES0,
@@ -205,6 +217,18 @@ disp_op_t afc_timing_set_get_amc_itl1_exp = {
 disp_op_t afc_timing_set_get_amc_src1_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_SRC1,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_SRC1,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_amc_dir1_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR1,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR1,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -322,6 +346,18 @@ disp_op_t afc_timing_set_get_amc_src2_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_amc_dir2_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR2,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR2,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_pulses2_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_PULSES2,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_PULSES2,
@@ -421,6 +457,18 @@ disp_op_t afc_timing_set_get_amc_itl3_exp = {
 disp_op_t afc_timing_set_get_amc_src3_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_SRC3,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_SRC3,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_amc_dir3_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR3,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR3,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -538,6 +586,18 @@ disp_op_t afc_timing_set_get_amc_src4_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_amc_dir4_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR4,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR4,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_pulses4_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_PULSES4,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_PULSES4,
@@ -637,6 +697,18 @@ disp_op_t afc_timing_set_get_amc_itl5_exp = {
 disp_op_t afc_timing_set_get_amc_src5_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_SRC5,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_SRC5,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_amc_dir5_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR5,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR5,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -754,6 +826,18 @@ disp_op_t afc_timing_set_get_amc_src6_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_amc_dir6_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR6,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR6,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_pulses6_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_PULSES6,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_PULSES6,
@@ -853,6 +937,18 @@ disp_op_t afc_timing_set_get_amc_itl7_exp = {
 disp_op_t afc_timing_set_get_amc_src7_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_SRC7,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_SRC7,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_amc_dir7_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_DIR7,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_DIR7,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -2264,6 +2360,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log0_exp,
   &afc_timing_set_get_amc_itl0_exp,
   &afc_timing_set_get_amc_src0_exp,
+  &afc_timing_set_get_amc_dir0_exp,
   &afc_timing_set_get_amc_pulses0_exp,
   &afc_timing_set_get_amc_evt0_exp,
   &afc_timing_set_get_amc_dly0_exp,
@@ -2273,6 +2370,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log1_exp,
   &afc_timing_set_get_amc_itl1_exp,
   &afc_timing_set_get_amc_src1_exp,
+  &afc_timing_set_get_amc_dir1_exp,
   &afc_timing_set_get_amc_pulses1_exp,
   &afc_timing_set_get_amc_evt1_exp,
   &afc_timing_set_get_amc_dly1_exp,
@@ -2282,6 +2380,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log2_exp,
   &afc_timing_set_get_amc_itl2_exp,
   &afc_timing_set_get_amc_src2_exp,
+  &afc_timing_set_get_amc_dir2_exp,
   &afc_timing_set_get_amc_pulses2_exp,
   &afc_timing_set_get_amc_evt2_exp,
   &afc_timing_set_get_amc_dly2_exp,
@@ -2291,6 +2390,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log3_exp,
   &afc_timing_set_get_amc_itl3_exp,
   &afc_timing_set_get_amc_src3_exp,
+  &afc_timing_set_get_amc_dir3_exp,
   &afc_timing_set_get_amc_pulses3_exp,
   &afc_timing_set_get_amc_evt3_exp,
   &afc_timing_set_get_amc_dly3_exp,
@@ -2300,6 +2400,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log4_exp,
   &afc_timing_set_get_amc_itl4_exp,
   &afc_timing_set_get_amc_src4_exp,
+  &afc_timing_set_get_amc_dir4_exp,
   &afc_timing_set_get_amc_pulses4_exp,
   &afc_timing_set_get_amc_evt4_exp,
   &afc_timing_set_get_amc_dly4_exp,
@@ -2309,6 +2410,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log5_exp,
   &afc_timing_set_get_amc_itl5_exp,
   &afc_timing_set_get_amc_src5_exp,
+  &afc_timing_set_get_amc_dir5_exp,
   &afc_timing_set_get_amc_pulses5_exp,
   &afc_timing_set_get_amc_evt5_exp,
   &afc_timing_set_get_amc_dly5_exp,
@@ -2318,6 +2420,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log6_exp,
   &afc_timing_set_get_amc_itl6_exp,
   &afc_timing_set_get_amc_src6_exp,
+  &afc_timing_set_get_amc_dir6_exp,
   &afc_timing_set_get_amc_pulses6_exp,
   &afc_timing_set_get_amc_evt6_exp,
   &afc_timing_set_get_amc_dly6_exp,
@@ -2327,6 +2430,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_amc_log7_exp,
   &afc_timing_set_get_amc_itl7_exp,
   &afc_timing_set_get_amc_src7_exp,
+  &afc_timing_set_get_amc_dir7_exp,
   &afc_timing_set_get_amc_pulses7_exp,
   &afc_timing_set_get_amc_evt7_exp,
   &afc_timing_set_get_amc_dly7_exp,

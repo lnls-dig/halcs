@@ -2199,16 +2199,28 @@ exit:
 
 /**************** AFC Timing SMIO Functions ****************/
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, link_status)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_LINK_STATUS, link_status);
+}
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, link_status)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_LINK_STATUS, link_status);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rxen_status)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RXEN_STATUS, rxen_status);
+}
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rxen_status)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RXEN_STATUS, rxen_status);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, ref_clk_locked)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_REF_CLK_LOCKED, ref_clk_locked);
+}
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, ref_clk_locked)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_REF_CLK_LOCKED, ref_clk_locked);
@@ -2257,6 +2269,15 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src0)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src0)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC0, amc_src0);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir0)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR0, amc_dir0);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir0)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR0, amc_dir0);
 }
 
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses0)
@@ -2340,6 +2361,15 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src1)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC1, amc_src1);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir1)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR1, amc_dir1);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir1)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR1, amc_dir1);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses1)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES1, amc_pulses1);
@@ -2419,6 +2449,15 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src2)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src2)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC2, amc_src2);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir2)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR2, amc_dir2);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir2)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR2, amc_dir2);
 }
 
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses2)
@@ -2502,6 +2541,15 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src3)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC3, amc_src3);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir3)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR3, amc_dir3);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir3)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR3, amc_dir3);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses3)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES3, amc_pulses3);
@@ -2581,6 +2629,15 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src4)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src4)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC4, amc_src4);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir4)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR4, amc_dir4);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir4)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR4, amc_dir4);
 }
 
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses4)
@@ -2664,6 +2721,15 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src5)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC5, amc_src5);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir5)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR5, amc_dir5);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir5)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR5, amc_dir5);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses5)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES5, amc_pulses5);
@@ -2745,6 +2811,15 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src6)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC6, amc_src6);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir6)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR6, amc_dir6);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir6)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR6, amc_dir6);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses6)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES6, amc_pulses6);
@@ -2824,6 +2899,15 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_src7)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_src7)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_SRC7, amc_src7);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_dir7)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR7, amc_dir7);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, amc_dir7)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR7, amc_dir7);
 }
 
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_pulses7)
