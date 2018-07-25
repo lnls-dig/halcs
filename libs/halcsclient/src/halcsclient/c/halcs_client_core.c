@@ -2226,6 +2226,24 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, ref_clk_locked)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_REF_CLK_LOCKED, ref_clk_locked);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, evren)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_EVREN, evren);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, evren)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_EVREN, evren);
+}
+
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, alive)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_ALIVE, alive);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, alive)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_ALIVE, alive);
+}
+
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, amc_en0)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_EN0, amc_en0);

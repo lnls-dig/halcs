@@ -1174,6 +1174,16 @@ halcs_client_err_e afc_timing_set_ref_clk_locked (halcs_client_t *self, char *se
 halcs_client_err_e afc_timing_get_ref_clk_locked (halcs_client_t *self, char *service,
         uint32_t *ref_clk_locked);
 
+halcs_client_err_e afc_timing_set_evren (halcs_client_t *self, char *service,
+        uint32_t evren);
+halcs_client_err_e afc_timing_get_evren (halcs_client_t *self, char *service,
+        uint32_t *evren);
+
+halcs_client_err_e afc_timing_set_alive (halcs_client_t *self, char *service,
+        uint32_t alive);
+halcs_client_err_e afc_timing_get_alive (halcs_client_t *self, char *service,
+        uint32_t *alive);
+
 halcs_client_err_e afc_timing_set_amc_en0 (halcs_client_t *self, char *service,
         uint32_t amc_en0);
 halcs_client_err_e afc_timing_get_amc_en0 (halcs_client_t *self, char *service,

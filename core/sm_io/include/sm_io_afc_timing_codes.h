@@ -404,8 +404,12 @@
 #define AFC_TIMING_NAME_SET_GET_AFC_N1          "afc_timing_set_get_afc_n1"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV          194
 #define AFC_TIMING_NAME_SET_GET_AFC_HS_DIV          "afc_timing_set_get_afc_hs_div"
+#define AFC_TIMING_OPCODE_SET_GET_EVREN          195
+#define AFC_TIMING_NAME_SET_GET_EVREN          "afc_timing_set_get_evren"
+#define AFC_TIMING_OPCODE_SET_GET_ALIVE          196
+#define AFC_TIMING_NAME_SET_GET_ALIVE          "afc_timing_set_get_alive"
 
-#define AFC_TIMING_OPCODE_END                       195
+#define AFC_TIMING_OPCODE_END                       197
 
 #endif
 

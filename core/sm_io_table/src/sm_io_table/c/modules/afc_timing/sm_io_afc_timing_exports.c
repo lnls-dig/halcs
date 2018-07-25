@@ -46,6 +46,30 @@ disp_op_t afc_timing_set_get_ref_clk_locked_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_evren_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_EVREN,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_EVREN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_alive_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_ALIVE,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_ALIVE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_en0_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_EN0,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_EN0,
@@ -2355,6 +2379,8 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_link_status_exp,
   &afc_timing_set_get_rxen_status_exp,
   &afc_timing_set_get_ref_clk_locked_exp,
+  &afc_timing_set_get_evren_exp,
+  &afc_timing_set_get_alive_exp,
   &afc_timing_set_get_amc_en0_exp,
   &afc_timing_set_get_amc_pol0_exp,
   &afc_timing_set_get_amc_log0_exp,

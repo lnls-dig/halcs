@@ -56,6 +56,19 @@ RW_PARAM_FUNC(afc_timing, ref_clk_locked) {
             /*read only*/,/*read only*/ , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(afc_timing, evren) {
+	SET_GET_PARAM(afc_timing, 0x0, TIMING, STAT, EVREN, SINGLE_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define TIMING_ALIVE_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_ALIVE_GLOBAL_W(val)                (val)
+#define TIMING_ALIVE_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, alive) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, ALIVE, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /****************** Event receiver configuration ******************/
 /* Custom parameter check */
 static int _rw_afc_timing_evtcode_chk (uint32_t evtcode)
@@ -1308,6 +1321,8 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, link_status),
     RW_PARAM_FUNC_NAME(afc_timing, rxen_status),
     RW_PARAM_FUNC_NAME(afc_timing, ref_clk_locked),
+    RW_PARAM_FUNC_NAME(afc_timing, evren),
+    RW_PARAM_FUNC_NAME(afc_timing, alive),
     RW_PARAM_FUNC_NAME(afc_timing, amc_en0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pol0),
     RW_PARAM_FUNC_NAME(afc_timing, amc_log0),

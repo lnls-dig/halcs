@@ -13,6 +13,8 @@
 extern disp_op_t afc_timing_set_get_link_status_exp;
 extern disp_op_t afc_timing_set_get_rxen_status_exp;
 extern disp_op_t afc_timing_set_get_ref_clk_locked_exp;
+extern disp_op_t afc_timing_set_get_evren_exp;
+extern disp_op_t afc_timing_set_get_alive_exp;
 extern disp_op_t afc_timing_set_get_amc_en0_exp;
 extern disp_op_t afc_timing_set_get_amc_pol0_exp;
 extern disp_op_t afc_timing_set_get_amc_log0_exp;
