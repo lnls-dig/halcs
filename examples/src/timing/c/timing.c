@@ -113,68 +113,70 @@ int main (int argc, char *argv [])
     uint32_t en = 1;
     uint32_t evt = 1;
     uint32_t src = 0;
-    uint32_t pulses = 1;
+    uint32_t pulses = 3;
     halcs_client_err_e err;
 
-    err = afc_timing_set_fmc1_wdt0 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc1_src0 (halcs_client, service, src);
-    err |= afc_timing_set_fmc1_evt0 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc1_pulses0 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc1_en0 (halcs_client, service, en);
+    err = afc_timing_set_evren (halcs_client, service, 1);
 
-    err = afc_timing_set_fmc1_wdt1 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc1_src1 (halcs_client, service, src);
-    err |= afc_timing_set_fmc1_evt1 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc1_pulses1 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc1_en1 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc1_wdt     (halcs_client, service, 0, wdt);
+    err |= halcs_set_afc_timing_fmc1_src     (halcs_client, service, 0, src);
+    err |= halcs_set_afc_timing_fmc1_evt     (halcs_client, service, 0, evt);
+    err |= halcs_set_afc_timing_fmc1_pulses  (halcs_client, service, 0, pulses);
+    err |= halcs_set_afc_timing_fmc1_en      (halcs_client, service, 0, en);
 
-    err = afc_timing_set_fmc1_wdt2 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc1_src2 (halcs_client, service, src);
-    err |= afc_timing_set_fmc1_evt2 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc1_pulses2 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc1_en2 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc1_wdt     (halcs_client, service, 1, wdt);
+    err |= halcs_set_afc_timing_fmc1_src     (halcs_client, service, 1, src);
+    err |= halcs_set_afc_timing_fmc1_evt     (halcs_client, service, 1, evt);
+    err |= halcs_set_afc_timing_fmc1_pulses  (halcs_client, service, 1, pulses);
+    err |= halcs_set_afc_timing_fmc1_en      (halcs_client, service, 1, en);
 
-    err = afc_timing_set_fmc1_wdt3 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc1_src3 (halcs_client, service, src);
-    err |= afc_timing_set_fmc1_evt3 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc1_pulses3 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc1_en3 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc1_wdt     (halcs_client, service, 2, wdt);
+    err |= halcs_set_afc_timing_fmc1_src     (halcs_client, service, 2, src);
+    err |= halcs_set_afc_timing_fmc1_evt     (halcs_client, service, 2, evt);
+    err |= halcs_set_afc_timing_fmc1_pulses  (halcs_client, service, 2, pulses);
+    err |= halcs_set_afc_timing_fmc1_en      (halcs_client, service, 2, en);
 
-    err = afc_timing_set_fmc1_wdt4 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc1_src4 (halcs_client, service, src);
-    err |= afc_timing_set_fmc1_evt4 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc1_pulses4 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc1_en4 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc1_wdt     (halcs_client, service, 3, wdt);
+    err |= halcs_set_afc_timing_fmc1_src     (halcs_client, service, 3, src);
+    err |= halcs_set_afc_timing_fmc1_evt     (halcs_client, service, 3, evt);
+    err |= halcs_set_afc_timing_fmc1_pulses  (halcs_client, service, 3, pulses);
+    err |= halcs_set_afc_timing_fmc1_en      (halcs_client, service, 3, en);
 
-    err = afc_timing_set_fmc2_wdt0 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc2_src0 (halcs_client, service, src);
-    err |= afc_timing_set_fmc2_evt0 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc2_pulses0 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc2_en0 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc1_wdt     (halcs_client, service, 4, wdt);
+    err |= halcs_set_afc_timing_fmc1_src     (halcs_client, service, 4, src);
+    err |= halcs_set_afc_timing_fmc1_evt     (halcs_client, service, 4, evt);
+    err |= halcs_set_afc_timing_fmc1_pulses  (halcs_client, service, 4, pulses);
+    err |= halcs_set_afc_timing_fmc1_en      (halcs_client, service, 4, en);
 
-    err = afc_timing_set_fmc2_wdt1 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc2_src1 (halcs_client, service, src);
-    err |= afc_timing_set_fmc2_evt1 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc2_pulses1 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc2_en1 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc2_wdt     (halcs_client, service, 0, wdt);
+    err |= halcs_set_afc_timing_fmc2_src     (halcs_client, service, 0, src);
+    err |= halcs_set_afc_timing_fmc2_evt     (halcs_client, service, 0, evt);
+    err |= halcs_set_afc_timing_fmc2_pulses  (halcs_client, service, 0, pulses);
+    err |= halcs_set_afc_timing_fmc2_en      (halcs_client, service, 0, en);
 
-    err = afc_timing_set_fmc2_wdt2 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc2_src2 (halcs_client, service, src);
-    err |= afc_timing_set_fmc2_evt2 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc2_pulses2 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc2_en2 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc2_wdt     (halcs_client, service, 1, wdt);
+    err |= halcs_set_afc_timing_fmc2_src     (halcs_client, service, 1, src);
+    err |= halcs_set_afc_timing_fmc2_evt     (halcs_client, service, 1, evt);
+    err |= halcs_set_afc_timing_fmc2_pulses  (halcs_client, service, 1, pulses);
+    err |= halcs_set_afc_timing_fmc2_en      (halcs_client, service, 1, en);
 
-    err = afc_timing_set_fmc2_wdt3 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc2_src3 (halcs_client, service, src);
-    err |= afc_timing_set_fmc2_evt3 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc2_pulses3 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc2_en3 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc2_wdt     (halcs_client, service, 2, wdt);
+    err |= halcs_set_afc_timing_fmc2_src     (halcs_client, service, 2, src);
+    err |= halcs_set_afc_timing_fmc2_evt     (halcs_client, service, 2, evt);
+    err |= halcs_set_afc_timing_fmc2_pulses  (halcs_client, service, 2, pulses);
+    err |= halcs_set_afc_timing_fmc2_en      (halcs_client, service, 2, en);
 
-    err = afc_timing_set_fmc2_wdt4 (halcs_client, service, wdt);
-    err |= afc_timing_set_fmc2_src4 (halcs_client, service, src);
-    err |= afc_timing_set_fmc2_evt4 (halcs_client, service, evt);
-    err |= afc_timing_set_fmc2_pulses4 (halcs_client, service, pulses);
-    err |= afc_timing_set_fmc2_en4 (halcs_client, service, en);
+    err |= halcs_set_afc_timing_fmc2_wdt     (halcs_client, service, 3, wdt);
+    err |= halcs_set_afc_timing_fmc2_src     (halcs_client, service, 3, src);
+    err |= halcs_set_afc_timing_fmc2_evt     (halcs_client, service, 3, evt);
+    err |= halcs_set_afc_timing_fmc2_pulses  (halcs_client, service, 3, pulses);
+    err |= halcs_set_afc_timing_fmc2_en      (halcs_client, service, 3, en);
+
+    err |= halcs_set_afc_timing_fmc2_wdt     (halcs_client, service, 4, wdt);
+    err |= halcs_set_afc_timing_fmc2_src     (halcs_client, service, 4, src);
+    err |= halcs_set_afc_timing_fmc2_evt     (halcs_client, service, 4, evt);
+    err |= halcs_set_afc_timing_fmc2_pulses  (halcs_client, service, 4, pulses);
+    err |= halcs_set_afc_timing_fmc2_en      (halcs_client, service, 4, en);
 
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:timing]: afc_timing_set_evt_code_X failed\n");
