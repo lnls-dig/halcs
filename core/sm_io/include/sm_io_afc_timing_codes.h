@@ -24,6 +24,8 @@
 #define AFC_TIMING_NAME_SET_GET_EVREN                       "afc_timing_set_get_evren"
 #define AFC_TIMING_OPCODE_SET_GET_ALIVE                     4
 #define AFC_TIMING_NAME_SET_GET_ALIVE                       "afc_timing_set_get_alive"
+#define AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE 57
+#define AFC_TIMING_NAME_SET_GET_FREQ_SAMPLE_RATE_PRESCALE   "afc_timing_set_get_freq_sample_rate_prescale"
 #define AFC_TIMING_OPCODE_SET_GET_AMC_EN                    5
 #define AFC_TIMING_NAME_SET_GET_AMC_EN                      "afc_timing_set_get_amc_en"
 #define AFC_TIMING_OPCODE_SET_GET_AMC_POL                   6
@@ -129,7 +131,7 @@
 #define AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV                56
 #define AFC_TIMING_NAME_SET_GET_AFC_HS_DIV                  "afc_timing_set_get_afc_hs_div"
 
-#define AFC_TIMING_OPCODE_END                               57
+#define AFC_TIMING_OPCODE_END                               58
 
 #endif
 

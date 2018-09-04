@@ -2244,6 +2244,15 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, alive)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_ALIVE, alive);
 }
 
+PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, freq_sample_rate_prescale)
+{
+    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE, freq_sample_rate_prescale);
+}
+PARAM_FUNC_CLIENT_READ_MOD(afc_timing, freq_sample_rate_prescale)
+{
+    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE, freq_sample_rate_prescale);
+}
+
 // AMC channels
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_en, chan, amc_en)
 {

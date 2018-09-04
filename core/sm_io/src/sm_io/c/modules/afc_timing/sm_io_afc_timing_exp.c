@@ -69,6 +69,14 @@ RW_PARAM_FUNC(afc_timing, alive) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define TIMING_FREQ_SAMPLE_RATE_PRESCALE_GLOBAL_MASK                  (0xffffffff)
+#define TIMING_FREQ_SAMPLE_RATE_PRESCALE_GLOBAL_W(val)                (val)
+#define TIMING_FREQ_SAMPLE_RATE_PRESCALE_GLOBAL_R(val)                (val)
+RW_PARAM_FUNC(afc_timing, freq_sample_rate_prescale) {
+    SET_GET_PARAM(afc_timing, 0x0, TIMING, FREQ_SAMPLE_RATE_PRESCALE, GLOBAL, MULT_BIT_PARAM,
+            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /****************** Event receiver configuration ******************/
 /* Custom parameter check */
 static int _rw_afc_timing_evtcode_chk (uint32_t evtcode)
@@ -352,7 +360,7 @@ RW_PARAM_FUNC(afc_timing, rtm_phase_set) {
             , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_NAVG_MIN 1
+#define TIMING_NAVG_MIN 0
 #define TIMING_NAVG_MAX 0xFFF
 RW_PARAM_FUNC(afc_timing, rtm_phase_navg) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM_MAF, NAVG, MULT_BIT_PARAM,
@@ -473,6 +481,7 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, ref_clk_locked),
     RW_PARAM_FUNC_NAME(afc_timing, evren),
     RW_PARAM_FUNC_NAME(afc_timing, alive),
+    RW_PARAM_FUNC_NAME(afc_timing, freq_sample_rate_prescale),
     RW_PARAM_FUNC_NAME(afc_timing, amc_en),
     RW_PARAM_FUNC_NAME(afc_timing, amc_pol),
     RW_PARAM_FUNC_NAME(afc_timing, amc_log),

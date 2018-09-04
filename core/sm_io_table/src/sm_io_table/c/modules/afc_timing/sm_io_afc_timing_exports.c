@@ -70,6 +70,18 @@ disp_op_t afc_timing_set_get_alive_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_freq_sample_rate_prescale_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_FREQ_SAMPLE_RATE_PRESCALE,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_en_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_EN,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_EN,
@@ -731,6 +743,7 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_ref_clk_locked_exp,
   &afc_timing_set_get_evren_exp,
   &afc_timing_set_get_alive_exp,
+  &afc_timing_set_get_freq_sample_rate_prescale_exp,
   &afc_timing_set_get_amc_en_exp,
   &afc_timing_set_get_amc_pol_exp,
   &afc_timing_set_get_amc_log_exp,

@@ -15,6 +15,7 @@ extern disp_op_t afc_timing_set_get_rxen_status_exp;
 extern disp_op_t afc_timing_set_get_ref_clk_locked_exp;
 extern disp_op_t afc_timing_set_get_evren_exp;
 extern disp_op_t afc_timing_set_get_alive_exp;
+extern disp_op_t afc_timing_set_get_freq_sample_rate_prescale_exp;
 extern disp_op_t afc_timing_set_get_amc_en_exp;
 extern disp_op_t afc_timing_set_get_amc_pol_exp;
 extern disp_op_t afc_timing_set_get_amc_log_exp;

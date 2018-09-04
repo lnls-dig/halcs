@@ -1184,6 +1184,11 @@ halcs_client_err_e afc_timing_set_alive (halcs_client_t *self, char *service,
 halcs_client_err_e afc_timing_get_alive (halcs_client_t *self, char *service,
         uint32_t *alive);
 
+halcs_client_err_e afc_timing_set_freq_sample_rate_prescale (halcs_client_t *self, char *service,
+        uint32_t freq_sample_rate_prescale);
+halcs_client_err_e afc_timing_get_freq_sample_rate_prescale (halcs_client_t *self, char *service,
+        uint32_t *freq_sample_rate_prescale);
+
 halcs_client_err_e halcs_set_afc_timing_amc_en (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t amc_en);
 halcs_client_err_e halcs_get_afc_timing_amc_en (halcs_client_t *self, char *service,

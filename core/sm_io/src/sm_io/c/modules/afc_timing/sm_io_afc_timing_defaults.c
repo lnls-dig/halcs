@@ -55,6 +55,14 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
             log_file_name, SMIO_AFC_TIMING_LIBHALCSCLIENT_LOG_MODE);
     ASSERT_ALLOC(config_client, err_alloc_client);
 
+    client_err = afc_timing_set_freq_sample_rate_prescale (config_client, service, AFC_TIMING_DFLT_FREQ_SAMPLE_RATE_PRESCALE);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set freq sample rate prescaler",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
+    client_err = afc_timing_set_afc_freq_kp (config_client, service, AFC_TIMING_DFLT_AFC_FREQ_KP);
+    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set proportional gain of frequency feedback",
+            err_param_set, SMIO_ERR_CONFIG_DFLT);
+
     client_err = afc_timing_set_afc_freq_kp (config_client, service, AFC_TIMING_DFLT_AFC_FREQ_KP);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set proportional gain of frequency feedback",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
