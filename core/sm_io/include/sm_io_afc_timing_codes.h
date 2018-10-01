@@ -94,8 +94,6 @@
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_KP                "afc_timing_set_get_rtm_phase_kp"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KI              38
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_KI                "afc_timing_set_get_rtm_phase_ki"
-#define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET             39
-#define AFC_TIMING_NAME_SET_GET_RTM_PHASE_SET               "afc_timing_set_get_rtm_phase_set"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG            40
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_NAVG              "afc_timing_set_get_rtm_phase_navg"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_DIV_EXP         41
@@ -116,8 +114,6 @@
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_KP                "afc_timing_set_get_afc_phase_kp"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI              49
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_KI                "afc_timing_set_get_afc_phase_ki"
-#define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET             50
-#define AFC_TIMING_NAME_SET_GET_AFC_PHASE_SET               "afc_timing_set_get_afc_phase_set"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_NAVG            51
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_NAVG              "afc_timing_set_get_afc_phase_navg"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_DIV_EXP         52

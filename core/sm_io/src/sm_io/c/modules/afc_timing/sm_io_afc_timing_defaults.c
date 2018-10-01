@@ -79,10 +79,6 @@ smio_err_e afc_timing_config_defaults (char *broker_endp, char *service,
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set integral gain of phase feedback",
             err_param_set, SMIO_ERR_CONFIG_DFLT);
 
-    client_err = afc_timing_set_afc_phase_set (config_client, service, AFC_TIMING_DFLT_AFC_PHASE_SET);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set set of phase feedback",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
     client_err = afc_timing_set_afc_phase_navg (config_client, service, AFC_TIMING_DFLT_AFC_PHASE_NAVG);
     ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set set of phase feedback",
             err_param_set, SMIO_ERR_CONFIG_DFLT);

@@ -1359,11 +1359,6 @@ halcs_client_err_e afc_timing_set_rtm_phase_ki (halcs_client_t *self, char *serv
 halcs_client_err_e afc_timing_get_rtm_phase_ki (halcs_client_t *self, char *service,
         uint32_t *rtm_phase_ki);
 
-halcs_client_err_e afc_timing_set_rtm_phase_set (halcs_client_t *self, char *service,
-        uint32_t rtm_phase_set);
-halcs_client_err_e afc_timing_get_rtm_phase_set (halcs_client_t *self, char *service,
-        uint32_t *rtm_phase_set);
-
 halcs_client_err_e afc_timing_set_rtm_phase_navg (halcs_client_t *self, char *service,
         uint32_t rtm_phase_navg);
 halcs_client_err_e afc_timing_get_rtm_phase_navg (halcs_client_t *self, char *service,
@@ -1413,11 +1408,6 @@ halcs_client_err_e afc_timing_set_afc_phase_ki (halcs_client_t *self, char *serv
         uint32_t afc_phase_ki);
 halcs_client_err_e afc_timing_get_afc_phase_ki (halcs_client_t *self, char *service,
         uint32_t *afc_phase_ki);
-
-halcs_client_err_e afc_timing_set_afc_phase_set (halcs_client_t *self, char *service,
-        uint32_t afc_phase_set);
-halcs_client_err_e afc_timing_get_afc_phase_set (halcs_client_t *self, char *service,
-        uint32_t *afc_phase_set);
 
 halcs_client_err_e afc_timing_set_afc_phase_navg (halcs_client_t *self, char *service,
         uint32_t afc_phase_navg);

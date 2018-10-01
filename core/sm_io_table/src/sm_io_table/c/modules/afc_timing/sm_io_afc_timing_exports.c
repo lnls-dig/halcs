@@ -520,18 +520,6 @@ disp_op_t afc_timing_set_get_rtm_phase_ki_exp = {
     }
 };
 
-disp_op_t afc_timing_set_get_rtm_phase_set_exp = {
-    .name = AFC_TIMING_NAME_SET_GET_RTM_PHASE_SET,
-    .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 disp_op_t afc_timing_set_get_rtm_phase_navg_exp = {
     .name = AFC_TIMING_NAME_SET_GET_RTM_PHASE_NAVG,
     .opcode = AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG,
@@ -643,18 +631,6 @@ disp_op_t afc_timing_set_get_afc_phase_kp_exp = {
 disp_op_t afc_timing_set_get_afc_phase_ki_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AFC_PHASE_KI,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t afc_timing_set_get_afc_phase_set_exp = {
-    .name = AFC_TIMING_NAME_SET_GET_AFC_PHASE_SET,
-    .opcode = AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -778,7 +754,6 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_rtm_freq_ki_exp,
   &afc_timing_set_get_rtm_phase_kp_exp,
   &afc_timing_set_get_rtm_phase_ki_exp,
-  &afc_timing_set_get_rtm_phase_set_exp,
   &afc_timing_set_get_rtm_phase_navg_exp,
   &afc_timing_set_get_rtm_phase_div_exp_exp,
   &afc_timing_set_get_rtm_rfreq_hi_exp,
@@ -789,7 +764,6 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_afc_freq_ki_exp,
   &afc_timing_set_get_afc_phase_kp_exp,
   &afc_timing_set_get_afc_phase_ki_exp,
-  &afc_timing_set_get_afc_phase_set_exp,
   &afc_timing_set_get_afc_phase_navg_exp,
   &afc_timing_set_get_afc_phase_div_exp_exp,
   &afc_timing_set_get_afc_rfreq_hi_exp,

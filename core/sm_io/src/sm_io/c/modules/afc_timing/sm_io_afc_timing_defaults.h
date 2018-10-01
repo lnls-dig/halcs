@@ -21,7 +21,6 @@
 #define AFC_TIMING_DFLT_AFC_FREQ_KI                                      0xc00
 #define AFC_TIMING_DFLT_AFC_PHASE_KP                                     0xa
 #define AFC_TIMING_DFLT_AFC_PHASE_KI                                     0x0
-#define AFC_TIMING_DFLT_AFC_PHASE_SET                                    0x47
 #define AFC_TIMING_DFLT_AFC_PHASE_NAVG                                   0x7
 #define AFC_TIMING_DFLT_AFC_PHASE_DIV                                    0x1
 

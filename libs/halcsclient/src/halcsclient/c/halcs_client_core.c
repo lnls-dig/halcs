@@ -2562,15 +2562,6 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_ki)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KI, rtm_phase_ki);
 }
 
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_set)
-{
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET, rtm_phase_set);
-}
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, rtm_phase_set)
-{
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET, rtm_phase_set);
-}
-
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, rtm_phase_navg)
 {
     return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG, rtm_phase_navg);
@@ -2659,15 +2650,6 @@ PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_ki)
 PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_ki)
 {
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI, afc_phase_ki);
-}
-
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_set)
-{
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET, afc_phase_set);
-}
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, afc_phase_set)
-{
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET, afc_phase_set);
 }
 
 PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, afc_phase_navg)

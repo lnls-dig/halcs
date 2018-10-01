@@ -352,14 +352,6 @@ RW_PARAM_FUNC(afc_timing, rtm_phase_ki) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define TIMING_RTM_PHASE_SET_GLOBAL_MASK                  (0xffffffff)
-#define TIMING_RTM_PHASE_SET_GLOBAL_W(val)                (val)
-#define TIMING_RTM_PHASE_SET_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(afc_timing, rtm_phase_set) {
-    SET_GET_PARAM(afc_timing, 0x0, TIMING, RTM_PHASE_SET, GLOBAL, MULT_BIT_PARAM,
-            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
 #define TIMING_NAVG_MIN 0
 #define TIMING_NAVG_MAX 0xFFF
 RW_PARAM_FUNC(afc_timing, rtm_phase_navg) {
@@ -427,14 +419,6 @@ RW_PARAM_FUNC(afc_timing, afc_phase_ki) {
     SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_PHASE, KI, MULT_BIT_PARAM,
             TIMING_CONTROL_GAIN_MIN, TIMING_CONTROL_GAIN_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define TIMING_AFC_PHASE_SET_GLOBAL_MASK                  (0xffffffff)
-#define TIMING_AFC_PHASE_SET_GLOBAL_W(val)                (val)
-#define TIMING_AFC_PHASE_SET_GLOBAL_R(val)                (val)
-RW_PARAM_FUNC(afc_timing, afc_phase_set) {
-    SET_GET_PARAM(afc_timing, 0x0, TIMING, AFC_PHASE_SET, GLOBAL, MULT_BIT_PARAM,
-            , , NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(afc_timing, afc_phase_navg) {
@@ -516,7 +500,6 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, rtm_freq_ki),
     RW_PARAM_FUNC_NAME(afc_timing, rtm_phase_kp),
     RW_PARAM_FUNC_NAME(afc_timing, rtm_phase_ki),
-    RW_PARAM_FUNC_NAME(afc_timing, rtm_phase_set),
     RW_PARAM_FUNC_NAME(afc_timing, rtm_phase_navg),
     RW_PARAM_FUNC_NAME(afc_timing, rtm_phase_div_exp),
     RW_PARAM_FUNC_NAME(afc_timing, rtm_rfreq_hi),
@@ -527,7 +510,6 @@ const disp_table_func_fp afc_timing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(afc_timing, afc_freq_ki),
     RW_PARAM_FUNC_NAME(afc_timing, afc_phase_kp),
     RW_PARAM_FUNC_NAME(afc_timing, afc_phase_ki),
-    RW_PARAM_FUNC_NAME(afc_timing, afc_phase_set),
     RW_PARAM_FUNC_NAME(afc_timing, afc_phase_navg),
     RW_PARAM_FUNC_NAME(afc_timing, afc_phase_div_exp),
     RW_PARAM_FUNC_NAME(afc_timing, afc_rfreq_hi),
