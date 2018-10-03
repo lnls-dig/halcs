@@ -1159,219 +1159,286 @@ halcs_client_err_e func_polling (halcs_client_t *self, char *name,
 
 /********************** AFC Timing Functions ********************/
 
-/* Status functions */
+halcs_client_err_e afc_timing_set_link_status (halcs_client_t *self, char *service,
+        uint32_t link_status);
 halcs_client_err_e afc_timing_get_link_status (halcs_client_t *self, char *service,
         uint32_t *link_status);
+
+halcs_client_err_e afc_timing_set_rxen_status (halcs_client_t *self, char *service,
+        uint32_t rxen_status);
 halcs_client_err_e afc_timing_get_rxen_status (halcs_client_t *self, char *service,
         uint32_t *rxen_status);
+
+halcs_client_err_e afc_timing_set_ref_clk_locked (halcs_client_t *self, char *service,
+        uint32_t ref_clk_locked);
 halcs_client_err_e afc_timing_get_ref_clk_locked (halcs_client_t *self, char *service,
         uint32_t *ref_clk_locked);
 
-/* Event code channel 0 functions */
-halcs_client_err_e afc_timing_set_evt_code_0 (halcs_client_t *self, char *service,
-        uint32_t evt_code_0);
-halcs_client_err_e afc_timing_get_evt_code_0 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_0);
+halcs_client_err_e afc_timing_set_evren (halcs_client_t *self, char *service,
+        uint32_t evren);
+halcs_client_err_e afc_timing_get_evren (halcs_client_t *self, char *service,
+        uint32_t *evren);
 
-/* Event code channel 1 functions */
-halcs_client_err_e afc_timing_set_evt_code_1 (halcs_client_t *self, char *service,
-        uint32_t evt_code_1);
-halcs_client_err_e afc_timing_get_evt_code_1 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_1);
+halcs_client_err_e afc_timing_set_alive (halcs_client_t *self, char *service,
+        uint32_t alive);
+halcs_client_err_e afc_timing_get_alive (halcs_client_t *self, char *service,
+        uint32_t *alive);
 
-/* Event code channel 2 functions */
-halcs_client_err_e afc_timing_set_evt_code_2 (halcs_client_t *self, char *service,
-        uint32_t evt_code_2);
-halcs_client_err_e afc_timing_get_evt_code_2 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_2);
+halcs_client_err_e halcs_set_afc_timing_amc_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_en);
+halcs_client_err_e halcs_get_afc_timing_amc_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_en);
 
-/* Event code channel 3 functions */
-halcs_client_err_e afc_timing_set_evt_code_3 (halcs_client_t *self, char *service,
-        uint32_t evt_code_3);
-halcs_client_err_e afc_timing_get_evt_code_3 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_3);
+halcs_client_err_e halcs_set_afc_timing_amc_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_pol);
+halcs_client_err_e halcs_get_afc_timing_amc_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_pol);
 
-/* Event code channel 4 functions */
-halcs_client_err_e afc_timing_set_evt_code_4 (halcs_client_t *self, char *service,
-        uint32_t evt_code_4);
-halcs_client_err_e afc_timing_get_evt_code_4 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_4);
+halcs_client_err_e halcs_set_afc_timing_amc_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_log);
+halcs_client_err_e halcs_get_afc_timing_amc_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_log);
 
-/* Event code channel 5 functions */
-halcs_client_err_e afc_timing_set_evt_code_5 (halcs_client_t *self, char *service,
-        uint32_t evt_code_5);
-halcs_client_err_e afc_timing_get_evt_code_5 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_5);
+halcs_client_err_e halcs_set_afc_timing_amc_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_itl);
+halcs_client_err_e halcs_get_afc_timing_amc_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_itl);
 
-/* Event code channel 6 functions */
-halcs_client_err_e afc_timing_set_evt_code_6 (halcs_client_t *self, char *service,
-        uint32_t evt_code_6);
-halcs_client_err_e afc_timing_get_evt_code_6 (halcs_client_t *self, char *service,
-        uint32_t *evt_code_6);
+halcs_client_err_e halcs_set_afc_timing_amc_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_src);
+halcs_client_err_e halcs_get_afc_timing_amc_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_src);
 
-/* Event delay channel 0 functions */
-halcs_client_err_e afc_timing_set_evt_delay_0 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_0);
-halcs_client_err_e afc_timing_get_evt_delay_0 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_0);
+halcs_client_err_e halcs_set_afc_timing_amc_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_dir);
+halcs_client_err_e halcs_get_afc_timing_amc_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_dir);
 
-/* Event delay channel 1 functions */
-halcs_client_err_e afc_timing_set_evt_delay_1 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_1);
-halcs_client_err_e afc_timing_get_evt_delay_1 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_1);
+halcs_client_err_e halcs_set_afc_timing_amc_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_pulses);
+halcs_client_err_e halcs_get_afc_timing_amc_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_pulses);
 
-/* Event delay channel 2 functions */
-halcs_client_err_e afc_timing_set_evt_delay_2 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_2);
-halcs_client_err_e afc_timing_get_evt_delay_2 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_2);
+halcs_client_err_e halcs_set_afc_timing_amc_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_evt);
+halcs_client_err_e halcs_get_afc_timing_amc_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_evt);
 
-/* Event delay channel 3 functions */
-halcs_client_err_e afc_timing_set_evt_delay_3 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_3);
-halcs_client_err_e afc_timing_get_evt_delay_3 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_3);
+halcs_client_err_e halcs_set_afc_timing_amc_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_dly);
+halcs_client_err_e halcs_get_afc_timing_amc_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_dly);
 
-/* Event delay channel 4 functions */
-halcs_client_err_e afc_timing_set_evt_delay_4 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_4);
-halcs_client_err_e afc_timing_get_evt_delay_4 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_4);
+halcs_client_err_e halcs_set_afc_timing_amc_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amc_wdt);
+halcs_client_err_e halcs_get_afc_timing_amc_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amc_wdt);
 
-/* Event delay channel 5 functions */
-halcs_client_err_e afc_timing_set_evt_delay_5 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_5);
-halcs_client_err_e afc_timing_get_evt_delay_5 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_5);
+halcs_client_err_e halcs_set_afc_timing_fmc1_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_en);
+halcs_client_err_e halcs_get_afc_timing_fmc1_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_en);
 
-/* Event delay channel 6 functions */
-halcs_client_err_e afc_timing_set_evt_delay_6 (halcs_client_t *self, char *service,
-        uint32_t evt_delay_6);
-halcs_client_err_e afc_timing_get_evt_delay_6 (halcs_client_t *self, char *service,
-        uint32_t *evt_delay_6);
+halcs_client_err_e halcs_set_afc_timing_fmc1_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_pol);
+halcs_client_err_e halcs_get_afc_timing_fmc1_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_pol);
 
-/* Event width channel 0 functions */
-halcs_client_err_e afc_timing_set_evt_width_0 (halcs_client_t *self, char *service,
-        uint32_t evt_width_0);
-halcs_client_err_e afc_timing_get_evt_width_0 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_0);
+halcs_client_err_e halcs_set_afc_timing_fmc1_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_log);
+halcs_client_err_e halcs_get_afc_timing_fmc1_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_log);
 
-/* Event width channel 1 functions */
-halcs_client_err_e afc_timing_set_evt_width_1 (halcs_client_t *self, char *service,
-        uint32_t evt_width_1);
-halcs_client_err_e afc_timing_get_evt_width_1 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_1);
+halcs_client_err_e halcs_set_afc_timing_fmc1_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_itl);
+halcs_client_err_e halcs_get_afc_timing_fmc1_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_itl);
 
-/* Event width channel 2 functions */
-halcs_client_err_e afc_timing_set_evt_width_2 (halcs_client_t *self, char *service,
-        uint32_t evt_width_2);
-halcs_client_err_e afc_timing_get_evt_width_2 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_2);
+halcs_client_err_e halcs_set_afc_timing_fmc1_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_src);
+halcs_client_err_e halcs_get_afc_timing_fmc1_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_src);
 
-/* Event width channel 3 functions */
-halcs_client_err_e afc_timing_set_evt_width_3 (halcs_client_t *self, char *service,
-        uint32_t evt_width_3);
-halcs_client_err_e afc_timing_get_evt_width_3 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_3);
+halcs_client_err_e halcs_set_afc_timing_fmc1_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_dir);
+halcs_client_err_e halcs_get_afc_timing_fmc1_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_dir);
 
-/* Event width channel 4 functions */
-halcs_client_err_e afc_timing_set_evt_width_4 (halcs_client_t *self, char *service,
-        uint32_t evt_width_4);
-halcs_client_err_e afc_timing_get_evt_width_4 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_4);
+halcs_client_err_e halcs_set_afc_timing_fmc1_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_pulses);
+halcs_client_err_e halcs_get_afc_timing_fmc1_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_pulses);
 
-/* Event width channel 5 functions */
-halcs_client_err_e afc_timing_set_evt_width_5 (halcs_client_t *self, char *service,
-        uint32_t evt_width_5);
-halcs_client_err_e afc_timing_get_evt_width_5 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_5);
+halcs_client_err_e halcs_set_afc_timing_fmc1_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_evt);
+halcs_client_err_e halcs_get_afc_timing_fmc1_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_evt);
 
-/* Event width channel 6 functions */
-halcs_client_err_e afc_timing_set_evt_width_6 (halcs_client_t *self, char *service,
-        uint32_t evt_width_6);
-halcs_client_err_e afc_timing_get_evt_width_6 (halcs_client_t *self, char *service,
-        uint32_t *evt_width_6);
+halcs_client_err_e halcs_set_afc_timing_fmc1_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_dly);
+halcs_client_err_e halcs_get_afc_timing_fmc1_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_dly);
 
-/* Proportional Gain of Frequency feedback functions */
-halcs_client_err_e afc_timing_set_freq_kp (halcs_client_t *self, char *service,
-        uint32_t freq_kp);
-halcs_client_err_e afc_timing_get_freq_kp (halcs_client_t *self, char *service,
-        uint32_t *freq_kp);
+halcs_client_err_e halcs_set_afc_timing_fmc1_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc1_wdt);
+halcs_client_err_e halcs_get_afc_timing_fmc1_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc1_wdt);
 
-/* Integral Gain of Frequency feedback functions */
-halcs_client_err_e afc_timing_set_freq_ki (halcs_client_t *self, char *service,
-        uint32_t freq_ki);
-halcs_client_err_e afc_timing_get_freq_ki (halcs_client_t *self, char *service,
-        uint32_t *freq_ki);
+halcs_client_err_e halcs_set_afc_timing_fmc2_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_en);
+halcs_client_err_e halcs_get_afc_timing_fmc2_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_en);
 
-/* Proportional Gain of Phase feedback functions */
-halcs_client_err_e afc_timing_set_phase_kp (halcs_client_t *self, char *service,
-        uint32_t phase_kp);
-halcs_client_err_e afc_timing_get_phase_kp (halcs_client_t *self, char *service,
-        uint32_t *phase_kp);
+halcs_client_err_e halcs_set_afc_timing_fmc2_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_pol);
+halcs_client_err_e halcs_get_afc_timing_fmc2_pol (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_pol);
 
-/* Integral Gain of Phase feedback functions */
-halcs_client_err_e afc_timing_set_phase_ki (halcs_client_t *self, char *service,
-        uint32_t phase_ki);
-halcs_client_err_e afc_timing_get_phase_ki (halcs_client_t *self, char *service,
-        uint32_t *phase_ki);
+halcs_client_err_e halcs_set_afc_timing_fmc2_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_log);
+halcs_client_err_e halcs_get_afc_timing_fmc2_log (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_log);
 
-/* Phase Setpoint functions */
-halcs_client_err_e afc_timing_set_phase_set (halcs_client_t *self, char *service,
-        uint32_t phase_set);
-halcs_client_err_e afc_timing_get_phase_set (halcs_client_t *self, char *service,
-        uint32_t *phase_set);
+halcs_client_err_e halcs_set_afc_timing_fmc2_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_itl);
+halcs_client_err_e halcs_get_afc_timing_fmc2_itl (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_itl);
 
-/* Average Exponent functions */
-halcs_client_err_e afc_timing_set_avg_exponent (halcs_client_t *self, char *service,
-        uint32_t avg_exponent);
-halcs_client_err_e afc_timing_get_avg_exponent (halcs_client_t *self, char *service,
-        uint32_t *avg_exponent);
+halcs_client_err_e halcs_set_afc_timing_fmc2_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_src);
+halcs_client_err_e halcs_get_afc_timing_fmc2_src (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_src);
 
-/* RTM Si570 rfreq[37-19] functions */
+halcs_client_err_e halcs_set_afc_timing_fmc2_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_dir);
+halcs_client_err_e halcs_get_afc_timing_fmc2_dir (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_dir);
+
+halcs_client_err_e halcs_set_afc_timing_fmc2_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_pulses);
+halcs_client_err_e halcs_get_afc_timing_fmc2_pulses (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_pulses);
+
+halcs_client_err_e halcs_set_afc_timing_fmc2_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_evt);
+halcs_client_err_e halcs_get_afc_timing_fmc2_evt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_evt);
+
+halcs_client_err_e halcs_set_afc_timing_fmc2_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_dly);
+halcs_client_err_e halcs_get_afc_timing_fmc2_dly (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_dly);
+
+halcs_client_err_e halcs_set_afc_timing_fmc2_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t fmc2_wdt);
+halcs_client_err_e halcs_get_afc_timing_fmc2_wdt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fmc2_wdt);
+
+halcs_client_err_e afc_timing_set_rtm_freq_kp (halcs_client_t *self, char *service,
+        uint32_t rtm_freq_kp);
+halcs_client_err_e afc_timing_get_rtm_freq_kp (halcs_client_t *self, char *service,
+        uint32_t *rtm_freq_kp);
+
+halcs_client_err_e afc_timing_set_rtm_freq_ki (halcs_client_t *self, char *service,
+        uint32_t rtm_freq_ki);
+halcs_client_err_e afc_timing_get_rtm_freq_ki (halcs_client_t *self, char *service,
+        uint32_t *rtm_freq_ki);
+
+halcs_client_err_e afc_timing_set_rtm_phase_kp (halcs_client_t *self, char *service,
+        uint32_t rtm_phase_kp);
+halcs_client_err_e afc_timing_get_rtm_phase_kp (halcs_client_t *self, char *service,
+        uint32_t *rtm_phase_kp);
+
+halcs_client_err_e afc_timing_set_rtm_phase_ki (halcs_client_t *self, char *service,
+        uint32_t rtm_phase_ki);
+halcs_client_err_e afc_timing_get_rtm_phase_ki (halcs_client_t *self, char *service,
+        uint32_t *rtm_phase_ki);
+
+halcs_client_err_e afc_timing_set_rtm_phase_set (halcs_client_t *self, char *service,
+        uint32_t rtm_phase_set);
+halcs_client_err_e afc_timing_get_rtm_phase_set (halcs_client_t *self, char *service,
+        uint32_t *rtm_phase_set);
+
+halcs_client_err_e afc_timing_set_rtm_phase_navg (halcs_client_t *self, char *service,
+        uint32_t rtm_phase_navg);
+halcs_client_err_e afc_timing_get_rtm_phase_navg (halcs_client_t *self, char *service,
+        uint32_t *rtm_phase_navg);
+
+halcs_client_err_e afc_timing_set_rtm_phase_div_exp (halcs_client_t *self, char *service,
+        uint32_t rtm_phase_div_exp);
+halcs_client_err_e afc_timing_get_rtm_phase_div_exp (halcs_client_t *self, char *service,
+        uint32_t *rtm_phase_div_exp);
+
 halcs_client_err_e afc_timing_set_rtm_rfreq_hi (halcs_client_t *self, char *service,
         uint32_t rtm_rfreq_hi);
 halcs_client_err_e afc_timing_get_rtm_rfreq_hi (halcs_client_t *self, char *service,
         uint32_t *rtm_rfreq_hi);
 
-/* RTM Si570 rfreq[18-0] functions */
 halcs_client_err_e afc_timing_set_rtm_rfreq_lo (halcs_client_t *self, char *service,
         uint32_t rtm_rfreq_lo);
 halcs_client_err_e afc_timing_get_rtm_rfreq_lo (halcs_client_t *self, char *service,
         uint32_t *rtm_rfreq_lo);
 
-/* RTM Si570 n1 functions */
 halcs_client_err_e afc_timing_set_rtm_n1 (halcs_client_t *self, char *service,
         uint32_t rtm_n1);
 halcs_client_err_e afc_timing_get_rtm_n1 (halcs_client_t *self, char *service,
         uint32_t *rtm_n1);
 
-/* RTM Si570 hs_div functions */
 halcs_client_err_e afc_timing_set_rtm_hs_div (halcs_client_t *self, char *service,
         uint32_t rtm_hs_div);
 halcs_client_err_e afc_timing_get_rtm_hs_div (halcs_client_t *self, char *service,
         uint32_t *rtm_hs_div);
 
-/* AFC Si570 rfreq[37-19] functions */
+halcs_client_err_e afc_timing_set_afc_freq_kp (halcs_client_t *self, char *service,
+        uint32_t afc_freq_kp);
+halcs_client_err_e afc_timing_get_afc_freq_kp (halcs_client_t *self, char *service,
+        uint32_t *afc_freq_kp);
+
+halcs_client_err_e afc_timing_set_afc_freq_ki (halcs_client_t *self, char *service,
+        uint32_t afc_freq_ki);
+halcs_client_err_e afc_timing_get_afc_freq_ki (halcs_client_t *self, char *service,
+        uint32_t *afc_freq_ki);
+
+halcs_client_err_e afc_timing_set_afc_phase_kp (halcs_client_t *self, char *service,
+        uint32_t afc_phase_kp);
+halcs_client_err_e afc_timing_get_afc_phase_kp (halcs_client_t *self, char *service,
+        uint32_t *afc_phase_kp);
+
+halcs_client_err_e afc_timing_set_afc_phase_ki (halcs_client_t *self, char *service,
+        uint32_t afc_phase_ki);
+halcs_client_err_e afc_timing_get_afc_phase_ki (halcs_client_t *self, char *service,
+        uint32_t *afc_phase_ki);
+
+halcs_client_err_e afc_timing_set_afc_phase_set (halcs_client_t *self, char *service,
+        uint32_t afc_phase_set);
+halcs_client_err_e afc_timing_get_afc_phase_set (halcs_client_t *self, char *service,
+        uint32_t *afc_phase_set);
+
+halcs_client_err_e afc_timing_set_afc_phase_navg (halcs_client_t *self, char *service,
+        uint32_t afc_phase_navg);
+halcs_client_err_e afc_timing_get_afc_phase_navg (halcs_client_t *self, char *service,
+        uint32_t *afc_phase_navg);
+
+halcs_client_err_e afc_timing_set_afc_phase_div_exp (halcs_client_t *self, char *service,
+        uint32_t afc_phase_div_exp);
+halcs_client_err_e afc_timing_get_afc_phase_div_exp (halcs_client_t *self, char *service,
+        uint32_t *afc_phase_div_exp);
+
 halcs_client_err_e afc_timing_set_afc_rfreq_hi (halcs_client_t *self, char *service,
         uint32_t afc_rfreq_hi);
 halcs_client_err_e afc_timing_get_afc_rfreq_hi (halcs_client_t *self, char *service,
         uint32_t *afc_rfreq_hi);
 
-/* AFC Si570 rfreq[18-0] functions */
 halcs_client_err_e afc_timing_set_afc_rfreq_lo (halcs_client_t *self, char *service,
         uint32_t afc_rfreq_lo);
 halcs_client_err_e afc_timing_get_afc_rfreq_lo (halcs_client_t *self, char *service,
         uint32_t *afc_rfreq_lo);
 
-/* AFC Si570 n1 functions */
 halcs_client_err_e afc_timing_set_afc_n1 (halcs_client_t *self, char *service,
         uint32_t afc_n1);
 halcs_client_err_e afc_timing_get_afc_n1 (halcs_client_t *self, char *service,
         uint32_t *afc_n1);
 
-/* AFC Si570 hs_div functions */
 halcs_client_err_e afc_timing_set_afc_hs_div (halcs_client_t *self, char *service,
         uint32_t afc_hs_div);
 halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *service,
