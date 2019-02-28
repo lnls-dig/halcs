@@ -310,10 +310,10 @@ static void _setup_transaction (bpm_single_pass_t *self)
     uint32_t chan = self->request.chan;
     uint32_t sample_size = 0;
 
-    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
+    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) *
             request->num_shots;
     halcs_client_err_e err = halcs_get_acq_ch_sample_size (acq_client, service, chan, &sample_size);
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get sample size", 
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get sample size",
         err_get_acq_prop);
 
     memcpy (&transaction->req, request, sizeof (transaction->req));
@@ -333,7 +333,7 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             "data acquisition\n");
 
     acq_req_t *request = &self->request;
-    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) * 
+    uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) *
             request->num_shots;
     double a = 0.0;
     double b = 0.0;
@@ -344,7 +344,7 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
 
     int err = halcs_get_acq_ch_atom_width (self->acq_client, self->service, self->request.chan, &atom_width);
     err |= halcs_get_acq_ch_num_atoms (self->acq_client, self->service, self->request.chan, &num_atoms);
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get channel properties", 
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get channel properties",
         err_get_acq_prop);
     ASSERT_TEST(num_atoms == 4, "Single-Pass processing is only valid for num_atoms = 4",
         err_num_atoms);
