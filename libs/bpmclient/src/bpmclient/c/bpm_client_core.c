@@ -429,8 +429,8 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     sample->c = c;
     sample->d = d;
     sample->x = kx * (a - b - c + d) / sum - offset_x;
-    sample->y = ky * (a + b - c - d) / sum - offset_y;
-    sample->q = kq * (a - b + c - d) / sum - offset_q;
+    sample->y = ky * (a - b + c - d) / sum - offset_y;
+    sample->q = kq * (a + b - c - d) / sum - offset_q;
     sample->sum = ksum * sum;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
