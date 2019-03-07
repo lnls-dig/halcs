@@ -89,6 +89,9 @@ static void _calculate_bpm_sample_partial (bpm_parameters_t *parameters, double 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
 
+static void _calculate_bpm_sample_gen (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample, bool partial_delta);
+
 static void _release_transaction (bpm_single_pass_t *self);
 
 bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
@@ -525,6 +528,17 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample)
 {
     return _calculate_bpm_sample_partial (parameters, a, b, c, d, sample);
+}
+
+static void _calculate_bpm_sample_gen (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample, bool partial_delta)
+{
+    if (partial_delta) {
+        _calculate_bpm_sample_partial (parameters, a, b, c, d, sample);
+    }
+    else {
+        _calculate_bpm_sample_std (parameters, a, b, c, d, sample);
+    }
 }
 
 static void _release_transaction (bpm_single_pass_t *self)
