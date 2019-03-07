@@ -77,6 +77,11 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample);
 
 static double _squared_value (uint8_t *adc_sample, uint32_t atom_size);
+static void _calculate_bpm_sample_std (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample);
+
+static void _calculate_bpm_sample_partial (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample);
 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
@@ -410,7 +415,7 @@ static double _squared_value (uint8_t *adc_sample, uint32_t atom_size)
     return value * value;
 }
 
-static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
+static void _calculate_bpm_sample_std (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample)
 {
     double sum = a + b + c + d;
@@ -434,10 +439,61 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
     sample->sum = ksum * sum;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
-            "_calculate_bpm_sample: (A, B, C, D, X, Y, Q, SUM) = "
+            "_calculate_bpm_sample_std: (A, B, C, D, X, Y, Q, SUM) = "
             "(%f, %f, %f, %f, %f, %f, %f, %f)\n",
             sample->a, sample->b, sample->c, sample->d,
             sample->x, sample->y, sample->q, sample->sum);
+}
+
+static void _calculate_bpm_sample_partial (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample)
+{
+    double sum_ac = a + c;
+    double sum_bd = b + d;
+    double sum_ab = a + b;
+    double sum_cd = c + d;
+    double sum = sum_ac + sum_bd;
+
+    double kx = parameters->kx;
+    double ky = parameters->ky;
+    double kq = parameters->kq;
+    double ksum = parameters->ksum;
+
+    double offset_x = parameters->offset_x;
+    double offset_y = parameters->offset_y;
+    double offset_q = parameters->offset_q;
+
+    double partial_ac_pos_x = kx * (a - c) / (2 * sum_ac);
+    double partial_bd_pos_x = kx * (b - d) / (2 * sum_bd);
+
+    double partial_ac_pos_y = ky * (a - c) / (2 * sum_ac);
+    double partial_bd_pos_y = ky * (b - d) / (2 * sum_bd);
+
+    double partial_ab_pos_q = kq * (a - b) / (2 * sum_ab);
+    double partial_cd_pos_q = kq * (c - d) / (2 * sum_cd);
+
+    sample->a = a;
+    sample->b = b;
+    sample->c = c;
+    sample->d = d;
+
+    sample->x = partial_ac_pos_x - partial_bd_pos_x - offset_x;
+    sample->y = partial_ac_pos_y + partial_bd_pos_y - offset_y;
+    sample->q = partial_ab_pos_q + partial_cd_pos_q - offset_q;
+    sample->sum = ksum * sum;
+
+    DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
+            "_calculate_bpm_sample_partial: (A, B, C, D, X, Y, Q, SUM) = "
+            "(%f, %f, %f, %f, %f, %f, %f, %f)\n",
+            sample->a, sample->b, sample->c, sample->d,
+            sample->x, sample->y, sample->q, sample->sum);
+}
+
+// Default is to use partial delta-sigma
+static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
+        double b, double c, double d, bpm_sample_t *sample)
+{
+    return _calculate_bpm_sample_partial (parameters, a, b, c, d, sample);
 }
 
 static void _release_transaction (bpm_single_pass_t *self)
