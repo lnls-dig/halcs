@@ -371,9 +371,15 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     uint8_t *raw_data = (uint8_t*) self->transaction.block.data;
 
     for (uint32_t i = 0; i < num_samples; ++i) {
+        /* Use the correct BPM convenction for channel 0, 1, 2 and 3
+         * A = ch0
+         * B = ch2
+         * C = ch1
+         * D = ch3
+         */
         double a_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+0), atom_width);
-        double b_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+1), atom_width);
-        double c_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+2), atom_width);
+        double c_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+1), atom_width);
+        double b_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+2), atom_width);
         double d_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+3), atom_width);
 
         a_mean += a_sample;
