@@ -76,7 +76,10 @@ static void _setup_transaction (bpm_single_pass_t *self);
 static void _process_single_pass_sample (bpm_single_pass_t *self,
         bpm_sample_t *sample);
 
-static double _squared_value (uint8_t *adc_sample, uint32_t atom_size);
+static double _cast_to_double (uint8_t *adc_sample, uint32_t atom_size);
+
+static double _squared_value (double value);
+
 static void _calculate_bpm_sample_std (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample);
 
@@ -340,10 +343,18 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     acq_req_t *request = &self->request;
     uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) *
             request->num_shots;
-    double a = 0.0;
-    double b = 0.0;
-    double c = 0.0;
-    double d = 0.0;
+    double a_squared = 0.0;
+    double b_squared = 0.0;
+    double c_squared = 0.0;
+    double d_squared = 0.0;
+    double a_mean = 0.0;
+    double b_mean = 0.0;
+    double c_mean = 0.0;
+    double d_mean = 0.0;
+    double a_rms = 0.0;
+    double b_rms = 0.0;
+    double c_rms = 0.0;
+    double d_rms = 0.0;
     uint32_t atom_width = 0;
     uint32_t num_atoms = 0;
 
@@ -360,33 +371,48 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     uint8_t *raw_data = (uint8_t*) self->transaction.block.data;
 
     for (uint32_t i = 0; i < num_samples; ++i) {
-        a += _squared_value (raw_data + atom_width*((i*num_atoms)+0), atom_width);
-        b += _squared_value (raw_data + atom_width*((i*num_atoms)+1), atom_width);
-        c += _squared_value (raw_data + atom_width*((i*num_atoms)+2), atom_width);
-        d += _squared_value (raw_data + atom_width*((i*num_atoms)+3), atom_width);
+        double a_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+0), atom_width);
+        double b_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+1), atom_width);
+        double c_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+2), atom_width);
+        double d_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+3), atom_width);
+
+        a_mean += a_sample;
+        b_mean += b_sample;
+        c_mean += c_sample;
+        d_mean += d_sample;
+
+        a_squared += _squared_value (a_sample);
+        b_squared += _squared_value (b_sample);
+        c_squared += _squared_value (c_sample);
+        d_squared += _squared_value (d_sample);
     }
+
+    a_mean /= num_samples;
+    b_mean /= num_samples;
+    c_mean /= num_samples;
+    d_mean /= num_samples;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
-            "(%f, %f, %f, %f)\n", a, b, c, d);
+            "(%f, %f, %f, %f)\n", a_squared, b_squared, c_squared, d_squared);
 
-    a = sqrt (a);
-    b = sqrt (b);
-    c = sqrt (c);
-    d = sqrt (d);
+    a_rms = sqrt (a_squared - _squared_value (a_mean));
+    b_rms = sqrt (b_squared - _squared_value (b_mean));
+    c_rms = sqrt (c_squared - _squared_value (c_mean));
+    d_rms = sqrt (d_squared - _squared_value (d_mean));
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
-            a, b, c, d);
+            a_rms, b_rms, c_rms, d_rms);
 
-    _calculate_bpm_sample (self->bpm_parameters, a, b, c, d, sample);
+    _calculate_bpm_sample (self->bpm_parameters, a_rms, b_rms, c_rms, d_rms, sample);
 
 err_num_atoms:
 err_get_acq_prop:
     return;
 }
 
-static double _squared_value (uint8_t *adc_sample, uint32_t atom_size)
+static double _cast_to_double (uint8_t *adc_sample, uint32_t atom_size)
 {
     double value = 0.0;
     switch (atom_size) {
@@ -406,12 +432,16 @@ static double _squared_value (uint8_t *adc_sample, uint32_t atom_size)
         default:
             value = -1;
             DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libbpmclient] "
-                    "_squared_value: invalid atom_size = %u. "
-                    "Single Pass processing will be invalid\n",
+                    "_cast_to_double: invalid atom_size = %u. ",
                     atom_size);
         break;
     }
 
+    return value;
+}
+
+static double _squared_value (double value)
+{
     return value * value;
 }
 
@@ -433,6 +463,7 @@ static void _calculate_bpm_sample_std (bpm_parameters_t *parameters, double a,
     sample->b = b;
     sample->c = c;
     sample->d = d;
+
     sample->x = kx * (a - b - c + d) / sum - offset_x;
     sample->y = ky * (a - b + c - d) / sum - offset_y;
     sample->q = kq * (a + b - c - d) / sum - offset_q;
