@@ -402,17 +402,21 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
             "(%f, %f, %f, %f)\n", a_energy, b_energy, c_energy, d_energy);
 
-    a_energy_ac = sqrt (a_energy - a_energy_dc);
-    b_energy_ac = sqrt (b_energy - b_energy_dc);
-    c_energy_ac = sqrt (c_energy - c_energy_dc);
-    d_energy_ac = sqrt (d_energy - d_energy_dc);
+    a_energy_ac = a_energy - a_energy_dc;
+    b_energy_ac = b_energy - b_energy_dc;
+    c_energy_ac = c_energy - c_energy_dc;
+    d_energy_ac = d_energy - d_energy_dc;
+
+    double a = sqrt (a_energy_ac);
+    double b = sqrt (b_energy_ac);
+    double c = sqrt (c_energy_ac);
+    double d = sqrt (d_energy_ac);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
-            a_energy_ac, b_energy_ac, c_energy_ac, d_energy_ac);
+            a, b, c, d);
 
-    _calculate_bpm_sample (self->bpm_parameters, a_energy_ac, b_energy_ac,
-            c_energy_ac, d_energy_ac, sample, true);
+    _calculate_bpm_sample (self->bpm_parameters, a, b, c, d, sample, true);
 
 err_num_atoms:
 err_get_acq_prop:
