@@ -393,10 +393,10 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
         d_energy += _squared_value (d_sample);
     }
 
-    double a_energy_dc = _squared_value (a_sum);
-    double b_energy_dc = _squared_value (b_sum);
-    double c_energy_dc = _squared_value (c_sum);
-    double d_energy_dc = _squared_value (d_sum);
+    double a_energy_dc = _squared_value (a_sum) / num_samples;
+    double b_energy_dc = _squared_value (b_sum) / num_samples;
+    double c_energy_dc = _squared_value (c_sum) / num_samples;
+    double d_energy_dc = _squared_value (d_sum) / num_samples;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
