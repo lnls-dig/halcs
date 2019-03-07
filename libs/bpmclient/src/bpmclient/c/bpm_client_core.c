@@ -343,18 +343,18 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
     acq_req_t *request = &self->request;
     uint32_t num_samples = (request->num_samples_pre + request->num_samples_post) *
             request->num_shots;
-    double a_squared = 0.0;
-    double b_squared = 0.0;
-    double c_squared = 0.0;
-    double d_squared = 0.0;
-    double a_mean = 0.0;
-    double b_mean = 0.0;
-    double c_mean = 0.0;
-    double d_mean = 0.0;
-    double a_rms = 0.0;
-    double b_rms = 0.0;
-    double c_rms = 0.0;
-    double d_rms = 0.0;
+    double a_energy = 0.0;
+    double b_energy = 0.0;
+    double c_energy = 0.0;
+    double d_energy = 0.0;
+    double a_sum = 0.0;
+    double b_sum = 0.0;
+    double c_sum = 0.0;
+    double d_sum = 0.0;
+    double a_energy_ac = 0.0;
+    double b_energy_ac = 0.0;
+    double c_energy_ac = 0.0;
+    double d_energy_ac = 0.0;
     uint32_t atom_width = 0;
     uint32_t num_atoms = 0;
 
@@ -382,33 +382,37 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
         double b_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+2), atom_width);
         double d_sample = _cast_to_double (raw_data + atom_width*((i*num_atoms)+3), atom_width);
 
-        a_mean += a_sample;
-        b_mean += b_sample;
-        c_mean += c_sample;
-        d_mean += d_sample;
+        a_sum += a_sample;
+        b_sum += b_sample;
+        c_sum += c_sample;
+        d_sum += d_sample;
 
-        a_squared += _squared_value (a_sample);
-        b_squared += _squared_value (b_sample);
-        c_squared += _squared_value (c_sample);
-        d_squared += _squared_value (d_sample);
+        a_energy += _squared_value (a_sample);
+        b_energy += _squared_value (b_sample);
+        c_energy += _squared_value (c_sample);
+        d_energy += _squared_value (d_sample);
     }
 
+    double a_energy_dc = _squared_value (a_sum);
+    double b_energy_dc = _squared_value (b_sum);
+    double c_energy_dc = _squared_value (c_sum);
+    double d_energy_dc = _squared_value (d_sum);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
-            "(%f, %f, %f, %f)\n", a_squared, b_squared, c_squared, d_squared);
+            "(%f, %f, %f, %f)\n", a_energy, b_energy, c_energy, d_energy);
 
-    a_rms = sqrt (a_squared - _squared_value (a_mean));
-    b_rms = sqrt (b_squared - _squared_value (b_mean));
-    c_rms = sqrt (c_squared - _squared_value (c_mean));
-    d_rms = sqrt (d_squared - _squared_value (d_mean));
+    a_energy_ac = sqrt (a_energy - a_energy_dc);
+    b_energy_ac = sqrt (b_energy - b_energy_dc);
+    c_energy_ac = sqrt (c_energy - c_energy_dc);
+    d_energy_ac = sqrt (d_energy - d_energy_dc);
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
-            a_rms, b_rms, c_rms, d_rms);
+            a_energy_ac, b_energy_ac, c_energy_ac, d_energy_ac);
 
-    _calculate_bpm_sample (self->bpm_parameters, a_rms, b_rms, c_rms, d_rms, sample,
-            true);
+    _calculate_bpm_sample (self->bpm_parameters, a_energy_ac, b_energy_ac,
+            c_energy_ac, d_energy_ac, sample, true);
 
 err_num_atoms:
 err_get_acq_prop:
