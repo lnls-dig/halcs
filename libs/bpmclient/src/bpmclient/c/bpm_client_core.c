@@ -87,9 +87,6 @@ static void _calculate_bpm_sample_partial (bpm_parameters_t *parameters, double 
         double b, double c, double d, bpm_sample_t *sample);
 
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
-        double b, double c, double d, bpm_sample_t *sample);
-
-static void _calculate_bpm_sample_gen (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample, bool partial_delta);
 
 static void _release_transaction (bpm_single_pass_t *self);
@@ -408,7 +405,8 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
             "_process_single_pass_sample: (A, B, C, D) = (%f, %f, %f, %f)\n",
             a_rms, b_rms, c_rms, d_rms);
 
-    _calculate_bpm_sample (self->bpm_parameters, a_rms, b_rms, c_rms, d_rms, sample);
+    _calculate_bpm_sample (self->bpm_parameters, a_rms, b_rms, c_rms, d_rms, sample,
+            true);
 
 err_num_atoms:
 err_get_acq_prop:
@@ -523,14 +521,7 @@ static void _calculate_bpm_sample_partial (bpm_parameters_t *parameters, double 
             sample->x, sample->y, sample->q, sample->sum);
 }
 
-// Default is to use partial delta-sigma
 static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
-        double b, double c, double d, bpm_sample_t *sample)
-{
-    return _calculate_bpm_sample_partial (parameters, a, b, c, d, sample);
-}
-
-static void _calculate_bpm_sample_gen (bpm_parameters_t *parameters, double a,
         double b, double c, double d, bpm_sample_t *sample, bool partial_delta)
 {
     if (partial_delta) {
