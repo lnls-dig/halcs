@@ -393,10 +393,6 @@ static void _process_single_pass_sample (bpm_single_pass_t *self,
         d_squared += _squared_value (d_sample);
     }
 
-    a_mean /= num_samples;
-    b_mean /= num_samples;
-    c_mean /= num_samples;
-    d_mean /= num_samples;
 
     DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_TRACE, "[libbpmclient] "
             "_process_single_pass_sample: (A^2, B^2, C^2, D^2) = "
