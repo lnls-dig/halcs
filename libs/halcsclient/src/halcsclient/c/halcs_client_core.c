@@ -1659,6 +1659,61 @@ PARAM_FUNC_CLIENT_READ(sw_data_mask_samples)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES, sw_data_mask_samples);
 }
 
+/* TBT Tag Enable */
+PARAM_FUNC_CLIENT_WRITE(tbt_tag_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_EN, tbt_tag_en);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_tag_en)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_EN, tbt_tag_en);
+}
+
+/* TBT Tag Delay */
+PARAM_FUNC_CLIENT_WRITE(tbt_tag_dly)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DLY, tbt_tag_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_tag_dly)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DLY, tbt_tag_dly);
+}
+
+/* TBT Data Mask Enable */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_EN, tbt_data_mask_en);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_en)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_EN, tbt_data_mask_en);
+}
+
+/* TBT Data Mask Samples Begginning */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_samples_beg)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_BEG, tbt_data_mask_samples_beg);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_samples_beg)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_BEG, tbt_data_mask_samples_beg);
+}
+
+/* TBT Data Mask Samples Ending */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_samples_end)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END, tbt_data_mask_samples_end);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_samples_end)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END, tbt_data_mask_samples_end);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */
