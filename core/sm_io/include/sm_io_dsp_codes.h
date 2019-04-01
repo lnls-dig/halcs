@@ -85,7 +85,21 @@ struct _smio_dsp_data_t {
 #define DSP_NAME_SET_GET_SW_DATA_MASK_EN    "dsp_set_get_sw_data_mask_en"
 #define DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES  29
 #define DSP_NAME_SET_GET_SW_DATA_MASK_SAMPLES    "dsp_set_get_sw_data_mask_samples"
-#define DSP_OPCODE_END                      30
+#define DSP_OPCODE_SET_GET_TBT_TAG_EN       30
+#define DSP_NAME_SET_GET_TBT_TAG_EN         "dsp_set_get_tbt_tag_en"
+#define DSP_OPCODE_SET_GET_TBT_TAG_DLY      31
+#define DSP_NAME_SET_GET_TBT_TAG_DLY        "dsp_set_get_tbt_tag_dly"
+#define DSP_OPCODE_SET_GET_TBT_DATA_MASK_EN 32
+#define DSP_NAME_SET_GET_TBT_DATA_MASK_EN   "dsp_set_get_tbt_data_mask_en"
+#define DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_BEG  \
+                                            33
+#define DSP_NAME_SET_GET_TBT_DATA_MASK_SAMPLES_BEG    \
+                                            "dsp_set_get_tbt_data_mask_samples_beg"
+#define DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END  \
+                                            34
+#define DSP_NAME_SET_GET_TBT_DATA_MASK_SAMPLES_END    \
+                                            "dsp_set_get_tbt_data_mask_samples_end"
+#define DSP_OPCODE_END                      35
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t

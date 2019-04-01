@@ -407,6 +407,46 @@ RW_PARAM_FUNC(dsp, sw_data_mask_samples) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define POS_CALC_TBT_TAG_EN_MIN                 0
+#define POS_CALC_TBT_TAG_EN_MAX                 1
+RW_PARAM_FUNC(dsp, tbt_tag_en) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_TAG, EN,
+            SINGLE_BIT_PARAM, POS_CALC_TBT_TAG_EN_MIN, POS_CALC_TBT_TAG_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_TAG_DLY_MIN                0
+#define POS_CALC_TBT_TAG_DLY_MAX                ((1<<16ULL)-1)
+RW_PARAM_FUNC(dsp, tbt_tag_dly) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_TAG, DLY,
+            MULT_BIT_PARAM, POS_CALC_TBT_TAG_DLY_MIN, POS_CALC_TBT_TAG_DLY_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_DATA_MASK_EN_MIN           0
+#define POS_CALC_TBT_DATA_MASK_EN_MAX           1
+RW_PARAM_FUNC(dsp, tbt_data_mask_en) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_DATA_MASK_CTL, EN,
+            SINGLE_BIT_PARAM, POS_CALC_TBT_DATA_MASK_EN_MIN, POS_CALC_TBT_DATA_MASK_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MIN      0
+#define POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MAX      ((1<<16ULL)-1)
+RW_PARAM_FUNC(dsp, tbt_data_mask_samples_beg) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_DATA_MASK_SAMPLES, BEG,
+            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MIN, POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_DATA_MASK_SAMPLES_END_MIN      0
+#define POS_CALC_TBT_DATA_MASK_SAMPLES_END_MAX      ((1<<16ULL)-1)
+RW_PARAM_FUNC(dsp, tbt_data_mask_samples_end) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_DATA_MASK_SAMPLES, END,
+            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_END_MIN, POS_CALC_TBT_DATA_MASK_SAMPLES_END_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -439,6 +479,11 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, sw_tag_en),
     RW_PARAM_FUNC_NAME(dsp, sw_data_mask_en),
     RW_PARAM_FUNC_NAME(dsp, sw_data_mask_samples),
+    RW_PARAM_FUNC_NAME(dsp, tbt_tag_en),
+    RW_PARAM_FUNC_NAME(dsp, tbt_tag_dly),
+    RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_en),
+    RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_samples_beg),
+    RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_samples_end),
     NULL
 };
 
