@@ -416,7 +416,7 @@ RW_PARAM_FUNC(dsp, tbt_tag_en) {
 }
 
 #define POS_CALC_TBT_TAG_DLY_MIN                0
-#define POS_CALC_TBT_TAG_DLY_MAX                ((1<<16ULL)-1)
+#define POS_CALC_TBT_TAG_DLY_MAX                ((1<<9ULL)-1)
 RW_PARAM_FUNC(dsp, tbt_tag_dly) {
     SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_TAG, DLY,
             MULT_BIT_PARAM, POS_CALC_TBT_TAG_DLY_MIN, POS_CALC_TBT_TAG_DLY_MAX,
