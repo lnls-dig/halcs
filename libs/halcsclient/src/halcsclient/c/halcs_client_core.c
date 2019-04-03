@@ -194,6 +194,7 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
         char *service, uint32_t *input, uint32_t *output, uint32_t output_size)
 {
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+    uint32_t module_err = 0;
     uint8_t *input8 = (uint8_t *) input;
     uint8_t *output8 = (uint8_t *) output;
 
@@ -243,7 +244,13 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
     /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg_code);
-    err = *(uint32_t *)zframe_data(err_code);
+
+    module_err = *(uint32_t *)zframe_data(err_code);
+    ASSERT_TEST(module_err < (HALCS_CLIENT_ERR_END - HALCS_CLIENT_ERR_MODULE - 1),
+            "Invalid return code", err_inv_ret_code, HALCS_CLIENT_ERR_INV_RETCODE);
+    if (module_err > 0) {
+        err = HALCS_CLIENT_ERR_MODULE + module_err;
+    }
 
     zframe_t *data_size_frm = NULL;
     zframe_t *data_frm = NULL;
@@ -274,6 +281,7 @@ err_msg_fmt:
 err_null_data:
     zframe_destroy (&data_size_frm);
 err_null_data_size:
+err_inv_ret_code:
     zframe_destroy (&err_code);
 err_msg_code:
     zmsg_destroy (&report);
