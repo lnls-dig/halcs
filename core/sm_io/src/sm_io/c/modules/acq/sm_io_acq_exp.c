@@ -46,6 +46,9 @@
 
 #define ACQ_CORE_IDLE_VALUE     ACQ_CORE_STA_FSM_STATE_W(0x1)
 
+#define ACQ_CORE_FC_FULL_MASK   ACQ_CORE_STA_FC_FULL
+#define ACQ_CORE_FC_FULL_VALUE  ACQ_CORE_STA_FC_FULL
+
 /* Acquisition is completed when FSM is in IDLE state, FSM is with DONE
  * flag asserted, Flow Control FIFO is with DOME flag asserted and DDR3 has
  * its DONE flag asserted */
@@ -56,7 +59,8 @@
                                     ACQ_CORE_STA_FC_TRANS_DONE | ACQ_CORE_STA_DDR3_TRANS_DONE)
 
 static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
-        uint32_t status_value);
+        uint32_t status_value, uint32_t status_oflow_mask,
+        uint32_t status_oflow_value);
 static int _acq_set_trigger_type (SMIO_OWNER_TYPE *self, uint32_t trigger_type);
 static int _acq_get_trigger_type (SMIO_OWNER_TYPE *self, uint32_t *trigger_type);
 static uint64_t _acq_get_start_address (uint64_t acq_core_trig_addr,
@@ -85,7 +89,8 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
 
     /* First step is to check if the FPGA is already doing an acquisition. If it
      * is, then return an error. Otherwise proceed normally. */
-    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+    err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE,
+            ACQ_CORE_FC_FULL_MASK, ACQ_CORE_FC_FULL_VALUE);
     ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
             "New acquisition not started", err_acq_not_completed);
 
@@ -254,7 +259,8 @@ static int _acq_check_data_acquire (void *owner, void *args, void *ret)
 
     uint32_t chan = acq->curr_chan;
 
-    err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE);
+    err = _acq_check_status (self, ACQ_CORE_COMPLETE_MASK, ACQ_CORE_COMPLETE_VALUE,
+            ACQ_CORE_FC_FULL_MASK, ACQ_CORE_FC_FULL_VALUE);
     if (err != -ACQ_OK) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] acq_check_data_acquire: "
                 "Acquisition is not done for channel %u\n", chan);
@@ -272,7 +278,8 @@ err_get_acq_handler:
 }
 
 static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
-        uint32_t status_value)
+        uint32_t status_value, uint32_t status_oflow_mask,
+        uint32_t status_oflow_value)
 {
     int err = -ACQ_OK;
     uint32_t status_done = 0;
@@ -282,6 +289,11 @@ static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire: "
             "Status done = 0x%08x\n", status_done);
 
+    if ((status_done & status_oflow_mask) == status_oflow_value) {
+        err = -ACQ_FC_FULL;
+        goto err_fc_full;
+    }
+
     if ((status_done & status_mask) != status_value) {
         err = -ACQ_NOT_COMPLETED;
         goto err_not_completed;
@@ -289,6 +301,7 @@ static int _acq_check_status (SMIO_OWNER_TYPE *self, uint32_t status_mask,
 
     err = -ACQ_OK;
 
+err_fc_full:
 err_not_completed:
     return err;
 }
@@ -574,7 +587,8 @@ static int _acq_cfg_trigger (void *owner, void *args, void *ret)
     else {
         /* Only check if the FPGA is already doing an acquisition if we are about
          * to change it. If it is, then return an error. Otherwise proceed normally. */
-        err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE);
+        err = _acq_check_status (self, ACQ_CORE_IDLE_MASK, ACQ_CORE_IDLE_VALUE,
+                ACQ_CORE_FC_FULL_MASK, ACQ_CORE_FC_FULL_VALUE);
         ASSERT_TEST(err == -ACQ_OK, "Previous acquisition in progress. "
                 "Cannot change trigger type", err_acq_not_completed);
 

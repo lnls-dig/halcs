@@ -67,6 +67,7 @@ struct _smio_acq_data_block_t {
 #define ACQ_NUM_CHAN_OOR                5   /* Channel number out of range */
 #define ACQ_COULD_NOT_READ              6   /* Could not read memory block */
 #define ACQ_TRIG_TYPE                   7   /* Incompatible trigger type */
-#define ACQ_REPLY_END                   8   /* End marker */
+#define ACQ_FC_FULL                     8   /* Acquisition overlfow error */
+#define ACQ_REPLY_END                   9   /* End marker */
 
 #endif
