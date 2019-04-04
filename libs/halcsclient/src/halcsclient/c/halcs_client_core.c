@@ -194,6 +194,7 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
         char *service, uint32_t *input, uint32_t *output, uint32_t output_size)
 {
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+    uint32_t module_err = 0;
     uint8_t *input8 = (uint8_t *) input;
     uint8_t *output8 = (uint8_t *) output;
 
@@ -243,7 +244,13 @@ halcs_client_err_e halcs_func_exec_size (halcs_client_t *self, const disp_op_t *
     /* Get message contents */
     zframe_t *err_code = zmsg_pop(report);
     ASSERT_TEST(err_code != NULL, "Could not receive error code", err_msg_code);
-    err = *(uint32_t *)zframe_data(err_code);
+
+    module_err = *(uint32_t *)zframe_data(err_code);
+    ASSERT_TEST(module_err < (HALCS_CLIENT_ERR_END - HALCS_CLIENT_ERR_MODULE - 1),
+            "Invalid return code", err_inv_ret_code, HALCS_CLIENT_ERR_INV_RETCODE);
+    if (module_err > 0) {
+        err = HALCS_CLIENT_ERR_MODULE + module_err;
+    }
 
     zframe_t *data_size_frm = NULL;
     zframe_t *data_frm = NULL;
@@ -274,6 +281,7 @@ err_msg_fmt:
 err_null_data:
     zframe_destroy (&data_size_frm);
 err_null_data_size:
+err_inv_ret_code:
     zframe_destroy (&err_code);
 err_msg_code:
     zmsg_destroy (&report);
@@ -1657,6 +1665,61 @@ PARAM_FUNC_CLIENT_WRITE(sw_data_mask_samples)
 PARAM_FUNC_CLIENT_READ(sw_data_mask_samples)
 {
     return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_DATA_MASK_SAMPLES, sw_data_mask_samples);
+}
+
+/* TBT Tag Enable */
+PARAM_FUNC_CLIENT_WRITE(tbt_tag_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_EN, tbt_tag_en);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_tag_en)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_EN, tbt_tag_en);
+}
+
+/* TBT Tag Delay */
+PARAM_FUNC_CLIENT_WRITE(tbt_tag_dly)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DLY, tbt_tag_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_tag_dly)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DLY, tbt_tag_dly);
+}
+
+/* TBT Data Mask Enable */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_EN, tbt_data_mask_en);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_en)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_EN, tbt_data_mask_en);
+}
+
+/* TBT Data Mask Samples Begginning */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_samples_beg)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_BEG, tbt_data_mask_samples_beg);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_samples_beg)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_BEG, tbt_data_mask_samples_beg);
+}
+
+/* TBT Data Mask Samples Ending */
+PARAM_FUNC_CLIENT_WRITE(tbt_data_mask_samples_end)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END, tbt_data_mask_samples_end);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_data_mask_samples_end)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END, tbt_data_mask_samples_end);
 }
 
 /**************** Swap SMIO Functions ****************/

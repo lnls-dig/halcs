@@ -844,6 +844,39 @@ halcs_client_err_e halcs_set_sw_data_mask_samples (halcs_client_t *self, char *s
 halcs_client_err_e halcs_get_sw_data_mask_samples (halcs_client_t *self, char *service,
         uint32_t *sw_data_mask_samples);
 
+/* TBT Tag Enable. This sets/gets the tag synchronization */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_tbt_tag_en (halcs_client_t *self, char *service,
+        uint32_t tbt_tag_en);
+halcs_client_err_e halcs_get_tbt_tag_en (halcs_client_t *self, char *service,
+        uint32_t *tbt_tag_en);
+
+/* TBT Tag Delay. This sets/gets the tag delay synchronization */
+halcs_client_err_e halcs_set_tbt_tag_dly (halcs_client_t *self, char *service,
+        uint32_t tbt_tag_dly);
+halcs_client_err_e halcs_get_tbt_tag_dly (halcs_client_t *self, char *service,
+        uint32_t *tbt_tag_dly);
+
+/* TBT Data Mask Enable. This sets/gets the TBT masking of samples*/
+halcs_client_err_e halcs_set_tbt_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t tbt_data_mask_en);
+halcs_client_err_e halcs_get_tbt_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t *tbt_data_mask_en);
+
+/* TBT Data Mask. This sets/gets the TBT mask to the specified number of samples at the beginning */
+halcs_client_err_e halcs_set_tbt_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t tbt_data_mask_samples_beg);
+halcs_client_err_e halcs_get_tbt_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t *tbt_data_mask_samples_beg);
+
+/* TBT Data Mask Ending. This sets/gets the TBT mask to the specified number of samples at the end*/
+halcs_client_err_e halcs_set_tbt_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t tbt_data_mask_samples_end);
+halcs_client_err_e halcs_get_tbt_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t *tbt_data_mask_samples_end);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */

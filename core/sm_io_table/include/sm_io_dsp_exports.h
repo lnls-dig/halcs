@@ -40,6 +40,11 @@ extern disp_op_t dsp_set_get_monit1_amp_pos_exp;
 extern disp_op_t dsp_set_get_sw_tag_en_exp;
 extern disp_op_t dsp_set_get_sw_data_mask_en_exp;
 extern disp_op_t dsp_set_get_sw_data_mask_samples_exp;
+extern disp_op_t dsp_set_get_tbt_tag_en_exp;
+extern disp_op_t dsp_set_get_tbt_tag_dly_exp;
+extern disp_op_t dsp_set_get_tbt_data_mask_en_exp;
+extern disp_op_t dsp_set_get_tbt_data_mask_samples_beg_exp;
+extern disp_op_t dsp_set_get_tbt_data_mask_samples_end_exp;
 
 extern const disp_op_t *dsp_exp_ops [];
 
