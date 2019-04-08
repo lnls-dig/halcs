@@ -169,8 +169,8 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
     uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/channel_sample_size;
-    uint32_t num_samples_pre_aligned = hutils_align_value (num_samples_pre,
-            samples_alignment);
+    uint32_t num_samples_pre_aligned = (num_samples_pre == 0) ?
+            samples_alignment*channel_sample_size : hutils_align_value (num_samples_pre, samples_alignment);
     /* FIXME. Curently, the FPGA gateware does not support triggered acquisitions with
      * post_samples = 0. There must be at more than DDR3_PAYLOAD_SIZE bytes in post_samples.
      * See github lnls-bpm/bpm-gw#62 */
