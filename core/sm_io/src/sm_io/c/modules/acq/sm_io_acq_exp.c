@@ -164,18 +164,16 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             "Number of shots = %u\n", acq_core_shots);
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
-    /* FIXME FPGA Firmware requires number of samples to be divisible by
-     * acquisition channel sample size */
     uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
     uint32_t samples_alignment =
         DDR3_PAYLOAD_SIZE/channel_sample_size;
     uint32_t num_samples_pre_aligned = (num_samples_pre == 0) ?
-            samples_alignment*channel_sample_size : hutils_align_value (num_samples_pre, samples_alignment);
+            samples_alignment : hutils_align_value (num_samples_pre, samples_alignment);
     /* FIXME. Curently, the FPGA gateware does not support triggered acquisitions with
      * post_samples = 0. There must be at more than DDR3_PAYLOAD_SIZE bytes in post_samples.
      * See github lnls-bpm/bpm-gw#62 */
     uint32_t num_samples_post_aligned = (num_samples_post == 0 && trigger_type != TYPE_ACQ_CORE_SKIP) ?
-            samples_alignment*channel_sample_size : hutils_align_value (num_samples_post, samples_alignment);
+            samples_alignment : hutils_align_value (num_samples_post, samples_alignment);
 
     /* Set the parameters: number of samples of this channel */
     acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
