@@ -152,10 +152,17 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             chan, num_samples_pre, num_samples_post, num_shots);
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] data_acquire:\n"
-            "\tPrevious acq params for channel #%u: number of pre-trigger samples = %u\n"
-            "\tnumber of post-trigger samples = %u, number of shots = %u\n",
-            chan, acq->acq_params[chan].num_samples_pre,
+            "\tPrevious acq params for channel #%u:\n"
+            "\tnumber of pre-trigger samples = %u\n"
+            "\tnumber of post-trigger samples = %u\n"
+            "\tnumber of pre-trigger samples aligned = %u\n"
+            "\tnumber of post-trigger samples aligned = %u\n"
+            "\tnumber of shots = %u\n",
+            chan,
+            acq->acq_params[chan].num_samples_pre,
             acq->acq_params[chan].num_samples_post,
+            acq->acq_params[chan].num_samples_pre_aligned,
+            acq->acq_params[chan].num_samples_post_aligned,
             acq->acq_params[chan].num_shots);
 
     /* Setting the number of shots */
@@ -176,8 +183,10 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
             samples_alignment : hutils_align_value (num_samples_post, samples_alignment);
 
     /* Set the parameters: number of samples of this channel */
-    acq->acq_params[chan].num_samples_pre = num_samples_pre_aligned;
-    acq->acq_params[chan].num_samples_post = num_samples_post_aligned;
+    acq->acq_params[chan].num_samples_pre = num_samples_pre;
+    acq->acq_params[chan].num_samples_post = num_samples_post;
+    acq->acq_params[chan].num_samples_pre_aligned = num_samples_pre_aligned;
+    acq->acq_params[chan].num_samples_post_aligned = num_samples_post_aligned;
     acq->acq_params[chan].num_shots = num_shots;
 
     /* Pre trigger samples */
@@ -361,19 +370,27 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
         return -ACQ_BLOCK_OOR;
     }
 
-    /* Get number of samples and shots */
+    /* User requested values */
     uint32_t num_samples_pre =
         acq->acq_params[chan].num_samples_pre;
     uint32_t num_samples_post =
         acq->acq_params[chan].num_samples_post;
-    uint32_t num_samples_shot = num_samples_pre + num_samples_post;
     uint32_t num_shots =
         acq->acq_params[chan].num_shots;
+    uint32_t num_samples_shot = num_samples_pre + num_samples_post;
     uint32_t num_samples_multishot = num_samples_shot*num_shots;
+
+    /* Get number of samples and shots aligned to FPGA restrictions */
+    uint32_t num_samples_pre_aligned =
+        acq->acq_params[chan].num_samples_pre_aligned;
+    uint32_t num_samples_post_aligned =
+        acq->acq_params[chan].num_samples_post_aligned;
+    uint32_t num_samples_shot_aligned = num_samples_pre_aligned + num_samples_post_aligned;
+    //uint32_t num_samples_multishot_aligned = num_samples_shot_aligned*num_shots;
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "last num_samples_pre = %u\n", num_samples_pre);
+            "last num_samples_pre_aligned = %u\n", num_samples_pre_aligned);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
-            "last num_samples_post = %u\n", num_samples_post);
+            "last num_samples_post_aligned = %u\n", num_samples_post_aligned);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "last num_shots = %u\n", num_shots);
 
@@ -381,6 +398,12 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
             "n_max_samples = %u\n", n_max_samples);
 
+    /* Calculate how much data can we fit in a single tranmission block. Caution
+     * here because when using multishot the number of valid pre_samples per shot
+     * can be different than the actual requested values to the FPGA. This will cause
+     * the buffer from the FPGA to contain more samples than the user requested.
+     * Thus needing some post-processing to select only the requested values per
+     * shot */
     uint32_t over_samples = num_samples_multishot % n_max_samples;
     uint32_t block_n_valid = num_samples_multishot / n_max_samples;
     /* When the last block is full 'block_n_valid' exceeds by one */
@@ -412,8 +435,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
     /* For all modes the start valid address is given by:
      * start_addr = trigger_addr -
-     * ((num_samples_pre+num_samples_post)*(num_shots-1) + num_samples_pre)*
-     * sample_size
+     * ((num_samples_pre_aligned+num_samples_post_aligned)*(num_shots-1) +
+     * num_samples_pre_aligned)*sample_size
      * */
 
     /* First step if to get the trigger address from the channel.
@@ -422,8 +445,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     uint32_t acq_core_trig_addr = acq->acq_params[chan].trig_addr;
 
     /* Second step is to calculate the size of the whole acquisition in bytes */
-    uint32_t acq_size_bytes = (num_samples_shot*(num_shots-1) +
-            num_samples_pre)*channel_sample_size;
+    uint32_t acq_size_bytes = (num_samples_shot_aligned*(num_shots-1) +
+            num_samples_pre_aligned)*channel_sample_size;
     /* Our "end address" is the start of the last valid address available for a
      * sample. So, our "end address" needs to be accounted for one sample more */
     uint32_t end_mem_space_addr = channel_end_addr + channel_sample_size;
@@ -433,17 +456,39 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     uint64_t start_addr = _acq_get_start_address (acq_core_trig_addr,
             acq_size_bytes, channel_start_addr, end_mem_space_addr);
 
-    /* Forth step is to calculate the offset from the start_addr, taking care
+    /* Fourth step is to calculate the correct sample location. These might be
+     * different because the number of aligned samples, specially in multishot
+     * acquisitions, could offset the desired block number by some ammount. */
+
+    /* Padding */
+    uint32_t num_samples_pre_pad = num_samples_pre_aligned - num_samples_pre;
+    uint32_t num_samples_post_pad = num_samples_post_aligned - num_samples_post;
+
+    /* Original user sample. WARNING! BLOCK_SIZE must be a multiple of channel_sample_size */
+    uint32_t or_block_sample = block_n * (BLOCK_SIZE / channel_sample_size);
+    /* Original shot the same was in */
+    uint32_t or_shot = or_block_sample / num_samples_shot;
+    /* Original sample inside the original shot */
+    uint32_t or_sample_off = or_block_sample - (or_shot * num_samples_shot);
+
+    /* Converted sample offset inside the converted shot */
+    uint32_t con_sample_off = (num_samples_pre_pad) + or_sample_off;
+    /* Converted sample */
+    uint32_t con_block_sample = (or_shot * num_samples_shot_aligned) + con_sample_off;
+    /* Back to memory address */
+    uint64_t con_block_addr_off = con_block_sample * channel_sample_size;
+
+    /* Fifth step is to calculate the offset from the start_addr, taking care
      * for wraps in the end of the current memory space */
-    uint64_t addr_i = _acq_get_read_block_addr_start (start_addr, block_n * BLOCK_SIZE,
+    uint64_t addr_i = _acq_get_read_block_addr_start (start_addr, con_block_addr_off,
             channel_start_addr, end_mem_space_addr);
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block:\n"
             "\tBlock %u of channel %u:\n"
             "\tChannel start address = 0x%08x,\n"
             "\tTrigger address = 0x%08x,\n"
             "\tAcquisition read start address\n"
-            "\t\t(trig_addr - ((num_samples_pre+num_samples_post)*(num_shots-1)\n"
-            "\t\t+ num_samples_pre)*sample_size = 0x%"PRIx64 ",\n"
+            "\t\t(trig_addr - ((num_samples_pre_aligned+num_samples_post_aligned)*(num_shots-1)\n"
+            "\t\t+ num_samples_pre_aligned)*sample_size = 0x%"PRIx64 ",\n"
             "\tCurrent block start address (read_start_addr + block_n*BLOCK_SIZE) = 0x%"PRIx64 "\n",
             block_n, chan,
             channel_start_addr,
@@ -457,11 +502,24 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     ssize_t valid_bytes = 0;
     uint64_t addr_start = addr_i;
     uint64_t rem_mem_space = end_mem_space_addr - addr_start;
+    uint32_t shot_sample_off = or_sample_off;
     for ( ;
             num_bytes_read < reply_size_full;
             num_bytes_read += valid_bytes) {
-        uint32_t bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)?
+
+        uint32_t bytes_to_read = 0;
+        uint32_t bytes_to_jump = 0;
+        /* Single shot can read everything from the start offset */
+        if (num_shots == 1) {
+            bytes_to_read = (reply_size_full-num_bytes_read > rem_mem_space)?
                 rem_mem_space : reply_size_full-num_bytes_read;
+        }
+        /* Multi shot must read only the shot and skip the padding values */
+        else {
+            bytes_to_read = (num_samples_shot - shot_sample_off) * channel_sample_size;
+            shot_sample_off = 0;
+            bytes_to_jump = (num_samples_post_pad + num_samples_pre_pad) * channel_sample_size;
+        }
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:acq] get_data_block: "
                 "Reading %u bytes from address 0x%"PRIx64"\n"
@@ -483,7 +541,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
 
         ASSERT_TEST(valid_bytes == bytes_to_read, "Could not read data block completely",
                 err_read_data_block, -ACQ_COULD_NOT_READ);
-        addr_start += valid_bytes;
+        addr_start += valid_bytes + bytes_to_jump;
         if (addr_start >= end_mem_space_addr) {
             addr_start = channel_start_addr + (end_mem_space_addr - addr_start);
         }
