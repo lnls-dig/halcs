@@ -485,7 +485,7 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
                 err_read_data_block, -ACQ_COULD_NOT_READ);
         addr_start += valid_bytes;
         if (addr_start >= end_mem_space_addr) {
-            addr_start = channel_start_addr;
+            addr_start = channel_start_addr + (end_mem_space_addr - addr_start);
         }
 
         rem_mem_space = end_mem_space_addr - addr_start;
