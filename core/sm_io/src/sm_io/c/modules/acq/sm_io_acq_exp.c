@@ -445,8 +445,8 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
      * Even on skip trigger mode, this will contain the address after
      * the last valid sample (end of acquisition address) */
     uint32_t __acq_core_trig_addr = acq->acq_params[chan].trig_addr;
-    uint32_t acq_core_trig_addr = (num_shots == 1) ? __acq_core_trig_addr :
-        __acq_core_trig_addr + num_samples_shot_aligned*(num_shots-1);
+    uint32_t acq_core_trig_addr = __acq_core_trig_addr + ((num_shots == 1) ?
+        0 : num_samples_shot_aligned*(num_shots-1)*channel_sample_size);
 
     /* Second step is to calculate the size of the whole acquisition in bytes */
     uint32_t acq_size_bytes = (num_samples_shot_aligned*(num_shots-1) +
