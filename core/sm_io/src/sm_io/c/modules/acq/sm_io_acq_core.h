@@ -31,8 +31,10 @@ typedef enum {
 #define ACQ_CORE_NUM_TRIGGERS               TYPE_ACQ_CORE_END
 
 typedef struct {
-    uint32_t num_samples_pre;               /* Number of pre-trigger samples */
-    uint32_t num_samples_post;              /* Number of post-trigger samples */
+    uint32_t num_samples_pre;               /* Number of pre-trigger samples as requested by the user */
+    uint32_t num_samples_post;              /* Number of post-trigger samples as requested by the user */
+    uint32_t num_samples_pre_aligned;       /* Number of pre-trigger samples aligned to requirements */
+    uint32_t num_samples_post_aligned;      /* Number of post-trigger samples aligned to FPGA requirements */
     uint32_t num_shots;                     /* Number of shots */
     /* Last trigger address. In case of multishot acquisition, this will
        contain only the last trigger address*/
