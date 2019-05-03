@@ -433,7 +433,9 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
             "Reading block %u of channel %u with %u valid samples\n",
             block_n, chan, reply_size_full);
 
-    /* For all modes the start valid address is given by:
+    /* As per commit github.com/lnls-dig/bpm-gw@44593e2a72, we only acquire
+     * the first trigger occurence. So, for multishots the trigger_addr needs
+     * to be corrected:
      * start_addr = trigger_addr -
      * ((num_samples_pre_aligned+num_samples_post_aligned)*(num_shots-1) +
      * num_samples_pre_aligned)*sample_size
@@ -442,7 +444,9 @@ static int _acq_get_data_block (void *owner, void *args, void *ret)
     /* First step if to get the trigger address from the channel.
      * Even on skip trigger mode, this will contain the address after
      * the last valid sample (end of acquisition address) */
-    uint32_t acq_core_trig_addr = acq->acq_params[chan].trig_addr;
+    uint32_t __acq_core_trig_addr = acq->acq_params[chan].trig_addr;
+    uint32_t acq_core_trig_addr = (num_shots == 1) ? __acq_core_trig_addr :
+        __acq_core_trig_addr + num_samples_shot_aligned*(num_shots-1);
 
     /* Second step is to calculate the size of the whole acquisition in bytes */
     uint32_t acq_size_bytes = (num_samples_shot_aligned*(num_shots-1) +
