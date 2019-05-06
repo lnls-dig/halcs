@@ -8,10 +8,6 @@
 #ifndef _ACQ_H_
 #define _ACQ_H_
 
-/* Known modules IDs (from SDB records defined in FPGA) */
-#define ACQ_SDB_DEVID       0x4519a0ad
-#define ACQ_SDB_NAME        "ACQ"
-
 extern const smio_bootstrap_ops_t acq_bootstrap_ops;
 
 #endif

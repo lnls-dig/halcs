@@ -8,6 +8,11 @@
 #ifndef _SM_IO_ACQ_CORE_H_
 #define _SM_IO_ACQ_CORE_H_
 
+/* Known modules IDs (from SDB records defined in FPGA) */
+#define ACQ_SDB_VENDORID    0x1000000000001215ULL
+#define ACQ_SDB_DEVID       0x4519a0ad
+#define ACQ_SDB_NAME        "ACQ"
+
 #define ACQ_CORE_MIN_NUM_SHOTS              1
 /* FIXME: This needs to match the FPGA firmware. Otherwise,
  * the acq_core module will not start an acquisition and
