@@ -26,7 +26,7 @@
 
 #define HALCS_CLIENT_VERSION_MAJOR 1
 #define HALCS_CLIENT_VERSION_MINOR 7
-#define HALCS_CLIENT_VERSION_PATCH 2
+#define HALCS_CLIENT_VERSION_PATCH 3
 
 #define HALCS_CLIENT_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

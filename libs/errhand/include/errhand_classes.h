@@ -21,7 +21,7 @@
 
 #define ERRHAND_VERSION_MAJOR 1
 #define ERRHAND_VERSION_MINOR 7
-#define ERRHAND_VERSION_PATCH 2
+#define ERRHAND_VERSION_PATCH 3
 
 #define ERRHAND_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
