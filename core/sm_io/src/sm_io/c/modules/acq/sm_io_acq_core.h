@@ -8,6 +8,11 @@
 #ifndef _SM_IO_ACQ_CORE_H_
 #define _SM_IO_ACQ_CORE_H_
 
+/* Known modules IDs (from SDB records defined in FPGA) */
+#define ACQ_SDB_VENDORID    0x1000000000001215ULL
+#define ACQ_SDB_DEVID       0x4519a0ad
+#define ACQ_SDB_NAME        "ACQ"
+
 #define ACQ_CORE_MIN_NUM_SHOTS              1
 /* FIXME: This needs to match the FPGA firmware. Otherwise,
  * the acq_core module will not start an acquisition and
@@ -31,8 +36,10 @@ typedef enum {
 #define ACQ_CORE_NUM_TRIGGERS               TYPE_ACQ_CORE_END
 
 typedef struct {
-    uint32_t num_samples_pre;               /* Number of pre-trigger samples */
-    uint32_t num_samples_post;              /* Number of post-trigger samples */
+    uint32_t num_samples_pre;               /* Number of pre-trigger samples as requested by the user */
+    uint32_t num_samples_post;              /* Number of post-trigger samples as requested by the user */
+    uint32_t num_samples_pre_aligned;       /* Number of pre-trigger samples aligned to requirements */
+    uint32_t num_samples_post_aligned;      /* Number of post-trigger samples aligned to FPGA requirements */
     uint32_t num_shots;                     /* Number of shots */
     /* Last trigger address. In case of multishot acquisition, this will
        contain only the last trigger address*/
@@ -40,6 +47,7 @@ typedef struct {
 } acq_params_t;
 
 typedef struct {
+    sdbutils_info_t sdbutils_info;          /* SDB information for this core */
     acq_params_t acq_params[END_CHAN_ID];   /* Parameters for each channel */
     uint32_t curr_chan;                     /* Current channel being acquired */
     uint32_t num_chan;                      /* Numbert of acquisition channels */

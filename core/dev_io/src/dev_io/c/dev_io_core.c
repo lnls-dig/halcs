@@ -960,7 +960,7 @@ static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
     ASSERT_TEST(sdb_device != NULL, "Could not get SDB device", err_sdb_device,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR,
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
                     "_devio_send_sdb_info_raw: sending message to actor with:\n"
                     "sdb_device->abi_class = %02X, sdb_device->abi_ver_major = %01X,"
             "sdb_device->abi_ver_minor = %01X, sdb_device->bus_specific = %04X\n",
