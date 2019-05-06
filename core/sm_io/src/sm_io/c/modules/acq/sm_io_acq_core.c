@@ -41,6 +41,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
     smio_acq_t *self = (smio_acq_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
+    uint32_t smio_id = smio_get_id (parent);
 
     /* Get the number of acquisition channels. If 0, this register is probably
      * unimplemented in gateware, so default it to the board END_CHAN_ID */
@@ -162,8 +163,23 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         return NULL;
     }
 
+    /* Get SDB info for this core */
+    smio_err_e err = SMIO_SUCCESS;
+
+    err = smio_get_sdb_info (parent, smio_id, inst_id, ACQ_SDB_VENDORID, ACQ_SDB_DEVID,
+        &self->sdbutils_info);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not get SDB info", err_sdb_info);
+    
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] abi_class: %" PRIu16 ", "
+        "abi_ver_major: %" PRIu8 ", abi_ver_minor: %" PRIu8 ", bus_specific: %" PRIu32 "\n", 
+        self->sdbutils_info.abi_class, 
+        self->sdbutils_info.abi_ver_major,
+        self->sdbutils_info.abi_ver_minor,
+        self->sdbutils_info.bus_specific);
+
     return self;
 
+err_sdb_info:
 err_atom_width:
 err_num_atoms:
 err_num_coalesce:

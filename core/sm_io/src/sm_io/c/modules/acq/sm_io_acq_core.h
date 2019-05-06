@@ -47,6 +47,7 @@ typedef struct {
 } acq_params_t;
 
 typedef struct {
+    sdbutils_info_t sdbutils_info;          /* SDB information for this core */
     acq_params_t acq_params[END_CHAN_ID];   /* Parameters for each channel */
     uint32_t curr_chan;                     /* Current channel being acquired */
     uint32_t num_chan;                      /* Numbert of acquisition channels */
