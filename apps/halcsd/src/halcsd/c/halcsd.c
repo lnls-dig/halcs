@@ -75,7 +75,7 @@
 
 static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
         zhashx_t *hints, char **dev_entry);
-static char *_create_log_filename (char *log_prefix, char *log_filename_pattern, 
+static char *_create_log_filename (char *log_prefix, char *log_filename_pattern,
         uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
         uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
     sigaddset (&signal_mask, SIGHUP);
     int rc = pthread_sigmask (SIG_BLOCK, &signal_mask, NULL);
     if (rc != 0) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Could not block sigmask: %d\n", rc); 
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Could not block sigmask: %d\n", rc);
         goto err_sigmask;
     }
 
@@ -488,14 +488,14 @@ int main (int argc, char *argv[])
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Creating DEVIO instance ...\n");
 
     /* Create LOG filename path */
-    char *devio_log_filename = _create_log_filename (log_prefix, 
-            DEVIO_LOG_FILENAME_PATTERN, dev_id, devio_type_str, 
+    char *devio_log_filename = _create_log_filename (log_prefix,
+            DEVIO_LOG_FILENAME_PATTERN, dev_id, devio_type_str,
             fe_smio_id);
     ASSERT_ALLOC (devio_log_filename, err_devio_log_filename_alloc);
 
     /* Create LOG DEVIO info path */
-    char *devio_log_info_filename = _create_log_filename (log_prefix, 
-            DEVIO_LOG_INFO_FILENAME_PATTERN, dev_id, devio_type_str, 
+    char *devio_log_info_filename = _create_log_filename (log_prefix,
+            DEVIO_LOG_INFO_FILENAME_PATTERN, dev_id, devio_type_str,
             fe_smio_id);
     ASSERT_ALLOC (devio_log_info_filename, err_devio_log_info_filename_alloc);
 
@@ -553,14 +553,14 @@ int main (int argc, char *argv[])
      *
      * Using a more brute-force solution we used to do the following:
      *
-     * 1) We reset the endpoint here (not done here as most of 
-     *   our endpoints need to recreate its SMCH instances to be 
+     * 1) We reset the endpoint here (not done here as most of
+     *   our endpoints need to recreate its SMCH instances to be
      *   able to communicate and we don't do that on reconfigure,
      *   only on create)
      * 2) Tell the SMIOs to reconfigure themselves
      *
      * But this posed complications as we could reset the endpoint
-     * without re-creating the SMIOs. So, to simplify this we just 
+     * without re-creating the SMIOs. So, to simplify this we just
      * destroy the DEVIO and recreate it.
      *
      * */
@@ -580,7 +580,7 @@ int main (int argc, char *argv[])
         free (message);
     }
 
-    /* Now that everything is ready spawn INIT SMIO so clients can 
+    /* Now that everything is ready spawn INIT SMIO so clients can
      * be sure HALCS is ready to go */
     devio_register_sm (server, 0xdc64e778, 0, 0);
 
@@ -591,12 +591,12 @@ int main (int argc, char *argv[])
 
     const char *backend_endpoint = zsock_endpoint (devio_get_pipe (devio));
     char frontend_endpoint [50];
-    snprintf (frontend_endpoint, sizeof (frontend_endpoint), "%s%u", 
+    snprintf (frontend_endpoint, sizeof (frontend_endpoint), "%s%u",
         FRONTEND_ENDPOINT_PREFIX, full_dev_id);
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Backend (server) endpoint: %s\n", 
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Backend (server) endpoint: %s\n",
         backend_endpoint);
     printf ("[halcsd] Backend (server) endpoint: %s\n", backend_endpoint);
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Frontend (clients) endpoint: %s\n", 
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Frontend (clients) endpoint: %s\n",
         frontend_endpoint);
     printf ("[halcsd] Frontend (server) endpoint: %s\n", frontend_endpoint);
     zstr_sendx (proxy, "FRONTEND", "ROUTER", frontend_endpoint, NULL);
@@ -693,7 +693,7 @@ err_cfg_exit:
     return err;
 }
 
-static char *_create_log_filename (char *log_prefix, char *log_filename_pattern, 
+static char *_create_log_filename (char *log_prefix, char *log_filename_pattern,
         uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id)
 {
     /* Set up logdir */
