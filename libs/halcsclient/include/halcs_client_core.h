@@ -877,6 +877,26 @@ halcs_client_err_e halcs_set_tbt_data_mask_samples_end (halcs_client_t *self, ch
 halcs_client_err_e halcs_get_tbt_data_mask_samples_end (halcs_client_t *self, char *service,
         uint32_t *tbt_data_mask_samples_end);
 
+/* SW Tag Desync Counter Reset. This sets/gets the SW Tag desync counter reset */
+halcs_client_err_e halcs_set_sw_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t sw_tag_desync_cnt_rst);
+halcs_client_err_e halcs_get_sw_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t *sw_tag_desync_cnt_rst);
+
+/* SW tag desync counter. This gets the Swithcing tag desync counter */
+halcs_client_err_e halcs_get_sw_tag_desync_cnt (halcs_client_t *self, char *service,
+        uint32_t *sw_tag_desync_cnt);
+
+/* TBT Tag Desync Counter Reset. This sets/gets the TBT Tag desync counter reset */
+halcs_client_err_e halcs_set_tbt_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t tbt_tag_desync_cnt_rst);
+halcs_client_err_e halcs_get_tbt_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t *tbt_tag_desync_cnt_rst);
+
+/* TBT tag desync counter. This gets the Swithcing tag desync counter */
+halcs_client_err_e halcs_get_tbt_tag_desync_cnt (halcs_client_t *self, char *service,
+        uint32_t *tbt_tag_desync_cnt);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */

@@ -1722,6 +1722,40 @@ PARAM_FUNC_CLIENT_READ(tbt_data_mask_samples_end)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_DATA_MASK_SAMPLES_END, tbt_data_mask_samples_end);
 }
 
+/* SW Tag Desync Counter Reset */
+PARAM_FUNC_CLIENT_WRITE(sw_tag_desync_cnt_rst)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT_RST, sw_tag_desync_cnt_rst);
+}
+
+PARAM_FUNC_CLIENT_READ(sw_tag_desync_cnt_rst)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT_RST, sw_tag_desync_cnt_rst);
+}
+
+/* SW Tag Desync Counter */
+PARAM_FUNC_CLIENT_READ(sw_tag_desync_cnt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT, sw_tag_desync_cnt);
+}
+
+/* SW Tag Desync Counter Reset */
+PARAM_FUNC_CLIENT_WRITE(tbt_tag_desync_cnt_rst)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST, tbt_tag_desync_cnt_rst);
+}
+
+PARAM_FUNC_CLIENT_READ(tbt_tag_desync_cnt_rst)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST, tbt_tag_desync_cnt_rst);
+}
+
+/* SW Tag Desync Counter */
+PARAM_FUNC_CLIENT_READ(tbt_tag_desync_cnt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT, tbt_tag_desync_cnt);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */

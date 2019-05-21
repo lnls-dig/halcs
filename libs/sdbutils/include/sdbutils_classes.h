@@ -16,8 +16,8 @@
 /* version macros for compile-time API detection */
 
 #define SDBUTILS_VERSION_MAJOR 1
-#define SDBUTILS_VERSION_MINOR 7
-#define SDBUTILS_VERSION_PATCH 3
+#define SDBUTILS_VERSION_MINOR 8
+#define SDBUTILS_VERSION_PATCH 0
 
 #define SDBUTILS_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

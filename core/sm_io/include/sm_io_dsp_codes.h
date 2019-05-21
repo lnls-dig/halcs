@@ -99,7 +99,21 @@ struct _smio_dsp_data_t {
                                             34
 #define DSP_NAME_SET_GET_TBT_DATA_MASK_SAMPLES_END    \
                                             "dsp_set_get_tbt_data_mask_samples_end"
-#define DSP_OPCODE_END                      35
+#define DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT_RST \
+                                            35
+#define DSP_NAME_SET_GET_SW_TAG_DESYNC_CNT_RST \
+                                            "dsp_set_get_sw_tag_desync_cnt_rst"
+#define DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT \
+                                            36
+#define DSP_NAME_SET_GET_SW_TAG_DESYNC_CNT   "dsp_set_get_sw_tag_desync_cnt"
+#define DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST \
+                                            37
+#define DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT_RST \
+                                            "dsp_set_get_tbt_tag_desync_cnt_rst"
+#define DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT \
+                                            38
+#define DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT   "dsp_set_get_tbt_tag_desync_cnt"
+#define DSP_OPCODE_END                      39
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
