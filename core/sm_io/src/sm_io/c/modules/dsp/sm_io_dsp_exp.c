@@ -435,7 +435,8 @@ RW_PARAM_FUNC(dsp, tbt_data_mask_en) {
 #define POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MAX      ((1<<10ULL)-1)
 RW_PARAM_FUNC(dsp, tbt_data_mask_samples_beg) {
     SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_DATA_MASK_SAMPLES, BEG,
-            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MIN, POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MAX,
+            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MIN,
+            POS_CALC_TBT_DATA_MASK_SAMPLES_BEG_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -443,7 +444,44 @@ RW_PARAM_FUNC(dsp, tbt_data_mask_samples_beg) {
 #define POS_CALC_TBT_DATA_MASK_SAMPLES_END_MAX      ((1<<10ULL)-1)
 RW_PARAM_FUNC(dsp, tbt_data_mask_samples_end) {
     SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_DATA_MASK_SAMPLES, END,
-            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_END_MIN, POS_CALC_TBT_DATA_MASK_SAMPLES_END_MAX,
+            MULT_BIT_PARAM, POS_CALC_TBT_DATA_MASK_SAMPLES_END_MIN,
+            POS_CALC_TBT_DATA_MASK_SAMPLES_END_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_SW_TAG_DESYNC_CNT_RST_MIN                  0
+#define POS_CALC_SW_TAG_DESYNC_CNT_RST_MAX                  1
+RW_PARAM_FUNC(dsp, sw_tag_desync_cnt_rst) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, SW_TAG, DESYNC_CNT_RST,
+            SINGLE_BIT_PARAM, POS_CALC_SW_TAG_DESYNC_CNT_RST_MIN,
+            POS_CALC_SW_TAG_DESYNC_CNT_RST_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_SW_TAG_DESYNC_CNT_MIN                     0
+#define POS_CALC_SW_TAG_DESYNC_CNT_MAX                     ((1<<14ULL)-1)
+RW_PARAM_FUNC(dsp, sw_tag_desync_cnt) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, SW_TAG, DESYNC_CNT,
+            MULT_BIT_PARAM, POS_CALC_SW_TAG_DESYNC_CNT_MIN,
+            POS_CALC_SW_TAG_DESYNC_CNT_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_TAG_DESYNC_CNT_RST_MIN                 0
+#define POS_CALC_TBT_TAG_DESYNC_CNT_RST_MAX                 1
+RW_PARAM_FUNC(dsp, tbt_tag_desync_cnt_rst) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_TAG, DESYNC_CNT_RST,
+            SINGLE_BIT_PARAM, POS_CALC_TBT_TAG_DESYNC_CNT_RST_MIN,
+            POS_CALC_TBT_TAG_DESYNC_CNT_RST_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_TBT_TAG_DESYNC_CNT_MIN                     0
+#define POS_CALC_TBT_TAG_DESYNC_CNT_MAX                     ((1<<14ULL)-1)
+RW_PARAM_FUNC(dsp, tbt_tag_desync_cnt) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, TBT_TAG, DESYNC_CNT,
+            MULT_BIT_PARAM, POS_CALC_TBT_TAG_DESYNC_CNT_MIN,
+            POS_CALC_TBT_TAG_DESYNC_CNT_MAX,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
@@ -484,6 +522,10 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_en),
     RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_samples_beg),
     RW_PARAM_FUNC_NAME(dsp, tbt_data_mask_samples_end),
+    RW_PARAM_FUNC_NAME(dsp, sw_tag_desync_cnt_rst),
+    RW_PARAM_FUNC_NAME(dsp, sw_tag_desync_cnt),
+    RW_PARAM_FUNC_NAME(dsp, tbt_tag_desync_cnt_rst),
+    RW_PARAM_FUNC_NAME(dsp, tbt_tag_desync_cnt),
     NULL
 };
 

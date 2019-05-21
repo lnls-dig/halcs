@@ -428,6 +428,55 @@ disp_op_t dsp_set_get_tbt_data_mask_samples_end_exp = {
     }
 };
 
+disp_op_t dsp_set_get_sw_tag_desync_cnt_rst_exp = {
+    .name = DSP_NAME_SET_GET_SW_TAG_DESYNC_CNT_RST,
+    .opcode = DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_sw_tag_desync_cnt_exp = {
+    .name = DSP_NAME_SET_GET_SW_TAG_DESYNC_CNT,
+    .opcode = DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+
+disp_op_t dsp_set_get_tbt_tag_desync_cnt_rst_exp = {
+    .name = DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT_RST,
+    .opcode = DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_tbt_tag_desync_cnt_exp = {
+    .name = DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT,
+    .opcode = DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -465,6 +514,11 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_tbt_data_mask_en_exp,
     &dsp_set_get_tbt_data_mask_samples_beg_exp,
     &dsp_set_get_tbt_data_mask_samples_end_exp,
+    &dsp_set_get_sw_tag_desync_cnt_rst_exp,
+    &dsp_set_get_sw_tag_desync_cnt_exp,
+    &dsp_set_get_tbt_tag_desync_cnt_rst_exp,
+    &dsp_set_get_tbt_tag_desync_cnt_exp,
     NULL
 };
+
 
