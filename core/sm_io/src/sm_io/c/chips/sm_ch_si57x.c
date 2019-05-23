@@ -66,6 +66,7 @@ static smch_err_e _smch_si57x_read_block (smch_si57x_t *self, uint8_t addr,
 static ssize_t _smch_si57x_read_generic (smch_si57x_t *self, uint8_t addr,
         uint8_t *data, size_t size);
 
+static smch_err_e _smch_si57x_set_freq (smch_si57x_t *self, double *freq);
 static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq);
 static smch_err_e _smch_si57x_set_freq_any (smch_si57x_t *self, double *freq);
 
@@ -168,6 +169,11 @@ smch_err_e smch_si57x_get_defaults (smch_si57x_t *self, double fout)
 }
 
 smch_err_e smch_si57x_set_freq (smch_si57x_t *self, double *freq)
+{
+    return _smch_si57x_set_freq (self, freq);
+}
+
+static smch_err_e _smch_si57x_set_freq (smch_si57x_t *self, double *freq)
 {
     assert (self);
     assert (freq);
