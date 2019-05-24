@@ -210,7 +210,6 @@ err_exit:
     return err;
 }
 
-
 static smch_err_e _smch_si57x_set_freq_small (smch_si57x_t *self, double *freq)
 {
     assert (self);
@@ -613,11 +612,17 @@ static smch_err_e _smch_si57x_set_fstartup (smch_si57x_t *self, double fstartup)
     assert (self);
     smch_err_e err = SMCH_SUCCESS;
     self->fstartup = fstartup;
+    double frequency = self->frequency;
 
     /* On changing the startup frequency, we need to recalculate the Si57x
      * register values */
     err = _smch_si57x_get_defaults (self, self->fstartup);
     ASSERT_TEST(err == SMCH_SUCCESS, "Could not return to Si57x defaults after "
+            "changing fstartup", err_exit);
+
+    /* Re-apply old frequency */
+    err = _smch_si57x_set_freq (self, &frequency);
+    ASSERT_TEST(err == SMCH_SUCCESS, "Could not set Si57x frequency after "
             "changing fstartup", err_exit);
     return err;
 
