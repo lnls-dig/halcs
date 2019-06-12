@@ -10,7 +10,7 @@
 
 #include "halcs_client.h"
 
-static const char *halcs_client_err [HALCS_CLIENT_ERR_END] =
+static const char *halcs_client_err [] =
 {
     [HALCS_CLIENT_SUCCESS]              = "Success",
     [HALCS_CLIENT_ERR_ALLOC]            = "Could not allocate memory",
