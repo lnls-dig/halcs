@@ -52,6 +52,7 @@ enum _halcs_client_err_e
     HALCS_CLIENT_ERR_INV_PARAM = 7,         /* Invalid function parameters */
     HALCS_CLIENT_ERR_INV_FUNCTION = 8,      /* Invalid function */
     HALCS_CLIENT_ERR_INV_RETCODE = 9,       /* Invalid return code */
+    HALCS_CLIENT_ERR_GEN_END = 10,          /* End of generic enum marker */
     HALCS_CLIENT_ERR_MODULE = __HALCS_CLIENT_ERR_MODULE_INIT,  /* Init of module enum marker */
     HALCS_CLIENT_ERR_MODULE_ERR1  = __HALCS_CLIENT_ERR_MODULE_ERR1,
     HALCS_CLIENT_ERR_MODULE_ERR2  = __HALCS_CLIENT_ERR_MODULE_ERR2,

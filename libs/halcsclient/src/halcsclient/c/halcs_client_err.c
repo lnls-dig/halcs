@@ -29,5 +29,9 @@ static const char *halcs_client_err [] =
 /* Convert enumeration type to string */
 const char * halcs_client_err_str (halcs_client_err_e err)
 {
-    return halcs_client_err [err];
+    if (err < HALCS_CLIENT_ERR_GEN_END) {
+        return halcs_client_err [err];
+    }
+
+    return NULL;
 }
