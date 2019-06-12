@@ -20,7 +20,10 @@ static const char *halcs_client_err [HALCS_CLIENT_ERR_END] =
     [HALCS_CLIENT_ERR_MSG]              = "Unexpected message",
     [HALCS_CLIENT_ERR_INV_PARAM]        = "Invalid function parameters",
     [HALCS_CLIENT_ERR_INV_FUNCTION]     = "Invalid function",
-    [HALCS_CLIENT_INT]                  = "Interrupt occured"
+    [HALCS_CLIENT_INT]                  = "Interrupt occured",
+    [HALCS_CLIENT_ERR_INV_PARAM]        = "Invalid function parameters",
+    [HALCS_CLIENT_ERR_INV_FUNCTION]     = "Invalid function",
+    [HALCS_CLIENT_ERR_INV_RETCODE]      = "Invalid return code"
 };
 
 /* Convert enumeration type to string */
