@@ -19,7 +19,7 @@
 
 #define CONVC_VERSION_MAJOR 1
 #define CONVC_VERSION_MINOR 8
-#define CONVC_VERSION_PATCH 1
+#define CONVC_VERSION_PATCH 2
 
 #define CONVC_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

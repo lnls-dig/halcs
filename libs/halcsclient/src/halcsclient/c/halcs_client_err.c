@@ -10,7 +10,7 @@
 
 #include "halcs_client.h"
 
-static const char *halcs_client_err [HALCS_CLIENT_ERR_END] =
+static const char *halcs_client_err [] =
 {
     [HALCS_CLIENT_SUCCESS]              = "Success",
     [HALCS_CLIENT_ERR_ALLOC]            = "Could not allocate memory",
@@ -18,13 +18,18 @@ static const char *halcs_client_err [HALCS_CLIENT_ERR_END] =
     [HALCS_CLIENT_ERR_AGAIN]            = "Operation did not fully complete, try again",
     [HALCS_CLIENT_ERR_TIMEOUT]          = "Timeout occurred",
     [HALCS_CLIENT_ERR_MSG]              = "Unexpected message",
+    [HALCS_CLIENT_INT]                  = "Interrupt occured",
     [HALCS_CLIENT_ERR_INV_PARAM]        = "Invalid function parameters",
     [HALCS_CLIENT_ERR_INV_FUNCTION]     = "Invalid function",
-    [HALCS_CLIENT_INT]                  = "Interrupt occured"
+    [HALCS_CLIENT_ERR_INV_RETCODE]      = "Invalid return code"
 };
 
 /* Convert enumeration type to string */
 const char * halcs_client_err_str (halcs_client_err_e err)
 {
-    return halcs_client_err [err];
+    if (err < HALCS_CLIENT_ERR_GEN_END) {
+        return halcs_client_err [err];
+    }
+
+    return NULL;
 }
