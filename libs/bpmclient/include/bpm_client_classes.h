@@ -23,7 +23,7 @@
 
 #define BPM_CLIENT_VERSION_MAJOR 1
 #define BPM_CLIENT_VERSION_MINOR 8
-#define BPM_CLIENT_VERSION_PATCH 1
+#define BPM_CLIENT_VERSION_PATCH 2
 
 #define BPM_CLIENT_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

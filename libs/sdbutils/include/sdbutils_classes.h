@@ -17,7 +17,7 @@
 
 #define SDBUTILS_VERSION_MAJOR 1
 #define SDBUTILS_VERSION_MINOR 8
-#define SDBUTILS_VERSION_PATCH 1
+#define SDBUTILS_VERSION_PATCH 2
 
 #define SDBUTILS_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

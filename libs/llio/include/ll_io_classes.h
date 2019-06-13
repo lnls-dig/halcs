@@ -20,7 +20,7 @@
 
 #define LL_IO_VERSION_MAJOR 1
 #define LL_IO_VERSION_MINOR 8
-#define LL_IO_VERSION_PATCH 1
+#define LL_IO_VERSION_PATCH 2
 
 #define LL_IO_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
