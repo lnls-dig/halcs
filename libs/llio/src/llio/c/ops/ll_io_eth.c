@@ -50,7 +50,7 @@
 #define LLIO_ETH_SECS_BEFORE_RECV_TIMEOUT    1
 
 /* Max retries when opening the ETH connection */
-#define LLIO_ETH_MAX_OPEN_RECONNECT_TRIES    300
+#define LLIO_ETH_MAX_OPEN_RECONNECT_TRIES    -1
 #define LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT  1
 
 /* Device endpoint */
@@ -195,14 +195,25 @@ static int eth_open (llio_t *self, llio_endpoint_t *endpoint)
     ASSERT_TEST(dev_eth != NULL, "Could not allocate dev_handler",
             err_dev_handler_alloc, -1);
 
-    size_t retries = LLIO_ETH_MAX_OPEN_RECONNECT_TRIES;
+    ssize_t retries = LLIO_ETH_MAX_OPEN_RECONNECT_TRIES;
+    bool retry_forever_first_time = (retries < 0)? true : false;
     err = _llio_eth_conn (&dev_eth->fd, dev_eth->type, dev_eth->hostname,
         dev_eth->port, LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
+
     while (err < 0) {
         ASSERT_TEST(retries != 0, "No more retries in connecting to endpoint", err_retries_eth_conn);
-        DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
-                "[ll_io_eth] Error on connection to endpoint the first time, retrying (%zu/%u)\n", LLIO_ETH_MAX_OPEN_RECONNECT_TRIES-retries, 
+
+        if (retry_forever_first_time) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                    "[ll_io_eth] Error on connection to endpoint the first time, retrying forever\n");
+            retry_forever_first_time = false;
+        }
+        else if (retries >= 0) {
+            DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                    "[ll_io_eth] Error on connection to endpoint the first time, retrying (%zu/%u)\n", LLIO_ETH_MAX_OPEN_RECONNECT_TRIES-retries,
                     LLIO_ETH_MAX_OPEN_RECONNECT_TRIES);
+        }
+
         /* Only decrement if we are in finite waiting mode */
         if (retries > 0) {
             retries--;
