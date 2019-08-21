@@ -517,6 +517,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
             if (rv < 0) {
                DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                        "[ll_io_eth] Error connecting: %d - %s\n", errno, strerror(errno));
+               sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
                err = -1;
                goto err_select1;
             }
@@ -536,6 +537,7 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
             if (valopt) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error in delayed connection:%d - %s\n", valopt, strerror(valopt));
+                sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
                 err = -1;
                 goto err_valopt;
             }
