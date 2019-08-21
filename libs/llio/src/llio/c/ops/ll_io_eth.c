@@ -515,25 +515,25 @@ static int _llio_eth_conn (int *fd, llio_eth_type_e type, char *hostname,
 
             rv = select (*fd+1, NULL, &myset, NULL, &tv);
             if (rv < 0) {
-               DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
-                       "[ll_io_eth] Error connecting: %d - %s\n", errno, strerror(errno));
-               sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
-               err = -1;
-               goto err_select1;
+                DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
+                        "[ll_io_eth] Error connecting: %d - %s\n", errno, strerror(errno));
+                sleep (LLIO_ETH_SECS_OPEN_BEFORE_RECONNECT);
+                err = -1;
+                goto err_select1;
             }
 
             if (rv == 0) {
-               DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
-                       "[ll_io_eth] Timeout in connecting\n");
-               err = -1;
-               goto err_select2;
+                DBE_DEBUG (DBG_LL_IO | DBG_LVL_TRACE,
+                        "[ll_io_eth] Timeout in connecting\n");
+                err = -1;
+                goto err_select2;
             }
 
             /* Check if socket is opened succesfully */
             lon = sizeof(int);
             rv = getsockopt (*fd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon);
             ASSERT_TEST (rv >= 0, "Could not get socket options",
-                err_getsockopt, -1);
+                    err_getsockopt, -1);
             if (valopt) {
                 DBE_DEBUG (DBG_LL_IO | DBG_LVL_FATAL,
                         "[ll_io_eth] Error in delayed connection:%d - %s\n", valopt, strerror(valopt));
