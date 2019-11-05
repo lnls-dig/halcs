@@ -147,7 +147,7 @@ WITH_APP_CFG=n
 if [ "$WITH_HALCS" = "yes" ]; then
     COMMAND_DEPS="\
         make ${EXTRA_FLAGS} deps && \
-        make ${EXTRA_FLAGS} deps_install"
+        sudo make ${EXTRA_FLAGS} deps_install"
 
     COMMAND_LIBS="\
         make \
@@ -157,7 +157,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
         ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
         LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
-        libs_compile_install"
+        sudo libs_compile_install"
 
     COMMAND_CORE="\
         make \
@@ -174,7 +174,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
         WITH_DEV_MNGR=${WITH_DEV_MNGR} \
         AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
         WITH_APP_CFG=${WITH_APP_CFG} && \
-        make \
+        sudo make \
         WITH_APP_CFG=${WITH_APP_CFG} \
         ${EXTRA_FLAGS} core_install"
 
@@ -194,8 +194,8 @@ fi
 if [ "$WITH_HALCS" = "yes" ]; then
     if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
         COMMAND_SYSTEM_INTEGRATION="\
-            make scripts_install && \
-            ldconfig"
+            sudo make scripts_install && \
+            sudo ldconfig"
     else
         COMMAND_SYSTEM_INTEGRATION=""
     fi
@@ -204,7 +204,7 @@ fi
 if [ "$WITH_DRIVER" = "yes" ]; then
     COMMAND_DRIVER="\
         make ${EXTRA_FLAGS} pcie_driver && \
-        make ${EXTRA_FLAGS} pcie_driver_install"
+        sudo make ${EXTRA_FLAGS} pcie_driver_install"
 else
     COMMAND_DRIVER=""
 fi
