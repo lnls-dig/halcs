@@ -26,7 +26,7 @@ PREFIX ?= /usr
 ENDIAN := $(shell ./check-endian $(CC))
 
 override CFLAGS += -Wall -ggdb -O2
-override CFLAGS += -Iinclude
+override CFLAGS += -Iinclude -I../../libs/llio/include
 override CFLAGS += -ffunction-sections -fdata-sections
 override CFLAGS += -Wno-pointer-sign
 override CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
