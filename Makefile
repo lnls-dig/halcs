@@ -13,14 +13,23 @@ MAKE ?=		make
 DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= ml605
+BOARD ?= afcv3_1
 # Select which application we want to generate. Options are: halcsd
 APPS ?= halcsd
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
-SHRINK_AFCV3_DDR_SIZE ?= y
+SHRINK_AFCV3_DDR_SIZE ?= n
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG ?= n
+#Select if we want to compile with debug mode on. Options are: y(es) or n(o)
+ERRHAND_DBG=y
+export ERRHAND_DBG
+# Select the minimum debug verbosity. See liberrhand file errhand_opts.h for more info.
+ERRHAND_MIN_LEVEL=DBG_LVL_WARN
+export ERRHAND_MIN_LEVEL
+# Select the subsytems which will have the debug on. See liberrhand file errhand_opts.h for more info.
+ERRHAND_SUBSYS_ON="(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+export ERRHAND_SUBSYS_ON
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
 DBE_DBG ?= y
 # Select the FMC ADC board type. Options are: passive or active
