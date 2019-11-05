@@ -23,10 +23,13 @@ the binaries or executing the instructions below:
 
 * uuid (distribution available):
 
+```bash
 	sudo apt-get install uuid
+```
 
 ### Prerequisites Installation Instructions
 
+```bash
 	git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
 	git clone --branch=v4.2.2-pre https://github.com/lnls-dig/libzmq.git && \
 	git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
@@ -39,44 +42,62 @@ the binaries or executing the instructions below:
 	    sudo ldconfig
 	    cd ..
 	done
+```
 
 ## Cloning this repository
 
+```bash
 	git clone --recursive https://github.com/lnls-dig/halcs.git
+```
 
 ## PCIe Installation Instructions
 
 Install linux header files
 
+```bash
 	sudo apt-get install linux-headers-generic
+```
 
 Install the GIT package
 
+```bash
 	sudo apt-get install binutils gcc
+```
 
 Change folder to the pcie driver location
 
+```bash
 	cd kernel
+```
 
 Compile the PCIe driver and its tests
 
+```bash
 	make
+```
 
 Install the PCIe drivers and libraries
 
+```bash
 	sudo make install
+```
 
 Load the Driver module
 
+```bash
 	sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
+```
 
 After this the kernel should have found the FPGA board
 and initialized it. Run the following command and check its output
 
+```bash
 	dmesg | tail
+```
 
 You should see something like the excerpt below:
 
+```bash
 	[267002.495109] pciDriver - pcidriver_init :
 		Major 250 allocated to nodename 'fpga'
 	[267002.495130] pciDriver - pcidriver_probe :
@@ -87,6 +108,7 @@ You should see something like the excerpt below:
 		Registered Interrupt Handler at pin 1, line 11, IRQ 16
 	[267002.495450] pciDriver - pcidriver_init :
 		Module loaded
+```
 
 ## Running the PCIe self-test
 
@@ -96,14 +118,19 @@ everything is setup properly. For this run the following:
 
 Change to the "compiled tests folder"
 
+```bash
 	cd tests/pcie/bin
+```
 
 Run the test entitled "testPciDriverMod"
 
+```bash
 	sudo ./testPciDriverMod
+```
 
 You should get an output like the following, if everythig is ok:
 
+```bash
         Testing OPEN DEVICE... PASSED!
          Testing PCIDRIVER_IOC_MMAP_MODE... PASSED!
          Testing PCIDRIVER_IOC_MMAP_AREA... PASSED!
@@ -195,6 +222,7 @@ You should get an output like the following, if everythig is ok:
 		-------------------------------------
 		|        All tests PASSED!          |
 		-------------------------------------
+```
 
 Notice that some tests that try to evaluate the limits of a current
 Linux Kernel may fail in some cases. In the example above,
@@ -215,50 +243,70 @@ the PCIe kernel driver.
 If the PCIe driver is already installed, you could
 run it without superuser.
 
-	Usage: ./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
+```bash
+	./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
 		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
+```
 
 ### Client
 
 Change to the Client API folder
 
+```bash
 	cd src/libs/libhalcsclient
+```
 
 Compile the library, with debug info
 
+```bash
 	make BOARD=<board> ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
         ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
         DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
+```
 
 or
 
+```bash
 	sudo ./compile.sh [<board>]
+```
 
 Install the library
 
+```bash
 	sudo make install
+```
 
 ## Running the examples
 
 Change to the examples folder
 
+```bash
     cd examples
+```
 
 Compile the examples
 
+```bash
 	make
+```
 
 Run an example application, for instance, the leds example
 
+```bash
 	./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
+```
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
+```bash
 	./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
+```
 
 If one would like to use TCP, it should call, for instance:
 
+```bash
 	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
+```
 
 Leds should be blinking in the FMC ADC board
