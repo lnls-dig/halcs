@@ -208,7 +208,19 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
 			   -lpthread
 
 # General library flags -L<libdir>
-LFLAGS = -Lforeign/libsdbfs
+LFLAGS = -Lforeign/libsdbfs \
+	     -Lforeign/libbsmp
+
+LFLAGS += -Llibs/errhand \
+	      -Llibs/convc \
+	      -Llibs/hutils \
+	      -Llibs/disptable \
+	      -Llibs/llio \
+	      -Llibs/halcsclient \
+	      -Llibs/acqclient \
+	      -Llibs/bpmclient \
+	      -Llibs/sdbutils \
+	      -Llibs/sdbfs
 
 # Specific platform objects
 OBJS_PLATFORM =
