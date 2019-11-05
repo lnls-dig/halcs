@@ -50,7 +50,51 @@ the binaries or executing the instructions below:
 	git clone --recursive https://github.com/lnls-dig/halcs.git
 ```
 
-## PCIe Installation Instructions
+## Installation Instructions
+
+### Server
+
+Compile everything with debug info. The superuser access
+is necessary because it checks (and installs if needed)
+the PCIe kernel driver.
+
+If the PCIe driver is already installed, you could
+run it without superuser.
+
+```bash
+	./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
+		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
+```
+
+### Client
+
+Change to the Client API folder
+
+```bash
+	cd src/libs/libhalcsclient
+```
+
+Compile the library, with debug info
+
+```bash
+	make BOARD=<board> ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
+        ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
+        DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
+```
+
+or
+
+```bash
+	sudo ./compile.sh [<board>]
+```
+
+Install the library
+
+```bash
+	sudo make install
+```
+
+### PCIe Installation Instructions
 
 Install linux header files
 
@@ -110,7 +154,7 @@ You should see something like the excerpt below:
 		Module loaded
 ```
 
-## Running the PCIe self-test
+### Running the PCIe self-test
 
 After the installation of the PCIe driver (see above)
 it is possible to run a self test to check if
@@ -232,49 +276,6 @@ space.
 This is not actually an error or a failure, it is just trying to
 allocate more memory than the kernel has available.
 
-## Installation Instructions
-
-### Server
-
-Compile everything with debug info. The superuser access
-is necessary because it checks (and installs if needed)
-the PCIe kernel driver.
-
-If the PCIe driver is already installed, you could
-run it without superuser.
-
-```bash
-	./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
-		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
-```
-
-### Client
-
-Change to the Client API folder
-
-```bash
-	cd src/libs/libhalcsclient
-```
-
-Compile the library, with debug info
-
-```bash
-	make BOARD=<board> ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
-        ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
-        DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
-```
-
-or
-
-```bash
-	sudo ./compile.sh [<board>]
-```
-
-Install the library
-
-```bash
-	sudo make install
-```
 
 ## Running the examples
 
