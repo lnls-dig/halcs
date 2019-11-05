@@ -146,8 +146,8 @@ WITH_APP_CFG=n
 # Install HALCS only if requested
 if [ "$WITH_HALCS" = "yes" ]; then
     COMMAND_DEPS="\
-        make ${EXTRA_FLAGS} deps && \
-        sudo make ${EXTRA_FLAGS} deps_install"
+        make ${EXTRA_FLAGS} deps \
+        && sudo make ${EXTRA_FLAGS} deps_install"
 
     COMMAND_LIBS="\
         make \
@@ -156,8 +156,15 @@ if [ "$WITH_HALCS" = "yes" ]; then
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
         ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-        LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
-        sudo libs_compile_install"
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        && sudo make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        libs_compile_install"
 
     COMMAND_CORE="\
         make \
@@ -173,10 +180,22 @@ if [ "$WITH_HALCS" = "yes" ]; then
         FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
         WITH_DEV_MNGR=${WITH_DEV_MNGR} \
         AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-        WITH_APP_CFG=${WITH_APP_CFG} && \
-        sudo make \
         WITH_APP_CFG=${WITH_APP_CFG} \
-        ${EXTRA_FLAGS} core_install"
+        && sudo make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        APPS=${APPS} \
+        SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
+        FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
+        WITH_DEV_MNGR=${WITH_DEV_MNGR} \
+        AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+        WITH_APP_CFG=${WITH_APP_CFG} \
+        core_install"
 
     if [ "$WITH_EXAMPLES" = "yes" ]; then
     COMMAND_EXAMPLES="\
