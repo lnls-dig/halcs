@@ -70,7 +70,9 @@ SRC_DIR = src/hutils/c
 INCLUDE_DIR = include
 
 # Include directories
-INCLUDE_DIRS = -Iinclude -I${PREFIX}/include
+INCLUDE_DIRS = -Iinclude \
+	           -I${PREFIX}/include \
+	           -I../errhand/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

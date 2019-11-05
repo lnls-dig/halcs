@@ -139,7 +139,11 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_timing \
-	       -I${PREFIX}/include
+	       -I${PREFIX}/include \
+	       -I../errhand/include \
+	       -I../hutils/include \
+	       -I../disptable/include \
+	       -I../halcsclient/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
