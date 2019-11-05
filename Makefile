@@ -336,7 +336,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(OUT)
+all: deps libs $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
