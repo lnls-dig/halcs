@@ -24,30 +24,30 @@ the binaries or executing the instructions below:
 * uuid (distribution available):
 
 ```bash
-	sudo apt-get install uuid
+sudo apt-get install uuid
 ```
 
 ### Prerequisites Installation Instructions
 
 ```bash
-	git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
-	git clone --branch=v4.2.2-pre https://github.com/lnls-dig/libzmq.git && \
-	git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
-	git clone --branch=v1.5.0 https://github.com/lnls-dig/malamute.git &&
-	for project in libsodium libzmq czmq malamute; do
-	    cd $project
-	    ./autogen.sh
-	    ./configure && make check
-	    sudo make install
-	    sudo ldconfig
-	    cd ..
-	done
+git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
+git clone --branch=v4.2.2-pre https://github.com/lnls-dig/libzmq.git && \
+git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
+git clone --branch=v1.5.0 https://github.com/lnls-dig/malamute.git &&
+for project in libsodium libzmq czmq malamute; do
+    cd $project
+    ./autogen.sh
+    ./configure && make check
+    sudo make install
+    sudo ldconfig
+    cd ..
+done
 ```
 
 ## Cloning this repository
 
 ```bash
-	git clone --recursive https://github.com/lnls-dig/halcs.git
+git clone --recursive https://github.com/lnls-dig/halcs.git
 ```
 
 ## Installation Instructions
@@ -62,26 +62,26 @@ If the PCIe driver is already installed, you could
 run it without superuser.
 
 ```bash
-    make && sudo make install
+make && sudo make install
 ```
 
 or
 
 ```bash
-	./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
-		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
+./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>] \
+    [-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
 ```
 
 ### Client
 
 ```bash
-	make libhalcsclient && sudo libhalcsclient_install
+make libhalcsclient && sudo libhalcsclient_install
 ```
 
 or
 
 ```bash
-	cd libs/halcsclient && ./compile.sh [<board>]
+cd libs/halcsclient && ./compile.sh [<board>]
 ```
 
 ### PCIe Installation Instructions (if needed)
@@ -89,59 +89,59 @@ or
 Install linux header files
 
 ```bash
-	sudo apt-get install linux-headers-generic
+sudo apt-get install linux-headers-generic
 ```
 
 Install the GIT package
 
 ```bash
-	sudo apt-get install binutils gcc
+sudo apt-get install binutils gcc
 ```
 
 Change folder to the pcie driver location
 
 ```bash
-	cd kernel
+cd kernel
 ```
 
 Compile the PCIe driver and its tests
 
 ```bash
-	make
+make
 ```
 
 Install the PCIe drivers and libraries
 
 ```bash
-	sudo make install
+sudo make install
 ```
 
 Load the Driver module
 
 ```bash
-	sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
+sudo insmod /lib/modules/$(uname -r)/extra/PciDriver.ko
 ```
 
 After this the kernel should have found the FPGA board
 and initialized it. Run the following command and check its output
 
 ```bash
-	dmesg | tail
+dmesg | tail
 ```
 
 You should see something like the excerpt below:
 
 ```bash
-	[267002.495109] pciDriver - pcidriver_init :
-		Major 250 allocated to nodename 'fpga'
-	[267002.495130] pciDriver - pcidriver_probe :
-		Found ML605 board at 0000:01:00.0
-	[267002.495224] pciDriver - pcidriver_probe :
-		Device /dev/fpga0 added
-	[267002.495434] pciDriver - pcidriver_probe_irq :
-		Registered Interrupt Handler at pin 1, line 11, IRQ 16
-	[267002.495450] pciDriver - pcidriver_init :
-		Module loaded
+[267002.495109] pciDriver - pcidriver_init :
+	Major 250 allocated to nodename 'fpga'
+[267002.495130] pciDriver - pcidriver_probe :
+	Found ML605 board at 0000:01:00.0
+[267002.495224] pciDriver - pcidriver_probe :
+	Device /dev/fpga0 added
+[267002.495434] pciDriver - pcidriver_probe_irq :
+	Registered Interrupt Handler at pin 1, line 11, IRQ 16
+[267002.495450] pciDriver - pcidriver_init :
+	Module loaded
 ```
 
 ### Running the PCIe self-test
@@ -153,109 +153,109 @@ everything is setup properly. For this run the following:
 Change to the "compiled tests folder"
 
 ```bash
-	cd tests/pcie/bin
+cd tests/pcie/bin
 ```
 
 Run the test entitled "testPciDriverMod"
 
 ```bash
-	sudo ./testPciDriverMod
+sudo ./testPciDriverMod
 ```
 
 You should get an output like the following, if everythig is ok:
 
 ```bash
-        Testing OPEN DEVICE... PASSED!
-         Testing PCIDRIVER_IOC_MMAP_MODE... PASSED!
-         Testing PCIDRIVER_IOC_MMAP_AREA... PASSED!
-         Testing PCIDRIVER_IOC_PCI_INFO...  PASSED!
-         Testing PCI CONFIG...
-           Reading PCI config area in byte mode ... PASSED!
-           Reading PCI config area in word mode ... PASSED!
-           Reading PCI config area in double-word mode ... PASSED!
-         Testing PCI mmap...
-           Reading PCI info... PASSED!
-           Setting mmap mode... PASSED!
-           Setting mmap area... PASSED!
-           MMAP'ing BAR0... PASSED!
-           Setting mmap area... PASSED!
-           MMAP'ing BAR2... PASSED!
-           Setting mmap area... PASSED!
-           MMAP'ing BAR4... PASSED!
-         Testing PCIDRIVER_IOC_KMEM_ALLOC...
-           alloc size    1024 :  PASSED!
-           alloc size    2048 :  PASSED!
-           alloc size    4096 :  PASSED!
-           alloc size    8192 :  PASSED!
-           alloc size   16384 :  PASSED!
-           alloc size   32768 :  PASSED!
-           alloc size   65536 :  PASSED!
-           alloc size  131072 :  PASSED!
-           alloc size  262144 :  PASSED!
-           alloc size  524288 :  PASSED!
-           alloc size 1048576 :  PASSED!
-           alloc size 2097152 :  PASSED!
-           alloc size 4194304 :  PASSED!
-           alloc size 8388608 :  FAILED (maybe size is just too big)!
-         Testing PCIDRIVER_IOC_KMEM_SYNC...
-           Setting KMEM SYNC to write mode... PASSED!
-           Setting KMEM SYNC to read mode... PASSED!
-           Setting KMEM SYNC to read/write mode... PASSED!
-         Testing PCIDRIVER_IOC_KMEM_FREE... PASSED!
-         Testing Kernel Buffer mmap...
-           Setting MMAP mode to KMEM... PASSED!
-             Allocing size    1024 : PASSED!
-             MMAPing size     1024 : PASSED!
-             Allocing size    2048 : PASSED!
-             MMAPing size     2048 : PASSED!
-             Allocing size    4096 : PASSED!
-             MMAPing size     4096 : PASSED!
-             Allocing size    8192 : PASSED!
-             MMAPing size     8192 : PASSED!
-             Allocing size   16384 : PASSED!
-             MMAPing size    16384 : PASSED!
-             Allocing size   32768 : PASSED!
-             MMAPing size    32768 : PASSED!
-             Allocing size   65536 : PASSED!
-             MMAPing size    65536 : PASSED!
-             Allocing size  131072 : PASSED!
-             MMAPing size   131072 : PASSED!
-             Allocing size  262144 : PASSED!
-             MMAPing size   262144 : PASSED!
-             Allocing size  524288 : PASSED!
-             MMAPing size   524288 : PASSED!
-             Allocing size 1048576 : PASSED!
-             MMAPing size  1048576 : PASSED!
-             Allocing size 2097152 : PASSED!
-             MMAPing size  2097152 : PASSED!
-             Allocing size 4194304 : PASSED!
-             MMAPing size  4194304 : PASSED!
-             Allocing size 8388608 : FAILED (maybe size is just too big)!
-           Freeing Kernel buffers...
-              Buffer index 0... PASSED!
-              Buffer index 1... PASSED!
-              Buffer index 2... PASSED!
-              Buffer index 3... PASSED!
-              Buffer index 4... PASSED!
-              Buffer index 5... PASSED!
-              Buffer index 6... PASSED!
-              Buffer index 7... PASSED!
-              Buffer index 8... PASSED!
-              Buffer index 9... PASSED!
-              Buffer index 10... PASSED!
-              Buffer index 11... PASSED!
-              Buffer index 12... PASSED!
-         Testing PCIDRIVER_IOC_UMEM_SGMAP ... PASSED!
-         Testing PCIDRIVER_IOC_UMEM_SGGET ... PASSED!
-         Testing PCIDRIVER_IOC_UMEM_SYNC ...
-           Setting UMEM SYNC to write mode... PASSED!
-           Setting UMEM SYNC to read mode... PASSED!
-           Setting UMEM SYNC to read/write mode... PASSED!
-         Testing PCIDRIVER_IOC_UMEM_SGUNMAP ... PASSED!
+Testing OPEN DEVICE... PASSED!
+ Testing PCIDRIVER_IOC_MMAP_MODE... PASSED!
+ Testing PCIDRIVER_IOC_MMAP_AREA... PASSED!
+ Testing PCIDRIVER_IOC_PCI_INFO...  PASSED!
+ Testing PCI CONFIG...
+   Reading PCI config area in byte mode ... PASSED!
+   Reading PCI config area in word mode ... PASSED!
+   Reading PCI config area in double-word mode ... PASSED!
+ Testing PCI mmap...
+   Reading PCI info... PASSED!
+   Setting mmap mode... PASSED!
+   Setting mmap area... PASSED!
+   MMAP'ing BAR0... PASSED!
+   Setting mmap area... PASSED!
+   MMAP'ing BAR2... PASSED!
+   Setting mmap area... PASSED!
+   MMAP'ing BAR4... PASSED!
+ Testing PCIDRIVER_IOC_KMEM_ALLOC...
+   alloc size    1024 :  PASSED!
+   alloc size    2048 :  PASSED!
+   alloc size    4096 :  PASSED!
+   alloc size    8192 :  PASSED!
+   alloc size   16384 :  PASSED!
+   alloc size   32768 :  PASSED!
+   alloc size   65536 :  PASSED!
+   alloc size  131072 :  PASSED!
+   alloc size  262144 :  PASSED!
+   alloc size  524288 :  PASSED!
+   alloc size 1048576 :  PASSED!
+   alloc size 2097152 :  PASSED!
+   alloc size 4194304 :  PASSED!
+   alloc size 8388608 :  FAILED (maybe size is just too big)!
+ Testing PCIDRIVER_IOC_KMEM_SYNC...
+   Setting KMEM SYNC to write mode... PASSED!
+   Setting KMEM SYNC to read mode... PASSED!
+   Setting KMEM SYNC to read/write mode... PASSED!
+ Testing PCIDRIVER_IOC_KMEM_FREE... PASSED!
+ Testing Kernel Buffer mmap...
+   Setting MMAP mode to KMEM... PASSED!
+     Allocing size    1024 : PASSED!
+     MMAPing size     1024 : PASSED!
+     Allocing size    2048 : PASSED!
+     MMAPing size     2048 : PASSED!
+     Allocing size    4096 : PASSED!
+     MMAPing size     4096 : PASSED!
+     Allocing size    8192 : PASSED!
+     MMAPing size     8192 : PASSED!
+     Allocing size   16384 : PASSED!
+     MMAPing size    16384 : PASSED!
+     Allocing size   32768 : PASSED!
+     MMAPing size    32768 : PASSED!
+     Allocing size   65536 : PASSED!
+     MMAPing size    65536 : PASSED!
+     Allocing size  131072 : PASSED!
+     MMAPing size   131072 : PASSED!
+     Allocing size  262144 : PASSED!
+     MMAPing size   262144 : PASSED!
+     Allocing size  524288 : PASSED!
+     MMAPing size   524288 : PASSED!
+     Allocing size 1048576 : PASSED!
+     MMAPing size  1048576 : PASSED!
+     Allocing size 2097152 : PASSED!
+     MMAPing size  2097152 : PASSED!
+     Allocing size 4194304 : PASSED!
+     MMAPing size  4194304 : PASSED!
+     Allocing size 8388608 : FAILED (maybe size is just too big)!
+   Freeing Kernel buffers...
+      Buffer index 0... PASSED!
+      Buffer index 1... PASSED!
+      Buffer index 2... PASSED!
+      Buffer index 3... PASSED!
+      Buffer index 4... PASSED!
+      Buffer index 5... PASSED!
+      Buffer index 6... PASSED!
+      Buffer index 7... PASSED!
+      Buffer index 8... PASSED!
+      Buffer index 9... PASSED!
+      Buffer index 10... PASSED!
+      Buffer index 11... PASSED!
+      Buffer index 12... PASSED!
+ Testing PCIDRIVER_IOC_UMEM_SGMAP ... PASSED!
+ Testing PCIDRIVER_IOC_UMEM_SGGET ... PASSED!
+ Testing PCIDRIVER_IOC_UMEM_SYNC ...
+   Setting UMEM SYNC to write mode... PASSED!
+   Setting UMEM SYNC to read mode... PASSED!
+   Setting UMEM SYNC to read/write mode... PASSED!
+ Testing PCIDRIVER_IOC_UMEM_SGUNMAP ... PASSED!
 
-		-------------------------------------
-		|        All tests PASSED!          |
-		-------------------------------------
+-------------------------------------
+|        All tests PASSED!          |
+-------------------------------------
 ```
 
 Notice that some tests that try to evaluate the limits of a current
@@ -272,32 +272,32 @@ allocate more memory than the kernel has available.
 Change to the examples folder
 
 ```bash
-    cd examples
+cd examples
 ```
 
 Compile the examples
 
 ```bash
-	make
+make
 ```
 
 Run an example application, for instance, the leds example
 
 ```bash
-	./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
+./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
 ```
 
 Typically, one should choose the IPC transport method
 for its faster than TCP. For instance:
 
 ```bash
-	./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
+./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
 ```
 
 If one would like to use TCP, it should call, for instance:
 
 ```bash
-	./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
+./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
 ```
 
 Leds should be blinking in the FMC ADC board
