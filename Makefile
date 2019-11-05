@@ -235,12 +235,22 @@ boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
+	       -I$(LIBBSMP_DIR)/include \
 	       -Icore/common/include \
 	       -Icore/revision/include \
 	       -Icore/sm_io/include \
 	       -Icore/sm_io_table/include \
 	       -Iforeign/libsdbfs/include \
 	       -Ilibs/llio/include \
+	       -Ilibs/acqclient/include \
+	       -Ilibs/bpmclient/include \
+	       -Ilibs/convc/include \
+	       -Ilibs/disptable/include \
+	       -Ilibs/errhand/include \
+	       -Ilibs/halcsclient/include \
+	       -Ilibs/hutils/include \
+	       -Ilibs/llio/include \
+	       -Ilibs/sdbutils/include \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
