@@ -1,11 +1,12 @@
 halcsd_DIR = $(SRC_DIR)/apps/halcsd/src/halcsd/c
+halcsd_cfg_DIR = $(SRC_DIR)/apps/halcsd/src/halcsd_cfg/c
 
 halcsd_OBJS = $(halcsd_DIR)/halcsd.o
 
 halcsd_OUT = halcsd
 
 ifeq ($(WITH_APP_CFG),y)
-halcsd_cfg_OBJS = $(halcsd_DIR)/../halcsd_cfg/c/halcsd_cfg.o
+halcsd_cfg_OBJS = $(halcsd_cfg_DIR)/halcsd_cfg.o
 halcsd_cfg_OUT = halcsd_cfg
 else
 halcsd_cfg_OBJS =
