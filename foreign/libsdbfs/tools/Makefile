@@ -19,10 +19,18 @@ ERRHAND_MIN_LEVEL ?= DBG_LVL_ERR
 ERRHAND_SUBSYS_ON ?= "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
 
 override CFLAGS += -Wall -ggdb
-override CFLAGS += -I.. -I../include
+override CFLAGS += -I.. \
+	               -I../include \
+	               -I../../../libs/llio/include \
+	               -I../../../libs/errhand/include \
+	               -I../../../libs/convc/include
 CFLAGS_LNLS = -DERRHAND_DBG=$(ERRHAND_DBG) -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL) \
 	-DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
-override LDFLAGS += -L.. -lsdbfs
+override LDFLAGS += -L.. \
+	               -L../../../libs/llio \
+	               -L../../../libs/errhand \
+	               -L../../../libs/convc \
+	               -lsdbfs
 LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
 PROG = gensdbfs sdb-read sdb-read-lnls sdb-extract
