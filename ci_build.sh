@@ -306,15 +306,15 @@ if [ -n "$GRADLE" ]; then
     export ${CONFIG_FLAGS[@]}
     ./gradlew $GRADLE
 elif [ "$PURE_MAKE" = yes ]; then
-    make BOARD="$BOARD" APPS="${APP}" "${HALCS_OPTS[*]}" && \
     make install
+        make BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
 
     if [ "$EXAMPLES" = yes ]; then
-        make "${HALCS_OPTS[*]}" examples
+        make ${HALCS_OPTS[*]} examples
     fi
 
     if [ "$SYSTEM_INTEGRATION" = yes ]; then
-        make "${HALCS_OPTS[*]}" scripts_install
+        make ${HALCS_OPTS[*]} scripts_install
     fi
 
 elif [ "$COMPILE_SCRIPT" = yes ]; then
