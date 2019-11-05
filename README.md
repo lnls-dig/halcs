@@ -84,7 +84,7 @@ or
 	cd libs/halcsclient && ./compile.sh [<board>]
 ```
 
-### PCIe Installation Instructions
+### PCIe Installation Instructions (if needed)
 
 Install linux header files
 
