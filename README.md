@@ -62,36 +62,26 @@ If the PCIe driver is already installed, you could
 run it without superuser.
 
 ```bash
+    make && sudo make install
+```
+
+or
+
+```bash
 	./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>]
 		[-l <with library linking = yes/no>] [-d <with driver = yes/no>] [-x <extra flags>]
 ```
 
 ### Client
 
-Change to the Client API folder
-
 ```bash
-	cd src/libs/libhalcsclient
-```
-
-Compile the library, with debug info
-
-```bash
-	make BOARD=<board> ERRHAND_DBG=y ERRHAND_MIN_LEVEL=DBG_MIN_TRACE \
-        ERRHAND_SUBSYS_ON=’”(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | \
-        DBG_LIB_CLIENT  | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)”’
+	make libhalcsclient && sudo libhalcsclient_install
 ```
 
 or
 
 ```bash
-	sudo ./compile.sh [<board>]
-```
-
-Install the library
-
-```bash
-	sudo make install
+	cd libs/halcsclient && ./compile.sh [<board>]
 ```
 
 ### PCIe Installation Instructions
