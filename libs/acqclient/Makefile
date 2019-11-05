@@ -14,7 +14,7 @@ MAKE ?=		make
 PWD = 		$(shell pwd)
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= ml605
+BOARD ?= afcv3_1
 
 LIBNAME_RAW = acqclient
 LIBNAME = lib$(LIBNAME_RAW)
