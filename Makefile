@@ -58,6 +58,10 @@ export SUPPORTED_ML605_BOARDS
 SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
+# Top Makefile directory
+SRC_DIR := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+TOP := $(SRC_DIR)
+export TOP
 # Linker script
 LD_SCRIPT = linker/halcs.ld
 
