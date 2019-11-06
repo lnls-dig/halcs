@@ -75,9 +75,9 @@ INCLUDE_DIR = include
 # Include directories
 INCLUDE_DIRS = -Iinclude \
 	           -I${PREFIX}/include \
-	           -I../errhand/include \
-	           -I../convc/include \
-	           -I../../foreign/pcie-driver/include
+	           -I$(LIBERRHAND_DIR)/include \
+	           -I$(LIBCONVC_DIR)/include \
+	           -I$(PCIE_DRIVER_DIR)/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

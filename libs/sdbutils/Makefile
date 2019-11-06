@@ -72,9 +72,9 @@ INCLUDE_DIR = include
 # Include directories
 # FIXME. Needed so we can find libsdbfs headers
 INCLUDE_DIRS = -Iinclude -I${PREFIX}/include \
-	           -I../../foreign/libsdbfs/include \
-	           -I../../core/common/include \
-	           -I../errhand/include
+	           -I$(TOP)/core/common/include \
+	           -I$(LIBSDBFS_DIR)/include \
+	           -I$(LIBERRHAND_DIR)/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options

@@ -89,10 +89,10 @@ SRC_DIR = src/bpmclient/c
 # Include directory
 INCLUDE_DIR = include
 
-SMIO_DIR = ../../core/sm_io
+SMIO_DIR = $(TOP)/core/sm_io
 SMIO_SRC_DIR = $(SMIO_DIR)/src/sm_io/c
 
-SMIO_TABLE_DIR = ../../core/sm_io_table
+SMIO_TABLE_DIR = $(TOP)/core/sm_io_table
 SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)/src/sm_io_table/c
 
 # Specific board objects
@@ -104,14 +104,13 @@ OBJS_PLATFORM =
 OBJS_EXTERNAL =
 
 # Project boards
-boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(TOP)/core/common/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = -I. -Iinclude \
 	       $(boards_INCLUDE_DIRS) \
-	       -I../../../include \
-		   -I../../core/common/include \
-		   -I$(SMIO_DIR)/include \
+	       -I$(TOP)/core/common/include \
+	       -I$(SMIO_DIR)/include \
 	       -I$(SMIO_SRC_DIR)/modules \
 	       -I$(SMIO_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_SRC_DIR)/modules/fmc250m_4ch \
@@ -125,7 +124,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_SRC_DIR)/modules/afc_timing \
-		   -I$(SMIO_TABLE_DIR)/include \
+	       -I$(SMIO_TABLE_DIR)/include \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc250m_4ch \
@@ -140,11 +139,11 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_timing \
 	       -I${PREFIX}/include \
-	       -I../errhand/include \
-	       -I../hutils/include \
-	       -I../disptable/include \
-	       -I../halcsclient/include \
-	       -I../acqclient/include
+	       -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBHUTILS_DIR)/include \
+	       -I$(LIBDISPTABLE_DIR)/include \
+	       -I$(LIBHALCSCLIENT_DIR)/include \
+	       -I$(LIBACQCLIENT_DIR)/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
@@ -165,7 +164,7 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 # Objects for each version of library
 $(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
 $(LIBNAME)_CODE_HEADERS = \
-	../../core/common/include/acq_chan_gen_defs.h
+	$(TOP)/core/common/include/acq_chan_gen_defs.h
 
 $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_codes.h \
@@ -197,7 +196,7 @@ $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBNAME)_ACQ_HEADERS = \
-	../../core/common/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
+	$(TOP)/core/common/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 $(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers
