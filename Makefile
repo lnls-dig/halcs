@@ -230,7 +230,8 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
 
 # General library flags -L<libdir>
 LFLAGS = -L$(LIBSDBFS_DIR) \
-	     -L$(LIBBSMP_DIR)
+	     -L$(LIBBSMP_DIR) \
+	     -L$(PCIE_DRIVER_DIR)/lib/pcie
 
 LFLAGS += -L$(LIBERRHAND_DIR) \
 	      -L$(LIBCONVC_DIR) \
