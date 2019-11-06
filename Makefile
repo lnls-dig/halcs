@@ -62,18 +62,20 @@ export SUPPORTED_AFCV3_BOARDS
 SRC_DIR := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 TOP := $(SRC_DIR)
 export TOP
+
+# Libraries
+LIBS_DIR := $(SRC_DIR)/libs
+export LIBS_DIR
+
+# Subdmoules and third-party codes
+FOREIGN_DIR := $(SRC_DIR)/foreign
+export FOREIGN_DIR
+
 # Linker script
-LD_SCRIPT = linker/halcs.ld
+LD_SCRIPT = $(TOP)/linker/halcs.ld
 
 # Init sripts
 INIT_SCRIPTS =
-
-# Subdmoules and third-party codes
-FOREIGN_DIR = foreign
-
-# Our submodules and third-party codes
-LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
-PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 
 # PCIe driver stuff (pcie driver and library) relative
 # directory
@@ -81,16 +83,31 @@ KERNEL_VERSION ?= $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VERSION)/extra/pciDriver.ko
 
 # Project libraries
-LIBERRHAND_DIR = libs/errhand
-LIBCONVC_DIR = libs/convc
-LIBHUTILS_DIR = libs/hutils
-LIBDISPTABLE_DIR = libs/disptable
-LIBLLIO_DIR = libs/llio
-LIBHALCSCLIENT_DIR = libs/halcsclient
-LIBACQCLIENT_DIR = libs/acqclient
-LIBBPMCLIENT_DIR = libs/bpmclient
-LIBSDBUTILS_DIR = libs/sdbutils
-LIBSDBFS_DIR = foreign/libsdbfs
+LIBERRHAND_DIR = $(LIBS_DIR)/errhand
+export LIBERRHAND_DIR
+LIBCONVC_DIR = $(LIBS_DIR)/convc
+export LIBCONVC_DIR
+LIBHUTILS_DIR = $(LIBS_DIR)/hutils
+export LIBHUTILS_DIR
+LIBDISPTABLE_DIR = $(LIBS_DIR)/disptable
+export LIBDISPTABLE_DIR
+LIBLLIO_DIR = $(LIBS_DIR)/llio
+export LIBLLIO_DIR
+LIBHALCSCLIENT_DIR = $(LIBS_DIR)/halcsclient
+export LIBHALCSCLIENT_DIR
+LIBACQCLIENT_DIR = $(LIBS_DIR)/acqclient
+export LIBACQCLIENT_DIR
+LIBBPMCLIENT_DIR = $(LIBS_DIR)/bpmclient
+export LIBBPMCLIENT_DIR
+LIBSDBUTILS_DIR = $(LIBS_DIR)/sdbutils
+export LIBSDBUTILS_DIR
+# Our submodules and third-party codes
+LIBSDBFS_DIR = $(FOREIGN_DIR)/libsdbfs
+export LIBSDBFS_DIR
+LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
+export LIBBSMP_DIR
+PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
+export PCIE_DRIVER_DIR
 
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2
@@ -212,28 +229,24 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
 			   -lpthread
 
 # General library flags -L<libdir>
-LFLAGS = -Lforeign/libsdbfs \
-	     -Lforeign/libbsmp
+LFLAGS = -L$(LIBSDBFS_DIR) \
+	     -L$(LIBBSMP_DIR)
 
-LFLAGS += -Llibs/errhand \
-	      -Llibs/convc \
-	      -Llibs/hutils \
-	      -Llibs/disptable \
-	      -Llibs/llio \
-	      -Llibs/halcsclient \
-	      -Llibs/acqclient \
-	      -Llibs/bpmclient \
-	      -Llibs/sdbutils \
-	      -Llibs/sdbfs
+LFLAGS += -L$(LIBERRHAND_DIR) \
+	      -L$(LIBCONVC_DIR) \
+	      -L$(LIBHUTILS_DIR) \
+	      -L$(LIBDISPTABLE_DIR) \
+	      -L$(LIBLLIO_DIR) \
+	      -L$(LIBHALCSCLIENT_DIR) \
+	      -L$(LIBACQCLIENT_DIR) \
+	      -L$(LIBBPMCLIENT_DIR) \
+	      -L$(LIBSDBUTILS_DIR)
 
 # Specific platform objects
 OBJS_PLATFORM =
 
-# Source directory
-SRC_DIR = .
-
 # Prepare "apps" include
-APPS_MKS = $(foreach mk,$(APPS),apps/$(mk)/$(mk).mk)
+APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
 include $(SRC_DIR)/core/sm_io/sm_io.mk
@@ -247,26 +260,25 @@ include $(SRC_DIR)/core/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(SRC_DIR)/common/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
+	       -I$(SRC_DIR)/core/common/include \
+	       -I$(SRC_DIR)/core/revision/include \
+	       -I$(SRC_DIR)/core/sm_io/include \
+	       -I$(SRC_DIR)/core/sm_io_table/include \
 	       -I$(LIBBSMP_DIR)/include \
-	       -Icore/common/include \
-	       -Icore/revision/include \
-	       -Icore/sm_io/include \
-	       -Icore/sm_io_table/include \
-	       -Iforeign/libsdbfs/include \
-	       -Ilibs/llio/include \
-	       -Ilibs/acqclient/include \
-	       -Ilibs/bpmclient/include \
-	       -Ilibs/convc/include \
-	       -Ilibs/disptable/include \
-	       -Ilibs/errhand/include \
-	       -Ilibs/halcsclient/include \
-	       -Ilibs/hutils/include \
-	       -Ilibs/llio/include \
-	       -Ilibs/sdbutils/include \
+	       -I$(LIBSDBFS_DIR)/include \
+           -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBCONVC_DIR)/include \
+	       -I$(LIBHUTILS_DIR)/include \
+	       -I$(LIBDISPTABLE_DIR)/include \
+	       -I$(LIBLLIO_DIR)/include \
+	       -I$(LIBHALCSCLIENT_DIR)/include \
+	       -I$(LIBACQCLIENT_DIR)/include \
+	       -I$(LIBBPMCLIENT_DIR)/include \
+	       -I$(LIBSDBUTILS_DIR)/include \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
