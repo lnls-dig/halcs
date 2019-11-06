@@ -21,15 +21,15 @@ ERRHAND_SUBSYS_ON ?= "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | 
 override CFLAGS += -Wall -ggdb
 override CFLAGS += -I.. \
 	               -I../include \
-	               -I../../../libs/llio/include \
-	               -I../../../libs/errhand/include \
-	               -I../../../libs/convc/include
+	               -I$(LIBLLIO_DIR)/include \
+	               -I$(LIBERRHAND_DIR)/include \
+	               -I$(LIBCONVC_DIR)/include
 CFLAGS_LNLS = -DERRHAND_DBG=$(ERRHAND_DBG) -DERRHAND_MIN_LEVEL=$(ERRHAND_MIN_LEVEL) \
 	-DERRHAND_SUBSYS_ON=$(ERRHAND_SUBSYS_ON)
 override LDFLAGS += -L.. \
-	               -L../../../libs/llio \
-	               -L../../../libs/errhand \
-	               -L../../../libs/convc \
+	               -L$(LIBLLIO_DIR) \
+	               -L$(LIBERRHAND_DIR) \
+	               -L$(LIBCONVC_DIR) \
 	               -lsdbfs
 LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
