@@ -30,7 +30,7 @@ override LDFLAGS += -L.. \
 	               -L$(LIBLLIO_DIR) \
 	               -L$(LIBERRHAND_DIR) \
 	               -L$(LIBCONVC_DIR) \
-	               -L$(PCIE_DRIVER_DIR) \
+	               -L$(PCIE_DRIVER_DIR)/lib/pcie \
 	               -lsdbfs
 LDFLAGS_LNLS = -lllio -lerrhand -lconvc -lczmq -lpcidriver
 
