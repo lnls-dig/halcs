@@ -72,6 +72,8 @@ typedef struct _smpr_spi_t smpr_spi_t;
 typedef struct _smpr_i2c_t smpr_i2c_t;
 /* Opaque smpr_bsmp_t structure */
 typedef struct _smpr_bsmp_t smpr_bsmp_t;
+/* Opaque smpr_scpi_t structure */
+typedef struct _smpr_scpi_t smpr_scpi_t;
 
 /* Forward smch_err_e declaration enumeration */
 typedef enum _smch_err_e smch_err_e;
@@ -85,6 +87,8 @@ typedef struct _smch_pca9547_t smch_pca9547_t;
 typedef struct _smch_si57x_t smch_si57x_t;
 /* Opaque sm_ch_rffe_t structure */
 typedef struct _smch_rffe_t smch_rffe_t;
+/* Opaque sm_ch_rffe_scpi_t structure */
+typedef struct _smch_rffe_scpi_t smch_rffe_scpi_t;
 /* Opaque sm_ch_isla216p_t structure */
 typedef struct _smch_isla216p_t smch_isla216p_t;
 
@@ -131,6 +135,7 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "protocols/sm_pr_i2c_defaults.h"
 #include "sm_pr_bsmp.h"
 #include "protocols/sm_pr_bsmp_defaults.h"
+#include "sm_pr_scpi.h"
 
 /* SM_CH */
 #include "sm_ch_err.h"
@@ -149,6 +154,8 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "chips/sm_ch_isla216p_defaults.h"
 #include "sm_ch_rffe.h"
 #include "chips/sm_ch_rffe_defaults.h"
+#include "sm_ch_rffe_scpi.h"
+//#include "chips/sm_ch_rffe_scpi_defaults.h"
 
 /* SM_IO */
 #include "sm_io_err.h"

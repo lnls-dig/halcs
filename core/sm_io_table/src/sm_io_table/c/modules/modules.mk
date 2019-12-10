@@ -15,7 +15,8 @@ include $(sm_io_table_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 		$(sm_io_table_modules_DIR)/afc_timing/afc_timing.mk \
 		$(sm_io_table_modules_DIR)/init/init.mk \
 		$(sm_io_table_modules_DIR)/afc_mgmt/afc_mgmt.mk \
-		$(sm_io_table_modules_DIR)/tim_rcv/tim_rcv.mk
+		$(sm_io_table_modules_DIR)/tim_rcv/tim_rcv.mk \
+		$(sm_io_table_modules_DIR)/rffe_scpi/rffe_scpi.mk
 
 sm_io_table_modules_OBJS = $(sm_io_table_modules_DIR)/sm_io_codes.o \
 		     $(sm_io_table_fmc130m_4ch_OBJS) \
@@ -33,4 +34,5 @@ sm_io_table_modules_OBJS = $(sm_io_table_modules_DIR)/sm_io_codes.o \
 		     $(sm_io_table_afc_timing_OBJS) \
 		     $(sm_io_table_init_OBJS) \
 		     $(sm_io_table_afc_mgmt_OBJS) \
-		     $(sm_io_table_tim_rcv_OBJS)
+		     $(sm_io_table_tim_rcv_OBJS) \
+		     $(sm_io_table_rffe_scpi_OBJS)
