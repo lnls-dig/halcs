@@ -44,7 +44,7 @@ AFE_RFFE_TYPE ?= 2
 # Selects if we want to compile specfic APP Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_APP_CFG ?= y
+WITH_APP_CFG ?= n
 # Installation prefix for the scripts. This is mainly used for testing the build
 # system. Usually this is empty
 SCRIPTS_PREFIX ?=
