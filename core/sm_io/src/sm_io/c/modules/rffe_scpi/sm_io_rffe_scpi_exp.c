@@ -72,18 +72,18 @@ static int scpi_read_line(smch_rffe_scpi_t *self, char* line, size_t size)
     ssize_t ret;
     size_t i;
 
-    for (i = 0; (i + 1) < size; i++)
-    {
+    for (i = 0; (i + 1) < size; i++) {
         ret = smio_thsafe_client_read_block (parent, 0, 1,
                                              (uint32_t *) &line[i]);
-        if (ret != 1)
-        {
+        if (ret != 1) {
             line[i] = '\0';
             i = -1;
             break;
         }
 
-        if (line[i] == '\n') break;
+        if (line[i] == '\n') {
+            break;
+        }
     }
 
     line[i] = '\0';
@@ -100,15 +100,15 @@ static int scpi_write_line(smch_rffe_scpi_t *self, const char* line)
 
     ret = smio_thsafe_client_write_block (parent, 0, i,
                                           (uint32_t *) line);
-    if (ret != i)
-    {
+    if (ret != i) {
         i = -1;
     }
-    else
-    {
+    else {
         ret = smio_thsafe_client_write_block (parent, 0, 1,
                                               (uint32_t *) "\n");
-        if (ret != 1) i = -1;
+        if (ret != 1) {
+            i = -1;
+        }
     }
 
     return i;
