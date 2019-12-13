@@ -66,10 +66,6 @@ typedef smch_err_e (*smch_rffe_scpi_func_fp) (smch_rffe_scpi_t *self, uint32_t i
 #define RFFE_SCPI_FUNC_NAME_HEADER(func_name)                                \
     static int RFFE_SCPI_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-struct _smch_rffe_scpi_t {
-    smpr_t *proto;                                       /* PROTO protocol object */
-};
-
 static int scpi_read_line(smch_rffe_scpi_t *self, char* line, size_t size)
 {
     smio_t *parent = smpr_get_parent (self->proto);
