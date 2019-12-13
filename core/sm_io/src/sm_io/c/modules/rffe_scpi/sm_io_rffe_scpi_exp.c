@@ -66,54 +66,6 @@ typedef smch_err_e (*smch_rffe_scpi_func_fp) (smch_rffe_scpi_t *self, uint32_t i
 #define RFFE_SCPI_FUNC_NAME_HEADER(func_name)                                \
     static int RFFE_SCPI_FUNC_NAME(func_name) (void *owner, void *args, void *ret)
 
-static int scpi_read_line(smch_rffe_scpi_t *self, char* line, size_t size)
-{
-    smio_t *parent = smpr_get_parent (self->proto);
-    ssize_t ret;
-    size_t i;
-
-    for (i = 0; (i + 1) < size; i++) {
-        ret = smio_thsafe_client_read_block (parent, 0, 1,
-                                             (uint32_t *) &line[i]);
-        if (ret != 1) {
-            line[i] = '\0';
-            i = -1;
-            break;
-        }
-
-        if (line[i] == '\n') {
-            break;
-        }
-    }
-
-    line[i] = '\0';
-    return i;
-}
-
-static int scpi_write_line(smch_rffe_scpi_t *self, const char* line)
-{
-    smio_t *parent = smpr_get_parent (self->proto);
-    ssize_t ret;
-    ssize_t i;
-
-    for (i = 0; line[i]; i++);
-
-    ret = smio_thsafe_client_write_block (parent, 0, i,
-                                          (uint32_t *) line);
-    if (ret != i) {
-        i = -1;
-    }
-    else {
-        ret = smio_thsafe_client_write_block (parent, 0, 1,
-                                              (uint32_t *) "\n");
-        if (ret != 1) {
-            i = -1;
-        }
-    }
-
-    return i;
-}
-
 enum scpi_req_type {
     scpi_double,
     scpi_int,
@@ -146,8 +98,8 @@ static int _rffe_scpi_var_rw (void *owner, void *args, const char* req,
 
     if (rw) {
         char ans[128];
-        scpi_write_line(smch_rffe, req);
-        scpi_read_line(smch_rffe, ans, sizeof(ans));
+        smch_scpi_write_line(smch_rffe, req);
+        smch_scpi_read_line(smch_rffe, ans, sizeof(ans));
 
         switch (req_type) {
         case scpi_double:
@@ -170,17 +122,17 @@ static int _rffe_scpi_var_rw (void *owner, void *args, const char* req,
         switch (req_type) {
         case scpi_double:
             snprintf(req_str, sizeof(req_str), "%s %lf", req, *((double *) param));
-            scpi_write_line(smch_rffe, req_str);
+            smch_scpi_write_line(smch_rffe, req_str);
             break;
 
         case scpi_int:
         case scpi_bool:
             snprintf(req_str, sizeof(req_str), "%s %lf", req, *((double *) param));
-            scpi_write_line(smch_rffe, req_str);
+            smch_scpi_write_line(smch_rffe, req_str);
             break;
 
         case scpi_none:
-            scpi_write_line(smch_rffe, req);
+            smch_scpi_write_line(smch_rffe, req);
             break;
 
         default:

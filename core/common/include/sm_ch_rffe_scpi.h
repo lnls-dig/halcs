@@ -42,6 +42,10 @@ smch_err_e smch_rffe_scpi_write_var (smch_rffe_scpi_t *self, uint32_t id, uint8_
 /* Read RFFE variable */
 smch_err_e smch_rffe_scpi_read_var (smch_rffe_scpi_t *self, uint32_t id, uint8_t *data,
         size_t size);
+/* Read SCPI line */
+int smch_scpi_read_line(smch_rffe_scpi_t *self, char* line, size_t size);
+/* Write SCPI line */
+int smch_scpi_write_line(smch_rffe_scpi_t *self, const char* line);
 
 #ifdef __cplusplus
 }
