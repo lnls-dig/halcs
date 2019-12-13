@@ -49,22 +49,9 @@
 
 #define SMPR_PROTO_SCPI_CLIENT(smpr_handler)         (smpr_handler->client)
 
-/* SCPI glue structure. Needed to overcome the need of global variables */
-typedef struct {
-    smio_t *parent;
-} smpr_proto_glue_scpi_t;
-
-/* SCPI glue structure */
-smpr_proto_glue_scpi_t scpi_glue;
-
 /* Device endpoint */
 typedef struct {
     uint64_t base;                                      /* Core base address */
-    struct scpi_func_info_list *funcs_list;             /* SCPI function handler */
-    struct scpi_var_info_list *vars_list;               /* SCPI variables handler */
-    struct scpi_curve_info_list *curves_list;           /* SCPI curves handler */
-    /* Unused */
-    struct scpi_group_list *groups_list;                /* SCPI groups handler */
 } smpr_proto_scpi_t;
 
 /* Protocol object specification */
@@ -122,9 +109,6 @@ static int scpi_open (smpr_t *self, uint64_t base, void *args)
     /* We need to initialize the SCPI protocol here, as we don't have access to
      * to parent pointer inside the smpr_proto_scpi_new () */
     smio_t *parent = smpr_get_parent (self);
-    /* Initialize global glue SCPI variable for usage with the send and recv
-     * functions */
-    scpi_glue.parent = parent;
 
     /* Attach specific protocol handler to generic one */
     smpr_err_e err = smpr_set_handler (self, scpi_proto);
@@ -154,9 +138,6 @@ static int scpi_release (smpr_t *self)
 
     /* Destroy SCPI client instance. Ne need to call any destroy function,
      * as the SCPI library does not dynamically allocates anything */
-
-    /* Null the parent SMIO pointer */
-    scpi_glue.parent = NULL;
 
     /* Deattach specific protocol handler to generic one */
     smpr_err_e err = smpr_proto_scpi_destroy (&scpi_proto);
