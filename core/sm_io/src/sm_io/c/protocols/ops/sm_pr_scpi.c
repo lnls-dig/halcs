@@ -109,6 +109,7 @@ static int scpi_open (smpr_t *self, uint64_t base, void *args)
     /* We need to initialize the SCPI protocol here, as we don't have access to
      * to parent pointer inside the smpr_proto_scpi_new () */
     smio_t *parent = smpr_get_parent (self);
+    (void) parent;
 
     /* Attach specific protocol handler to generic one */
     smpr_err_e err = smpr_set_handler (self, scpi_proto);
