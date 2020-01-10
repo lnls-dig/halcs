@@ -50,6 +50,7 @@ enum sdb_record_type {
 	sdb_type_interconnect	= 0x00,
 	sdb_type_device		= 0x01,
 	sdb_type_bridge		= 0x02,
+	sdb_type_msi		= 0x03,
 	sdb_type_integration	= 0x80,
 	sdb_type_repo_url	= 0x81,
 	sdb_type_synthesis	= 0x82,
@@ -91,6 +92,15 @@ struct sdb_device {
 struct sdb_bridge {
 	uint64_t		sdb_child;	/* 0x00-0x07 */
 	struct sdb_component	sdb_component;	/* 0x08-0x3f */
+};
+
+/* Type 3: msi
+ *
+ * child is the address of the nested SDB table
+ */
+struct sdb_msi {
+	uint32_t		bus_specific;	/* 0x00-0x03 */
+	struct sdb_component	sdb_component;	/* 0x04-0x3b */
 };
 
 /* Type 0x80: integration
