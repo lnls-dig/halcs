@@ -442,12 +442,12 @@ RFFE_SCPI_FUNC_NAME_HEADER(pid_bd_td)
     int res = 0;
 
     if (rw) {
-        res = _rffe_scpi_var_rw (owner, args, "GET:PID:Ti:BD?", scpi_double,
-                            "Could not get RFFE BD PID TI parameter", ret);
+        res = _rffe_scpi_var_rw (owner, args, "GET:PID:Td:BD?", scpi_double,
+                            "Could not get RFFE BD PID TD parameter", ret);
     }
     else {
-        res = _rffe_scpi_var_rw (owner, args, "SET:PID:Ti:BD", scpi_double,
-                            "Could not set RFFE BD PID TI parameter", ret);
+        res = _rffe_scpi_var_rw (owner, args, "SET:PID:Td:BD", scpi_double,
+                            "Could not set RFFE BD PID TD parameter", ret);
     }
 
     return res;
