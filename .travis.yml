@@ -8,14 +8,16 @@ sudo: false
 dist: trusty
 
 env:
-- BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+- COMPILE_SCRIPT=yes BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+- COMPILE_SCRIPT=yes BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+- COMPILE_SCRIPT=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 
 matrix:
   include:
   - compiler: gcc
     env: GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
+  - compiler: gcc
+    env: PURE_MAKE=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
 
 addons:
   apt:

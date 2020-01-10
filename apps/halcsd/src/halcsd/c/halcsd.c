@@ -74,12 +74,12 @@
 #define FRONTEND_ENDPOINT_PREFIX        "ipc:///tmp/halcs-pipe"
 
 static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
-        zhashx_t *hints, char **dev_entry);
+        zhashx_t *hints, char **dev_entry, uint32_t *rffe_id);
 static char *_create_log_filename (char *log_prefix, char *log_filename_pattern,
         uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
-        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id);
-static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id);
+        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id, uint32_t rffe_id);
+static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id, uint32_t rffe_id);
 
 static struct option long_options[] =
 {
@@ -294,6 +294,7 @@ int main (int argc, char *argv[])
 
     uint32_t full_dev_id = 0;
     uint32_t dev_id = 0;
+    uint32_t rffe_id = 0;
     uint32_t fe_smio_id = 0;
     /* Check for device ID */
     if (dev_id_str != NULL) {
@@ -335,7 +336,7 @@ int main (int argc, char *argv[])
             if (dev_entry == NULL && dev_id_str != NULL) {
                 DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Dev_id parameter was set, but Dev_entry was not.\n"
                         "\tTrying to get Dev_entry from config file...\n");
-                err = _rffe_get_dev_entry (dev_id, fe_smio_id, devio_hints, &dev_entry);
+                err = _rffe_get_dev_entry (dev_id, fe_smio_id, devio_hints, &dev_entry, &rffe_id);
                 ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get dev_entry from config file",
                         err_exit);
             }
@@ -530,7 +531,7 @@ int main (int argc, char *argv[])
 
     /* Spawn platform SMIOSs */
     err = _spawn_platform_smios (server, devio_type, fe_smio_id, devio_hints,
-            dev_id);
+            dev_id, rffe_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] _spawn_platform_smios error!\n");
         goto err_plat_devio;
@@ -663,10 +664,11 @@ err_sigmask:
 }
 
 static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
-        zhashx_t *hints, char **dev_entry)
+        zhashx_t *hints, char **dev_entry, uint32_t* rffe_proto)
 {
     assert (dev_entry);
     assert (hints);
+    assert (rffe_proto);
     devio_err_e err = DEVIO_SUCCESS;
 
     char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
@@ -687,6 +689,16 @@ static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
 
     *dev_entry = strdup (cfg_item->bind);
     ASSERT_ALLOC (*dev_entry, err_alloc_entry, DEVIO_ERR_ALLOC);
+
+    if (strcmp(cfg_item->proto, "bsmp") == 0) {
+        *rffe_proto = 0x7af21909;
+    } else if (strcmp(cfg_item->proto, "scpi") == 0) {
+        *rffe_proto = 0x30625320;
+    } else {
+        *rffe_proto = 0;
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Invalid RFFE protocol. It should be set to bsmp or scpi.\n");
+        err = DEVIO_ERR_CFG;
+    }
 
 err_alloc_entry:
 err_cfg_exit:
@@ -716,7 +728,7 @@ err_devio_log_alloc:
 }
 
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
-        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id)
+        uint32_t smio_inst_id, zhashx_t *hints, uint32_t dev_id, uint32_t rffe_id)
 {
     assert (pipe);
     UNUSED(hints);
@@ -730,7 +742,7 @@ static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
             break;
 
         case FE_DEVIO:
-            err = _spawn_fe_platform_smios (pipe, smio_inst_id);
+            err = _spawn_fe_platform_smios (pipe, smio_inst_id, rffe_id);
             break;
 
         default:
@@ -747,9 +759,8 @@ err_register_sm:
     return err;
 }
 
-static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id)
+static devio_err_e _spawn_fe_platform_smios (void *pipe, uint32_t smio_inst_id, uint32_t rffe_id)
 {
-    uint32_t rffe_id = 0x7af21909;
     devio_err_e err = DEVIO_SUCCESS;
 
     /* RFFE V2 only */

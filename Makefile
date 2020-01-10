@@ -13,14 +13,23 @@ MAKE ?=		make
 DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= ml605
+BOARD ?= afcv3_1
 # Select which application we want to generate. Options are: halcsd
 APPS ?= halcsd
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
-SHRINK_AFCV3_DDR_SIZE ?= y
+SHRINK_AFCV3_DDR_SIZE ?= n
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG ?= n
+#Select if we want to compile with debug mode on. Options are: y(es) or n(o)
+ERRHAND_DBG=y
+export ERRHAND_DBG
+# Select the minimum debug verbosity. See liberrhand file errhand_opts.h for more info.
+ERRHAND_MIN_LEVEL=DBG_LVL_WARN
+export ERRHAND_MIN_LEVEL
+# Select the subsytems which will have the debug on. See liberrhand file errhand_opts.h for more info.
+ERRHAND_SUBSYS_ON="(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+export ERRHAND_SUBSYS_ON
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
 DBE_DBG ?= y
 # Select the FMC ADC board type. Options are: passive or active
@@ -35,7 +44,7 @@ AFE_RFFE_TYPE ?= 2
 # Selects if we want to compile specfic APP Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_APP_CFG ?= y
+WITH_APP_CFG ?= n
 # Installation prefix for the scripts. This is mainly used for testing the build
 # system. Usually this is empty
 SCRIPTS_PREFIX ?=
@@ -49,18 +58,24 @@ export SUPPORTED_ML605_BOARDS
 SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
+# Top Makefile directory
+SRC_DIR := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+TOP := $(SRC_DIR)
+export TOP
+
+# Libraries
+LIBS_DIR := $(SRC_DIR)/libs
+export LIBS_DIR
+
+# Subdmoules and third-party codes
+FOREIGN_DIR := $(SRC_DIR)/foreign
+export FOREIGN_DIR
+
 # Linker script
-LD_SCRIPT = linker/halcs.ld
+LD_SCRIPT = $(TOP)/linker/halcs.ld
 
 # Init sripts
 INIT_SCRIPTS =
-
-# Subdmoules and third-party codes
-FOREIGN_DIR = foreign
-
-# Our submodules and third-party codes
-LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
-PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 
 # PCIe driver stuff (pcie driver and library) relative
 # directory
@@ -68,16 +83,31 @@ KERNEL_VERSION ?= $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VERSION)/extra/pciDriver.ko
 
 # Project libraries
-LIBERRHAND_DIR = libs/errhand
-LIBCONVC_DIR = libs/convc
-LIBHUTILS_DIR = libs/hutils
-LIBDISPTABLE_DIR = libs/disptable
-LIBLLIO_DIR = libs/llio
-LIBHALCSCLIENT_DIR = libs/halcsclient
-LIBACQCLIENT_DIR = libs/acqclient
-LIBBPMCLIENT_DIR = libs/bpmclient
-LIBSDBUTILS_DIR = libs/sdbutils
-LIBSDBFS_DIR = foreign/libsdbfs
+LIBERRHAND_DIR = $(LIBS_DIR)/errhand
+export LIBERRHAND_DIR
+LIBCONVC_DIR = $(LIBS_DIR)/convc
+export LIBCONVC_DIR
+LIBHUTILS_DIR = $(LIBS_DIR)/hutils
+export LIBHUTILS_DIR
+LIBDISPTABLE_DIR = $(LIBS_DIR)/disptable
+export LIBDISPTABLE_DIR
+LIBLLIO_DIR = $(LIBS_DIR)/llio
+export LIBLLIO_DIR
+LIBHALCSCLIENT_DIR = $(LIBS_DIR)/halcsclient
+export LIBHALCSCLIENT_DIR
+LIBACQCLIENT_DIR = $(LIBS_DIR)/acqclient
+export LIBACQCLIENT_DIR
+LIBBPMCLIENT_DIR = $(LIBS_DIR)/bpmclient
+export LIBBPMCLIENT_DIR
+LIBSDBUTILS_DIR = $(LIBS_DIR)/sdbutils
+export LIBSDBUTILS_DIR
+# Our submodules and third-party codes
+LIBSDBFS_DIR = $(FOREIGN_DIR)/libsdbfs
+export LIBSDBFS_DIR
+LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
+export LIBBSMP_DIR
+PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
+export PCIE_DRIVER_DIR
 
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2
@@ -199,16 +229,25 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
 			   -lpthread
 
 # General library flags -L<libdir>
-LFLAGS = -Lforeign/libsdbfs
+LFLAGS = -L$(LIBSDBFS_DIR) \
+	     -L$(LIBBSMP_DIR) \
+	     -L$(PCIE_DRIVER_DIR)/lib/pcie
+
+LFLAGS += -L$(LIBERRHAND_DIR) \
+	      -L$(LIBCONVC_DIR) \
+	      -L$(LIBHUTILS_DIR) \
+	      -L$(LIBDISPTABLE_DIR) \
+	      -L$(LIBLLIO_DIR) \
+	      -L$(LIBHALCSCLIENT_DIR) \
+	      -L$(LIBACQCLIENT_DIR) \
+	      -L$(LIBBPMCLIENT_DIR) \
+	      -L$(LIBSDBUTILS_DIR)
 
 # Specific platform objects
 OBJS_PLATFORM =
 
-# Source directory
-SRC_DIR = .
-
 # Prepare "apps" include
-APPS_MKS = $(foreach mk,$(APPS),apps/$(mk)/$(mk).mk)
+APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
 include $(SRC_DIR)/core/sm_io/sm_io.mk
@@ -222,16 +261,25 @@ include $(SRC_DIR)/core/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(SRC_DIR)/common/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -Icore/common/include \
-	       -Icore/revision/include \
-	       -Icore/sm_io/include \
-	       -Icore/sm_io_table/include \
-	       -Iforeign/libsdbfs/include \
-	       -Ilibs/llio/include \
+	       -I$(SRC_DIR)/core/common/include \
+	       -I$(SRC_DIR)/core/revision/include \
+	       -I$(SRC_DIR)/core/sm_io/include \
+	       -I$(SRC_DIR)/core/sm_io_table/include \
+	       -I$(LIBBSMP_DIR)/include \
+	       -I$(LIBSDBFS_DIR)/include \
+           -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBCONVC_DIR)/include \
+	       -I$(LIBHUTILS_DIR)/include \
+	       -I$(LIBDISPTABLE_DIR)/include \
+	       -I$(LIBLLIO_DIR)/include \
+	       -I$(LIBHALCSCLIENT_DIR)/include \
+	       -I$(LIBACQCLIENT_DIR)/include \
+	       -I$(LIBBPMCLIENT_DIR)/include \
+	       -I$(LIBSDBUTILS_DIR)/include \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -305,7 +353,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(OUT)
+all: deps libs $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)

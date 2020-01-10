@@ -9,7 +9,7 @@
 #define _HUTILS_CLASSES_H_
 
 /* Set up environment for the application */
-#include "convc_prelude.h"
+#include "hutils_prelude.h"
 
 /* External dependencies */
 #include <czmq.h>

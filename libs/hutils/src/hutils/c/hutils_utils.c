@@ -437,6 +437,19 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
             item->bind = strdup (afe_bind);
             ASSERT_ALLOC(item->bind, err_hash_bind_alloc, HUTILS_ERR_ALLOC);
 
+            /* We expect to find the rffe protocol of this halcs/board instance
+             * in the configuration file */
+            char *afe_proto = zconfig_resolve (halcs_cfg, "/afe/proto",
+                    NULL);
+
+            if (afe_proto == NULL) {
+                item->proto = strdup ("bsmp");
+            } else {
+                item->proto = strdup (afe_proto);
+            }
+
+            ASSERT_ALLOC(item->proto, err_hash_proto_alloc, HUTILS_ERR_ALLOC);
+
             /* Read if the user ask us to spawn the EPICS IOC in the
              * configuration file */
             char *spawn_dbe_epics_ioc = zconfig_resolve (halcs_cfg, "/dbe/spawn_epics_ioc",
@@ -512,6 +525,8 @@ err_inv_spawn_afe_epics_ioc:
 err_spawn_afe_epics_ioc:
 err_inv_spawn_dbe_epics_ioc:
 err_spawn_dbe_epics_ioc:
+    free (item->proto);
+err_hash_proto_alloc:
     free (item->bind);
 err_hash_bind_alloc:
 err_afe_bind:

@@ -302,11 +302,26 @@ make install
 cd "${BASE_PWD}"
 
 ########## HALCS
-if [ -z "$GRADLE" ]; then
-    build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
-else
+if [ -n "$GRADLE" ]; then
     export ${CONFIG_FLAGS[@]}
     ./gradlew $GRADLE
+elif [ "$PURE_MAKE" = yes ]; then
+    build-wrapper-linux-x86-64 --out-dir bw-output \
+        make BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
+    make ${HALCS_OPTS[*]} install
+
+    if [ "$EXAMPLES" = yes ]; then
+        make ${HALCS_OPTS[*]} examples
+    fi
+
+    if [ "$SYSTEM_INTEGRATION" = yes ]; then
+        make ${HALCS_OPTS[*]} scripts_install
+    fi
+
+elif [ "$COMPILE_SCRIPT" = yes ]; then
+    build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+else
+    build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
 fi
 
 # Get CCache statistics

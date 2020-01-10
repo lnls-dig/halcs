@@ -284,7 +284,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     char *llio_name = zmalloc (llio_name_len);
     ASSERT_ALLOC(llio_name, err_llio_name_alloc);
 
-    strncat (llio_name, name, llio_name_len_rem);
+    strcpy (llio_name, name);
     llio_name_len_rem -= strlen(name);
     strncat (llio_name, LLIO_STR, llio_name_len_rem);
 
