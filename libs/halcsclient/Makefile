@@ -111,6 +111,7 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/modules/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/swap/sm_io_swap_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/rffe/sm_io_rffe_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/rffe_scpi/sm_io_rffe_scpi_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/afc_diag/sm_io_afc_diag_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/trigger_iface/sm_io_trigger_iface_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_exports.o \
@@ -138,6 +139,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules/swap \
 	       -I$(SMIO_SRC_DIR)/modules/dsp \
 	       -I$(SMIO_SRC_DIR)/modules/rffe \
+	       -I$(SMIO_SRC_DIR)/modules/rffe_scpi \
 	       -I$(SMIO_SRC_DIR)/modules/afc_diag \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_mux \
@@ -157,6 +159,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/swap \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/dsp \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/rffe \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/rffe_scpi \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_diag \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux \
@@ -220,6 +223,7 @@ $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h 
 	$(SMIO_TABLE_DIR)/include/sm_io_dsp_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_swap_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_rffe_exports.h \
+	$(SMIO_TABLE_DIR)/include/sm_io_rffe_scpi_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_afc_diag_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_trigger_iface_exports.h \
 	$(SMIO_TABLE_DIR)/include/sm_io_trigger_mux_exports.h \

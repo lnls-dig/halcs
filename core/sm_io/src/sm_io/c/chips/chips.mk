@@ -9,4 +9,5 @@ sm_io_chips_OBJS =  $(sm_io_chips_DIR)/sm_ch_ad9510.o \
             $(sm_io_chips_DIR)/sm_ch_pca9547.o \
             $(sm_io_chips_DIR)/sm_ch_si57x.o \
             $(sm_io_chips_DIR)/sm_ch_rffe.o \
+            $(sm_io_chips_DIR)/sm_ch_rffe_scpi.o \
 			$(sm_io_chips_DIR)/sm_ch_err.o
