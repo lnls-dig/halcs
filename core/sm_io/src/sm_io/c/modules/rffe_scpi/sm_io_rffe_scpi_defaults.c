@@ -62,23 +62,8 @@
 smio_err_e rffe_scpi_config_defaults (char *broker_endp, char *service,
        const char *log_file_name)
 {
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:rffe_spci_defaults] Configuring SMIO "
-            "RFFE with default values ...\n");
-    halcs_client_err_e client_err = HALCS_CLIENT_SUCCESS;
-    smio_err_e err = SMIO_SUCCESS;
-
-    halcs_client_t *config_client = halcs_client_new_log_mode (broker_endp, 0,
-            log_file_name, SMIO_RFFE_LIBHALCSCLIENT_LOG_MODE);
-    ASSERT_ALLOC(config_client, err_alloc_client);
-
-    client_err = halcs_set_rffe_att (config_client, service, RFFE_DFLT_ATT);
-    ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not set RFFE attenuator value",
-            err_param_set, SMIO_ERR_CONFIG_DFLT);
-
-err_param_set:
-    halcs_client_destroy (&config_client);
-err_alloc_client:
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:rffe_scpi_defaults] Exiting Config thread %s\n",
-        service);
-    return err;
+    UNUSED(broker_endp);
+    UNUSED(service);
+    UNUSED(log_file_name);
+    return SMIO_SUCCESS;
 }
