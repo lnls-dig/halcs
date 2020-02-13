@@ -2,6 +2,7 @@ sm_io_modules_DIR = $(sm_io_DIR)/modules
 
 include $(sm_io_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 		$(sm_io_modules_DIR)/fmc250m_4ch/fmc250m_4ch.mk \
+		$(sm_io_modules_DIR)/fmc100m_4ch/fmc100m_4ch.mk \
 		$(sm_io_modules_DIR)/fmc_adc_common/fmc_adc_common.mk \
 		$(sm_io_modules_DIR)/fmc_active_clk/fmc_active_clk.mk \
 		$(sm_io_modules_DIR)/acq/acq.mk \
@@ -20,6 +21,7 @@ include $(sm_io_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 
 sm_io_modules_OBJS = $(sm_io_fmc130m_4ch_OBJS) \
 					 $(sm_io_fmc250m_4ch_OBJS) \
+					 $(sm_io_fmc100m_4ch_OBJS) \
 					 $(sm_io_fmc_adc_common_OBJS) \
 					 $(sm_io_fmc_active_clk_OBJS) \
 					 $(sm_io_acq_OBJS) \
