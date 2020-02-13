@@ -82,6 +82,96 @@ halcs_client_err_e halcs_client_set_timeout (halcs_client_t *self, int timeout);
 /* Get the timeout parameter */
 uint32_t halcs_client_get_timeout (halcs_client_t *self);
 
+/******************** FMC100M SMIO Functions ******************/
+
+/* Read FMC status.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_get_adc100_status (halcs_client_t *self, char *service,
+        uint32_t *adc100_status);
+
+/* Read/Write FMC ACQ LED.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_acq_led (halcs_client_t *self, char *service,
+        uint32_t adc100_acq_led);
+halcs_client_err_e halcs_get_adc100_acq_led (halcs_client_t *self, char *service,
+        uint32_t *adc100_acq_led);
+
+/* Read ADCs Status FMC.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_get_adc100_adc_status (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *adc100_adc_status);
+
+/* Read/Write calib gain for FMC ADCs.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_adc_calib_gain (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t adc100_adc_calib_gain);
+halcs_client_err_e halcs_get_adc100_adc_calib_gain (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *adc100_adc_calib_gain);
+
+/* Read/Write calib offset for FMC ADCs.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_adc_calib_offset (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t adc100_adc_calib_offset);
+halcs_client_err_e halcs_get_adc100_adc_calib_offset (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *adc100_adc_calib_offset);
+
+/* Read/Write calib saturation for FMC ADCs.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_adc_sat (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t adc100_adc_sat);
+halcs_client_err_e halcs_get_adc100_adc_sat (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *adc100_adc_sat);
+
+/* Read/Write Solid State Relays for FMC ADCs.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_adc_ssr (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t adc100_adc_ssr);
+halcs_client_err_e halcs_get_adc100_adc_ssr (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *adc100_adc_ssr);
+
+/* Read sampling frequency.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_get_adc100_fs_freq (halcs_client_t *self, char *service,
+        uint32_t *adc100_fs_freq);
+
+/* Read/Write calibration pattern enable.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_ltc2174_test_patt (halcs_client_t *self, char *service,
+        uint32_t adc100_ltc2174_test_patt);
+halcs_client_err_e halcs_get_adc100_ltc2174_test_patt (halcs_client_t *self, char *service,
+        uint32_t *adc100_ltc2174_test_patt);
+
+/* Read/Write calibration pattern data.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_ltc2174_test_patt_data (halcs_client_t *self, char *service,
+        uint32_t adc100_ltc2174_test_patt_data);
+halcs_client_err_e halcs_get_adc100_ltc2174_test_patt_data (halcs_client_t *self, char *service,
+        uint32_t *adc100_ltc2174_test_patt_data);
+
+/* Reset LTC2174.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_ltc2174_reset (halcs_client_t *self, char *service,
+        uint32_t adc100_ltc2174_reset);
+
+/* Read/Write twos complement format.
+ * Returns HALCS_CLIENT_SUCCESS if ok and HALCS_CLIIENT_ERR_SERVER if
+ * if server could not complete the request */
+halcs_client_err_e halcs_set_adc100_ltc2174_twos_compl (halcs_client_t *self, char *service,
+        uint32_t adc100_ltc2174_twos_compl);
+halcs_client_err_e halcs_get_adc100_ltc2174_twos_compl (halcs_client_t *self, char *service,
+        uint32_t *adc100_ltc2174_twos_compl);
+
 /******************** FMC130M SMIO Functions ******************/
 
 /* Blink the FMC Leds. This is only used for debug and for demostration
