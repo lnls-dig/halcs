@@ -117,7 +117,7 @@ smio_err_e fmc100m_4ch_config_defaults (char *broker_endp, char *service,
 
     uint32_t chan = 0;
     for (chan = 0; chan < SMIO_FMC_100M_4CH_NUM_ADCS; ++chan) {
-        status = 0x8000;
+        status = 0x2000; /* 2^14 gain, as the 2 LSB are tied to 0 */
         client_err = halcs_set_adc100_adc_calib_gain (config_client, service, chan, status);
         ASSERT_TEST(client_err == HALCS_CLIENT_SUCCESS, "Could not write FMC gain",
                 err_param_set, SMIO_ERR_CONFIG_DFLT);
