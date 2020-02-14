@@ -50,10 +50,11 @@ static struct option long_options[] =
     {"test_pattern_en",     required_argument,   NULL, 'e'},
     {"channel",             required_argument,   NULL, 'c'},
     {"ssr",                 required_argument,   NULL, 'r'},
+    {"termination",         required_argument,   NULL, 'm'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:e:c:r:";
+static const char* shortopt = "hb:vo:s:t:e:c:r:m:";
 
 void print_help (char *program_name)
 {
@@ -69,7 +70,8 @@ void print_help (char *program_name)
             "  -t  --test_pattern <Pattern>         Test pattern\n"
             "  -e  --test_pattern_en <Enable>       Enable test pattern\n"
             "  -c  --channel <Channel=[0-3]>        Channel to apply operation. Select 4, for all channel\n"
-            "  -r  --ssr <SSR option>               Select SSR option\n",
+            "  -r  --ssr <SSR option>               Select SSR option\n"
+            "  -m  --termination <Term=[0|1]>       Select 50-ohm termination\n",
             program_name);
 }
 
@@ -83,6 +85,7 @@ int main (int argc, char *argv [])
     char *test_pattern_en_str = NULL;
     char *channel_str = NULL;
     char *ssr_str = NULL;
+    char *termination_str = NULL;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -120,6 +123,10 @@ int main (int argc, char *argv [])
 
             case 'r':
                 ssr_str = strdup (optarg);
+                break;
+
+            case 'm':
+                termination_str = strdup (optarg);
                 break;
 
             case 'c':
@@ -202,6 +209,13 @@ int main (int argc, char *argv [])
         }
     }
 
+    uint32_t termination = 0;
+    if (termination_str != NULL) {
+        termination = strtoul (termination_str, NULL, 10);
+
+        fprintf (stdout, "[client:fmc100m_4ch_ctl]: termination = 0x%08X\n", termination);
+    }
+
     uint32_t ssr = 0;
     if (ssr_str != NULL) {
         uint32_t channel = 0;
@@ -242,13 +256,14 @@ int main (int argc, char *argv [])
 
         uint32_t i;
         for (i = channel_start; i < channel_end; ++i) {
-            err = halcs_set_adc100_adc_ssr (halcs_client, service, i, ssr_options[ssr]);
+            uint32_t ssr_term = ssr_options[ssr] | ((termination)? 0x08 : 0x00);
+            err = halcs_set_adc100_adc_ssr (halcs_client, service, i, ssr_term);
             if (err != HALCS_CLIENT_SUCCESS) {
                 fprintf (stderr, "[client:fmc100m_4ch_ctl]: halcs_set_ssr failed\n");
                 goto err_halcs_exit;
             }
-            fprintf (stdout, "[client:fmc100m_4ch_ctl]: ssr option 0x%08X set for channel #%u\n",
-                ssr, i);
+            fprintf (stdout, "[client:fmc100m_4ch_ctl]: ssr option 0x%08X, ssr bits 0x%08X set for channel #%u\n",
+                ssr, ssr_term, i);
         }
     }
 
@@ -269,6 +284,8 @@ err_halcs_exit:
 err_halcs_client_new:
     free (channel_str);
     channel_str = NULL;
+    free (termination_str);
+    termination_str = NULL;
     free (ssr_str);
     ssr_str = NULL;
     free (test_pattern_en_str);
