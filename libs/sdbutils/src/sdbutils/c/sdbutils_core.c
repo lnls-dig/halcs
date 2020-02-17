@@ -71,6 +71,7 @@ sdbutils_err_e sdbutils_list_device_file (struct sdb_device *d, int depth, int b
         case sdb_type_interconnect:
         case sdb_type_device:
         case sdb_type_bridge:
+        case sdb_type_msi:
             if (!opt_long) {
                 __SDBUTILS_PRINT(stream, "%.19s\n", p->name);
                 return SDBUTILS_SUCCESS;
@@ -327,7 +328,7 @@ struct sdb_device *sdbutils_get_sdb_device (struct sdbfs *fs, uint64_t vendor,
                 DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE, "[sdbutils] Device "
                         "vid = 0x%"PRIx64", did = 0x%08x, instance = %d found\n"
                         "\tname = %.19s, abi_class = %02X, abi_major = %01X, abi_minor = %01X\n",
-                        ntohll(p->vendor_id), ntohl(p->device_id), num_device_skip, p->name, 
+                        ntohll(p->vendor_id), ntohl(p->device_id), num_device_skip, p->name,
                         d->abi_class, d->abi_ver_major, d->abi_ver_minor);
                 return d;
             }

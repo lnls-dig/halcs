@@ -97,6 +97,7 @@ static int list_device(struct sdb_device *d, int depth, int base)
 	case sdb_type_interconnect:
 	case sdb_type_device:
 	case sdb_type_bridge:
+    case sdb_type_msi:
 		if (!opt_long) {
 			printf("%.19s\n", p->name);
 			return 0;
