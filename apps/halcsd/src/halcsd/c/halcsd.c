@@ -500,8 +500,24 @@ int main (int argc, char *argv[])
             fe_smio_id);
     ASSERT_ALLOC (devio_log_info_filename, err_devio_log_info_filename_alloc);
 
+    /* DEVIO name? */
+    const char *devio_name = NULL;
+    switch (devio_type) {
+        case BE_DEVIO:
+            devio_name = "DEVIO";
+            break;
+
+        case FE_DEVIO:
+            devio_name = "DEVIORFFE";
+            break;
+
+        default:
+            devio_name = "DEVIO";
+    }
+
     char devio_service_str [DEVIO_SERVICE_LEN];
-    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:DEVIO", dev_id);
+    snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:%s", dev_id,
+        devio_name);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
     devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
             broker_endp, verbose, devio_log_filename, devio_log_info_filename);
