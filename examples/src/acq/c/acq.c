@@ -19,10 +19,15 @@
 
 #define DFLT_BOARD_NUMBER           0
 
+#define MIN_NUM_TRIGGER_TYPE        0
+#define MAX_NUM_TRIGGER_TYPE        3
+
 #define MIN_NUM_SAMPLES             4
 /* Arbitrary hard limits */
 #define MAX_NUM_SAMPLES             (1 << 28)
 #define MAX_NUM_CHANS               (1 << 8)
+#define MIN_NUM_SHOTS               1
+#define MAX_NUM_SHOTS               (1 << 16)
 
 #define DFLT_FILE_FMT               0
 #define DFLT_NEWACQ_NUM             1
@@ -86,29 +91,57 @@ static struct option long_options[] =
     {"boardslot",           required_argument,   NULL, 'o'},
     {"channumber",          required_argument,   NULL, 'c'},
     {"numsamples",          required_argument,   NULL, 'n'},
+    {"postsamples",         required_argument,   NULL, 'p'},
+    {"numshots",            required_argument,   NULL, 't'},
+    {"triggertype",         required_argument,   NULL, 'g'},
+    {"datatriggerthres",    required_argument,   NULL, 'e'},
+    {"datatriggerpol",      required_argument,   NULL, 'l'},
+    {"datatriggersel",      required_argument,   NULL, 'z'},
+    {"datatriggerfilt",     required_argument,   NULL, 'i'},
+    {"datatriggerchan",     required_argument,   NULL, 'r'},
+    {"triggerdelay",        required_argument,   NULL, 'd'},
     {"filefmt",             required_argument,   NULL, 'f'},
     {"newacq",              required_argument,   NULL, 'a'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:n:f:a:";
+static const char* shortopt = "hb:vo:s:c:n:p:t:g:e:l:z:i:r:d:f:a:";
 
 void print_help (char *program_name)
 {
     fprintf (stdout, "HALCSD Acquisition Utility\n"
             "Usage: %s [options]\n"
             "\n"
-            "  -h  --help                           Display this usage information\n"
-            "  -b  --brokerendp <Broker endpoint>   Broker endpoint\n"
-            "  -v  --verbose                        Verbose output\n"
-            "  -o  --boardslot <Board slot number = [1-12]> \n"
-            "  -s  --halcsnumber <HALCS number = [0|1]> HALCS number\n"
-            "                                       Board slot number\n"
-            "  -c  --channumber <Channel>           Channel number\n"
-            "                                     <Channel> is dependant on the FPGA firmware\n"
-            "  -n  --numsamples <Number of samples> Number of samples\n"
-            "  -f  --filefmt <Output format = [0 = text | 1=binary]>\n"
-            "                                       Output format\n"
+            "  -h  --help                            Display this usage information\n"
+            "  -b  --brokerendp <Broker endpoint>    Broker endpoint\n"
+            "  -v  --verbose                         Verbose output\n"
+            "  -o  --boardslot <Board slot number = [1-12]>\n"
+            "                                        Board slot number\n"
+            "  -s  --halcsnumber <HALCS number = [0|1]>\n"
+            "                                        HALCS instance number\n"
+            "  -c  --channumber <Channel>            Channel number\n"
+            "                                            <Channel> is dependant on the FPGA firmware\n"
+            "  -n  --numsamples <Number of samples>  Number of samples or number of pre-trigger\n"
+            "                                            samples if using triggered mode\n"
+            "  -p  --postsamples <Number of samples> Number of post-trigger samples\n"
+            "                                            if using triggered mode\n"
+            "  -t  --numshots <Number of shots>      Number of shots\n"
+            "                                            if using triggered mode\n"
+            "  -g  --triggertype <Trigger type>      Trigger type. 0 is immediate, 1 is external trigger,\n"
+            "                                            2 is data-driver trigger and 3 is software trigger\n"
+            "  -e  --datatriggerthres <Trigger threshold>\n"
+            "                                        Trigger threshold level for data-driven trigger\n"
+            "  -l  --datatriggerpol <Trigger polarity>\n"
+            "                                        Trigger polarity. 0 is positive edge, 1 is negative edge\n"
+            "  -z  --datatriggersel <Trigger data selection>\n"
+            "                                        Trigger data selection within one channel to compare for threshold level\n"
+            "  -i  --datatriggerfilt <Trigger hysteresis>\n"
+            "                                        Trigger hysteresis value for data trigger detection\n"
+            "  -r  --datatriggerchan <Trigger channel>\n"
+            "                                        Trigger data channel to be compared with the threshold level\n"
+            "  -d  --triggerdelay <Trigger delay>    Trigger delay for all triggers\n"
+            "  -f  --filefmt <Output format = [0 = text | 1 = binary]>\n"
+            "                                        Output format\n"
             "  -a  --newcq <Trigger new acquisition = [0 = no | 1 = yes]\n",
             program_name);
 }
@@ -118,6 +151,15 @@ int main (int argc, char *argv [])
     int verbose = 0;
     char *broker_endp = NULL;
     char *num_samples_str = NULL;
+    char *post_samples_str = NULL;
+    char *num_shots_str = NULL;
+    char *trigger_type_str = NULL;
+    char *datatriggerthres_str = NULL;
+    char *datatriggerpol_str = NULL;
+    char *datatriggersel_str = NULL;
+    char *datatriggerfilt_str = NULL;
+    char *datatriggerchan_str = NULL;
+    char *triggerdelay_str = NULL;
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
     char *chan_str = NULL;
@@ -158,6 +200,42 @@ int main (int argc, char *argv [])
                 num_samples_str = strdup (optarg);
                 break;
 
+            case 'p':
+                post_samples_str = strdup (optarg);
+                break;
+
+            case 't':
+                num_shots_str = strdup (optarg);
+                break;
+
+            case 'g':
+                trigger_type_str = strdup (optarg);
+                break;
+
+            case 'e':
+               datatriggerthres_str = strdup (optarg);
+               break;
+
+            case 'l':
+               datatriggerpol_str = strdup (optarg);
+               break;
+
+            case 'z':
+               datatriggersel_str = strdup (optarg);
+               break;
+
+            case 'i':
+               datatriggerfilt_str = strdup (optarg);
+               break;
+
+            case 'r':
+               datatriggerchan_str = strdup (optarg);
+               break;
+
+            case 'd':
+               triggerdelay_str = strdup (optarg);
+               break;
+
             case 'a':
                 new_acq_str = strdup (optarg);
                 break;
@@ -187,49 +265,125 @@ int main (int argc, char *argv [])
     }
 
     /* Set default number samples */
-    uint32_t num_samples;
+    uint32_t num_samples = 0;
     if (num_samples_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to number of samples: %u\n",
-                DFLT_NUM_SAMPLES);
-        num_samples = DFLT_NUM_SAMPLES;
+        fprintf (stderr, "[client:acq]: No number of samples spcified. Please use --numsamples option\n");
+        goto err_opt_exit;
     }
     else {
         num_samples = strtoul (num_samples_str, NULL, 10);
 
         if (num_samples < MIN_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too small! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq]: Number of samples too small. Minimum number is: %u\n",
                     MIN_NUM_SAMPLES);
-            num_samples = MIN_NUM_SAMPLES;
+            goto err_opt_exit;
         }
         else if (num_samples > MAX_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq]: Number of samples too big. Maximum number is: %u\n",
                     MAX_NUM_SAMPLES);
-            num_samples = MAX_NUM_SAMPLES;
+            goto err_opt_exit;
+        }
+    }
+
+    /* Set post samples */
+    uint32_t post_samples = 0;
+    if (post_samples_str != NULL) {
+        post_samples = strtoul (post_samples_str, NULL, 10);
+
+        if (post_samples < MIN_NUM_SAMPLES) {
+            fprintf (stderr, "[client:acq]: Number of samples too small. Minimum number is: %u\n",
+                    MIN_NUM_SAMPLES);
+            goto err_opt_exit;
+        }
+        else if (post_samples > MAX_NUM_SAMPLES) {
+            fprintf (stderr, "[client:acq]: Number of samples too big. Maximum number is: %u\n",
+                    MAX_NUM_SAMPLES);
+            goto err_opt_exit;
+        }
+    }
+
+    /* Set number os shots */
+    uint32_t num_shots = 1;
+    if (num_shots_str != NULL) {
+        num_shots = strtoul (num_shots_str, NULL, 10);
+        
+        if (num_shots < MIN_NUM_SHOTS) {
+            fprintf (stderr, "[client:acq]: Number of shots too small. Minimum number is: %u\n",
+                    MIN_NUM_SHOTS);
+            goto err_opt_exit;
+        }
+        else if (num_shots > MAX_NUM_SHOTS) {
+            fprintf (stderr, "[client:acq]: Number of samples too big. Maximum number is: %u\n",
+                    MAX_NUM_SHOTS);
+            goto err_opt_exit;
+        }
+    }
+
+    /* Parse trigger properties */
+
+    uint32_t datatriggerthres = 0;
+    if (datatriggerthres_str != NULL) {
+        datatriggerthres = strtoul (datatriggerthres_str, NULL, 10);
+    }
+
+    uint32_t datatriggerpol = 0;
+    if (datatriggerpol_str != NULL) {
+        datatriggerpol = strtoul (datatriggerpol_str, NULL, 10);
+    }
+
+    uint32_t datatriggersel = 0;
+    if (datatriggersel_str != NULL) {
+        datatriggersel = strtoul (datatriggersel_str, NULL, 10);
+    }
+
+    uint32_t datatriggerfilt = 1;
+    if (datatriggerfilt_str != NULL) {
+        datatriggerfilt = strtoul (datatriggerfilt_str, NULL, 10);
+    }
+
+    uint32_t triggerdelay = 0;
+    if (triggerdelay_str != NULL) {
+        triggerdelay = strtoul (triggerdelay_str, NULL, 10);
+    }
+
+    uint32_t datatriggerchan = 0;
+    if (datatriggerchan_str != NULL) {
+        datatriggerchan = strtoul (datatriggerchan_str, NULL, 10);
+    }
+
+    /* Set trigger type */
+    uint32_t trigger_type = 0;
+    if (trigger_type_str != NULL) {
+        trigger_type = strtoul (trigger_type_str, NULL, 10);
+
+        if (trigger_type > MAX_NUM_TRIGGER_TYPE) {
+            fprintf (stderr, "[client:acq]: Trigger type too big. Maximum number is: %u\n",
+                    MAX_NUM_TRIGGER_TYPE);
+            goto err_opt_exit;
         }
     }
 
     /* Set default channel */
     uint32_t chan;
     if (chan_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to 'chan'\n");
-        chan = DFLT_CHAN_NUM;
+        fprintf (stderr, "[client:acq]: No channel specified. Please use --chan option\n");
+        goto err_opt_exit;
     }
     else {
         chan = strtoul (chan_str, NULL, 10);
 
         if (chan > END_CHAN_ID-1) {
-            fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:acq]: Channel number too big. Maximum number is: %u\n",
                     MAX_NUM_CHANS);
-            chan = END_CHAN_ID-1;
+            goto err_opt_exit;
         }
     }
 
     /* Set default board number */
     uint32_t board_number;
     if (board_number_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to BOARD number: %u\n",
-                DFLT_BOARD_NUMBER);
-        board_number = DFLT_BOARD_NUMBER;
+        fprintf (stderr, "[client:acq]: No board number specified. Please use --boardslot option\n");
+        goto err_opt_exit;
     }
     else {
         board_number = strtoul (board_number_str, NULL, 10);
@@ -238,9 +392,8 @@ int main (int argc, char *argv [])
     /* Set default halcs number */
     uint32_t halcs_number;
     if (halcs_number_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to HALCS number: %u\n",
-                DFLT_HALCS_NUMBER);
-        halcs_number = DFLT_HALCS_NUMBER;
+        fprintf (stderr, "[client:acq]: No halcs instance specified. Please use --halcsnumber option\n");
+        goto err_opt_exit;
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
@@ -249,18 +402,18 @@ int main (int argc, char *argv [])
     /* Set default file format */
     file_fmt_e file_fmt;
     if (file_fmt_str == NULL) {
-        fprintf (stderr, "[client:acq]: Setting default value to 'file_fmt'\n");
         file_fmt = DFLT_FILE_FMT;
     }
     else {
         file_fmt = strtoul (file_fmt_str, NULL, 10);
 
         if (file_fmt > END_FILE_FMT-1) {
-            fprintf (stderr, "[client:acq]: Invalid file format (-file_fmt) Defaulting to:: %u\n",
-                    0);
-            file_fmt = 0;
+            fprintf (stderr, "[client:acq]: Invalid file format (-file_fmt)\n");
+            goto err_opt_exit;
         }
     }
+
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
     /* Set new_acq */
     uint32_t new_acq;
@@ -271,7 +424,7 @@ int main (int argc, char *argv [])
         new_acq = strtoul (new_acq_str, NULL, 10);
 
         if (new_acq != 0 && new_acq != 1) {
-            fprintf (stderr, "[client:acq]: Newacq parameter is invalid\n");
+            fprintf (stderr, "[client:acq]: Invalid --new_acq option parameter\n");
             exit (1);
         }
     }
@@ -287,9 +440,58 @@ int main (int argc, char *argv [])
 
     acq_set_fsm_stop (acq_client, service, 1);
 
-    /* Set trigger to skip */
-    uint32_t acq_trig = 0;
-    halcs_client_err_e err = acq_set_trig (acq_client, service, acq_trig);
+    /* Set trigger properties */
+
+    if (datatriggerthres_str != NULL) {
+        halcs_client_err_e err = acq_set_data_trig_thres (acq_client, service, datatriggerthres);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_data_trig_thres failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    if (datatriggerpol_str != NULL) {
+        err = acq_set_data_trig_pol (acq_client, service, datatriggerpol);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_data_trig_pol failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    if (datatriggersel_str != NULL) {
+        err = acq_set_data_trig_sel (acq_client, service, datatriggersel);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_data_trig_sel failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    if (datatriggerfilt_str != NULL) {
+        err = acq_set_data_trig_filt (acq_client, service, datatriggerfilt);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_data_trig_filt failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    if (datatriggerchan_str != NULL) {
+        err =  acq_set_data_trig_chan (acq_client, service, datatriggerchan);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_data_trig_chan failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    if (triggerdelay_str != NULL) {
+        err =  acq_set_hw_trig_dly (acq_client, service, triggerdelay);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:acq]: acq_set_hw_trig_dly failed\n");
+            goto err_acq_set_trig;
+        }
+    }
+
+    /* Set trigger */
+    err = acq_set_trig (acq_client, service, trigger_type);
     if (err != HALCS_CLIENT_SUCCESS){
         fprintf (stderr, "[client:acq]: acq_set_trig failed\n");
         goto err_acq_set_trig;
@@ -303,20 +505,20 @@ int main (int argc, char *argv [])
     err |= halcs_get_acq_ch_atom_width (acq_client, service, chan, &req_ch_atom_width);
     err |= halcs_get_acq_ch_num_atoms (acq_client, service, chan, &req_ch_num_atoms);
     if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:acq]: getting channel properties failed\n");
+        fprintf (stderr, "[client:acq]: Getting channel properties failed\n");
         goto err_acq_get_prop;
     }
 
     /* bit to byte */
     req_ch_atom_size = req_ch_atom_width/8;
 
-    uint32_t data_size = num_samples*req_ch_sample_size;
+    uint32_t data_size = (num_samples+post_samples)*num_shots*req_ch_sample_size;
     uint32_t *data = (uint32_t *) zmalloc (data_size*sizeof (uint8_t));
     bool new_acq_arg = new_acq;
     acq_trans_t acq_trans = {.req =   {
                                         .num_samples_pre = num_samples,
-                                        .num_samples_post = 0,
-                                        .num_shots = 1,
+                                        .num_samples_post = post_samples,
+                                        .num_shots = num_shots,
                                         .chan = chan,
                                       },
                              .block = {
@@ -341,7 +543,21 @@ err_set_file_mode:
 err_acq_full_compat:
 err_acq_get_prop:
 err_acq_set_trig:
+    acq_client_destroy (&acq_client);
 err_acq_client_new:
+err_opt_exit:
+    free (datatriggerthres_str);
+    datatriggerthres_str = NULL;
+    free (datatriggerpol_str);
+    datatriggerpol_str = NULL;
+    free (datatriggersel_str);
+    datatriggersel_str = NULL;
+    free (datatriggerfilt_str);
+    datatriggerfilt_str = NULL;
+    free (datatriggerchan_str);
+    datatriggerchan_str = NULL;
+    free (triggerdelay_str);
+    triggerdelay_str = NULL;
     free (file_fmt_str);
     file_fmt_str = NULL;
     free (chan_str);
@@ -354,7 +570,6 @@ err_acq_client_new:
     num_samples_str = NULL;
     free (broker_endp);
     broker_endp = NULL;
-    acq_client_destroy (&acq_client);
 
     return 0;
 }
