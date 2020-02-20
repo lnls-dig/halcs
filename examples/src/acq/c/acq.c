@@ -274,12 +274,12 @@ int main (int argc, char *argv [])
         num_samples = strtoul (num_samples_str, NULL, 10);
 
         if (num_samples < MIN_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too small. Minimum number is: %u\n",
+            fprintf (stderr, "[client:acq]: Number of Pre-Trigger samples too small. Minimum number is: %u\n",
                     MIN_NUM_SAMPLES);
             goto err_opt_exit;
         }
         else if (num_samples > MAX_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too big. Maximum number is: %u\n",
+            fprintf (stderr, "[client:acq]: Number of Pre-Trigger samples too big. Maximum number is: %u\n",
                     MAX_NUM_SAMPLES);
             goto err_opt_exit;
         }
@@ -290,13 +290,8 @@ int main (int argc, char *argv [])
     if (post_samples_str != NULL) {
         post_samples = strtoul (post_samples_str, NULL, 10);
 
-        if (post_samples < MIN_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too small. Minimum number is: %u\n",
-                    MIN_NUM_SAMPLES);
-            goto err_opt_exit;
-        }
-        else if (post_samples > MAX_NUM_SAMPLES) {
-            fprintf (stderr, "[client:acq]: Number of samples too big. Maximum number is: %u\n",
+        if (post_samples > MAX_NUM_SAMPLES) {
+            fprintf (stderr, "[client:acq]: Number of Post-Trigger samples too big. Maximum number is: %u\n",
                     MAX_NUM_SAMPLES);
             goto err_opt_exit;
         }
