@@ -11,6 +11,8 @@ OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 
+PREFIX ?= /usr/local
+
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2
 # We expect tghese variables to be appended to the possible
@@ -76,7 +78,11 @@ all: $(OUT)
 	$(CC) $(LDFLAGS) $(CFLAGS) $(INCLUDE_DIRS) $^ -o $@ $(LIBS)
 
 # For compatibility
-install:
+install: $(OUT)
+	$(foreach bin,$(OUT),install -m 755 $(bin) $(PREFIX)/bin $(CMDSEP))
+
+uninstall:
+	$(foreach bin,$(notdir $(OUT)),rm -f $(PREFIX)/bin/$(bin) $(CMDSEP))
 
 #BAD
 clean:
