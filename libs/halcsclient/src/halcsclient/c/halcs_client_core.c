@@ -622,6 +622,127 @@ PARAM_FUNC_CLIENT_READ_DOUBLE(si571_fstartup)
             si571_fstartup);
 }
 
+/**************** FMC 100M SMIO Functions ****************/
+
+PARAM_FUNC_CLIENT_READ(adc100_status)
+{
+     return param_client_read (self, service, FMC_100M_4CH_OPCODE_STATUS, adc100_status);
+}
+
+PARAM_FUNC_CLIENT_WRITE(adc100_acq_led)
+{
+    return param_client_write (self, service, FMC_100M_4CH_OPCODE_ACQ_LED, adc100_acq_led);
+}
+
+PARAM_FUNC_CLIENT_READ(adc100_acq_led)
+{
+     return param_client_read (self, service, FMC_100M_4CH_OPCODE_ACQ_LED, adc100_acq_led);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(adc100_adc_status, chan, status)
+{
+     return param_client_write_read (self, service, FMC_100M_4CH_OPCODE_ADC_STATUS,
+             chan, status);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(adc100_adc_calib_gain, chan, gain)
+{
+    return param_client_write2 (self, service, FMC_100M_4CH_OPCODE_ADC_CALIB_GAIN,
+            chan, gain);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(adc100_adc_calib_gain, chan, gain)
+{
+     return param_client_write_read (self, service, FMC_100M_4CH_OPCODE_ADC_CALIB_GAIN,
+             chan, gain);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(adc100_adc_calib_offset, chan, offset)
+{
+    return param_client_write2 (self, service, FMC_100M_4CH_OPCODE_ADC_CALIB_OFFSET,
+            chan, offset);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(adc100_adc_calib_offset, chan, offset)
+{
+     return param_client_write_read (self, service, FMC_100M_4CH_OPCODE_ADC_CALIB_OFFSET,
+             chan, offset);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(adc100_adc_sat, chan, sat)
+{
+    return param_client_write2 (self, service, FMC_100M_4CH_OPCODE_ADC_SAT,
+            chan, sat);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(adc100_adc_sat, chan, sat)
+{
+     return param_client_write_read (self, service, FMC_100M_4CH_OPCODE_ADC_SAT,
+             chan, sat);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(adc100_adc_ssr, chan, sat)
+{
+    return param_client_write2 (self, service, FMC_100M_4CH_OPCODE_ADC_SSR,
+            chan, sat);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(adc100_adc_ssr, chan, sat)
+{
+     return param_client_write_read (self, service, FMC_100M_4CH_OPCODE_ADC_SSR,
+             chan, sat);
+}
+
+PARAM_FUNC_CLIENT_READ(adc100_fs_freq)
+{
+     return param_client_read (self, service, FMC_100M_4CH_OPCODE_FS_FREQ, adc100_fs_freq);
+}
+
+/* LTC2174 Test Pattern */
+PARAM_FUNC_CLIENT_WRITE(adc100_ltc2174_test_patt)
+{
+    return param_client_write (self, service, FMC_100M_4CH_OPCODE_LTC2174_TEST_PATT,
+            adc100_ltc2174_test_patt);
+}
+
+PARAM_FUNC_CLIENT_READ(adc100_ltc2174_test_patt)
+{
+    return param_client_read (self, service, FMC_100M_4CH_OPCODE_LTC2174_TEST_PATT,
+            adc100_ltc2174_test_patt);
+}
+
+/* LTC2174 Test Pattern Data */
+PARAM_FUNC_CLIENT_WRITE(adc100_ltc2174_test_patt_data)
+{
+    return param_client_write (self, service, FMC_100M_4CH_OPCODE_LTC2174_TEST_PATT_DATA,
+            adc100_ltc2174_test_patt_data);
+}
+
+PARAM_FUNC_CLIENT_READ(adc100_ltc2174_test_patt_data)
+{
+    return param_client_read (self, service, FMC_100M_4CH_OPCODE_LTC2174_TEST_PATT_DATA,
+            adc100_ltc2174_test_patt_data);
+}
+
+PARAM_FUNC_CLIENT_WRITE(adc100_ltc2174_reset)
+{
+    return param_client_write (self, service, FMC_100M_4CH_OPCODE_LTC2174_RESET,
+            adc100_ltc2174_reset);
+}
+
+/* LTC2174 Test Pattern Data */
+PARAM_FUNC_CLIENT_WRITE(adc100_ltc2174_twos_compl)
+{
+    return param_client_write (self, service, FMC_100M_4CH_OPCODE_LTC2174_TWOS_COMPL,
+            adc100_ltc2174_twos_compl);
+}
+
+PARAM_FUNC_CLIENT_READ(adc100_ltc2174_twos_compl)
+{
+    return param_client_read (self, service, FMC_100M_4CH_OPCODE_LTC2174_TWOS_COMPL,
+            adc100_ltc2174_twos_compl);
+}
+
 /**************** FMC 130M SMIO Functions ****************/
 
 /* ADC LTC2208 RAND */

@@ -26,6 +26,7 @@ typedef struct _smio_rffe_version_t smio_rffe_version_t;
 /* Include all module's codes */
 #include "sm_io_fmc130m_4ch_codes.h"
 #include "sm_io_fmc250m_4ch_codes.h"
+#include "sm_io_fmc100m_4ch_codes.h"
 #include "sm_io_fmcpico1m_4ch_codes.h"
 #include "sm_io_fmc_adc_common_codes.h"
 #include "sm_io_fmc_active_clk_codes.h"
@@ -45,6 +46,7 @@ typedef struct _smio_rffe_version_t smio_rffe_version_t;
 /* Include all function descriptors */
 #include "sm_io_fmc130m_4ch_exports.h"
 #include "sm_io_fmc250m_4ch_exports.h"
+#include "sm_io_fmc100m_4ch_exports.h"
 #include "sm_io_fmcpico1m_4ch_exports.h"
 #include "sm_io_fmc_adc_common_exports.h"
 #include "sm_io_fmc_active_clk_exports.h"

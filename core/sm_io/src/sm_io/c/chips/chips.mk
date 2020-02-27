@@ -4,6 +4,7 @@ sm_io_chips_DIR = $(sm_io_DIR)/chips
 # more objects to this target. This is done in the hal.mk
 # makefile
 sm_io_chips_OBJS =  $(sm_io_chips_DIR)/sm_ch_ad9510.o \
+            $(sm_io_chips_DIR)/sm_ch_ltc2174.o \
             $(sm_io_chips_DIR)/sm_ch_isla216p.o \
             $(sm_io_chips_DIR)/sm_ch_24aa64.o \
             $(sm_io_chips_DIR)/sm_ch_pca9547.o \
