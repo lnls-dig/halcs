@@ -1,0 +1,418 @@
+\input texinfo    @c -*-texinfo-*-
+%
+% halcs_firmware_manual.in - main file for the documentation
+%
+%%%%
+
+%------------------------------------------------------------------------------
+%
+%                         NOTE FOR THE UNAWARE USER
+%                         =========================
+%
+%    This file is a texinfo source. It isn't the binary file of some strange
+%    editor of mine. If you want ASCII, you should "make halcs_firmware_manual.txt".
+%
+%------------------------------------------------------------------------------
+
+%
+% This is not a conventional info file...
+% I use three extra features:
+%   - The '%' as a comment marker, if at beginning of line ("\%" -> "%")
+%   - leading blanks are allowed (this is something I can't live without)
+%   - braces are automatically escaped when they appear in example blocks
+%
+
+@comment %**start of header
+@documentlanguage en
+@documentencoding UTF-8
+@setfilename halcs_firmware_manual.info
+@settitle halcs_firmware_manual
+@iftex
+@afourpaper
+@end iftex
+@c @paragraphindent 0
+@comment %**end of header
+
+@setchapternewpage off
+
+@set update-month March 2020
+@set libsodium-version 1.0.8
+@set libzmq-version v4.2.5
+@set libczmq-version v4.0.2
+@set malamute-version v1.6.1
+
+@finalout
+
+@titlepage
+@title HALCS Guide
+@subtitle Hardware Abstraction Layer for Control Systems
+@subtitle @value{update-month} - Release 1.9.1
+@flushright
+@image{images/lnls_logo,3cm,,,pdf}
+@end flushright
+@author Lucas Russo (LNLS)
+@end titlepage
+@headings single
+
+@iftex
+@contents
+@end iftex
+
+@c ##########################################################################
+@node Top
+@top Introduction
+
+This document describes HALCS, the software developed to abstract hardware details,
+providing an easy to use interface to clients. The hardware, in this case,
+is used in the broad sense, meaning an AMC board, a network-attached device
+or any other piece of equipment meant to be integrated to a control system or
+test-bench.
+
+@c ##########################################################################
+@node Repositories and Releases
+@chapter Repositories and Releases
+
+This project is hosted on Github, at the following link:@*
+@uref{https://github.com/lnls-dig/halcs}
+
+Here a list of resources that you can find on the project page.
+@table @code
+
+@item Releases@footnote{@uref{https://github.com/lnls-dig/halcs/releases}}
+contains the @t{.rpm} packages for installing HALCS on a CentOS/RedHat/Fedora
+and the @t{.pdf} documentation for every official release.
+
+@item Repository@footnote{@uref{https://github.com/lnls-dig/halcs}}
+contains the git repository of the project.
+
+@end table
+
+On the repository the official releases have a tag named
+@code{v#maj.#min.#rev} where @code{#maj} represent the major release
+version of the software, @code{#min} the minor one and @code{#rev} the revision
+(e.g @code{v1.9.1}). This follows semantic versioning as defined in @uref{https://semver.org}
+The released binary files follow the same naming convention.
+
+@b{Note:} If you got this from the repository (as opposed to a named
+@i{tar.gz} or @i{pdf} file) it may happen that you are looking at a later
+commit than the release this manual claims to document.
+It is a fact of life that developers forget to re-read and fix documentation
+while updating the code. In that case, please run ``@code{git describe HEAD}''
+to ensure where you are.
+
+@c ##########################################################################
+@page
+@node About source code
+@chapter About Source Code
+
+@c ==========================================================================
+@section Build from Sources
+
+The HALCS software makes use of two build systems: @command{make}@footnote{@uref{https://www.gnu.org/software/make}}
+and @command{gradle}@footnote{@uref{https://gradle.org}}. Both of them should produce
+the same binaries, but @command{gradle} gives you more outputs, such as@i{.rpm}
+packages and automatically increment version number in header files.
+
+Prior to build HALCS, we need to install its dependencies. As of the moment,
+it makes use of 4 external dependencies:
+
+@table @file
+    @item libsodium @value{libsodium-version}
+        @uref{https://github.com/jedisct1/libsodium/tree/@value{libsodium-version}}
+    @item zeromq @value{libzmq-version}
+        @uref{https://github.com/zeromq/libzmq/tree/@value{libzmq-version}}
+    @item czmq @value{libczmq-version}
+        @uref{https://github.com/zeromq/czmq/tree/@value{libczmq-version}}
+    @item mlm @value{malamute-version}
+        @uref{https://github.com/lnls-dig/malamute/tree/@value{malamute-version}}
+@end table
+
+In order to install them with versions that are known to be compatible use the
+following snippet:
+
+@example
+git clone --branch=@value{libsodium-version} https://github.com/jedisct1/libsodium.git && \
+git clone --branch=@value{libzmq-version} https://github.com/zeromq/libzmq.git && \
+git clone --branch=@value{libczmq-version} https://github.com/zeromq/czmq.git && \
+for project in libsodium libzmq czmq; do
+  CONFIG_OPTS=()
+  CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+  CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+  if [ $project == "libzmq" ]; then
+    CONFIG_OPTS+=("--with-libsodium")
+  fi
+
+  cd $project && \
+  ./autogen.sh && \
+  ./configure "$@{CONFIG_OPTS[@@]@}" && \
+  make check && \
+  make && \
+  sudo make install && \
+  sudo ldconfig && \
+  cd ..
+
+  # Check last command return status
+  if [ $? -ne 0 ]; then
+    echo "Could not compile/install project $project." >&2
+    exit 1
+  fi
+done
+
+git clone --branch=@value{malamute-version} https://github.com/lnls-dig/malamute.git && \
+for project in malamute; do
+  CONFIG_OPTS=()
+  CONFIG_OPTS+=("--with-systemd-units")
+  CONFIG_OPTS+=("--sysconfdir=/usr/etc")
+  CONFIG_OPTS+=("--prefix=/usr")
+  CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+  CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+
+  cd $project && \
+  ./autogen.sh && \
+  ./configure "$@{CONFIG_OPTS[@@]@}" && \
+  make check && \
+  make && \
+  sudo make install && \
+  sudo ldconfig && \
+  cd ..
+
+  MALAMUTE_VERBOSE=0
+  MALAMUTE_PLAIN_AUTH=
+  MALAMUTE_AUTH_MECHANISM=null
+  MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
+  MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
+  # Install our custom Malamute config file
+  sudo sed -i \
+    -e "s|verbose\( *\)=.*|verbose\1= $@{MALAMUTE_VERBOSE@}|g" \
+    -e "s|plain\( *\)=.*|plain\1= $@{MALAMUTE_PLAIN_AUTH@}|g" \
+    -e "s|mechanism\( *\)=.*|mechanism\1= $@{MALAMUTE_AUTH_MECHANISM@}|g" \
+    -e "s|tcp://\*:9999|$@{MALAMUTE_ENDPOINT@}|g" \
+    $@{MALAMUTE_CFG_FILE@}
+
+
+  # Enable service
+  sudo systemctl enable malamute || /bin/true
+
+  # Check last command return status
+  if [ $? -ne 0 ]; then
+    echo "Could not compile/install project $project." >&2
+    exit 1
+  fi
+done
+@end example
+
+Alternatively you can install them via @t{.rpm} or @t{.deb} packages if available
+at your distribution. As all of them use semantic versioning, you can install any
+version that is greater or equal than the specified ones for @i{minor} and @i{revision}
+numbers.
+
+Here is the procedure to build the binary images from the source using @command{make}:
+
+@enumerate
+@item Install @command{make} and @command{gcc}.@*
+    @command{sudo apt-get install make gcc}, for Debian-based systems.@*
+    @command{sudo yum install make gcc-c++}, for Fedora-based systems.
+@item Get the source code.@*
+    @code{git clone --recursive https://github.com/lnls-dig/halcs}
+@item Goto the source code directory.@*
+    @code{cd halcs}
+@item Build and install the code.@*
+    @code{make && sudo make install}
+@end enumerate
+
+Alternatively you can use a script called @command{./compile.sh} that gives you
+more flexibility in terms of compilation-time configurability. You should only
+use this method if the defaults are not sufficient for you use case:
+
+@enumerate
+@item Install @command{make} and @command{gcc}.@*
+    @command{sudo apt-get install make gcc}, for Debian-based systems.@*
+    @command{sudo yum install make gcc-c++}, for Fedora-based systems.
+@item Get the source code.@*
+    @code{git clone --recursive https://github.com/lnls-dig/halcs}
+@item Goto the source code directory.@*
+    @code{cd halcs}
+@item Build and install the code.@*
+    @code{./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes}
+@end enumerate
+
+Yet another way to build the source code is to use @command{gradle}:
+
+@enumerate
+@item Install @command{make} and @command{gcc}.@*
+    @command{sudo apt-get install openjdk-8-jdk openjdk-8-jre gcc}, for Debian-based systems.@*
+    @command{sudo yum install java-1.8.0-openjdk java-1.8.0-openjre gcc-c++}, for Fedora-based systems.
+@item Get the source code.@*
+    @code{git clone --recursive https://github.com/lnls-dig/halcs}
+@item Goto the source code directory.@*
+    @code{cd halcs}
+@item Build and install the code.@*
+    @code{./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes}
+@end enumerate
+
+If you already have the software installed and wish to remote update to the latest release
+you can run the following snippet. Be advised that this is just an example and assumes
+specific @i{paths} and running applications:
+
+@example
+NODES=()
+NODES+=("<type the computer IP that you wish to update>")
+
+for crate in "$@{NODES[@@]@}"; do
+  SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
+  root@@$@{crate@} bash -c "\
+    set -x && \
+    cd /root/postinstall/apps/bpm-app/halcs && \
+    git fetch --all && \
+    git checkout -b stable-\$(date +%Y%m%d-%H%M%S) && \
+    git checkout master && \
+    git reset --hard origin/master && \
+    cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
+    systemctl stop \
+      halcs@@@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24@}.target && \
+    cd /root/postinstall/apps/bpm-app/halcs && \
+    ./gradle_uninstall.sh && \
+    ./gradle_compile.sh -a halcsd -b afcv3_1 -e yes && \
+    mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
+    systemctl daemon-reload && \
+    cd /root/postinstall/apps/bpm-app/halcs-generic-udev && \
+    make install &&  \
+    systemctl start \
+      halcs-ioc@@@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24@}.target" &
+done
+@end example
+
+@c ==========================================================================
+@section Source Code Organization
+
+To be written
+
+@c ==========================================================================
+@section Dependencies
+
+The fmc-adc gateware depends on the following hdl cores and libraries:
+@table @b
+    @item libsodium
+        @code{repo   : https://github.com/jedisct1/libsodium}@*
+        @code{commit : @value{libsodium-version}}
+    @item zeromq
+        @code{repo   : https://github.com/zeromq/libzmq}@*
+        @code{commit : @value{libzmq-version}}
+    @item czmq
+        @code{repo   : https://github.com/zeromq/czmq}@*
+        @code{commit : @value{libczmq-version}}
+    @item mlm
+        @code{repo   : https://github.com/lnls-dig/malamute}@*
+        @code{commit : @value{malamute-version}}
+@end table
+
+@c ##########################################################################
+@page
+@node Architecture
+@chapter Architecture
+
+This chapter describes the internal architecture of HALCS and its abstractions.
+
+@ref{fig:halcs-architecture-simple} describes the general HALCS components and
+how they are organized.
+
+@float Figure,fig:halcs-architecture-simple
+@center @image{images/halcs-architecture-simple, 5cm,,,pdf}
+@caption{High-level HALCS architecture.}
+@end float
+
+@ref{fig:halcs-architecture} describes the HALCS architecture in more detail,
+enphasizing the modular approach used (i.e., @i{SMIO} or @i{Specific Module I/O})
+
+@float Figure,fig:halcs-architecture
+@center @image{images/halcs-architecture, 7cm,,,pdf}
+@caption{HALCS architecture.}
+@end float
+
+@c ==========================================================================
+@section Motivation
+
+To be written
+
+@c ==========================================================================
+@section Features
+
+To be written
+
+@c ==========================================================================
+@section Description
+
+To be written
+
+@c --------------------------------------------------------------------------
+@subsection LLIO (Low-level I/O)
+
+To be written
+
+@c --------------------------------------------------------------------------
+@subsection DEVIO (Device I/O)
+
+To be written
+
+@c --------------------------------------------------------------------------
+@subsection SMIO (Specific-Module I/O)
+
+To be written
+
+@c --------------------------------------------------------------------------
+@subsection Malamute Broker
+
+To be written
+
+@c --------------------------------------------------------------------------
+@subsection Client
+
+To be written
+
+@c ##########################################################################
+@page
+@node How to use
+@chapter How to use
+
+@c ==========================================================================
+@section Server-side
+
+To be written
+
+@c ==========================================================================
+@section Client-side
+
+To be written
+
+@c ==========================================================================
+@subsection Examples
+
+To be written
+
+@c ##########################################################################
+@page
+@node Missing Features and Improvements
+@chapter Missing Features and Improvements
+
+To be written
+
+@c ##########################################################################
+@page
+@node Appendix
+@appendix
+
+To be written
+
+@c --------------------------------------------------------------------------
+@page
+@appendix Glossary
+@section Glossary
+
+@table @b
+@item HALCS
+      Hardware Abstraction Layer for Control Systems.
+@end table
+
+
+
+@bye
