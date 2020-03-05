@@ -15,9 +15,9 @@ Make sure you have the following libraries installed, either by download
 the binaries or executing the instructions below:
 
 * libsodium-1.0.8 (https://github.com/jedisct1/libsodium/tree/1.0.8)
-* zeromq-4.2.2 (https://github.com/zeromq/libzmq/tree/v4.2.2)
+* zeromq-4.2.5 (https://github.com/zeromq/libzmq/tree/v4.2.5)
 * czmq-4.0.2 (https://github.com/zeromq/czmq/tree/v4.0.2)
-* mlm-1.5.0 (https://github.com/lnls-dig/malamute/tree/v1.5.0)
+* mlm-1.6.1 (https://github.com/lnls-dig/malamute/tree/v1.6.1)
 
 ## Optional libraries:
 
@@ -31,16 +31,75 @@ sudo apt-get install uuid
 
 ```bash
 git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
-git clone --branch=v4.2.2-pre https://github.com/lnls-dig/libzmq.git && \
+git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
 git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
-git clone --branch=v1.5.0 https://github.com/lnls-dig/malamute.git &&
-for project in libsodium libzmq czmq malamute; do
-    cd $project
-    ./autogen.sh
-    ./configure && make check
-    sudo make install
-    sudo ldconfig
+for project in libsodium libzmq czmq; do
+
+    CONFIG_OPTS=()
+    CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+    CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+    if [ $project == "libzmq" ]; then
+        CONFIG_OPTS+=("--with-libsodium")
+    fi
+
+    cd $project && \
+    ./autogen.sh && \
+    ./configure "${CONFIG_OPTS[@]}" && \
+    make check && \
+    make && \
+    sudo make install && \
+    sudo ldconfig && \
     cd ..
+
+    # Check last command return status
+    if [ $? -ne 0 ]; then
+        echo "Could not compile/install project $project." >&2
+        exit 1
+    fi
+done
+
+git clone --branch=v1.6.1 https://github.com/lnls-dig/malamute.git && \
+for project in malamute; do
+
+    CONFIG_OPTS=()
+    CONFIG_OPTS+=("--with-systemd-units")
+    CONFIG_OPTS+=("--sysconfdir=/usr/etc")
+    CONFIG_OPTS+=("--prefix=/usr")
+    CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+    CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+
+    cd $project && \
+    ./autogen.sh && \
+    ./configure "${CONFIG_OPTS[@]}" && \
+    make check && \
+    make && \
+    sudo make install && \
+    sudo ldconfig && \
+    cd ..
+
+    MALAMUTE_VERBOSE=0
+    MALAMUTE_PLAIN_AUTH=
+    MALAMUTE_AUTH_MECHANISM=null
+    MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
+    MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
+    # Install our custom Malamute config file
+    sudo sed -i \
+        -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
+        -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
+        -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
+        -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
+        ${MALAMUTE_CFG_FILE}
+
+
+    # Enable service
+    sudo systemctl enable malamute || /bin/true
+
+    # Check last command return status
+    if [ $? -ne 0 ]; then
+        echo "Could not compile/install project $project." >&2
+        echo "Try executing the script with root access." >&2
+        exit 1
+    fi
 done
 ```
 
