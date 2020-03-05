@@ -162,6 +162,95 @@ at your distribution. As all of them use semantic versioning, you can install an
 version that is greater or equal than the specified ones for *minor* and *revision*:
 numbers.
 
+Additionaly, it's often interesting to install customized udev scripts, so
+your application will automatically start a given program when some ID is
+detected:
+
+.. code-block:: bash
+
+    git clone --recursive https://github.com/lnls-dig/halcs-generic-udev.git && \
+    for project in halcs-generic-udev; do
+        cd $project && \
+        git submodule update --init --recursive &&
+        sudo make install && \
+        cd ..
+
+        # Check last command return status
+        if [ $? -ne 0 ]; then
+            echo "Could not compile/install project $project." >&2
+            exit 1
+        fi
+    done
+
+Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
+``synthesis-name`` that is baked inside the FPGA Gateware.
+
+.. [#sdb] |SDB Wiki|_
+
+.. _`SDB Wiki`: https://ohwr.org/project/fpga-config-space/wikis/home
+.. |SDB Wiki| replace:: https://ohwr.org/project/fpga-config-space/wikis/home
+
+To add your specific program to start when some ID is found, the ``run-fpga-program.sh``
+(typically installed in ``/usr/local/share/halcs/scripts`` or under
+``halcs-generic-udev`` repository path ``scripts/share/halcs/scripts``) script
+can be modified. Below, an excerpt of the script is showm with a possible
+modification to allow starting another program:
+
+.. code-block:: bash
+
+    ...
+
+    for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
+        prog_inst=$((i-1));
+        case "${GATEWARE_NAME}" in
+            bpm-gw*)
+                case "${FMC_NAMES[$prog_inst]}" in
+                    LNLS_FMC250M*)
+                        START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                        ;;
+                    LNLS_FMC130M*)
+                        START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                        ;;
+                    *)
+                        echo "Unsupported Gateware Module: "${FPGA_FMC_NAME} >&2
+                        exit 1
+                        ;;
+                esac
+                ;;
+
+            tim-receiver*)
+                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                ;;
+
+            afc-tim*)
+                # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
+                if [ $((prog_inst%2)) -eq 0 ]; then
+                    START_PROGRAM="/usr/bin/systemctl --no-block start tim-rx-ioc@${HALCS_IDXS[$prog_inst]}.service"
+                else
+                    START_PROGRAM=""
+                fi
+                ;;
+
+            pbpm-gw*)
+                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                ;;
+
+            <ADD YOU GATEWARE NAME HERE>*)
+                START_PROGRAM="<ADD YOUR START PROGRAM HERE>"
+                ;;
+
+            *)
+                echo "Invalid Gateware: "${GATEWARE_NAME} >&2
+                exit 2
+                ;;
+        esac
+
+        eval ${START_PROGRAM}
+    done
+
+    ...
+
+
 Here is the procedure to build the binary images from the source using ``make``:
 
 1. Install ``make`` and ``gcc``:
