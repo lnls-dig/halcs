@@ -1,59 +1,24 @@
+# Minimal makefile for Sphinx documentation
 #
-# Makefile for the documentation directory
-#
-# Copyright 1994,2000,2010,2011   Alessandro Rubini <rubini@linux.it>
-#
-#################
 
-# There is not basenames here, all *.in are considered input
-INPUT = $(wildcard *.in)
+# You can set these variables from the command line.
+SPHINXOPTS    =
+SPHINXBUILD   = sphinx-build
+SPHINXPROJ    = HALCS
+SOURCEDIR     = .
+BUILDDIR      = _build
+MAKE          = make
 
-TEXI = $(INPUT:.in=.texi)
-INFO = $(INPUT:.in=.info)
-HTML = $(INPUT:.in=.html)
-TXT  = $(INPUT:.in=.txt)
-PDF  = $(INPUT:.in=.pdf)
+# Put it first so that "make" without argument is like "make help".
+help:
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-ALL    = $(INFO) $(HTML) $(TXT) $(PDF)
+.PHONY: help images Makefile
 
-MAKEINFO ?= makeinfo
-
-%.texi: %.in
-	@rm -f $@
-	sed -f ./infofilter $< > $@
-	emacs -batch --no-site-file -l fixinfo $@
-	chmod -w $@
-
-%.pdf: %.texi
-	texi2pdf --batch $<
-
-%.info: %.texi
-	$(MAKEINFO) $< -o $@
-
-%.html: %.texi
-	$(MAKEINFO) --html --no-split -o $@ $<
-
-%.txt: %.texi
-	$(MAKEINFO) --no-headers $< > $@
-
-##############################################
-.PHONY: all images check terse clean install
-
-all: images $(ALL)
-	$(MAKE) terse
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+%: images Makefile
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 images::
 	if [ -d images ]; then $(MAKE) -C images || exit 1; fi
-
-check: _err.ps
-	gs -sDEVICE=linux -r320x200x16 $<
-
-terse:
-	for n in cp fn ky pg toc tp vr aux log; do rm -f *.$$n; done
-	rm -f *~
-
-clean: terse
-	rm -f $(ALL) $(TEXI)
-
-# add the other unused targets, so the rule in ../Makefile works
-modules install modules_install:
