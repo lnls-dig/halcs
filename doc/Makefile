@@ -22,3 +22,7 @@ help:
 
 images::
 	if [ -d images ]; then $(MAKE) -C images || exit 1; fi
+
+clean:
+	if [ -d images ]; then $(MAKE) -C images clean || exit 1; fi
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
