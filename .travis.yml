@@ -46,7 +46,7 @@ script:
 - ./ci_scanner.sh
 
 # Generate and deploy documentation
-after_success: "cd $TRAVIS_BUILD_DIR/doc && make html"
+after_success: "cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR"
 
 cache:
   ccache: true
