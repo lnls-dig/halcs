@@ -23,6 +23,7 @@ addons:
   apt:
     packages:
     - uuid-dev
+    - python-sphinx
     - graphviz
   sonarqube:
     organization: lnls-dig
@@ -36,9 +37,6 @@ addons:
 
 before_install:
 - git submodule update --init --recursive
-
-install:
-- pip install sphinx
 
 #   Build and check this project
 script:
