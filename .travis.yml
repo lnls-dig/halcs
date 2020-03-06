@@ -23,6 +23,7 @@ addons:
   apt:
     packages:
     - uuid-dev
+    - dia
   sonarqube:
     organization: lnls-dig
     token:
