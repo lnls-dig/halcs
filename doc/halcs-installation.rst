@@ -45,16 +45,18 @@ About the source code
 Build from sources
 ''''''''''''''''''
 
-The HALCS software makes use of two build systems: ``make`` [#make]
-and ``gradle`` [#gradle]. Both of them should produce the same binaries, but
+The HALCS software makes use of two build systems: ``make`` [#make]_
+and ``gradle`` [#gradle]_. Both of them should produce the same binaries, but
 ``gradle`` gives you more outputs, such as ``.rpm`` packages and automatically
 increments the version number in header files during development.
 
-.. [#make] `Make Page`_
-.. [#gradle] `Gradle Page`_
+.. [#make] |Make Page|_
+.. [#gradle] |Gradle Page|_
 
 .. _`Make Page`: https://www.gnu.org/software/make
 .. _`Gradle Page`: https://gradle.org
+.. |Make Page| replace:: https://www.gnu.org/software/make
+.. |Gradle Page| replace:: https://gradle.org
 
 Prior to build HALCS, we need to install its dependencies. As of the moment,
 it makes use of 4 external dependencies:
@@ -87,6 +89,7 @@ In order to install them with versions that are known to be compatible use the
 following snippet:
 
 .. code-block:: bash
+  :linenos:
 
     git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
     git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
@@ -167,6 +170,7 @@ your application will automatically start a given program when some ID is
 detected:
 
 .. code-block:: bash
+  :linenos:
 
     git clone --recursive https://github.com/lnls-dig/halcs-generic-udev.git && \
     for project in halcs-generic-udev; do
@@ -197,6 +201,8 @@ can be modified. Below, an excerpt of the script is showm with a possible
 modification to allow starting another program:
 
 .. code-block:: bash
+  :linenos:
+  :emphasize-lines: 38-40
 
     ...
 
@@ -256,12 +262,14 @@ Here is the procedure to build the binary images from the source using ``make``:
 1. Install ``make`` and ``gcc``:
 
 .. code-block:: bash
+  :linenos:
 
     sudo apt-get install make gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
+  :linenos:
 
     sudo yum install make gcc-c++
 
@@ -270,18 +278,21 @@ for Fedora-based systems.
 2. Get the source code:
 
 .. code-block:: bash
+  :linenos:
 
     git clone --recursive https://github.com/lnls-dig/halcs
 
 3. Go to the source code directory:
 
 .. code-block:: bash
+  :linenos:
 
     cd halcs
 
 4. Build and install the code:
 
 .. code-block:: bash
+  :linenos:
 
     make && sudo make install
 
@@ -292,12 +303,14 @@ use this method if the defaults are not sufficient for you use case:
 1. Install ``make`` and ``gcc``:
 
 .. code-block:: bash
+  :linenos:
 
     sudo apt-get install make gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
+  :linenos:
 
     sudo yum install make gcc-c++
 
@@ -306,18 +319,21 @@ for Fedora-based systems.
 2. Get the source code:
 
 .. code-block:: bash
+  :linenos:
 
    git clone --recursive https://github.com/lnls-dig/halcs
 
 3. Go to the source code directory:
 
 .. code-block:: bash
+  :linenos:
 
     cd halcs
 
 4. Build and install the code:
 
 .. code-block:: bash
+  :linenos:
 
     ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
 
@@ -326,12 +342,14 @@ Yet another way to build the source code is to use ``gradle``:
 1. Install ``make``, ``gcc`` and ``java``:
 
 .. code-block:: bash
+  :linenos:
 
     sudo apt-get install openjdk-8-jdk openjdk-8-jre gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
+  :linenos:
 
    sudo yum install java-1.8.0-openjdk java-1.8.0-openjre gcc-c++
 
@@ -340,18 +358,21 @@ for Fedora-based systems.
 2. Get the source code:
 
 .. code-block:: bash
+  :linenos:
 
     git clone --recursive https://github.com/lnls-dig/halcs
 
 3. Go to the source code directory:
 
 .. code-block:: bash
+  :linenos:
 
     cd halcs
 
 4. Build and install the code:
 
 .. code-block:: bash
+  :linenos:
 
    ./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes
 
@@ -360,32 +381,33 @@ latest release you can run the following snippet. Be advised that this is just
 an example and assumes specific paths and running applications:
 
 .. code-block:: bash
+  :linenos:
 
-  NODES=()
-  NODES+=("<type the computer IP that you wish to update>")
+    NODES=()
+    NODES+=("<type the computer IP that you wish to update>")
 
-  for crate in "${NODES[@]}"; do
-    SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
-    root@${crate} bash -c "\
-      set -x && \
-      cd /root/postinstall/apps/bpm-app/halcs && \
-      git fetch --all && \
-      git checkout -b stable-\$(date +%Y%m%d-%H%M%S) && \
-      git checkout master && \
-      git reset --hard origin/master && \
-      cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
-      systemctl stop \
-        halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
-      cd /root/postinstall/apps/bpm-app/halcs && \
-      ./gradle_uninstall.sh && \
-      ./gradle_compile.sh -a halcsd -b afcv3_1 -e yes && \
-      mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
-      systemctl daemon-reload && \
-      cd /root/postinstall/apps/bpm-app/halcs-generic-udev && \
-      make install &&  \
-      systemctl start \
-        halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target" &
-  done
+    for crate in "${NODES[@]}"; do
+        SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
+        root@${crate} bash -c "\
+            set -x && \
+            cd /root/postinstall/apps/bpm-app/halcs && \
+            git fetch --all && \
+            git checkout -b stable-\$(date +%Y%m%d-%H%M%S) && \
+            git checkout master && \
+            git reset --hard origin/master && \
+            cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
+            systemctl stop \
+                halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
+            cd /root/postinstall/apps/bpm-app/halcs && \
+            ./gradle_uninstall.sh && \
+            ./gradle_compile.sh -a halcsd -b afcv3_1 -e yes && \
+            mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
+            systemctl daemon-reload && \
+            cd /root/postinstall/apps/bpm-app/halcs-generic-udev && \
+            make install &&  \
+            systemctl start \
+                halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target" &
+    done
 
 Source Code Organization
 ''''''''''''''''''''''''
