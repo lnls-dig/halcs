@@ -1,3 +1,5 @@
+.. _halcs-tools:
+
 HALCS Tools
 ===========
 
@@ -9,7 +11,7 @@ HALCS provides a set of example tools that can be used with the provided
 to HALCS:
 
 Acquisition (acq)
-    General-purpose acquisiton module, supporting multiple channels,
+    General-purpose acquisition module, supporting multiple channels,
     generic number of pre-trigger and post-trigger samples, along with
     external and data threshold triggers.
 
@@ -76,10 +78,10 @@ MTCA Trigger Interface (trigger_iface)
     by AFC. This controls the buffer directions, debouncing,
     length and trigger counter.
 
-Trigger Multiplexor (trigger_mux)
+Trigger Multiplexer (trigger_mux)
     Generic module used to multiplex a set of incoming triggers from
-    different sources and a st of outgoing triggers from diffe
-    sources.
+    different sources and a set of outgoing triggers to different
+    destination.
 
 .. [#afc] |AFC Page|_
 
@@ -198,7 +200,7 @@ The summary of all command-line ``acq`` options are below:
                                             Output format
       -a  --newcq <Trigger new acquisition = [0 = no | 1 = yes]
 
-An example of acquiring 10 samples from acquistion channel 0, from a MTCA
+An example of acquiring 10 samples from acquisition channel 0, from a MTCA
 board located at slot 6, FMC 1, broker endpoint ``ipc:///tmp/malamute``,
 could be issued like the following:
 

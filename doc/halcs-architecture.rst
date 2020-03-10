@@ -1,3 +1,5 @@
+.. _halcs-architecture:
+
 HALCS Architecture
 ==================
 
@@ -16,7 +18,7 @@ how they are organized.
    High-level HALCS architecture.
 
 :numref:`fig:halcs-architecture` describes the HALCS architecture in more detail,
-enphasizing the modular approach used (i.e., *SMIO* or *Specific Module I/O*).
+emphasizing the modular approach used (i.e., *SMIO* or *Specific Module I/O*).
 
 .. _fig:halcs-architecture:
 .. figure:: images/halcs-architecture.pdf
