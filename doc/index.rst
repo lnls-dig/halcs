@@ -15,7 +15,7 @@ where you can find the latest developments, news and updates.
 .. _`HALCS Github Repository`: http://github.com/lnls-dig/halcs
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
    halcs-installation
