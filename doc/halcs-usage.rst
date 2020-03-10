@@ -242,4 +242,4 @@ the daemon status and the command-line executed.
 
 With the HALCS application checked and in a *running* state everything should be
 in place for running client applications and communicating with this HALCS
-instance.
+instance. For more information refer to :ref:`halcs-tools`.
