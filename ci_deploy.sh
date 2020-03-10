@@ -34,9 +34,14 @@ if [ "$DEPLOY" = "yes" ]; then
     cd -
 
     # Generate hash sums
-    cd dist
+    cd ${TOPDIR}/dist
     md5sum ${TOPDIR}/build/release/*.rpm > MD5SUMS
     sha1sum ${TOPDIR}/build/release/*.rpm > SHA1SUMS
+    cd -
+
+    # Copy documentation
+    cd ${TOPDIR}/dist
+    cp ${TRAVIS_BUILD_DIR}/doc/_build/latex/HALCS.pdf .
     cd -
 fi
 
