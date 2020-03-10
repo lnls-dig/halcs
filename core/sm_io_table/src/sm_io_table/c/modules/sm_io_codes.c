@@ -12,6 +12,7 @@ const disp_op_t **smio_exp_ops [] = {
     dsp_exp_ops,
     fmc130m_4ch_exp_ops,
     fmc250m_4ch_exp_ops,
+    fmc100m_4ch_exp_ops,
     fmc_adc_common_exp_ops,
     fmc_active_clk_exp_ops,
     fmcpico1m_4ch_exp_ops,

@@ -14,6 +14,7 @@ model {
         fmc130m_eeprom_ctl(NativeExecutableSpec)
         fmc250m_4ch_sleep(NativeExecutableSpec)
         fmc250m_4ch_test_mode(NativeExecutableSpec)
+        fmc100m_4ch_ctl(NativeExecutableSpec)
         fmc_active_clk_ad9510_ctl(NativeExecutableSpec)
         fpga_info(NativeExecutableSpec)
         leds(NativeExecutableSpec)

@@ -91,6 +91,8 @@ typedef struct _smch_rffe_t smch_rffe_t;
 typedef struct _smch_rffe_scpi_t smch_rffe_scpi_t;
 /* Opaque sm_ch_isla216p_t structure */
 typedef struct _smch_isla216p_t smch_isla216p_t;
+/* Opaque sm_ch_ltc2174_t structure */
+typedef struct _smch_ltc2174_t smch_ltc2174_t;
 
 
 /* Forward declaration smio_mod_dispatch_t declaration structure */
@@ -156,6 +158,9 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "chips/sm_ch_rffe_defaults.h"
 #include "sm_ch_rffe_scpi.h"
 //#include "chips/sm_ch_rffe_scpi_defaults.h"
+#include "sm_ch_ltc2174.h"
+#include "chips/ltc2174_regs.h"
+//#include "chips/sm_ch_ltc2174_defaults.h"
 
 /* SM_IO */
 #include "sm_io_err.h"

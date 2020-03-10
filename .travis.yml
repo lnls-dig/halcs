@@ -23,6 +23,7 @@ addons:
   apt:
     packages:
     - uuid-dev
+    - graphviz
   sonarqube:
     organization: lnls-dig
     token:
@@ -36,10 +37,16 @@ addons:
 before_install:
 - git submodule update --init --recursive
 
+install:
+- pip install --user sphinx
+
 #   Build and check this project
 script:
 - ./ci_build.sh
 - ./ci_scanner.sh
+
+# Generate and deploy documentation
+after_success: "cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR"
 
 cache:
   ccache: true
@@ -50,13 +57,21 @@ before_deploy:
 - . ./ci_deploy.sh
 
 deploy:
-  provider: releases
-  api_key:
-    secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
-  file_glob: true
-  file: ${HALCS_DEPLOYMENT}
-  skip_cleanup: true
-  on:
-    all_branches: true
-    tags: true
-    condition: $DEPLOY = "yes"
+  - provider: releases
+    api_key:
+      secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
+    file_glob: true
+    file: ${HALCS_DEPLOYMENT}
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
+      condition: $DEPLOY = "yes"
+
+  - provider: pages
+    skip-cleanup: true
+    local-dir: doc/_build/html
+    github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+    keep-history: false
+    on:
+      all_branches: true

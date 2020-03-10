@@ -2,6 +2,7 @@ sm_io_table_modules_DIR = $(sm_io_table_DIR)/modules
 
 include $(sm_io_table_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 		$(sm_io_table_modules_DIR)/fmc250m_4ch/fmc250m_4ch.mk \
+		$(sm_io_table_modules_DIR)/fmc100m_4ch/fmc100m_4ch.mk \
 		$(sm_io_table_modules_DIR)/fmc_adc_common/fmc_adc_common.mk \
 		$(sm_io_table_modules_DIR)/fmc_active_clk/fmc_active_clk.mk \
 		$(sm_io_table_modules_DIR)/acq/acq.mk \
@@ -21,6 +22,7 @@ include $(sm_io_table_modules_DIR)/fmc130m_4ch/fmc130m_4ch.mk \
 sm_io_table_modules_OBJS = $(sm_io_table_modules_DIR)/sm_io_codes.o \
 		     $(sm_io_table_fmc130m_4ch_OBJS) \
 		     $(sm_io_table_fmc250m_4ch_OBJS) \
+		     $(sm_io_table_fmc100m_4ch_OBJS) \
 		     $(sm_io_table_fmc_adc_common_OBJS) \
 		     $(sm_io_table_fmc_active_clk_OBJS) \
 		     $(sm_io_table_acq_OBJS) \

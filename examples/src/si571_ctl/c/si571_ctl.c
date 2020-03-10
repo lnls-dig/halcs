@@ -152,12 +152,6 @@ int main (int argc, char *argv [])
         goto err_null_service;
     }
 
-    if (!streq (service_str, "FMC_ACTIVE_CLK") && !streq (service_str, "AFC_MGMT")) {
-        fprintf (stderr, "[client:si571_ctl]: Invalid service. Must be "
-                "\"FMC_ACTIVE_CLK\" or \"AFC_MGMT\"\n");
-        goto err_inv_service;
-    }
-
     char service_full[50];
     char service_common[50];
     snprintf (service_full, sizeof (service_full), "HALCS%u:DEVIO:%s%u",
@@ -211,12 +205,29 @@ int main (int argc, char *argv [])
         }
     }
 
+    uint32_t status = 0;
+    err = halcs_get_adc100_status (halcs_client, service_full, &status);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:si571_ctl]: Could not read FMC status\n");
+        goto err_halcs_get_status;
+    }
+
+    printf ("FMC status: 0x%08X\n", status);
+
+    err = halcs_get_adc100_fs_freq (halcs_client, service_full, &status);
+    if (err != HALCS_CLIENT_SUCCESS){
+        fprintf (stderr, "[client:si571_ctl]: Could not read FMC FS freq\n");
+        goto err_halcs_get_status;
+    }
+
+    printf ("FMC FS freq: %u\n", status);
+
+err_halcs_get_status:
 err_halcs_mmcm_rst:
 err_halcs_set_freq:
 err_halcs_set_fstartup:
 err_halcs_client_new:
     halcs_client_destroy (&halcs_client);
-err_inv_service:
 err_null_service:
     str_p = &service_str;
     free (*str_p);
