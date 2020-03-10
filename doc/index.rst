@@ -19,6 +19,7 @@ where you can find the latest developments, news and updates.
    :caption: Contents:
 
    halcs-installation
+   halcs-usage
    halcs-architecture
    halcs-development
    halcs-tools
