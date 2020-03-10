@@ -256,6 +256,8 @@ modification to allow starting another program:
 
     ...
 
+Using Make Build System
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is the procedure to build the binary images from the source using ``make``:
 
@@ -295,6 +297,16 @@ for Fedora-based systems.
   :linenos:
 
     make && sudo make install
+
+All in all, the full script to install HALCS with ``make`` is:
+
+.. code-block:: bash
+  :linenos:
+
+    git clone --recursive https://github.com/lnls-dig/halcs && \
+    cd halcs && \
+    make && \
+    sudo make install
 
 Alternatively you can use a script called ``./compile.sh`` that gives you
 more flexibility in terms of compilation-time configurability. You should only
@@ -337,7 +349,19 @@ for Fedora-based systems.
 
     ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
 
-Yet another way to build the source code is to use ``gradle``:
+The full procedure would be:
+
+.. code-block:: bash
+  :linenos:
+
+    git clone --recursive https://github.com/lnls-dig/halcs && \
+    cd halcs && \
+    ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
+
+Using Gradle Build System
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to build the source code is to use ``gradle``:
 
 1. Install ``make``, ``gcc`` and ``java``:
 
@@ -376,6 +400,120 @@ for Fedora-based systems.
 
    ./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes
 
+All in all, the full script to install HALCS with ``gradle`` is:
+
+.. code-block:: bash
+  :linenos:
+
+    git clone --recursive https://github.com/lnls-dig/halcs && \
+    cd halcs && \
+   ./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes
+
+Updating Dependencies
+~~~~~~~~~~~~~~~~~~~~~
+
+If you already have dependencies installed and wish to remote update to a
+specific release you can run the following snippet. Be advised that you
+would need to change the repository locations to match your environment:
+
+.. code-block:: bash
+  :linenos:
+
+    NODES=()
+    NODES+=("<type the computer IP that you wish to update>")
+
+    for crate in "${NODES[@]}"; do
+        SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
+        root@${crate} bash -s <<'EOF'
+            set -x && \
+            export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig && \
+            DEP_DIR=/root/postinstall/apps/bpm-app && \
+            libsodium_VER=1.0.8 && \
+            libzmq_VER=v4.2.5 && \
+            libczmq_VER=v4.0.2 && \
+            malamute_VER=v1.6.1 && \
+            cd ${DEP_DIR} && \
+            for project in libsodium libzmq czmq; do
+                PROJECT_VER=${project}_VER
+                CONFIG_OPTS=()
+                CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+                CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+                if [ $project == "libzmq" ]; then
+                    CONFIG_OPTS+=("--with-libsodium")
+                fi
+
+                cd $project && \
+                git fetch --all && \
+                git stash && \
+                git checkout -f ${!PROJECT_VER} && \
+                git reset --hard ${!PROJECT_VER} && \
+                ./autogen.sh && \
+                ./configure "${CONFIG_OPTS[@]}" && \
+                make check && \
+                make && \
+                sudo make install && \
+                sudo ldconfig && \
+                cd ..
+
+                # Check last command return status
+                if [ $? -ne 0 ]; then
+                    echo "Could not compile/install project $project." >&2
+                    exit 1
+                fi
+            done
+
+            cd ${DEP_DIR} && \
+            for project in malamute; do
+                PROJECT_VER=${project}_VER
+                CONFIG_OPTS=()
+                CONFIG_OPTS+=("--with-systemd-units")
+                CONFIG_OPTS+=("--sysconfdir=/usr/etc")
+                CONFIG_OPTS+=("--prefix=/usr")
+                CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+                CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+
+                cd $project && \
+                git fetch --all && \
+                git stash && \
+                git checkout -f ${!PROJECT_VER} && \
+                git reset --hard ${!PROJECT_VER} && \
+                ./autogen.sh && \
+                ./configure "${CONFIG_OPTS[@]}" && \
+                make check && \
+                make && \
+                sudo make install && \
+                sudo ldconfig && \
+                cd ..
+
+                MALAMUTE_VERBOSE=0
+                MALAMUTE_PLAIN_AUTH=
+                MALAMUTE_AUTH_MECHANISM=null
+                MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
+                MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
+                # Install our custom Malamute config file
+                sudo sed -i \
+                    -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
+                    -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
+                    -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
+                    -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
+                    ${MALAMUTE_CFG_FILE}
+
+                # Enable service
+                sudo systemctl enable malamute || /bin/true
+                sudo systemctl restart malamute || /bin/true
+
+                # Check last command return status
+                if [ $? -ne 0 ]; then
+                    echo "Could not compile/install project $project." >&2
+                    exit 1
+                fi
+            done
+    EOF
+    done
+
+Updating HALCS
+~~~~~~~~~~~~~~
+
 If you already have the software installed and wish to remote update to the
 latest release you can run the following snippet. Be advised that this is just
 an example and assumes specific paths and running applications:
@@ -388,25 +526,28 @@ an example and assumes specific paths and running applications:
 
     for crate in "${NODES[@]}"; do
         SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
-        root@${crate} bash -c "\
+        root@${crate} bash -s <<'EOF'
             set -x && \
-            cd /root/postinstall/apps/bpm-app/halcs && \
+            DEP_DIR=/root/postinstall/apps/bpm-app && \
+            PROJECT_VER=master && \
+            cd ${DEP_DIR}/halcs && \
             git fetch --all && \
-            git checkout -b stable-\$(date +%Y%m%d-%H%M%S) && \
-            git checkout master && \
-            git reset --hard origin/master && \
+            git checkout -b stable-$(date +%Y%m%d-%H%M%S) && \
+            git checkout ${!PROJECT_VER} && \
+            git reset --hard ${!PROJECT_VER} && \
             cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
             systemctl stop \
                 halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
-            cd /root/postinstall/apps/bpm-app/halcs && \
+            cd ${DEP_DIR}/halcs && \
             ./gradle_uninstall.sh && \
             ./gradle_compile.sh -a halcsd -b afcv3_1 -e yes && \
             mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
             systemctl daemon-reload && \
-            cd /root/postinstall/apps/bpm-app/halcs-generic-udev && \
+            cd ${DEP_DIR}/halcs-generic-udev && \
             make install &&  \
             systemctl start \
-                halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target" &
+                halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target
+    EOF
     done
 
 Source Code Organization
