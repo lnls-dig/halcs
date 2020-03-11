@@ -56,7 +56,7 @@ FMC ADC Pico 1MSPS 4 Channel (fmcpico1m_4ch)
 
 Initialization (init)
     This is a meta-module used so clients can be sure the whole HALCS
-    instance has initialized and is raedy to receive commands.
+    instance has initialized and is ready to receive commands.
 
 LNLS BPM RFFE with BSMP protocol (rffe)
     Module used for controlling and monitoring the LNLS BPM RFFE
@@ -271,3 +271,118 @@ of 1000 is shown below:
 Note the crossing point in which the sample goes from a value below
 1000 to a value above 1000 at line 20. Each 10 samples in the above example
 correspond to one shot.
+
+FMC ADC 100MSPS 4 Channel
+'''''''''''''''''''''''''
+
+The FMC ADC 100m example, also called ``fmc100m_4ch_ctl``, can be used if the
+``wb_fmc100m_4ch`` module is instantiated by the FPGA gateware. If this is available,
+HALCS will spawn the *SMIO* ``fmc100m_4ch`` module to interface with ``wb_fmc100m_4ch``.
+This module uses the ``SDB`` **vendor id** 0x000000000000CE42ULL and **device id**
+0x00000608.
+
+The summary of all command-line ``acq`` options are below:
+
+.. code-block:: bash
+  :linenos:
+
+    HALCSD FMC ADC 100M control utility
+    Usage: ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl [options]
+
+      -h  --help                           Display this usage information
+      -b  --brokerendp <Broker endpoint>   Broker endpoint
+      -v  --verbose                        Verbose output
+      -o  --boardslot <Board slot number = [1-12]>
+      -s  --halcsnumber <HALCS number = [0|1]> HALCS number
+                                           Board slot number
+      -t  --test_pattern <Pattern>         Test pattern
+      -e  --test_pattern_en <Enable>       Enable test pattern
+      -c  --channel <Channel=[0-3]>        Channel to apply operation. Select 4, for all channel
+      -r  --ssr <SSR option>               Select SSR option
+      -m  --termination <Term=[0|1]>       Select 50-ohm termination
+
+An example of configuring the ADC to output a test pattern :math:`10101010101010`
+(:math:`10922`) from a MTCA board located at slot 6, FMC 1, broker endpoint
+``ipc:///tmp/malamute``, could be issued like the following:
+
+.. code-block:: bash
+  :linenos:
+
+    $ ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl \
+        -b ipc:///tmp/malamute \
+        --boardslot 6 \
+        --halcsnumber 1 \
+        --test_pattern_en 1 \
+        --test_pattern 10922
+    [client:fmc100m_4ch_ctl]: test_pattern = 0x00002AAA
+    [client:fmc100m_4ch_ctl]: test_pattern_en = 0x00000001
+    [client:fmc100m_4ch_ctl]: FMC channel #0 status = 0x0000AAA8
+    [client:fmc100m_4ch_ctl]: FMC channel #1 status = 0x0000AAA8
+    [client:fmc100m_4ch_ctl]: FMC channel #2 status = 0x0000AAA8
+    [client:fmc100m_4ch_ctl]: FMC channel #3 status = 0x0000AAA8
+
+The information displayed after executing the command gives you a feedback
+of the test pattern set, which was :math:`10101010101010` in binary,
+:math:`10922` in decimal or :math:`0x2AAA` in hexadecimal. It also shows
+the raw ADC data from all 4 ADC channels.
+
+.. Note:: Keep in mind that we are using a 14-bit ADC (FMC ADC 100M 14-bit
+            4 Channel). To make acquisition easier, the ADC in the example,
+            LTC2174, has a mode in which it sends a 16-bit data with the 2
+            LSB fixed to 0. This make acquisition easier, as we can treat the
+            date as 2 bytes. However, it's important to know that we can only
+            have control over the 14 MSB, so the test pattern we set refers
+            to those 14 MSB, as well. As such, when setting the :math:`0x2AAA`
+            test pattern, the expected acquired data would be :math:`0x2AAA << 2`,
+            which is equal to :math:`0xAAA8` as shown in the example.
+
+A more complex example of setting the ADC to acquire real data (no test pattern),
+100 mVpp ADC range (``--ssr`` option 2), for all ADC channels (``--channel`` option
+4), with 50 `ohm` termination enabled is shown below:
+
+.. code-block:: bash
+  :linenos:
+
+    $ ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl \
+        -b ipc:///tmp/malamute \
+        --boardslot 6 \
+        --halcsnumber 1 \
+        --test_pattern_en 0 \
+        --test_pattern 1 \
+        --ssr 2 \
+        --channel 4 \
+        --termination 1
+    [client:fmc100m_4ch_ctl]: test_pattern_en = 0x00000000
+    [client:fmc100m_4ch_ctl]: termination = 0x00000001
+    [client:fmc100m_4ch_ctl]: channel = 0x00000004
+    [client:fmc100m_4ch_ctl]: ssr = 0x00000002
+    [client:fmc100m_4ch_ctl]: ssr option 0x00000002, ssr bits 0x0000002B set for channel #0
+    [client:fmc100m_4ch_ctl]: ssr option 0x00000002, ssr bits 0x0000002B set for channel #1
+    [client:fmc100m_4ch_ctl]: ssr option 0x00000002, ssr bits 0x0000002B set for channel #2
+    [client:fmc100m_4ch_ctl]: ssr option 0x00000002, ssr bits 0x0000002B set for channel #3
+    [client:fmc100m_4ch_ctl]: FMC channel #0 status = 0x0000013C
+    [client:fmc100m_4ch_ctl]: FMC channel #1 status = 0x0000014C
+    [client:fmc100m_4ch_ctl]: FMC channel #2 status = 0x0000FD3C
+    [client:fmc100m_4ch_ctl]: FMC channel #3 status = 0x0000FE00
+
+And a subsequent acquisition of the ADCs in that configuration could be done with:
+
+.. code-block:: bash
+  :linenos:
+
+    $ ./examples/build/exe/acq/production/afcv3_1/acq \
+        -b ipc:///tmp/malamute \
+        --boardslot 6 \
+        --halcsnumber 1 \
+        --channumber 0 \
+        --numsamples 10
+    -193	    -216	    -216	    -200
+    -139	    -167	    -177	    -166
+     -83	    -112	    -124	    -110
+     -19	     -44	     -63	     -53
+      46	      29	       7	      13
+     112	      91	      74	      77
+     161	     137	     124	     136
+     192	     166	     169	     180
+     205	     180	     192	     203
+     205	     169	     192	     198
