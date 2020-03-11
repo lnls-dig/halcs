@@ -1,3 +1,5 @@
+.. _halcs-installation:
+
 HALCS Installation
 ==================
 
@@ -165,7 +167,7 @@ at your distribution. As all of them use semantic versioning, you can install an
 version that is greater or equal than the specified ones for *minor* and *revision*:
 numbers.
 
-Additionaly, it's often interesting to install customized udev scripts, so
+Additionally, it's often interesting to install customized udev scripts, so
 your application will automatically start a given program when some ID is
 detected:
 
@@ -197,7 +199,7 @@ Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ prop
 To add your specific program to start when some ID is found, the ``run-fpga-program.sh``
 (typically installed in ``/usr/local/share/halcs/scripts`` or under
 ``halcs-generic-udev`` repository path ``scripts/share/halcs/scripts``) script
-can be modified. Below, an excerpt of the script is showm with a possible
+can be modified. Below, an excerpt of the script is shown with a possible
 modification to allow starting another program:
 
 .. code-block:: bash

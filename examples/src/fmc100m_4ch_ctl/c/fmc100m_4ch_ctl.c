@@ -58,7 +58,7 @@ static const char* shortopt = "hb:vo:s:t:e:c:r:m:";
 
 void print_help (char *program_name)
 {
-    fprintf (stdout, "HALCSD Acquisition Utility\n"
+    fprintf (stdout, "HALCSD FMC ADC 100M control utility\n"
             "Usage: %s [options]\n"
             "\n"
             "  -h  --help                           Display this usage information\n"

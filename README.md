@@ -9,6 +9,8 @@
 
 Software for creating controlling daemons for devices
 
+Documentation: https://lnls-dig.github.io/halcs
+
 ## Prerequisites:
 
 Make sure you have the following libraries installed, either by download

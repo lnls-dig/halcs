@@ -1,3 +1,5 @@
+.. _halcs-development:
+
 HALCS Development
 =================
 
