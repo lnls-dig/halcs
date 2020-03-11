@@ -243,3 +243,53 @@ the daemon status and the command-line executed.
 With the HALCS application checked and in a *running* state everything should be
 in place for running client applications and communicating with this HALCS
 instance. For more information refer to :ref:`halcs-tools`.
+
+Lastly, the configuration file contents used by HALCS
+(the pathname given after the `-f` option) can be shown with:
+
+.. code-block:: bash
+
+    $ cat /usr/local/etc/halcs/halcs.cfg
+
+And it should show something like:
+
+.. code-block:: bash
+
+    #   HALCS configuration file
+
+    # Device manager configurations
+    dev_mngr
+        broker
+            bind = tcp://127.0.0.1:9999
+        log
+            dir = /media/remote_logs
+            filename = dev_mngr.log
+        verbose = 1             # Ask for a trace
+        daemonize = no          # Ask for daemonize process (options are: yes or no)
+        workdir = .             #   Working directory for daemon
+        spawn_broker = no       # Ask to spawn broker (options are: yes or no)
+
+    # Device I/O configurations
+    dev_io
+        board1
+            halcs0
+                dbe
+                    spawn_epics_ioc = no        # Ask to spawn DBE EPICS IOC (Options are: yes or no)
+                    fmc_board = fmc250m_4ch
+                afe
+                    spawn_epics_ioc = no        # Ask to spawn AFE EPICS IOC (Options are: yes or no)
+                    bind =
+                    proto =
+            halcs1
+                dbe
+                    spawn_epics_ioc = no        # Ask to spawn DBE EPICS IOC (Options are: yes or no)
+                    fmc_board = fmc250m_4ch
+                afe
+                    spawn_epics_ioc = no        # Ask to spawn AFE EPICS IOC (Options are: yes or no)
+                    bind =
+                    proto =
+
+        ...
+
+The configuration file would have an entry for each board slot *board<board_slot>*,
+and two entries for each instance of that slot *halcs<instance_number>*.
