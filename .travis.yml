@@ -10,7 +10,6 @@ branches:
     - gradle-removal
     - cmake-support
 
-sudo: false
 dist: bionic
 
 env:
