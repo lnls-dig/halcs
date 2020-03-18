@@ -11,7 +11,7 @@ branches:
     - cmake-support
 
 sudo: false
-dist: trusty
+dist: bionic
 
 env:
   - PURE_MAKE=yes BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
