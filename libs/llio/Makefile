@@ -68,7 +68,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src/llio/c
+SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 

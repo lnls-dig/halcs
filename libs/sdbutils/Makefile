@@ -65,7 +65,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src/sdbutils/c
+SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 

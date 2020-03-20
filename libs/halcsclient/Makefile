@@ -85,7 +85,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src/halcsclient/c
+SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 
