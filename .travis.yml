@@ -4,6 +4,11 @@ language: c
 compiler:
 - gcc
 
+# blocklist
+branches:
+  except:
+    - gradle-removal
+
 sudo: false
 dist: trusty
 
