@@ -68,8 +68,8 @@ override CFLAGS += $(CFLAGS_USR) $(CFLAGS_PLATFORM) $(CFLAGS_DEBUG) $(CPPFLAGS) 
 override LDFLAGS += $(LFLAGS) $(LDFLAGS_PLATFORM)
 
 # Every .c file will must be a separate example
-examples_DIRS = $(wildcard src/*)
-examples_SRC = $(foreach dir,$(examples_DIRS),$(wildcard $(dir)/c/*.c))
+examples_DIRS = src
+examples_SRC = $(foreach dir,$(examples_DIRS),$(wildcard $(dir)/*.c))
 OUT = $(basename $(examples_SRC))
 
 all: $(OUT)
