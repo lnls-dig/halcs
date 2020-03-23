@@ -35,8 +35,8 @@ if [ "$DEPLOY" = "yes" ]; then
 
     # Generate hash sums
     cd dist
-    md5sum ${TOPDIR}/build/release/*.rpm > MD5SUMS
-    sha1sum ${TOPDIR}/build/release/*.rpm > SHA1SUMS
+    md5sum *.rpm > MD5SUMS
+    sha1sum *.rpm > SHA1SUMS
     cd -
 fi
 
