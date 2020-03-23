@@ -31,12 +31,11 @@ if [ "$DEPLOY" = "yes" ]; then
             mv ${board}${mode}.tar.gz ${TOPDIR}/dist
         done
     done
-    cd -
 
     # Generate hash sums
-    cd dist
-    md5sum *.rpm > MD5SUMS
-    sha1sum *.rpm > SHA1SUMS
+    md5sum *.rpm > ${TOPDIR}/dist/MD5SUMS
+    sha1sum *.rpm > ${TOPDIR}/dist/SHA1SUMS
+
     cd -
 fi
 
