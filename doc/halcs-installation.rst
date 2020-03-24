@@ -109,6 +109,8 @@ for Fedora-based systems.
 .. code-block:: bash
   :linenos:
 
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
     git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
     git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
     git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
