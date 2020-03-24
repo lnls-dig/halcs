@@ -89,11 +89,11 @@ SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 
-SMIO_DIR = $(TOP)/core/sm_io
-SMIO_SRC_DIR = $(SMIO_DIR)/src/sm_io/c
+SMIO_DIR = $(TOP)/src/sm_io
+SMIO_SRC_DIR = $(SMIO_DIR)
 
-SMIO_TABLE_DIR = $(TOP)/core/sm_io_table
-SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)/src/sm_io_table/c
+SMIO_TABLE_DIR = $(TOP)src/sm_io_table
+SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)
 
 # Specific board objects
 OBJS_BOARD =
@@ -104,12 +104,12 @@ OBJS_PLATFORM =
 OBJS_EXTERNAL =
 
 # Project boards
-boards_INCLUDE_DIRS = -I$(TOP)/core/common/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(TOP)/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = -I. -Iinclude \
 	       $(boards_INCLUDE_DIRS) \
-	       -I$(TOP)/core/common/include \
+	       -I$(TOP)/include \
 		   -I$(SMIO_DIR)/include \
 	       -I$(SMIO_SRC_DIR)/modules \
 	       -I$(SMIO_SRC_DIR)/modules/fmc130m_4ch \
@@ -163,7 +163,7 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 # Objects for each version of library
 $(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
 $(LIBNAME)_CODE_HEADERS = \
-	$(TOP)/core/common/include/acq_chan_gen_defs.h
+	$(TOP)/include/acq_chan_gen_defs.h
 
 $(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
 	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_codes.h \
@@ -195,7 +195,7 @@ $(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBNAME)_ACQ_HEADERS = \
-	$(TOP)/core/common/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
+	$(TOP)/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 $(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers

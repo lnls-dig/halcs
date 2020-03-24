@@ -59,16 +59,16 @@ SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
 # Top Makefile directory
-SRC_DIR := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
-TOP := $(SRC_DIR)
+TOP := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+SRC_DIR := $(TOP)/src
 export TOP
 
 # Libraries
-LIBS_DIR := $(SRC_DIR)/libs
+LIBS_DIR := $(TOP)/libs
 export LIBS_DIR
 
 # Subdmoules and third-party codes
-FOREIGN_DIR := $(SRC_DIR)/foreign
+FOREIGN_DIR := $(TOP)/foreign
 export FOREIGN_DIR
 
 # Linker script
@@ -250,25 +250,25 @@ OBJS_PLATFORM =
 APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/core/sm_io/sm_io.mk
-include $(SRC_DIR)/core/sm_io_table/sm_io_table.mk
-include $(SRC_DIR)/core/dev_mngr/dev_mngr.mk
-include $(SRC_DIR)/core/dev_io/dev_io.mk
-include $(SRC_DIR)/core/msg/msg.mk
-include $(SRC_DIR)/core/revision/revision.mk
-include $(SRC_DIR)/core/boards/$(BOARD)/board.mk
-include $(SRC_DIR)/core/boards/common/common.mk
+include $(SRC_DIR)/sm_io/sm_io.mk
+include $(SRC_DIR)/sm_io_table/sm_io_table.mk
+include $(SRC_DIR)/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/dev_io/dev_io.mk
+include $(SRC_DIR)/msg/msg.mk
+include $(SRC_DIR)/revision/revision.mk
+include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -I$(SRC_DIR)/common/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(SRC_DIR)/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -I$(SRC_DIR)/core/common/include \
-	       -I$(SRC_DIR)/core/revision/include \
-	       -I$(SRC_DIR)/core/sm_io/include \
-	       -I$(SRC_DIR)/core/sm_io_table/include \
+	       -I$(SRC_DIR)/common/include \
+	       -I$(SRC_DIR)/revision/include \
+	       -I$(SRC_DIR)/sm_io/include \
+	       -I$(SRC_DIR)/sm_io_table/include \
 	       -I$(LIBBSMP_DIR)/include \
 	       -I$(LIBSDBFS_DIR)/include \
            -I$(LIBERRHAND_DIR)/include \
