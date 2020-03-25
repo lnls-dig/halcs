@@ -31,10 +31,8 @@ all:
 install:
 	$(foreach script,$(SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(script)) $(CMDSEP))
 	$(foreach script,$(SCRIPTS),cp --preserve=mode $(INIT_SYSTEM)/$(script) ${SCRIPTS_PREFIX}/$(script) $(CMDSEP))
-	./enable-service.sh -s $(SERVICE_NAME)
 
 uninstall:
-	./disable-service.sh -s $(SERVICE_NAME)
 	$(foreach script,$(SCRIPTS),rm -f ${SCRITS_PREFIX}/$(script) $(CMDSEP))
 
 clean:
