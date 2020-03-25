@@ -34,6 +34,7 @@ install:
 
 uninstall:
 	$(foreach script,$(SCRIPTS),rm -f ${SCRITS_PREFIX}/$(script) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),(cd ${SCRIPTS_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(script))) $(CMDSEP))
 
 clean:
 

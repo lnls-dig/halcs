@@ -659,8 +659,9 @@ scripts_install:
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
 
 scripts_uninstall:
-	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
+	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_SCRIPTS),(cd ${SCRIPTS_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(shell echo $(app_script) | cut -f2 -d:)))  $(CMDSEP))
 
 scripts_clean:
 	$(MAKE) -C scripts clean
