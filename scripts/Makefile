@@ -18,7 +18,9 @@ SCRIPTS_PREFIX ?=
 # OS information
 SERVICE_NAME = halcs
 INIT_SYSTEM := $(shell ./get-init-system.sh)
-SCRIPTS_FULL_NAME := $(shell cd $(INIT_SYSTEM) && find . -type f)
+GENERIC_INIT := init-generic
+SCRIPTS_FULL_NAME := $(shell cd $(INIT_SYSTEM) && find . -type f) \
+					 $(shell cd $(GENERIC_INIT) && find . -type f)
 
 # Strip off a leading ./
 SCRIPTS=$(SCRIPTS_FULL_NAME:./%=%)
