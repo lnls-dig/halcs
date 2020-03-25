@@ -263,8 +263,14 @@ include $(APPS_MKS)
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
+# We need this until we merge smio and smio_table modules
+# together
+smio_table_DIRS = $(shell find $(SRC_DIR)/sm_io_table/modules -type d -print)
+smio_table_INCLUDE_DIRS = $(addprefix -I, $(smio_table_DIRS))
+
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
+	        $(smio_table_INCLUDE_DIRS) \
 	       -Iinclude \
 	       -I$(LIBBSMP_DIR)/include \
 	       -I$(LIBSDBFS_DIR)/include \
