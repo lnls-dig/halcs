@@ -194,7 +194,7 @@ uninstall:
 		$(PREFIX)/include/$(header) $(CMDSEP))
 	$(foreach header,$(notdir $($(LIBNAME)_HW_HEADERS)),rm -f \
 		$(PREFIX)/include/hw/$(header) $(CMDSEP))
-	rmdir --ignore-fail-on-non-empty $(PREFIX)/include/hw
+	-rmdir --ignore-fail-on-non-empty $(PREFIX)/include/hw
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)
