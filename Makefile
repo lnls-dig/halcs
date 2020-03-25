@@ -45,9 +45,12 @@ AFE_RFFE_TYPE ?= 2
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
 WITH_APP_CFG ?= n
-# Installation prefix for the scripts. This is mainly used for testing the build
-# system. Usually this is empty
+# Installation prefix for the etc scripts.
+# This is mainly used for testing the build system. Usually this is empty
 SCRIPTS_ETC_PREFIX ?=
+# Installation prefix for the share scripts.
+# Usually this is set to /usr/local
+SCRIPTS_SHARE_PREFIX ?= /usr/local
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -656,10 +659,10 @@ core_mrproper:
 scripts_install:
 	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} install
+	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} install
 
 scripts_uninstall:
-	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} uninstall
+	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} uninstall
 	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SCRIPTS),(cd ${SCRIPTS_ETC_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(shell echo $(app_script) | cut -f2 -d:)))  $(CMDSEP))
 
