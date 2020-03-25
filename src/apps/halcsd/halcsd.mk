@@ -24,17 +24,10 @@ halcsd_STATIC_LIBS =
 halcsd_cfg_LIBS = -lbsmp
 halcsd_cfg_STATIC_LIBS =
 
-halcsd_SCRIPT_FILES = $(shell cd $(halcsd_DIR)/../sysfiles && find . -type f)
-halcsd_SCRIPTS = $(patsubst ./%,$(halcsd_DIR)/../sysfiles/:%,$(halcsd_SCRIPT_FILES))
+halcsd_INIT_SYSTEM = $(shell $(TOP)/scripts/get-init-system.sh)
 
-halcsd_INIT_SYSTEM = $(shell $(SRC_DIR)/scripts/get-init-system.sh)
+halcsd_INIT_DIR = $(halcsd_DIR)/init/$(halcsd_INIT_SYSTEM)
+halcsd_INIT_FILES = $(shell cd $(halcsd_INIT_DIR) && find . -type f)
 
-LEDBG = before $(halcsd_INIT_SYSTEM)
-
-ifeq ($(halcsd_INIT_SYSTEM),systemd)
-LEDBG += inside
-halcsd_SYSTEMD_DIR = $(halcsd_DIR)/../../systemd
-halcsd_SYSTEMD_FILES = $(shell cd $(halcsd_SYSTEMD_DIR)/sysfiles && find . -type f)
-halcsd_SCRIPTS += $(patsubst ./%,$(halcsd_SYSTEMD_DIR)/sysfiles/:%,$(halcsd_SYSTEMD_FILES))
-endif
-LEDBG += after
+# Top Makefile uses $(app)_SCRIPTS this to install config files
+halcsd_SCRIPTS = $(patsubst ./%,$(halcsd_INIT_DIR)/:%,$(halcsd_INIT_FILES))
