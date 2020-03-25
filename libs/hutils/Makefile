@@ -164,11 +164,11 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 	@rm -f $*.d.tmp
 
 install: all
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
-	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HEADERS),install -m 644 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))

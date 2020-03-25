@@ -42,7 +42,7 @@ ifeq ($(CFG_FILE_EXISTS),1)
 else
 	@echo "Config file not found at \"$(DEST_CFG_FILES)\". Installing config file."
 	@mkdir -m 755 -p $(CFG_DIR)
-	$(foreach cfg,$(CFG_FILES),install -m 755 $(cfg) $(CFG_DIR)/ $(CMDSEP))
+	$(foreach cfg,$(CFG_FILES),install -m 644 $(cfg) $(CFG_DIR)/ $(CMDSEP))
 endif
 
 uninstall:
