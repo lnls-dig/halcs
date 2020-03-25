@@ -19,7 +19,7 @@ mkdir -p tmp/etc
 
 # Build and local install repositories
 BUILD_PREFIX=$PWD/tmp
-SCRIPTS_PREFIX=$PWD/tmp/etc
+SCRIPTS_ETC_PREFIX=$PWD/tmp
 
 # CCache setup
 PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
@@ -93,7 +93,7 @@ HALCS_OPTS=()
 HALCS_OPTS+=(${CONFIG_FLAGS[@]})
 HALCS_OPTS+=(${KERNEL_FLAGS[@]})
 HALCS_OPTS+=("PREFIX=${BUILD_PREFIX}")
-HALCS_OPTS+=("SCRIPTS_PREFIX=${SCRIPTS_PREFIX}")
+HALCS_OPTS+=("SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX}")
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=(${CONFIG_FLAGS[@]})

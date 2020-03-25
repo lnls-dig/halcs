@@ -10,10 +10,10 @@ OBJDUMP ?=	$(CROSS_COMPILE)objdump
 OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
-# This SCRIPTS_PREFIX could be different than PREFIX, as SCRIPTS_PREFIX
+# This SCRIPTS_ETC_PREFIX could be different than PREFIX, as SCRIPTS_ETC_PREFIX
 # is defined as the location of init scripts and must be placed in a specific
 # place. The main use of thuis variable is for testing the build system
-SCRIPTS_PREFIX ?=
+SCRIPTS_ETC_PREFIX ?=
 
 # OS information
 SERVICE_NAME = halcs
@@ -29,12 +29,12 @@ all:
 
 # Makefile rules
 install:
-	$(foreach script,$(SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(script)) $(CMDSEP))
-	$(foreach script,$(SCRIPTS),cp --preserve=mode $(INIT_SYSTEM)/$(script) ${SCRIPTS_PREFIX}/$(script) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(script)) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),cp --preserve=mode $(INIT_SYSTEM)/$(script) ${SCRIPTS_ETC_PREFIX}/$(script) $(CMDSEP))
 
 uninstall:
 	$(foreach script,$(SCRIPTS),rm -f ${SCRITS_PREFIX}/$(script) $(CMDSEP))
-	$(foreach script,$(SCRIPTS),(cd ${SCRIPTS_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(script))) $(CMDSEP))
+	$(foreach script,$(SCRIPTS),(cd ${SCRIPTS_ETC_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(script))) $(CMDSEP))
 
 clean:
 
