@@ -261,14 +261,11 @@ include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -I$(SRC_DIR)/boards/$(BOARD)
+boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -I$(SRC_DIR)/common/include \
-	       -I$(SRC_DIR)/revision/include \
-	       -I$(SRC_DIR)/sm_io/include \
-	       -I$(SRC_DIR)/sm_io_table/include \
+	       -Iinclude \
 	       -I$(LIBBSMP_DIR)/include \
 	       -I$(LIBSDBFS_DIR)/include \
            -I$(LIBERRHAND_DIR)/include \
