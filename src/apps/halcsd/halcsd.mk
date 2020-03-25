@@ -27,7 +27,10 @@ halcsd_cfg_STATIC_LIBS =
 halcsd_INIT_SYSTEM = $(shell $(TOP)/scripts/get-init-system.sh)
 
 halcsd_INIT_DIR = $(halcsd_DIR)/init/$(halcsd_INIT_SYSTEM)
-halcsd_INIT_FILES = $(shell cd $(halcsd_INIT_DIR) && find . -type f)
+halcsd_INIT_ETC_FILES = $(shell cd $(halcsd_INIT_DIR) && find etc/ -type f)
+halcsd_INIT_SHARE_FILES = $(shell cd $(halcsd_INIT_DIR) && find share/ -type f)
 
-# Top Makefile uses $(app)_SCRIPTS this to install config files
-halcsd_SCRIPTS = $(patsubst ./%,$(halcsd_INIT_DIR)/:%,$(halcsd_INIT_FILES))
+# Top Makefile uses $(app)_ETC_SCRIPTS/$(app)_SHARE_SCRIPTS this to install
+# config files
+halcsd_ETC_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_ETC_FILES))
+halcsd_SHARE_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_SHARE_FILES))

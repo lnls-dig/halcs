@@ -314,7 +314,8 @@ common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
-apps_SCRIPTS = $(foreach app,$(APPS),$($(app)_SCRIPTS))
+apps_ETC_SCRIPTS = $(foreach app,$(APPS),$($(app)_ETC_SCRIPTS))
+apps_SHARE_SCRIPTS = $(foreach app,$(APPS),$($(app)_SHARE_SCRIPTS))
 
 .SECONDEXPANSION:
 
@@ -657,14 +658,16 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
-	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
-	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} install
 
 scripts_uninstall:
 	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} uninstall
-	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(foreach app_script,$(apps_SCRIPTS),(cd ${SCRIPTS_ETC_PREFIX} && rmdir -p --ignore-fail-on-non-empty $(dir $(shell echo $(app_script) | cut -f2 -d:)))  $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_clean:
 	$(MAKE) -C scripts clean
