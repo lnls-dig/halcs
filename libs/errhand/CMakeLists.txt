@@ -224,15 +224,15 @@ set_target_properties(objects PROPERTIES
 )
 
 # setting compile options
-target_compile_definitions(objects PRIVATE
+target_compile_definitions(objects PUBLIC
     ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
 )
 
-target_compile_definitions(objects PRIVATE
+target_compile_definitions(objects PUBLIC
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
 )
 
-target_compile_definitions(objects PRIVATE
+target_compile_definitions(objects PUBLIC
     ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
 )
 
