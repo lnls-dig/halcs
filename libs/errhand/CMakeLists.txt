@@ -142,6 +142,53 @@ set(errhand_public_headers
 source_group("Header Files" FILES ${errhand_public_headers})
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# should we use our errhand debug
+option(ERRHAND_DBG_OPT "Enable debug mode" ON)
+if(ERRHAND_DBG_OPT)
+    set(ERRHAND_DBG_OPT_VALUE y)
+else()
+    set(ERRHAND_DBG_OPT_VALUE n)
+endif()
+
+message(STATUS
+    "Setting compile-time option ERRHAND_DBG='${ERRHAND_DBG_OPT_VALUE}'")
+
+# which debug level do we want
+set(ERRHAND_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
+    "Minimum debug level")
+set(ERRHAND_MIN_LEVEL_VALUES
+    "DBG_LVL_TRACE;DBG_LVL_INFO;DBG_LVL_WARN;DBG_LVL_ERR;DBG_LVL_FATAL"
+)
+
+set_property(CACHE ERRHAND_MIN_LEVEL_OPT PROPERTY STRINGS
+    ${ERRHAND_MIN_LEVEL_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option ERRHAND_MIN_LEVEL='${ERRHAND_MIN_LEVEL_OPT}'")
+
+# which subsystem do we want on.
+# Right now, the only option is all or none of them
+set(ERRHAND_SUBSYS_ON_OPT
+    "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+    CACHE STRING
+    "Set Subsystem On")
+set(ERRHAND_SUBSYS_ON_VALUES
+    "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS);"
+)
+
+set_property(CACHE ERRHAND_SUBSYS_ON_OPT PROPERTY STRINGS
+    ${ERRHAND_SUBSYS_ON_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option ERRHAND_SUBSYS_ON='${ERRHAND_SUBSYS_ON_OPT}'")
+
+
+########################################################################
 # Library declaration
 ########################################################################
 
@@ -156,6 +203,19 @@ add_library(objects OBJECT ${errhand_sources})
 set_target_properties(objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
+)
+
+# setting compile options
+target_compile_definitions(objects PRIVATE
+    ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
+)
+
+target_compile_definitions(objects PRIVATE
+    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
+)
+
+target_compile_definitions(objects PRIVATE
+    ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
 )
 
 # add the binary tree to the search path for include files
@@ -214,70 +274,6 @@ foreach(target ${target_outputs})
         errhand_compiler_flags
     )
 endforeach()
-
-########################################################################
-# User compile-time options
-########################################################################
-
-# should we use our errhand debug
-option(ERRHAND_DBG_OPT "Enable debug mode" ON)
-if(ERRHAND_DBG_OPT)
-    set(ERRHAND_DBG_OPT_VALUE y)
-else()
-    set(ERRHAND_DBG_OPT_VALUE n)
-endif()
-
-foreach(target ${target_outputs})
-    target_compile_definitions(${target} PRIVATE
-        ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
-    )
-endforeach()
-
-message(STATUS
-    "Setting compile-time option ERRHAND_DBG='${ERRHAND_DBG_OPT_VALUE}'")
-
-# which debug level do we want
-set(ERRHAND_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
-    "Minimum debug level")
-set(ERRHAND_MIN_LEVEL_VALUES
-    "DBG_LVL_TRACE;DBG_LVL_INFO;DBG_LVL_WARN;DBG_LVL_ERR;DBG_LVL_FATAL"
-)
-
-set_property(CACHE ERRHAND_MIN_LEVEL_OPT PROPERTY STRINGS
-    ${ERRHAND_MIN_LEVEL_VALUES}
-)
-
-foreach(target ${target_outputs})
-    target_compile_definitions(${target} PRIVATE
-        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
-    )
-endforeach()
-
-message(STATUS
-    "Setting compile-time option ERRHAND_MIN_LEVEL='${ERRHAND_MIN_LEVEL_OPT}'")
-
-# which subsystem do we want on.
-# Right now, the only option is all or none of them
-set(ERRHAND_SUBSYS_ON_OPT
-    "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
-    CACHE STRING
-    "Set Subsystem On")
-set(ERRHAND_SUBSYS_ON_VALUES
-    "(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS);"
-)
-
-set_property(CACHE ERRHAND_SUBSYS_ON_OPT PROPERTY STRINGS
-    ${ERRHAND_SUBSYS_ON_VALUES}
-)
-
-foreach(target ${target_outputs})
-    target_compile_definitions(${target} PRIVATE
-        ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
-    )
-endforeach()
-
-message(STATUS
-    "Setting compile-time option ERRHAND_SUBSYS_ON='${ERRHAND_SUBSYS_ON_OPT}'")
 
 ########################################################################
 # Library dependencies
