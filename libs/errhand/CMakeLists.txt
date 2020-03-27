@@ -19,6 +19,10 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 # extract version numbers from header file
 include(TestErrhandVersion)
+# detect target architecture
+include(TargetArch)
+
+target_architecture(ARCH)
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
@@ -360,5 +364,72 @@ if(BUILD_SHARED OR BUILD_STATIC)
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
         ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+    )
+endif()
+
+# CPack rules
+option(ENABLE_CPACK "Enables cpack rules" ON)
+
+if(ENABLE_CPACK)
+    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    endif()
+
+    include(InstallRequiredSystemLibraries)
+
+    # set architecture as detected by TargetArch module
+    set(arch_name ${ARCH})
+
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_PACKAGE_NAME "errhand")
+    set(CPACK_PACKAGE_FILE_NAME
+        "${CPACK_PACKAGE_NAME}-${ERRHAND_VERSION}-${arch_name}"
+    )
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Error Handling library")
+    set(CPACK_PACKAGE_VENDOR "LNLS")
+    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+    # set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}\\\\COPYING.txt")
+    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}\\\\README.txt")
+    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}\\\\WELCOME.txt")
+    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\branding.bmp")
+    set(CPACK_PACKAGE_VERSION ${ERRHAND_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${ERRHAND_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${ERRHAND_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${ERRHAND_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "ERRHAND Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "ERRHAND Temporary CPack Directory")
+
+    include(CPack)
+
+    cpack_add_component_group(Development
+        DISPLAY_NAME "Errhand library"
+        EXPANDED
+    )
+    cpack_add_component(SourceCode
+        DISPLAY_NAME "Errhand source code"
+        DISABLED
+        INSTALL_TYPES FullInstall
+    )
+    cpack_add_component(SDK
+        DISPLAY_NAME "Errhand headers and libraries"
+        INSTALL_TYPES FullInstall DevInstall
+        GROUP Development
+    )
+    cpack_add_component(Runtime
+        DISPLAY_NAME "Errhand runtime files"
+        REQUIRED
+        INSTALL_TYPES FullInstall DevInstall MinInstall
+    )
+    cpack_add_install_type(FullInstall
+        DISPLAY_NAME "Full install, including source code"
+    )
+    cpack_add_install_type(DevInstall
+        DISPLAY_NAME "Developer install, headers and libraries"
+    )
+    cpack_add_install_type(MinInstall
+        DISPLAY_NAME "Minimal install, runtime only"
     )
 endif()
