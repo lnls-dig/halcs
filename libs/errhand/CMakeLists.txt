@@ -10,6 +10,11 @@ list(APPEND CMAKE_MODULE_PATH ${ERRHAND_CMAKE_MODULES_DIR})
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
 
+# Will be used to add flags to pkg-config useful when apps want to statically link
+set(pkg_config_libs_private "")
+set(pkg_config_names_private "")
+set(pkg_config_defines "")
+
 set(CMAKE_DEBUG_POSTFIX d)
 
 add_library(errhand_compiler_flags INTERFACE)
@@ -133,6 +138,49 @@ set_target_properties(errhand PROPERTIES
 
 target_link_libraries(errhand PUBLIC errhand_compiler_flags)
 
-# set depedency to libzmq and libczmq
-target_link_libraries(errhand PUBLIC zmq)
-target_link_libraries(errhand PUBLIC czmq)
+# set library dependencies
+set(OPT_LIBRARIES_STATIC)
+
+# search for lizmq
+find_package(libzmq)
+if(LIBZMQ_FOUND)
+    target_include_directories(errhand
+        PUBLIC
+        ${LIBZMQ_INCLUDE_DIRS}
+    )
+    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+  if(PC_LIBZMQ_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+      list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+  else()
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+  endif()
+else()
+    message(FATAL_ERROR
+        "libzmq is not installed. Install it, then run CMake again." )
+endif()
+
+# search for czmq
+find_package(czmq)
+if(CZMQ_FOUND)
+    target_include_directories(errhand
+        PUBLIC
+        ${CZMQ_INCLUDE_DIRS}
+    )
+    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
+  if(PC_CZMQ_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libczmq")
+      list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+  else()
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
+  endif()
+else()
+    message(FATAL_ERROR
+        "czmq is not installed. Install it, then run CMake again." )
+endif()
+
+# set depedency to all libraries
+target_link_libraries(errhand
+    PUBLIC
+    ${MORE_LIBRARIES}
+)
