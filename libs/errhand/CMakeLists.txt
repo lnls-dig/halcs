@@ -17,6 +17,8 @@ include(PreventInSourceBuilds)
 include(GNUInstallDirs)
 # configure and generate *.Config.cmake files
 include(CMakePackageConfigHelpers)
+# extract version numbers from header file
+include(TestErrhandVersion)
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
@@ -33,6 +35,11 @@ set (ERRHAND_OUTPUT_BASENAME "errhand"
 
 # set library dependencies
 set(OPT_LIBRARIES_STATIC)
+
+# set VERSION from the variables exported by Test*Version module
+set(VERSION
+    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
+)
 
 ########################################################################
 # LIBZMQ dependency
@@ -334,6 +341,14 @@ configure_package_config_file(
     ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
 )
 
+# configure and generate <PROJECT_NAME>ConfigVersion.cmake file
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION
+    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
+    COMPATIBILITY AnyNewerVersion
+)
+
 # actually install <PROJECT_NAME>Targets.cmake file
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
@@ -342,6 +357,7 @@ if(BUILD_SHARED OR BUILD_STATIC)
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
         ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
     )
