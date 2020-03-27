@@ -21,6 +21,47 @@ set(pkg_config_defines "")
 
 set(CMAKE_DEBUG_POSTFIX d)
 
+# set library dependencies
+set(OPT_LIBRARIES_STATIC)
+
+########################################################################
+# LIBZMQ dependency
+########################################################################
+
+find_package(libzmq)
+if(LIBZMQ_FOUND)
+    include_directories(${LIBZMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+  if(PC_LIBZMQ_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+      list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+  else()
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+  endif()
+else()
+    message(FATAL_ERROR
+        "libzmq is not installed. Install it, then run CMake again." )
+endif()
+
+#########################################################################
+# CZMQ dependency
+#########################################################################
+
+find_package(czmq)
+if(CZMQ_FOUND)
+    include_directories(${CZMQ_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
+  if(PC_CZMQ_FOUND)
+      set(pkg_config_names_private "${pkg_config_names_private} libczmq")
+      list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+  else()
+      set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
+  endif()
+else()
+    message(FATAL_ERROR
+        "czmq is not installed. Install it, then run CMake again." )
+endif()
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -137,53 +178,6 @@ target_compile_definitions(errhand PRIVATE ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON
 
 message(STATUS
     "Setting compile-time option ERRHAND_SUBSYS_ON='${ERRHAND_SUBSYS_ON_OPT}'")
-
-# set library dependencies
-set(OPT_LIBRARIES_STATIC)
-
-########################################################################
-# LIBZMQ dependency
-########################################################################
-
-find_package(libzmq)
-if(LIBZMQ_FOUND)
-    target_include_directories(errhand
-        PUBLIC
-        ${LIBZMQ_INCLUDE_DIRS}
-    )
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-  if(PC_LIBZMQ_FOUND)
-      set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-      list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
-  else()
-      set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
-  endif()
-else()
-    message(FATAL_ERROR
-        "libzmq is not installed. Install it, then run CMake again." )
-endif()
-
-#########################################################################
-# CZMQ dependency
-#########################################################################
-
-find_package(czmq)
-if(CZMQ_FOUND)
-    target_include_directories(errhand
-        PUBLIC
-        ${CZMQ_INCLUDE_DIRS}
-    )
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-  if(PC_CZMQ_FOUND)
-      set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-      list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
-  else()
-      set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
-  endif()
-else()
-    message(FATAL_ERROR
-        "czmq is not installed. Install it, then run CMake again." )
-endif()
 
 ########################################################################
 # Library dependencies
