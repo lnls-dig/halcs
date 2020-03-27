@@ -13,6 +13,8 @@ list(APPEND CMAKE_MODULE_PATH ${ERRHAND_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
+# set installation variables compliant with distributions
+include(GNUInstallDirs)
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
@@ -291,5 +293,41 @@ if(BUILD_STATIC)
     target_link_libraries(errhand-static
         PUBLIC
         ${MORE_LIBRARIES}
+    )
+endif()
+
+########################################################################
+# Installer
+########################################################################
+
+install(TARGETS ${target_outputs} errhand_compiler_flags
+    EXPORT ${PROJECT_NAME}-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    FRAMEWORK DESTINATION "Library/Frameworks"
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
+# for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
+set(ERRHAND_CMAKECONFIG_INSTALL_DIR
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    CACHE STRING
+    "install path for errhandConfig.cmake and errhandTargets.cmake"
+)
+
+# only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
+# file for other cmake projects using this.
+export(EXPORT ${PROJECT_NAME}-targets
+    FILE
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
+)
+
+# actually install <PROJECT_NAME>Targets.cmake file
+if(BUILD_SHARED OR BUILD_STATIC)
+    install(EXPORT ${PROJECT_NAME}-targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
