@@ -228,12 +228,27 @@ target_compile_definitions(objects PUBLIC
     ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
 )
 
+# for .pc file
+set(pkg_config_defines "${pkg_config_defines} \
+    -DERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}"
+)
+
 target_compile_definitions(objects PUBLIC
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
 )
 
+# for .pc file
+set(pkg_config_defines "${pkg_config_defines} \
+    -DERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}"
+)
+
 target_compile_definitions(objects PUBLIC
     ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
+)
+
+# for .pc file
+set(pkg_config_defines "${pkg_config_defines} \
+    -DERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}"
 )
 
 # add the binary tree to the search path for include files
