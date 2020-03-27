@@ -21,6 +21,10 @@ set(pkg_config_defines "")
 
 set(CMAKE_DEBUG_POSTFIX d)
 
+########################################################################
+# Library compile options
+########################################################################
+
 add_library(errhand_compiler_flags INTERFACE)
 target_compile_features(errhand_compiler_flags
     INTERFACE
@@ -53,6 +57,10 @@ elseif(UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 endif()
 
+########################################################################
+# Library declaration
+########################################################################
+
 set(ERRHAND_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/errhand_local_print.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/errhand_print.c
@@ -74,7 +82,7 @@ target_include_directories(errhand
 )
 
 ########################################################################
-# Compile options
+# User compile-time options
 ########################################################################
 
 # should we use our errhand debug
@@ -136,6 +144,7 @@ set(OPT_LIBRARIES_STATIC)
 ########################################################################
 # LIBZMQ dependency
 ########################################################################
+
 find_package(libzmq)
 if(LIBZMQ_FOUND)
     target_include_directories(errhand
@@ -157,6 +166,7 @@ endif()
 #########################################################################
 # CZMQ dependency
 #########################################################################
+
 find_package(czmq)
 if(CZMQ_FOUND)
     target_include_directories(errhand
@@ -174,6 +184,10 @@ else()
     message(FATAL_ERROR
         "czmq is not installed. Install it, then run CMake again." )
 endif()
+
+########################################################################
+# Library dependencies
+########################################################################
 
 # set depedency to all libraries
 target_link_libraries(errhand
