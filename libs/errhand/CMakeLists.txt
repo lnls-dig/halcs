@@ -15,6 +15,8 @@ list(APPEND CMAKE_MODULE_PATH ${ERRHAND_CMAKE_MODULES_DIR})
 include(PreventInSourceBuilds)
 # set installation variables compliant with distributions
 include(GNUInstallDirs)
+# configure and generate *.Config.cmake files
+include(CMakePackageConfigHelpers)
 
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
@@ -324,10 +326,23 @@ export(EXPORT ${PROJECT_NAME}-targets
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
 )
 
+# configure and generate <PROJECT_NAME>Config.cmake file
+configure_package_config_file(
+    cmake/${PROJECT_NAME}Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION
+    ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+)
+
 # actually install <PROJECT_NAME>Targets.cmake file
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+    )
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION
+        ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
