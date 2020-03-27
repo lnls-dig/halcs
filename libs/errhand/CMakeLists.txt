@@ -53,12 +53,6 @@ elseif(UNIX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 endif()
 
-# configure a header file to pass the version number only
-#configure_file(errhandConfig.h.in errhandConfig.h)
-
-# add the MathFunctions library
-#add_subdirectory(MathFunctions)
-
 set(ERRHAND_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/errhand_local_print.c
   ${CMAKE_CURRENT_SOURCE_DIR}/src/errhand_print.c
