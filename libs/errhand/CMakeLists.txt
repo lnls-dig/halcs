@@ -156,6 +156,11 @@ set(errhand_public_headers
 # for IDE project generation
 source_group("Header Files" FILES ${errhand_public_headers})
 
+# README files
+set(readme-docs
+    COPYING
+)
+
 ########################################################################
 # User compile-time options
 ########################################################################
@@ -246,6 +251,7 @@ if(BUILD_SHARED)
     add_library(errhand SHARED
         $<TARGET_OBJECTS:objects>
         ${errhand_public_headers}
+        ${readme-docs}
     )
 
     set_target_properties(errhand PROPERTIES
@@ -260,6 +266,7 @@ if(BUILD_STATIC)
     add_library(errhand-static STATIC
         $<TARGET_OBJECTS:objects>
         ${errhand_public_headers}
+        ${readme-docs}
     )
 
     set_target_properties(errhand-static PROPERTIES
@@ -330,6 +337,13 @@ set(ERRHAND_CMAKECONFIG_INSTALL_DIR
     "install path for errhandConfig.cmake and errhandTargets.cmake"
 )
 
+# Convert README files in *.txt ones
+foreach(readme ${readme-docs})
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${readme}
+        ${CMAKE_CURRENT_BINARY_DIR}/${readme}.txt
+    )
+endforeach()
+
 # only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
 # file for other cmake projects using this.
 export(EXPORT ${PROJECT_NAME}-targets
@@ -391,7 +405,7 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Error Handling library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    # set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}\\\\COPYING.txt")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}\\\\README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}\\\\WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}\\\\branding.bmp")
