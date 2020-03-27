@@ -345,7 +345,7 @@ configure_package_config_file(
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
+    ${VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
