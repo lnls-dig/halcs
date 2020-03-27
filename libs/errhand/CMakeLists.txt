@@ -254,8 +254,10 @@ if(BUILD_SHARED)
     )
 
     set_target_properties(errhand PROPERTIES
-        COMPILE_DEFINITIONS "DLL_EXPORT"
         PUBLIC_HEADER "${errhand_public_headers}"
+        SOVERSION "1"
+        VERSION "${ERRHAND_VERSION}"
+        COMPILE_DEFINITIONS "DLL_EXPORT"
         OUTPUT_NAME "${ERRHAND_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
