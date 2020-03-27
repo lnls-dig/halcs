@@ -24,6 +24,9 @@ include(TargetArch)
 
 target_architecture(ARCH)
 
+# find pkg-config
+find_package(PkgConfig)
+
 # Will be used to add flags to pkg-config useful when apps want to statically link
 set(pkg_config_libs_private "")
 set(pkg_config_names_private "")
@@ -39,11 +42,6 @@ set (ERRHAND_OUTPUT_BASENAME "errhand"
 
 # set library dependencies
 set(OPT_LIBRARIES_STATIC)
-
-# set VERSION from the variables exported by Test*Version module
-set(VERSION
-    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
-)
 
 ########################################################################
 # LIBZMQ dependency
@@ -252,6 +250,7 @@ if(BUILD_SHARED)
         $<TARGET_OBJECTS:objects>
         ${errhand_public_headers}
         ${readme-docs}
+        ${errhand-pkgconfig}
     )
 
     set_target_properties(errhand PROPERTIES
@@ -267,6 +266,7 @@ if(BUILD_STATIC)
         $<TARGET_OBJECTS:objects>
         ${errhand_public_headers}
         ${readme-docs}
+        ${errhand-pkgconfig}
     )
 
     set_target_properties(errhand-static PROPERTIES
@@ -343,6 +343,25 @@ foreach(readme ${readme-docs})
         ${CMAKE_CURRENT_BINARY_DIR}/${readme}.txt
     )
 endforeach()
+
+# Generate .pc file
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${prefix})
+set(libdir ${prefix}/lib)
+set(includedir ${prefix}/include)
+set(VERSION
+    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
+)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/liberrhand.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/liberrhand.pc @ONLY)
+set(errhand-pkgconfig ${CMAKE_CURRENT_BINARY_DIR}/liberrhand.pc)
+
+# install .pc file
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/liberrhand.pc
+    DESTINATION
+    ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
 
 # only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
 # file for other cmake projects using this.
