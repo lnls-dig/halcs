@@ -1,3 +1,7 @@
+########################################################################
+# Project setup
+########################################################################
+
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name and version
@@ -75,7 +79,9 @@ target_include_directories(errhand
     $<INSTALL_INTERFACE:include>
 )
 
-# compile Options
+########################################################################
+# Compile options
+########################################################################
 
 # should we use our errhand debug
 option(ERRHAND_DBG_OPT "Enable debug mode" ON)
@@ -130,18 +136,12 @@ target_compile_definitions(errhand PRIVATE ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON
 message(STATUS
     "Setting compile-time option ERRHAND_SUBSYS_ON='${ERRHAND_SUBSYS_ON_OPT}'")
 
-# state that errhand need PIC when the default is shared libraries
-set_target_properties(errhand PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ${BUILD_SHARED_LIBS}
-)
-
-target_link_libraries(errhand PUBLIC errhand_compiler_flags)
-
 # set library dependencies
 set(OPT_LIBRARIES_STATIC)
 
-# search for lizmq
+########################################################################
+# LIBZMQ dependency
+########################################################################
 find_package(libzmq)
 if(LIBZMQ_FOUND)
     target_include_directories(errhand
@@ -160,7 +160,9 @@ else()
         "libzmq is not installed. Install it, then run CMake again." )
 endif()
 
-# search for czmq
+#########################################################################
+# CZMQ dependency
+#########################################################################
 find_package(czmq)
 if(CZMQ_FOUND)
     target_include_directories(errhand
@@ -184,3 +186,15 @@ target_link_libraries(errhand
     PUBLIC
     ${MORE_LIBRARIES}
 )
+
+########################################################################
+# Library
+########################################################################
+
+# state that errhand need PIC when the default is shared libraries
+set_target_properties(errhand PROPERTIES
+    POSITION_INDEPENDENT_CODE
+    ${BUILD_SHARED_LIBS}
+)
+
+target_link_libraries(errhand PUBLIC errhand_compiler_flags)
