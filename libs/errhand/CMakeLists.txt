@@ -248,7 +248,7 @@ target_compile_definitions(objects PUBLIC
 
 # for .pc file
 set(pkg_config_defines "${pkg_config_defines} \
-    -DERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}"
+    -DERRHAND_SUBSYS_ON=\'\"${ERRHAND_SUBSYS_ON_OPT}\"\'"
 )
 
 # add the binary tree to the search path for include files
