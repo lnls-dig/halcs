@@ -34,7 +34,7 @@ override CFLAGS += $(ENDIAN) $(LINUXINCLUDE)
 .PHONY: tools tools_clean tools_install tools_uninstall
 
 LIB = libsdbfs.a
-OBJS = src/sdbfs/c/glue.o src/sdbfs/c/access.o
+OBJS = src/glue.o src/access.o
 
 all: $(LIB) tools
 
