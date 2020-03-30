@@ -12,6 +12,18 @@
 
 #include <linux/sdb.h> /* Please point your "-I" to some sensible place */
 
+/* version macros for compile-time API detection */
+
+#define SDBFS_VERSION_MAJOR 1
+#define SDBFS_VERSION_MINOR 0
+#define SDBFS_VERSION_PATCH 0
+
+#define SDBFS_MAKE_VERSION(major, minor, patch) \
+    ((major) * 10000 + (minor) * 100 + (patch))
+#define SDBFS_VERSION \
+    SDBFS_MAKE_VERSION(SDBFS_VERSION_MAJOR, SDBFS_VERSION_MINOR, \
+            SDBFS_VERSION_PATCH)
+
 #define SDBFS_DEPTH 4 /* Max number of subdirectory depth */
 /*
  * Data structures: please not that the library intself doesn't use
