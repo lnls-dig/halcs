@@ -102,11 +102,11 @@ LIBACQCLIENT_DIR = $(LIBS_DIR)/acqclient
 export LIBACQCLIENT_DIR
 LIBBPMCLIENT_DIR = $(LIBS_DIR)/bpmclient
 export LIBBPMCLIENT_DIR
+LIBSDBFS_DIR = $(LIBS_DIR)/sdbfs
+export LIBSDBFS_DIR
 LIBSDBUTILS_DIR = $(LIBS_DIR)/sdbutils
 export LIBSDBUTILS_DIR
 # Our submodules and third-party codes
-LIBSDBFS_DIR = $(FOREIGN_DIR)/libsdbfs
-export LIBSDBFS_DIR
 LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
 export LIBBSMP_DIR
 PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
