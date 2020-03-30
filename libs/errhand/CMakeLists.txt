@@ -98,9 +98,9 @@ set(clang_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:Clang>>")
 set(msvc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:MSVC>>")
 target_compile_options(errhand_compiler_flags
     INTERFACE
-    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror>>"
-    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror>>"
-    "$<${msvc_c}:$<BUILD_INTERFACE:-W3>>"
+    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
+    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
+    "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
 # control where the static and shared libraries are built so that on windows
