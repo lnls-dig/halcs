@@ -197,6 +197,30 @@ target_include_directories(objects
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>)
 
+# as we can't link an object library to anything, get
+# the properties INTERFACE_COMPILE_FEATURES and
+# INTERFACE_COMPILE_DEFINITONS and aplpy to the
+# object library
+get_target_property(convc_compiler_features
+    convc_compiler_flags
+    INTERFACE_COMPILE_FEATURES
+)
+
+target_compile_features(objects
+    PRIVATE
+    ${convc_compiler_features}
+)
+
+get_target_property(convc_compiler_options
+    convc_compiler_flags
+    INTERFACE_COMPILE_OPTIONS
+)
+
+target_compile_options(objects
+    PRIVATE
+    ${convc_compiler_options}
+)
+
 # build shared library
 if(BUILD_SHARED)
     add_library(convc SHARED
