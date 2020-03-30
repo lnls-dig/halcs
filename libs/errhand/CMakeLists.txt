@@ -263,6 +263,30 @@ target_include_directories(objects
     $<INSTALL_INTERFACE:include>
 )
 
+# as we can't link an object library to anything, get
+# the properties INTERFACE_COMPILE_FEATURES and
+# INTERFACE_COMPILE_DEFINITONS and aplpy to the
+# object library
+get_target_property(errhand_compiler_features
+    errhand_compiler_flags
+    INTERFACE_COMPILE_FEATURES
+)
+
+target_compile_features(objects
+    PRIVATE
+    ${errhand_compiler_features}
+)
+
+get_target_property(errhand_compiler_options
+    errhand_compiler_flags
+    INTERFACE_COMPILE_OPTIONS
+)
+
+target_compile_options(objects
+    PRIVATE
+    ${errhand_compiler_options}
+)
+
 # build shared library
 if(BUILD_SHARED)
     add_library(errhand SHARED
