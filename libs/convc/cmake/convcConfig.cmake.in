@@ -1,0 +1,44 @@
+# convc cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   convc-static
+#   convc
+#
+# This module sets the following variables in your project::
+#
+#   convc_FOUND - true if convc found on the system
+#   convc_INCLUDE_DIR - the directory containing convc headers
+#   convc_LIBRARY -
+#   convc_STATIC_LIBRARY
+
+@PACKAGE_INIT@
+
+if(NOT TARGET convc AND NOT TARGET convc-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET convc)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+            convc
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+            convc-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET convc)
+        get_target_property(@PROJECT_NAME@_LIBRARY
+            convc LOCATION
+        )
+    endif()
+    if (TARGET convc-static)
+        get_target_property(@PROJECT_NAME@_STATIC_LIBRARY
+            convc-static LOCATION
+        )
+    endif()
+endif()
