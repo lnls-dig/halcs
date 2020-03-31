@@ -76,6 +76,148 @@ is shown below:
     [Fri Feb 28 11:24:15 2020] pciDriver - pcidriver_mmap_kmem : Got kmem_entry with id: 0
     [Fri Feb 28 11:24:15 2020] pciDriver - pcidriver_mmap_kmem : Mapping address 44ba00000 / PFN 0044ba00
 
+Device simple readout
+'''''''''''''''''''''
+
+If the driver is working ok, you can read/write to/from device registers
+by using a simple program called ``regAccess``. This is shipped with
+`FPGA PCIe driver`_ and is located at ``tests/pcie/bin``. From then
+HALCS source tree you can located it at ``foreign/pcie-driver/tests/pcie/bin``.
+
+The usage is as follows:
+
+.. code-block:: bash
+  :linenos:
+
+    Simple Register Access to FPGA
+    Usage: ./bin/regAccess [options]
+      -h  --help                           Display this usage information
+      -b  --devicefile <Device File>       Device File
+      -v  --verbose                        Verbose output
+      -r  --read                           Perform read access
+      -w  --write                          Perform write access
+      -n  --barno <BAR number = [0|2|4]    Bar Number
+      -a  --address <FPGA Address in hex>  Address to read/write
+      -d  --data <FPGA Data in hex>        Data to write to FPGA
+
+In that case, if we want to read a register from board located at slot 1,
+at address 0x0 from BAR 4, which is the Wishbone register space in most cases,
+you could issue the following:
+
+.. code-block:: bash
+  :linenos:
+
+    $ ./bin/regAccess \
+        --devicefile /dev/fpga-1
+        --read \
+        --barno 4 \
+        --address 0x0
+    0x0000AA55
+
+To write a value to register address ``0x0`` you could issue:
+
+.. code-block:: bash
+  :linenos:
+
+    $ ./bin/regAccess \
+        --devicefile /dev/fpga-1
+        --write \
+        --barno 4 \
+        --address 0x0 \
+        --data 0xAA55AA55
+    0xAA55AA55
+
+SDB readout
+'''''''''''
+
+On gateware projects that support SDB you can read its contents by
+using the ``sdb-read-lnls`` program located at ``foreign/libsdbfs/tools``.
+
+The usage is as follows:
+
+.. code-block:: bash
+  :linenos:
+
+    sdb-read-lnls: Use: "sdb-read-lnls [options] <image-file> [<file>]
+       -l          long listing (like ls -l)
+       -v          verbose
+       -e <num>    entry point offset
+
+To read the SDB information from a board located at slot 11, from starting address
+``0x0``, you could issue:
+
+.. code-block:: bash
+  :linenos:
+
+    $ sdb-read-lnls -l -e 0x0 /dev/fpga-11
+    INFO : [20-03-31 11:46:59] [ll_io] Ops set
+    INFO : [20-03-31 11:46:59] [ll_io] Created instance of llio
+    INFO : [20-03-31 11:46:59] [ll_io_pcie] Opened PCIe device located at /dev/fpga-11
+    sdb-read-lnls: listing format is to be defined
+    0000000000000651:e6a542c9 @ 00000000-007fffff WB4-Crossbar-GSI
+    0000000000000651:eef0b198 @ 00310000-00310fff WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00310000-003107ff   WB4-Crossbar-GSI
+    1000000000001215:1bafbf1e @ 00310000-003100ff   LNLS_POS_CALC_REGS
+    1000000000001215:12897592 @ 00310100-003101ff   LNLS_BPM_SWAP
+    0000000000000651:eef0b198 @ 00320000-0032ffff WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00320000-00327fff   WB4-Crossbar-GSI
+    1000000000001215:68e3b1af @ 00320000-003200ff   LNLS_FMC250M_REGS
+    1000000000001215:2403f569 @ 00321000-003210ff   LNLS_ACOMMON_REGS
+    0000000000000651:eef0b198 @ 00322000-00322fff   WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00322000-003223ff     WB4-Crossbar-GSI
+    1000000000001215:88c67d9c @ 00322000-003220ff     LNLS_ACLK_REGS
+    000000000000ce42:123c5443 @ 00322100-003221ff     WB-I2C-Master
+    000000000000ce42:e503947e @ 00322200-003222ff     WB-SPI.Control
+    000000000000ce42:123c5443 @ 00323000-003230ff   WB-I2C-Master
+    000000000000ce42:e503947e @ 00324000-003240ff   WB-SPI.Control
+    000000000000ce42:e503947e @ 00325000-003250ff   WB-SPI.Control
+    1000000000001215:4519a0ad @ 00330000-00330fff LNLS_BPM_ACQ_CORE
+    0000000000000651:eef0b198 @ 00340000-00340fff WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00340000-003407ff   WB4-Crossbar-GSI
+    1000000000001215:1bafbf1e @ 00340000-003400ff   LNLS_POS_CALC_REGS
+    1000000000001215:12897592 @ 00340100-003401ff   LNLS_BPM_SWAP
+    0000000000000651:eef0b198 @ 00350000-0035ffff WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00350000-00357fff   WB4-Crossbar-GSI
+    1000000000001215:68e3b1af @ 00350000-003500ff   LNLS_FMC250M_REGS
+    1000000000001215:2403f569 @ 00351000-003510ff   LNLS_ACOMMON_REGS
+    0000000000000651:eef0b198 @ 00352000-00352fff   WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00352000-003523ff     WB4-Crossbar-GSI
+    1000000000001215:88c67d9c @ 00352000-003520ff     LNLS_ACLK_REGS
+    000000000000ce42:123c5443 @ 00352100-003521ff     WB-I2C-Master
+    000000000000ce42:e503947e @ 00352200-003522ff     WB-SPI.Control
+    000000000000ce42:123c5443 @ 00353000-003530ff   WB-I2C-Master
+    000000000000ce42:e503947e @ 00354000-003540ff   WB-SPI.Control
+    000000000000ce42:e503947e @ 00355000-003550ff   WB-SPI.Control
+    1000000000001215:4519a0ad @ 00360000-00360fff LNLS_BPM_ACQ_CORE
+    0000000000000651:eef0b198 @ 00370000-00370fff WB4-Bridge-GSI
+    0000000000000651:e6a542c9 @ 00370000-003707ff   WB4-Crossbar-GSI
+    000000000000ce42:8a5719ae @ 00370000-003700ff   CERN_SIMPLE_UART
+    0000000000000651:35aa6b95 @ 00370100-003701ff   GSI_GPIO_32
+    0000000000000651:35aa6b95 @ 00370200-003702ff   GSI_GPIO_32
+    000000000000ce42:fdafb9dd @ 00370300-0037030f   CERN_TICS_COUNTER
+    1000000000001215:51954750 @ 00380000-003800ff LNLS_AFCDIAG
+    1000000000001215:bcbb78d2 @ 00390000-003903ff LNLS_TRIGGER_IFACE
+    1000000000001215:84b6a5ac @ 00400000-004003ff LNLS_TRIGGER_MUX
+    1000000000001215:84b6a5ac @ 00410000-004103ff LNLS_TRIGGER_MUX
+    1000000000001215:7f9e3377 @ 00420000-00420fff LNLS_ACQ_CORE_PM
+    1000000000001215:7f9e3377 @ 00430000-00430fff LNLS_ACQ_CORE_PM
+    1000000000001215:84b6a5ac @ 00440000-004403ff LNLS_TRIGGER_MUX
+    1000000000001215:84b6a5ac @ 00450000-004503ff LNLS_TRIGGER_MUX
+    repo-url: https://github.com/lnls-dig/bpm-gw.git
+    synthesis-name: bpm-gw-sr-siriu+
+      commit-id: 4bf1f18fedb7a9694e8d5a80a859bc4e
+      tool-name: VIVADO
+      tool-version: 0x00020183
+      build-date: 20191206
+      build-user: LRusso
+    synthesis-name: dsp-cores+
+      commit-id: 31d42c16f00e75e3fa3d52ef2951ba71
+    synthesis-name: general-cores+
+      commit-id: b056d1983e92c723a20c78eecebea2cb
+    synthesis-name: infra-cores+
+      commit-id: dd80bd238f200c16e77f4125e31bc160
+    INFO : [20-03-31 11:46:59] [ll_io_pcie] Closed PCIe device located at /dev/fpga-11
+    INFO : [20-03-31 11:46:59] [ll_io] Ops unset
 
 Malamute application
 ''''''''''''''''''''
