@@ -1,0 +1,28 @@
+# Read header file and extract version numbers
+
+file(READ
+    "${PROJECT_SOURCE_DIR}/include/disptable_classes.h"
+    _DISPTABLE_H_CONTENTS
+)
+
+string(REGEX REPLACE
+    ".*#define DISPTABLE_VERSION_MAJOR ([0-9]+).*"
+    "\\1" DISPTABLE_VERSION_MAJOR
+    "${_DISPTABLE_H_CONTENTS}"
+)
+string(REGEX REPLACE
+    ".*#define DISPTABLE_VERSION_MINOR ([0-9]+).*"
+    "\\1" DISPTABLE_VERSION_MINOR
+    "${_DISPTABLE_H_CONTENTS}"
+)
+string(REGEX REPLACE
+    ".*#define DISPTABLE_VERSION_PATCH ([0-9]+).*"
+    "\\1" DISPTABLE_VERSION_PATCH
+    "${_DISPTABLE_H_CONTENTS}"
+)
+
+set(DISPTABLE_VERSION
+    "${DISPTABLE_VERSION_MAJOR}.${DISPTABLE_VERSION_MINOR}.${DISPTABLE_VERSION_PATCH}"
+)
+
+message(STATUS "Detected DISPTABLE Version - ${DISPTABLE_VERSION}")
