@@ -400,7 +400,7 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}-${CONVC_VERSION}-${arch_name}"
     )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Error Handling library")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
