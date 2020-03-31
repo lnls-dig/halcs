@@ -10,9 +10,9 @@
 # This module sets the following variables in your project::
 #
 #   hutils_FOUND - true if hutils found on the system
-#   hutils_INCLUDE_DIR - the directory containing hutils headers
-#   hutils_LIBRARY -
-#   hutils_STATIC_LIBRARY
+#   hutils_INCLUDE_DIRS - the directory containing hutils headers
+#   hutils_LIBRARIES -
+#   hutils_STATIC_LIBRARIES
 
 @PACKAGE_INIT@
 
@@ -20,24 +20,24 @@ if(NOT TARGET hutils AND NOT TARGET hutils-static)
     include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
     if (TARGET hutils)
-        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
             hutils
             INTERFACE_INCLUDE_DIRECTORIES
         )
     else ()
-        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
             hutils-static
             INTERFACE_INCLUDE_DIRECTORIES
         )
     endif()
 
     if (TARGET hutils)
-        get_target_property(@PROJECT_NAME@_LIBRARY
+        get_target_property(@PROJECT_NAME@_LIBRARIES
             hutils LOCATION
         )
     endif()
     if (TARGET hutils-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARY
+        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
             hutils-static LOCATION
         )
     endif()

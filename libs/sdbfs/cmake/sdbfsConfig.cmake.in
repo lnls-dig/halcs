@@ -10,9 +10,9 @@
 # This module sets the following variables in your project::
 #
 #   sdbfs_FOUND - true if sdbfs found on the system
-#   sdbfs_INCLUDE_DIR - the directory containing sdbfs headers
-#   sdbfs_LIBRARY -
-#   sdbfs_STATIC_LIBRARY
+#   sdbfs_INCLUDE_DIRS - the directory containing sdbfs headers
+#   sdbfs_LIBRARIES -
+#   sdbfs_STATIC_LIBRARIES
 
 @PACKAGE_INIT@
 
@@ -20,24 +20,24 @@ if(NOT TARGET sdbfs AND NOT TARGET sdbfs-static)
     include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
     if (TARGET sdbfs)
-        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
             sdbfs
             INTERFACE_INCLUDE_DIRECTORIES
         )
     else ()
-        get_target_property(@PROJECT_NAME@_INCLUDE_DIR
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
             sdbfs-static
             INTERFACE_INCLUDE_DIRECTORIES
         )
     endif()
 
     if (TARGET sdbfs)
-        get_target_property(@PROJECT_NAME@_LIBRARY
+        get_target_property(@PROJECT_NAME@_LIBRARIES
             sdbfs LOCATION
         )
     endif()
     if (TARGET sdbfs-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARY
+        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
             sdbfs-static LOCATION
         )
     endif()
