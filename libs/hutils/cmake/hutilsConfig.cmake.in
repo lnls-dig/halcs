@@ -42,3 +42,5 @@ if(NOT TARGET hutils AND NOT TARGET hutils-static)
         )
     endif()
 endif()
+
+check_required_components("@PROJECT_NAME@")

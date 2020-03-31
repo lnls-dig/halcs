@@ -42,3 +42,5 @@ if(NOT TARGET sdbfs AND NOT TARGET sdbfs-static)
         )
     endif()
 endif()
+
+check_required_components("@PROJECT_NAME@")
