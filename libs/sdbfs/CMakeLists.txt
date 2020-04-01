@@ -349,14 +349,159 @@ endforeach()
 
 # sdb-read-lnls needs more stuff
 if(BUILD_SDB_READ_LNLS)
-    target_link_libraries(sdb-read-lnls
-        PRIVATE
-        llio
-        errhand
-        convc
-        czmq
-        pcidriver
-    )
+
+    # lots of dependencies for sdb-read-lnls
+    ########################################################################
+    # LIBZMQ dependency
+    ########################################################################
+
+    find_package(libzmq)
+    if(LIBZMQ_FOUND)
+        target_include_directories(sdb-read-lnls
+            PRIVATE
+            ${LIBZMQ_INCLUDE_DIRS}
+        )
+        list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
+        if(PC_LIBZMQ_FOUND)
+            set(pkg_config_names_private "${pkg_config_names_private} libzmq")
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        else()
+            set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
+        endif()
+    else()
+        message(FATAL_ERROR
+            "libzmq is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    endif()
+
+    #########################################################################
+    # CZMQ dependency
+    #########################################################################
+
+    find_package(czmq)
+    if(CZMQ_FOUND)
+        target_include_directories(sdb-read-lnls
+            PRIVATE
+            ${CZMQ_INCLUDE_DIRS}
+        )
+        list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
+        if(PC_CZMQ_FOUND)
+            set(pkg_config_names_private "${pkg_config_names_private} libczmq")
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        else()
+            set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
+        endif()
+    else()
+        message(FATAL_ERROR
+            "czmq is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    endif()
+
+    #########################################################################
+    # ERRHAND dependency
+    #########################################################################
+
+    find_package(errhand)
+    if(ERRHAND_FOUND)
+        target_include_directories(sdb-read-lnls
+            PRIVATE
+            ${ERRHAND_INCLUDE_DIRS}
+        )
+        list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
+        if(PC_ERRHAND_FOUND)
+            set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        else()
+            set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
+        endif()
+    else()
+        message(FATAL_ERROR
+            "liberrhand is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    endif()
+
+    #########################################################################
+    # CONVC dependency
+    #########################################################################
+
+    find_package(convc)
+    if(CONVC_FOUND)
+        target_include_directories(sdb-read-lnls
+            PRIVATE
+            ${CONVC_INCLUDE_DIRS}
+        )
+        list(APPEND MORE_LIBRARIES ${CONVC_LIBRARIES})
+        if(PC_CONVC_FOUND)
+            set(pkg_config_names_private "${pkg_config_names_private} libconvc")
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_CONVC_STATIC_LDFLAGS})
+        else()
+            set(pkg_config_libs_private "${pkg_config_libs_private} -lconvc")
+        endif()
+    else()
+        message(FATAL_ERROR
+            "libconvc is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    endif()
+
+    # Is this needed or is it better to leave this unspecified in case
+    # libs depending on sdbfs that do not use sdb-read-lnls can be left without
+    # requiring this PCIE driver lib?
+    ##########################################################################
+    ## PCIE Driver lib dependency
+    ##########################################################################
+
+    #find_package(pciedriver)
+    #if(PCIEDRIVER_FOUND)
+    #    target_include_directories(sdb-read-lnls
+    #        PRIVATE
+    #        ${PCIEDRIVER_INCLUDE_DIRS}
+    #    )
+    #    list(APPEND MORE_LIBRARIES ${PCIEDRIVER_LIBRARIES})
+    #    if(PC_PCIEDRIVER_FOUND)
+    #        set(pkg_config_names_private "${pkg_config_names_private} libpciedriver")
+    #        list(APPEND OPT_LIBRARIES_STATIC ${PC_PCIEDRIVER_STATIC_LDFLAGS})
+    #    else()
+    #        set(pkg_config_libs_private "${pkg_config_libs_private} -lpciedriver")
+    #    endif()
+    #else()
+    #    message(FATAL_ERROR
+    #        "libpciedriver is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    #endif()
+
+    #########################################################################
+    # LLIO dependency
+    #########################################################################
+
+    find_package(llio)
+    if(LLIO_FOUND)
+        target_include_directories(sdb-read-lnls
+            PRIVATE
+            ${LLIO_INCLUDE_DIRS}
+        )
+        list(APPEND MORE_LIBRARIES ${LLIO_LIBRARIES})
+        if(PC_LLIO_FOUND)
+            set(pkg_config_names_private "${pkg_config_names_private} libllio")
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_LLIO_STATIC_LDFLAGS})
+        else()
+            set(pkg_config_libs_private "${pkg_config_libs_private} -lllio")
+        endif()
+    else()
+        message(FATAL_ERROR
+            "libllio is not installed for sdb-read-lnls. Install it, then run CMake again." )
+    endif()
+
+    # dynamic library
+    if(TARGET sdbfs)
+        target_link_libraries(sdb-read-lnls
+            PRIVATE
+            ${MORE_LIBRARIES}
+        )
+    endif()
+
+    # only building static lib
+    if(NOT TARGET sdbfs AND TARGET sdbfs-static)
+        target_link_libraries(sdb-read-lnls
+            PRIVATE
+            ${MORE_LIBRARIES}
+            ${OPT_LIBRARIES_STATIC}
+        )
+    endif()
 endif()
 
 ########################################################################
