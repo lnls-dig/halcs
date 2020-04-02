@@ -8,6 +8,7 @@ compiler:
 branches:
   except:
     - gradle-removal
+    - cmake-support
 
 sudo: false
 dist: trusty
