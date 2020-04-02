@@ -385,7 +385,7 @@ export(EXPORT ${PROJECT_NAME}-targets
 
 # configure and generate <PROJECT_NAME>Config.cmake file
 configure_package_config_file(
-    cmake/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
     ${DISPTABLE_CMAKECONFIG_INSTALL_DIR}
