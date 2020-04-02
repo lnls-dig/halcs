@@ -304,10 +304,7 @@ make install
 cd "${BASE_PWD}"
 
 ########## HALCS
-if [ -n "$GRADLE" ]; then
-    export ${CONFIG_FLAGS[@]}
-    ./gradlew $GRADLE
-elif [ "$PURE_MAKE" = yes ]; then
+if [ "$PURE_MAKE" = yes ]; then
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
     make ${HALCS_OPTS[*]} install
