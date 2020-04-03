@@ -320,10 +320,10 @@ foreach(readme ${readme-docs})
 endforeach()
 
 # Generate .pc file
-set(prefix ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${prefix})
-set(libdir ${prefix}/lib)
-set(includedir ${prefix}/include)
+set(prefix \${pcfiledir}/../..)
+set(exec_prefix \${prefix})
+set(libdir \${prefix}/lib)
+set(includedir \${prefix}/include)
 set(VERSION
     ${SDBUTILS_VERSION_MAJOR}.${SDBUTILS_VERSION_MINOR}.${SDBUTILS_VERSION_PATCH}
 )

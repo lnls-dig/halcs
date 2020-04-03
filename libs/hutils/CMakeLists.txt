@@ -342,10 +342,10 @@ foreach(readme ${readme-docs})
 endforeach()
 
 # Generate .pc file
-set(prefix ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${prefix})
-set(libdir ${prefix}/lib)
-set(includedir ${prefix}/include)
+set(prefix \${pcfiledir}/../..)
+set(exec_prefix \${prefix})
+set(libdir \${prefix}/lib)
+set(includedir \${prefix}/include)
 set(VERSION
     ${HUTILS_VERSION_MAJOR}.${HUTILS_VERSION_MINOR}.${HUTILS_VERSION_PATCH}
 )

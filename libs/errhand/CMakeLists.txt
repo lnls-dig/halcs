@@ -405,10 +405,10 @@ foreach(readme ${readme-docs})
 endforeach()
 
 # Generate .pc file
-set(prefix ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${prefix})
-set(libdir ${prefix}/lib)
-set(includedir ${prefix}/include)
+set(prefix \${pcfiledir}/../..)
+set(exec_prefix \${prefix})
+set(libdir \${prefix}/lib)
+set(includedir \${prefix}/include)
 set(VERSION
     ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
 )
