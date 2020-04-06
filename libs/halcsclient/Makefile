@@ -11,6 +11,8 @@ OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 
+TOP ?= ../..
+
 PWD = 		$(shell pwd)
 
 # Select board in which we will work. Options are: ml605 or afcv3
