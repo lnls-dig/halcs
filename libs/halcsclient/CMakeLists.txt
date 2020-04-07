@@ -380,6 +380,7 @@ list(APPEND halcsclient_public_headers
 # Ugly and weird set of sources outside the source directory
 set(halcsclient_acq_public_headers
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan_gen_defs.h
 )
 
 # Get directory names only
