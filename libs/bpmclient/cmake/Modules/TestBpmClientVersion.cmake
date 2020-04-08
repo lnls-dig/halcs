@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/bpm_client_classes.h"
-    _BPMCLIENT_H_CONTENTS
+    _bpmclient_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define BPM_CLIENT_VERSION_MAJOR ([0-9]+).*"
-    "\\1" BPMCLIENT_VERSION_MAJOR
-    "${_BPMCLIENT_H_CONTENTS}"
+    "\\1" bpmclient_VERSION_MAJOR
+    "${_bpmclient_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define BPM_CLIENT_VERSION_MINOR ([0-9]+).*"
-    "\\1" BPMCLIENT_VERSION_MINOR
-    "${_BPMCLIENT_H_CONTENTS}"
+    "\\1" bpmclient_VERSION_MINOR
+    "${_bpmclient_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define BPM_CLIENT_VERSION_PATCH ([0-9]+).*"
-    "\\1" BPMCLIENT_VERSION_PATCH
-    "${_BPMCLIENT_H_CONTENTS}"
+    "\\1" bpmclient_VERSION_PATCH
+    "${_bpmclient_H_CONTENTS}"
 )
 
-set(BPMCLIENT_VERSION
-    "${BPMCLIENT_VERSION_MAJOR}.${BPMCLIENT_VERSION_MINOR}.${BPMCLIENT_VERSION_PATCH}"
+set(bpmclient_VERSION
+    "${bpmclient_VERSION_MAJOR}.${bpmclient_VERSION_MINOR}.${bpmclient_VERSION_PATCH}"
 )
 
-message(STATUS "Detected BPMCLIENT Version - ${BPMCLIENT_VERSION}")
+message(STATUS "Detected bpmclient Version - ${bpmclient_VERSION}")

@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(llio)
 
 # set modules path for CMkake to find
-set(LLIO_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${LLIO_CMAKE_MODULES_DIR})
+set(llio_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${llio_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -35,7 +35,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (LLIO_OUTPUT_BASENAME "llio"
+set (llio_OUTPUT_BASENAME "llio"
     CACHE STRING
     "Output llio library base name"
 )
@@ -44,16 +44,16 @@ set (LLIO_OUTPUT_BASENAME "llio"
 set(OPT_LIBRARIES_STATIC)
 
 ########################################################################
-# LIBZMQ dependency
+# libzmq dependency
 ########################################################################
 
 find_package(libzmq)
-if(LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    if(PC_LIBZMQ_FOUND)
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
     endif()
@@ -63,16 +63,16 @@ else()
 endif()
 
 #########################################################################
-# CZMQ dependency
+# czmq dependency
 #########################################################################
 
 find_package(czmq)
-if(CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    if(PC_CZMQ_FOUND)
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
     endif()
@@ -82,16 +82,16 @@ else()
 endif()
 
 #########################################################################
-# ERRHAND dependency
+# errhand dependency
 #########################################################################
 
 find_package(errhand)
-if(ERRHAND_FOUND)
-    include_directories(${ERRHAND_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-    if(PC_ERRHAND_FOUND)
+if(errhand_FOUND)
+    include_directories(${errhand_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+    if(PC_errhand_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
     endif()
@@ -101,16 +101,16 @@ else()
 endif()
 
 #########################################################################
-# CONVC dependency
+# convc dependency
 #########################################################################
 
 find_package(convc)
-if(CONVC_FOUND)
-    include_directories(${CONVC_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CONVC_LIBRARIES})
-    if(PC_CONVC_FOUND)
+if(convc_FOUND)
+    include_directories(${convc_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${convc_LIBRARIES})
+    if(PC_convc_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libconvc")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CONVC_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_convc_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lconvc")
     endif()
@@ -306,9 +306,9 @@ if(BUILD_SHARED)
     set_target_properties(llio PROPERTIES
         PUBLIC_HEADER "${llio_public_headers}"
         SOVERSION "1"
-        VERSION "${LLIO_VERSION}"
+        VERSION "${llio_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${LLIO_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${llio_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -324,7 +324,7 @@ if(BUILD_STATIC)
 
     set_target_properties(llio-static PROPERTIES
       PUBLIC_HEADER "${llio_public_headers}"
-      OUTPUT_NAME "${LLIO_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${llio_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -406,7 +406,7 @@ install(DIRECTORY
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(LLIO_CMAKECONFIG_INSTALL_DIR
+set(llio_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for llioConfig.cmake and llioTargets.cmake"
@@ -425,7 +425,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${LLIO_VERSION_MAJOR}.${LLIO_VERSION_MINOR}.${LLIO_VERSION_PATCH}
+    ${llio_VERSION_MAJOR}.${llio_VERSION_MINOR}.${llio_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libllio.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libllio.pc @ONLY)
@@ -450,14 +450,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${LLIO_CMAKECONFIG_INSTALL_DIR}
+    ${llio_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${LLIO_VERSION}
+    ${llio_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -465,13 +465,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${LLIO_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${llio_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${LLIO_CMAKECONFIG_INSTALL_DIR}
+        ${llio_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -497,7 +497,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "llio")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${LLIO_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${llio_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Low-level I/O library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -506,12 +506,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${LLIO_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${LLIO_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${LLIO_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${LLIO_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "LLIO Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "LLIO Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${llio_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${llio_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${llio_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${llio_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "llio Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "llio Temporary CPack Directory")
 
     include(CPack)
 

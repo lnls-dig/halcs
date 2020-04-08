@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/libsdbfs.h"
-    _SDBFS_H_CONTENTS
+    _sdbfs_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define SDBFS_VERSION_MAJOR ([0-9]+).*"
-    "\\1" SDBFS_VERSION_MAJOR
-    "${_SDBFS_H_CONTENTS}"
+    "\\1" sdbfs_VERSION_MAJOR
+    "${_sdbfs_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define SDBFS_VERSION_MINOR ([0-9]+).*"
-    "\\1" SDBFS_VERSION_MINOR
-    "${_SDBFS_H_CONTENTS}"
+    "\\1" sdbfs_VERSION_MINOR
+    "${_sdbfs_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define SDBFS_VERSION_PATCH ([0-9]+).*"
-    "\\1" SDBFS_VERSION_PATCH
-    "${_SDBFS_H_CONTENTS}"
+    "\\1" sdbfs_VERSION_PATCH
+    "${_sdbfs_H_CONTENTS}"
 )
 
-set(SDBFS_VERSION
-    "${SDBFS_VERSION_MAJOR}.${SDBFS_VERSION_MINOR}.${SDBFS_VERSION_PATCH}"
+set(sdbfs_VERSION
+    "${sdbfs_VERSION_MAJOR}.${sdbfs_VERSION_MINOR}.${sdbfs_VERSION_PATCH}"
 )
 
-message(STATUS "Detected SDBFS Version - ${SDBFS_VERSION}")
+message(STATUS "Detected sdbfs Version - ${sdbfs_VERSION}")

@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(bpmclient)
 
 # set modules path for CMkake to find
-set(BPMCLIENT_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${BPMCLIENT_CMAKE_MODULES_DIR})
+set(bpmclient_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${bpmclient_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -37,7 +37,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (BPMCLIENT_OUTPUT_BASENAME "bpmclient"
+set (bpmclient_OUTPUT_BASENAME "bpmclient"
     CACHE STRING
     "Output bpmclient library base name"
 )
@@ -46,16 +46,16 @@ set (BPMCLIENT_OUTPUT_BASENAME "bpmclient"
 set(OPT_LIBRARIES_STATIC)
 
 ########################################################################
-# LIBZMQ dependency
+# libzmq dependency
 ########################################################################
 
 find_package(libzmq)
-if(LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    if(PC_LIBZMQ_FOUND)
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
     endif()
@@ -65,16 +65,16 @@ else()
 endif()
 
 #########################################################################
-# CZMQ dependency
+# czmq dependency
 #########################################################################
 
 find_package(czmq)
-if(CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    if(PC_CZMQ_FOUND)
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
     endif()
@@ -84,16 +84,16 @@ else()
 endif()
 
 #########################################################################
-# ERRHAND dependency
+# errhand dependency
 #########################################################################
 
 find_package(errhand)
-if(ERRHAND_FOUND)
-    include_directories(${ERRHAND_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-    if(PC_ERRHAND_FOUND)
+if(errhand_FOUND)
+    include_directories(${errhand_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+    if(PC_errhand_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
     endif()
@@ -103,16 +103,16 @@ else()
 endif()
 
 #########################################################################
-# DISPTABLE dependency
+# disptable dependency
 #########################################################################
 
 find_package(disptable)
-if(DISPTABLE_FOUND)
-    include_directories(${DISPTABLE_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${DISPTABLE_LIBRARIES})
-    if(PC_DISPTABLE_FOUND)
+if(disptable_FOUND)
+    include_directories(${disptable_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${disptable_LIBRARIES})
+    if(PC_disptable_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libdisptable")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_DISPTABLE_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_disptable_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -ldisptable")
     endif()
@@ -122,16 +122,16 @@ else()
 endif()
 
 #########################################################################
-# HUTILS dependency
+# hutils dependency
 #########################################################################
 
 find_package(hutils)
-if(HUTILS_FOUND)
-    include_directories(${HUTILS_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${HUTILS_LIBRARIES})
-    if(PC_HUTILS_FOUND)
+if(hutils_FOUND)
+    include_directories(${hutils_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${hutils_LIBRARIES})
+    if(PC_hutils_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libhutils")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_HUTILS_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_hutils_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lhutils")
     endif()
@@ -141,16 +141,16 @@ else()
 endif()
 
 #########################################################################
-# MLM dependency
+# mlm dependency
 #########################################################################
 
 find_package(mlm)
-if(MLM_FOUND)
-    include_directories(${MLM_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${MLM_LIBRARIES})
-    if(PC_MLM_FOUND)
+if(mlm_FOUND)
+    include_directories(${mlm_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${mlm_LIBRARIES})
+    if(PC_mlm_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libmlm")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_MLM_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_mlm_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lmlm")
     endif()
@@ -160,16 +160,16 @@ else()
 endif()
 
 #########################################################################
-# HALCSCLIENT dependency
+# halcsclient dependency
 #########################################################################
 
 find_package(halcsclient)
-if(HALCSCLIENT_FOUND)
-    include_directories(${HALCSCLIENT_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${HALCSCLIENT_LIBRARIES})
-    if(PC_HALCSCLIENT_FOUND)
+if(halcsclient_FOUND)
+    include_directories(${halcsclient_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${halcsclient_LIBRARIES})
+    if(PC_halcsclient_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libhalcsclient")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_HALCSCLIENT_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_halcsclient_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lhalcsclient")
     endif()
@@ -179,16 +179,16 @@ else()
 endif()
 
 #########################################################################
-# ACQCLIENT dependency
+# acqclient dependency
 #########################################################################
 
 find_package(acqclient)
-if(ACQCLIENT_FOUND)
-    include_directories(${ACQCLIENT_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ACQCLIENT_LIBRARIES})
-    if(PC_ACQCLIENT_FOUND)
+if(acqclient_FOUND)
+    include_directories(${acqclient_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${acqclient_LIBRARIES})
+    if(PC_acqclient_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libacqclient")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ACQCLIENT_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_acqclient_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lacqclient")
     endif()
@@ -342,9 +342,9 @@ if(BUILD_SHARED)
     set_target_properties(bpmclient PROPERTIES
         PUBLIC_HEADER "${bpmclient_public_headers}"
         SOVERSION "1"
-        VERSION "${BPMCLIENT_VERSION}"
+        VERSION "${bpmclient_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${BPMCLIENT_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${bpmclient_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -359,7 +359,7 @@ if(BUILD_STATIC)
 
     set_target_properties(bpmclient-static PROPERTIES
       PUBLIC_HEADER "${bpmclient_public_headers}"
-      OUTPUT_NAME "${BPMCLIENT_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${bpmclient_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -434,7 +434,7 @@ install(TARGETS ${target_outputs} bpmclient_compiler_flags
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(BPMCLIENT_CMAKECONFIG_INSTALL_DIR
+set(bpmclient_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for bpmclientConfig.cmake and bpmclientTargets.cmake"
@@ -453,7 +453,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${BPMCLIENT_VERSION_MAJOR}.${BPMCLIENT_VERSION_MINOR}.${BPMCLIENT_VERSION_PATCH}
+    ${bpmclient_VERSION_MAJOR}.${bpmclient_VERSION_MINOR}.${bpmclient_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libbpmclient.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libbpmclient.pc @ONLY)
@@ -478,14 +478,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${BPMCLIENT_CMAKECONFIG_INSTALL_DIR}
+    ${bpmclient_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${BPMCLIENT_VERSION}
+    ${bpmclient_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -493,13 +493,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${BPMCLIENT_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${bpmclient_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${BPMCLIENT_CMAKECONFIG_INSTALL_DIR}
+        ${bpmclient_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -525,7 +525,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "bpmclient")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${BPMCLIENT_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${bpmclient_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS BPM library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -534,12 +534,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${BPMCLIENT_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${BPMCLIENT_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${BPMCLIENT_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${BPMCLIENT_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "BPMCLIENT Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "BPMCLIENT Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${bpmclient_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${bpmclient_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${bpmclient_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${bpmclient_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "bpmclient Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "bpmclient Temporary CPack Directory")
 
     include(CPack)
 

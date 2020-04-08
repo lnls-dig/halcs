@@ -3,22 +3,22 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_LIBZMQ "libzmq")
-    if (PC_LIBZMQ_FOUND)
+    pkg_check_modules(PC_libzmq "libzmq")
+    if (PC_libzmq_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_LIBZMQ_CFLAGS} ${PC_LIBZMQ_CFLAGS_OTHER})
+        add_definitions(${PC_libzmq_CFLAGS} ${PC_libzmq_CFLAGS_OTHER})
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
-        set(PC_LIBZMQ_INCLUDE_HINTS ${PC_LIBZMQ_INCLUDE_DIRS} ${PC_LIBZMQ_INCLUDE_DIRS}/*)
-        set(PC_LIBZMQ_LIBRARY_HINTS ${PC_LIBZMQ_LIBRARY_DIRS} ${PC_LIBZMQ_LIBRARY_DIRS}/*)
-    endif(PC_LIBZMQ_FOUND)
+        set(PC_libzmq_INCLUDE_HINTS ${PC_libzmq_INCLUDE_DIRS} ${PC_libzmq_INCLUDE_DIRS}/*)
+        set(PC_libzmq_LIBRARY_HINTS ${PC_libzmq_LIBRARY_DIRS} ${PC_libzmq_LIBRARY_DIRS}/*)
+    endif(PC_libzmq_FOUND)
 endif (NOT MSVC)
 
 find_path (
-    LIBZMQ_INCLUDE_DIRS
+    libzmq_INCLUDE_DIRS
     NAMES zmq.h
-    HINTS ${PC_LIBZMQ_INCLUDE_HINTS}
+    HINTS ${PC_libzmq_INCLUDE_HINTS}
 )
 
 if (MSVC)
@@ -32,7 +32,7 @@ if (MSVC)
     endif ()
 
     # Retrieve ZeroMQ version number from zmq.h
-    file(STRINGS "${LIBZMQ_INCLUDE_DIRS}/zmq.h" zmq_version_defines
+    file(STRINGS "${libzmq_INCLUDE_DIRS}/zmq.h" zmq_version_defines
         REGEX "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH)")
     foreach(ver ${zmq_version_defines})
         if(ver MATCHES "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -56,33 +56,33 @@ if (MSVC)
         "libzmq-mt-s-${_zmq_version}" # Release|RelWithDebInfo|MinSizeRel, BUILD_STATIC
     )
 
-    find_library (LIBZMQ_LIBRARY_DEBUG
+    find_library (libzmq_LIBRARY_DEBUG
         NAMES ${_zmq_debug_names}
     )
 
-    find_library (LIBZMQ_LIBRARY_RELEASE
+    find_library (libzmq_LIBRARY_RELEASE
         NAMES ${_zmq_release_names}
     )
 
     include(SelectLibraryConfigurations)
-    select_library_configurations(LIBZMQ)
+    select_library_configurations(libzmq)
 endif ()
 
-if (NOT LIBZMQ_LIBRARIES)
+if (NOT libzmq_LIBRARIES)
     find_library (
-        LIBZMQ_LIBRARIES
+        libzmq_LIBRARIES
         NAMES libzmq zmq
-        HINTS ${PC_LIBZMQ_LIBRARY_HINTS}
+        HINTS ${PC_libzmq_LIBRARY_HINTS}
     )
 endif ()
 
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    LIBZMQ
-    REQUIRED_VARS LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+    libzmq
+    REQUIRED_VARS libzmq_LIBRARIES libzmq_INCLUDE_DIRS
 )
 mark_as_advanced(
-    LIBZMQ_FOUND
-    LIBZMQ_LIBRARIES LIBZMQ_INCLUDE_DIRS
+    libzmq_FOUND
+    libzmq_LIBRARIES libzmq_INCLUDE_DIRS
 )

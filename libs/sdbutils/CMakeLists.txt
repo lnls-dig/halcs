@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(sdbutils)
 
 # set modules path for CMkake to find
-set(SDBUTILS_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${SDBUTILS_CMAKE_MODULES_DIR})
+set(sdbutils_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${sdbutils_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -35,7 +35,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (SDBUTILS_OUTPUT_BASENAME "sdbutils"
+set (sdbutils_OUTPUT_BASENAME "sdbutils"
     CACHE STRING
     "Output sdbutils library base name"
 )
@@ -44,16 +44,21 @@ set (SDBUTILS_OUTPUT_BASENAME "sdbutils"
 set(OPT_LIBRARIES_STATIC)
 
 #########################################################################
-# ERRHAND dependency
+# errhand dependency
 #########################################################################
 
 find_package(errhand)
-if(ERRHAND_FOUND)
-    include_directories(${ERRHAND_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-    if(PC_ERRHAND_FOUND)
+if(NOT errhand_FOUND)
+    message(STATUS
+        "errhand not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(errhand CONFIG)
+endif()
+if(errhand_FOUND)
+    include_directories(${errhand_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+    if(PC_errhand_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
     endif()
@@ -63,16 +68,21 @@ else()
 endif()
 
 #########################################################################
-# SDBFS dependency
+# sdbfs dependency
 #########################################################################
 
 find_package(sdbfs)
-if(SDBFS_FOUND)
-    include_directories(${SDBFS_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${SDBFS_LIBRARIES})
-    if(PC_SDBFS_FOUND)
+if(NOT sdbfs_FOUND)
+    message(STATUS
+        "sdbfs not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(sdbfs CONFIG)
+endif()
+if(sdbfs_FOUND)
+    include_directories(${sdbfs_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${sdbfs_LIBRARIES})
+    if(PC_sdbfs_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libsdbfs")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_SDBFS_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_sdbfs_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lsdbfs")
     endif()
@@ -214,9 +224,9 @@ if(BUILD_SHARED)
     set_target_properties(sdbutils PROPERTIES
         PUBLIC_HEADER "${sdbutils_public_headers}"
         SOVERSION "1"
-        VERSION "${SDBUTILS_VERSION}"
+        VERSION "${sdbutils_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${SDBUTILS_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${sdbutils_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -231,7 +241,7 @@ if(BUILD_STATIC)
 
     set_target_properties(sdbutils-static PROPERTIES
       PUBLIC_HEADER "${sdbutils_public_headers}"
-      OUTPUT_NAME "${SDBUTILS_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${sdbutils_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -306,7 +316,7 @@ install(TARGETS ${target_outputs} sdbutils_compiler_flags
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(SDBUTILS_CMAKECONFIG_INSTALL_DIR
+set(sdbutils_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for sdbutilsConfig.cmake and sdbutilsTargets.cmake"
@@ -325,7 +335,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${SDBUTILS_VERSION_MAJOR}.${SDBUTILS_VERSION_MINOR}.${SDBUTILS_VERSION_PATCH}
+    ${sdbutils_VERSION_MAJOR}.${sdbutils_VERSION_MINOR}.${sdbutils_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libsdbutils.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libsdbutils.pc @ONLY)
@@ -350,14 +360,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${SDBUTILS_CMAKECONFIG_INSTALL_DIR}
+    ${sdbutils_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${SDBUTILS_VERSION}
+    ${sdbutils_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -365,13 +375,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${SDBUTILS_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${sdbutils_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${SDBUTILS_CMAKECONFIG_INSTALL_DIR}
+        ${sdbutils_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -397,7 +407,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "sdbutils")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${SDBUTILS_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${sdbutils_VERSION}-${arch_name}"
     )
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB utilities library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -406,12 +416,12 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB utilities library")
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${SDBUTILS_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${SDBUTILS_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${SDBUTILS_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${SDBUTILS_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "SDBUTILS Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "SDBUTILS Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${sdbutils_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${sdbutils_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${sdbutils_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${sdbutils_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "sdbutils Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "sdbutils Temporary CPack Directory")
 
     include(CPack)
 

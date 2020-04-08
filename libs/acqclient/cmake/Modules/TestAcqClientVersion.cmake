@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/acq_client_classes.h"
-    _ACQCLIENT_H_CONTENTS
+    _acqclient_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define ACQ_CLIENT_VERSION_MAJOR ([0-9]+).*"
-    "\\1" ACQCLIENT_VERSION_MAJOR
-    "${_ACQCLIENT_H_CONTENTS}"
+    "\\1" acqclient_VERSION_MAJOR
+    "${_acqclient_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define ACQ_CLIENT_VERSION_MINOR ([0-9]+).*"
-    "\\1" ACQCLIENT_VERSION_MINOR
-    "${_ACQCLIENT_H_CONTENTS}"
+    "\\1" acqclient_VERSION_MINOR
+    "${_acqclient_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define ACQ_CLIENT_VERSION_PATCH ([0-9]+).*"
-    "\\1" ACQCLIENT_VERSION_PATCH
-    "${_ACQCLIENT_H_CONTENTS}"
+    "\\1" acqclient_VERSION_PATCH
+    "${_acqclient_H_CONTENTS}"
 )
 
-set(ACQCLIENT_VERSION
-    "${ACQCLIENT_VERSION_MAJOR}.${ACQCLIENT_VERSION_MINOR}.${ACQCLIENT_VERSION_PATCH}"
+set(acqclient_VERSION
+    "${acqclient_VERSION_MAJOR}.${acqclient_VERSION_MINOR}.${acqclient_VERSION_PATCH}"
 )
 
-message(STATUS "Detected ACQCLIENT Version - ${ACQCLIENT_VERSION}")
+message(STATUS "Detected acqclient Version - ${acqclient_VERSION}")

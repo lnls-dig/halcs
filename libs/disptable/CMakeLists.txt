@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(disptable)
 
 # set modules path for CMkake to find
-set(DISPTABLE_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${DISPTABLE_CMAKE_MODULES_DIR})
+set(disptable_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${disptable_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -35,7 +35,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (DISPTABLE_OUTPUT_BASENAME "disptable"
+set (disptable_OUTPUT_BASENAME "disptable"
     CACHE STRING
     "Output disptable library base name"
 )
@@ -44,16 +44,16 @@ set (DISPTABLE_OUTPUT_BASENAME "disptable"
 set(OPT_LIBRARIES_STATIC)
 
 ########################################################################
-# LIBZMQ dependency
+# libzmq dependency
 ########################################################################
 
 find_package(libzmq)
-if(LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    if(PC_LIBZMQ_FOUND)
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
     endif()
@@ -63,16 +63,16 @@ else()
 endif()
 
 #########################################################################
-# CZMQ dependency
+# czmq dependency
 #########################################################################
 
 find_package(czmq)
-if(CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    if(PC_CZMQ_FOUND)
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
     endif()
@@ -82,16 +82,16 @@ else()
 endif()
 
 #########################################################################
-# ERRHAND dependency
+# errhand dependency
 #########################################################################
 
 find_package(errhand)
-if(ERRHAND_FOUND)
-    include_directories(${ERRHAND_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-    if(PC_ERRHAND_FOUND)
+if(errhand_FOUND)
+    include_directories(${errhand_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+    if(PC_errhand_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
     endif()
@@ -101,16 +101,16 @@ else()
 endif()
 
 #########################################################################
-# HUTILS dependency
+# hutils dependency
 #########################################################################
 
 find_package(hutils)
-if(HUTILS_FOUND)
-    include_directories(${HUTILS_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${HUTILS_LIBRARIES})
-    if(PC_HUTILS_FOUND)
+if(hutils_FOUND)
+    include_directories(${hutils_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${hutils_LIBRARIES})
+    if(PC_hutils_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libhutils")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_HUTILS_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_hutils_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lhutils")
     endif()
@@ -252,9 +252,9 @@ if(BUILD_SHARED)
     set_target_properties(disptable PROPERTIES
         PUBLIC_HEADER "${disptable_public_headers}"
         SOVERSION "1"
-        VERSION "${DISPTABLE_VERSION}"
+        VERSION "${disptable_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${DISPTABLE_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${disptable_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -269,7 +269,7 @@ if(BUILD_STATIC)
 
     set_target_properties(disptable-static PROPERTIES
       PUBLIC_HEADER "${disptable_public_headers}"
-      OUTPUT_NAME "${DISPTABLE_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${disptable_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -344,7 +344,7 @@ install(TARGETS ${target_outputs} disptable_compiler_flags
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(DISPTABLE_CMAKECONFIG_INSTALL_DIR
+set(disptable_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for disptableConfig.cmake and disptableTargets.cmake"
@@ -363,7 +363,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${DISPTABLE_VERSION_MAJOR}.${DISPTABLE_VERSION_MINOR}.${DISPTABLE_VERSION_PATCH}
+    ${disptable_VERSION_MAJOR}.${disptable_VERSION_MINOR}.${disptable_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libdisptable.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libdisptable.pc @ONLY)
@@ -388,14 +388,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${DISPTABLE_CMAKECONFIG_INSTALL_DIR}
+    ${disptable_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${DISPTABLE_VERSION}
+    ${disptable_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -403,13 +403,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${DISPTABLE_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${disptable_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${DISPTABLE_CMAKECONFIG_INSTALL_DIR}
+        ${disptable_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -435,7 +435,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "disptable")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${DISPTABLE_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${disptable_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Dispatch Table library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -444,12 +444,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${DISPTABLE_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${DISPTABLE_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${DISPTABLE_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${DISPTABLE_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "DISPTABLE Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "DISPTABLE Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${disptable_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${disptable_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${disptable_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${disptable_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "disptable Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "disptable Temporary CPack Directory")
 
     include(CPack)
 

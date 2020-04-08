@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(halcsclient)
 
 # set modules path for CMkake to find
-set(HALCSCLIENT_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${HALCSCLIENT_CMAKE_MODULES_DIR})
+set(halcsclient_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${halcsclient_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -37,7 +37,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (HALCSCLIENT_OUTPUT_BASENAME "halcsclient"
+set (halcsclient_OUTPUT_BASENAME "halcsclient"
     CACHE STRING
     "Output halcsclient library base name"
 )
@@ -46,16 +46,16 @@ set (HALCSCLIENT_OUTPUT_BASENAME "halcsclient"
 set(OPT_LIBRARIES_STATIC)
 
 ########################################################################
-# LIBZMQ dependency
+# libzmq dependency
 ########################################################################
 
 find_package(libzmq)
-if(LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    if(PC_LIBZMQ_FOUND)
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
     endif()
@@ -65,16 +65,16 @@ else()
 endif()
 
 #########################################################################
-# CZMQ dependency
+# czmq dependency
 #########################################################################
 
 find_package(czmq)
-if(CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    if(PC_CZMQ_FOUND)
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
     endif()
@@ -84,16 +84,16 @@ else()
 endif()
 
 #########################################################################
-# ERRHAND dependency
+# errhand dependency
 #########################################################################
 
 find_package(errhand)
-if(ERRHAND_FOUND)
-    include_directories(${ERRHAND_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-    if(PC_ERRHAND_FOUND)
+if(errhand_FOUND)
+    include_directories(${errhand_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+    if(PC_errhand_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
     endif()
@@ -103,16 +103,16 @@ else()
 endif()
 
 #########################################################################
-# DISPTABLE dependency
+# disptable dependency
 #########################################################################
 
 find_package(disptable)
-if(DISPTABLE_FOUND)
-    include_directories(${DISPTABLE_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${DISPTABLE_LIBRARIES})
-    if(PC_DISPTABLE_FOUND)
+if(disptable_FOUND)
+    include_directories(${disptable_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${disptable_LIBRARIES})
+    if(PC_disptable_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libdisptable")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_DISPTABLE_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_disptable_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -ldisptable")
     endif()
@@ -122,16 +122,16 @@ else()
 endif()
 
 #########################################################################
-# HUTILS dependency
+# hutils dependency
 #########################################################################
 
 find_package(hutils)
-if(HUTILS_FOUND)
-    include_directories(${HUTILS_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${HUTILS_LIBRARIES})
-    if(PC_HUTILS_FOUND)
+if(hutils_FOUND)
+    include_directories(${hutils_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${hutils_LIBRARIES})
+    if(PC_hutils_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libhutils")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_HUTILS_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_hutils_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lhutils")
     endif()
@@ -141,16 +141,16 @@ else()
 endif()
 
 #########################################################################
-# MLM dependency
+# mlm dependency
 #########################################################################
 
 find_package(mlm)
-if(MLM_FOUND)
-    include_directories(${MLM_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${MLM_LIBRARIES})
-    if(PC_MLM_FOUND)
+if(mlm_FOUND)
+    include_directories(${mlm_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${mlm_LIBRARIES})
+    if(PC_mlm_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libmlm")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_MLM_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_mlm_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lmlm")
     endif()
@@ -208,7 +208,7 @@ endif()
 # Source files
 
 #######################################
-# HALCSCLIENT sources definitions
+# halcsclient sources definitions
 #######################################
 
 set(halcsclient_sources
@@ -258,7 +258,7 @@ list(APPEND halcsclient_public_dirs "")
 list(APPEND halcsclient_other_search_dirs "")
 
 #######################################
-# HALCSCLIENT header definitions
+# halcsclient header definitions
 #######################################
 
 # Ugly and weird set of sources outside the source directory
@@ -471,18 +471,18 @@ set(readme-docs
 
 # which board do we want.
 
-set(HALCSCLIENT_BOARD_OPT "AFCV3_1" CACHE STRING
+set(halcsclient_BOARD_OPT "AFCV3_1" CACHE STRING
     "HALCS board")
-set(HALCSCLIENT_BOARD_VALUES
+set(halcsclient_BOARD_VALUES
     "ML605;AFCV3;AFCV3_1"
 )
 
-set_property(CACHE HALCSCLIENT_BOARD_OPT PROPERTY STRINGS
-    ${HALCSCLIENT_BOARD_VALUES}
+set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
+    ${halcsclient_BOARD_VALUES}
 )
 
 message(STATUS
-    "Setting compile-time option HALCSCLIENT_BOARD='${HALCSCLIENT_BOARD_OPT}'")
+    "Setting compile-time option halcsclient_BOARD='${halcsclient_BOARD_OPT}'")
 
 ########################################################################
 # Library declaration
@@ -507,15 +507,15 @@ set_target_properties(halcsclient-objects PROPERTIES
 string(APPEND halcsclient_board_definitions "")
 
 # setting board macros
-if(HALCSCLIENT_BOARD_OPT STREQUAL ML605)
+if(halcsclient_BOARD_OPT STREQUAL ML605)
     list(APPEND halcsclient_board_definitions
         __BOARD_ML605__
     )
-elseif(HALCSCLIENT_BOARD_OPT STREQUAL AFCV3)
+elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
     list(APPEND halcsclient_board_definitions
         __BOARD_AFCV3__
     )
-elseif(HALCSCLIENT_BOARD_OPT STREQUAL AFCV3_1)
+elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
     list(APPEND halcsclient_board_definitions
         __BOARD_AFCV3__
         __BOARD_AFCV3_1__
@@ -597,9 +597,9 @@ if(BUILD_SHARED)
     set_target_properties(halcsclient PROPERTIES
         PUBLIC_HEADER "${halcsclient_public_headers}"
         SOVERSION "1"
-        VERSION "${HALCSCLIENT_VERSION}"
+        VERSION "${halcsclient_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${HALCSCLIENT_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${halcsclient_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -614,7 +614,7 @@ if(BUILD_STATIC)
 
     set_target_properties(halcsclient-static PROPERTIES
       PUBLIC_HEADER "${halcsclient_public_headers}"
-      OUTPUT_NAME "${HALCSCLIENT_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${halcsclient_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -698,7 +698,7 @@ install(DIRECTORY
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(HALCSCLIENT_CMAKECONFIG_INSTALL_DIR
+set(halcsclient_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for halcsclientConfig.cmake and halcsclientTargets.cmake"
@@ -717,7 +717,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${HALCSCLIENT_VERSION_MAJOR}.${HALCSCLIENT_VERSION_MINOR}.${HALCSCLIENT_VERSION_PATCH}
+    ${halcsclient_VERSION_MAJOR}.${halcsclient_VERSION_MINOR}.${halcsclient_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libhalcsclient.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libhalcsclient.pc @ONLY)
@@ -742,14 +742,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${HALCSCLIENT_CMAKECONFIG_INSTALL_DIR}
+    ${halcsclient_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${HALCSCLIENT_VERSION}
+    ${halcsclient_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -757,13 +757,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${HALCSCLIENT_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${halcsclient_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${HALCSCLIENT_CMAKECONFIG_INSTALL_DIR}
+        ${halcsclient_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -789,7 +789,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "halcsclient")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${HALCSCLIENT_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${halcsclient_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -798,12 +798,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${HALCSCLIENT_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${HALCSCLIENT_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${HALCSCLIENT_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${HALCSCLIENT_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "HALCSCLIENT Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "HALCSCLIENT Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${halcsclient_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${halcsclient_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${halcsclient_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${halcsclient_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsclient Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "halcsclient Temporary CPack Directory")
 
     include(CPack)
 

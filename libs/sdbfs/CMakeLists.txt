@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(sdbfs)
 
 # set modules path for CMkake to find
-set(SDBFS_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${SDBFS_CMAKE_MODULES_DIR})
+set(sdbfs_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${sdbfs_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -35,7 +35,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (SDBFS_OUTPUT_BASENAME "sdbfs"
+set (sdbfs_OUTPUT_BASENAME "sdbfs"
     CACHE STRING
     "Output sdbfs library base name"
 )
@@ -197,9 +197,9 @@ if(BUILD_SHARED)
     set_target_properties(sdbfs PROPERTIES
         PUBLIC_HEADER "${sdbfs_public_headers}"
         SOVERSION "1"
-        VERSION "${SDBFS_VERSION}"
+        VERSION "${sdbfs_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${SDBFS_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${sdbfs_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -215,7 +215,7 @@ if(BUILD_STATIC)
 
     set_target_properties(sdbfs-static PROPERTIES
       PUBLIC_HEADER "${sdbfs_public_headers}"
-      OUTPUT_NAME "${SDBFS_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${sdbfs_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -287,9 +287,9 @@ list(APPEND bin_target_outputs "")
 # Binaries declaration
 ########################################################################
 
-option(BUILD_GENSDBFS "Whether or not to build gensdbfs tool" ON)
+option(BUILD_GENsdbfs "Whether or not to build gensdbfs tool" ON)
 
-if(BUILD_GENSDBFS)
+if(BUILD_GENsdbfs)
     list(APPEND bin_target_outputs "gensdbfs")
 endif()
 
@@ -352,19 +352,19 @@ if(BUILD_SDB_READ_LNLS)
 
     # lots of dependencies for sdb-read-lnls
     ########################################################################
-    # LIBZMQ dependency
+    # libzmq dependency
     ########################################################################
 
     find_package(libzmq)
-    if(LIBZMQ_FOUND)
+    if(libzmq_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
-            ${LIBZMQ_INCLUDE_DIRS}
+            ${libzmq_INCLUDE_DIRS}
         )
-        list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-        if(PC_LIBZMQ_FOUND)
+        list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+        if(PC_libzmq_FOUND)
             set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-            list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
         else()
             set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
         endif()
@@ -374,19 +374,19 @@ if(BUILD_SDB_READ_LNLS)
     endif()
 
     #########################################################################
-    # CZMQ dependency
+    # czmq dependency
     #########################################################################
 
     find_package(czmq)
-    if(CZMQ_FOUND)
+    if(czmq_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
-            ${CZMQ_INCLUDE_DIRS}
+            ${czmq_INCLUDE_DIRS}
         )
-        list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-        if(PC_CZMQ_FOUND)
+        list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+        if(PC_czmq_FOUND)
             set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-            list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
         else()
             set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
         endif()
@@ -396,19 +396,19 @@ if(BUILD_SDB_READ_LNLS)
     endif()
 
     #########################################################################
-    # ERRHAND dependency
+    # errhand dependency
     #########################################################################
 
     find_package(errhand)
-    if(ERRHAND_FOUND)
+    if(errhand_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
-            ${ERRHAND_INCLUDE_DIRS}
+            ${errhand_INCLUDE_DIRS}
         )
-        list(APPEND MORE_LIBRARIES ${ERRHAND_LIBRARIES})
-        if(PC_ERRHAND_FOUND)
+        list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
+        if(PC_errhand_FOUND)
             set(pkg_config_names_private "${pkg_config_names_private} liberrhand")
-            list(APPEND OPT_LIBRARIES_STATIC ${PC_ERRHAND_STATIC_LDFLAGS})
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_errhand_STATIC_LDFLAGS})
         else()
             set(pkg_config_libs_private "${pkg_config_libs_private} -lerrhand")
         endif()
@@ -418,19 +418,19 @@ if(BUILD_SDB_READ_LNLS)
     endif()
 
     #########################################################################
-    # CONVC dependency
+    # convc dependency
     #########################################################################
 
     find_package(convc)
-    if(CONVC_FOUND)
+    if(convc_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
-            ${CONVC_INCLUDE_DIRS}
+            ${convc_INCLUDE_DIRS}
         )
-        list(APPEND MORE_LIBRARIES ${CONVC_LIBRARIES})
-        if(PC_CONVC_FOUND)
+        list(APPEND MORE_LIBRARIES ${convc_LIBRARIES})
+        if(PC_convc_FOUND)
             set(pkg_config_names_private "${pkg_config_names_private} libconvc")
-            list(APPEND OPT_LIBRARIES_STATIC ${PC_CONVC_STATIC_LDFLAGS})
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_convc_STATIC_LDFLAGS})
         else()
             set(pkg_config_libs_private "${pkg_config_libs_private} -lconvc")
         endif()
@@ -465,19 +465,19 @@ if(BUILD_SDB_READ_LNLS)
     #endif()
 
     #########################################################################
-    # LLIO dependency
+    # llio dependency
     #########################################################################
 
     find_package(llio)
-    if(LLIO_FOUND)
+    if(llio_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
-            ${LLIO_INCLUDE_DIRS}
+            ${llio_INCLUDE_DIRS}
         )
-        list(APPEND MORE_LIBRARIES ${LLIO_LIBRARIES})
-        if(PC_LLIO_FOUND)
+        list(APPEND MORE_LIBRARIES ${llio_LIBRARIES})
+        if(PC_llio_FOUND)
             set(pkg_config_names_private "${pkg_config_names_private} libllio")
-            list(APPEND OPT_LIBRARIES_STATIC ${PC_LLIO_STATIC_LDFLAGS})
+            list(APPEND OPT_LIBRARIES_STATIC ${PC_llio_STATIC_LDFLAGS})
         else()
             set(pkg_config_libs_private "${pkg_config_libs_private} -lllio")
         endif()
@@ -541,7 +541,7 @@ install(DIRECTORY
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(SDBFS_CMAKECONFIG_INSTALL_DIR
+set(sdbfs_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for sdbfsConfig.cmake and sdbfsTargets.cmake"
@@ -560,7 +560,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${SDBFS_VERSION_MAJOR}.${SDBFS_VERSION_MINOR}.${SDBFS_VERSION_PATCH}
+    ${sdbfs_VERSION_MAJOR}.${sdbfs_VERSION_MINOR}.${sdbfs_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libsdbfs.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libsdbfs.pc @ONLY)
@@ -585,14 +585,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${SDBFS_CMAKECONFIG_INSTALL_DIR}
+    ${sdbfs_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${SDBFS_VERSION}
+    ${sdbfs_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -600,13 +600,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${SDBFS_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${sdbfs_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${SDBFS_CMAKECONFIG_INSTALL_DIR}
+        ${sdbfs_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -632,7 +632,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "sdbfs")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${SDBFS_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${sdbfs_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB filesystem library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -641,12 +641,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${SDBFS_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${SDBFS_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${SDBFS_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${SDBFS_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "SDBFS Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "SDBFS Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${sdbfs_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${sdbfs_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${sdbfs_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${sdbfs_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "sdbfs Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "sdbfs Temporary CPack Directory")
 
     include(CPack)
 

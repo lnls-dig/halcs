@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/errhand_classes.h"
-    _ERRHAND_H_CONTENTS
+    _errhand_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define ERRHAND_VERSION_MAJOR ([0-9]+).*"
-    "\\1" ERRHAND_VERSION_MAJOR
-    "${_ERRHAND_H_CONTENTS}"
+    "\\1" errhand_VERSION_MAJOR
+    "${_errhand_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define ERRHAND_VERSION_MINOR ([0-9]+).*"
-    "\\1" ERRHAND_VERSION_MINOR
-    "${_ERRHAND_H_CONTENTS}"
+    "\\1" errhand_VERSION_MINOR
+    "${_errhand_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define ERRHAND_VERSION_PATCH ([0-9]+).*"
-    "\\1" ERRHAND_VERSION_PATCH
-    "${_ERRHAND_H_CONTENTS}"
+    "\\1" errhand_VERSION_PATCH
+    "${_errhand_H_CONTENTS}"
 )
 
-set(ERRHAND_VERSION
-    "${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}"
+set(errhand_VERSION
+    "${errhand_VERSION_MAJOR}.${errhand_VERSION_MINOR}.${errhand_VERSION_PATCH}"
 )
 
-message(STATUS "Detected ERRHAND Version - ${ERRHAND_VERSION}")
+message(STATUS "Detected errhand Version - ${errhand_VERSION}")

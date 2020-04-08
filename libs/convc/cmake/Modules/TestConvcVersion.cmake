@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/convc_classes.h"
-    _CONVC_H_CONTENTS
+    _convc_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define CONVC_VERSION_MAJOR ([0-9]+).*"
-    "\\1" CONVC_VERSION_MAJOR
-    "${_CONVC_H_CONTENTS}"
+    "\\1" convc_VERSION_MAJOR
+    "${_convc_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define CONVC_VERSION_MINOR ([0-9]+).*"
-    "\\1" CONVC_VERSION_MINOR
-    "${_CONVC_H_CONTENTS}"
+    "\\1" convc_VERSION_MINOR
+    "${_convc_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define CONVC_VERSION_PATCH ([0-9]+).*"
-    "\\1" CONVC_VERSION_PATCH
-    "${_CONVC_H_CONTENTS}"
+    "\\1" convc_VERSION_PATCH
+    "${_convc_H_CONTENTS}"
 )
 
-set(CONVC_VERSION
-    "${CONVC_VERSION_MAJOR}.${CONVC_VERSION_MINOR}.${CONVC_VERSION_PATCH}"
+set(convc_VERSION
+    "${convc_VERSION_MAJOR}.${convc_VERSION_MINOR}.${convc_VERSION_PATCH}"
 )
 
-message(STATUS "Detected CONVC Version - ${CONVC_VERSION}")
+message(STATUS "Detected convc Version - ${convc_VERSION}")

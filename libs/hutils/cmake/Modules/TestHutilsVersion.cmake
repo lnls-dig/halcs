@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/hutils_classes.h"
-    _HUTILS_H_CONTENTS
+    _hutils_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define HUTILS_VERSION_MAJOR ([0-9]+).*"
-    "\\1" HUTILS_VERSION_MAJOR
-    "${_HUTILS_H_CONTENTS}"
+    "\\1" hutils_VERSION_MAJOR
+    "${_hutils_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define HUTILS_VERSION_MINOR ([0-9]+).*"
-    "\\1" HUTILS_VERSION_MINOR
-    "${_HUTILS_H_CONTENTS}"
+    "\\1" hutils_VERSION_MINOR
+    "${_hutils_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define HUTILS_VERSION_PATCH ([0-9]+).*"
-    "\\1" HUTILS_VERSION_PATCH
-    "${_HUTILS_H_CONTENTS}"
+    "\\1" hutils_VERSION_PATCH
+    "${_hutils_H_CONTENTS}"
 )
 
-set(HUTILS_VERSION
-    "${HUTILS_VERSION_MAJOR}.${HUTILS_VERSION_MINOR}.${HUTILS_VERSION_PATCH}"
+set(hutils_VERSION
+    "${hutils_VERSION_MAJOR}.${hutils_VERSION_MINOR}.${hutils_VERSION_PATCH}"
 )
 
-message(STATUS "Detected HUTILS Version - ${HUTILS_VERSION}")
+message(STATUS "Detected hutils Version - ${hutils_VERSION}")

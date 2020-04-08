@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 3.10)
 project(errhand)
 
 # set modules path for CMkake to find
-set(ERRHAND_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
-list(APPEND CMAKE_MODULE_PATH ${ERRHAND_CMAKE_MODULES_DIR})
+set(errhand_CMAKE_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${errhand_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
@@ -35,7 +35,7 @@ set(pkg_config_defines "")
 set(CMAKE_DEBUG_POSTFIX d)
 
 # library basename
-set (ERRHAND_OUTPUT_BASENAME "errhand"
+set (errhand_OUTPUT_BASENAME "errhand"
     CACHE STRING
     "Output errhand library base name"
 )
@@ -44,16 +44,16 @@ set (ERRHAND_OUTPUT_BASENAME "errhand"
 set(OPT_LIBRARIES_STATIC)
 
 ########################################################################
-# LIBZMQ dependency
+# libzmq dependency
 ########################################################################
 
 find_package(libzmq)
-if(LIBZMQ_FOUND)
-    include_directories(${LIBZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${LIBZMQ_LIBRARIES})
-    if(PC_LIBZMQ_FOUND)
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libzmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_LIBZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_gibzmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lzmq")
     endif()
@@ -63,16 +63,16 @@ else()
 endif()
 
 #########################################################################
-# CZMQ dependency
+# czmq dependency
 #########################################################################
 
 find_package(czmq)
-if(CZMQ_FOUND)
-    include_directories(${CZMQ_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${CZMQ_LIBRARIES})
-    if(PC_CZMQ_FOUND)
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
         set(pkg_config_names_private "${pkg_config_names_private} libczmq")
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_CZMQ_STATIC_LDFLAGS})
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
     else()
         set(pkg_config_libs_private "${pkg_config_libs_private} -lczmq")
     endif()
@@ -164,46 +164,46 @@ set(readme-docs
 ########################################################################
 
 # should we use our errhand debug
-option(ERRHAND_DBG_OPT "Enable debug mode" ON)
-if(ERRHAND_DBG_OPT)
-    set(ERRHAND_DBG_OPT_VALUE y)
+option(errhand_DBG_OPT "Enable debug mode" ON)
+if(errhand_DBG_OPT)
+    set(errhand_DBG_OPT_VALUE y)
 else()
-    set(ERRHAND_DBG_OPT_VALUE n)
+    set(errhand_DBG_OPT_VALUE n)
 endif()
 
 message(STATUS
-    "Setting compile-time option ERRHAND_DBG='${ERRHAND_DBG_OPT_VALUE}'")
+    "Setting compile-time option errhand_DBG='${errhand_DBG_OPT_VALUE}'")
 
 # which debug level do we want
-set(ERRHAND_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
+set(errhand_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
     "Minimum debug level")
-set(ERRHAND_MIN_LEVEL_VALUES
+set(errhand_MIN_LEVEL_VALUES
     "DBG_LVL_TRACE;DBG_LVL_INFO;DBG_LVL_WARN;DBG_LVL_ERR;DBG_LVL_FATAL"
 )
 
-set_property(CACHE ERRHAND_MIN_LEVEL_OPT PROPERTY STRINGS
-    ${ERRHAND_MIN_LEVEL_VALUES}
+set_property(CACHE errhand_MIN_LEVEL_OPT PROPERTY STRINGS
+    ${errhand_MIN_LEVEL_VALUES}
 )
 
 message(STATUS
-    "Setting compile-time option ERRHAND_MIN_LEVEL='${ERRHAND_MIN_LEVEL_OPT}'")
+    "Setting compile-time option errhand_MIN_LEVEL='${errhand_MIN_LEVEL_OPT}'")
 
 # which subsystem do we want on.
 # Right now, the only option is all or none of them
-set(ERRHAND_SUBSYS_ON_OPT
+set(errhand_SUBSYS_ON_OPT
     "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS)"
     CACHE STRING
     "Set Subsystem On")
-set(ERRHAND_SUBSYS_ON_VALUES
+set(errhand_SUBSYS_ON_VALUES
     "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS);"
 )
 
-set_property(CACHE ERRHAND_SUBSYS_ON_OPT PROPERTY STRINGS
-    ${ERRHAND_SUBSYS_ON_VALUES}
+set_property(CACHE errhand_SUBSYS_ON_OPT PROPERTY STRINGS
+    ${errhand_SUBSYS_ON_VALUES}
 )
 
 message(STATUS
-    "Setting compile-time option ERRHAND_SUBSYS_ON='${ERRHAND_SUBSYS_ON_OPT}'")
+    "Setting compile-time option errhand_SUBSYS_ON='${errhand_SUBSYS_ON_OPT}'")
 
 
 ########################################################################
@@ -225,33 +225,33 @@ set_target_properties(errhand-objects PROPERTIES
 
 # setting compile options
 target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
+    ERRHAND_DBG=${errhand_DBG_OPT_VALUE}
 )
 
 # for .pc file
 string(APPEND
     pkg_config_defines
-    " -DERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}"
+    " -DERRHAND_DBG=${errhand_DBG_OPT_VALUE}"
 )
 
 target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
+    ERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}
 )
 
 # for .pc file
 string(APPEND
     pkg_config_defines
-    " -DERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}"
+    " -DERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}"
 )
 
 target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
+    ERRHAND_SUBSYS_ON=${errhand_SUBSYS_ON_OPT}
 )
 
 # for .pc file
 string(APPEND
     pkg_config_defines
-    " -DERRHAND_SUBSYS_ON=\"${ERRHAND_SUBSYS_ON_OPT}\""
+    " -DERRHAND_SUBSYS_ON=\"${errhand_SUBSYS_ON_OPT}\""
 )
 
 # add the binary tree to the search path for include files
@@ -299,9 +299,9 @@ if(BUILD_SHARED)
     set_target_properties(errhand PROPERTIES
         PUBLIC_HEADER "${errhand_public_headers}"
         SOVERSION "1"
-        VERSION "${ERRHAND_VERSION}"
+        VERSION "${errhand_VERSION}"
         COMPILE_DEFINITIONS "DLL_EXPORT"
-        OUTPUT_NAME "${ERRHAND_OUTPUT_BASENAME}"
+        OUTPUT_NAME "${errhand_OUTPUT_BASENAME}"
         PREFIX "lib")
 endif()
 
@@ -316,7 +316,7 @@ if(BUILD_STATIC)
 
     set_target_properties(errhand-static PROPERTIES
       PUBLIC_HEADER "${errhand_public_headers}"
-      OUTPUT_NAME "${ERRHAND_OUTPUT_BASENAME}"
+      OUTPUT_NAME "${errhand_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
 
@@ -391,7 +391,7 @@ install(TARGETS ${target_outputs} errhand_compiler_flags
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
 # for arch-independent, or LIBDIR for arch-dependent, plus "cmake" as prefix
-set(ERRHAND_CMAKECONFIG_INSTALL_DIR
+set(errhand_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING
     "install path for errhandConfig.cmake and errhandTargets.cmake"
@@ -410,7 +410,7 @@ set(exec_prefix \${prefix})
 set(libdir \${prefix}/lib)
 set(includedir \${prefix}/include)
 set(VERSION
-    ${ERRHAND_VERSION_MAJOR}.${ERRHAND_VERSION_MINOR}.${ERRHAND_VERSION_PATCH}
+    ${errhand_VERSION_MAJOR}.${errhand_VERSION_MINOR}.${errhand_VERSION_PATCH}
 )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/liberrhand.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/liberrhand.pc @ONLY)
@@ -435,14 +435,14 @@ configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
-    ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+    ${errhand_CMAKECONFIG_INSTALL_DIR}
 )
 
 # configure and generate <PROJECT_NAME>ConfigVersion.cmake file
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION
-    ${ERRHAND_VERSION}
+    ${errhand_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
@@ -450,13 +450,13 @@ write_basic_package_version_file(
 if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+        DESTINATION ${errhand_CMAKECONFIG_INSTALL_DIR}
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
-        ${ERRHAND_CMAKECONFIG_INSTALL_DIR}
+        ${errhand_CMAKECONFIG_INSTALL_DIR}
     )
 endif()
 
@@ -482,7 +482,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_PACKAGE_NAME "errhand")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${ERRHAND_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${errhand_VERSION}-${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Error Handling library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
@@ -491,12 +491,12 @@ if(ENABLE_CPACK)
     # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
     # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
     # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${ERRHAND_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${ERRHAND_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${ERRHAND_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${ERRHAND_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "ERRHAND Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "ERRHAND Temporary CPack Directory")
+    set(CPACK_PACKAGE_VERSION ${errhand_VERSION})
+    set(CPACK_PACKAGE_VERSION_MAJOR ${errhand_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${errhand_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${errhand_VERSION_PATCH})
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "errhand Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "errhand Temporary CPack Directory")
 
     include(CPack)
 

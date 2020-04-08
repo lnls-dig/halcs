@@ -2,27 +2,27 @@
 
 file(READ
     "${PROJECT_SOURCE_DIR}/include/sdbutils_classes.h"
-    _SDBUTILS_H_CONTENTS
+    _sdbutils_H_CONTENTS
 )
 
 string(REGEX REPLACE
     ".*#define SDBUTILS_VERSION_MAJOR ([0-9]+).*"
-    "\\1" SDBUTILS_VERSION_MAJOR
-    "${_SDBUTILS_H_CONTENTS}"
+    "\\1" sdbutils_VERSION_MAJOR
+    "${_sdbutils_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define SDBUTILS_VERSION_MINOR ([0-9]+).*"
-    "\\1" SDBUTILS_VERSION_MINOR
-    "${_SDBUTILS_H_CONTENTS}"
+    "\\1" sdbutils_VERSION_MINOR
+    "${_sdbutils_H_CONTENTS}"
 )
 string(REGEX REPLACE
     ".*#define SDBUTILS_VERSION_PATCH ([0-9]+).*"
-    "\\1" SDBUTILS_VERSION_PATCH
-    "${_SDBUTILS_H_CONTENTS}"
+    "\\1" sdbutils_VERSION_PATCH
+    "${_sdbutils_H_CONTENTS}"
 )
 
-set(SDBUTILS_VERSION
-    "${SDBUTILS_VERSION_MAJOR}.${SDBUTILS_VERSION_MINOR}.${SDBUTILS_VERSION_PATCH}"
+set(sdbutils_VERSION
+    "${sdbutils_VERSION_MAJOR}.${sdbutils_VERSION_MINOR}.${sdbutils_VERSION_PATCH}"
 )
 
-message(STATUS "Detected SDBUTILS Version - ${SDBUTILS_VERSION}")
+message(STATUS "Detected sdbutils Version - ${sdbutils_VERSION}")
