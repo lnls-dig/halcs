@@ -199,18 +199,18 @@ set(readme-docs
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${disptable_sources})
+# add sources to "library" disptable-objects
+add_library(disptable-objects OBJECT ${disptable_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build disptable-objects with position independent code on
+set_target_properties(disptable-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(disptable-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -225,7 +225,7 @@ get_target_property(disptable_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(disptable-objects
     PRIVATE
     ${disptable_compiler_features}
 )
@@ -235,7 +235,7 @@ get_target_property(disptable_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(disptable-objects
     PRIVATE
     ${disptable_compiler_options}
 )
@@ -243,7 +243,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(disptable SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:disptable-objects>
         ${disptable_public_headers}
         ${readme-docs}
         ${disptable-pkgconfig}
@@ -261,7 +261,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(disptable-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:disptable-objects>
         ${disptable_public_headers}
         ${readme-docs}
         ${disptable-pkgconfig}

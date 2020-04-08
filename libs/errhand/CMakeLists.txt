@@ -214,17 +214,17 @@ message(STATUS
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${errhand_sources})
+# add sources to "library" errhand-objects
+add_library(errhand-objects OBJECT ${errhand_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build errhand-objects with position independent code on
+set_target_properties(errhand-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
 
 # setting compile options
-target_compile_definitions(objects PUBLIC
+target_compile_definitions(errhand-objects PUBLIC
     ERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}
 )
 
@@ -234,7 +234,7 @@ string(APPEND
     " -DERRHAND_DBG=${ERRHAND_DBG_OPT_VALUE}"
 )
 
-target_compile_definitions(objects PUBLIC
+target_compile_definitions(errhand-objects PUBLIC
     ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}
 )
 
@@ -244,7 +244,7 @@ string(APPEND
     " -DERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL_OPT}"
 )
 
-target_compile_definitions(objects PUBLIC
+target_compile_definitions(errhand-objects PUBLIC
     ERRHAND_SUBSYS_ON=${ERRHAND_SUBSYS_ON_OPT}
 )
 
@@ -256,7 +256,7 @@ string(APPEND
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(errhand-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -272,7 +272,7 @@ get_target_property(errhand_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(errhand-objects
     PRIVATE
     ${errhand_compiler_features}
 )
@@ -282,7 +282,7 @@ get_target_property(errhand_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(errhand-objects
     PRIVATE
     ${errhand_compiler_options}
 )
@@ -290,7 +290,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(errhand SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:errhand-objects>
         ${errhand_public_headers}
         ${readme-docs}
         ${errhand-pkgconfig}
@@ -308,7 +308,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(errhand-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:errhand-objects>
         ${errhand_public_headers}
         ${readme-docs}
         ${errhand-pkgconfig}

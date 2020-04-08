@@ -492,14 +492,14 @@ message(STATUS
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT
+# add sources to "library" halcsclient-objects
+add_library(halcsclient-objects OBJECT
     ${halcsclient_sources}
     ${halcsclient_smio_table_sources}
 )
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build halcsclient-objects with position independent code on
+set_target_properties(halcsclient-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
@@ -523,7 +523,7 @@ elseif(HALCSCLIENT_BOARD_OPT STREQUAL AFCV3_1)
 endif()
 
 # add board compile definitions
-target_compile_definitions(objects PUBLIC
+target_compile_definitions(halcsclient-objects PUBLIC
     ${halcsclient_board_definitions}
 )
 
@@ -541,7 +541,7 @@ git_get_config(GIT_NAME "user.name")
 git_get_config(GIT_EMAIL "user.email")
 
 # add board compile definitions
-target_compile_definitions(objects PRIVATE
+target_compile_definitions(halcsclient-objects PRIVATE
     GIT_REVISION=\"${GIT_TAG}\"
     GIT_USER_NAME=\"${GIT_NAME}\"
     GIT_USER_EMAIL=\"${GIT_EMAIL}\"
@@ -553,7 +553,7 @@ target_compile_definitions(objects PRIVATE
 # halcsclient_other_search_dirs is in quotes as this is a list
 # and the first element would be concatenated with the previous
 # generator expression.
-target_include_directories(objects
+target_include_directories(halcsclient-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     "$<BUILD_INTERFACE:${halcsclient_other_search_dirs}>"
@@ -570,7 +570,7 @@ get_target_property(halcsclient_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(halcsclient-objects
     PRIVATE
     ${halcsclient_compiler_features}
 )
@@ -580,7 +580,7 @@ get_target_property(halcsclient_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(halcsclient-objects
     PRIVATE
     ${halcsclient_compiler_options}
 )
@@ -588,7 +588,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(halcsclient SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:halcsclient-objects>
         ${halcsclient_public_headers}
         ${readme-docs}
         ${halcsclient-pkgconfig}
@@ -606,7 +606,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(halcsclient-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:halcsclient-objects>
         ${halcsclient_public_headers}
         ${readme-docs}
         ${halcsclient-pkgconfig}

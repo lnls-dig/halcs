@@ -277,11 +277,11 @@ set(readme-docs
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${bpmclient_sources})
+# add sources to "library" bpmclient-objects
+add_library(bpmclient-objects OBJECT ${bpmclient_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build bpmclient-objects with position independent code on
+set_target_properties(bpmclient-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
@@ -292,7 +292,7 @@ git_get_config(GIT_NAME "user.name")
 git_get_config(GIT_EMAIL "user.email")
 
 # add board compile definitions
-target_compile_definitions(objects PRIVATE
+target_compile_definitions(bpmclient-objects PRIVATE
     GIT_REVISION=\"${GIT_TAG}\"
     GIT_USER_NAME=\"${GIT_NAME}\"
     GIT_USER_EMAIL=\"${GIT_EMAIL}\"
@@ -300,7 +300,7 @@ target_compile_definitions(objects PRIVATE
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(bpmclient-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -315,7 +315,7 @@ get_target_property(bpmclient_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(bpmclient-objects
     PRIVATE
     ${bpmclient_compiler_features}
 )
@@ -325,7 +325,7 @@ get_target_property(bpmclient_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(bpmclient-objects
     PRIVATE
     ${bpmclient_compiler_options}
 )
@@ -333,7 +333,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(bpmclient SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:bpmclient-objects>
         ${bpmclient_public_headers}
         ${readme-docs}
         ${bpmclient-pkgconfig}
@@ -351,7 +351,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(bpmclient-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:bpmclient-objects>
         ${bpmclient_public_headers}
         ${readme-docs}
         ${bpmclient-pkgconfig}

@@ -143,18 +143,18 @@ set(readme-docs
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${sdbfs_sources})
+# add sources to "library" sdbfs-objects
+add_library(sdbfs-objects OBJECT ${sdbfs_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build sdbfs-objects with position independent code on
+set_target_properties(sdbfs-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(sdbfs-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -169,7 +169,7 @@ get_target_property(sdbfs_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(sdbfs-objects
     PRIVATE
     ${sdbfs_compiler_features}
 )
@@ -179,7 +179,7 @@ get_target_property(sdbfs_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(sdbfs-objects
     PRIVATE
     ${sdbfs_compiler_options}
 )
@@ -187,7 +187,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(sdbfs SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:sdbfs-objects>
         ${sdbfs_public_headers}
         ${sdbfs_public_dir_headers}
         ${readme-docs}
@@ -206,7 +206,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(sdbfs-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:sdbfs-objects>
         ${sdbfs_public_headers}
         ${sdbfs_public_dir_headers}
         ${readme-docs}

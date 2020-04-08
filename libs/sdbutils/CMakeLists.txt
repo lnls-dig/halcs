@@ -161,18 +161,18 @@ set(readme-docs
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${sdbutils_sources})
+# add sources to "library" sdbutils-objects
+add_library(sdbutils-objects OBJECT ${sdbutils_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build sdbutils-objects with position independent code on
+set_target_properties(sdbutils-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(sdbutils-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -187,7 +187,7 @@ get_target_property(sdbutils_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(sdbutils-objects
     PRIVATE
     ${sdbutils_compiler_features}
 )
@@ -197,7 +197,7 @@ get_target_property(sdbutils_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(sdbutils-objects
     PRIVATE
     ${sdbutils_compiler_options}
 )
@@ -205,7 +205,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(sdbutils SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:sdbutils-objects>
         ${sdbutils_public_headers}
         ${readme-docs}
         ${sdbutils-pkgconfig}
@@ -223,7 +223,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(sdbutils-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:sdbutils-objects>
         ${sdbutils_public_headers}
         ${readme-docs}
         ${sdbutils-pkgconfig}

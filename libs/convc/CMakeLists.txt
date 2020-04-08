@@ -180,18 +180,18 @@ set(readme-docs
 # only on *nix, as Windows needs different preprocessor
 # defines in static builds
 
-# add sources to "library" objects
-add_library(objects OBJECT ${convc_sources})
+# add sources to "library" convc-objects
+add_library(convc-objects OBJECT ${convc_sources})
 
-# always build objects with position independent code on
-set_target_properties(objects PROPERTIES
+# always build convc-objects with position independent code on
+set_target_properties(convc-objects PROPERTIES
     POSITION_INDEPENDENT_CODE
     ON
 )
 
 # add the binary tree to the search path for include files
 # so that we will find our headers
-target_include_directories(objects
+target_include_directories(convc-objects
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -206,7 +206,7 @@ get_target_property(convc_compiler_features
     INTERFACE_COMPILE_FEATURES
 )
 
-target_compile_features(objects
+target_compile_features(convc-objects
     PRIVATE
     ${convc_compiler_features}
 )
@@ -216,7 +216,7 @@ get_target_property(convc_compiler_options
     INTERFACE_COMPILE_OPTIONS
 )
 
-target_compile_options(objects
+target_compile_options(convc-objects
     PRIVATE
     ${convc_compiler_options}
 )
@@ -224,7 +224,7 @@ target_compile_options(objects
 # build shared library
 if(BUILD_SHARED)
     add_library(convc SHARED
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:convc-objects>
         ${convc_public_headers}
         ${readme-docs}
         ${convc-pkgconfig}
@@ -242,7 +242,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(convc-static STATIC
-        $<TARGET_OBJECTS:objects>
+        $<TARGET_OBJECTS:convc-objects>
         ${convc_public_headers}
         ${readme-docs}
         ${convc-pkgconfig}
