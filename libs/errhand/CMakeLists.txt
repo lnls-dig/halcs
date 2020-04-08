@@ -48,6 +48,11 @@ set(OPT_LIBRARIES_STATIC)
 ########################################################################
 
 find_package(libzmq)
+if(NOT libzmq_FOUND)
+    message(STATUS
+        "libzmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(libzmq CONFIG)
+endif()
 if(libzmq_FOUND)
     include_directories(${libzmq_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
@@ -67,6 +72,11 @@ endif()
 #########################################################################
 
 find_package(czmq)
+if(NOT czmq_FOUND)
+    message(STATUS
+        "czmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(czmq CONFIG)
+endif()
 if(czmq_FOUND)
     include_directories(${czmq_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})

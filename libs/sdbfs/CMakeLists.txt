@@ -356,6 +356,11 @@ if(BUILD_SDB_READ_LNLS)
     ########################################################################
 
     find_package(libzmq)
+    if(NOT libzmq_FOUND)
+        message(STATUS
+            "libzmq not found with find_package MODULE mode. Trying CONFIG mode." )
+        find_package(libzmq CONFIG)
+    endif()
     if(libzmq_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
@@ -378,6 +383,11 @@ if(BUILD_SDB_READ_LNLS)
     #########################################################################
 
     find_package(czmq)
+    if(NOT czmq_FOUND)
+        message(STATUS
+            "czmq not found with find_package MODULE mode. Trying CONFIG mode." )
+        find_package(czmq CONFIG)
+    endif()
     if(czmq_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
@@ -400,6 +410,11 @@ if(BUILD_SDB_READ_LNLS)
     #########################################################################
 
     find_package(errhand)
+    if(NOT errhand_FOUND)
+        message(STATUS
+            "errhand not found with find_package MODULE mode. Trying CONFIG mode." )
+        find_package(errhand CONFIG)
+    endif()
     if(errhand_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
@@ -422,6 +437,11 @@ if(BUILD_SDB_READ_LNLS)
     #########################################################################
 
     find_package(convc)
+    if(NOT convc_FOUND)
+        message(STATUS
+            "convc not found with find_package MODULE mode. Trying CONFIG mode." )
+        find_package(convc CONFIG)
+    endif()
     if(convc_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE
@@ -447,6 +467,11 @@ if(BUILD_SDB_READ_LNLS)
     ##########################################################################
 
     #find_package(pciedriver)
+    #if(NOT pciedriver_FOUND)
+    #    message(STATUS
+    #        "pciedriver not found with find_package MODULE mode. Trying CONFIG mode." )
+    #    find_package(pciedriver CONFIG)
+    #endif()
     #if(PCIEDRIVER_FOUND)
     #    target_include_directories(sdb-read-lnls
     #        PRIVATE
@@ -469,6 +494,11 @@ if(BUILD_SDB_READ_LNLS)
     #########################################################################
 
     find_package(llio)
+    if(NOT llio_FOUND)
+        message(STATUS
+            "llio not found with find_package MODULE mode. Trying CONFIG mode." )
+        find_package(llio CONFIG)
+    endif()
     if(llio_FOUND)
         target_include_directories(sdb-read-lnls
             PRIVATE

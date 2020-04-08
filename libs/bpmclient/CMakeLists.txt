@@ -50,6 +50,11 @@ set(OPT_LIBRARIES_STATIC)
 ########################################################################
 
 find_package(libzmq)
+if(NOT libzmq_FOUND)
+    message(STATUS
+        "libzmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(libzmq CONFIG)
+endif()
 if(libzmq_FOUND)
     include_directories(${libzmq_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
@@ -69,6 +74,11 @@ endif()
 #########################################################################
 
 find_package(czmq)
+if(NOT czmq_FOUND)
+    message(STATUS
+        "czmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(czmq CONFIG)
+endif()
 if(czmq_FOUND)
     include_directories(${czmq_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
@@ -88,6 +98,11 @@ endif()
 #########################################################################
 
 find_package(errhand)
+if(NOT errhand_FOUND)
+    message(STATUS
+        "errhand not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(errhand CONFIG)
+endif()
 if(errhand_FOUND)
     include_directories(${errhand_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${errhand_LIBRARIES})
@@ -107,6 +122,11 @@ endif()
 #########################################################################
 
 find_package(disptable)
+if(NOT disptable_FOUND)
+    message(STATUS
+        "disptable not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(disptable CONFIG)
+endif()
 if(disptable_FOUND)
     include_directories(${disptable_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${disptable_LIBRARIES})
@@ -126,6 +146,11 @@ endif()
 #########################################################################
 
 find_package(hutils)
+if(NOT hutils_FOUND)
+    message(STATUS
+        "hutils not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(hutils CONFIG)
+endif()
 if(hutils_FOUND)
     include_directories(${hutils_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${hutils_LIBRARIES})
@@ -145,6 +170,11 @@ endif()
 #########################################################################
 
 find_package(mlm)
+if(NOT mlm_FOUND)
+    message(STATUS
+        "mlm not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(mlm CONFIG)
+endif()
 if(mlm_FOUND)
     include_directories(${mlm_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${mlm_LIBRARIES})
@@ -164,6 +194,11 @@ endif()
 #########################################################################
 
 find_package(halcsclient)
+if(NOT halcsclient_FOUND)
+    message(STATUS
+        "halcsclient not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(halcsclient CONFIG)
+endif()
 if(halcsclient_FOUND)
     include_directories(${halcsclient_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${halcsclient_LIBRARIES})
@@ -183,6 +218,11 @@ endif()
 #########################################################################
 
 find_package(acqclient)
+if(NOT acqclient_FOUND)
+    message(STATUS
+        "acqclient not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(acqclient CONFIG)
+endif()
 if(acqclient_FOUND)
     include_directories(${acqclient_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${acqclient_LIBRARIES})
