@@ -167,55 +167,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" sdbutils-objects
-add_library(sdbutils-objects OBJECT ${sdbutils_sources})
-
-# always build sdbutils-objects with position independent code on
-set_target_properties(sdbutils-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(sdbutils-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(sdbutils_compiler_features
-    sdbutils_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(sdbutils-objects
-    PRIVATE
-    ${sdbutils_compiler_features}
-)
-
-get_target_property(sdbutils_compiler_options
-    sdbutils_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(sdbutils-objects
-    PRIVATE
-    ${sdbutils_compiler_options}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(sdbutils SHARED
-        $<TARGET_OBJECTS:sdbutils-objects>
+        ${sdbutils_sources}
         ${sdbutils_public_headers}
         ${readme-docs}
         ${sdbutils-pkgconfig}
@@ -233,7 +188,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(sdbutils-static STATIC
-        $<TARGET_OBJECTS:sdbutils-objects>
+        ${sdbutils_sources}
         ${sdbutils_public_headers}
         ${readme-docs}
         ${sdbutils-pkgconfig}
@@ -258,6 +213,8 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
     )
 
     # set compiler flags

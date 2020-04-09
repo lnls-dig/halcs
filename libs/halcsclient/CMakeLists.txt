@@ -549,86 +549,11 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" halcsclient-objects
-add_library(halcsclient-objects OBJECT
-    ${halcsclient_sources}
-    ${halcsclient_smio_table_sources}
-)
-
-# always build halcsclient-objects with position independent code on
-set_target_properties(halcsclient-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# set Git macros
-git_describe(GIT_TAG --always --tags)
-git_get_config(GIT_NAME "user.name")
-git_get_config(GIT_EMAIL "user.email")
-
-# add board compile definitions
-target_compile_definitions(halcsclient-objects PRIVATE
-    GIT_REVISION=\"${GIT_TAG}\"
-    GIT_USER_NAME=\"${GIT_NAME}\"
-    GIT_USER_EMAIL=\"${GIT_EMAIL}\"
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-#
-# halcsclient_other_search_dirs is in quotes as this is a list
-# and the first element would be concatenated with the previous
-# generator expression.
-target_include_directories(halcsclient-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    "$<BUILD_INTERFACE:${halcsclient_other_search_dirs}>"
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>
-)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(halcsclient_compiler_features
-    halcsclient_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(halcsclient-objects
-    PRIVATE
-    ${halcsclient_compiler_features}
-)
-
-get_target_property(halcsclient_compiler_options
-    halcsclient_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(halcsclient-objects
-    PRIVATE
-    ${halcsclient_compiler_options}
-)
-
-get_target_property(halcsclient_compiler_definitions
-    halcsclient_compiler_flags
-    INTERFACE_COMPILE_DEFINITIONS
-)
-
-target_compile_definitions(halcsclient-objects
-    PRIVATE
-    ${halcsclient_compiler_definitions}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(halcsclient SHARED
-        $<TARGET_OBJECTS:halcsclient-objects>
+        ${halcsclient_sources}
+        ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}
         ${halcsclient-pkgconfig}
@@ -646,7 +571,8 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(halcsclient-static STATIC
-        $<TARGET_OBJECTS:halcsclient-objects>
+        ${halcsclient_sources}
+        ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}
         ${halcsclient-pkgconfig}
@@ -658,19 +584,39 @@ if(BUILD_STATIC)
       PREFIX "lib")
 endif()
 
+# set Git macros
+git_describe(GIT_TAG --always --tags)
+git_get_config(GIT_NAME "user.name")
+git_get_config(GIT_EMAIL "user.email")
+
 # set properties for all targets
 foreach(target ${target_outputs})
+    # halcsclient_other_search_dirs is in quotes as this is a list
+    # and the first element would be concatenated with the previous
+    # generator expression.
     target_include_directories(${target}
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:include>
+        PRIVATE
+        "$<BUILD_INTERFACE:${halcsclient_other_search_dirs}>"
+
     )
 
     # set debug posfix in case of debug builds
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
+    )
+
+    # add board compile definitions
+    target_compile_definitions(${target} PRIVATE
+        GIT_REVISION=\"${GIT_TAG}\"
+        GIT_USER_NAME=\"${GIT_NAME}\"
+        GIT_USER_EMAIL=\"${GIT_EMAIL}\"
     )
 
     # set compiler flags

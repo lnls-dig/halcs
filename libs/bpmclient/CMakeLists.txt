@@ -313,67 +313,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" bpmclient-objects
-add_library(bpmclient-objects OBJECT ${bpmclient_sources})
-
-# always build bpmclient-objects with position independent code on
-set_target_properties(bpmclient-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# set Git macros
-git_describe(GIT_TAG --always --tags)
-git_get_config(GIT_NAME "user.name")
-git_get_config(GIT_EMAIL "user.email")
-
-# add board compile definitions
-target_compile_definitions(bpmclient-objects PRIVATE
-    GIT_REVISION=\"${GIT_TAG}\"
-    GIT_USER_NAME=\"${GIT_NAME}\"
-    GIT_USER_EMAIL=\"${GIT_EMAIL}\"
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(bpmclient-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(bpmclient_compiler_features
-    bpmclient_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(bpmclient-objects
-    PRIVATE
-    ${bpmclient_compiler_features}
-)
-
-get_target_property(bpmclient_compiler_options
-    bpmclient_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(bpmclient-objects
-    PRIVATE
-    ${bpmclient_compiler_options}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(bpmclient SHARED
-        $<TARGET_OBJECTS:bpmclient-objects>
+        ${bpmclient_sources}
         ${bpmclient_public_headers}
         ${readme-docs}
         ${bpmclient-pkgconfig}
@@ -391,7 +334,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(bpmclient-static STATIC
-        $<TARGET_OBJECTS:bpmclient-objects>
+        ${bpmclient_sources}
         ${bpmclient_public_headers}
         ${readme-docs}
         ${bpmclient-pkgconfig}
@@ -402,6 +345,11 @@ if(BUILD_STATIC)
       OUTPUT_NAME "${bpmclient_OUTPUT_BASENAME}"
       PREFIX "lib")
 endif()
+
+# set Git macros
+git_describe(GIT_TAG --always --tags)
+git_get_config(GIT_NAME "user.name")
+git_get_config(GIT_EMAIL "user.email")
 
 # set properties for all targets
 foreach(target ${target_outputs})
@@ -416,6 +364,15 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
+    )
+
+    # add board compile definitions
+    target_compile_definitions(${target} PRIVATE
+        GIT_REVISION=\"${GIT_TAG}\"
+        GIT_USER_NAME=\"${GIT_NAME}\"
+        GIT_USER_EMAIL=\"${GIT_EMAIL}\"
     )
 
     # set compiler flags

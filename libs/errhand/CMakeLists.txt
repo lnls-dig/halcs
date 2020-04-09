@@ -250,66 +250,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" errhand-objects
-add_library(errhand-objects OBJECT ${errhand_sources})
-
-# always build errhand-objects with position independent code on
-set_target_properties(errhand-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(errhand-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>
-)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(errhand_compiler_features
-    errhand_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(errhand-objects
-    PRIVATE
-    ${errhand_compiler_features}
-)
-
-get_target_property(errhand_compiler_options
-    errhand_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(errhand-objects
-    PRIVATE
-    ${errhand_compiler_options}
-)
-
-get_target_property(errhand_compiler_definitions
-    errhand_compiler_flags
-    INTERFACE_COMPILE_DEFINITIONS
-)
-
-target_compile_definitions(errhand-objects
-    PRIVATE
-    ${errhand_compiler_definitions}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(errhand SHARED
-        $<TARGET_OBJECTS:errhand-objects>
+        ${errhand_sources}
         ${errhand_public_headers}
         ${readme-docs}
         ${errhand-pkgconfig}
@@ -327,7 +271,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(errhand-static STATIC
-        $<TARGET_OBJECTS:errhand-objects>
+        ${errhand_sources}
         ${errhand_public_headers}
         ${readme-docs}
         ${errhand-pkgconfig}
@@ -352,6 +296,8 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
     )
 
     # set compiler flags

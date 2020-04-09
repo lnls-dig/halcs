@@ -273,55 +273,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" llio-objects
-add_library(llio-objects OBJECT ${llio_sources})
-
-# always build llio-objects with position independent code on
-set_target_properties(llio-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(llio-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(llio_compiler_features
-    llio_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(llio-objects
-    PRIVATE
-    ${llio_compiler_features}
-)
-
-get_target_property(llio_compiler_options
-    llio_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(llio-objects
-    PRIVATE
-    ${llio_compiler_options}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(llio SHARED
-        $<TARGET_OBJECTS:llio-objects>
+        ${llio_sources}
         ${llio_public_headers}
         ${llio_public_dir_headers}
         ${readme-docs}
@@ -340,7 +295,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(llio-static STATIC
-        $<TARGET_OBJECTS:llio-objects>
+        ${llio_sources}
         ${llio_public_headers}
         ${llio_public_dir_headers}
         ${readme-docs}
@@ -366,6 +321,8 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
     )
 
     # set compiler flags

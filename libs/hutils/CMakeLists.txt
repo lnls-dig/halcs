@@ -194,55 +194,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" hutils-objects
-add_library(hutils-objects OBJECT ${hutils_sources})
-
-# always build hutils-objects with position independent code on
-set_target_properties(hutils-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(hutils-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(hutils_compiler_features
-    hutils_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(hutils-objects
-    PRIVATE
-    ${hutils_compiler_features}
-)
-
-get_target_property(hutils_compiler_options
-    hutils_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(hutils-objects
-    PRIVATE
-    ${hutils_compiler_options}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(hutils SHARED
-        $<TARGET_OBJECTS:hutils-objects>
+        ${hutils_sources}
         ${hutils_public_headers}
         ${readme-docs}
         ${hutils-pkgconfig}
@@ -260,7 +215,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(hutils-static STATIC
-        $<TARGET_OBJECTS:hutils-objects>
+        ${hutils_sources}
         ${hutils_public_headers}
         ${readme-docs}
         ${hutils-pkgconfig}
@@ -285,6 +240,8 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
     )
 
     # set compiler flags

@@ -215,55 +215,10 @@ set(readme-docs
 # Library declaration
 ########################################################################
 
-# avoid building everything twice for shared + static
-# only on *nix, as Windows needs different preprocessor
-# defines in static builds
-
-# add sources to "library" disptable-objects
-add_library(disptable-objects OBJECT ${disptable_sources})
-
-# always build disptable-objects with position independent code on
-set_target_properties(disptable-objects PROPERTIES
-    POSITION_INDEPENDENT_CODE
-    ON
-)
-
-# add the binary tree to the search path for include files
-# so that we will find our headers
-target_include_directories(disptable-objects
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include>)
-
-# as we can't link an object library to anything, get
-# the properties INTERFACE_COMPILE_FEATURES and
-# INTERFACE_COMPILE_DEFINITONS and aplpy to the
-# object library
-get_target_property(disptable_compiler_features
-    disptable_compiler_flags
-    INTERFACE_COMPILE_FEATURES
-)
-
-target_compile_features(disptable-objects
-    PRIVATE
-    ${disptable_compiler_features}
-)
-
-get_target_property(disptable_compiler_options
-    disptable_compiler_flags
-    INTERFACE_COMPILE_OPTIONS
-)
-
-target_compile_options(disptable-objects
-    PRIVATE
-    ${disptable_compiler_options}
-)
-
 # build shared library
 if(BUILD_SHARED)
     add_library(disptable SHARED
-        $<TARGET_OBJECTS:disptable-objects>
+        ${disptable_sources}
         ${disptable_public_headers}
         ${readme-docs}
         ${disptable-pkgconfig}
@@ -281,7 +236,7 @@ endif()
 # build static library
 if(BUILD_STATIC)
     add_library(disptable-static STATIC
-        $<TARGET_OBJECTS:disptable-objects>
+        ${disptable_sources}
         ${disptable_public_headers}
         ${readme-docs}
         ${disptable-pkgconfig}
@@ -306,6 +261,8 @@ foreach(target ${target_outputs})
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
         ${CMAKE_DEBUG_POSTFIX}
+        POSITION_INDEPENDENT_CODE
+        ON
     )
 
     # set compiler flags
