@@ -32,14 +32,14 @@ if(NOT TARGET acqclient AND NOT TARGET acqclient-static)
     endif()
 
     if (TARGET acqclient)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            acqclient LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES acqclient)
     endif()
     if (TARGET acqclient-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            acqclient-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES acqclient-static)
     endif()
 endif()
 

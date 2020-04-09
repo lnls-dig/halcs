@@ -32,14 +32,14 @@ if(NOT TARGET convc AND NOT TARGET convc-static)
     endif()
 
     if (TARGET convc)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            convc LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES convc)
     endif()
     if (TARGET convc-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            convc-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES convc-static)
     endif()
 endif()
 

@@ -32,14 +32,14 @@ if(NOT TARGET errhand AND NOT TARGET errhand-static)
     endif()
 
     if (TARGET errhand)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            errhand LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES errhand)
     endif()
     if (TARGET errhand-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            errhand-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES errhand-static)
     endif()
 endif()
 

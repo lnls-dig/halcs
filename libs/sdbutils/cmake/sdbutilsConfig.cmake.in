@@ -32,14 +32,14 @@ if(NOT TARGET sdbutils AND NOT TARGET sdbutils-static)
     endif()
 
     if (TARGET sdbutils)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            sdbutils LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES sdbutils)
     endif()
     if (TARGET sdbutils-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            sdbutils-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES sdbutils-static)
     endif()
 endif()
 

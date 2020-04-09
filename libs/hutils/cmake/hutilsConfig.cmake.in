@@ -32,14 +32,14 @@ if(NOT TARGET hutils AND NOT TARGET hutils-static)
     endif()
 
     if (TARGET hutils)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            hutils LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES hutils)
     endif()
     if (TARGET hutils-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            hutils-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES hutils-static)
     endif()
 endif()
 

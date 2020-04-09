@@ -32,14 +32,14 @@ if(NOT TARGET halcsclient AND NOT TARGET halcsclient-static)
     endif()
 
     if (TARGET halcsclient)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            halcsclient LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES halcsclient)
     endif()
     if (TARGET halcsclient-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            halcsclient-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES halcsclient-static)
     endif()
 endif()
 

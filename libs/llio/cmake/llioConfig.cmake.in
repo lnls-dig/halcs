@@ -32,14 +32,14 @@ if(NOT TARGET llio AND NOT TARGET llio-static)
     endif()
 
     if (TARGET llio)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            llio LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES llio)
     endif()
     if (TARGET llio-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            llio-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES llio-static)
     endif()
 endif()
 

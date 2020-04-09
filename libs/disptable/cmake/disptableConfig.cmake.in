@@ -32,14 +32,14 @@ if(NOT TARGET disptable AND NOT TARGET disptable-static)
     endif()
 
     if (TARGET disptable)
-        get_target_property(@PROJECT_NAME@_LIBRARIES
-            disptable LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES disptable)
     endif()
     if (TARGET disptable-static)
-        get_target_property(@PROJECT_NAME@_STATIC_LIBRARIES
-            disptable-static LOCATION
-        )
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES disptable-static)
     endif()
 endif()
 
