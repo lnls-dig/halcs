@@ -159,6 +159,37 @@ target_compile_options(errhand_compiler_flags
     "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
+# setting compile options
+target_compile_definitions(errhand_compiler_flags INTERFACE
+    ERRHAND_DBG=${errhand_DBG_OPT_VALUE}
+)
+
+# for .pc file
+string(APPEND
+    pkg_config_defines
+    " -DERRHAND_DBG=${errhand_DBG_OPT_VALUE}"
+)
+
+target_compile_definitions(errhand_compiler_flags INTERFACE
+    ERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}
+)
+
+# for .pc file
+string(APPEND
+    pkg_config_defines
+    " -DERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}"
+)
+
+target_compile_definitions(errhand_compiler_flags INTERFACE
+    ERRHAND_SUBSYS_ON=${errhand_SUBSYS_ON_OPT}
+)
+
+# for .pc file
+string(APPEND
+    pkg_config_defines
+    " -DERRHAND_SUBSYS_ON=\"${errhand_SUBSYS_ON_OPT}\""
+)
+
 # control where the static and shared libraries are built so that on windows
 # we don't need to tinker with the path to run the executable
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
@@ -232,37 +263,6 @@ set_target_properties(errhand-objects PROPERTIES
     ON
 )
 
-# setting compile options
-target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_DBG=${errhand_DBG_OPT_VALUE}
-)
-
-# for .pc file
-string(APPEND
-    pkg_config_defines
-    " -DERRHAND_DBG=${errhand_DBG_OPT_VALUE}"
-)
-
-target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}
-)
-
-# for .pc file
-string(APPEND
-    pkg_config_defines
-    " -DERRHAND_MIN_LEVEL=${errhand_MIN_LEVEL_OPT}"
-)
-
-target_compile_definitions(errhand-objects PUBLIC
-    ERRHAND_SUBSYS_ON=${errhand_SUBSYS_ON_OPT}
-)
-
-# for .pc file
-string(APPEND
-    pkg_config_defines
-    " -DERRHAND_SUBSYS_ON=\"${errhand_SUBSYS_ON_OPT}\""
-)
-
 # add the binary tree to the search path for include files
 # so that we will find our headers
 target_include_directories(errhand-objects
@@ -294,6 +294,16 @@ get_target_property(errhand_compiler_options
 target_compile_options(errhand-objects
     PRIVATE
     ${errhand_compiler_options}
+)
+
+get_target_property(errhand_compiler_definitions
+    errhand_compiler_flags
+    INTERFACE_COMPILE_DEFINITIONS
+)
+
+target_compile_definitions(errhand-objects
+    PRIVATE
+    ${errhand_compiler_definitions}
 )
 
 # build shared library

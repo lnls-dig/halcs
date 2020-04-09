@@ -230,8 +230,39 @@ target_compile_options(halcsclient_compiler_flags
     "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
+string(APPEND halcsclient_board_definitions "")
+
+# setting board macros
+if(halcsclient_BOARD_OPT STREQUAL ML605)
+    list(APPEND halcsclient_board_definitions
+        __BOARD_ML605__
+    )
+elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
+    list(APPEND halcsclient_board_definitions
+        __BOARD_AFCV3__
+    )
+elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
+    list(APPEND halcsclient_board_definitions
+        __BOARD_AFCV3__
+        __BOARD_AFCV3_1__
+    )
+endif()
+
+# add board compile definitions
+target_compile_definitions(halcsclient_compiler_flags INTERFACE
+    ${halcsclient_board_definitions}
+)
+
+# for .pc file
+foreach(board_def IN LISTS halcsclient_board_definitions)
+    string(APPEND
+        pkg_config_defines
+        " -D${board_def}"
+    )
+endforeach()
+
 # control where the static and shared libraries are built so that on windows
-# we don't need to tinker with the path to run the executable
+# we don't need to tinker with the /ath to run the executable
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
@@ -534,37 +565,6 @@ set_target_properties(halcsclient-objects PROPERTIES
     ON
 )
 
-string(APPEND halcsclient_board_definitions "")
-
-# setting board macros
-if(halcsclient_BOARD_OPT STREQUAL ML605)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_ML605__
-    )
-elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_AFCV3__
-    )
-elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_AFCV3__
-        __BOARD_AFCV3_1__
-    )
-endif()
-
-# add board compile definitions
-target_compile_definitions(halcsclient-objects PUBLIC
-    ${halcsclient_board_definitions}
-)
-
-# for .pc file
-foreach(board_def IN LISTS halcsclient_board_definitions)
-    string(APPEND
-        pkg_config_defines
-        " -D${board_def}"
-    )
-endforeach()
-
 # set Git macros
 git_describe(GIT_TAG --always --tags)
 git_get_config(GIT_NAME "user.name")
@@ -613,6 +613,16 @@ get_target_property(halcsclient_compiler_options
 target_compile_options(halcsclient-objects
     PRIVATE
     ${halcsclient_compiler_options}
+)
+
+get_target_property(halcsclient_compiler_definitions
+    halcsclient_compiler_flags
+    INTERFACE_COMPILE_DEFINITIONS
+)
+
+target_compile_definitions(halcsclient-objects
+    PRIVATE
+    ${halcsclient_compiler_definitions}
 )
 
 # build shared library
