@@ -24,6 +24,12 @@ find_path (
         /usr/local/include/pciDriver/lib
 )
 
+# also include the grandparent directory, as some header files in
+# pciedriver use the format <pciDriver/lib/<header>.h> to include
+# the header
+get_filename_component(pciedriver_GRANDPARENT_INCLUDE_DIRS "${pciedriver_INCLUDE_DIRS}/../../" ABSOLUTE)
+list(APPEND pciedriver_INCLUDE_DIRS "${pciedriver_GRANDPARENT_INCLUDE_DIRS}")
+
 find_library (
     pciedriver_LIBRARIES
     NAMES libpcidriver pcidriver
