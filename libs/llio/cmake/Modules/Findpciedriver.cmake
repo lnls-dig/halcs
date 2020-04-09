@@ -3,31 +3,31 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_PCIEDRIVER "libpciedriver")
-    if (PC_PCIEDRIVER_FOUND)
+    pkg_check_modules(PC_pciedriver "libpciedriver")
+    if (PC_pciedriver_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_PCIEDRIVER_CFLAGS} ${PC_PCIEDRIVER_CFLAGS_OTHER})
+        add_definitions(${PC_pciedriver_CFLAGS} ${PC_pciedriver_CFLAGS_OTHER})
         # some libraries install the headers is a subdirectory of the include dir
         # returned by pkg-config, so use a wildcard match to improve chances of finding
         # headers and SOs.
-        set(PC_PCIEDRIVER_INCLUDE_HINTS ${PC_PCIEDRIVER_INCLUDE_DIRS} ${PC_PCIEDRIVER_INCLUDE_DIRS}/*)
-        set(PC_PCIEDRIVER_LIBRARY_HINTS ${PC_PCIEDRIVER_LIBRARY_DIRS} ${PC_PCIEDRIVER_LIBRARY_DIRS}/*)
-    endif(PC_PCIEDRIVER_FOUND)
+        set(PC_pciedriver_INCLUDE_HINTS ${PC_pciedriver_INCLUDE_DIRS} ${PC_pciedriver_INCLUDE_DIRS}/*)
+        set(PC_pciedriver_LIBRARY_HINTS ${PC_pciedriver_LIBRARY_DIRS} ${PC_pciedriver_LIBRARY_DIRS}/*)
+    endif(PC_pciedriver_FOUND)
 endif (NOT MSVC)
 
 find_path (
-    PCIEDRIVER_INCLUDE_DIRS
+    pciedriver_INCLUDE_DIRS
     NAMES pciDriver.h
-    HINTS ${PC_PCIEDRIVER_INCLUDE_HINTS}
+    HINTS ${PC_pciedriver_INCLUDE_HINTS}
     PATHS
         /usr/include/pciDriver/lib
         /usr/local/include/pciDriver/lib
 )
 
 find_library (
-    PCIEDRIVER_LIBRARIES
+    pciedriver_LIBRARIES
     NAMES libpcidriver pcidriver
-    HINTS ${PC_PCIEDRIVER_LIBRARY_HINTS}
+    HINTS ${PC_pciedriver_LIBRARY_HINTS}
     PATHS
         /usr/lib
         /usr/lib/pciDriver
@@ -40,10 +40,10 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    PCIEDRIVER
-    REQUIRED_VARS PCIEDRIVER_LIBRARIES PCIEDRIVER_INCLUDE_DIRS
+    pciedriver
+    REQUIRED_VARS pciedriver_LIBRARIES pciedriver_INCLUDE_DIRS
 )
 mark_as_advanced(
-    PCIEDRIVER_FOUND
-    PCIEDRIVER_LIBRARIES PCIEDRIVER_INCLUDE_DIRS
+    pciedriver_FOUND
+    pciedriver_LIBRARIES pciedriver_INCLUDE_DIRS
 )
