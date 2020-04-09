@@ -92,6 +92,52 @@ else()
 endif()
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# should we use our errhand debug
+option(errhand_DBG_OPT "Enable debug mode" ON)
+if(errhand_DBG_OPT)
+    set(errhand_DBG_OPT_VALUE y)
+else()
+    set(errhand_DBG_OPT_VALUE n)
+endif()
+
+message(STATUS
+    "Setting compile-time option errhand_DBG='${errhand_DBG_OPT_VALUE}'")
+
+# which debug level do we want
+set(errhand_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
+    "Minimum debug level")
+set(errhand_MIN_LEVEL_VALUES
+    "DBG_LVL_TRACE;DBG_LVL_INFO;DBG_LVL_WARN;DBG_LVL_ERR;DBG_LVL_FATAL"
+)
+
+set_property(CACHE errhand_MIN_LEVEL_OPT PROPERTY STRINGS
+    ${errhand_MIN_LEVEL_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option errhand_MIN_LEVEL='${errhand_MIN_LEVEL_OPT}'")
+
+# which subsystem do we want on.
+# Right now, the only option is all or none of them
+set(errhand_SUBSYS_ON_OPT
+    "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS)"
+    CACHE STRING
+    "Set Subsystem On")
+set(errhand_SUBSYS_ON_VALUES
+    "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS);"
+)
+
+set_property(CACHE errhand_SUBSYS_ON_OPT PROPERTY STRINGS
+    ${errhand_SUBSYS_ON_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option errhand_SUBSYS_ON='${errhand_SUBSYS_ON_OPT}'")
+
+########################################################################
 # Library compile options
 ########################################################################
 
@@ -168,53 +214,6 @@ source_group("Header Files" FILES ${errhand_public_headers})
 set(readme-docs
     COPYING
 )
-
-########################################################################
-# User compile-time options
-########################################################################
-
-# should we use our errhand debug
-option(errhand_DBG_OPT "Enable debug mode" ON)
-if(errhand_DBG_OPT)
-    set(errhand_DBG_OPT_VALUE y)
-else()
-    set(errhand_DBG_OPT_VALUE n)
-endif()
-
-message(STATUS
-    "Setting compile-time option errhand_DBG='${errhand_DBG_OPT_VALUE}'")
-
-# which debug level do we want
-set(errhand_MIN_LEVEL_OPT "DBG_LVL_INFO" CACHE STRING
-    "Minimum debug level")
-set(errhand_MIN_LEVEL_VALUES
-    "DBG_LVL_TRACE;DBG_LVL_INFO;DBG_LVL_WARN;DBG_LVL_ERR;DBG_LVL_FATAL"
-)
-
-set_property(CACHE errhand_MIN_LEVEL_OPT PROPERTY STRINGS
-    ${errhand_MIN_LEVEL_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option errhand_MIN_LEVEL='${errhand_MIN_LEVEL_OPT}'")
-
-# which subsystem do we want on.
-# Right now, the only option is all or none of them
-set(errhand_SUBSYS_ON_OPT
-    "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS)"
-    CACHE STRING
-    "Set Subsystem On")
-set(errhand_SUBSYS_ON_VALUES
-    "(DBG_DEV_MNGR|DBG_DEV_IO|DBG_SM_IO|DBG_LIB_CLIENT|DBG_SM_PR|DBG_SM_CH|DBG_LL_IO|DBG_HAL_UTILS);"
-)
-
-set_property(CACHE errhand_SUBSYS_ON_OPT PROPERTY STRINGS
-    ${errhand_SUBSYS_ON_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option errhand_SUBSYS_ON='${errhand_SUBSYS_ON_OPT}'")
-
 
 ########################################################################
 # Library declaration

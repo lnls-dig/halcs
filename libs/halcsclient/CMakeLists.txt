@@ -190,6 +190,25 @@ else()
 endif()
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# which board do we want.
+
+set(halcsclient_BOARD_OPT "AFCV3_1" CACHE STRING
+    "HALCS board")
+set(halcsclient_BOARD_VALUES
+    "ML605;AFCV3;AFCV3_1"
+)
+
+set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
+    ${halcsclient_BOARD_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option halcsclient_BOARD='${halcsclient_BOARD_OPT}'")
+
+########################################################################
 # Library compile options
 ########################################################################
 
@@ -494,25 +513,6 @@ source_group("Header Files" FILES
 set(readme-docs
     COPYING
 )
-
-########################################################################
-# User compile-time options
-########################################################################
-
-# which board do we want.
-
-set(halcsclient_BOARD_OPT "AFCV3_1" CACHE STRING
-    "HALCS board")
-set(halcsclient_BOARD_VALUES
-    "ML605;AFCV3;AFCV3_1"
-)
-
-set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
-    ${halcsclient_BOARD_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option halcsclient_BOARD='${halcsclient_BOARD_OPT}'")
 
 ########################################################################
 # Library declaration
