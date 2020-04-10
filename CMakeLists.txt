@@ -43,11 +43,132 @@ set (halcs_OUTPUT_BASENAME "halcs"
 # set library dependencies
 set(OPT_LIBRARIES_STATIC)
 
+########################################################################
+# Macros
+########################################################################
+
+# Based on the lecture by Daniel Pfeifer - "Effective CMake"
+
+# list all internal project libraries that we don't want to search for
+# dependencies
+set(as_subproject
+    halcsclient
+    acqclient
+    bpmclient
+    convc
+    disptable
+    errhand
+    hutils
+    llio
+    sdbfs
+    sdbutils
+    # external projects, not CMake
+    pciedriver
+    bsmp
+)
+
+# override find_package to only call the built-in find_package()
+# if not project listed above. Fool library checks to think
+# find_package was executed and set the necessary variables>
+# <lib_name>_LIBRARIES will have the target name which will be
+# enough for the project to find all dependencies.
+macro(find_package)
+    if(NOT "${ARGV0}" IN_LIST as_subproject)
+        _find_package(${ARGV})
+    else()
+        set(${ARGV0}_FOUND TRUE)
+        set(${ARGV0}_LIBRARIES ${ARGV0})
+        set(${ARGV0}_INCLUDE_DIRS "")
+    endif()
+endmacro()
+
+########################################################################
+# User compile-time options
+########################################################################
+
+# which board do we want.
+
+set(halcs_BOARD_OPT "AFCV3_1" CACHE STRING
+    "HALCS board")
+set(halcs_BOARD_VALUES
+    "ML605;AFCV3;AFCV3_1"
+)
+
+set_property(CACHE halcs_BOARD_OPT PROPERTY STRINGS
+    ${halcs_BOARD_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option halcs_BOARD='${halcs_BOARD_OPT}'")
+
+########################################################################
+# libzmq dependency
+########################################################################
+
+find_package(libzmq)
+if(NOT libzmq_FOUND)
+    message(STATUS
+        "libzmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(libzmq CONFIG)
+endif()
+if(libzmq_FOUND)
+    include_directories(${libzmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
+    if(PC_libzmq_FOUND)
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
+    endif()
+else()
+    message(FATAL_ERROR
+        "libzmq is not installed. Install it, then run CMake again." )
+endif()
+
+#########################################################################
+# czmq dependency
+#########################################################################
+
+find_package(czmq)
+if(NOT czmq_FOUND)
+    message(STATUS
+        "czmq not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(czmq CONFIG)
+endif()
+if(czmq_FOUND)
+    include_directories(${czmq_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
+    if(PC_czmq_FOUND)
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
+    endif()
+else()
+    message(FATAL_ERROR
+        "czmq is not installed. Install it, then run CMake again." )
+endif()
+
+#########################################################################
+# mlm dependency
+#########################################################################
+
+find_package(mlm)
+if(NOT mlm_FOUND)
+    message(STATUS
+        "mlm not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(mlm CONFIG)
+endif()
+if(mlm_FOUND)
+    include_directories(${mlm_INCLUDE_DIRS})
+    list(APPEND MORE_LIBRARIES ${mlm_LIBRARIES})
+    if(PC_mlm_FOUND)
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_mlm_STATIC_LDFLAGS})
+    endif()
+else()
+    message(FATAL_ERROR
+        "libmlm is not installed. Install it, then run CMake again." )
+endif()
+
 #########################################################################
 # PCIEDRIVER dependency
 #########################################################################
 
-ExternalProject_Add(pciedriver
+ExternalProject_Add(pciedriver_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/pcie-driver
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/pciedriver
     CONFIGURE_COMMAND ""
@@ -58,19 +179,45 @@ ExternalProject_Add(pciedriver
     BUILD_IN_SOURCE ON
 )
 
-ExternalProject_Get_property(pciedriver BINARY_DIR)
+ExternalProject_Get_property(pciedriver_ext BINARY_DIR)
 
 # this is not a CMake project, so no *Config.cmake or *Targets.cmake
 # files will be generated. Hardcode library and include paths so when
 # libraries try to search for pciedriver they can find it locally!
-set(pciedriver_LIBRARY_PATH ${BINARY_DIR}/lib/pcie)
-set(pciedriver_INCLUDE_PATH ${BINARY_DIR}/include/pciDriver/lib)
+set(pciedriver_LIBRARY_DIRECTORIES
+    ${BINARY_DIR}/lib/pcie
+)
+
+set(pciedriver_INCLUDE_DIRECTORIES
+    ${BINARY_DIR}/include/pciDriver/lib
+    ${BINARY_DIR}/include/pciDriver/lib/../..
+)
+
+# Hack to make it work, otherwise INTERFACE_INCLUDE_DIRECTORIES will not be propagated
+file(MAKE_DIRECTORY ${pciedriver_INCLUDE_DIRECTORIES})
+
+# add imported library so we can link to it later
+add_library(pciedriver SHARED IMPORTED)
+
+# set library locations
+set_target_properties(pciedriver
+    PROPERTIES
+    IMPORTED_LOCATION
+    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
+    INTERFACE_INCLUDE_DIRECTORIES
+    "${pciedriver_INCLUDE_DIRECTORIES}"
+)
+
+add_dependencies(pciedriver pciedriver_ext)
+
+# Add "target" name library dependency
+list(APPEND MORE_LIBRARIES pciedriver)
 
 #########################################################################
 # BSMP dependency
 #########################################################################
 
-ExternalProject_Add(bsmp
+ExternalProject_Add(bsmp_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/libbsmp
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/bsmp
     CONFIGURE_COMMAND ""
@@ -80,42 +227,44 @@ ExternalProject_Add(bsmp
     BUILD_IN_SOURCE ON
 )
 
-ExternalProject_Get_property(bsmp BINARY_DIR)
+ExternalProject_Get_property(bsmp_ext BINARY_DIR)
 
 # this is not a CMake project, so no *Config.cmake or *Targets.cmake
 # files will be generated. Hardcode library and include paths so when
 # libraries try to search for bsmp they can find it locally!
-set(bsmp_LIBRARY_PATH ${BINARY_DIR})
-set(bsmp_INCLUDE_PATH ${BINARY_DIR}/include/bsmp)
+set(bsmp_LIBRARY_DIRECTORIES
+    ${BINARY_DIR}
+)
+set(bsmp_INCLUDE_DIRECTORIES
+    ${BINARY_DIR}/include/bsmp
+    ${BINARY_DIR}/include/bsmp/..
+)
 
-# Project libraries treated as External Projects with ExternalProject
-#
-# References:
-# https://cmake.org/pipermail/cmake/2012-June/050930.html
-# https://coderwall.com/p/qk2eog/use-cmake-enabled-libraries-in-your-cmake-project-ii
-#
-# We use ExternalProject, as the libraries themselves have dependencies between
-# them. Even exporting *Config.cmake and *Targets.cmake is not enough to use
-# add_subdirectories() approach, as *Targets.cmake are only cretaed at configure
-# time, after the initial CMake parsing is done is done. So, libs will not find
-# its dependencies via find_package() in CONFIG mode.
+# Hack to make it work, otherwise INTERFACE_INCLUDE_DIRECTORIES will not be propagated
+file(MAKE_DIRECTORY ${bsmp_INCLUDE_DIRECTORIES})
+
+# add imported library so we can link to it later
+add_library(bsmp SHARED IMPORTED)
+
+# set library locations
+set_target_properties(bsmp
+    PROPERTIES
+    IMPORTED_LOCATION
+    ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so
+    INTERFACE_INCLUDE_DIRECTORIES
+    "${bsmp_INCLUDE_DIRECTORIES}"
+)
+
+add_dependencies(bsmp bsmp_ext)
+
+# Add "target" name library dependency
+list(APPEND MORE_LIBRARIES bsmp)
 
 #########################################################################
 # ERRHAND dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(errhand
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/errhand
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/errhand
-    INSTALL_COMMAND ""
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(errhand BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND errhand_DIR ${BINARY_DIR})
+add_subdirectory(libs/errhand)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES errhand)
@@ -124,29 +273,7 @@ list(APPEND MORE_LIBRARIES errhand)
 # CONVC dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(convc
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/convc
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/convc
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(convc BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND convc_DIR ${BINARY_DIR})
+add_subdirectory(libs/convc)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES convc)
@@ -155,33 +282,7 @@ list(APPEND MORE_LIBRARIES convc)
 # LLIO dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(llio
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/llio
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/llio
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-        -Dconvc_DIR=${convc_DIR}
-        # Location of PCIEDRIVER lib and include
-        -DCMAKE_LIBRARY_PATH=${pciedriver_LIBRARY_PATH}
-        -DCMAKE_INCLUDE_PATH=${pciedriver_INCLUDE_PATH}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand convc pciedriver
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(llio BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND llio_DIR ${BINARY_DIR})
+add_subdirectory(libs/llio)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES llio)
@@ -190,31 +291,7 @@ list(APPEND MORE_LIBRARIES llio)
 # SDBFS dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(sdbfs
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdbfs
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/sdbfs
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-        -Dconvc_DIR=${convc_DIR}
-        -Dllio_DIR=${llio_DIR}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand convc llio
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(sdbfs BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND sdbfs_DIR ${BINARY_DIR})
+add_subdirectory(libs/sdbfs)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES sdbfs)
@@ -223,30 +300,7 @@ list(APPEND MORE_LIBRARIES sdbfs)
 # SDBUTILS dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(sdbutils
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdbutils
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/sdbutils
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-        -Dsdbfs_DIR=${sdbfs_DIR}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand sdbfs
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(sdbutils BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND sdbutils_DIR ${BINARY_DIR})
+add_subdirectory(libs/sdbutils)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES sdbutils)
@@ -255,29 +309,7 @@ list(APPEND MORE_LIBRARIES sdbutils)
 # HUTILS dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(hutils
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/hutils
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/hutils
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(hutils BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND hutils_DIR ${BINARY_DIR})
+add_subdirectory(libs/hutils)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES hutils)
@@ -286,33 +318,38 @@ list(APPEND MORE_LIBRARIES hutils)
 # DISPTABLE dependency
 #########################################################################
 
-# add external project
-ExternalProject_Add(disptable
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/libs/disptable
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/disptable
-    INSTALL_COMMAND ""
-    CMAKE_ARGS
-        -Derrhand_DIR=${errhand_DIR}
-        -Dhutils_DIR=${hutils_DIR}
-    # Specify other targets on which the external project depends.
-    # The other targets will be brought up to date before any of
-    # the external project’s steps are executed. Because the external
-    # project uses additional custom targets internally for each step,
-    # the DEPENDS option is the most convenient way to ensure all of
-    # those steps depend on the other targets. Simply doing
-    # add_dependencies(<name> <targets>) will not make any of the
-    # steps dependent on <targets>.
-    DEPENDS errhand hutils
-)
-
-# get binary directory where we can use for searching *Config.cmake files
-ExternalProject_Get_property(disptable BINARY_DIR)
-
-# add project to search path for *Config.cmake files
-list(APPEND disptable_DIR ${BINARY_DIR})
+add_subdirectory(libs/disptable)
 
 # Add "target" name library dependency
 list(APPEND MORE_LIBRARIES disptable)
+
+#########################################################################
+# HALCSCLIENT dependency
+#########################################################################
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
+
+# Add "target" name library dependency
+list(APPEND MORE_LIBRARIES halcsclient)
+
+#########################################################################
+# ACQCLIENT dependency
+#########################################################################
+
+add_subdirectory(libs/acqclient)
+
+# Add "target" name library dependency
+list(APPEND MORE_LIBRARIES acqclient)
+
+#########################################################################
+# BPMCLIENT dependency
+#########################################################################
+
+add_subdirectory(libs/bpmclient)
+
+# Add "target" name library dependency
+list(APPEND MORE_LIBRARIES bpmclient)
+
 
 ########################################################################
 # Custom targets
