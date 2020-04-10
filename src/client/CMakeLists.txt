@@ -598,10 +598,8 @@ foreach(target ${target_outputs})
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-        $<INSTALL_INTERFACE:include>
-        PRIVATE
         "$<BUILD_INTERFACE:${halcsclient_other_search_dirs}>"
-
+        $<INSTALL_INTERFACE:include>
     )
 
     # set debug posfix in case of debug builds
