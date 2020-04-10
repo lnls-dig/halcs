@@ -91,10 +91,10 @@ SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 
-SMIO_DIR = $(TOP)/src/sm_io
+SMIO_DIR = ../sm_io
 SMIO_SRC_DIR = $(SMIO_DIR)
 
-SMIO_TABLE_DIR = $(TOP)/src/sm_io_table
+SMIO_TABLE_DIR = ../sm_io_table
 SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)
 
 # Specific board objects
