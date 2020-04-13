@@ -208,7 +208,7 @@ set_target_properties(pciedriver
 add_dependencies(pciedriver pciedriver_ext)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES pciedriver)
+list(APPEND halcs_LIBRARIES pciedriver)
 
 #########################################################################
 # BSMP dependency
@@ -255,7 +255,7 @@ set_target_properties(bsmp
 add_dependencies(bsmp bsmp_ext)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES bsmp)
+list(APPEND halcs_LIBRARIES bsmp)
 
 #########################################################################
 # ERRHAND dependency
@@ -264,7 +264,7 @@ list(APPEND MORE_LIBRARIES bsmp)
 add_subdirectory(libs/errhand)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES errhand)
+list(APPEND halcs_LIBRARIES errhand)
 
 #########################################################################
 # CONVC dependency
@@ -273,7 +273,7 @@ list(APPEND MORE_LIBRARIES errhand)
 add_subdirectory(libs/convc)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES convc)
+list(APPEND halcs_LIBRARIES convc)
 
 #########################################################################
 # LLIO dependency
@@ -282,7 +282,7 @@ list(APPEND MORE_LIBRARIES convc)
 add_subdirectory(libs/llio)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES llio)
+list(APPEND halcs_LIBRARIES llio)
 
 #########################################################################
 # SDBFS dependency
@@ -291,7 +291,7 @@ list(APPEND MORE_LIBRARIES llio)
 add_subdirectory(libs/sdbfs)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES sdbfs)
+list(APPEND halcs_LIBRARIES sdbfs)
 
 #########################################################################
 # SDBUTILS dependency
@@ -300,7 +300,7 @@ list(APPEND MORE_LIBRARIES sdbfs)
 add_subdirectory(libs/sdbutils)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES sdbutils)
+list(APPEND halcs_LIBRARIES sdbutils)
 
 #########################################################################
 # HUTILS dependency
@@ -309,7 +309,7 @@ list(APPEND MORE_LIBRARIES sdbutils)
 add_subdirectory(libs/hutils)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES hutils)
+list(APPEND halcs_LIBRARIES hutils)
 
 #########################################################################
 # DISPTABLE dependency
@@ -318,7 +318,7 @@ list(APPEND MORE_LIBRARIES hutils)
 add_subdirectory(libs/disptable)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES disptable)
+list(APPEND halcs_LIBRARIES disptable)
 
 #########################################################################
 # HALCSCLIENT dependency
@@ -327,7 +327,7 @@ list(APPEND MORE_LIBRARIES disptable)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
 
 # Add "target" name library dependency
-list(APPEND MORE_LIBRARIES halcsclient)
+list(APPEND halcs_LIBRARIES halcsclient)
 
 #########################################################################
 # ACQCLIENT dependency
@@ -335,17 +335,13 @@ list(APPEND MORE_LIBRARIES halcsclient)
 
 add_subdirectory(libs/acqclient)
 
-# Add "target" name library dependency
-list(APPEND MORE_LIBRARIES acqclient)
-
 #########################################################################
 # BPMCLIENT dependency
 #########################################################################
 
 add_subdirectory(libs/bpmclient)
 
-# Add "target" name library dependency
-list(APPEND MORE_LIBRARIES bpmclient)
+########################################################################
 
 
 ########################################################################
