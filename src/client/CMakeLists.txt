@@ -419,6 +419,7 @@ set(halcsclient_smio_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/dsp/sm_io_dsp_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/swap/sm_io_swap_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rffe/sm_io_rffe_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rffe_scpi/sm_io_rffe_scpi_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/afc_diag/sm_io_afc_diag_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/trigger_iface/sm_io_trigger_iface_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/trigger_mux/sm_io_trigger_mux_exports.h
