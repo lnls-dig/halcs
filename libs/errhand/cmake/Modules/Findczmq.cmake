@@ -3,26 +3,25 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_czmq "libczmq")
+    pkg_check_modules(PC_czmq IMPORTED_TARGET "libczmq")
     if (PC_czmq_FOUND)
-        # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_czmq_CFLAGS} ${PC_czmq_CFLAGS_OTHER})
-        # some libraries install the headers is a subdirectory of the include dir
-        # returned by pkg-config, so use a wildcard match to improve chances of finding
-        # headers and SOs.
+        # To satisfy find_path()/find_library()
         set(PC_czmq_INCLUDE_HINTS ${PC_czmq_INCLUDE_DIRS} ${PC_czmq_INCLUDE_DIRS}/*)
         set(PC_czmq_LIBRARY_HINTS ${PC_czmq_LIBRARY_DIRS} ${PC_czmq_LIBRARY_DIRS}/*)
+        # Imported target library name is all we need for
+        # target_link_libraries().
+        set(czmq_LIBRARIES PkgConfig::PC_czmq)
     endif(PC_czmq_FOUND)
 endif (NOT MSVC)
 
 find_path (
-    czmq_INCLUDE_DIRS
+    _czmq_INCLUDE_DIRS
     NAMES czmq.h
     HINTS ${PC_czmq_INCLUDE_HINTS}
 )
 
 find_library (
-    czmq_LIBRARIES
+    _czmq_LIBRARIES
     NAMES libczmq czmq
     HINTS ${PC_czmq_LIBRARY_HINTS}
 )
@@ -31,9 +30,23 @@ include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
     czmq
-    REQUIRED_VARS czmq_LIBRARIES czmq_INCLUDE_DIRS
+    REQUIRED_VARS _czmq_LIBRARIES _czmq_INCLUDE_DIRS
 )
 mark_as_advanced(
     czmq_FOUND
-    czmq_LIBRARIES czmq_INCLUDE_DIRS
+    _czmq_LIBRARIES _czmq_INCLUDE_DIRS
 )
+
+# Create our INTERFACE library if not created by PkgConfig
+if(czmq_FOUND AND NOT TARGET PkgConfig::PC_czmq AND NOT TARGET czmq::czmq)
+    add_library(czmq::czmq
+        INTERFACE IMPORTED
+    )
+    set_target_properties(czmq::czmq
+        PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_czmq_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_czmq_LIBRARIES}"
+    )
+
+    set(czmq_LIBRARIES czmq::czmq)
+endif()

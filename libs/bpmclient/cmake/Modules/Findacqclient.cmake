@@ -3,26 +3,26 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_acqclient "libacqclient")
+    pkg_check_modules(PC_acqclient IMPORTED_TARGET "libacqclient")
     if (PC_acqclient_FOUND)
-        # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_acqclient_CFLAGS} ${PC_acqclient_CFLAGS_OTHER})
-        # some libraries install the headers is a subdirectory of the include dir
-        # returned by pkg-config, so use a wildcard match to improve chances of finding
-        # headers and SOs.
+        # To satisfy find_path()/find_library()
         set(PC_acqclient_INCLUDE_HINTS ${PC_acqclient_INCLUDE_DIRS} ${PC_acqclient_INCLUDE_DIRS}/*)
         set(PC_acqclient_LIBRARY_HINTS ${PC_acqclient_LIBRARY_DIRS} ${PC_acqclient_LIBRARY_DIRS}/*)
+        # Imported target library name is all we need for
+        # target_link_libraries().
+        set(acqclient_LIBRARIES PkgConfig::PC_acqclient)
     endif(PC_acqclient_FOUND)
 endif (NOT MSVC)
 
+# Try to find on our own
 find_path (
-    acqclient_INCLUDE_DIRS
+    _acqclient_INCLUDE_DIRS
     NAMES acq_client.h
     HINTS ${PC_acqclient_INCLUDE_HINTS}
 )
 
 find_library (
-    acqclient_LIBRARIES
+    _acqclient_LIBRARIES
     NAMES libacqclient acqclient
     HINTS ${PC_acqclient_LIBRARY_HINTS}
 )
@@ -31,9 +31,23 @@ include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
     acqclient
-    REQUIRED_VARS acqclient_LIBRARIES acqclient_INCLUDE_DIRS
+    REQUIRED_VARS _acqclient_LIBRARIES _acqclient_INCLUDE_DIRS
 )
 mark_as_advanced(
     acqclient_FOUND
-    acqclient_LIBRARIES acqclient_INCLUDE_DIRS
+    _acqclient_LIBRARIES _acqclient_INCLUDE_DIRS
 )
+
+# Create our INTERFACE library if not created by PkgConfig
+if(acqclient_FOUND AND NOT TARGET PkgConfig::PC_acqclient AND NOT TARGET acqclient::acqclient)
+    add_library(acqclient::acqclient
+        INTERFACE IMPORTED
+    )
+    set_target_properties(acqclient::acqclient
+        PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_acqclient_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_acqclient_LIBRARIES}"
+    )
+
+    set(acqclient_LIBRARIES acqclient::acqclient)
+endif()

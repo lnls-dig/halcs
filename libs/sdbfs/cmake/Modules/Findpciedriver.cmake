@@ -3,31 +3,37 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_PCIEDRIVER "libpciedriver")
-    if (PC_PCIEDRIVER_FOUND)
-        # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_PCIEDRIVER_CFLAGS} ${PC_PCIEDRIVER_CFLAGS_OTHER})
-        # some libraries install the headers is a subdirectory of the include dir
-        # returned by pkg-config, so use a wildcard match to improve chances of finding
-        # headers and SOs.
-        set(PC_PCIEDRIVER_INCLUDE_HINTS ${PC_PCIEDRIVER_INCLUDE_DIRS} ${PC_PCIEDRIVER_INCLUDE_DIRS}/*)
-        set(PC_PCIEDRIVER_LIBRARY_HINTS ${PC_PCIEDRIVER_LIBRARY_DIRS} ${PC_PCIEDRIVER_LIBRARY_DIRS}/*)
-    endif(PC_PCIEDRIVER_FOUND)
+    pkg_check_modules(PC_pciedriver IMPORTED_TARGET "libpciedriver")
+    if (PC_pciedriver_FOUND)
+        # To satisfy find_path()/find_library()
+        set(PC_pciedriver_INCLUDE_HINTS ${PC_pciedriver_INCLUDE_DIRS} ${PC_pciedriver_INCLUDE_DIRS}/*)
+        set(PC_pciedriver_LIBRARY_HINTS ${PC_pciedriver_LIBRARY_DIRS} ${PC_pciedriver_LIBRARY_DIRS}/*)
+        # Imported target library name is all we need for
+        # target_link_libraries().
+        set(pciedriver_LIBRARIES PkgConfig::PC_pciedriver)
+    endif(PC_pciedriver_FOUND)
 endif (NOT MSVC)
 
+# Try to find on our own
 find_path (
-    PCIEDRIVER_INCLUDE_DIRS
+    _pciedriver_INCLUDE_DIRS
     NAMES pciDriver.h
-    HINTS ${PC_PCIEDRIVER_INCLUDE_HINTS}
+    HINTS ${PC_pciedriver_INCLUDE_HINTS}
     PATHS
         /usr/include/pciDriver/lib
         /usr/local/include/pciDriver/lib
 )
 
+# also include the grandparent directory, as some header files in
+# pciedriver use the format <pciDriver/lib/<header>.h> to include
+# the header
+get_filename_component(_pciedriver_GRANDPARENT_INCLUDE_DIRS "${_pciedriver_INCLUDE_DIRS}/../../" ABSOLUTE)
+list(APPEND _pciedriver_INCLUDE_DIRS "${_pciedriver_GRANDPARENT_INCLUDE_DIRS}")
+
 find_library (
-    PCIEDRIVER_LIBRARIES
+    _pciedriver_LIBRARIES
     NAMES libpcidriver pcidriver
-    HINTS ${PC_PCIEDRIVER_LIBRARY_HINTS}
+    HINTS ${PC_pciedriver_LIBRARY_HINTS}
     PATHS
         /usr/lib
         /usr/lib/pciDriver
@@ -40,10 +46,24 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    PCIEDRIVER
-    REQUIRED_VARS PCIEDRIVER_LIBRARIES PCIEDRIVER_INCLUDE_DIRS
+    pciedriver
+    REQUIRED_VARS _pciedriver_LIBRARIES _pciedriver_INCLUDE_DIRS
 )
 mark_as_advanced(
-    PCIEDRIVER_FOUND
-    PCIEDRIVER_LIBRARIES PCIEDRIVER_INCLUDE_DIRS
+    pciedriver_FOUND
+    _pciedriver_LIBRARIES _pciedriver_INCLUDE_DIRS
 )
+
+# Create our INTERFACE library if not created by PkgConfig
+if(pciedriver_FOUND AND NOT TARGET PkgConfig::PC_pciedriver AND NOT TARGET pciedriver::pciedriver)
+    add_library(pciedriver::pciedriver
+        INTERFACE IMPORTED
+    )
+    set_target_properties(pciedriver::pciedriver
+        PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_pciedriver_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_pciedriver_LIBRARIES}"
+    )
+
+    set(pciedriver_LIBRARIES pciedriver::pciedriver)
+endif()

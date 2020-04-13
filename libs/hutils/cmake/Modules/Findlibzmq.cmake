@@ -3,20 +3,19 @@
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_libzmq "libzmq")
+    pkg_check_modules(PC_libzmq IMPORTED_TARGET "libzmq")
     if (PC_libzmq_FOUND)
-        # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_libzmq_CFLAGS} ${PC_libzmq_CFLAGS_OTHER})
-        # some libraries install the headers is a subdirectory of the include dir
-        # returned by pkg-config, so use a wildcard match to improve chances of finding
-        # headers and SOs.
+        # To satisfy find_path()/find_library()
         set(PC_libzmq_INCLUDE_HINTS ${PC_libzmq_INCLUDE_DIRS} ${PC_libzmq_INCLUDE_DIRS}/*)
         set(PC_libzmq_LIBRARY_HINTS ${PC_libzmq_LIBRARY_DIRS} ${PC_libzmq_LIBRARY_DIRS}/*)
+        # Imported target library name is all we need for
+        # target_link_libraries().
+        set(libzmq_LIBRARIES PkgConfig::PC_libzmq)
     endif(PC_libzmq_FOUND)
 endif (NOT MSVC)
 
 find_path (
-    libzmq_INCLUDE_DIRS
+    _libzmq_INCLUDE_DIRS
     NAMES zmq.h
     HINTS ${PC_libzmq_INCLUDE_HINTS}
 )
@@ -32,7 +31,7 @@ if (MSVC)
     endif ()
 
     # Retrieve ZeroMQ version number from zmq.h
-    file(STRINGS "${libzmq_INCLUDE_DIRS}/zmq.h" zmq_version_defines
+    file(STRINGS "${_libzmq_INCLUDE_DIRS}/zmq.h" zmq_version_defines
         REGEX "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH)")
     foreach(ver ${zmq_version_defines})
         if(ver MATCHES "#define ZMQ_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -68,9 +67,9 @@ if (MSVC)
     select_library_configurations(libzmq)
 endif ()
 
-if (NOT libzmq_LIBRARIES)
+if (NOT _libzmq_LIBRARIES)
     find_library (
-        libzmq_LIBRARIES
+        _libzmq_LIBRARIES
         NAMES libzmq zmq
         HINTS ${PC_libzmq_LIBRARY_HINTS}
     )
@@ -80,9 +79,23 @@ include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
     libzmq
-    REQUIRED_VARS libzmq_LIBRARIES libzmq_INCLUDE_DIRS
+    REQUIRED_VARS _libzmq_LIBRARIES _libzmq_INCLUDE_DIRS
 )
 mark_as_advanced(
     libzmq_FOUND
-    libzmq_LIBRARIES libzmq_INCLUDE_DIRS
+    _libzmq_LIBRARIES _libzmq_INCLUDE_DIRS
 )
+
+# Create our INTERFACE library if not created by PkgConfig
+if(libzmq_FOUND AND NOT TARGET PkgConfig::PC_libzmq AND NOT TARGET libzmq::libzmq)
+    add_library(libzmq::libzmq
+        INTERFACE IMPORTED
+    )
+    set_target_properties(libzmq::libzmq
+        PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_libzmq_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_libzmq_LIBRARIES}"
+    )
+
+    set(libzmq_LIBRARIES libzmq::libzmq)
+endif()

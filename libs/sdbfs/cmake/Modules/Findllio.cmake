@@ -1,28 +1,28 @@
-# Copied from:
+# Based on:
 # https://github.com/zeromq/malamute/blob/master/Findczmq.cmake
 
 if (NOT MSVC)
     include(FindPkgConfig)
-    pkg_check_modules(PC_llio "libllio")
+    pkg_check_modules(PC_llio IMPORTED_TARGET "libllio")
     if (PC_llio_FOUND)
-        # add CFLAGS from pkg-config file, e.g. draft api.
-        add_definitions(${PC_llio_CFLAGS} ${PC_llio_CFLAGS_OTHER})
-        # some libraries install the headers is a subdirectory of the include dir
-        # returned by pkg-config, so use a wildcard match to improve chances of finding
-        # headers and SOs.
+        # To satisfy find_path()/find_library()
         set(PC_llio_INCLUDE_HINTS ${PC_llio_INCLUDE_DIRS} ${PC_llio_INCLUDE_DIRS}/*)
         set(PC_llio_LIBRARY_HINTS ${PC_llio_LIBRARY_DIRS} ${PC_llio_LIBRARY_DIRS}/*)
+        # Imported target library name is all we need for
+        # target_link_libraries().
+        set(llio_LIBRARIES PkgConfig::PC_llio)
     endif(PC_llio_FOUND)
 endif (NOT MSVC)
 
+# Try to find on our own
 find_path (
-    llio_INCLUDE_DIRS
+    _llio_INCLUDE_DIRS
     NAMES ll_io.h
     HINTS ${PC_llio_INCLUDE_HINTS}
 )
 
 find_library (
-    llio_LIBRARIES
+    _llio_LIBRARIES
     NAMES libllio llio
     HINTS ${PC_llio_LIBRARY_HINTS}
 )
@@ -31,9 +31,23 @@ include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
     llio
-    REQUIRED_VARS llio_LIBRARIES llio_INCLUDE_DIRS
+    REQUIRED_VARS _llio_LIBRARIES _llio_INCLUDE_DIRS
 )
 mark_as_advanced(
     llio_FOUND
-    llio_LIBRARIES llio_INCLUDE_DIRS
+    _llio_LIBRARIES _llio_INCLUDE_DIRS
 )
+
+# Create our INTERFACE library if not created by PkgConfig
+if(llio_FOUND AND NOT TARGET PkgConfig::PC_llio AND NOT TARGET llio::llio)
+    add_library(llio::llio
+        INTERFACE IMPORTED
+    )
+    set_target_properties(llio::llio
+        PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${_llio_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${_llio_LIBRARIES}"
+    )
+
+    set(llio_LIBRARIES llio::llio)
+endif()
