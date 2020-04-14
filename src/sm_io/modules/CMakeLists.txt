@@ -8,6 +8,18 @@ set (smio_modules_OUTPUT_BASENAME "smio_modules"
     "Output smio_modules library base name"
 )
 
+# get all directories under a directory
+macro(subdirlist result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
+
 #########################################################################
 # XXX dependency
 #########################################################################
@@ -26,44 +38,11 @@ set (smio_modules_OUTPUT_BASENAME "smio_modules"
 # Other sources
 #######################################
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/acq)
-list(APPEND smio_modules_LIBRARIES smio_module_acq)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/acq_pm)
-list(APPEND smio_modules_LIBRARIES smio_module_acq_pm)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/afc_diag)
-list(APPEND smio_modules_LIBRARIES smio_module_afc_diag)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/afc_mgmt)
-list(APPEND smio_modules_LIBRARIES smio_module_afc_mgmt)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/afc_timing)
-list(APPEND smio_modules_LIBRARIES smio_module_afc_timing)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dsp)
-list(APPEND smio_modules_LIBRARIES smio_module_dsp)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmc100m_4ch)
-list(APPEND smio_modules_LIBRARIES smio_module_fmc100m_4ch)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmc130m_4ch)
-list(APPEND smio_modules_LIBRARIES smio_module_fmc130m_4ch)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmc250m_4ch)
-list(APPEND smio_modules_LIBRARIES smio_module_fmc250m_4ch)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmc_active_clk)
-list(APPEND smio_modules_LIBRARIES smio_module_fmc_active_clk)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmc_adc_common)
-list(APPEND smio_modules_LIBRARIES smio_module_fmc_adc_common)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fmcpico1m_4ch)
-list(APPEND smio_modules_LIBRARIES smio_module_fmcpico1m_4ch)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/init)
-list(APPEND smio_modules_LIBRARIES smio_module_init)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rffe)
-list(APPEND smio_modules_LIBRARIES smio_module_rffe)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rffe_scpi)
-list(APPEND smio_modules_LIBRARIES smio_module_rffe_scpi)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/swap)
-list(APPEND smio_modules_LIBRARIES smio_module_swap)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tim_rcv)
-list(APPEND smio_modules_LIBRARIES smio_module_tim_rcv)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/trigger_iface)
-list(APPEND smio_modules_LIBRARIES smio_module_trigger_iface)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/trigger_mux)
-list(APPEND smio_modules_LIBRARIES smio_module_trigger_mux)
+subdirlist(subdirs ${CMAKE_CURRENT_SOURCE_DIR})
+
+foreach(subdir ${subdirs})
+    add_subdirectory(${subdir})
+endforeach()
 
 #######################################
 # Our sources
