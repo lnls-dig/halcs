@@ -18,6 +18,13 @@ set (smio_table_OUTPUT_BASENAME "smio_table"
 # Library compile options
 ########################################################################
 
+add_library(smio_table_compiler_flags INTERFACE)
+
+target_link_libraries(smio_table_compiler_flags
+    INTERFACE
+    halcs_compiler_flags
+)
+
 ########################################################################
 # Sources/Headers definitions
 ########################################################################
@@ -146,10 +153,23 @@ set_target_properties(smio_table PROPERTIES
     ON
 )
 
-# set compiler flags
-target_link_libraries(smio_table
-    PUBLIC
-    halcs_compiler_flags
+# set PRIVATE compiler flags. It doesn't really work to link an
+# INTERFACE library with PRIVATE scope. See:
+# https://gitlab.kitware.com/cmake/cmake/-/issues/15415
+target_link_libraries(smio_table PRIVATE
+    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_LINK_LIBRARIES>
+)
+target_include_directories(smio_table PRIVATE
+    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+)
+target_compile_options(smio_table PRIVATE
+    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+)
+target_compile_definitions(smio_table PRIVATE
+    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+)
+target_sources(smio_table PRIVATE
+    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_SOURCES>
 )
 
 ########################################################################
