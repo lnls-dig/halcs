@@ -396,7 +396,7 @@ set(smio_protocols_INCLUDE_DIR
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/boards)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_io)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_mngr)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/msg)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/msg)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/revision)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/sm_io)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/sm_io_table)
