@@ -224,37 +224,6 @@ target_compile_options(halcsclient_compiler_flags
     "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
-string(APPEND halcsclient_board_definitions "")
-
-# setting board macros
-if(halcsclient_BOARD_OPT STREQUAL ML605)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_ML605__
-    )
-elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_AFCV3__
-    )
-elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
-    list(APPEND halcsclient_board_definitions
-        __BOARD_AFCV3__
-        __BOARD_AFCV3_1__
-    )
-endif()
-
-# add board compile definitions
-target_compile_definitions(halcsclient_compiler_flags INTERFACE
-    ${halcsclient_board_definitions}
-)
-
-# for .pc file
-foreach(board_def IN LISTS halcsclient_board_definitions)
-    string(APPEND
-        pkg_config_defines
-        " -D${board_def}"
-    )
-endforeach()
-
 # control where the static and shared libraries are built so that on windows
 # we don't need to tinker with the /ath to run the executable
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
@@ -597,6 +566,37 @@ foreach(target ${target_outputs})
         $<INSTALL_INTERFACE:include>
     )
 
+    # setting PUBLIC compile options
+    string(APPEND halcsclient_board_definitions "")
+
+    # setting board macros
+    if(halcsclient_BOARD_OPT STREQUAL ML605)
+        list(APPEND halcsclient_board_definitions
+            __BOARD_ML605__
+        )
+    elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
+        list(APPEND halcsclient_board_definitions
+            __BOARD_AFCV3__
+        )
+    elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
+        list(APPEND halcsclient_board_definitions
+            __BOARD_AFCV3__
+            __BOARD_AFCV3_1__
+        )
+    endif()
+
+    target_compile_definitions(${target} PUBLIC
+        ${halcsclient_board_definitions}
+    )
+
+    # for .pc file
+    foreach(board_def IN LISTS halcsclient_board_definitions)
+        string(APPEND
+            pkg_config_defines
+            " -D${board_def}"
+        )
+    endforeach()
+
     # set debug posfix in case of debug builds
     set_target_properties(${target} PROPERTIES
         DEBUG_POSTFIX
@@ -612,10 +612,23 @@ foreach(target ${target_outputs})
         GIT_USER_EMAIL=\"${GIT_EMAIL}\"
     )
 
-    # set compiler flags
-    target_link_libraries(${target}
-        PUBLIC
-        halcsclient_compiler_flags
+    # set PRIVATE compiler flags. It doesn't really work to link an
+    # INTERFACE library with PRIVATE scope. See:
+    # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
+    target_link_libraries(${target} PRIVATE
+        $<TARGET_PROPERTY:halcsclient_compiler_flags,INTERFACE_LINK_LIBRARIES>
+    )
+    target_include_directories(${target} PRIVATE
+        $<TARGET_PROPERTY:halcsclient_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+    target_compile_options(${target} PRIVATE
+        $<TARGET_PROPERTY:halcsclient_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+    )
+    target_compile_definitions(${target} PRIVATE
+        $<TARGET_PROPERTY:halcsclient_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+    )
+    target_sources(${target} PRIVATE
+        $<TARGET_PROPERTY:halcsclient_compiler_flags,INTERFACE_SOURCES>
     )
 endforeach()
 

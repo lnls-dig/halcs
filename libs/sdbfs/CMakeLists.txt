@@ -191,10 +191,23 @@ foreach(target ${target_outputs})
         ON
     )
 
-    # set compiler flags
-    target_link_libraries(${target}
-        PUBLIC
-        sdbfs_compiler_flags
+    # set PRIVATE compiler flags. It doesn't really work to link an
+    # INTERFACE library with PRIVATE scope. See:
+    # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
+    target_link_libraries(${target} PRIVATE
+        $<TARGET_PROPERTY:sdbfs_compiler_flags,INTERFACE_LINK_LIBRARIES>
+    )
+    target_include_directories(${target} PRIVATE
+        $<TARGET_PROPERTY:sdbfs_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+    target_compile_options(${target} PRIVATE
+        $<TARGET_PROPERTY:sdbfs_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+    )
+    target_compile_definitions(${target} PRIVATE
+        $<TARGET_PROPERTY:sdbfs_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+    )
+    target_sources(${target} PRIVATE
+        $<TARGET_PROPERTY:sdbfs_compiler_flags,INTERFACE_SOURCES>
     )
 endforeach()
 
