@@ -19,21 +19,10 @@ set (smio_OUTPUT_BASENAME "smio"
 ########################################################################
 
 add_library(smio_compiler_flags INTERFACE)
-target_compile_features(smio_compiler_flags
-    INTERFACE
-    c_std_99
-)
 
-# add compiler warning flags just when building this project via
-# the BUILD_INTERFACE genex
-set(gcc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:GNU>>")
-set(clang_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:Clang>>")
-set(msvc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:MSVC>>")
-target_compile_options(smio_compiler_flags
+target_link_libraries(smio_compiler_flags
     INTERFACE
-    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
-    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
-    "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
+    halcs_compiler_flags
 )
 
 ########################################################################
@@ -150,7 +139,7 @@ set_target_properties(smio PROPERTIES
 
 # set compiler flags
 target_link_libraries(smio
-    PUBLIC
+    PRIVATE
     smio_compiler_flags
 )
 

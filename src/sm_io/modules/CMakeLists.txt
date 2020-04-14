@@ -102,6 +102,12 @@ source_group("Header Files" FILES
 # build static library
 add_library(smio_modules INTERFACE)
 
+# set compiler flags
+target_link_libraries(smio_modules
+    INTERFACE
+    smio_compiler_flags
+)
+
 ########################################################################
 # Library dependencies
 ########################################################################
