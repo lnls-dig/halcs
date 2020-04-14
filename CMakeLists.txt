@@ -324,6 +324,9 @@ list(APPEND halcs_LIBRARIES disptable)
 # HALCSCLIENT dependency
 #########################################################################
 
+# set compile options to halcsclient
+set(halcsclient_BOARD_OPT ${halcs_BOARD_OPT})
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
 
 # Add "target" name library dependency
