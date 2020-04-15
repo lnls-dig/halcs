@@ -257,9 +257,9 @@ list(APPEND bin_target_outputs "")
 # Binaries declaration
 ########################################################################
 
-option(BUILD_GENsdbfs "Whether or not to build gensdbfs tool" ON)
+option(BUILD_GENSDBFS "Whether or not to build gensdbfs tool" ON)
 
-if(BUILD_GENsdbfs)
+if(BUILD_GENSDBFS)
     list(APPEND bin_target_outputs "gensdbfs")
 endif()
 
