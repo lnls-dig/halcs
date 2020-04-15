@@ -210,6 +210,7 @@ set(llio_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ll_io_dev_info.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ll_io_endpoint.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ll_io_err.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ll_io_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ops/ll_io_eth.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ops/ll_io_eth_utils.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ops/ll_io_pcie.c
