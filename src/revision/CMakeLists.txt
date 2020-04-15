@@ -158,7 +158,7 @@ target_sources(revision PRIVATE
 
 # set depedency to targets
 target_link_libraries(revision
-    PUBLIC
+    PRIVATE
     ${revision_LIBRARIES}
     ${halcs_LIBRARIES}
 )

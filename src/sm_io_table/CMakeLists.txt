@@ -178,7 +178,7 @@ target_sources(smio_table PRIVATE
 
 # set depedency to targets
 target_link_libraries(smio_table
-    PUBLIC
+    PRIVATE
     ${smio_table_LIBRARIES}
     ${halcs_LIBRARIES}
 )

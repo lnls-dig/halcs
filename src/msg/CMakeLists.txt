@@ -157,7 +157,7 @@ target_sources(msg PRIVATE
 
 # set depedency to targets
 target_link_libraries(msg
-    PUBLIC
+    PRIVATE
     ${msg_LIBRARIES}
     ${halcs_LIBRARIES}
 )
