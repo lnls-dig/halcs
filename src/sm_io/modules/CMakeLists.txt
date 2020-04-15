@@ -42,6 +42,9 @@ subdirlist(subdirs ${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach(subdir ${subdirs})
     add_subdirectory(${subdir})
+    # modules are expected to generate a library with the name
+    # smio_module_<module_name>
+    list(APPEND smio_modules_LIBRARIES smio_module_${subdir})
 endforeach()
 
 #######################################
