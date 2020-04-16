@@ -3,24 +3,24 @@
 ########################################################################
 
 # library basename
-set (devio_OUTPUT_BASENAME "devio"
+set (dev_io_OUTPUT_BASENAME "dev_io"
     CACHE STRING
-    "Output devio library base name"
+    "Output dev_io library base name"
 )
 
 #########################################################################
 # XXX dependency
 #########################################################################
 
-# list(APPEND devio_LIBRARIES XXX)
+# list(APPEND dev_io_LIBRARIES XXX)
 
 ########################################################################
 # Library compile options
 ########################################################################
 
-add_library(devio_compiler_flags INTERFACE)
+add_library(dev_io_compiler_flags INTERFACE)
 
-target_link_libraries(devio_compiler_flags
+target_link_libraries(dev_io_compiler_flags
     INTERFACE
     halcs_compiler_flags
 )
@@ -35,7 +35,7 @@ target_link_libraries(devio_compiler_flags
 
 # Source files
 
-set(devio_sources
+set(dev_io_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_core.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_err.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_utils.c
@@ -43,39 +43,39 @@ set(devio_sources
 
 # for IDE project generation
 source_group("Source Files" FILES
-    ${devio_sources}
+    ${dev_io_sources}
 )
 
 # Header files
-list(APPEND devio_other_search_dirs "")
+list(APPEND dev_io_other_search_dirs "")
 
 #######################################
-# devio header definitions
+# dev_io header definitions
 #######################################
 
-set(devio_public_headers
+set(dev_io_public_headers
     ${common_INCLUDE_DIR}/dev_io_core.h
     ${common_INCLUDE_DIR}/dev_io_err.h
     ${common_INCLUDE_DIR}/dev_io_utils.h
 )
 
 # Get directory names only
-list(APPEND devio_search_dirs "")
+list(APPEND dev_io_search_dirs "")
 
-foreach(search_dir_header ${devio_public_headers})
+foreach(search_dir_header ${dev_io_public_headers})
     get_filename_component(search_dir
         ${search_dir_header}
         DIRECTORY
     )
 
-    list(APPEND devio_search_dirs ${search_dir})
+    list(APPEND dev_io_search_dirs ${search_dir})
 endforeach()
 
 # remove, well, duplicates ...
-list(REMOVE_DUPLICATES devio_search_dirs)
+list(REMOVE_DUPLICATES dev_io_search_dirs)
 
 # append to global search list
-list(APPEND devio_other_search_dirs ${devio_search_dirs})
+list(APPEND dev_io_other_search_dirs ${dev_io_search_dirs})
 
 #######################################
 # HEADER Grouping
@@ -83,40 +83,40 @@ list(APPEND devio_other_search_dirs ${devio_search_dirs})
 
 # for IDE project generation
 source_group("Header Files" FILES
-    ${devio_public_headers}
+    ${dev_io_public_headers}
 )
 
 # append to global search list
-list(APPEND devio_other_search_dirs ${common_INCLUDE_DIRS})
+list(APPEND dev_io_other_search_dirs ${common_INCLUDE_DIRS})
 
 ########################################################################
 # Library declaration
 ########################################################################
 
 # build static library
-add_library(devio STATIC
-    ${devio_sources}
-    ${devio_public_headers}
+add_library(dev_io STATIC
+    ${dev_io_sources}
+    ${dev_io_public_headers}
 )
 
-set_target_properties(devio PROPERTIES
-  PUBLIC_HEADER "${devio_public_headers}"
-  OUTPUT_NAME "${devio_OUTPUT_BASENAME}"
+set_target_properties(dev_io PROPERTIES
+  PUBLIC_HEADER "${dev_io_public_headers}"
+  OUTPUT_NAME "${dev_io_OUTPUT_BASENAME}"
   PREFIX "lib")
 
-# devio_other_search_dirs is in quotes as this is a list
+# dev_io_other_search_dirs is in quotes as this is a list
 # and the first element would be concatenated with the previous
 # generator expression.
-target_include_directories(devio
+target_include_directories(dev_io
     PRIVATE
-    "$<BUILD_INTERFACE:${devio_other_search_dirs}>"
+    "$<BUILD_INTERFACE:${dev_io_other_search_dirs}>"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>
 
 )
 
 # set debug posfix in case of debug builds
-set_target_properties(devio PROPERTIES
+set_target_properties(dev_io PROPERTIES
     DEBUG_POSTFIX
     ${CMAKE_DEBUG_POSTFIX}
     POSITION_INDEPENDENT_CODE
@@ -126,20 +126,20 @@ set_target_properties(devio PROPERTIES
 # set PRIVATE compiler flags. It doesn't really work to link an
 # INTERFACE library with PRIVATE scope. See:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
-target_link_libraries(devio PRIVATE
-    $<TARGET_PROPERTY:devio_compiler_flags,INTERFACE_LINK_LIBRARIES>
+target_link_libraries(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_LINK_LIBRARIES>
 )
-target_include_directories(devio PRIVATE
-    $<TARGET_PROPERTY:devio_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+target_include_directories(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
 )
-target_compile_options(devio PRIVATE
-    $<TARGET_PROPERTY:devio_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+target_compile_options(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_COMPILE_OPTIONS>
 )
-target_compile_definitions(devio PRIVATE
-    $<TARGET_PROPERTY:devio_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+target_compile_definitions(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
-target_sources(devio PRIVATE
-    $<TARGET_PROPERTY:devio_compiler_flags,INTERFACE_SOURCES>
+target_sources(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_SOURCES>
 )
 
 ########################################################################
@@ -147,8 +147,8 @@ target_sources(devio PRIVATE
 ########################################################################
 
 # set depedency to targets
-target_link_libraries(devio
+target_link_libraries(dev_io
     PRIVATE
-    ${devio_LIBRARIES}
+    ${dev_io_LIBRARIES}
     ${halcs_LIBRARIES}
 )

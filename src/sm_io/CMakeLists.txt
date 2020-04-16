@@ -3,24 +3,24 @@
 ########################################################################
 
 # library basename
-set (smio_OUTPUT_BASENAME "smio"
+set (sm_io_OUTPUT_BASENAME "sm_io"
     CACHE STRING
-    "Output smio library base name"
+    "Output sm_io library base name"
 )
 
 #########################################################################
 # XXX dependency
 #########################################################################
 
-# list(APPEND smio_LIBRARIES XXX)
+# list(APPEND sm_io_LIBRARIES XXX)
 
 ########################################################################
 # Library compile options
 ########################################################################
 
-add_library(smio_compiler_flags INTERFACE)
+add_library(sm_io_compiler_flags INTERFACE)
 
-target_link_libraries(smio_compiler_flags
+target_link_libraries(sm_io_compiler_flags
     INTERFACE
     halcs_compiler_flags
 )
@@ -34,16 +34,16 @@ target_link_libraries(smio_compiler_flags
 #######################################
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/chips)
-list(APPEND smio_LIBRARIES smio_chips)
+list(APPEND sm_io_LIBRARIES sm_io_chips)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/protocols)
-list(APPEND smio_LIBRARIES smio_protocols)
+list(APPEND sm_io_LIBRARIES sm_io_protocols)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rw_param)
-list(APPEND smio_LIBRARIES smio_rw_param)
+list(APPEND sm_io_LIBRARIES sm_io_rw_param)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
-list(APPEND smio_LIBRARIES smio_modules)
+list(APPEND sm_io_LIBRARIES sm_io_modules)
 
 #######################################
 # Our sources
@@ -51,7 +51,7 @@ list(APPEND smio_LIBRARIES smio_modules)
 
 # Source files
 
-set(smio_sources
+set(sm_io_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_bootstrap.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_cfg.c
@@ -60,36 +60,36 @@ set(smio_sources
 
 # for IDE project generation
 source_group("Source Files" FILES
-    ${smio_sources}
+    ${sm_io_sources}
 )
 
 # Header files
-list(APPEND smio_other_search_dirs "")
+list(APPEND sm_io_other_search_dirs "")
 
 #######################################
-# SMIO header definitions
+# sm_io header definitions
 #######################################
 
-set(smio_public_headers
+set(sm_io_public_headers
 )
 
 # Get directory names only
-list(APPEND smio_search_dirs "")
+list(APPEND sm_io_search_dirs "")
 
-foreach(search_dir_header ${smio_public_headers})
+foreach(search_dir_header ${sm_io_public_headers})
     get_filename_component(search_dir
         ${search_dir_header}
         DIRECTORY
     )
 
-    list(APPEND smio_search_dirs ${search_dir})
+    list(APPEND sm_io_search_dirs ${search_dir})
 endforeach()
 
 # remove, well, duplicates ...
-list(REMOVE_DUPLICATES smio_search_dirs)
+list(REMOVE_DUPLICATES sm_io_search_dirs)
 
 # append to global search list
-list(APPEND smio_other_search_dirs ${smio_search_dirs})
+list(APPEND sm_io_other_search_dirs ${sm_io_search_dirs})
 
 #######################################
 # HEADER Grouping
@@ -97,40 +97,40 @@ list(APPEND smio_other_search_dirs ${smio_search_dirs})
 
 # for IDE project generation
 source_group("Header Files" FILES
-    ${smio_public_headers}
+    ${sm_io_public_headers}
 )
 
 # append to global search list
-list(APPEND smio_other_search_dirs ${common_INCLUDE_DIRS})
+list(APPEND sm_io_other_search_dirs ${common_INCLUDE_DIRS})
 
 ########################################################################
 # Library declaration
 ########################################################################
 
 # build static library
-add_library(smio STATIC
-    ${smio_sources}
-    ${smio_public_headers}
+add_library(sm_io STATIC
+    ${sm_io_sources}
+    ${sm_io_public_headers}
 )
 
-set_target_properties(smio PROPERTIES
-  PUBLIC_HEADER "${smio_public_headers}"
-  OUTPUT_NAME "${smio_OUTPUT_BASENAME}"
+set_target_properties(sm_io PROPERTIES
+  PUBLIC_HEADER "${sm_io_public_headers}"
+  OUTPUT_NAME "${sm_io_OUTPUT_BASENAME}"
   PREFIX "lib")
 
-# smio_other_search_dirs is in quotes as this is a list
+# sm_io_other_search_dirs is in quotes as this is a list
 # and the first element would be concatenated with the previous
 # generator expression.
-target_include_directories(smio
+target_include_directories(sm_io
     PRIVATE
-    "$<BUILD_INTERFACE:${smio_other_search_dirs}>"
+    "$<BUILD_INTERFACE:${sm_io_other_search_dirs}>"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>
 
 )
 
 # set debug posfix in case of debug builds
-set_target_properties(smio PROPERTIES
+set_target_properties(sm_io PROPERTIES
     DEBUG_POSTFIX
     ${CMAKE_DEBUG_POSTFIX}
     POSITION_INDEPENDENT_CODE
@@ -140,20 +140,20 @@ set_target_properties(smio PROPERTIES
 # set PRIVATE compiler flags. It doesn't really work to link an
 # INTERFACE library with PRIVATE scope. See:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
-target_link_libraries(smio PRIVATE
-    $<TARGET_PROPERTY:smio_compiler_flags,INTERFACE_LINK_LIBRARIES>
+target_link_libraries(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_LINK_LIBRARIES>
 )
-target_include_directories(smio PRIVATE
-    $<TARGET_PROPERTY:smio_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+target_include_directories(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
 )
-target_compile_options(smio PRIVATE
-    $<TARGET_PROPERTY:smio_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+target_compile_options(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_COMPILE_OPTIONS>
 )
-target_compile_definitions(smio PRIVATE
-    $<TARGET_PROPERTY:smio_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+target_compile_definitions(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
-target_sources(smio PRIVATE
-    $<TARGET_PROPERTY:smio_compiler_flags,INTERFACE_SOURCES>
+target_sources(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_SOURCES>
 )
 
 ########################################################################
@@ -161,8 +161,8 @@ target_sources(smio PRIVATE
 ########################################################################
 
 # set depedency to targets
-target_link_libraries(smio
+target_link_libraries(sm_io
     PRIVATE
-    ${smio_LIBRARIES}
+    ${sm_io_LIBRARIES}
     ${halcs_LIBRARIES}
 )

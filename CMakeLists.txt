@@ -379,15 +379,15 @@ set(common_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-set(smio_chips_regs_INCLUDE_DIR
+set(sm_io_chips_regs_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include/chips
 )
 
-set(smio_modules_regs_INCLUDE_DIR
+set(sm_io_modules_regs_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include/hw
 )
 
-set(smio_protocols_INCLUDE_DIR
+set(sm_io_protocols_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include/protocols
 )
 

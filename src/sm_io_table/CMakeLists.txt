@@ -3,9 +3,9 @@
 ########################################################################
 
 # library basename
-set (smio_table_OUTPUT_BASENAME "smio_table"
+set (sm_io_table_OUTPUT_BASENAME "sm_io_table"
     CACHE STRING
-    "Output smio_table library base name"
+    "Output sm_io_table library base name"
 )
 
 #########################################################################
@@ -18,9 +18,9 @@ set (smio_table_OUTPUT_BASENAME "smio_table"
 # Library compile options
 ########################################################################
 
-add_library(smio_table_compiler_flags INTERFACE)
+add_library(sm_io_table_compiler_flags INTERFACE)
 
-target_link_libraries(smio_table_compiler_flags
+target_link_libraries(sm_io_table_compiler_flags
     INTERFACE
     halcs_compiler_flags
 )
@@ -31,7 +31,7 @@ target_link_libraries(smio_table_compiler_flags
 
 # Source files
 
-set(smio_table_sources
+set(sm_io_table_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/acq/sm_io_acq_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/dsp/sm_io_dsp_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.c
@@ -56,17 +56,17 @@ set(smio_table_sources
 
 # for IDE project generation
 source_group("Source Files" FILES
-    ${smio_table_sources}
+    ${sm_io_table_sources}
 )
 
 # Header files
-list(APPEND smio_table_other_search_dirs "")
+list(APPEND sm_io_table_other_search_dirs "")
 
 #######################################
 # SMIO TABLE header definitions
 #######################################
 
-set(smio_table_public_headers
+set(sm_io_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/fmc100m_4ch/sm_io_fmc100m_4ch_exports.h
@@ -90,22 +90,22 @@ set(smio_table_public_headers
 )
 
 # Get directory names only
-list(APPEND smio_table_search_dirs "")
+list(APPEND sm_io_table_search_dirs "")
 
-foreach(search_dir_header ${smio_table_public_headers})
+foreach(search_dir_header ${sm_io_table_public_headers})
     get_filename_component(search_dir
         ${search_dir_header}
         DIRECTORY
     )
 
-    list(APPEND smio_table_search_dirs ${search_dir})
+    list(APPEND sm_io_table_search_dirs ${search_dir})
 endforeach()
 
 # remove, well, duplicates ...
-list(REMOVE_DUPLICATES smio_table_search_dirs)
+list(REMOVE_DUPLICATES sm_io_table_search_dirs)
 
 # append to global search list
-list(APPEND smio_table_other_search_dirs ${smio_table_search_dirs})
+list(APPEND sm_io_table_other_search_dirs ${sm_io_table_search_dirs})
 
 #######################################
 # HEADER Grouping
@@ -113,40 +113,40 @@ list(APPEND smio_table_other_search_dirs ${smio_table_search_dirs})
 
 # for IDE project generation
 source_group("Header Files" FILES
-    ${smio_table_public_headers}
+    ${sm_io_table_public_headers}
 )
 
 # append to global search list
-list(APPEND smio_table_other_search_dirs ${common_INCLUDE_DIR})
+list(APPEND sm_io_table_other_search_dirs ${common_INCLUDE_DIR})
 
 ########################################################################
 # Library declaration
 ########################################################################
 
 # build static library
-add_library(smio_table STATIC
-    ${smio_table_sources}
-    ${smio_table_public_headers}
+add_library(sm_io_table STATIC
+    ${sm_io_table_sources}
+    ${sm_io_table_public_headers}
 )
 
-set_target_properties(smio_table PROPERTIES
-  PUBLIC_HEADER "${smio_table_public_headers}"
-  OUTPUT_NAME "${smio_table_OUTPUT_BASENAME}"
+set_target_properties(sm_io_table PROPERTIES
+  PUBLIC_HEADER "${sm_io_table_public_headers}"
+  OUTPUT_NAME "${sm_io_table_OUTPUT_BASENAME}"
   PREFIX "lib")
 
-# smio_table_other_search_dirs is in quotes as this is a list
+# sm_io_table_other_search_dirs is in quotes as this is a list
 # and the first element would be concatenated with the previous
 # generator expression.
-target_include_directories(smio_table
+target_include_directories(sm_io_table
     PRIVATE
-    "$<BUILD_INTERFACE:${smio_table_other_search_dirs}>"
+    "$<BUILD_INTERFACE:${sm_io_table_other_search_dirs}>"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>
 
 )
 
 # set debug posfix in case of debug builds
-set_target_properties(smio_table PROPERTIES
+set_target_properties(sm_io_table PROPERTIES
     DEBUG_POSTFIX
     ${CMAKE_DEBUG_POSTFIX}
     POSITION_INDEPENDENT_CODE
@@ -156,20 +156,20 @@ set_target_properties(smio_table PROPERTIES
 # set PRIVATE compiler flags. It doesn't really work to link an
 # INTERFACE library with PRIVATE scope. See:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
-target_link_libraries(smio_table PRIVATE
-    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_LINK_LIBRARIES>
+target_link_libraries(sm_io_table PRIVATE
+    $<TARGET_PROPERTY:sm_io_table_compiler_flags,INTERFACE_LINK_LIBRARIES>
 )
-target_include_directories(smio_table PRIVATE
-    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+target_include_directories(sm_io_table PRIVATE
+    $<TARGET_PROPERTY:sm_io_table_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
 )
-target_compile_options(smio_table PRIVATE
-    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+target_compile_options(sm_io_table PRIVATE
+    $<TARGET_PROPERTY:sm_io_table_compiler_flags,INTERFACE_COMPILE_OPTIONS>
 )
-target_compile_definitions(smio_table PRIVATE
-    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+target_compile_definitions(sm_io_table PRIVATE
+    $<TARGET_PROPERTY:sm_io_table_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
-target_sources(smio_table PRIVATE
-    $<TARGET_PROPERTY:smio_table_compiler_flags,INTERFACE_SOURCES>
+target_sources(sm_io_table PRIVATE
+    $<TARGET_PROPERTY:sm_io_table_compiler_flags,INTERFACE_SOURCES>
 )
 
 ########################################################################
@@ -177,8 +177,8 @@ target_sources(smio_table PRIVATE
 ########################################################################
 
 # set depedency to targets
-target_link_libraries(smio_table
+target_link_libraries(sm_io_table
     PRIVATE
-    ${smio_table_LIBRARIES}
+    ${sm_io_table_LIBRARIES}
     ${halcs_LIBRARIES}
 )
