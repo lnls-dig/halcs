@@ -401,7 +401,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/sm_io_table)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/linker)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/examples)
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_mngr)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_mngr)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/apps)
 
 ########################################################################
