@@ -15,6 +15,21 @@ set (boards_OUTPUT_BASENAME "boards"
 # list(APPEND boards_LIBRARIES XXX)
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# should we shrink DDR memory space for AFCv3 or not
+option(boards_SHRINK_AFCV3_DDR_SIZE "Enable AFCv3 DDR space shrinking" OFF)
+if(boards_SHRINK_AFCV3_DDR_SIZE)
+    set(boards_SHRINK_AFCV3_DDR_SIZE_VALUE y)
+else()
+    set(boards_SHRINK_AFCV3_DDR_SIZE_VALUE n)
+endif()
+
+message(STATUS
+    "Setting compile-time option boards_SHRINK_AFCV3_DDR_SIZE='${boards_SHRINK_AFCV3_DDR_SIZE_VALUE}'")
+
+########################################################################
 # Library compile options
 ########################################################################
 
@@ -32,6 +47,20 @@ target_link_libraries(boards_compiler_flags
 #######################################
 # Other sources
 #######################################
+
+# setting compile options
+string(APPEND boards_definitions "")
+string(APPEND boards_afcv3_definitions "")
+string(APPEND boards_afcv3_1_definitions "")
+
+if(boards_SHRINK_AFCV3_DDR_SIZE_VALUE STREQUAL y)
+    list(APPEND boards_afcv3_definitions
+        __SHRINK_AFCV3_DDR_SIZE__
+    )
+    list(APPEND boards_afcv3_1_definitions
+        __SHRINK_AFCV3_DDR_SIZE__
+    )
+endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
 list(APPEND boards_LIBRARIES boards_common)

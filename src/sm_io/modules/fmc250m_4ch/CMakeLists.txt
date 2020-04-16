@@ -15,6 +15,25 @@ set (sm_io_module_fmc250m_4ch_OUTPUT_BASENAME "sm_io_module_fmc250m_4ch"
 # list(APPEND sm_io_module_fmc250m_4ch_LIBRARIES XXX)
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# which programming value we want to program on EEPROM.
+
+set(sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_OPT "no_program" CACHE STRING
+    "FMC250M4CH EEPROM program type")
+set(sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_VALUES
+    "active;passive;no_program"
+)
+
+set_property(CACHE sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_OPT PROPERTY STRINGS
+    ${sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_VALUES}
+)
+
+message(STATUS
+    "Setting compile-time option sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE='${sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_OPT}'")
+
+########################################################################
 # Library compile options
 ########################################################################
 
@@ -103,6 +122,25 @@ target_include_directories(sm_io_module_fmc250m_4ch
     "$<BUILD_INTERFACE:${sm_io_module_fmc250m_4ch_other_search_dirs}>"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>
+)
+
+# setting compile options
+string(APPEND sm_io_module_fmc250m_4ch_board_definitions "")
+
+# setting board macros
+if(sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_OPT STREQUAL active)
+    list(APPEND sm_io_module_fmc250m_4ch_board_definitions
+        __FMC250M_4CH_EEPROM_PROGRAM__=1
+    )
+elseif(sm_io_module_fmc250m_4ch_EEPROM_PROG_VALUE_OPT STREQUAL passive)
+    list(APPEND sm_io_module_fmc250m_4ch_board_definitions
+        __FMC250M_4CH_EEPROM_PROGRAM__=2
+    )
+# no define for no_program
+endif()
+
+target_compile_definitions(sm_io_module_fmc250m_4ch PRIVATE
+    ${sm_io_module_fmc250m_4ch_board_definitions}
 )
 
 # set debug posfix in case of debug builds

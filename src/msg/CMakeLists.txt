@@ -15,6 +15,21 @@ set (msg_OUTPUT_BASENAME "msg"
 # list(APPEND msg_LIBRARIES XXX)
 
 ########################################################################
+# User compile-time options
+########################################################################
+
+# should we use local debug or not
+option(msg_LOCAL_MSG_DBG "Enable local message debug" OFF)
+if(msg_LOCAL_MSG_DBG)
+    set(msg_LOCAL_MSG_DBG_VALUE y)
+else()
+    set(msg_LOCAL_MSG_DBG_VALUE n)
+endif()
+
+message(STATUS
+    "Setting compile-time option msg_LOCAL_MSG_DBG='${msg_LOCAL_MSG_DBG_VALUE}'")
+
+########################################################################
 # Library compile options
 ########################################################################
 
@@ -122,6 +137,20 @@ target_include_directories(msg
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>
 
+)
+
+# setting compile options
+string(APPEND msg_definitions "")
+
+if(msg_LOCAL_MSG_DBG_VALUE STREQUAL y)
+    list(APPEND msg_definitions
+        LOCAL_MSG_DBG=1
+    )
+endif()
+
+# setting compile options
+target_compile_definitions(msg PRIVATE
+    ${msg_definitions}
 )
 
 # set debug posfix in case of debug builds

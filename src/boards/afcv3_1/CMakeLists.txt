@@ -108,6 +108,11 @@ target_include_directories(boards_afcv3_1
     $<INSTALL_INTERFACE:include>
 )
 
+# setting compile options
+target_compile_definitions(boards_afcv3_1 PRIVATE
+    ${boards_afcv3_1_definitions}
+)
+
 # set debug posfix in case of debug builds
 set_target_properties(boards_afcv3_1 PROPERTIES
     DEBUG_POSTFIX
