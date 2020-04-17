@@ -126,47 +126,7 @@ target_compile_options(halcs_compiler_flags
 # PCIEDRIVER dependency
 #########################################################################
 
-ExternalProject_Add(pciedriver_ext
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/pcie-driver
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/pciedriver
-    CONFIGURE_COMMAND ""
-    # Build only library, not the driver
-    BUILD_COMMAND make lib_driver
-    INSTALL_COMMAND ""
-    # PCIEDRIVER assumes in-source build
-    BUILD_IN_SOURCE ON
-)
-
-ExternalProject_Get_property(pciedriver_ext BINARY_DIR)
-
-# this is not a CMake project, so no *Config.cmake or *Targets.cmake
-# files will be generated. Hardcode library and include paths so when
-# libraries try to search for pciedriver they can find it locally!
-set(pciedriver_LIBRARY_DIRECTORIES
-    ${BINARY_DIR}/lib/pcie
-)
-
-set(pciedriver_INCLUDE_DIRECTORIES
-    ${BINARY_DIR}/include/pciDriver/lib
-    ${BINARY_DIR}/include/pciDriver/lib/../..
-)
-
-# Hack to make it work, otherwise INTERFACE_INCLUDE_DIRECTORIES will not be propagated
-file(MAKE_DIRECTORY ${pciedriver_INCLUDE_DIRECTORIES})
-
-# add imported library so we can link to it later
-add_library(pciedriver SHARED IMPORTED)
-
-# set library locations
-set_target_properties(pciedriver
-    PROPERTIES
-    IMPORTED_LOCATION
-    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
-    INTERFACE_INCLUDE_DIRECTORIES
-    "${pciedriver_INCLUDE_DIRECTORIES}"
-)
-
-add_dependencies(pciedriver pciedriver_ext)
+include(AddExternalProjectPciedriver)
 
 # Add "target" name library dependency
 list(APPEND halcs_LIBRARIES pciedriver)
@@ -175,45 +135,7 @@ list(APPEND halcs_LIBRARIES pciedriver)
 # BSMP dependency
 #########################################################################
 
-ExternalProject_Add(bsmp_ext
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/libbsmp
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/bsmp
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND make
-    INSTALL_COMMAND ""
-    # BSMP assumes in-source build
-    BUILD_IN_SOURCE ON
-)
-
-ExternalProject_Get_property(bsmp_ext BINARY_DIR)
-
-# this is not a CMake project, so no *Config.cmake or *Targets.cmake
-# files will be generated. Hardcode library and include paths so when
-# libraries try to search for bsmp they can find it locally!
-set(bsmp_LIBRARY_DIRECTORIES
-    ${BINARY_DIR}
-)
-set(bsmp_INCLUDE_DIRECTORIES
-    ${BINARY_DIR}/include/bsmp
-    ${BINARY_DIR}/include/bsmp/..
-)
-
-# Hack to make it work, otherwise INTERFACE_INCLUDE_DIRECTORIES will not be propagated
-file(MAKE_DIRECTORY ${bsmp_INCLUDE_DIRECTORIES})
-
-# add imported library so we can link to it later
-add_library(bsmp SHARED IMPORTED)
-
-# set library locations
-set_target_properties(bsmp
-    PROPERTIES
-    IMPORTED_LOCATION
-    ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so
-    INTERFACE_INCLUDE_DIRECTORIES
-    "${bsmp_INCLUDE_DIRECTORIES}"
-)
-
-add_dependencies(bsmp bsmp_ext)
+include(AddExternalProjectBsmp)
 
 # Add "target" name library dependency
 list(APPEND halcs_LIBRARIES bsmp)
