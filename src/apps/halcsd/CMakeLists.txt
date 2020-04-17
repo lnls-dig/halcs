@@ -165,6 +165,10 @@ find_path (
     NAMES libgen.h
 )
 
+mark_as_advanced(
+    _libgen_INCLUDE_DIRS
+)
+
 # append to global search list
 list(APPEND halcsd_other_search_dirs ${_libgen_INCLUDE_DIRS})
 
