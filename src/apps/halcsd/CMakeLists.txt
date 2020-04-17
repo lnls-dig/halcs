@@ -68,7 +68,7 @@ endif()
 
 # if we want HALCSD_CFG or not.
 
-option(BUILD_halcsd_cfg "Whether or not to build halcsd_cfg" ON)
+option(BUILD_halcsd_cfg "Whether or not to build halcsd_cfg" OFF)
 
 if(BUILD_halcsd_cfg)
     list(APPEND apps_halcsd "halcsd_cfg")
