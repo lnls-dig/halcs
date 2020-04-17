@@ -122,66 +122,6 @@ target_compile_options(halcs_compiler_flags
     "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
 )
 
-########################################################################
-# libzmq dependency
-########################################################################
-
-find_package(libzmq)
-if(NOT libzmq_FOUND)
-    message(STATUS
-        "libzmq not found with find_package MODULE mode. Trying CONFIG mode." )
-    find_package(libzmq CONFIG)
-endif()
-if(libzmq_FOUND)
-    list(APPEND MORE_LIBRARIES ${libzmq_LIBRARIES})
-    if(PC_libzmq_FOUND)
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_libzmq_STATIC_LDFLAGS})
-    endif()
-else()
-    message(FATAL_ERROR
-        "libzmq is not installed. Install it, then run CMake again." )
-endif()
-
-#########################################################################
-# czmq dependency
-#########################################################################
-
-find_package(czmq)
-if(NOT czmq_FOUND)
-    message(STATUS
-        "czmq not found with find_package MODULE mode. Trying CONFIG mode." )
-    find_package(czmq CONFIG)
-endif()
-if(czmq_FOUND)
-    list(APPEND MORE_LIBRARIES ${czmq_LIBRARIES})
-    if(PC_czmq_FOUND)
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_czmq_STATIC_LDFLAGS})
-    endif()
-else()
-    message(FATAL_ERROR
-        "czmq is not installed. Install it, then run CMake again." )
-endif()
-
-#########################################################################
-# mlm dependency
-#########################################################################
-
-find_package(mlm)
-if(NOT mlm_FOUND)
-    message(STATUS
-        "mlm not found with find_package MODULE mode. Trying CONFIG mode." )
-    find_package(mlm CONFIG)
-endif()
-if(mlm_FOUND)
-    list(APPEND MORE_LIBRARIES ${mlm_LIBRARIES})
-    if(PC_mlm_FOUND)
-        list(APPEND OPT_LIBRARIES_STATIC ${PC_mlm_STATIC_LDFLAGS})
-    endif()
-else()
-    message(FATAL_ERROR
-        "libmlm is not installed. Install it, then run CMake again." )
-endif()
-
 #########################################################################
 # PCIEDRIVER dependency
 #########################################################################
