@@ -87,7 +87,6 @@ endmacro()
 ########################################################################
 
 # which board do we want.
-
 set(halcs_BOARD_OPT "AFCV3_1" CACHE STRING
     "HALCS board")
 set(halcs_BOARD_VALUES
@@ -100,7 +99,6 @@ set_property(CACHE halcs_BOARD_OPT PROPERTY STRINGS
 
 message(STATUS
     "Setting compile-time option halcs_BOARD='${halcs_BOARD_OPT}'")
-
 
 ########################################################################
 # Library options
