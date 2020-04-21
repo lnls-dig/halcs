@@ -2,7 +2,12 @@
 # Library definition
 #######################################
 
+# set installation variables compliant with distributions
+include(GNUInstallDirs)
+# get pciedriver version
 include(TestPciedriverVersion)
+# add external project
+include(ExternalProject)
 
 ExternalProject_Add(pciedriver_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/pcie-driver

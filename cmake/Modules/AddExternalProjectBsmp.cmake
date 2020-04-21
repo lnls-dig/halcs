@@ -2,7 +2,12 @@
 # Library definition
 #######################################
 
+# set installation variables compliant with distributions
+include(GNUInstallDirs)
+# get bsmp version
 include(TestBsmpVersion)
+# add external project
+include(ExternalProject)
 
 ExternalProject_Add(bsmp_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/libbsmp
