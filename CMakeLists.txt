@@ -13,21 +13,6 @@ list(APPEND CMAKE_MODULE_PATH ${halcs_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
-# set installation variables compliant with distributions
-include(GNUInstallDirs)
-# configure and generate *.Config.cmake files
-include(CMakePackageConfigHelpers)
-# extract version numbers from header file
-include(TestHalcsVersion)
-# detect target architecture
-include(TargetArch)
-# add git introspection functions
-include(GetGitRevisionDescription)
-### add FetchContent to enabla configure-time populating dependencies
-##include(FetchContent)
-include(ExternalProject)
-
-target_architecture(ARCH)
 
 # find pkg-config
 find_package(PkgConfig)
