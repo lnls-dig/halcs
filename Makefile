@@ -646,6 +646,7 @@ deps_clean: libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
+	mkdir -p ${PREFIX}/bin
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
 
 core_uninstall:
@@ -662,10 +663,8 @@ scripts_install:
 	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} install
 
 scripts_uninstall:
-	$(MAKE) -C scripts SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX} SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX} uninstall
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 

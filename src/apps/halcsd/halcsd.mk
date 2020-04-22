@@ -27,10 +27,16 @@ halcsd_cfg_STATIC_LIBS =
 halcsd_INIT_SYSTEM = $(shell $(TOP)/scripts/get-init-system.sh)
 
 halcsd_INIT_DIR = $(halcsd_DIR)/init/$(halcsd_INIT_SYSTEM)
-halcsd_INIT_ETC_FILES = $(shell cd $(halcsd_INIT_DIR) && find etc/ -type f ! -name '*.in')
-halcsd_INIT_SHARE_FILES = $(shell cd $(halcsd_INIT_DIR) && find share/ -type f ! -name '*.in')
+halcsd_INIT_SPECIFIC_ETC_FILES = $(shell cd $(halcsd_INIT_DIR) && find etc/ -type f ! -name '*.in')
+halcsd_INIT_SPECIFIC_SHARE_FILES = $(shell cd $(halcsd_INIT_DIR) && find share/ -type f ! -name '*.in')
+
+halcsd_INIT_GENERIC_DIR = $(halcsd_DIR)/init-generic
+halcsd_INIT_GENERIC_ETC_FILES = $(shell cd $(halcsd_INIT_GENERIC_DIR) && find etc/ -type f ! -name '*.in')
+halcsd_INIT_GENERIC_SHARE_FILES = $(shell cd $(halcsd_INIT_GENERIC_DIR) && find share/ -type f ! -name '*.in')
 
 # Top Makefile uses $(app)_ETC_SCRIPTS/$(app)_SHARE_SCRIPTS this to install
 # config files
-halcsd_ETC_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_ETC_FILES))
-halcsd_SHARE_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_SHARE_FILES))
+halcsd_ETC_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_SPECIFIC_ETC_FILES)) \
+	$(addprefix $(halcsd_INIT_GENERIC_DIR)/:,$(halcsd_INIT_GENERIC_ETC_FILES))
+halcsd_SHARE_SCRIPTS = $(addprefix $(halcsd_INIT_DIR)/:,$(halcsd_INIT_SPECIFIC_SHARE_FILES)) \
+	$(addprefix $(halcsd_INIT_GENERIC_DIR)/:,$(halcsd_INIT_GENERIC_SHARE_FILES))
