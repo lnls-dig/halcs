@@ -696,21 +696,6 @@ examples_clean:
 examples_mrproper:
 	$(MAKE) -C examples mrproper
 
-cfg:
-	$(MAKE) -C cfg all
-
-cfg_install:
-	$(MAKE) -C cfg install
-
-cfg_uninstall:
-	$(MAKE) -C cfg uninstall
-
-cfg_clean:
-	$(MAKE) -C cfg clean
-
-cfg_mrproper:
-	$(MAKE) -C cfg mrproper
-
 install: core_install deps_install liberrhand_install libconvc_install \
     libsdbutils_install libhutils_install libdisptable_install libllio_install \
     libhalcsclient_install libacqclient_install libbpmclient_install \
