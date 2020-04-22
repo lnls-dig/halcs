@@ -7,11 +7,11 @@ Requires=malamute.service
 PartOf=halcs@%i.target
 
 [Service]
-EnvironmentFile=@SYSTEMD_CONF_INSTALL_DIR@/halcs-board
+EnvironmentFile=@halcsd_SYSTEMD_CONF_INSTALL_DIR@/halcs-board
 Environment=HALCS_LOG_DIR=/var/log/halcs
 ExecStartPre=/bin/mkdir -p ${HALCS_LOG_DIR}
-ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/halcsd -f @CMAKE_INSTALL_FULL_SYSCONFDIR@/halcs/halcs.cfg -n be -t pcie -i %i -b ipc:///tmp/malamute -l ${HALCS_LOG_DIR}
-WorkingDirectory=@CMAKE_INSTALL_FULL_BINDIR@
+ExecStart=@halcsd_CMAKE_INSTALL_FULL_BINDIR@/halcsd -f @halcsd_CMAKE_INSTALL_FULL_SYSCONFDIR@/halcs/halcs.cfg -n be -t pcie -i %i -b ipc:///tmp/malamute -l ${HALCS_LOG_DIR}
+WorkingDirectory=@halcsd_CMAKE_INSTALL_FULL_BINDIR@
 TimeoutStopSec=2
 
 [Install]
