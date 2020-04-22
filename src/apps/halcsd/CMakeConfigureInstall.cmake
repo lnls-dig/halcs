@@ -9,6 +9,9 @@
 # This script can be used as part of the build via ADD_CUSTOM_COMMAND, or used
 # only during make install via INSTALL SCRIPT.
 #
+
+include(GNUInstallDirs)
+
 if(NOT DEFINED input_file)
     message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}(${CMAKE_CURRENT_LIST_LINE}): error: Variable input_file is not defined.")
 endif()
@@ -37,7 +40,6 @@ if(NOT DEFINED CMAKE_INSTALL_FULL_SYSCONFDIR)
     message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}(${CMAKE_CURRENT_LIST_LINE}): error: Variable MAKE_INSTALL_FULL_SYSCONFDIR is not defined.")
 endif()
 
-# prepend all variables with DESTDIR
 if(NOT DEFINED SYSTEMD_SERVICES_INSTALL_DIR_SET)
     set(SYSTEMD_SERVICES_INSTALL_DIR "$ENV{DESTDIR}${SYSTEMD_SERVICES_INSTALL_DIR}")
     set(SYSTEMD_SERVICES_INSTALL_DIR_SET ON)

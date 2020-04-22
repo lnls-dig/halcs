@@ -351,12 +351,10 @@ foreach(bin_target ${apps_halcsd})
         if(WITH_SYSTEMD)
             # service files. Use an install script so we are able to change the
             # absolute paths of systemd unit files on install, which can be
-            # prefixed by DESTDIR
+            # prefixed by CMAKE_INSTALL_PREFIX. SYSTEMD variables are always fixed
+            # to an absolute path.
             install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
             install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
-            install(CODE "set(CMAKE_INSTALL_FULL_BINDIR ${CMAKE_INSTALL_FULL_BINDIR})")
-            install(CODE "set(CMAKE_INSTALL_FULL_DATADIR ${CMAKE_INSTALL_FULL_DATADIR})")
-            install(CODE "set(CMAKE_INSTALL_FULL_SYSCONFDIR ${CMAKE_INSTALL_FULL_SYSCONFDIR})")
 
             install(CODE "set(input_file
                 \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-be@.service.in\")")
