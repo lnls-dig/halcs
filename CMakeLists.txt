@@ -240,7 +240,6 @@ set(halcs_LINKER_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/linker
 )
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cfg)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/boards)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_io)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/msg)
