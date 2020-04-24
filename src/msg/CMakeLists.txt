@@ -176,6 +176,9 @@ target_compile_options(msg PRIVATE
 target_compile_definitions(msg PRIVATE
     $<TARGET_PROPERTY:msg_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
+target_compile_features(msg PRIVATE
+    $<TARGET_PROPERTY:msg_compiler_flags,INTERFACE_COMPILE_FEATURES>
+)
 target_sources(msg PRIVATE
     $<TARGET_PROPERTY:msg_compiler_flags,INTERFACE_SOURCES>
 )

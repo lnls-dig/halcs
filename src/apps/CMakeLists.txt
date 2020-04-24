@@ -134,6 +134,9 @@ source_group("Header Files" FILES
 #    target_compile_definitions(${app_target} PRIVATE
 #        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 #    )
+#    target_compile_features(${app_target} PRIVATE
+#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_FEATURES>
+#    )
 #    target_sources(${app_target} PRIVATE
 #        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_SOURCES>
 #    )

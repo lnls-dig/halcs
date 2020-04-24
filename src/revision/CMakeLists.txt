@@ -148,6 +148,9 @@ target_compile_options(revision PRIVATE
 target_compile_definitions(revision PRIVATE
     $<TARGET_PROPERTY:revision_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
+target_compile_features(revision PRIVATE
+    $<TARGET_PROPERTY:revision_compiler_flags,INTERFACE_COMPILE_FEATURES>
+)
 target_sources(revision PRIVATE
     $<TARGET_PROPERTY:revision_compiler_flags,INTERFACE_SOURCES>
 )

@@ -312,6 +312,9 @@ foreach(bin_target ${apps_halcsd})
     target_compile_definitions(${bin_target} PRIVATE
         $<TARGET_PROPERTY:${bin_target}_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
     )
+    target_compile_features(${bin_target} PRIVATE
+        $<TARGET_PROPERTY:${bin_target}_compiler_flags,INTERFACE_COMPILE_FEATURES>
+    )
     target_sources(${bin_target} PRIVATE
         $<TARGET_PROPERTY:${bin_target}_compiler_flags,INTERFACE_SOURCES>
     )

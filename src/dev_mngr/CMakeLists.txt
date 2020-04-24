@@ -144,6 +144,9 @@ if(BUILD_dev_mngr)
     target_compile_definitions(dev_mngr PRIVATE
         $<TARGET_PROPERTY:dev_mngr_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
     )
+    target_compile_features(dev_mngr  PRIVATE
+        $<TARGET_PROPERTY:dev_mngr_compiler_flags,INTERFACE_COMPILE_FEATURES>
+    )
     target_sources(dev_mngr PRIVATE
         $<TARGET_PROPERTY:dev_mngr_compiler_flags,INTERFACE_SOURCES>
     )

@@ -138,6 +138,9 @@ target_compile_options(dev_io PRIVATE
 target_compile_definitions(dev_io PRIVATE
     $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
+target_compile_features(dev_io PRIVATE
+    $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_COMPILE_FEATURES>
+)
 target_sources(dev_io PRIVATE
     $<TARGET_PROPERTY:dev_io_compiler_flags,INTERFACE_SOURCES>
 )

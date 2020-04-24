@@ -382,6 +382,9 @@ foreach(target ${target_outputs})
     target_compile_definitions(${target} PRIVATE
         $<TARGET_PROPERTY:bpmclient_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
     )
+    target_compile_features(${target} PRIVATE
+        $<TARGET_PROPERTY:bpmclient_compiler_flags,INTERFACE_COMPILE_FEATURES>
+    )
     target_sources(${target} PRIVATE
         $<TARGET_PROPERTY:bpmclient_compiler_flags,INTERFACE_SOURCES>
     )

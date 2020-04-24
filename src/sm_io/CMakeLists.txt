@@ -152,6 +152,9 @@ target_compile_options(sm_io PRIVATE
 target_compile_definitions(sm_io PRIVATE
     $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
 )
+target_compile_features(sm_io PRIVATE
+    $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_COMPILE_FEATURES>
+)
 target_sources(sm_io PRIVATE
     $<TARGET_PROPERTY:sm_io_compiler_flags,INTERFACE_SOURCES>
 )
