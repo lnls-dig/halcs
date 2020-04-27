@@ -14,6 +14,7 @@ function usage() {
 }
 
 LIBSDIR="libs"
+SRCDIR="src"
 
 #######################################
 # All of our Makefile options
@@ -232,7 +233,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
     # Meta target to remove copied headers
     COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
         make -C ${LIBSDIR}/bpmclient pre_clean &&
-        make -C ${LIBSDIR}/halcsclient pre_clean"
+        make -C ${SRCDIR}/client pre_clean"
 else
     COMMAND_CLEAN=""
 fi
