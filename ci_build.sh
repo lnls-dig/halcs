@@ -335,17 +335,19 @@ elif [ "$CMAKE" = yes ]; then
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
-    make DESTDIR="${BUILD_PREFIX}" install
+    make install
 elif [ "$CPACK" = yes ]; then
     for board in ${CPACK_BOARDS}; do
         mkdir -p build
         cd build
         cmake \
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+            -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
             -DBUILD_PCIE_DRIVER=OFF \
             -Dhalcs_BOARD_OPT="$board" ../
         cpack -V -G "${CPACK_GENERATORS}"
@@ -355,11 +357,12 @@ else
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
-    make DESTDIR="${BUILD_PREFIX}" install
+    make install
 fi
 
 # Get CCache statistics
