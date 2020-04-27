@@ -87,11 +87,29 @@ mlm |malamute-version|
 .. |Libczmq Repository| replace:: https://github.com/zeromq/czmq/tree/|libczmq-version|
 .. |Malamute Repository| replace:: https://github.com/lnls-dig/malamute/tree/|malamute-version|
 
-In order to install them with versions that are known to be compatible use the
-following snippet:
+In order to install them with versions that are known to be compatible
+install the compiler, the build tools and use the snippet below:
+
+1. Install ``make``, ``gcc`` and ``build tools``:
 
 .. code-block:: bash
   :linenos:
+
+    sudo apt-get install make gcc g++ autoconf automake libtool git
+
+for Debian-based systems.
+
+.. code-block:: bash
+  :linenos:
+
+    sudo yum install make gcc gcc-c++ autoconf automake libtool git
+
+for Fedora-based systems.
+
+.. code-block:: bash
+  :linenos:
+
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
     git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
