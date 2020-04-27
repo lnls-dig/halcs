@@ -193,7 +193,8 @@ list(APPEND halcs_LIBRARIES disptable)
 #########################################################################
 
 # set compile options to halcsclient
-set(halcsclient_BOARD_OPT ${halcs_BOARD_OPT})
+set(halcsclient_BOARD_OPT ${halcs_BOARD_OPT} CACHE STRING
+    "HALCS board")
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
 
