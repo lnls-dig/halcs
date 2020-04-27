@@ -350,7 +350,8 @@ elif [ "$CPACK" = yes ]; then
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
             -DBUILD_PCIE_DRIVER=OFF \
             -Dhalcs_BOARD_OPT="$board" ../
-        LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
+        # only expand and add ":" to LD_LIBRARY_PATH if non-empty
+        LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
     done
 else
     mkdir -p build
