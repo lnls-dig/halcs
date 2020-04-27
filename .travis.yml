@@ -24,6 +24,7 @@ addons:
     packages:
     - uuid-dev
     - graphviz
+    - alien
     - cmake
   sonarqube:
     organization: lnls-dig
