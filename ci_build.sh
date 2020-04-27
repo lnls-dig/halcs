@@ -331,33 +331,32 @@ elif [ "$COMPILE_SCRIPT" = yes ]; then
             -l $SYSTEM_INTEGRATION \
             -x "${HALCS_OPTS[*]}"
 elif [ "$CMAKE" = yes ]; then
+    mkdir -p build
+    cd build
+    cmake \
+        -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
-        mkdir -p build && \
-        cd build && \
-        cmake \
-            -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-            -Dhalcs_BOARD_OPT="$BOARD" ../ && \
-        make VERBOSE=1 && \
-        make DESTDIR="${BUILD_PREFIX}" install
+        make VERBOSE=1
+    make DESTDIR="${BUILD_PREFIX}" install
 elif [ "$CPACK" = yes ]; then
     for board in ${CPACK_BOARDS}; do
-        build-wrapper-linux-x86-64 --out-dir bw-output \
-            mkdir -p build && \
-            cd build && \
-            cmake \
-                -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-                -Dhalcs_BOARD_OPT="$board" ../ && \
-            cpack -G "${CPACK_GENERATORS}"
-    done
-else
-    build-wrapper-linux-x86-64 --out-dir bw-output \
-        mkdir -p build && \
-        cd build && \
+        mkdir -p build
+        cd build
         cmake \
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-            -Dhalcs_BOARD_OPT="$BOARD" ../ && \
-        make VERBOSE=1 && \
-        make DESTDIR="${BUILD_PREFIX}" install
+            -Dhalcs_BOARD_OPT="$board" ../
+        cpack -G "${CPACK_GENERATORS}"
+    done
+else
+    mkdir -p build
+    cd build
+    cmake \
+        -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -Dhalcs_BOARD_OPT="$BOARD" ../
+    build-wrapper-linux-x86-64 --out-dir bw-output \
+        make VERBOSE=1
+    make DESTDIR="${BUILD_PREFIX}" install
 fi
 
 # Get CCache statistics
