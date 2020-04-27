@@ -112,6 +112,9 @@ if(halcsd_INSTALL_UDEV_RULES)
     endif()
 endif()
 
+# relative directory for halcs config files
+set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -408,7 +411,7 @@ foreach(bin_target ${apps_halcsd})
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs.cfg
-                DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
+                DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/${NOPREFIX_HALCS_SYSCONFDIR}
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
             )
