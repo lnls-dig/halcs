@@ -346,7 +346,7 @@ elif [ "$CPACK" = yes ]; then
         cmake \
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
             -Dhalcs_BOARD_OPT="$board" ../
-        cpack -G "${CPACK_GENERATORS}"
+        cpack -V -G "${CPACK_GENERATORS}"
     done
 else
     mkdir -p build
