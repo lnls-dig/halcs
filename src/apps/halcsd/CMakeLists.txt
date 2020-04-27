@@ -103,9 +103,16 @@ option(halcsd_INSTALL_UDEV_RULES
     ON
 )
 
+# udev directories
+set(UDEV_RULES_PREFIX "/etc" CACHE STRING
+    "UDEV rules system prefix (typically /etc ou /usr/lib)")
+
+set(NOPREFIX_UDEV_SYSCONFDIR "udev/rules.d")
+
+set(UDEV_SYSCONFDIR "${UDEV_RULES_PREFIX}/${NOPREFIX_UDEV_SYSCONFDIR}")
+
 # check directory for udev rules
 if(halcsd_INSTALL_UDEV_RULES)
-    set(NOPREFIX_UDEV_SYSCONFDIR "udev/rules.d")
 endif()
 
 # relative directory for halcs config files
@@ -357,7 +364,7 @@ foreach(bin_target ${apps_halcsd})
             # to an absolute path.
             install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
             install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
-            install(CODE "set(NOPREFIX_UDEV_SYSCONFDIR ${NOPREFIX_UDEV_SYSCONFDIR})")
+            install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
             install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
 
             install(CODE "set(input_file
@@ -423,7 +430,7 @@ foreach(bin_target ${apps_halcsd})
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/60-udev_fpga.rules
-                DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/${NOPREFIX_UDEV_SYSCONFDIR}
+                DESTINATION ${UDEV_SYSCONFDIR}
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
             )
