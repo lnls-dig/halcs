@@ -340,6 +340,7 @@ elif [ "$CMAKE" = yes ]; then
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
     make DESTDIR="${BUILD_PREFIX}" install
+    cd "${BASE_PWD}"
 elif [ "$CPACK" = yes ]; then
     LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib)
     LOCAL_LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:$(readlink -f ${BUILD_PREFIX}/lib64)
@@ -352,6 +353,7 @@ elif [ "$CPACK" = yes ]; then
             -Dhalcs_BOARD_OPT="$board" ../
         # only expand and add ":" to LD_LIBRARY_PATH if non-empty
         LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
+        cd "${BASE_PWD}"
     done
 else
     mkdir -p build
@@ -363,6 +365,7 @@ else
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
     make DESTDIR="${BUILD_PREFIX}" install
+    cd "${BASE_PWD}"
 fi
 
 # Get CCache statistics
