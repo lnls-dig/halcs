@@ -4,12 +4,6 @@ language: c
 compiler:
 - gcc
 
-# blocklist
-branches:
-  except:
-    - gradle-removal
-    - cmake-support
-
 dist: bionic
 os: linux
 
@@ -17,12 +11,22 @@ env:
   - PURE_MAKE=yes BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
   - PURE_MAKE=yes BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
   - PURE_MAKE=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - COMPILE_SCRIPT=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - CMAKE=yes BOARD=ml605
+  - CMAKE=yes BOARD=afcv3
+  - CMAKE=yes BOARD=afcv3_1
+
+jobs:
+  include:
+  - compiler: gcc
+    env: CPACK=yes CPACK_BOARDS="ml605 afcv3 afcv3_1" CPACK_GENERATORS="DEB;RPM" DEPLOY="yes"
 
 addons:
   apt:
     packages:
     - uuid-dev
     - graphviz
+    - cmake
   sonarqube:
     organization: lnls-dig
     token:

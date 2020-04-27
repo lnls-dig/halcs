@@ -324,8 +324,14 @@ if [ "$PURE_MAKE" = yes ]; then
 
 elif [ "$COMPILE_SCRIPT" = yes ]; then
     build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+elif [ "$CMAKE" = yes ]; then
+    build-wrapper-linux-x86-64 --out-dir bw-output mkdir -p build && cd build && cmake -Dhalcs_BOARD_OPT="$BOARD" ../ && make VERBOSE=1 && make DESTDIR="${BUILD_PREFIX}" install
+elif [ "$CPACK" = yes ]; then
+    for board in ${CPACK_BOARDS}; do
+        build-wrapper-linux-x86-64 --out-dir bw-output mkdir -p build && cd build && cmake -Dhalcs_BOARD_OPT="$board" ../ && cpack -G "${CPACK_GENERATORS}"
+    done
 else
-    build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+    build-wrapper-linux-x86-64 --out-dir bw-output mkdir -p build && cd build && cmake -Dhalcs_BOARD_OPT="$BOARD" ../ && make VERBOSE=1 && make DESTDIR="${BUILD_PREFIX}" install
 fi
 
 # Get CCache statistics
