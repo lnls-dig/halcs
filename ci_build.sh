@@ -335,12 +335,11 @@ elif [ "$CMAKE" = yes ]; then
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-        -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
-    make install
+    make DESTDIR="${BUILD_PREFIX}" install
 elif [ "$CPACK" = yes ]; then
     LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib)
     LOCAL_LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:$(readlink -f ${BUILD_PREFIX}/lib64)
@@ -349,7 +348,6 @@ elif [ "$CPACK" = yes ]; then
         cd build
         cmake \
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-            -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
             -DBUILD_PCIE_DRIVER=OFF \
             -Dhalcs_BOARD_OPT="$board" ../
         LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
@@ -359,12 +357,11 @@ else
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-        -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
-    make install
+    make DESTDIR="${BUILD_PREFIX}" install
 fi
 
 # Get CCache statistics
