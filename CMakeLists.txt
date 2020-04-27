@@ -72,10 +72,10 @@ endmacro()
 ########################################################################
 
 # which board do we want.
-set(halcs_BOARD_OPT "AFCV3_1" CACHE STRING
+set(halcs_BOARD_OPT "afcv3_1" CACHE STRING
     "HALCS board")
 set(halcs_BOARD_VALUES
-    "ML605;AFCV3;AFCV3_1"
+    "ml605;afcv3;afcv3_1"
 )
 
 set_property(CACHE halcs_BOARD_OPT PROPERTY STRINGS

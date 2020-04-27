@@ -189,10 +189,10 @@ endif()
 
 # which board do we want.
 
-set(halcsclient_BOARD_OPT "AFCV3_1" CACHE STRING
+set(halcsclient_BOARD_OPT "afcv3_1" CACHE STRING
     "HALCS board")
 set(halcsclient_BOARD_VALUES
-    "ML605;AFCV3;AFCV3_1"
+    "ml605;afcv3;afcv3_1"
 )
 
 set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
@@ -570,15 +570,15 @@ foreach(target ${target_outputs})
     string(APPEND halcsclient_board_definitions "")
 
     # setting board macros
-    if(halcsclient_BOARD_OPT STREQUAL ML605)
+    if(halcsclient_BOARD_OPT STREQUAL ml605)
         list(APPEND halcsclient_board_definitions
             __BOARD_ML605__
         )
-    elseif(halcsclient_BOARD_OPT STREQUAL AFCV3)
+    elseif(halcsclient_BOARD_OPT STREQUAL afcv3)
         list(APPEND halcsclient_board_definitions
             __BOARD_AFCV3__
         )
-    elseif(halcsclient_BOARD_OPT STREQUAL AFCV3_1)
+    elseif(halcsclient_BOARD_OPT STREQUAL afcv3_1)
         list(APPEND halcsclient_board_definitions
             __BOARD_AFCV3__
             __BOARD_AFCV3_1__
