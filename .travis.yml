@@ -45,6 +45,7 @@ install:
 #   Build and check this project
 script:
 - ./ci_build.sh
+- ./ci_show_err_logs.sh
 - ./ci_scanner.sh
 
 # Generate and deploy documentation
