@@ -335,6 +335,7 @@ elif [ "$CMAKE" = yes ]; then
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
@@ -345,6 +346,7 @@ elif [ "$CPACK" = yes ]; then
         cd build
         cmake \
             -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+            -DBUILD_PCIE_DRIVER=OFF \
             -Dhalcs_BOARD_OPT="$board" ../
         cpack -V -G "${CPACK_GENERATORS}"
     done
@@ -353,6 +355,7 @@ else
     cd build
     cmake \
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
     build-wrapper-linux-x86-64 --out-dir bw-output \
         make VERBOSE=1
