@@ -342,6 +342,8 @@ elif [ "$CMAKE" = yes ]; then
         make VERBOSE=1
     make install
 elif [ "$CPACK" = yes ]; then
+    LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib)
+    LOCAL_LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:$(readlink -f ${BUILD_PREFIX}/lib64)
     for board in ${CPACK_BOARDS}; do
         mkdir -p build
         cd build
@@ -350,7 +352,7 @@ elif [ "$CPACK" = yes ]; then
             -DCMAKE_INSTALL_PREFIX="${BUILD_PREFIX}" \
             -DBUILD_PCIE_DRIVER=OFF \
             -Dhalcs_BOARD_OPT="$board" ../
-        cpack -V -G "${CPACK_GENERATORS}"
+        LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
     done
 else
     mkdir -p build
