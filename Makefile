@@ -15,7 +15,7 @@ DEPMOD ?=	depmod
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= afcv3_1
 # Select which application we want to generate. Options are: halcsd, halcs_generic_udev
-APPS ?= "halcsd halcs_generic_udev"
+APPS ?= halcsd halcs_generic_udev
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE ?= n
