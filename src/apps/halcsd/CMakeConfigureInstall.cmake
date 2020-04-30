@@ -48,24 +48,17 @@ if(NOT DEFINED CMAKE_INSTALL_FULL_SYSCONFDIR)
     message(FATAL_ERROR "${CMAKE_CURRENT_LIST_FILE}(${CMAKE_CURRENT_LIST_LINE}): error: Variable CMAKE_INSTALL_FULL_SYSCONFDIR is not defined.")
 endif()
 
-# if we are in a cpack environment, cpack will first use DESTDIR to create a local build
-# and after it will relocate them to build the final package. This is a problem for
-# us, as we need to set DESTDIR to the final paths as we need it for setting
-# absolute paths in .service units and udev rules.
-#
-# default CMAKE_FINAL_DESTDIR if not set by CPACK_PROJECT_CONFIG_FILE
-set(CMAKE_FINAL_DESTDIR $ENV{DESTDIR})
-set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMakeFixCPackPaths.cmake)
+# None of the variables will add DESDIR to the files. This is on purpose, as
+# on a CPack packaging there is no way to distinguish the intermediate CPack
+# DESTDIR variable from a non CPack packaging (e.g., make DESDIR=<dir> install)
+set(halcsd_SYSTEMD_SERVICES_INSTALL_DIR "${SYSTEMD_SERVICES_INSTALL_DIR}")
+set(halcsd_SYSTEMD_CONF_INSTALL_DIR "${SYSTEMD_CONF_INSTALL_DIR}")
 
-# prepend all variables with our CMAKE_FINAL_DESTDIR
-set(halcsd_SYSTEMD_SERVICES_INSTALL_DIR "${CMAKE_FINAL_DESTDIR}${SYSTEMD_SERVICES_INSTALL_DIR}")
-set(halcsd_SYSTEMD_CONF_INSTALL_DIR "${CMAKE_FINAL_DESTDIR}${SYSTEMD_CONF_INSTALL_DIR}")
-
-set(halcsd_CMAKE_INSTALL_FULL_BINDIR "${CMAKE_FINAL_DESTDIR}${CMAKE_INSTALL_FULL_BINDIR}")
-set(halcsd_CMAKE_INSTALL_FULL_DATADIR "${CMAKE_FINAL_DESTDIR}${CMAKE_INSTALL_FULL_DATADIR}")
-set(halcsd_CMAKE_INSTALL_FULL_SYSCONFDIR "${CMAKE_FINAL_DESTDIR}${CMAKE_INSTALL_FULL_SYSCONFDIR}")
-set(halcsd_HALCS_INSTALL_FULL_SYSCONFDIR "${CMAKE_FINAL_DESTDIR}${CMAKE_INSTALL_FULL_SYSCONFDIR}/${NOPREFIX_HALCS_SYSCONFDIR}")
-set(halcsd_UDEV_INSTALL_FULL_SYSCONFDIR "${CMAKE_FINAL_DESTDIR}${UDEV_SYSCONFDIR}")
+set(halcsd_CMAKE_INSTALL_FULL_BINDIR "${CMAKE_INSTALL_FULL_BINDIR}")
+set(halcsd_CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}")
+set(halcsd_CMAKE_INSTALL_FULL_SYSCONFDIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+set(halcsd_HALCS_INSTALL_FULL_SYSCONFDIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}/${NOPREFIX_HALCS_SYSCONFDIR}")
+set(halcsd_UDEV_INSTALL_FULL_SYSCONFDIR "${UDEV_SYSCONFDIR}")
 
 configure_file(${input_file}
     ${output_file}
