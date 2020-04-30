@@ -58,9 +58,11 @@ message(STATUS "apps_targets: ${apps_targets}")
 foreach(app_target ${apps_targets})
     # add linker options here as we can't use the more modern
     # target_link_options() that appeared only on CMake 3.13
-    set_target_properties(${app_target}
-        PROPERTIES LINK_FLAGS "-Wl,-T${halcs_LINKER_DIR}/halcs.ld"
-    )
+    if(TARGET ${app_target})
+        set_target_properties(${app_target}
+            PROPERTIES LINK_FLAGS "-Wl,-T${halcs_LINKER_DIR}/halcs.ld"
+        )
+    endif()
 endforeach()
 
 #######################################
@@ -119,27 +121,29 @@ source_group("Header Files" FILES
 ########################################################################
 
 #foreach(app_target ${apps_targets})
-#    # set PRIVATE compiler flags. It doesn't really work to link an
-#    # INTERFACE library with PRIVATE scope. See:
-#    # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
-#    target_link_libraries(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_LINK_LIBRARIES>
-#    )
-#    target_include_directories(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
-#    )
-#    target_compile_options(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_OPTIONS>
-#    )
-#    target_compile_definitions(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
-#    )
-#    target_compile_features(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_FEATURES>
-#    )
-#    target_sources(${app_target} PRIVATE
-#        $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_SOURCES>
-#    )
+#    if(TARGET ${app_target})
+#        # set PRIVATE compiler flags. It doesn't really work to link an
+#        # INTERFACE library with PRIVATE scope. See:
+#        # https://gitlab.kitware.com/cmake/cmake/-/issues/15415
+#        target_link_libraries(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_LINK_LIBRARIES>
+#        )
+#        target_include_directories(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_INCLUDE_DIRECTORIES>
+#        )
+#        target_compile_options(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_OPTIONS>
+#        )
+#        target_compile_definitions(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_DEFINITIONS>
+#        )
+#        target_compile_features(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_COMPILE_FEATURES>
+#        )
+#        target_sources(${app_target} PRIVATE
+#            $<TARGET_PROPERTY:apps_compiler_flags,INTERFACE_SOURCES>
+#        )
+#    endif()
 #endforeach()
 
 ########################################################################
@@ -147,10 +151,12 @@ source_group("Header Files" FILES
 ########################################################################
 
 #foreach(app_target ${apps_targets})
-#    # set depedency to targets
-#    target_link_libraries(${app_target}
-#        PRIVATE
-#        ${apps_LIBRARIES}
-#        ${halcs_LIBRARIES}
-#    )
+#    if(TARGET ${app_target})
+#        # set depedency to targets
+#        target_link_libraries(${app_target}
+#            PRIVATE
+#            ${apps_LIBRARIES}
+#            ${halcs_LIBRARIES}
+#        )
+#    endif()
 #endforeach()
