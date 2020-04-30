@@ -668,12 +668,6 @@ scripts_uninstall:
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
-scripts_clean:
-	$(MAKE) -C scripts clean
-
-scripts_mrproper:
-	$(MAKE) -C scripts mrproper
-
 tests:
 	$(MAKE) -C tests all
 
@@ -708,9 +702,8 @@ uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
     libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean \
     libacqclient_clean libbpmclient_clean examples_clean tests_clean \
-    scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
     libhalcsclient_mrproper libacqclient_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper scripts_mrproper
+    examples_mrproper tests_mrproper
