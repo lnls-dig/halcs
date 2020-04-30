@@ -27,6 +27,12 @@ set (halcs_generic_udev_OUTPUT_BASENAME "halcs_generic_udev"
 # User compile-time options
 ########################################################################
 
+option(BUILD_halcs_generic_udev "Whether or not to build halcs_generic_udev" ON)
+
+if(BUILD_halcs_generic_udev)
+    list(APPEND apps_halcs_generic_udev "halcs_generic_udev")
+endif()
+
 #######################################
 # HALCS_GENERIC_UDEV
 #######################################
@@ -60,46 +66,48 @@ set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
 # Binaries declaration
 ########################################################################
 
-# install config files
-if(halcs_generic_udev_INSTALL_UDEV_RULES)
-    # general scripts location
-    set(halcs_generic_udev_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/halcs)
-    install(DIRECTORY DESTINATION ${halcs_generic_udev_INSTALL_DATADIR})
+if(BUILD_halcs_generic_udev)
+    # install config files
+    if(halcs_generic_udev_INSTALL_UDEV_RULES)
+        # general scripts location
+        set(halcs_generic_udev_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/halcs)
+        install(DIRECTORY DESTINATION ${halcs_generic_udev_INSTALL_DATADIR})
 
-    # general scripts
-    install(FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/find-script.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/get-fpga-gateware-properties.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/get-halcs-idxs.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/run-fpga-program.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/stop-fpga-program.sh
-        DESTINATION ${halcs_generic_udev_INSTALL_DATADIR}
-        PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-    )
+        # general scripts
+        install(FILES
+            ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/find-script.sh
+            ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/get-fpga-gateware-properties.sh
+            ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/get-halcs-idxs.sh
+            ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/run-fpga-program.sh
+            ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/stop-fpga-program.sh
+            DESTINATION ${halcs_generic_udev_INSTALL_DATADIR}
+            PERMISSIONS
+            OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
 
-    # udev files. Use an install script so we are able to change the
-    # absolute paths of systemd unit files on install, which can be
-    # prefixed by CMAKE_INSTALL_PREFIX. SYSTEMD variables are always fixed
-    # to an absolute path.
-    install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
-    install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
-    install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
-    install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
+        # udev files. Use an install script so we are able to change the
+        # absolute paths of systemd unit files on install, which can be
+        # prefixed by CMAKE_INSTALL_PREFIX. SYSTEMD variables are always fixed
+        # to an absolute path.
+        install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
+        install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
+        install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
+        install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
 
-    # udev rules
-    install(CODE "set(input_file
-        \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/50-udev_fpga.rules.in\")")
-    install(CODE "set(output_file
-        \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/50-udev_fpga.rules\")")
-    install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+        # udev rules
+        install(CODE "set(input_file
+            \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/50-udev_fpga.rules.in\")")
+        install(CODE "set(output_file
+            \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/50-udev_fpga.rules\")")
+        install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
 
-    install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/50-udev_fpga.rules
-        DESTINATION ${UDEV_SYSCONFDIR}
-        PERMISSIONS
-        OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
-    )
+        install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/50-udev_fpga.rules
+            DESTINATION ${UDEV_SYSCONFDIR}
+            PERMISSIONS
+            OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
+        )
+    endif()
 endif()
 
 # set list to global, as linker options are passed through this
