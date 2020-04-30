@@ -111,10 +111,6 @@ set(NOPREFIX_UDEV_SYSCONFDIR "udev/rules.d")
 
 set(UDEV_SYSCONFDIR "${UDEV_RULES_PREFIX}/${NOPREFIX_UDEV_SYSCONFDIR}")
 
-# check directory for udev rules
-if(halcsd_INSTALL_UDEV_RULES)
-endif()
-
 # relative directory for halcs config files
 set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
 
