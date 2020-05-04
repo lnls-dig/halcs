@@ -784,6 +784,16 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+        /lib
+        /usr/etc
+        /etc/systemd
+        /lib/systemd
+        /etc/systemd/system
+        /lib/systemd/system
+        /etc/udev
+        /etc/udev/rules.d
+    )
     set(CPACK_PACKAGE_NAME "halcsclient")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}-${halcsclient_VERSION}-${arch_name}"
