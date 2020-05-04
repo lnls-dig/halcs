@@ -54,6 +54,9 @@ set(UDEV_SYSCONFDIR "${UDEV_RULES_PREFIX}/${NOPREFIX_UDEV_SYSCONFDIR}")
 # relative directory for halcs config files
 set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
 
+# relative directory for halcs data files
+set(NOPREFIX_HALCS_DATADIR "halcs")
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -70,7 +73,7 @@ if(BUILD_halcs_generic_udev)
     # install config files
     if(halcs_generic_udev_INSTALL_UDEV_RULES)
         # general scripts location
-        set(halcs_generic_udev_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/halcs)
+        set(halcs_generic_udev_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/${NOPREFIX_HALCS_DATADIR})
         install(DIRECTORY DESTINATION ${halcs_generic_udev_INSTALL_DATADIR})
 
         # general scripts
@@ -93,6 +96,7 @@ if(BUILD_halcs_generic_udev)
         install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
         install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
         install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
+        install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})")
 
         # udev rules
         install(CODE "set(input_file

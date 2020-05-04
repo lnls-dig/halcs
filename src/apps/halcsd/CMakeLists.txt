@@ -114,6 +114,9 @@ set(UDEV_SYSCONFDIR "${UDEV_RULES_PREFIX}/${NOPREFIX_UDEV_SYSCONFDIR}")
 # relative directory for halcs config files
 set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
 
+# relative directory for halcs data files
+set(NOPREFIX_HALCS_DATADIR "halcs")
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -340,7 +343,7 @@ foreach(bin_target ${apps_halcsd})
     # install config files
     if(TARGET halcsd)
         # general scripts location
-        set(halcsd_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/halcs)
+        set(halcsd_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/${NOPREFIX_HALCS_DATADIR})
         install(DIRECTORY DESTINATION ${halcsd_INSTALL_DATADIR})
 
         # general scripts
@@ -362,6 +365,7 @@ foreach(bin_target ${apps_halcsd})
             install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
             install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
             install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
+            install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})")
 
             install(CODE "set(input_file
                 \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-be@.service.in\")")
