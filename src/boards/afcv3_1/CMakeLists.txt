@@ -109,7 +109,8 @@ target_include_directories(boards_afcv3_1
 )
 
 # setting compile options
-target_compile_definitions(boards_afcv3_1 PRIVATE
+target_compile_definitions(boards_afcv3_1
+    PUBLIC
     ${boards_afcv3_1_definitions}
 )
 
