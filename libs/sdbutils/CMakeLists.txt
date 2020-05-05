@@ -106,9 +106,9 @@ set(clang_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:Clang>>")
 set(msvc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:MSVC>>")
 target_compile_options(sdbutils_compiler_flags
     INTERFACE
-    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
-    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2>>"
-    "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2>>"
+    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2;-g>>"
+    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-Wextra;-Werror;-O2;-g>>"
+    "$<${msvc_c}:$<BUILD_INTERFACE:-W3;-O2;-g>>"
 )
 
 # control where the static and shared libraries are built so that on windows
