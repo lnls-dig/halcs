@@ -108,6 +108,12 @@ target_include_directories(boards_ml605
     $<INSTALL_INTERFACE:include>
 )
 
+# setting compile options
+target_compile_definitions(boards_ml605
+    PUBLIC
+    ${boards_ml605_definitions}
+)
+
 # set debug posfix in case of debug builds
 set_target_properties(boards_ml605 PROPERTIES
     DEBUG_POSTFIX
