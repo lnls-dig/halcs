@@ -45,14 +45,21 @@ option(halcs_generic_udev_INSTALL_UDEV_RULES
 
 # udev directories
 set(UDEV_RULES_PREFIX "/etc" CACHE STRING
-    "UDEV rules system prefix (typically /etc ou /usr/lib)")
+    "UDEV rules system prefix (typically /etc or /usr/lib)")
 
+# relative directory for udev rules
 set(NOPREFIX_UDEV_SYSCONFDIR "udev/rules.d")
 
 set(UDEV_SYSCONFDIR "${UDEV_RULES_PREFIX}/${NOPREFIX_UDEV_SYSCONFDIR}")
 
+# halcs config directory
+set(HALCS_CFG_PREFIX "/etc" CACHE STRING
+    "HALCS config files prefix (typically /etc, /usr/etc or /usr/local/etc)")
+
 # relative directory for halcs config files
 set(NOPREFIX_HALCS_SYSCONFDIR "halcs")
+
+set(HALCS_SYSCONFDIR ${HALCS_CFG_PREFIX}/${NOPREFIX_HALCS_SYSCONFDIR})
 
 # relative directory for halcs data files
 set(NOPREFIX_HALCS_DATADIR "halcs")
@@ -94,6 +101,7 @@ if(BUILD_halcs_generic_udev)
         # to an absolute path.
         install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
         install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
+        install(CODE "set(HALCS_SYSCONFDIR ${HALCS_SYSCONFDIR})")
         install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
         install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
         install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})")
