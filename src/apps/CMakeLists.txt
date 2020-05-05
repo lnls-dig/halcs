@@ -60,7 +60,7 @@ foreach(app_target ${apps_targets})
     # target_link_options() that appeared only on CMake 3.13
     if(TARGET ${app_target})
         set_target_properties(${app_target}
-            PROPERTIES LINK_FLAGS "-Wl,-T${halcs_LINKER_DIR}/halcs.ld"
+            PROPERTIES LINK_FLAGS "-Wl,-T,${halcs_LINKER_DIR}/halcs.ld"
         )
     endif()
 endforeach()
