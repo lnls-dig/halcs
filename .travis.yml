@@ -2,7 +2,7 @@
 
 language: c
 compiler:
-- gcc
+  - gcc
 
 dist: bionic
 os: linux
@@ -16,10 +16,10 @@ env:
 
 jobs:
   include:
-  - compiler: gcc
-    env: CPACK=yes CPACK_BOARDS="ml605 afcv3 afcv3_1" CPACK_GENERATORS="DEB;RPM" DEPLOY="yes"
-  - compiler: gcc
-    env: CMAKE=yes BOARD=afcv3_1 DEPLOY_PAGES="yes"
+    - compiler: gcc
+      env: CPACK=yes CPACK_BOARDS="ml605 afcv3 afcv3_1" CPACK_GENERATORS="DEB;RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: CMAKE=yes BOARD=afcv3_1 DEPLOY_PAGES="yes"
 
 # Prerequisite packages provided by OS distro and used "as is"
 pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
@@ -39,14 +39,14 @@ pkg_deps_devtools: &pkg_deps_devtools
   - cmake
 
 pkg_deps_prereqs: &pkg_deps_prereqs
-    - *pkg_deps_prereqs_source
-    - *pkg_deps_prereqs_distro
+  - *pkg_deps_prereqs_source
+  - *pkg_deps_prereqs_distro
 
 addons:
   apt:
     packages:
-    - *pkg_deps_devtools
-    - *pkg_deps_prereqs
+      - *pkg_deps_devtools
+      - *pkg_deps_prereqs
   sonarqube:
     organization: lnls-dig
     token:
@@ -58,16 +58,16 @@ addons:
       - sonarqube-gradle
 
 before_install:
-- git submodule update --init --recursive
+  - git submodule update --init --recursive
 
 install:
-- pip install --user sphinx
+  - pip install --user sphinx
 
 #   Build and check this project
 script:
-- ./ci_build.sh
-- ./ci_show_err_logs.sh
-- ./ci_scanner.sh
+  - ./ci_build.sh
+  - ./ci_show_err_logs.sh
+  - ./ci_scanner.sh
 
 # Generate and deploy documentation
 after_success:
@@ -79,7 +79,7 @@ cache:
     - '$HOME/.sonar/cache'
 
 before_deploy:
-- . ./ci_deploy.sh
+  - . ./ci_deploy.sh
 
 deploy:
   - provider: releases
