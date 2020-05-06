@@ -118,6 +118,21 @@ target_link_libraries(sm_io_modules
 # set depedency to targets
 target_link_libraries(sm_io_modules
     INTERFACE
-    ${sm_io_modules_LIBRARIES}
     ${halcs_LIBRARIES}
+)
+
+########################################################################
+# Module dependencies
+########################################################################
+
+# This techinique is required so we can link to all of the module unconditionally,
+# as linker will add the symbol to the final binary if it has an unresolved symbol,
+# but for modules this is always the case. This was extracted from:
+# https://stackoverflow.com/questions/53071878/using-whole-archive-linker-option-with-cmake-and-libraries-with-other-library
+
+target_link_libraries(sm_io_modules
+    INTERFACE
+    -Wl,--whole-archive
+    ${sm_io_modules_LIBRARIES}
+    -Wl,--no-whole-archive
 )
