@@ -33,6 +33,9 @@ target_link_libraries(sm_io_compiler_flags
 # Other sources
 #######################################
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
+list(APPEND sm_io_LIBRARIES sm_io_modules)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/chips)
 list(APPEND sm_io_LIBRARIES sm_io_chips)
 
@@ -41,9 +44,6 @@ list(APPEND sm_io_LIBRARIES sm_io_protocols)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rw_param)
 list(APPEND sm_io_LIBRARIES sm_io_rw_param)
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules)
-list(APPEND sm_io_LIBRARIES sm_io_modules)
 
 #######################################
 # Our sources

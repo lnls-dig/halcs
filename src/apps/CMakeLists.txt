@@ -19,12 +19,12 @@ endmacro()
 #########################################################################
 
 list(APPEND apps_LIBRARIES
-    boards
     dev_io
-    msg
-    revision
     sm_io
     sm_io_table
+    msg
+    boards
+    revision
 )
 
 ########################################################################
