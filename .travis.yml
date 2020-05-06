@@ -18,6 +18,8 @@ jobs:
   include:
   - compiler: gcc
     env: CPACK=yes CPACK_BOARDS="ml605 afcv3 afcv3_1" CPACK_GENERATORS="DEB;RPM" DEPLOY="yes"
+  - compiler: gcc
+    env: CMAKE=yes BOARD=afcv3_1 DEPLOY_PAGES="yes"
 
 # Prerequisite packages provided by OS distro and used "as is"
 pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
@@ -68,7 +70,8 @@ script:
 - ./ci_scanner.sh
 
 # Generate and deploy documentation
-after_success: "cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR"
+after_success:
+  - if [ $DEPLOY_PAGES == "yes" ] ; then cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR; fi
 
 cache:
   ccache: true
@@ -97,3 +100,4 @@ deploy:
     keep_history: false
     on:
       all_branches: true
+      condition: $DEPLOY_PAGES = "yes"
