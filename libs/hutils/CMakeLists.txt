@@ -112,6 +112,34 @@ else()
         "liberrhand is not installed. Install it, then run CMake again." )
 endif()
 
+#########################################################################
+# libm dependency (possibly)
+#########################################################################
+
+include(CheckSymbolExists)
+
+if(NOT FLOOR_FUNCTION_EXISTS AND NOT NEED_LINKING_AGAINST_LIBM)
+    check_symbol_exists(floor math.h FLOOR_FUNCTION_EXISTS)
+    if(NOT FLOOR_FUNCTION_EXISTS)
+        unset(FLOOR_FUNCTION_EXISTS CACHE)
+        list(APPEND CMAKE_REQUIRED_LIBRARIES m)
+        check_symbol_exists(floor math.h FLOOR_FUNCTION_EXISTS)
+        if(FLOOR_FUNCTION_EXISTS)
+            set(NEED_LINKING_AGAINST_LIBM ON
+                CACHE BOOL
+                "Whether we need to link against libm or not" FORCE
+            )
+        else()
+            message(FATAL_ERROR
+                "could not find floor function on system libm")
+        endif()
+    endif()
+endif()
+
+if (NEED_LINKING_AGAINST_LIBM)
+    list(APPEND MORE_LIBRARIES m)
+endif()
+
 ########################################################################
 # Library compile options
 ########################################################################
