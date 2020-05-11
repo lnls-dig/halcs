@@ -48,17 +48,18 @@ Build from sources
 ''''''''''''''''''
 
 The HALCS software makes use of two build systems: ``make`` [#make]_
-and ``gradle`` [#gradle]_. Both of them should produce the same binaries, but
-``gradle`` gives you more outputs, such as ``.rpm`` packages and automatically
-increments the version number in header files during development.
+and ``cmake`` [#cmake]_. Both of them should produce the same binaries, but
+``cmake`` gives you more outputs, such as ``.deb`` and ``.rpm`` packages. Also,
+CMake gives you more controlover how binaries are built and is the recommended
+way.
 
 .. [#make] |Make Page|_
-.. [#gradle] |Gradle Page|_
+.. [#cmake] |CMake Page|_
 
 .. _`Make Page`: https://www.gnu.org/software/make
-.. _`Gradle Page`: https://gradle.org
+.. _`CMake Page`: https://cmake.org
 .. |Make Page| replace:: https://www.gnu.org/software/make
-.. |Gradle Page| replace:: https://gradle.org
+.. |CMake Page| replace:: https://cmake.org
 
 Prior to build HALCS, we need to install its dependencies. As of the moment,
 it makes use of 4 external dependencies:
@@ -258,6 +259,108 @@ modification to allow starting another program:
 
     ...
 
+Using CMake Build System
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to build the source code is to use ``cmake``:
+
+1. Install ``make`` and ``gcc``:
+
+.. code-block:: bash
+  :linenos:
+
+    sudo apt-get install make gcc
+
+for Debian-based systems.
+
+.. code-block:: bash
+  :linenos:
+
+    sudo yum install make gcc-c++
+
+for Fedora-based systems.
+
+2. Install ``CMake``. The supported version is ``3.10+``. Check you distribution
+   for the correct ``CMake`` version:
+
+.. code-block:: bash
+  :linenos:
+
+    sudo apt-get install cmake
+
+for Debian-based systems.
+
+.. code-block:: bash
+  :linenos:
+
+    sudo yum install cmake
+
+for Fedora-based systems.
+
+3. Check CMake version with:
+
+.. code-block:: bash
+
+    cmake --version
+
+If the reported version is less than ``3.10`` install it manually with:
+
+.. code-block:: bash
+  :linenos:
+
+    version=3.10
+    build=3
+    wget -c https://cmake.org/files/v$version/cmake-$version.$build.tar.gz -O - | \
+        tar -xzv
+    cd cmake-$version.$build/
+
+Compile and install ``CMake``:
+
+.. code-block:: bash
+  :linenos:
+
+    ./bootstrap
+    make -j$(nproc)
+    sudo make install
+
+4. Get the source code:
+
+.. code-block:: bash
+  :linenos:
+
+    git clone --recursive https://github.com/lnls-dig/halcs
+
+5. Go to the source code directory:
+
+.. code-block:: bash
+  :linenos:
+
+    cd halcs
+
+6. Build and install the code:
+
+.. code-block:: bash
+  :linenos:
+
+    mkdir -p build
+    cd build
+    cmake ../
+    make
+    sudo make install
+
+All in all, the full script to install HALCS with ``cmake`` is:
+
+.. code-block:: bash
+  :linenos:
+
+    git clone --recursive https://github.com/lnls-dig/halcs && \
+    cd halcs && \
+    mkdir -p build
+    cd build
+    cmake ../
+    make
+    sudo make install
+
 Using Make Build System
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -359,57 +462,6 @@ The full procedure would be:
     git clone --recursive https://github.com/lnls-dig/halcs && \
     cd halcs && \
     ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
-
-Using Gradle Build System
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Another way to build the source code is to use ``gradle``:
-
-1. Install ``make``, ``gcc`` and ``java``:
-
-.. code-block:: bash
-  :linenos:
-
-    sudo apt-get install openjdk-8-jdk openjdk-8-jre gcc
-
-for Debian-based systems.
-
-.. code-block:: bash
-  :linenos:
-
-   sudo yum install java-1.8.0-openjdk java-1.8.0-openjre gcc-c++
-
-for Fedora-based systems.
-
-2. Get the source code:
-
-.. code-block:: bash
-  :linenos:
-
-    git clone --recursive https://github.com/lnls-dig/halcs
-
-3. Go to the source code directory:
-
-.. code-block:: bash
-  :linenos:
-
-    cd halcs
-
-4. Build and install the code:
-
-.. code-block:: bash
-  :linenos:
-
-   ./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes
-
-All in all, the full script to install HALCS with ``gradle`` is:
-
-.. code-block:: bash
-  :linenos:
-
-    git clone --recursive https://github.com/lnls-dig/halcs && \
-    cd halcs && \
-   ./gradle_compile.sh -b afcv3_1 -a halcsd -e yes -f yes
 
 Updating Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
@@ -541,12 +593,13 @@ an example and assumes specific paths and running applications:
             systemctl stop \
                 halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
             cd ${DEP_DIR}/halcs && \
-            ./gradle_uninstall.sh && \
-            ./gradle_compile.sh -a halcsd -b afcv3_1 -e yes && \
+            mkdir -p build && \
+            cd build && \
+            cmake ../ && \
+            make && \
+            sudo make install && \
             mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
             systemctl daemon-reload && \
-            cd ${DEP_DIR}/halcs-generic-udev && \
-            make install &&  \
             systemctl start \
                 halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target
     EOF

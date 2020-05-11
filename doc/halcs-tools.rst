@@ -128,9 +128,9 @@ Example Tools
 
 Inside the ``examples/src`` directory under the project source tree
 you can find tools to control and monitor most of the mentioned modules.
-If HALCS was installed via ``make`` then the examples will be available
-at the system ``PATH``. Otherwise, you will need to use the examples build
-directory.
+If HALCS was installed via ``make`` or ``cmake`` then the examples will be
+available at the system ``PATH``. Otherwise, you will need to use the examples
+build directory.
 
 If in doubt which build system was used you can always build the examples
 by using one of the following options:
@@ -141,15 +141,23 @@ by using one of the following options:
 .. code-block:: bash
   :linenos:
 
-  make examples && sudo make examples_install
+  make examples
+  sudo make examples_install
 
-``Gradle``
-    With ``gradle`` you can build the examples from the root of HALCS with:
+``CMake``
+    With ``cmake`` you can build the examples from the root of HALCS with:
 
 .. code-block:: bash
   :linenos:
 
-  ./gradlew :examples:assemble
+    mkdir -p build
+    cd build
+    cmake ../examples
+    make
+    sudo make install
+
+And the examples should be installed in your system ``PATH`` (either
+``/usr/local/bin`` or ``/usr/bin``).
 
 Acquisition
 '''''''''''
