@@ -107,6 +107,26 @@ else()
 endif()
 
 #########################################################################
+# disptable dependency
+#########################################################################
+
+find_package(disptable)
+if(NOT disptable_FOUND)
+    message(STATUS
+        "disptable not found with find_package MODULE mode. Trying CONFIG mode." )
+    find_package(disptable CONFIG)
+endif()
+if(disptable_FOUND)
+    list(APPEND MORE_LIBRARIES ${disptable_LIBRARIES})
+    if(PC_disptable_FOUND)
+        list(APPEND OPT_LIBRARIES_STATIC ${PC_disptable_STATIC_LDFLAGS})
+    endif()
+else()
+    message(FATAL_ERROR
+        "libdisptable is not installed. Install it, then run CMake again." )
+endif()
+
+#########################################################################
 # halcsclient dependency
 #########################################################################
 
