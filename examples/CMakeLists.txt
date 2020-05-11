@@ -409,7 +409,7 @@ foreach(bin_target ${bin_target_outputs})
     # set compiler flags
     target_link_libraries(${bin_target}
         PRIVATE
-        binaries_compiler_flags
+        halcs_examples_compiler_flags
     )
 
     # library dependencies
