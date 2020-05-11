@@ -94,74 +94,74 @@ following snippet:
 .. code-block:: bash
   :linenos:
 
-    git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
-    git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
-    git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
-    for project in libsodium libzmq czmq; do
-        CONFIG_OPTS=()
-        CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
-        CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
-        if [ $project == "libzmq" ]; then
-            CONFIG_OPTS+=("--with-libsodium")
-        fi
+  git clone --branch=1.0.8 https://github.com/jedisct1/libsodium.git && \
+  git clone --branch=v4.2.5 https://github.com/zeromq/libzmq.git && \
+  git clone --branch=v4.0.2 https://github.com/zeromq/czmq.git && \
+  for project in libsodium libzmq czmq; do
+      CONFIG_OPTS=()
+      CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+      CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+      if [ $project == "libzmq" ]; then
+          CONFIG_OPTS+=("--with-libsodium")
+      fi
 
-        cd $project && \
-        ./autogen.sh && \
-        ./configure "${CONFIG_OPTS[@]}" && \
-        make check && \
-        make && \
-        sudo make install && \
-        sudo ldconfig && \
-        cd ..
+      cd $project && \
+      ./autogen.sh && \
+      ./configure "${CONFIG_OPTS[@]}" && \
+      make check && \
+      make && \
+      sudo make install && \
+      sudo ldconfig && \
+      cd ..
 
-        # Check last command return status
-        if [ $? -ne 0 ]; then
-            echo "Could not compile/install project $project." >&2
-            exit 1
-        fi
-    done
+      # Check last command return status
+      if [ $? -ne 0 ]; then
+          echo "Could not compile/install project $project." >&2
+          exit 1
+      fi
+  done
 
-    git clone --branch=v1.6.1 https://github.com/lnls-dig/malamute.git && \
-    for project in malamute; do
-        CONFIG_OPTS=()
-        CONFIG_OPTS+=("--with-systemd-units")
-        CONFIG_OPTS+=("--sysconfdir=/usr/etc")
-        CONFIG_OPTS+=("--prefix=/usr")
-        CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
-        CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+  git clone --branch=v1.6.1 https://github.com/lnls-dig/malamute.git && \
+  for project in malamute; do
+      CONFIG_OPTS=()
+      CONFIG_OPTS+=("--with-systemd-units")
+      CONFIG_OPTS+=("--sysconfdir=/usr/etc")
+      CONFIG_OPTS+=("--prefix=/usr")
+      CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+      CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
 
-        cd $project && \
-        ./autogen.sh && \
-        ./configure "${CONFIG_OPTS[@]}" && \
-        make check && \
-        make && \
-        sudo make install && \
-        sudo ldconfig && \
-        cd ..
+      cd $project && \
+      ./autogen.sh && \
+      ./configure "${CONFIG_OPTS[@]}" && \
+      make check && \
+      make && \
+      sudo make install && \
+      sudo ldconfig && \
+      cd ..
 
-        MALAMUTE_VERBOSE=0
-        MALAMUTE_PLAIN_AUTH=
-        MALAMUTE_AUTH_MECHANISM=null
-        MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
-        MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
-        # Install our custom Malamute config file
-        sudo sed -i \
-            -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
-            -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
-            -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
-            -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
-            ${MALAMUTE_CFG_FILE}
+      MALAMUTE_VERBOSE=0
+      MALAMUTE_PLAIN_AUTH=
+      MALAMUTE_AUTH_MECHANISM=null
+      MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
+      MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
+      # Install our custom Malamute config file
+      sudo sed -i \
+          -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
+          -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
+          -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
+          -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
+          ${MALAMUTE_CFG_FILE}
 
 
-        # Enable service
-        sudo systemctl enable malamute || /bin/true
+      # Enable service
+      sudo systemctl enable malamute || /bin/true
 
-        # Check last command return status
-        if [ $? -ne 0 ]; then
-            echo "Could not compile/install project $project." >&2
-            exit 1
-        fi
-    done
+      # Check last command return status
+      if [ $? -ne 0 ]; then
+          echo "Could not compile/install project $project." >&2
+          exit 1
+      fi
+  done
 
 Alternatively you can install them via ``.rpm`` or ``.deb`` packages if available
 at your distribution. As all of them use semantic versioning, you can install any
@@ -175,19 +175,19 @@ detected:
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs-generic-udev.git && \
-    for project in halcs-generic-udev; do
-        cd $project && \
-        git submodule update --init --recursive &&
-        sudo make install && \
-        cd ..
+  git clone --recursive https://github.com/lnls-dig/halcs-generic-udev.git && \
+  for project in halcs-generic-udev; do
+      cd $project && \
+      git submodule update --init --recursive &&
+      sudo make install && \
+      cd ..
 
-        # Check last command return status
-        if [ $? -ne 0 ]; then
-            echo "Could not compile/install project $project." >&2
-            exit 1
-        fi
-    done
+      # Check last command return status
+      if [ $? -ne 0 ]; then
+          echo "Could not compile/install project $project." >&2
+          exit 1
+      fi
+  done
 
 Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
 ``synthesis-name`` that is baked inside the FPGA Gateware.
@@ -207,57 +207,57 @@ modification to allow starting another program:
   :linenos:
   :emphasize-lines: 38-40
 
-    ...
+  ...
 
-    for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
-        prog_inst=$((i-1));
-        case "${GATEWARE_NAME}" in
-            bpm-gw*)
-                case "${FMC_NAMES[$prog_inst]}" in
-                    LNLS_FMC250M*)
-                        START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                        ;;
-                    LNLS_FMC130M*)
-                        START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                        ;;
-                    *)
-                        echo "Unsupported Gateware Module: "${FPGA_FMC_NAME} >&2
-                        exit 1
-                        ;;
-                esac
-                ;;
+  for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
+      prog_inst=$((i-1));
+      case "${GATEWARE_NAME}" in
+          bpm-gw*)
+              case "${FMC_NAMES[$prog_inst]}" in
+                  LNLS_FMC250M*)
+                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                      ;;
+                  LNLS_FMC130M*)
+                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                      ;;
+                  *)
+                      echo "Unsupported Gateware Module: "${FPGA_FMC_NAME} >&2
+                      exit 1
+                      ;;
+              esac
+              ;;
 
-            tim-receiver*)
-                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                ;;
+          tim-receiver*)
+              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+              ;;
 
-            afc-tim*)
-                # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
-                if [ $((prog_inst%2)) -eq 0 ]; then
-                    START_PROGRAM="/usr/bin/systemctl --no-block start tim-rx-ioc@${HALCS_IDXS[$prog_inst]}.service"
-                else
-                    START_PROGRAM=""
-                fi
-                ;;
+          afc-tim*)
+              # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
+              if [ $((prog_inst%2)) -eq 0 ]; then
+                  START_PROGRAM="/usr/bin/systemctl --no-block start tim-rx-ioc@${HALCS_IDXS[$prog_inst]}.service"
+              else
+                  START_PROGRAM=""
+              fi
+              ;;
 
-            pbpm-gw*)
-                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                ;;
+          pbpm-gw*)
+              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+              ;;
 
-            <ADD YOU GATEWARE NAME HERE>*)
-                START_PROGRAM="<ADD YOUR START PROGRAM HERE>"
-                ;;
+          <ADD YOU GATEWARE NAME HERE>*)
+              START_PROGRAM="<ADD YOUR START PROGRAM HERE>"
+              ;;
 
-            *)
-                echo "Invalid Gateware: "${GATEWARE_NAME} >&2
-                exit 2
-                ;;
-        esac
+          *)
+              echo "Invalid Gateware: "${GATEWARE_NAME} >&2
+              exit 2
+              ;;
+      esac
 
-        eval ${START_PROGRAM}
-    done
+      eval ${START_PROGRAM}
+  done
 
-    ...
+  ...
 
 Using CMake Build System
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -269,14 +269,14 @@ Another way to build the source code is to use ``cmake``:
 .. code-block:: bash
   :linenos:
 
-    sudo apt-get install make gcc
+  sudo apt-get install make gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
   :linenos:
 
-    sudo yum install make gcc-c++
+  sudo yum install make gcc-c++
 
 for Fedora-based systems.
 
@@ -286,14 +286,14 @@ for Fedora-based systems.
 .. code-block:: bash
   :linenos:
 
-    sudo apt-get install cmake
+  sudo apt-get install cmake
 
 for Debian-based systems.
 
 .. code-block:: bash
   :linenos:
 
-    sudo yum install cmake
+  sudo yum install cmake
 
 for Fedora-based systems.
 
@@ -301,65 +301,65 @@ for Fedora-based systems.
 
 .. code-block:: bash
 
-    cmake --version
+  cmake --version
 
 If the reported version is less than ``3.10`` install it manually with:
 
 .. code-block:: bash
   :linenos:
 
-    version=3.10
-    build=3
-    wget -c https://cmake.org/files/v$version/cmake-$version.$build.tar.gz -O - | \
-        tar -xzv
-    cd cmake-$version.$build/
+  version=3.10
+  build=3
+  wget -c https://cmake.org/files/v$version/cmake-$version.$build.tar.gz -O - | \
+      tar -xzv
+  cd cmake-$version.$build/
 
 Compile and install ``CMake``:
 
 .. code-block:: bash
   :linenos:
 
-    ./bootstrap
-    make -j$(nproc)
-    sudo make install
+  ./bootstrap
+  make -j$(nproc)
+  sudo make install
 
 4. Get the source code:
 
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs
+  git clone --recursive https://github.com/lnls-dig/halcs
 
 5. Go to the source code directory:
 
 .. code-block:: bash
   :linenos:
 
-    cd halcs
+  cd halcs
 
 6. Build and install the code:
 
 .. code-block:: bash
   :linenos:
 
-    mkdir -p build
-    cd build
-    cmake ../
-    make
-    sudo make install
+  mkdir -p build
+  cd build
+  cmake ../
+  make
+  sudo make install
 
 All in all, the full script to install HALCS with ``cmake`` is:
 
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs && \
-    cd halcs && \
-    mkdir -p build
-    cd build
-    cmake ../
-    make
-    sudo make install
+  git clone --recursive https://github.com/lnls-dig/halcs && \
+  cd halcs && \
+  mkdir -p build
+  cd build
+  cmake ../
+  make
+  sudo make install
 
 Using Make Build System
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -371,14 +371,14 @@ Here is the procedure to build the binary images from the source using ``make``:
 .. code-block:: bash
   :linenos:
 
-    sudo apt-get install make gcc
+  sudo apt-get install make gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
   :linenos:
 
-    sudo yum install make gcc-c++
+  sudo yum install make gcc-c++
 
 for Fedora-based systems.
 
@@ -387,31 +387,31 @@ for Fedora-based systems.
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs
+  git clone --recursive https://github.com/lnls-dig/halcs
 
 3. Go to the source code directory:
 
 .. code-block:: bash
   :linenos:
 
-    cd halcs
+  cd halcs
 
 4. Build and install the code:
 
 .. code-block:: bash
   :linenos:
 
-    make && sudo make install
+  make && sudo make install
 
 All in all, the full script to install HALCS with ``make`` is:
 
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs && \
-    cd halcs && \
-    make && \
-    sudo make install
+  git clone --recursive https://github.com/lnls-dig/halcs && \
+  cd halcs && \
+  make && \
+  sudo make install
 
 Alternatively you can use a script called ``./compile.sh`` that gives you
 more flexibility in terms of compilation-time configurability. You should only
@@ -422,14 +422,14 @@ use this method if the defaults are not sufficient for you use case:
 .. code-block:: bash
   :linenos:
 
-    sudo apt-get install make gcc
+  sudo apt-get install make gcc
 
 for Debian-based systems.
 
 .. code-block:: bash
   :linenos:
 
-    sudo yum install make gcc-c++
+  sudo yum install make gcc-c++
 
 for Fedora-based systems.
 
@@ -438,30 +438,30 @@ for Fedora-based systems.
 .. code-block:: bash
   :linenos:
 
-   git clone --recursive https://github.com/lnls-dig/halcs
+  git clone --recursive https://github.com/lnls-dig/halcs
 
 3. Go to the source code directory:
 
 .. code-block:: bash
   :linenos:
 
-    cd halcs
+  cd halcs
 
 4. Build and install the code:
 
 .. code-block:: bash
   :linenos:
 
-    ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
+  ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
 
 The full procedure would be:
 
 .. code-block:: bash
   :linenos:
 
-    git clone --recursive https://github.com/lnls-dig/halcs && \
-    cd halcs && \
-    ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
+  git clone --recursive https://github.com/lnls-dig/halcs && \
+  cd halcs && \
+  ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
 
 Updating Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
@@ -473,97 +473,97 @@ would need to change the repository locations to match your environment:
 .. code-block:: bash
   :linenos:
 
-    NODES=()
-    NODES+=("<type the computer IP that you wish to update>")
+  NODES=()
+  NODES+=("<type the computer IP that you wish to update>")
 
-    for crate in "${NODES[@]}"; do
-        SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
-        root@${crate} bash -s <<'EOF'
-            set -x && \
-            export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig && \
-            DEP_DIR=/root/postinstall/apps/bpm-app && \
-            libsodium_VER=1.0.8 && \
-            libzmq_VER=v4.2.5 && \
-            libczmq_VER=v4.0.2 && \
-            malamute_VER=v1.6.1 && \
-            cd ${DEP_DIR} && \
-            for project in libsodium libzmq czmq; do
-                PROJECT_VER=${project}_VER
-                CONFIG_OPTS=()
-                CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
-                CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
-                if [ $project == "libzmq" ]; then
-                    CONFIG_OPTS+=("--with-libsodium")
-                fi
+  for crate in "${NODES[@]}"; do
+      SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
+      root@${crate} bash -s <<'EOF'
+          set -x && \
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig && \
+          DEP_DIR=/root/postinstall/apps/bpm-app && \
+          libsodium_VER=1.0.8 && \
+          libzmq_VER=v4.2.5 && \
+          libczmq_VER=v4.0.2 && \
+          malamute_VER=v1.6.1 && \
+          cd ${DEP_DIR} && \
+          for project in libsodium libzmq czmq; do
+              PROJECT_VER=${project}_VER
+              CONFIG_OPTS=()
+              CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+              CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+              if [ $project == "libzmq" ]; then
+                  CONFIG_OPTS+=("--with-libsodium")
+              fi
 
-                cd $project && \
-                git fetch --all && \
-                git stash && \
-                git checkout -f ${!PROJECT_VER} && \
-                git reset --hard ${!PROJECT_VER} && \
-                ./autogen.sh && \
-                ./configure "${CONFIG_OPTS[@]}" && \
-                make check && \
-                make && \
-                sudo make install && \
-                sudo ldconfig && \
-                cd ..
+              cd $project && \
+              git fetch --all && \
+              git stash && \
+              git checkout -f ${!PROJECT_VER} && \
+              git reset --hard ${!PROJECT_VER} && \
+              ./autogen.sh && \
+              ./configure "${CONFIG_OPTS[@]}" && \
+              make check && \
+              make && \
+              sudo make install && \
+              sudo ldconfig && \
+              cd ..
 
-                # Check last command return status
-                if [ $? -ne 0 ]; then
-                    echo "Could not compile/install project $project." >&2
-                    exit 1
-                fi
-            done
+              # Check last command return status
+              if [ $? -ne 0 ]; then
+                  echo "Could not compile/install project $project." >&2
+                  exit 1
+              fi
+          done
 
-            cd ${DEP_DIR} && \
-            for project in malamute; do
-                PROJECT_VER=${project}_VER
-                CONFIG_OPTS=()
-                CONFIG_OPTS+=("--with-systemd-units")
-                CONFIG_OPTS+=("--sysconfdir=/usr/etc")
-                CONFIG_OPTS+=("--prefix=/usr")
-                CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
-                CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+          cd ${DEP_DIR} && \
+          for project in malamute; do
+              PROJECT_VER=${project}_VER
+              CONFIG_OPTS=()
+              CONFIG_OPTS+=("--with-systemd-units")
+              CONFIG_OPTS+=("--sysconfdir=/usr/etc")
+              CONFIG_OPTS+=("--prefix=/usr")
+              CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+              CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
 
-                cd $project && \
-                git fetch --all && \
-                git stash && \
-                git checkout -f ${!PROJECT_VER} && \
-                git reset --hard ${!PROJECT_VER} && \
-                ./autogen.sh && \
-                ./configure "${CONFIG_OPTS[@]}" && \
-                make check && \
-                make && \
-                sudo make install && \
-                sudo ldconfig && \
-                cd ..
+              cd $project && \
+              git fetch --all && \
+              git stash && \
+              git checkout -f ${!PROJECT_VER} && \
+              git reset --hard ${!PROJECT_VER} && \
+              ./autogen.sh && \
+              ./configure "${CONFIG_OPTS[@]}" && \
+              make check && \
+              make && \
+              sudo make install && \
+              sudo ldconfig && \
+              cd ..
 
-                MALAMUTE_VERBOSE=0
-                MALAMUTE_PLAIN_AUTH=
-                MALAMUTE_AUTH_MECHANISM=null
-                MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
-                MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
-                # Install our custom Malamute config file
-                sudo sed -i \
-                    -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
-                    -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
-                    -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
-                    -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
-                    ${MALAMUTE_CFG_FILE}
+              MALAMUTE_VERBOSE=0
+              MALAMUTE_PLAIN_AUTH=
+              MALAMUTE_AUTH_MECHANISM=null
+              MALAMUTE_ENDPOINT='ipc:///tmp/malamute'
+              MALAMUTE_CFG_FILE=/usr/etc/malamute/malamute.cfg
+              # Install our custom Malamute config file
+              sudo sed -i \
+                  -e "s|verbose\( *\)=.*|verbose\1= ${MALAMUTE_VERBOSE}|g" \
+                  -e "s|plain\( *\)=.*|plain\1= ${MALAMUTE_PLAIN_AUTH}|g" \
+                  -e "s|mechanism\( *\)=.*|mechanism\1= ${MALAMUTE_AUTH_MECHANISM}|g" \
+                  -e "s|tcp://\*:9999|${MALAMUTE_ENDPOINT}|g" \
+                  ${MALAMUTE_CFG_FILE}
 
-                # Enable service
-                sudo systemctl enable malamute || /bin/true
-                sudo systemctl restart malamute || /bin/true
+              # Enable service
+              sudo systemctl enable malamute || /bin/true
+              sudo systemctl restart malamute || /bin/true
 
-                # Check last command return status
-                if [ $? -ne 0 ]; then
-                    echo "Could not compile/install project $project." >&2
-                    exit 1
-                fi
-            done
-    EOF
-    done
+              # Check last command return status
+              if [ $? -ne 0 ]; then
+                  echo "Could not compile/install project $project." >&2
+                  exit 1
+              fi
+          done
+  EOF
+  done
 
 Updating HALCS
 ~~~~~~~~~~~~~~
@@ -575,35 +575,35 @@ an example and assumes specific paths and running applications:
 .. code-block:: bash
   :linenos:
 
-    NODES=()
-    NODES+=("<type the computer IP that you wish to update>")
+  NODES=()
+  NODES+=("<type the computer IP that you wish to update>")
 
-    for crate in "${NODES[@]}"; do
-        SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
-        root@${crate} bash -s <<'EOF'
-            set -x && \
-            DEP_DIR=/root/postinstall/apps/bpm-app && \
-            PROJECT_VER=master && \
-            cd ${DEP_DIR}/halcs && \
-            git fetch --all && \
-            git checkout -b stable-$(date +%Y%m%d-%H%M%S) && \
-            git checkout ${!PROJECT_VER} && \
-            git reset --hard ${!PROJECT_VER} && \
-            cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
-            systemctl stop \
-                halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
-            cd ${DEP_DIR}/halcs && \
-            mkdir -p build && \
-            cd build && \
-            cmake ../ && \
-            make && \
-            sudo make install && \
-            mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
-            systemctl daemon-reload && \
-            systemctl start \
-                halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target
-    EOF
-    done
+  for crate in "${NODES[@]}"; do
+      SSHPASS=root sshpass -e ssh -o StrictHostKeyChecking=no \
+      root@${crate} bash -s <<'EOF'
+          set -x && \
+          DEP_DIR=/root/postinstall/apps/bpm-app && \
+          PROJECT_VER=master && \
+          cd ${DEP_DIR}/halcs && \
+          git fetch --all && \
+          git checkout -b stable-$(date +%Y%m%d-%H%M%S) && \
+          git checkout ${!PROJECT_VER} && \
+          git reset --hard ${!PROJECT_VER} && \
+          cp /usr/local/etc/halcs/halcs.cfg /home/lnls-bpm/halcs.cfg.temp && \
+          systemctl stop \
+              halcs@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target && \
+          cd ${DEP_DIR}/halcs && \
+          mkdir -p build && \
+          cd build && \
+          cmake ../ && \
+          make && \
+          sudo make install && \
+          mv /home/lnls-bpm/halcs.cfg.temp /usr/local/etc/halcs/halcs.cfg && \
+          systemctl daemon-reload && \
+          systemctl start \
+              halcs-ioc@{7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}.target
+  EOF
+  done
 
 Source Code Organization
 ''''''''''''''''''''''''
