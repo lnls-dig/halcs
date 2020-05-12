@@ -353,10 +353,10 @@ elif [ "$CMAKE" = yes ]; then
     make DESTDIR="${BUILD_PREFIX}" install
     cd "${BASE_PWD}"
 elif [ "$CPACK" = yes ]; then
-    LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib):$(readlink -f ${BUILD_PREFIX}/lib64)
+    # all of these options are relative to the docker container filesystem
+    LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
     # only expand and add ":" to LD_LIBRARY_PATH if non-empty
     LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-    # all of these options are relative to the docker container filesystem
     CMAKE_OPTS="-DCMAKE_PREFIX_PATH="/source/${BUILD_PREFIX_BASENAME}" -DBUILD_PCIE_DRIVER=OFF -Dhalcs_BOARD_OPT=\"${CPACK_BOARDS}\""
     SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${CMAKE_OPTS}" "${CPACK_GENERATORS}"
     cd "${BASE_PWD}"
