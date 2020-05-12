@@ -211,6 +211,6 @@ docker run \
         ${DOCKER_REPO}:${DOCKER_IMAGE} \
         /build/usercmd.sh "$@"
 retcode=$?
-rm -f ${BUILDDIR}/userwrapper.sh ${BUILDDIR}/env
+rm -f ${BUILDDIR}/userwrapper.sh ${BUILDDIR}/usercmd.sh ${BUILDDIR}/env
 exit $retcode
 # vim: filetype=sh tabstop=4 shiftwidth=4 softtabstop=4 expandtab
