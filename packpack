@@ -150,8 +150,9 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
 (
     echo "#!/bin/sh";
     echo "set -x";
-    echo "CMAKE_OPTS=\"\$1\"";
-    echo "CPACK_GENERATORS=\"\$2\"";
+    echo "CPACK_GENERATORS=\"\$1\"";
+    echo "shift 1";
+    echo "CMAKE_OPTS=\"\$@\"";
     echo "cd /build";
     echo "sudo apt-get install -y pkg-config uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
     echo "if [ \"\$?\" -ne 0 ]; then"
@@ -161,8 +162,8 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then"
     echo "    exit 1";
     echo "fi"
-    echo "{ cmake3 \"\${CMAKE_OPTS}\" /source || \ ";
-    echo "    cmake \"\${CMAKE_OPTS}\" /source; }";
+    echo "{ cmake3 \${CMAKE_OPTS} /source || \ ";
+    echo "    cmake \${CMAKE_OPTS} /source; }";
     echo "if [ \"\$?\" -ne 0 ]; then"
     echo "    exit 1";
     echo "fi"
