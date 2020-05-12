@@ -151,15 +151,17 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then"
     echo "    sudo yum install -y epel-release && \ ";
     echo "       sudo yum install -y pkgconfig uuid-devel libsodium-devel zeromq-devel czmq-devel";
-    echo "fi"
-    echo "if [ \"\$?\" -ne 0 ]; then"
+    echo "fi";
+    echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
-    echo "fi"
-    echo "{ cmake3 \${CMAKE_OPTS} /source || \ ";
-    echo "    cmake \${CMAKE_OPTS} /source; }";
-    echo "if [ \"\$?\" -ne 0 ]; then"
+    echo "fi";
+    echo "cmake3 \${CMAKE_OPTS} /source";
+    echo "if [ \"\$?\" -ne 0 ]; then";
+    echo "    cmake \${CMAKE_OPTS} /source";
+    echo "fi";
+    echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
-    echo "fi"
+    echo "fi";
     echo "cpack -V -G \"\${CPACK_GENERATORS}\"";
 ) > ${BUILDDIR}/usercmd.sh
 
