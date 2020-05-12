@@ -18,9 +18,10 @@ mkdir -p tmp
 mkdir -p tmp/etc
 
 # Build and local install repositories
-BUILD_PREFIX=$PWD/tmp
-SCRIPTS_ETC_PREFIX=$PWD/tmp
-SCRIPTS_SHARE_PREFIX=$PWD/tmp/usr/local
+BUILD_PREFIX_BASENAME=tmp
+BUILD_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
+SCRIPTS_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
+SCRIPTS_SHARE_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}/usr/local
 
 # CCache setup
 PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
@@ -355,7 +356,8 @@ elif [ "$CPACK" = yes ]; then
     LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib):$(readlink -f ${BUILD_PREFIX}/lib64)
     # only expand and add ":" to LD_LIBRARY_PATH if non-empty
     LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-    CMAKE_OPTS="-DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" -DBUILD_PCIE_DRIVER=OFF -Dhalcs_BOARD_OPT=\"${CPACK_BOARDS}\""
+    # all of these options are relative to the docker container filesystem
+    CMAKE_OPTS="-DCMAKE_PREFIX_PATH="/source/${BUILD_PREFIX_BASENAME}" -DBUILD_PCIE_DRIVER=OFF -Dhalcs_BOARD_OPT=\"${CPACK_BOARDS}\""
     SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${CMAKE_OPTS}" "${CPACK_GENERATORS}"
     cd "${BASE_PWD}"
 else
