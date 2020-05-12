@@ -147,7 +147,8 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
     echo "cd /build";
-    echo "sudo apt-get install -y pkg-config uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
+    echo "sudo apt-get -y update && \ ";
+    echo "    sudo apt-get -y install pkg-config systemd uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
     echo "if [ \"\$?\" -ne 0 ]; then"
     echo "    sudo yum install -y epel-release && \ ";
     echo "       sudo yum install -y pkgconfig uuid-devel libsodium-devel zeromq-devel czmq-devel";
