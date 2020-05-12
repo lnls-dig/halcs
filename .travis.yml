@@ -4,6 +4,9 @@ language: c
 compiler:
   - gcc
 
+services:
+  - docker
+
 dist: bionic
 os: linux
 
@@ -17,7 +20,17 @@ env:
 jobs:
   include:
     - compiler: gcc
-      env: CPACK=yes CPACK_BOARDS="ml605 afcv3 afcv3_1" CPACK_GENERATORS="DEB;RPM" DEPLOY="yes"
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="ml605" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="afcv3" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="ml605" CPACK_GENERATORS="RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="afcv3" CPACK_GENERATORS="RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="RPM" DEPLOY="yes"
     - compiler: gcc
       env: CMAKE=yes BOARD=afcv3_1 DEPLOY_PAGES="yes"
 
@@ -77,6 +90,7 @@ cache:
   ccache: true
   directories:
     - '$HOME/.sonar/cache'
+    - '$HOME/.cache'
 
 before_deploy:
   - . ./ci_deploy.sh

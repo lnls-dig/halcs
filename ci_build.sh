@@ -352,19 +352,12 @@ elif [ "$CMAKE" = yes ]; then
     make DESTDIR="${BUILD_PREFIX}" install
     cd "${BASE_PWD}"
 elif [ "$CPACK" = yes ]; then
-    LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib)
-    LOCAL_LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}:$(readlink -f ${BUILD_PREFIX}/lib64)
-    for board in ${CPACK_BOARDS}; do
-        mkdir -p build
-        cd build
-        cmake \
-            -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-            -DBUILD_PCIE_DRIVER=OFF \
-            -Dhalcs_BOARD_OPT="$board" ../
-        # only expand and add ":" to LD_LIBRARY_PATH if non-empty
-        LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} cpack -V -G "${CPACK_GENERATORS}"
-        cd "${BASE_PWD}"
-    done
+    LOCAL_LD_LIBRARY_PATH=$(readlink -f ${BUILD_PREFIX}/lib):$(readlink -f ${BUILD_PREFIX}/lib64)
+    # only expand and add ":" to LD_LIBRARY_PATH if non-empty
+    LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+    CMAKE_OPTS="-DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" -DBUILD_PCIE_DRIVER=OFF -Dhalcs_BOARD_OPT=\"${CPACK_BOARDS}\""
+    SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${CMAKE_OPTS}" "${CPACK_GENERATORS}"
+    cd "${BASE_PWD}"
 else
     mkdir -p build
     cd build
