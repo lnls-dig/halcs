@@ -147,11 +147,11 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
     echo "cd /build";
-    echo "sudo apt-get -y update && \ ";
+    echo "sudo apt-get -y update && \\";
     echo "    sudo apt-get -y install pkg-config systemd uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
     echo "if [ \"\$?\" -ne 0 ]; then"
-    echo "    sudo yum install -y epel-release && \ ";
-    echo "       sudo yum-config-manager --add-repo http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-draft/CentOS_7/network:messaging:zeromq:release-draft.repo && \ ";
+    echo "    sudo yum install -y epel-release && \\";
+    echo "       sudo yum-config-manager --add-repo http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-draft/CentOS_7/network:messaging:zeromq:release-draft.repo && \\";
     echo "       sudo yum install -y pkgconfig uuid-devel libsodium-devel zeromq-devel czmq-devel";
     echo "fi";
     echo "if [ \"\$?\" -ne 0 ]; then";
