@@ -355,14 +355,14 @@ elif [ "$CMAKE" = yes ]; then
 elif [ "$CPACK" = yes ]; then
     # all of these options are relative to the docker container filesystem
     LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
-    # only expand and add ":" to LD_LIBRARY_PATH if non-empty
-    LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
     PACKPACK_OPTS=()
     PACKPACK_OPTS+=("${CPACK_GENERATORS}")
     PACKPACK_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
     PACKPACK_OPTS+=("-DBUILD_PCIE_DRIVER=OFF")
     PACKPACK_OPTS+=("-Dhalcs_BOARD_OPT=${CPACK_BOARDS}")
-    SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
+    # only expand and add ":" to LD_LIBRARY_PATH if non-empty
+    LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+        SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
     cd "${BASE_PWD}"
 else
     mkdir -p build
