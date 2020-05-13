@@ -68,7 +68,7 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src/llio/c
+SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 
@@ -177,24 +177,24 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 	@rm -f $*.d.tmp
 
 install: all
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
-	$(foreach header,$($(LIBNAME)_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HEADERS),install -m 644 $(header) $(PREFIX)/include $(CMDSEP))
 	mkdir -p $(PREFIX)/include/hw
-	$(foreach header,$($(LIBNAME)_HW_HEADERS),install -m 755 $(header) $(PREFIX)/include/hw $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_HW_HEADERS),install -m 644 $(header) $(PREFIX)/include/hw $(CMDSEP))
 
 uninstall:
-	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
-	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
-	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
-		$(PREFIX)/include/$(header) $(CMDSEP))
 	$(foreach header,$(notdir $($(LIBNAME)_HW_HEADERS)),rm -f \
 		$(PREFIX)/include/hw/$(header) $(CMDSEP))
-	rmdir --ignore-fail-on-non-empty $(PREFIX)/include/hw
+	-rmdir --ignore-fail-on-non-empty $(PREFIX)/include/hw
+	$(foreach header,$(notdir $($(LIBNAME)_HEADERS)),rm -f \
+		$(PREFIX)/include/$(header) $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib) $(CMDSEP))
 
 clean:
 	rm -f $(OBJS_all) $(OBJS_all:.o=.d)

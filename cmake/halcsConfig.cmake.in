@@ -1,0 +1,46 @@
+# halcs cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   halcs-static
+#   halcs
+#
+# This module sets the following variables in your project::
+#
+#   halcs_FOUND - true if halcs found on the system
+#   halcs_INCLUDE_DIRS - the directory containing halcs headers
+#   halcs_LIBRARIES -
+#   halcs_STATIC_LIBRARIES
+
+@PACKAGE_INIT@
+
+if(NOT TARGET halcs AND NOT TARGET halcs-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET halcs)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            halcs
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            halcs-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET halcs)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES halcs)
+    endif()
+    if (TARGET halcs-static)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES halcs-static)
+    endif()
+endif()
+
+check_required_components("@PROJECT_NAME@")

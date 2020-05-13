@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
-VALID_APPS_STR="Valid values are: \"halcsd\"."
+VALID_APPS_STR="Valid values are: \"halcsd\", \"halcs_generic_udev\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
@@ -14,6 +14,7 @@ function usage() {
 }
 
 LIBSDIR="libs"
+SRCDIR="src"
 
 #######################################
 # All of our Makefile options
@@ -170,7 +171,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
         make \
         ${EXTRA_FLAGS} \
         BOARD=${BOARD} \
-        APPS=${APPS} \
+        APPS='"${APPS}"' \
         SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -184,7 +185,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
         && sudo make \
         ${EXTRA_FLAGS} \
         BOARD=${BOARD} \
-        APPS=${APPS} \
+        APPS='"${APPS}"' \
         SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -213,7 +214,9 @@ fi
 if [ "$WITH_HALCS" = "yes" ]; then
     if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
         COMMAND_SYSTEM_INTEGRATION="\
-            sudo make scripts_install && \
+            sudo make
+            APPS='"${APPS}"' \
+            scripts_install && \
             sudo ldconfig"
     else
         COMMAND_SYSTEM_INTEGRATION=""
@@ -232,7 +235,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
     # Meta target to remove copied headers
     COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
         make -C ${LIBSDIR}/bpmclient pre_clean &&
-        make -C ${LIBSDIR}/halcsclient pre_clean"
+        make -C ${SRCDIR}/client pre_clean"
 else
     COMMAND_CLEAN=""
 fi
