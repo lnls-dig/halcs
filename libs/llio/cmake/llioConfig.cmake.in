@@ -1,0 +1,46 @@
+# llio cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   llio-static
+#   llio
+#
+# This module sets the following variables in your project::
+#
+#   llio_FOUND - true if llio found on the system
+#   llio_INCLUDE_DIRS - the directory containing llio headers
+#   llio_LIBRARIES -
+#   llio_STATIC_LIBRARIES
+
+@PACKAGE_INIT@
+
+if(NOT TARGET llio AND NOT TARGET llio-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET llio)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            llio
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            llio-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET llio)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES llio)
+    endif()
+    if (TARGET llio-static)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES llio-static)
+    endif()
+endif()
+
+check_required_components("@PROJECT_NAME@")

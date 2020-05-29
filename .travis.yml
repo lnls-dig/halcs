@@ -2,28 +2,64 @@
 
 language: c
 compiler:
-- gcc
+  - gcc
 
-sudo: false
-dist: trusty
+services:
+  - docker
+
+dist: bionic
+os: linux
 
 env:
-- COMPILE_SCRIPT=yes BOARD=ml605 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- COMPILE_SCRIPT=yes BOARD=afcv3 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
-- COMPILE_SCRIPT=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - PURE_MAKE=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - COMPILE_SCRIPT=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - CMAKE=yes BOARD=ml605
+  - CMAKE=yes BOARD=afcv3
+  - CMAKE=yes BOARD=afcv3_1
 
-matrix:
+jobs:
   include:
-  - compiler: gcc
-    env: GRADLE="installLibPcieDriver collectRpms" DEPLOY="yes"
-  - compiler: gcc
-    env: PURE_MAKE=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+    - compiler: gcc
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="ml605" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="afcv3" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=ubuntu DIST=bionic CPACK=yes CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="DEB" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="ml605" CPACK_GENERATORS="RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="afcv3" CPACK_GENERATORS="RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: OS=centos DIST=7 CPACK=yes CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="RPM" DEPLOY="yes"
+    - compiler: gcc
+      env: CMAKE=yes BOARD=afcv3_1 DEPLOY_PAGES="yes"
+
+# Prerequisite packages provided by OS distro and used "as is"
+pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
+  - uuid-dev
+
+# Prerequisite packages that may be built from source or used from
+# prebuilt packages of that source (usually not from an OS distro)
+# NOTE: For travis, we want also libsodium as a common dependency
+pkg_deps_prereqs_source: &pkg_deps_prereqs_source
+  - libsodium-dev
+  - libzmq3-dev
+  - libczmq-dev
+
+pkg_deps_devtools: &pkg_deps_devtools
+  - graphviz
+  - alien
+  - cmake
+
+pkg_deps_prereqs: &pkg_deps_prereqs
+  - *pkg_deps_prereqs_source
+  - *pkg_deps_prereqs_distro
 
 addons:
   apt:
     packages:
-    - uuid-dev
-    - graphviz
+      - *pkg_deps_devtools
+      - *pkg_deps_prereqs
   sonarqube:
     organization: lnls-dig
     token:
@@ -35,30 +71,33 @@ addons:
       - sonarqube-gradle
 
 before_install:
-- git submodule update --init --recursive
+  - git submodule update --init --recursive
 
 install:
-- pip install --user sphinx
+  - pip install --user sphinx
 
 #   Build and check this project
 script:
-- ./ci_build.sh
-- ./ci_scanner.sh
+  - ./ci_build.sh
+  - ./ci_show_err_logs.sh
+  - ./ci_scanner.sh
 
 # Generate and deploy documentation
-after_success: "cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR"
+after_success:
+  - if [ $DEPLOY_PAGES == "yes" ] ; then cd $TRAVIS_BUILD_DIR/doc && make html; cd $TRAVIS_BUILD_DIR; fi
 
 cache:
   ccache: true
   directories:
     - '$HOME/.sonar/cache'
+    - '$HOME/.cache'
 
 before_deploy:
-- . ./ci_deploy.sh
+  - . ./ci_deploy.sh
 
 deploy:
   - provider: releases
-    api_key:
+    token:
       secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
     file_glob: true
     file: ${HALCS_DEPLOYMENT}
@@ -69,9 +108,10 @@ deploy:
       condition: $DEPLOY = "yes"
 
   - provider: pages
-    skip-cleanup: true
-    local-dir: doc/_build/html
-    github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
-    keep-history: false
+    skip_cleanup: true
+    local_dir: doc/_build/html
+    token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+    keep_history: false
     on:
       all_branches: true
+      condition: $DEPLOY_PAGES = "yes"

@@ -1,0 +1,9 @@
+Project Dependencies:
+    liberrhand
+    libhutils
+    libdisptable
+    libhalcsclient
+
+Foreign Dependencies:
+    libczmq
+    libmlm

@@ -14,8 +14,8 @@ DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
 BOARD ?= afcv3_1
-# Select which application we want to generate. Options are: halcsd
-APPS ?= halcsd
+# Select which application we want to generate. Options are: halcsd, halcs_generic_udev
+APPS ?= halcsd halcs_generic_udev
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
 SHRINK_AFCV3_DDR_SIZE ?= n
@@ -45,9 +45,12 @@ AFE_RFFE_TYPE ?= 2
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
 WITH_APP_CFG ?= n
-# Installation prefix for the scripts. This is mainly used for testing the build
-# system. Usually this is empty
-SCRIPTS_PREFIX ?=
+# Installation prefix for the etc scripts.
+# This is mainly used for testing the build system. Usually this is empty
+SCRIPTS_ETC_PREFIX ?=
+# Installation prefix for the share scripts.
+# Usually this is set to /usr/local
+SCRIPTS_SHARE_PREFIX ?= /usr/local
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -59,16 +62,16 @@ SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
 # Top Makefile directory
-SRC_DIR := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
-TOP := $(SRC_DIR)
+TOP := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+SRC_DIR := $(TOP)/src
 export TOP
 
 # Libraries
-LIBS_DIR := $(SRC_DIR)/libs
+LIBS_DIR := $(TOP)/libs
 export LIBS_DIR
 
 # Subdmoules and third-party codes
-FOREIGN_DIR := $(SRC_DIR)/foreign
+FOREIGN_DIR := $(TOP)/foreign
 export FOREIGN_DIR
 
 # Linker script
@@ -93,17 +96,17 @@ LIBDISPTABLE_DIR = $(LIBS_DIR)/disptable
 export LIBDISPTABLE_DIR
 LIBLLIO_DIR = $(LIBS_DIR)/llio
 export LIBLLIO_DIR
-LIBHALCSCLIENT_DIR = $(LIBS_DIR)/halcsclient
+LIBHALCSCLIENT_DIR = $(SRC_DIR)/client
 export LIBHALCSCLIENT_DIR
 LIBACQCLIENT_DIR = $(LIBS_DIR)/acqclient
 export LIBACQCLIENT_DIR
 LIBBPMCLIENT_DIR = $(LIBS_DIR)/bpmclient
 export LIBBPMCLIENT_DIR
+LIBSDBFS_DIR = $(LIBS_DIR)/sdbfs
+export LIBSDBFS_DIR
 LIBSDBUTILS_DIR = $(LIBS_DIR)/sdbutils
 export LIBSDBUTILS_DIR
 # Our submodules and third-party codes
-LIBSDBFS_DIR = $(FOREIGN_DIR)/libsdbfs
-export LIBSDBFS_DIR
 LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
 export LIBBSMP_DIR
 PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
@@ -250,25 +253,28 @@ OBJS_PLATFORM =
 APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/core/sm_io/sm_io.mk
-include $(SRC_DIR)/core/sm_io_table/sm_io_table.mk
-include $(SRC_DIR)/core/dev_mngr/dev_mngr.mk
-include $(SRC_DIR)/core/dev_io/dev_io.mk
-include $(SRC_DIR)/core/msg/msg.mk
-include $(SRC_DIR)/core/revision/revision.mk
-include $(SRC_DIR)/core/boards/$(BOARD)/board.mk
-include $(SRC_DIR)/core/boards/common/common.mk
+include $(SRC_DIR)/sm_io/sm_io.mk
+include $(SRC_DIR)/sm_io_table/sm_io_table.mk
+include $(SRC_DIR)/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/dev_io/dev_io.mk
+include $(SRC_DIR)/msg/msg.mk
+include $(SRC_DIR)/revision/revision.mk
+include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
 
 # Project boards
-boards_INCLUDE_DIRS = -I$(SRC_DIR)/common/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
+
+# We need this until we merge smio and smio_table modules
+# together
+smio_table_DIRS = $(shell find $(SRC_DIR)/sm_io_table/modules -type d -print)
+smio_table_INCLUDE_DIRS = $(addprefix -I, $(smio_table_DIRS))
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -I$(SRC_DIR)/core/common/include \
-	       -I$(SRC_DIR)/core/revision/include \
-	       -I$(SRC_DIR)/core/sm_io/include \
-	       -I$(SRC_DIR)/core/sm_io_table/include \
+	        $(smio_table_INCLUDE_DIRS) \
+	       -Iinclude \
 	       -I$(LIBBSMP_DIR)/include \
 	       -I$(LIBSDBFS_DIR)/include \
            -I$(LIBERRHAND_DIR)/include \
@@ -308,7 +314,8 @@ common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
-apps_SCRIPTS = $(foreach app,$(APPS),$($(app)_SCRIPTS))
+apps_ETC_SCRIPTS = $(foreach app,$(APPS),$($(app)_ETC_SCRIPTS))
+apps_SHARE_SCRIPTS = $(foreach app,$(APPS),$($(app)_SHARE_SCRIPTS))
 
 .SECONDEXPANSION:
 
@@ -639,6 +646,7 @@ deps_clean: libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
+	mkdir -p ${PREFIX}/bin
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
 
 core_uninstall:
@@ -651,19 +659,14 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
-	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
-	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
+	$(foreach app_script,$(apps_ETC_SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_uninstall:
-	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
-
-scripts_clean:
-	$(MAKE) -C scripts clean
-
-scripts_mrproper:
-	$(MAKE) -C scripts mrproper
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
 tests:
 	$(MAKE) -C tests all
@@ -699,9 +702,8 @@ uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
     libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean \
     libacqclient_clean libbpmclient_clean examples_clean tests_clean \
-    scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
     libhalcsclient_mrproper libacqclient_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper scripts_mrproper
+    examples_mrproper tests_mrproper
