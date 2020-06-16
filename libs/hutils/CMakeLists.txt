@@ -443,7 +443,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "hutils")
-    set(hutils_DISTRO_VERSION "")
+    set(hutils_DISTRO_VERSION "" CACHE STRING "hutils distribution version")
     string(APPEND hutils_VERSION "${hutils_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${hutils_VERSION}_${arch_name}"

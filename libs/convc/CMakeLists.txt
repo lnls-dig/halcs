@@ -412,7 +412,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "convc")
-    set(convc_DISTRO_VERSION "")
+    set(convc_DISTRO_VERSION "" CACHE STRING "convc distribution version")
     string(APPEND convc_VERSION "${convc_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${convc_VERSION}_${arch_name}"
