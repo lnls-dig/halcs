@@ -795,6 +795,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "halcsclient")
+    set(halcsclient_DISTRO_VERSION "")
+    string(APPEND halcsclient_VERSION "${halcsclient_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}_${arch_name}"
     )

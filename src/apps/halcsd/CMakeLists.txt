@@ -491,6 +491,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "halcsd")
+    set(halcs_DISTRO_VERSION "")
+    string(APPEND halcs_VERSION "${halcs_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}_${arch_name}"
     )

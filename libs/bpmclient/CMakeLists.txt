@@ -541,6 +541,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "bpmclient")
+    set(bpmclient_DISTRO_VERSION "")
+    string(APPEND bpmclient_VERSION "${bpmclient_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${bpmclient_VERSION}_${arch_name}"
     )

@@ -518,6 +518,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "acqclient")
+    set(acqclient_DISTRO_VERSION "")
+    string(APPEND acqclient_VERSION "${acqclient_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${acqclient_VERSION}_${arch_name}"
     )

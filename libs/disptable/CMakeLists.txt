@@ -435,6 +435,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "disptable")
+    set(disptable_DISTRO_VERSION "")
+    string(APPEND disptable_VERSION "${disptable_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${disptable_VERSION}_${arch_name}"
     )

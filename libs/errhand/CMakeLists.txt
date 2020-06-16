@@ -456,6 +456,8 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "errhand")
+    set(errhand_DISTRO_VERSION "")
+    string(APPEND errhand_VERSION "${errhand_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${errhand_VERSION}_${arch_name}"
     )
