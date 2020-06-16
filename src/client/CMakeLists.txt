@@ -795,8 +795,10 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "halcsclient")
+    set(halcsclient_DISTRO_VERSION "")
+    string(APPEND halcsclient_VERSION "${halcsclient_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcsclient_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
     set(CPACK_PACKAGE_VENDOR "LNLS")

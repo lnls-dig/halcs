@@ -435,8 +435,10 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "disptable")
+    set(disptable_DISTRO_VERSION "")
+    string(APPEND disptable_VERSION "${disptable_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${disptable_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${disptable_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Dispatch Table library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
