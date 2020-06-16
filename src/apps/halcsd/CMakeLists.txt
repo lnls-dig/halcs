@@ -492,7 +492,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "halcsd")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcs_VERSION}-${halcs_BOARD_OPT}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "halcsd daemon")
     set(CPACK_PACKAGE_VENDOR "LNLS")

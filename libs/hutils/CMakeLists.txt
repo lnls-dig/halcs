@@ -444,7 +444,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "hutils")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${hutils_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${hutils_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS utilities library")
     set(CPACK_PACKAGE_VENDOR "LNLS")

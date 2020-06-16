@@ -457,7 +457,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "errhand")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${errhand_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${errhand_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Error Handling library")
     set(CPACK_PACKAGE_VENDOR "LNLS")

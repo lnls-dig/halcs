@@ -542,7 +542,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "bpmclient")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${bpmclient_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${bpmclient_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS BPM library")
     set(CPACK_PACKAGE_VENDOR "LNLS")

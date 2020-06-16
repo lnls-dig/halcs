@@ -159,7 +159,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "halcs_generic_udev")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcs_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${halcs_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS generic udev scripts")
     set(CPACK_PACKAGE_VENDOR "LNLS")

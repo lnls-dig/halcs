@@ -647,7 +647,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "sdbfs")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${sdbfs_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${sdbfs_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB filesystem library")
     set(CPACK_PACKAGE_VENDOR "LNLS")

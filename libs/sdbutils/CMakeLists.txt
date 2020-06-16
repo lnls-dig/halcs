@@ -390,9 +390,9 @@ if(ENABLE_CPACK)
     )
     set(CPACK_PACKAGE_NAME "sdbutils")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${sdbutils_VERSION}-${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${sdbutils_VERSION}_${arch_name}"
     )
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB utilities library")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB utilities library")
     set(CPACK_PACKAGE_VENDOR "LNLS")
     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
