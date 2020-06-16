@@ -147,6 +147,15 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
     echo "cd /build";
+    echo "if [ -f \"/etc/debian_version\" ]; then";
+    echo "    case \"\$(cat /etc/debian_version)\" in";
+    echo "        *stretch* | 9.* )";
+    echo "            echo \"deb http://deb.debian.org/debian stretch-backports main\" | sudo tee -a /etc/apt/sources.list";
+    echo "            sudo apt-get update";
+    echo "            sudo apt-get install cmake -t stretch-backports";
+    echo "        ;;"
+    echo "    esac";
+    echo "fi";
     echo "sudo apt-get -y update && \\";
     echo "    sudo apt-get -y install pkg-config systemd uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
     echo "if [ \"\$?\" -ne 0 ]; then"
