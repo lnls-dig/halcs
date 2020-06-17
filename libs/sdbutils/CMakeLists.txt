@@ -389,7 +389,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "sdbutils")
-    set(sdbutils_DISTRO_VERSION "")
+    set(sdbutils_DISTRO_VERSION "" CACHE STRING "sdbutils distribution version")
     string(APPEND sdbutils_VERSION "${sdbutils_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${sdbutils_VERSION}_${arch_name}"

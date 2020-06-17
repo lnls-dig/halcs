@@ -502,7 +502,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "llio")
-    set(llio_DISTRO_VERSION "")
+    set(llio_DISTRO_VERSION "" CACHE STRING "llio distribution version")
     string(APPEND llio_VERSION "${llio_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${llio_VERSION}_${arch_name}"

@@ -646,7 +646,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_PACKAGE_NAME "sdbfs")
-    set(sdbfs_DISTRO_VERSION "")
+    set(sdbfs_DISTRO_VERSION "" CACHE STRING "sdbfs distribution version")
     string(APPEND sdbfs_VERSION "${sdbfs_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
         "${CPACK_PACKAGE_NAME}_${sdbfs_VERSION}_${arch_name}"

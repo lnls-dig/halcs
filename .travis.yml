@@ -13,6 +13,7 @@ os: linux
 env:
   - PURE_MAKE=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
   - COMPILE_SCRIPT=yes BOARD=afcv3_1 EXAMPLES=yes SYSTEM_INTEGRATION=no APP=halcsd
+  - SONARQUBE=yes CMAKE=yes BOARD=afcv3_1
   - CMAKE=yes BOARD=ml605
   - CMAKE=yes BOARD=afcv3
   - CMAKE=yes BOARD=afcv3_1
@@ -92,7 +93,7 @@ install:
 script:
   - ./ci_build.sh
   - ./ci_show_err_logs.sh
-  - ./ci_scanner.sh
+  - if [ $SONARQUBE == "yes" ] ; then ./ci_scanner.sh; fi
 
 # Generate and deploy documentation
 after_success:
