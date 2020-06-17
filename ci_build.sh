@@ -23,6 +23,12 @@ BUILD_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 SCRIPTS_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 SCRIPTS_SHARE_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}/usr/local
 
+# With sonarqube or not
+STATIC_ANALYSIS_WRAPPER=""
+if [ "$SONARQUBE" = yes ]; then
+    STATIC_ANALYSIS_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
+fi
+
 # CCache setup
 PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
 CCACHE_PATH="$PATH"
@@ -321,8 +327,8 @@ fi
 
 ########## HALCS
 if [ "$PURE_MAKE" = yes ]; then
-    build-wrapper-linux-x86-64 --out-dir bw-output \
-        make BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
     make ${HALCS_OPTS[*]} install
 
     if [ "$EXAMPLES" = yes ]; then
@@ -334,8 +340,7 @@ if [ "$PURE_MAKE" = yes ]; then
     fi
 
 elif [ "$COMPILE_SCRIPT" = yes ]; then
-    build-wrapper-linux-x86-64 --out-dir bw-output \
-        ./compile.sh \
+    ${STATIC_ANALYSIS_WRAPPER} ./compile.sh \
             -b $BOARD \
             -a "${APP}" \
             -e $EXAMPLES \
@@ -348,8 +353,8 @@ elif [ "$CMAKE" = yes ]; then
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
-    build-wrapper-linux-x86-64 --out-dir bw-output \
-        make VERBOSE=1
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        VERBOSE=1
     make DESTDIR="${BUILD_PREFIX}" install
     cd "${BASE_PWD}"
 elif [ "$CPACK" = yes ]; then
@@ -372,8 +377,8 @@ else
         -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
         -DBUILD_PCIE_DRIVER=OFF \
         -Dhalcs_BOARD_OPT="$BOARD" ../
-    build-wrapper-linux-x86-64 --out-dir bw-output \
-        make VERBOSE=1
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        VERBOSE=1
     make DESTDIR="${BUILD_PREFIX}" install
     cd "${BASE_PWD}"
 fi
