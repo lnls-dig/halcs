@@ -93,7 +93,7 @@ install:
 script:
   - ./ci_build.sh
   - ./ci_show_err_logs.sh
-  - if [ $SONARQUBE == "yes" ] ; then ./ci_scanner.sh; fi
+  - ./ci_scanner.sh
 
 # Generate and deploy documentation
 after_success:
