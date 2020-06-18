@@ -150,9 +150,20 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ -f \"/etc/debian_version\" ]; then";
     echo "    case \"\$(cat /etc/debian_version)\" in";
     echo "        *stretch* | 9.* )";
-    echo "            echo \"deb http://deb.debian.org/debian stretch-backports main\" | sudo tee -a /etc/apt/sources.list";
-    echo "            sudo apt-get update";
-    echo "            sudo apt-get install cmake -t stretch-backports";
+    echo "            sudo apt purge -y --auto-remove cmake";
+    echo "            sudo apt install -y libssl-dev";
+    echo "            version=3.17";
+    echo "            build=3";
+    echo "            mkdir -p ~/cmake-src";
+    echo "            cd ~/cmake-src";
+    echo "            wget https://cmake.org/files/v\$version/cmake-\$version.\$build.tar.gz";
+    echo "            tar -xzvf cmake-\$version.\$build.tar.gz";
+    echo "            cd cmake-\$version.\$build/";
+    echo "            ./bootstrap";
+    echo "            make -j\$(nproc)";
+    echo "            sudo make install";
+    echo "            cmake --version";
+    echo "            cd /build";
     echo "        ;;"
     echo "    esac";
     echo "fi";
