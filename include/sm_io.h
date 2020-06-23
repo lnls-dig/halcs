@@ -110,6 +110,7 @@ typedef struct {
     void *args;                                                 /* Generic arguments for SMIO */
     volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
     zsock_t *pipe_msg;                                          /* Message PIPE to actor */
+    zsock_t *pipe_msg2;                                         /* Message PIPE to actor 2 */
     char *broker;                                               /* Endpoint to connect to broker */
     char *service;                                              /* (part of) the service name to be exported */
     int verbose;                                                /* Print trace information to stdout*/
