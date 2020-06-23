@@ -177,6 +177,14 @@ smio_err_e smio_set_handler (smio_t *self, void *smio_handler);
 void *smio_get_handler (smio_t *self);
 /* Get SMIO Worker */
 mlm_client_t *smio_get_worker (smio_t *self);
+/* Get SMIO endpoint */
+const char *smio_get_endpoint (smio_t *self);
+/* Clone SMIO endpoint */
+char *smio_clone_endpoint (smio_t *self);
+/* Get SMIO service */
+const char *smio_get_service (smio_t *self);
+/* Clone SMIO service */
+char *smio_clone_service (smio_t *self);
 /* Get SMIO PIPE Message */
 zsock_t *smio_get_pipe_msg (smio_t *self);
 /* Get SMIO PIPE Management */

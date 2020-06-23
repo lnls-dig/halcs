@@ -42,6 +42,7 @@ struct _smio_t {
     uint64_t base;                      /* Base SMIO address */
     char *name;                         /* Identification of this sm_io instance */
     char *service;                      /* Exported service name */
+    char *endpoint;                     /* Broker endpoint */
     /* int verbose; */                  /* Print activity to stdout */
     mlm_client_t *worker;               /* zeroMQ Malamute client (worker) */
     void *smio_handler;                 /* Generic pointer to a device handler. This
@@ -80,6 +81,10 @@ static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
 static smio_err_e _smio_set_name (smio_t *self, const char *name);
 static const char *_smio_get_name (smio_t *self);
 static char *_smio_clone_name (smio_t *self);
+static const char *_smio_get_endpoint (smio_t *self);
+static char *_smio_clone_endpoint (smio_t *self);
+static const char *_smio_get_service (smio_t *self);
+static char *_smio_clone_service (smio_t *self);
 
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
@@ -100,6 +105,10 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     /* Setup exported service name */
     self->service = strdup (service);
     ASSERT_ALLOC(self->service, err_service_alloc);
+
+    /* Setup endpoint name */
+    self->endpoint = strdup (args->broker);
+    ASSERT_ALLOC(self->endpoint, err_endpoint_alloc);
 
     /* Setup Dispatch table */
     self->exp_ops_dtable = disp_table_new (&smio_disp_table_ops);
@@ -163,6 +172,8 @@ err_pipe_frontend_alloc:
     zsock_destroy (&self->pipe_msg);
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
+    free (self->endpoint);
+err_endpoint_alloc:
     free (self->service);
 err_service_alloc:
     free (self);
@@ -192,6 +203,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
+        free (self->endpoint);
         free (self->service);
         free (self->name);
 
@@ -657,6 +669,34 @@ char *smio_clone_name (smio_t *self)
     return _smio_clone_name (self);
 }
 
+/* Get SMIO endpoint */
+const char *smio_get_endpoint (smio_t *self)
+{
+    assert (self);
+    return _smio_get_endpoint (self);
+}
+
+/* Clone SMIO endpoint */
+char *smio_clone_endpoint (smio_t *self)
+{
+    assert (self);
+    return _smio_clone_endpoint (self);
+}
+
+/* Get SMIO service */
+const char *smio_get_service (smio_t *self)
+{
+    assert (self);
+    return _smio_get_service (self);
+}
+
+/* Clone SMIO service */
+char *smio_clone_service (smio_t *self)
+{
+    assert (self);
+    return _smio_clone_service (self);
+}
+
 smio_err_e smio_set_exp_ops (smio_t *self, const disp_op_t **exp_ops)
 {
     assert (self);
@@ -793,6 +833,44 @@ static char *_smio_clone_name (smio_t *self)
 
 err_alloc:
     return name;
+}
+
+/* Get SMIO endpoint */
+static const char *_smio_get_endpoint (smio_t *self)
+{
+    assert (self);
+    return self->endpoint;
+}
+
+/* Clone SMIO endpoint */
+static char *_smio_clone_endpoint (smio_t *self)
+{
+    assert (self);
+
+    char *endpoint = strdup (self->endpoint);
+    ASSERT_ALLOC(endpoint, err_alloc);
+
+err_alloc:
+    return endpoint;
+}
+
+/* Get SMIO service */
+static const char *_smio_get_service (smio_t *self)
+{
+    assert (self);
+    return self->service;
+}
+
+/* Clone SMIO service */
+static char *_smio_clone_service (smio_t *self)
+{
+    assert (self);
+
+    char *service = strdup (self->service);
+    ASSERT_ALLOC(service, err_alloc);
+
+err_alloc:
+    return service;
 }
 
 smio_err_e smio_set_handler (smio_t *self, void *smio_handler)
