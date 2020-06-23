@@ -311,7 +311,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 }
 
 /* zloop handler for MSG PIPE */
-static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
+static int _smio_handle_worker (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
     smio_err_e err = SMIO_SUCCESS;
@@ -390,7 +390,7 @@ smio_err_e smio_loop (smio_t *self)
 
     /* Set-up server register commands handler */
     _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
-    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_pipe_msg);
+    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
 
     /* Run reactor until there's a termination signal */
     zloop_start (self->loop);
