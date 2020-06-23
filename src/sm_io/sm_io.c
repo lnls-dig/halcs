@@ -797,27 +797,32 @@ err_alloc:
 
 smio_err_e smio_set_handler (smio_t *self, void *smio_handler)
 {
+    assert (self);
     self->smio_handler = smio_handler;
     return SMIO_SUCCESS;
 }
 
 void *smio_get_handler (smio_t *self)
 {
+    assert (self);
     return self->smio_handler;
 }
 
 mlm_client_t *smio_get_worker (smio_t *self)
 {
+    assert (self);
     return self->worker;
 }
 
 zsock_t *smio_get_pipe_msg (smio_t *self)
 {
+    assert (self);
     return self->pipe_msg;
 }
 
 zsock_t *smio_get_pipe_mgmt (smio_t *self)
 {
+    assert (self);
     return self->pipe_mgmt;
 }
 
