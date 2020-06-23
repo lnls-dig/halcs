@@ -1064,7 +1064,6 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     /* Create PIPE message to talk to SMIO */
     zsock_t *pipe_msg_backend[NUM_PIPE_MSG_PER_SMIO];
     uint32_t i;
-    uint32_t pipe_msg_idx = pipe_msg_idx;
     for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
         self->pipes_msg [pipe_msg_idx+i] = zsys_create_pipe (&pipe_msg_backend[i]);
         ASSERT_TEST (self->pipes_msg [pipe_msg_idx+i] != NULL, "Could not create message PIPE",
