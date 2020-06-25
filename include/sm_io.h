@@ -135,7 +135,7 @@ smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id,
     uint32_t dest_smio_inst, char *msg);
 /* Get SDB info from specified VID/DID */
 smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
-    uint32_t smio_inst, uint64_t vid, uint32_t did, 
+    uint32_t smio_inst, uint64_t vid, uint32_t did,
     sdbutils_info_t *sdbutils_info);
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
