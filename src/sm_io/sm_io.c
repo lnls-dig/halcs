@@ -157,11 +157,11 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
 
     int rc = mlm_client_connect (self->worker, args->broker, 1000, service);
-    ASSERT_TEST(rc >= 0, "Could not connect MLM to broker", err_mlm_connect);
+    ASSERT_TEST(rc >= 0, "Could not connect MLM worker to broker", err_mlm_worker_connect);
 
     return self;
 
-err_mlm_connect:
+err_mlm_worker_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
     zloop_timer_end (self->loop, self->timer_id);
@@ -445,7 +445,7 @@ err_send_mgmt_msg:
 }
 
 smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
-    uint32_t smio_inst, uint64_t vid, uint32_t did, 
+    uint32_t smio_inst, uint64_t vid, uint32_t did,
     sdbutils_info_t *sdbutils_info)
 {
     assert (self);
@@ -461,12 +461,12 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
     ASSERT_TEST(zerr == 0, "Could not send SDB_DEVICE_INFO message", err_send_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
 
-    /* Wait for reply. Note here we expect the reply over the same socket, 
+    /* Wait for reply. Note here we expect the reply over the same socket,
      * event though the receiving channel was registered in a zloop engine.
      * The zloop reader was canceled before and will be reinserted in the engine
      * in after receving the message */
     char command[50];
-    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class, 
+    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class,
         &sdbutils_info->abi_ver_major, &sdbutils_info->abi_ver_minor, &sdbutils_info->bus_specific);
     ASSERT_TEST(zerr == 0, "Could not receive SDB_DEVICE_INFO message", err_recv_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
