@@ -30,6 +30,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
+#define SMIO_RCV_TIMEOUT                   5000       /* ms */
 #define SMIO_POLLER_TIMEOUT                100000     /* in msec */
 #define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
 
@@ -55,7 +56,6 @@ struct _smio_t {
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
-    zpoller_t *poller;                  /* Poller for internal DEVIO <-> SMIO sockets */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -121,6 +121,12 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->pipe_msg2 = pipe_msg2;
     self->inst_id = args->inst_id;
 
+    /* Set maximum receive wait for PIPE MSG sockets. This is important
+     * so as to not block DEVIO <-> SMIO communication if something is
+     * wrong */
+    zsock_set_rcvtimeo (self->pipe_msg, SMIO_RCV_TIMEOUT);
+    zsock_set_rcvtimeo (self->pipe_msg2, SMIO_RCV_TIMEOUT);
+
     /* Setup pipes for zloop interrupting */
     self->pipe_frontend = zsys_create_pipe (&self->pipe_backend);
     ASSERT_ALLOC(self->pipe_frontend, err_pipe_frontend_alloc);
@@ -140,10 +146,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
      * interrupting the loop to check for rebuilds */
     _smio_engine_handle_socket (self, self->pipe_backend, _smio_handle_pipe_backend);
 
-    /* Set-up poller for internal DEVIO <-> SMIO sockets */
-    self->poller = zpoller_new (self->pipe_msg, NULL);
-    ASSERT_TEST(self->poller != NULL, "Could not create zpoller", err_poller_alloc);
-
     /* Initialize SMIO base address */
     self->base = args->base;
 
@@ -162,8 +164,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
-    zpoller_destroy (&self->poller);
-err_poller_alloc:
     zloop_timer_end (self->loop, self->timer_id);
 err_timer_alloc:
     zloop_destroy (&self->loop);
@@ -192,7 +192,6 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
-        zpoller_destroy (&self->poller);
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
@@ -748,12 +747,6 @@ const smio_thsafe_client_ops_t *smio_get_thsafe_client_ops (smio_t *self)
 {
     assert (self);
     return self->thsafe_client_ops;
-}
-
-zpoller_t *smio_get_poller (smio_t *self)
-{
-    assert (self);
-    return self->poller;
 }
 
 /**************** Static Functions ***************/
