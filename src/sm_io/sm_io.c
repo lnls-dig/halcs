@@ -51,6 +51,7 @@ struct _smio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
+    zsock_t *pipe_msg2;                 /* Pipe back to parent to exchange Payload messages 2 */
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
@@ -93,7 +94,7 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
-        zsock_t *pipe_msg, char *service)
+        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
@@ -117,6 +118,7 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->pipe_mgmt = pipe_mgmt;
     self->pipe_msg = pipe_msg;
+    self->pipe_msg2 = pipe_msg2;
     self->inst_id = args->inst_id;
 
     /* Setup pipes for zloop interrupting */
@@ -169,6 +171,7 @@ err_loop_alloc:
     zsock_destroy (&self->pipe_backend);
     zsock_destroy (&self->pipe_frontend);
 err_pipe_frontend_alloc:
+    zsock_destroy (&self->pipe_msg2);
     zsock_destroy (&self->pipe_msg);
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
@@ -194,6 +197,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
+        zsock_destroy (&self->pipe_msg2);
         zsock_destroy (&self->pipe_msg);
         /* Don't destroy pipe_mgmt as this is taken care of by the
          * zactor infrastructure, s_thread_shim (void *args) on CZMQ
@@ -896,6 +900,12 @@ zsock_t *smio_get_pipe_msg (smio_t *self)
 {
     assert (self);
     return self->pipe_msg;
+}
+
+zsock_t *smio_get_pipe_msg2 (smio_t *self)
+{
+    assert (self);
+    return self->pipe_msg2;
 }
 
 zsock_t *smio_get_pipe_mgmt (smio_t *self)

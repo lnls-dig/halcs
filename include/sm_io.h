@@ -121,8 +121,8 @@ typedef struct {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMIO */
-smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt, zsock_t *pipe_msg,
-        char *service);
+smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service);
 /* Destroy an instance of the Low-level I/O */
 smio_err_e smio_destroy (smio_t **self_p);
 /* Loop through all interface sockets */
