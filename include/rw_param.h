@@ -21,10 +21,10 @@ typedef int (*rw_param_check_fp) (uint32_t param);
 typedef int (*rw_param_format_fp) (uint32_t *param);
 
 /* User function to write 32-bit data */
-typedef ssize_t (*smio_thsafe_client_write_32_fp) (smio_t *self, uint64_t offs, const uint32_t *data);
+typedef ssize_t (*smio_thsafe_client_write_32_gen_fp) (smio_t *self, void *sock, uint64_t offs, const uint32_t *data);
 
 /* User function to read 32-bit data */
-typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, uint32_t *data);
+typedef ssize_t (*smio_thsafe_client_read_32_gen_fp) (smio_t *self, void *sock, uint64_t offs, uint32_t *data);
 
 #define SINGLE_BIT_PARAM            1
 #define MULT_BIT_PARAM              0
@@ -80,7 +80,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
                 void *ret)
 
 #define GET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, var, \
-        fmt_funcp, read_32_fp)                                                  \
+        fmt_funcp, read_32_fp, sock)                                            \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
         uint32_t __value;                                                       \
@@ -89,8 +89,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
                 "GET_PARAM_" #reg "_" #field ": reading from address 0x%"PRIx64 "\n", \
                 smio_base_addr | addr);                                         \
-        ssize_t __ret = ((smio_thsafe_client_read_32_fp) read_32_fp)(self, addr, \
-            &__value);                                                          \
+        ssize_t __ret = ((smio_thsafe_client_read_32_gen_fp) read_32_fp)(self,  \
+            sock, addr, &__value);                                              \
                                                                                 \
         if (__ret != sizeof(uint32_t)) {                                        \
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] "   \
@@ -119,11 +119,11 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
 #define GET_PARAM(self, module, base_addr, prefix, reg, field, single_bit, var, \
         fmt_funcp)                                                              \
             GET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, var, \
-               fmt_funcp, smio_thsafe_client_read_32)
+               fmt_funcp, smio_thsafe_client_read_32_gen, smio_get_pipe_msg (self))
 
 /* SET or CLEAR parameter based on the last macro parameter "clr_field" */
 #define SET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, value, \
-        min, max, chk_funcp, clr_field, read_32_fp, write_32_fp)                \
+        min, max, chk_funcp, clr_field, read_32_fp, write_32_fp, sock)          \
     ({                                                                          \
         RW_REPLY_TYPE err = RW_OK;                                              \
         uint64_t addr = base_addr + CONCAT_NAME3(prefix, REG, reg);             \
@@ -134,8 +134,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         if (EXPAND_CHECK_LIM_NE(min, max)                                       \
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
             uint32_t __write_value;                                             \
-            ssize_t __ret = ((smio_thsafe_client_read_32_fp) read_32_fp)(self,  \
-                addr, &__write_value);                                          \
+            ssize_t __ret = ((smio_thsafe_client_read_32_gen_fp) read_32_fp)(self, \
+                sock, addr, &__write_value);                                    \
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
@@ -160,8 +160,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
                         )                                                       \
                     )                                                           \
             ;                                                                   \
-            __ret = ((smio_thsafe_client_write_32_fp) write_32_fp)(self, addr,  \
-                &__write_value);                                                \
+            __ret = ((smio_thsafe_client_write_32_gen_fp) write_32_fp)(self, sock, \
+                addr, &__write_value);                                          \
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
                 DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:rw_param:"#module"] " \
@@ -187,8 +187,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
 #define SET_PARAM(self, module, base_addr, prefix, reg, field, single_bit, value, \
         min, max, chk_funcp, clr_field)                                         \
             SET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, value, \
-                min, max, chk_funcp, clr_field, smio_thsafe_client_read_32,     \
-                    smio_thsafe_client_write_32)
+                min, max, chk_funcp, clr_field, smio_thsafe_client_read_32_gen,  \
+                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
 
 /* zmq message in SET_GET_PARAM macro is:
  * frame 0: operation code
@@ -196,7 +196,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
  * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
  * */
 #define SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
-        max, chk_funcp, fmt_funcp, clr_field, read_32_fp, write_32_fp)          \
+        max, chk_funcp, fmt_funcp, clr_field, read_32_fp, write_32_fp, sock)    \
     do {                                                                        \
         assert (owner);                                                         \
         assert (args);                                                          \
@@ -210,7 +210,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         RW_REPLY_TYPE set_param_return;                                         \
         if (rw) {                                                               \
             set_param_return = GET_PARAM_GEN(self, module, base_addr,           \
-                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp); \
+                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp, \
+                    sock);                                                      \
             if (set_param_return != RW_OK) {                                    \
                 return -set_param_return;                                       \
             }                                                                   \
@@ -222,7 +223,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         else {                                                                  \
             set_param_return = SET_PARAM_GEN(self, module, base_addr,           \
                     prefix, reg, field, single_bit, value, min, max, chk_funcp, \
-                    clr_field, read_32_fp, write_32_fp);                        \
+                    clr_field, read_32_fp, write_32_fp, sock);                  \
             return -set_param_return;                                           \
         }                                                                       \
     } while (0)
@@ -230,8 +231,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
 #define SET_GET_PARAM(module, base_addr, prefix, reg, field, single_bit, min,   \
         max, chk_funcp, fmt_funcp, clr_field)                                   \
             SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
-                max, chk_funcp, fmt_funcp, clr_field, smio_thsafe_client_read_32, \
-                    smio_thsafe_client_write_32)
+                max, chk_funcp, fmt_funcp, clr_field, smio_thsafe_client_read_32_gen, \
+                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
 
 /* zmq message in SET_GET_PARAM_CHANNEL macro is:
  * frame 0: operation code
@@ -241,7 +242,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
  * */
 #define SET_GET_PARAM_CHANNEL_GEN(module, base_addr, prefix, reg, field,        \
         chan_offset, chan_num, single_bit, min, max, chk_funcp, fmt_funcp, clr_field, \
-        read_32_fp, write_32_fp)                                                \
+        read_32_fp, write_32_fp, sock)                                         \
     do {                                                                        \
         assert (owner);                                                         \
         assert (args);                                                          \
@@ -261,7 +262,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         if (rw) {                                                               \
             set_param_return = GET_PARAM_GEN(self, module,                      \
                     (base_addr + (chan*chan_offset)),                           \
-                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp); \
+                    prefix, reg, field, single_bit, value, fmt_funcp, read_32_fp, \
+                    sock);                                                      \
             if (set_param_return != RW_OK) {                                    \
                 return -set_param_return;                                       \
             }                                                                   \
@@ -274,7 +276,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
             set_param_return = SET_PARAM_GEN(self, module,                      \
                     (base_addr + (chan*chan_offset)),                           \
                     prefix, reg, field, single_bit, value, min, max, chk_funcp, \
-                    clr_field, read_32_fp, write_32_fp);                        \
+                    clr_field, read_32_fp, write_32_fp, sock);                  \
             return -set_param_return;                                           \
         }                                                                       \
     } while (0)
@@ -283,8 +285,8 @@ typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, u
         chan_num, single_bit, min, max, chk_funcp, fmt_funcp, clr_field)        \
             SET_GET_PARAM_CHANNEL_GEN(module, base_addr, prefix, reg, field,    \
                     chan_offset, chan_num, single_bit, min, max, chk_funcp,     \
-                    fmt_funcp, clr_field, smio_thsafe_client_read_32,           \
-                    smio_thsafe_client_write_32)
+                    fmt_funcp, clr_field, smio_thsafe_client_read_32_gen,       \
+                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
 
 #define GET_PARAM_CHANNEL(self, module, base_addr, prefix, reg, field, chan_offset,   \
         chan_num, single_bit, var, fmt_funcp)                                   \
