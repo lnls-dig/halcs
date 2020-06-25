@@ -30,92 +30,90 @@
     CHECK_HAL_ERR(err, MSG, "[smio_thsafe_client:zmq]",     \
             msg_err_str (err_type))
 
-#define SMIO_THSAFE_MSG_POLLER_TIMEOUT          5000 /* ms */
-
-static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self);
-int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode);
-static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uint8_t *data,
+static zmsg_t *_thsafe_zmq_client_recv_confirmation (void *self);
+int _thsafe_zmq_client_open_release (void *self, llio_endpoint_t *endpoint, uint32_t opcode);
+static ssize_t _thsafe_zmq_client_read_generic (void *self, uint64_t offs, uint8_t *data,
         uint32_t size);
-static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, const uint8_t *data,
+static ssize_t _thsafe_zmq_client_write_generic (void *self, uint64_t offs, const uint8_t *data,
         uint32_t size);
-static ssize_t _thsafe_zmq_client_read_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+static ssize_t _thsafe_zmq_client_read_block_generic (void *self, uint32_t opcode, uint64_t offs,
         size_t size, uint32_t *data);
-static ssize_t _thsafe_zmq_client_write_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+static ssize_t _thsafe_zmq_client_write_block_generic (void *self, uint32_t opcode, uint64_t offs,
         size_t size, const uint32_t *data);
-static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
+static ssize_t _thsafe_zmq_client_recv_rw (void *self, uint8_t *data,
         uint32_t size, bool accept_empty_data);
 
 /**** Open device ****/
-int thsafe_zmq_client_open (smio_t *self, llio_endpoint_t *endpoint)
+int thsafe_zmq_client_open (void *self, llio_endpoint_t *endpoint)
 {
     return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_OPCODE_OPEN);
 }
 
 /**** Release device ****/
 
-int thsafe_zmq_client_release (smio_t *self, llio_endpoint_t *endpoint)
+int thsafe_zmq_client_release (void *self, llio_endpoint_t *endpoint)
 {
     return _thsafe_zmq_client_open_release (self, endpoint, THSAFE_OPCODE_RELEASE);
 }
 
 /**** Read data from device ****/
-ssize_t thsafe_zmq_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
+ssize_t thsafe_zmq_client_read_16 (void *self, uint64_t offs, uint16_t *data)
 {
     return _thsafe_zmq_client_read_generic (self, offs, (uint8_t *) data, THSAFE_READ_16_DSIZE);
 }
 
-ssize_t thsafe_zmq_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
+ssize_t thsafe_zmq_client_read_32 (void *self, uint64_t offs, uint32_t *data)
 {
     return _thsafe_zmq_client_read_generic (self, offs, (uint8_t *) data, THSAFE_READ_32_DSIZE);
 }
 
-ssize_t thsafe_zmq_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
+ssize_t thsafe_zmq_client_read_64 (void *self, uint64_t offs, uint64_t *data)
 {
     return _thsafe_zmq_client_read_generic (self, offs, (uint8_t *) data, THSAFE_READ_64_DSIZE);
 }
 
 /**** Write data to device ****/
-ssize_t thsafe_zmq_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
+ssize_t thsafe_zmq_client_write_16 (void *self, uint64_t offs, const uint16_t *data)
 {
     return _thsafe_zmq_client_write_generic (self, offs, (const uint8_t *) data, THSAFE_WRITE_16_DSIZE);
 }
 
-ssize_t thsafe_zmq_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
+ssize_t thsafe_zmq_client_write_32 (void *self, uint64_t offs, const uint32_t *data)
 {
     return _thsafe_zmq_client_write_generic (self, offs, (const uint8_t *) data, THSAFE_WRITE_32_DSIZE);
 }
 
-ssize_t thsafe_zmq_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
+ssize_t thsafe_zmq_client_write_64 (void *self, uint64_t offs, const uint64_t *data)
 {
     return _thsafe_zmq_client_write_generic (self, offs, (const uint8_t *) data, THSAFE_WRITE_64_DSIZE);
 }
 
 /**** Read data block from device function pointer, size in bytes ****/
-ssize_t thsafe_zmq_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
+ssize_t thsafe_zmq_client_read_block (void *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _thsafe_zmq_client_read_block_generic (self, THSAFE_OPCODE_READ_BLOCK, offs, size, data);
 }
 
 /**** Write data block from device function pointer, size in bytes ****/
-ssize_t thsafe_zmq_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
+ssize_t thsafe_zmq_client_write_block (void *self, uint64_t offs, size_t size, const uint32_t *data)
 {
     return _thsafe_zmq_client_write_block_generic (self, THSAFE_OPCODE_WRITE_BLOCK, offs, size, data);
 }
 
 /**** Read data block via DMA from device, size in bytes ****/
-ssize_t thsafe_zmq_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
+ssize_t thsafe_zmq_client_read_dma (void *self, uint64_t offs, size_t size, uint32_t *data)
 {
     return _thsafe_zmq_client_read_block_generic (self, THSAFE_OPCODE_READ_DMA, offs, size, data);
 }
 
 /**** Write data block via DMA from device, size in bytes ****/
-ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
+ssize_t thsafe_zmq_client_write_dma (void *self, uint64_t offs, size_t size, const uint32_t *data)
 {
     return _thsafe_zmq_client_write_block_generic (self, THSAFE_OPCODE_WRITE_DMA, offs, size, data);
 }
 
 /**** Read device information function pointer ****/
-/* int thsafe_zmq_client_read_info (smio_t *self, thsafe_dev_info_t *dev_info)
+/* int thsafe_zmq_client_read_info (void *self, thsafe_dev_info_t *dev_info)
  *{
  *  UNUSED(self);
  *  UNUSED(dev_info);
@@ -124,7 +122,7 @@ ssize_t thsafe_zmq_client_write_dma (smio_t *self, uint64_t offs, size_t size, c
 
 /*************** Helper functions **************/
 
-int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, uint32_t opcode)
+int _thsafe_zmq_client_open_release (void *self, llio_endpoint_t *endpoint, uint32_t opcode)
 {
     UNUSED(endpoint);
     assert (self);
@@ -132,9 +130,6 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
     int ret = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_release\n");
     /* Message is:
@@ -152,7 +147,7 @@ int _thsafe_zmq_client_open_release (smio_t *self, llio_endpoint_t *endpoint, ui
 #ifdef LOCAL_MSG_DBG
     errhand_log_print_zmq_msg (send_msg);
 #endif
-    zerr = zmsg_send (&send_msg, pipe_msg);
+    zerr = zmsg_send (&send_msg, self);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -187,22 +182,18 @@ err_null_raw_data:
 err_send_msg:
 err_add_endpoint:
 err_add_opcode:
-err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret;
 }
 
-static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uint8_t *data,
+static ssize_t _thsafe_zmq_client_read_generic (void *self, uint64_t offs, uint8_t *data,
         uint32_t size)
 {
     assert (self);
     ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
     uint32_t opcode;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_read_generic\n");
@@ -239,7 +230,7 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
     errhand_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, pipe_msg);
+    zerr = zmsg_send (&send_msg, self);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -251,21 +242,17 @@ static ssize_t _thsafe_zmq_client_read_generic (smio_t *self, uint64_t offs, uin
 err_send_msg:
 err_add_offset:
 err_add_opcode:
-err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret_size;
 }
 
-static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, const uint8_t *data,
+static ssize_t _thsafe_zmq_client_write_generic (void *self, uint64_t offs, const uint8_t *data,
         uint32_t size)
 {
     assert (self);
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
     uint32_t opcode;
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_write_generic\n");
@@ -307,7 +294,7 @@ static ssize_t _thsafe_zmq_client_write_generic (smio_t *self, uint64_t offs, co
     errhand_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, pipe_msg);
+    zerr = zmsg_send (&send_msg, self);
     ASSERT_TEST(zerr == 0, "Could not send message",
             err_send_msg);
 
@@ -329,22 +316,18 @@ err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
-err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return -1;
 }
 
-static ssize_t _thsafe_zmq_client_read_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+static ssize_t _thsafe_zmq_client_read_block_generic (void *self, uint32_t opcode, uint64_t offs,
         size_t size, uint32_t *data)
 {
     assert (self);
     ssize_t ret_size = -1;
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_read_block\n");
 
@@ -367,7 +350,7 @@ static ssize_t _thsafe_zmq_client_read_block_generic (smio_t *self, uint32_t opc
     errhand_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, pipe_msg);
+    zerr = zmsg_send (&send_msg, self);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -380,21 +363,17 @@ err_send_msg:
 err_add_size:
 err_add_offset:
 err_add_opcode:
-err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return ret_size;
 }
 
-static ssize_t _thsafe_zmq_client_write_block_generic (smio_t *self, uint32_t opcode, uint64_t offs, 
+static ssize_t _thsafe_zmq_client_write_block_generic (void *self, uint32_t opcode, uint64_t offs,
         size_t size, const uint32_t *data)
 {
     assert (self);
     zmsg_t *send_msg = zmsg_new ();
     ASSERT_ALLOC(send_msg, err_msg_alloc);
-    zsock_t *pipe_msg = smio_get_pipe_msg (self);
-    ASSERT_TEST(pipe_msg != NULL, "Could not get SMIO PIPE MSG",
-            err_get_pipe_msg);
 
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling thsafe_write_block\n");
 
@@ -418,7 +397,7 @@ static ssize_t _thsafe_zmq_client_write_block_generic (smio_t *self, uint32_t op
     errhand_log_print_zmq_msg (send_msg);
 #endif
 
-    zerr = zmsg_send (&send_msg, pipe_msg);
+    zerr = zmsg_send (&send_msg, self);
     ASSERT_TEST(zerr == 0, "Could not send message", err_send_msg);
 
     /* Message is:
@@ -439,28 +418,19 @@ err_send_msg:
 err_add_data:
 err_add_offset:
 err_add_opcode:
-err_get_pipe_msg:
     zmsg_destroy (&send_msg);
 err_msg_alloc:
     return -1;
 }
 
-static zmsg_t *_thsafe_zmq_client_recv_confirmation (smio_t *self)
+static zmsg_t *_thsafe_zmq_client_recv_confirmation (void *self)
 {
     DBE_DEBUG (DBG_MSG | DBG_LVL_TRACE, "[smio_thsafe_client:zmq] Calling _thsafe_zmq_client_recv_confirmation\n");
 
     assert (self);
-    zpoller_t *poller = smio_get_poller (self);
-    ASSERT_TEST(poller != NULL, "Could not get SMIO Poller",
-            err_get_poller);
-
-    /* Wait for response */
-    void *sock = zpoller_wait (poller, SMIO_THSAFE_MSG_POLLER_TIMEOUT);
-    ASSERT_TEST(sock != NULL, "Could not wait on SMIO poller. Interrupted or expired",
-            err_poller_wait);
 
     /* With activiy on socker, just receive the message */
-    zmsg_t *recv_msg = zmsg_recv (sock);
+    zmsg_t *recv_msg = zmsg_recv (self);
     ASSERT_TEST(recv_msg != NULL, "Could not receive PIPE message. Interrupted",
             err_get_recv_msg);
     /* Do not pop the message, just set a cursor to it */
@@ -497,12 +467,10 @@ err_null_raw_data:
 err_recv_data:
     zmsg_destroy (&recv_msg);
 err_get_recv_msg:
-err_poller_wait:
-err_get_poller:
     return NULL;
 }
 
-static ssize_t _thsafe_zmq_client_recv_rw (smio_t *self, uint8_t *data,
+static ssize_t _thsafe_zmq_client_recv_rw (void *self, uint8_t *data,
         uint32_t size, bool accept_empty_data)
 {
     ssize_t ret_size = -1;
