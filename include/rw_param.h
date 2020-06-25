@@ -20,6 +20,12 @@ typedef int (*rw_param_check_fp) (uint32_t param);
  * format the read parameter to a specific output */
 typedef int (*rw_param_format_fp) (uint32_t *param);
 
+/* User function to write 32-bit data */
+typedef ssize_t (*smio_thsafe_client_write_32_fp) (smio_t *self, uint64_t offs, const uint32_t *data);
+
+/* User function to read 32-bit data */
+typedef ssize_t (*smio_thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, uint32_t *data);
+
 #define SINGLE_BIT_PARAM            1
 #define MULT_BIT_PARAM              0
 
@@ -83,7 +89,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:rw_param:"#module"] "     \
                 "GET_PARAM_" #reg "_" #field ": reading from address 0x%"PRIx64 "\n", \
                 smio_base_addr | addr);                                         \
-        ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(self, addr,     \
+        ssize_t __ret = ((smio_thsafe_client_read_32_fp) read_32_fp)(self, addr, \
             &__value);                                                          \
                                                                                 \
         if (__ret != sizeof(uint32_t)) {                                        \
@@ -128,7 +134,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
         if (EXPAND_CHECK_LIM_NE(min, max)                                       \
             ((chk_funcp == NULL) || ((rw_param_check_fp) chk_funcp) (value) == PARAM_OK)) { \
             uint32_t __write_value;                                             \
-            ssize_t __ret = ((thsafe_client_read_32_fp) read_32_fp)(self,       \
+            ssize_t __ret = ((smio_thsafe_client_read_32_fp) read_32_fp)(self,  \
                 addr, &__write_value);                                          \
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
@@ -154,7 +160,7 @@ typedef int (*rw_param_format_fp) (uint32_t *param);
                         )                                                       \
                     )                                                           \
             ;                                                                   \
-            __ret = ((thsafe_client_write_32_fp) write_32_fp)(self, addr,       \
+            __ret = ((smio_thsafe_client_write_32_fp) write_32_fp)(self, addr,  \
                 &__write_value);                                                \
                                                                                 \
             if (__ret != sizeof(uint32_t)) {                                    \
