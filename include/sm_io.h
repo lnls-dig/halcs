@@ -187,6 +187,8 @@ const char *smio_get_service (smio_t *self);
 char *smio_clone_service (smio_t *self);
 /* Get SMIO PIPE Message */
 zsock_t *smio_get_pipe_msg (smio_t *self);
+/* Get SMIO PIPE Message 2 */
+zsock_t *smio_get_pipe_msg2 (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
 
