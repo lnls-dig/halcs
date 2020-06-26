@@ -21,6 +21,13 @@ struct _smio_dsp_data_t {
     uint32_t new_pos_data;               /* Do we have new POS data? */
 };
 
+struct _smio_dsp_monit_data_t {
+    uint32_t amp_ch0;                    /* Amplitude CH0 */
+    uint32_t amp_ch1;                    /* Amplitude CH1 */
+    uint32_t amp_ch2;                    /* Amplitude CH2 */
+    uint32_t amp_ch3;                    /* Amplitude CH3 */
+};
+
 /* Messaging OPCODES */
 #define DSP_OPCODE_TYPE                     uint32_t
 #define DSP_OPCODE_SIZE                     (sizeof (DSP_OPCODE_TYPE))

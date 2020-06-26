@@ -16,6 +16,7 @@ struct _smio_rffe_data_block_t;
 struct _smio_rffe_version_t;
 struct _smio_afc_diag_revision_data_t;
 struct _smio_dsp_data_t;
+struct _smio_dsp_monit_data_t;
 
 /********************************************************/
 /************************ Our API ***********************/
