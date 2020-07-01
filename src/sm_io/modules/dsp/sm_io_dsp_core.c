@@ -33,7 +33,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io_dsp_core]",   \
             smio_err_str (err_type))
 
-#define SMIO_DSP_POLLER_TIMEOUT                1     /* in msec */
+#define SMIO_DSP_POLLER_TIMEOUT                4     /* in msec */
 #define SMIO_DSP_POLLER_NTIMES                 0     /* 0 for infinte */
 
 static smio_err_e _smio_dsp_monit_engine_handle_socket (smio_dsp_monit_t *smio_dsp_monit, void *sock,
