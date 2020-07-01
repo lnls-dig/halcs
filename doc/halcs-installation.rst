@@ -102,7 +102,7 @@ following snippet:
       CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
       CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
       if [ $project == "libzmq" ]; then
-          CONFIG_OPTS+=("--with-libsodium")
+          CONFIG_OPTS+=("PKG_CONFIG_PATH=/usr/local/lib/pkgconfig --with-libsodium")
       fi
 
       cd $project && \
