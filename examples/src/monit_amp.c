@@ -4,6 +4,7 @@
 
 #include <inttypes.h>
 #include <halcs_client.h>
+#include <time.h>
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
@@ -108,26 +109,34 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    smio_dsp_data_t dsp_data;
-    halcs_client_err_e err = halcs_get_monit_amp_pos (halcs_client, service, &dsp_data);
-    if (err != HALCS_CLIENT_SUCCESS){
-        fprintf (stderr, "[client:monit_amp]: halcs_get_monit_amp_pos failed\n");
-        goto err_get_monit_amp;
+    halcs_client_err_e err = halcs_set_monit_subscription (halcs_client, "MONIT_DATA", "MONIT_AMP");
+    if (err != HALCS_CLIENT_SUCCESS) {
+        fprintf (stderr, "[client:monit_amp]: halcs_set_monit_subscription failed\n");
+        goto err_set_monit_subscription;
     }
 
-    fprintf (stdout, "[client:monit_amp]: \n"
-              "monitoring amplitude ch0 = %d\n"
-              "monitoring amplitude ch1 = %d\n"
-              "monitoring amplitude ch2 = %d\n"
-              "monitoring amplitude ch3 = %d\n", 
-              (int32_t) dsp_data.amp_ch0,
-              (int32_t) dsp_data.amp_ch1,
-              (int32_t) dsp_data.amp_ch2,
-              (int32_t) dsp_data.amp_ch3);
+    smio_dsp_monit_data_t monit_data;
+    while (!zsys_interrupted) {
 
-err_get_monit_amp:
-err_halcs_client_new:
+        err = halcs_get_monit_stream (halcs_client, "MONIT_AMP", &monit_data);
+        if(err == HALCS_CLIENT_SUCCESS) {
+            struct timespec ts;
+            clock_gettime(CLOCK_REALTIME, &ts); 
+
+            fprintf (stdout, "[client:monit_amp]: %lld.%.9ld "
+                    "ch0/ch1/ch2/ch3 = %d %d %d %d\n", 
+                    (long long)ts.tv_sec, ts.tv_nsec,
+                    (int32_t) monit_data.amp_ch0,
+                    (int32_t) monit_data.amp_ch1,
+                    (int32_t) monit_data.amp_ch2,
+                    (int32_t) monit_data.amp_ch3);
+        }
+    }
+
+    halcs_remove_monit_subscription (halcs_client, "MONIT_AMP");
+err_set_monit_subscription:
     halcs_client_destroy (&halcs_client);
+err_halcs_client_new:
     str_p = &board_number_str;
     free (*str_p);
     board_number_str = NULL;
