@@ -292,6 +292,7 @@ err_send_msg:
 err_addmem:
     zmsg_destroy (&msg);
 err_send_msg_alloc:
+err_get_monit_amp:
     return err;
 }
 
