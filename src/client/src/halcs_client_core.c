@@ -1616,26 +1616,6 @@ PARAM_FUNC_CLIENT_READ(monit_updt)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_UPDT, monit_updt);
 }
 
-/* Monitoring AMP/POS funcion */
-halcs_client_err_e halcs_get_monit_amp_pos (halcs_client_t *self, char *service,
-        struct _smio_dsp_data_t *dsp_data)
-{
-    assert (self);
-    assert (service);
-
-    /* Use the direct function table pointer to speed up the process */
-    const disp_op_t* func = &dsp_set_get_monit_amp_pos_exp;
-    halcs_client_err_e err = halcs_func_exec(self, func, service,
-            NULL, (uint32_t *)dsp_data);
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get Monit. AMP/POS",
-            err_get_amp_pos_data);
-
-    return err;
-
-err_get_amp_pos_data:
-    return err;
-}
-
 halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, const char *stream,
         const char *pattern)
 {
