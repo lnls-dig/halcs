@@ -1636,6 +1636,74 @@ err_get_amp_pos_data:
     return err;
 }
 
+halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, const char *stream,
+        const char *pattern)
+{
+    assert (self);
+    assert (stream);
+    assert (pattern);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+
+    int rc = mlm_client_set_consumer (self->mlm_client, stream, pattern);
+    ASSERT_TEST(rc == 0, "Could not set monit subscription",
+            err_set_monit_subscription);
+
+    return err;
+
+err_set_monit_subscription:
+    return err;
+}
+
+halcs_client_err_e halcs_remove_monit_subscription (halcs_client_t *self, const char *stream)
+{
+    assert (self);
+    assert (stream);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+
+    int rc = mlm_client_remove_consumer (self->mlm_client, stream);
+    ASSERT_TEST(rc == 0, "Could not remove monit subscription",
+            err_remove_monit_subscription);
+
+    return err;
+
+err_remove_monit_subscription:
+    return err;
+}
+
+halcs_client_err_e halcs_get_monit_stream (halcs_client_t *self,
+        const char *subject, struct _smio_dsp_monit_data_t *monit_data)
+{
+    assert (self);
+    assert(monit_data);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+
+    zmsg_t *msg = mlm_client_recv (self->mlm_client);
+    const char *mlm_subject = mlm_client_subject (self->mlm_client);
+
+    if (!streq (mlm_subject, subject)) {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                "halcs_get_monit_stream: Unexpected subject %s, waiting for %s\n",
+                 mlm_subject, subject);
+        err = HALCS_CLIENT_ERR_MSG;
+        goto err_unexpected_subject;
+    }
+
+    zframe_t *frame = zmsg_pop (msg);
+    ASSERT_ALLOC(frame, err_msg_alloc, HALCS_CLIENT_ERR_ALLOC);
+    ASSERT_TEST(zframe_size (frame) == sizeof (*monit_data),
+            "Unexpected message received", err_msg_size);
+
+    uint32_t *data_out = (uint32_t *) zframe_data (frame);
+    memcpy (monit_data, data_out, sizeof (*monit_data));
+    
+err_msg_size:
+    zframe_destroy (&frame);
+err_msg_alloc:
+err_unexpected_subject:
+    zmsg_destroy (&msg);
+    return err;
+}
+
 /* Monitoring 1 Amplitude channel 0 value */
 PARAM_FUNC_CLIENT_WRITE(monit1_amp_ch0)
 {

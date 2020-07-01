@@ -850,6 +850,18 @@ halcs_client_err_e halcs_get_monit_updt (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_monit_amp_pos (halcs_client_t *self, char *service,
         struct _smio_dsp_data_t *dsp_data);
 
+/* Get Monitoring Amp/Pos values. Stream interface */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors) */
+halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, 
+        const char *stream, const char *pattern);
+halcs_client_err_e halcs_remove_monit_subscription (halcs_client_t *self, 
+        const char *stream);
+
+halcs_client_err_e halcs_get_monit_stream (halcs_client_t *self, 
+        const char *subject, struct _smio_dsp_monit_data_t *monit_data);
+
 /* Monitoring 1 Position values */
 /* These set of functions read (get) the Monitoring position values.
  * All of the functions returns HALCS_CLIENT_SUCCESS if the
