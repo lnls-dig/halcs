@@ -283,11 +283,6 @@ err_get_dsp_handler:                                                            
 
 /* Monit declaration */
 
-DSP_MONIT_FUNC_NAME_HEADER(monit_amp_pos)
-{
-    DSP_MONIT_FUNC_BODY(owner, args, ret, MONIT);
-}
-
 #define POS_CALC_DSP_MONIT1_AMP_CH0_R(val)       (val)
 #define POS_CALC_DSP_MONIT1_AMP_CH0_W(val)       (val)
 #define POS_CALC_DSP_MONIT1_AMP_CH0_MASK         ((1ULL<<32)-1)
@@ -503,7 +498,6 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_pos_q),
     RW_PARAM_FUNC_NAME(dsp, monit_pos_sum),
     RW_PARAM_FUNC_NAME(dsp, monit_updt),
-    DSP_MONIT_FUNC_NAME(monit_amp_pos),
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch0),
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch1),
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch2),
