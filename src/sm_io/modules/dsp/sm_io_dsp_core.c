@@ -243,30 +243,38 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
     smio_dsp_monit_t *self = (smio_dsp_monit_t *) arg;
 
     uint32_t ampfifo_empty;
-    GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_CSR, EMPTY,
+    RW_REPLY_TYPE err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_CSR, EMPTY,
         SINGLE_BIT_PARAM, ampfifo_empty, NO_FMT_FUNC,
         smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+    ASSERT_TEST(err == RW_OK, "Could not get ampfifo empty register", err_get_monit_amp, -1);
 
     zmsg_t *msg = NULL;
     smio_dsp_monit_data_t monit_data;
     if (!ampfifo_empty) {
-        GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R0, AMP_CH0,
+        err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R0, AMP_CH0,
             MULT_BIT_PARAM, monit_data.amp_ch0, NO_FMT_FUNC,
             smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
-        GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R1, AMP_CH1,
+        ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp0 register", err_get_monit_amp, -1);
+
+        err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R1, AMP_CH1,
             MULT_BIT_PARAM, monit_data.amp_ch1, NO_FMT_FUNC,
             smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
-        GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R2, AMP_CH2,
+        ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp1 register", err_get_monit_amp, -1);
+
+        err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R2, AMP_CH2,
             MULT_BIT_PARAM, monit_data.amp_ch2, NO_FMT_FUNC,
             smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
-        GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R3, AMP_CH3,
+        ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp2 register", err_get_monit_amp, -1);
+
+        err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R3, AMP_CH3,
             MULT_BIT_PARAM, monit_data.amp_ch3, NO_FMT_FUNC,
             smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+        ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp3 register", err_get_monit_amp, -1);
 
+        /* Send message */
         msg = zmsg_new ();
         ASSERT_ALLOC(msg, err_send_msg_alloc);
 
-        /* Send message */
         int zerr = zmsg_addmem (msg, &monit_data, sizeof(monit_data));
         ASSERT_TEST(zerr==0, "Could not add MONIT data in message", err_addmem);
 
@@ -278,36 +286,13 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
             monit_data.amp_ch2, monit_data.amp_ch3);
     }
 
-    /*
-     * uint32_t posfifo_empty;
-     *
-     * GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, POSFIFO_MONIT_CSR, EMPTY,
-     *     SINGLE_BIT_PARAM, posfifo_empty, NO_FMT_FUNC,
-     *     smio_thsafe_client_read_32_gen,
-     *     smio_get_pipe_msg2 (self));
-     * if (!posfifo_empty) {
-     *     GET_PARAM(self, dsp, 0x0, POS_CALC,
-     *         POSFIFO_## reg_prefix ##_R0, POS_X, MULT_BIT_PARAM,
-     *         data->pos_x, NO_FMT_FUNC);
-     *     GET_PARAM(self, dsp, 0x0, POS_CALC,
-     *         POSFIFO_## reg_prefix ##_R1, POS_Y, MULT_BIT_PARAM,
-     *         data->pos_y, NO_FMT_FUNC);
-     *     GET_PARAM(self, dsp, 0x0, POS_CALC,
-     *         POSFIFO_## reg_prefix ##_R2, POS_Q, MULT_BIT_PARAM,
-     *         data->pos_q, NO_FMT_FUNC);
-     *     GET_PARAM(self, dsp, 0x0, POS_CALC,
-     *         POSFIFO_## reg_prefix ##_R3, POS_SUM, MULT_BIT_PARAM,
-     *         data->pos_sum, NO_FMT_FUNC);
-     * }
-    */
-
-    return 0;
+    return err;
 
 err_send_msg:
 err_addmem:
     zmsg_destroy (&msg);
 err_send_msg_alloc:
-    return 0;
+    return err;
 }
 
 /* zloop handler for CFG PIPE */
