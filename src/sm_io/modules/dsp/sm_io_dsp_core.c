@@ -142,7 +142,7 @@ smio_dsp_monit_t* smio_dsp_monit_new (zsock_t *pipe_mgmt, zsock_t *pipe_msg,
     ASSERT_TEST(rc >= 0, "Could not connect DSP MLM producer to broker", err_mlm_producer_connect);
 
     /* Set producer channel */
-    rc = mlm_client_set_producer (self->producer, "MONIT_DATA");
+    rc = mlm_client_set_producer (self->producer, service);
     ASSERT_TEST(rc >= 0, "Could not set DSP MLM producer channel name", err_mlm_producer_channel);
 
     return self;
