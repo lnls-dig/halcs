@@ -101,7 +101,7 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "HALCS%u:DEVIO:DSP%u", board_number, halcs_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:DSP%u:%s", board_number, halcs_number, "DATA_PRODUCER");
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
@@ -109,7 +109,7 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    halcs_client_err_e err = halcs_set_monit_subscription (halcs_client, "MONIT_DATA", "MONIT_AMP");
+    halcs_client_err_e err = halcs_set_monit_subscription (halcs_client, service, "MONIT_AMP");
     if (err != HALCS_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:monit_amp]: halcs_set_monit_subscription failed\n");
         goto err_set_monit_subscription;
