@@ -1665,8 +1665,12 @@ halcs_client_err_e halcs_get_monit_stream (halcs_client_t *self,
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
     zmsg_t *msg = mlm_client_recv (self->mlm_client);
-    const char *mlm_subject = mlm_client_subject (self->mlm_client);
+    if (msg == NULL) { /* interrupted */
+        err = HALCS_CLIENT_ERR_MSG;
+        goto err_null_msg;
+    }
 
+    const char *mlm_subject = mlm_client_subject (self->mlm_client);
     if (!streq (mlm_subject, subject)) {
         DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
                 "halcs_get_monit_stream: Unexpected subject %s, waiting for %s\n",
@@ -1688,6 +1692,7 @@ err_msg_size:
 err_msg_alloc:
 err_unexpected_subject:
     zmsg_destroy (&msg);
+err_null_msg:
     return err;
 }
 
