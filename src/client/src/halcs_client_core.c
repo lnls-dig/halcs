@@ -1616,23 +1616,83 @@ PARAM_FUNC_CLIENT_READ(monit_updt)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_UPDT, monit_updt);
 }
 
-/* Monitoring AMP/POS funcion */
-halcs_client_err_e halcs_get_monit_amp_pos (halcs_client_t *self, char *service,
-        struct _smio_dsp_data_t *dsp_data)
+/* Monitoring Update value */
+PARAM_FUNC_CLIENT_WRITE(monit_poll_time)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POLL_TIME, monit_poll_time);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_poll_time)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POLL_TIME, monit_poll_time);
+}
+
+halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, const char *stream,
+        const char *pattern)
 {
     assert (self);
-    assert (service);
+    assert (stream);
+    assert (pattern);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
-    /* Use the direct function table pointer to speed up the process */
-    const disp_op_t* func = &dsp_set_get_monit_amp_pos_exp;
-    halcs_client_err_e err = halcs_func_exec(self, func, service,
-            NULL, (uint32_t *)dsp_data);
-    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS, "Could not get Monit. AMP/POS",
-            err_get_amp_pos_data);
+    int rc = mlm_client_set_consumer (self->mlm_client, stream, pattern);
+    if (rc != 0) {
+        err = HALCS_CLIENT_ERR_TIMEOUT;
+    }
 
     return err;
+}
 
-err_get_amp_pos_data:
+halcs_client_err_e halcs_remove_monit_subscription (halcs_client_t *self, const char *stream)
+{
+    assert (self);
+    assert (stream);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+
+    int rc = mlm_client_remove_consumer (self->mlm_client, stream);
+    if (rc != 0) {
+        err = HALCS_CLIENT_ERR_TIMEOUT;
+    }
+
+    return err;
+}
+
+halcs_client_err_e halcs_get_monit_stream (halcs_client_t *self,
+        const char *subject, struct _smio_dsp_monit_data_t *monit_data)
+{
+    assert (self);
+    assert(monit_data);
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+
+    zmsg_t *msg = mlm_client_recv (self->mlm_client);
+    if (msg == NULL) { /* interrupted */
+        err = HALCS_CLIENT_ERR_MSG;
+        goto err_null_msg;
+    }
+
+    const char *mlm_subject = mlm_client_subject (self->mlm_client);
+    if (!streq (mlm_subject, subject)) {
+        DBE_DEBUG (DBG_LIB_CLIENT | DBG_LVL_FATAL, "[libclient] "
+                "halcs_get_monit_stream: Unexpected subject %s, waiting for %s\n",
+                 mlm_subject, subject);
+        err = HALCS_CLIENT_ERR_MSG;
+        goto err_unexpected_subject;
+    }
+
+    zframe_t *frame = zmsg_pop (msg);
+    ASSERT_ALLOC(frame, err_msg_alloc, HALCS_CLIENT_ERR_ALLOC);
+    ASSERT_TEST(zframe_size (frame) == sizeof (*monit_data),
+            "Unexpected message received", err_msg_size);
+
+    uint32_t *data_out = (uint32_t *) zframe_data (frame);
+    memcpy (monit_data, data_out, sizeof (*monit_data));
+    
+err_msg_size:
+    zframe_destroy (&frame);
+err_msg_alloc:
+err_unexpected_subject:
+    zmsg_destroy (&msg);
+err_null_msg:
     return err;
 }
 

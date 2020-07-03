@@ -42,6 +42,7 @@ void smio_startup (zsock_t *pipe, void *args)
     th_boot_args_t *th_args = (th_boot_args_t *) args;
     zsock_t *pipe_mgmt = pipe;
     zsock_t *pipe_msg = th_args->pipe_msg;
+    zsock_t *pipe_msg2 = th_args->pipe_msg2;
     volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
     /* We must export our service as the combination of the
@@ -58,7 +59,7 @@ void smio_startup (zsock_t *pipe, void *args)
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] SMIO Thread %s "
             "allocating resources ...\n", smio_service);
 
-    smio_t *self = smio_new (th_args, pipe_mgmt, pipe_msg, smio_service);
+    smio_t *self = smio_new (th_args, pipe_mgmt, pipe_msg, pipe_msg2, smio_service);
     ASSERT_ALLOC(self, err_self_alloc);
 
     /* Signal parent we are ready. It's important to signal the parent only

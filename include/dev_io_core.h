@@ -15,6 +15,9 @@ extern "C" {
 /* SMIO hash key length in chars */
 #define SMIO_HKEY_LEN                   8
 #define NODES_MAX_LEN                   100
+/* We use 2 PIPE MSG sockets per SMIO */
+#define NUM_PIPE_MSG_PER_SMIO           2
+#define NODES_MAX_PIPE_MSG_LEN          (NUM_PIPE_MSG_PER_SMIO * NODES_MAX_LEN)
 
 /* Node of sig_ops list */
 typedef struct {

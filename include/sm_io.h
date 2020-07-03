@@ -63,27 +63,27 @@ typedef struct {
 } smio_ops_t;
 
 /* Open device */
-typedef int (*thsafe_client_open_fp) (smio_t *self, llio_endpoint_t *endpoint);
+typedef int (*thsafe_client_open_fp) (void *self, llio_endpoint_t *endpoint);
 /* Release device */
-typedef int (*thsafe_client_release_fp) (smio_t *self, llio_endpoint_t *endpoint);
+typedef int (*thsafe_client_release_fp) (void *self, llio_endpoint_t *endpoint);
 /* Read data from device */
-typedef ssize_t (*thsafe_client_read_16_fp) (smio_t *self, uint64_t offs, uint16_t *data);
-typedef ssize_t (*thsafe_client_read_32_fp) (smio_t *self, uint64_t offs, uint32_t *data);
-typedef ssize_t (*thsafe_client_read_64_fp) (smio_t *self, uint64_t offs, uint64_t *data);
+typedef ssize_t (*thsafe_client_read_16_fp) (void *self, uint64_t offs, uint16_t *data);
+typedef ssize_t (*thsafe_client_read_32_fp) (void *self, uint64_t offs, uint32_t *data);
+typedef ssize_t (*thsafe_client_read_64_fp) (void *self, uint64_t offs, uint64_t *data);
 /* Write data to device */
-typedef ssize_t (*thsafe_client_write_16_fp) (smio_t *self, uint64_t offs, const uint16_t *data);
-typedef ssize_t (*thsafe_client_write_32_fp) (smio_t *self, uint64_t offs, const uint32_t *data);
-typedef ssize_t (*thsafe_client_write_64_fp) (smio_t *self, uint64_t offs, const uint64_t *data);
+typedef ssize_t (*thsafe_client_write_16_fp) (void *self, uint64_t offs, const uint16_t *data);
+typedef ssize_t (*thsafe_client_write_32_fp) (void *self, uint64_t offs, const uint32_t *data);
+typedef ssize_t (*thsafe_client_write_64_fp) (void *self, uint64_t offs, const uint64_t *data);
 /* Read data block from device, size in bytes */
-typedef ssize_t (*thsafe_client_read_block_fp) (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*thsafe_client_read_block_fp) (void *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block from device, size in bytes */
-typedef ssize_t (*thsafe_client_write_block_fp) (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
+typedef ssize_t (*thsafe_client_write_block_fp) (void *self, uint64_t offs, size_t size, const uint32_t *data);
 /* Read data block via DMA from device, size in bytes */
-typedef ssize_t (*thsafe_client_read_dma_fp) (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
+typedef ssize_t (*thsafe_client_read_dma_fp) (void *self, uint64_t offs, size_t size, uint32_t *data);
 /* Write data block via DMA from device, size in bytes */
-typedef ssize_t (*thsafe_client_write_dma_fp) (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
+typedef ssize_t (*thsafe_client_write_dma_fp) (void *self, uint64_t offs, size_t size, const uint32_t *data);
 /* Read device information */
-/* typedef int (*thsafe_client_read_info_fp) (smio_t *self, llio_dev_info_t *dev_info); Moved to dev_io */
+/* typedef int (*thsafe_client_read_info_fp) (void *self, llio_dev_info_t *dev_info); Moved to dev_io */
 
 typedef struct {
     thsafe_client_open_fp thsafe_client_open;                   /* Open device */
@@ -110,6 +110,7 @@ typedef struct {
     void *args;                                                 /* Generic arguments for SMIO */
     volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
     zsock_t *pipe_msg;                                          /* Message PIPE to actor */
+    zsock_t *pipe_msg2;                                         /* Message PIPE to actor 2 */
     char *broker;                                               /* Endpoint to connect to broker */
     char *service;                                              /* (part of) the service name to be exported */
     int verbose;                                                /* Print trace information to stdout*/
@@ -120,8 +121,8 @@ typedef struct {
 /***************** Our methods *****************/
 
 /* Creates a new instance of the SMIO */
-smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt, zsock_t *pipe_msg,
-        char *service);
+smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
+        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service);
 /* Destroy an instance of the Low-level I/O */
 smio_err_e smio_destroy (smio_t **self_p);
 /* Loop through all interface sockets */
@@ -134,7 +135,7 @@ smio_err_e smio_send_mgmt_msg (smio_t *self, uint32_t dest_smio_id,
     uint32_t dest_smio_inst, char *msg);
 /* Get SDB info from specified VID/DID */
 smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
-    uint32_t smio_inst, uint64_t vid, uint32_t did, 
+    uint32_t smio_inst, uint64_t vid, uint32_t did,
     sdbutils_info_t *sdbutils_info);
 
 smio_err_e smio_init_exp_ops (smio_t *self, disp_op_t** smio_exp_ops,
@@ -176,12 +177,20 @@ smio_err_e smio_set_handler (smio_t *self, void *smio_handler);
 void *smio_get_handler (smio_t *self);
 /* Get SMIO Worker */
 mlm_client_t *smio_get_worker (smio_t *self);
+/* Get SMIO endpoint */
+const char *smio_get_endpoint (smio_t *self);
+/* Clone SMIO endpoint */
+char *smio_clone_endpoint (smio_t *self);
+/* Get SMIO service */
+const char *smio_get_service (smio_t *self);
+/* Clone SMIO service */
+char *smio_clone_service (smio_t *self);
 /* Get SMIO PIPE Message */
 zsock_t *smio_get_pipe_msg (smio_t *self);
+/* Get SMIO PIPE Message 2 */
+zsock_t *smio_get_pipe_msg2 (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
-/* Get poller */
-zpoller_t *smio_get_poller (smio_t *self);
 
 /************************************************************/
 /**************** Smio OPS generic methods API **************/
@@ -202,51 +211,93 @@ smio_err_e smio_do_op (void *owner, void *msg);
 /***************** Thsafe generic methods API ***************/
 /************************************************************/
 
-/* Open device */
+/**** Open device ****/
 int smio_thsafe_client_open (smio_t *self, llio_endpoint_t *endpoint);
-/* Release device */
-int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint);
+int smio_thsafe_client_open_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint);
 
-/* Read data from device */
+/**** Release device ****/
+int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint);
+int smio_thsafe_client_release_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint);
+
+/**** Read data from device ****/
 ssize_t smio_thsafe_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data);
 ssize_t smio_thsafe_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data);
 ssize_t smio_thsafe_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data);
-/* Read data from device with raw address (no base address mangling) */
+
 ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data);
 ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data);
 ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data);
 
-/* Write data to device */
+ssize_t smio_thsafe_client_read_16_gen (smio_t *self, void *sock, uint64_t offs, uint16_t *data);
+ssize_t smio_thsafe_client_read_32_gen (smio_t *self, void *sock, uint64_t offs, uint32_t *data);
+ssize_t smio_thsafe_client_read_64_gen (smio_t *self, void *sock, uint64_t offs, uint64_t *data);
+
+ssize_t smio_thsafe_raw_client_read_16_gen (smio_t *self, void *sock, uint64_t offs, uint16_t *data);
+ssize_t smio_thsafe_raw_client_read_32_gen (smio_t *self, void *sock, uint64_t offs, uint32_t *data);
+ssize_t smio_thsafe_raw_client_read_64_gen (smio_t *self, void *sock, uint64_t offs, uint64_t *data);
+
+/**** Write data to device ****/
 ssize_t smio_thsafe_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data);
 ssize_t smio_thsafe_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data);
 ssize_t smio_thsafe_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data);
-/* Write data to device with raw address (no base address mangling) */
+
 ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data);
 ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data);
 ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data);
 
-/* Read data block from device, size in bytes */
-ssize_t smio_thsafe_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
-/* Read data block from device, size in bytes, with raw address (no base address mangling) */
-ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
+ssize_t smio_thsafe_client_write_16_gen (smio_t *self, void *sock, uint64_t offs, const uint16_t *data);
+ssize_t smio_thsafe_client_write_32_gen (smio_t *self, void *sock, uint64_t offs, const uint32_t *data);
+ssize_t smio_thsafe_client_write_64_gen (smio_t *self, void *sock, uint64_t offs, const uint64_t *data);
 
-/* Write data block from device, size in bytes */
-ssize_t smio_thsafe_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
-/* Write data block from device, size in bytes, with raw address (no base address mangling) */
-ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_16_gen (smio_t *self, void *sock, uint64_t offs, const uint16_t *data);
+ssize_t smio_thsafe_raw_client_write_32_gen (smio_t *self, void *sock, uint64_t offs, const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_64_gen (smio_t *self, void *sock, uint64_t offs, const uint64_t *data);
 
-/* read data block via dma from device, size in bytes */
-ssize_t smio_thsafe_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
-/* read data block via dma from device, size in bytes, with raw address (no base address mangling) */
+/**** Read data block from device function pointer, size in bytes ****/
+ssize_t smio_thsafe_client_read_block (smio_t *self, uint64_t offs, size_t size,
+        uint32_t *data);
+ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size,
+        uint32_t *data);
+
+ssize_t smio_thsafe_client_read_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data);
+ssize_t smio_thsafe_raw_client_read_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data);
+
+/**** Write data block from device function pointer, size in bytes ****/
+ssize_t smio_thsafe_client_write_block (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data);
+
+ssize_t smio_thsafe_client_write_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data);
+
+/**** Read data block via DMA from device, size in bytes ****/
+ssize_t smio_thsafe_client_read_dma (smio_t *self, uint64_t offs, size_t size,
+        uint32_t *data);
 ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data);
 
-/* Write data block via DMA from device, size in bytes */
-ssize_t smio_thsafe_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
-/* Write data block via DMA from device, size in bytes, with raw address (no base address mangling) */
-ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data);
+ssize_t smio_thsafe_client_read_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data);
+ssize_t smio_thsafe_raw_client_read_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data);
 
-/* Read device information */
-/* int smio_thsafe_client_read_info (smio_t *self, llio_dev_info_t *dev_info) */
+/**** Write data block via DMA from device, size in bytes ****/
+ssize_t smio_thsafe_client_write_dma (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data);
+
+ssize_t smio_thsafe_client_write_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data);
+ssize_t smio_thsafe_raw_client_write_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data);
+
+/**** Read device information function pointer ****/
+/* int smio_thsafe_raw_client_read_info (smio_t *self, llio_dev_info_t *dev_info) */
 
 #ifdef __cplusplus
 }

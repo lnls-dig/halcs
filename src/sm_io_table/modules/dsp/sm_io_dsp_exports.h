@@ -26,7 +26,7 @@ extern disp_op_t dsp_set_get_monit_pos_y_exp;
 extern disp_op_t dsp_set_get_monit_pos_q_exp;
 extern disp_op_t dsp_set_get_monit_pos_sum_exp;
 extern disp_op_t dsp_set_get_monit_updt_exp;
-extern disp_op_t dsp_set_get_monit_amp_pos_exp;
+extern disp_op_t dsp_set_get_monit_poll_time_exp;
 extern disp_op_t dsp_set_get_monit1_amp_ch0_exp;
 extern disp_op_t dsp_set_get_monit1_amp_ch1_exp;
 extern disp_op_t dsp_set_get_monit1_amp_ch2_exp;
