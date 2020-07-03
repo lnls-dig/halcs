@@ -199,6 +199,67 @@ zsock_t *smio_dsp_monit_get_pipe_msg (smio_dsp_monit_t *self)
     return self->pipe_msg;
 }
 
+/*
+ *  The picture can contain any
+ *  of these characters, each corresponding to one or two arguments:
+ *        i = int (signed)
+ *        1 = uint8_t
+ *        2 = uint16_t
+ *        4 = uint32_t
+ *        8 = uint64_t
+ *        s = char *
+ *        b = byte *, int (2 arguments)
+ *        c = zchunk_t *
+ *        f = zframe_t *
+ *        h = zhashx_t *
+ *        l = zlistx_t *
+ *        U = zuuid_t *
+ *        p = void * (sends the pointer value, only meaningful over inproc)
+ *        m = zmsg_t * (sends all frames in the zmsg)
+ *        z = sends zero-sized frame (0 arguments)
+ *        u = uint (deprecated)
+ *    Note that s, b, c, and f are encoded the same way and the choice is
+ *    offered as a convenience to the sender, which may or may not already
+ *    have data in a zchunk or zframe. Does not change or take ownership of
+ *    any arguments. Returns 0 if successful, -1 if sending failed for any
+ *    reason.
+ */
+smio_err_e smio_send_dsp_monit_mgmt_msg (zactor_t *actor, 
+    const char *picture, ...)
+{
+    assert (actor);
+    smio_err_e err = SMIO_SUCCESS;
+
+    va_list argptr;
+    va_start(argptr, picture);
+    int zerr = zsock_vsend (actor, picture, argptr);
+    va_end(argptr);
+    ASSERT_TEST(zerr == 0, "Could not send MGMT message to DSP MONIT", 
+        err_send_mgmt_msg,
+        SMIO_ERR_INV_SOCKET);
+
+err_send_mgmt_msg:
+    return err;
+}
+
+smio_err_e smio_recv_dsp_monit_mgmt_msg (zactor_t *actor, 
+    const char *picture, ...)
+{
+    assert (actor);
+    smio_err_e err = SMIO_SUCCESS;
+
+    va_list argptr;
+    va_start(argptr, picture);
+    int zerr = zsock_vrecv (actor, picture, argptr);
+    va_end(argptr);
+    ASSERT_TEST(zerr == 0, "Could not recv MGMT message from DSP MONIT", 
+        err_recv_mgmt_msg,
+        SMIO_ERR_INV_SOCKET);
+
+err_recv_mgmt_msg:
+    return err;
+}
+
 static smio_err_e _smio_dsp_monit_engine_handle_socket (smio_dsp_monit_t *smio_dsp_monit, void *sock,
         zloop_reader_fn handler)
 {
@@ -315,11 +376,20 @@ static int _smio_dsp_monit_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, voi
         /* Shutdown the engine */
         terminated = true;    
     }
-    else if (streq (command, "$MONIT_POLL_TIME")) {
+    else if (streq (command, "MONIT_POLL_TIME_W")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_dsp_core:_smio_dsp_monit_handle_pipe_mgmt] PIPE "
-               "received MONIT_POLL_TIME command.\n");
+               "received MONIT_POLL_TIME_W command.\n");
         /* Updte monit poll time */
         zsock_recv (reader, "4", &self->monit_poll_time);
+        zloop_timer_end (self->loop, self->timer_id);
+        self->timer_id = zloop_timer (self->loop, self->monit_poll_time, SMIO_DSP_POLLER_NTIMES,
+            _smio_dsp_monit_handle_timer, self);
+    }
+    else if (streq (command, "MONIT_POLL_TIME_R")) {
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_dsp_core:_smio_dsp_monit_handle_pipe_mgmt] PIPE "
+               "received MONIT_POLL_TIME_R command.\n");
+        /* Updte monit poll time */
+        zsock_send (reader, "4", self->monit_poll_time);
     }
 
     /*  Cleanup pipe if any argument frames are still waiting to be eaten */

@@ -43,5 +43,11 @@ smio_err_e smio_dsp_monit_destroy (smio_dsp_monit_t **self_p);
 zsock_t *smio_dsp_monit_get_pipe_mgmt (smio_dsp_monit_t *self);
 /* Returns pipe_msg */
 zsock_t *smio_dsp_monit_get_pipe_msg (smio_dsp_monit_t *self);
+/* Send message to DSP MONIT MGMT PIPE*/
+smio_err_e smio_send_dsp_monit_mgmt_msg (zactor_t *actor, 
+    const char *picture, ...);
+/* Recv message from DSP MONIT MGMT PIPE */
+smio_err_e smio_recv_dsp_monit_mgmt_msg (zactor_t *actor, 
+    const char *picture, ...);
 
 #endif
