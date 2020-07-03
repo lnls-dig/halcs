@@ -181,6 +181,44 @@ RW_PARAM_FUNC(dsp, monit_updt) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+/* MONIT Update time */
+static int _dsp_monit_poll_time (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_dsp_t *dsp = smio_get_handler (self);
+    ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",
+            err_get_dsp_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     uint32_t value = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        smio_send_dsp_monit_mgmt_msg (smio_dsp_get_actor (dsp),
+            "s", "MONIT_POLL_TIME_R");
+        smio_recv_dsp_monit_mgmt_msg (smio_dsp_get_actor (dsp),
+            "4", &value);
+        *(uint32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        smio_send_dsp_monit_mgmt_msg (smio_dsp_get_actor (dsp),
+            "s4", "MONIT_POLL_TIME_W", value);
+        return -DSP_OK;
+    }
+
+err_get_dsp_handler:
+    return err;
+}
+
 /* Macros to avoid repetition of the function body Monit */
 
 #define DSP_MONIT_FUNC_NAME(func_name)                                          \
@@ -378,6 +416,98 @@ DSP_MONIT_FUNC_NAME_HEADER(monit1_amp_pos)
     DSP_MONIT_FUNC_BODY(owner, args, ret, MONIT1);
 }
 
+#define DSP_MONIT_FUNC_BODY(owner, args, ret, reg_prefix)                       \
+    do {                                                                        \
+        assert (owner);                                                         \
+        assert (args);                                                          \
+                                                                                \
+        int err = -DSP_OK;                                                      \
+        uint32_t ampfifo_empty;                                                 \
+        uint32_t posfifo_empty;                                                 \
+                                                                                \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp] "                    \
+                "Calling _dsp_monit_amp_pos for "#reg_prefix"\n");              \
+        SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);                          \
+        smio_dsp_t *dsp = smio_get_handler (self);                              \
+        ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",              \
+                err_get_dsp_handler, -DSP_ERR);                                 \
+                                                                                \
+        /*                          */                                          \
+        /* Message is:              */                                          \
+        /* frame 0: operation code  */                                          \
+        /*                          */                                          \
+                                                                                \
+        smio_dsp_data_t *data = (smio_dsp_data_t *) ret;                        \
+        data->new_amp_data = false;                                             \
+        data->new_pos_data = false;                                             \
+                                                                                \
+        /* Check if FIFO is empty before reading from it */                     \
+        GET_PARAM(self, dsp, 0x0, POS_CALC,                                     \
+            AMPFIFO_## reg_prefix ##_CSR, EMPTY, SINGLE_BIT_PARAM,              \
+            ampfifo_empty, NO_FMT_FUNC);                                        \
+        GET_PARAM(self, dsp, 0x0, POS_CALC,                                     \
+            POSFIFO_## reg_prefix ##_CSR, EMPTY, SINGLE_BIT_PARAM,              \
+            posfifo_empty, NO_FMT_FUNC);                                        \
+                                                                                \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp] "                    \
+                "ampfifo empty for "#reg_prefix": %u\n", ampfifo_empty);        \
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp] "                    \
+                "posfifo empty for "#reg_prefix": %u\n", posfifo_empty);        \
+                                                                                \
+        if (!ampfifo_empty) {                                                   \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                AMPFIFO_## reg_prefix ##_R0, AMP_CH0, MULT_BIT_PARAM,           \
+                data->amp_ch0, NO_FMT_FUNC);                                    \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                AMPFIFO_## reg_prefix ##_R1, AMP_CH1, MULT_BIT_PARAM,           \
+                data->amp_ch1, NO_FMT_FUNC);                                    \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                AMPFIFO_## reg_prefix ##_R2, AMP_CH2, MULT_BIT_PARAM,           \
+                data->amp_ch2, NO_FMT_FUNC);                                    \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                AMPFIFO_## reg_prefix ##_R3, AMP_CH3, MULT_BIT_PARAM,           \
+                data->amp_ch3, NO_FMT_FUNC);                                    \
+        }                                                                       \
+                                                                                \
+        if (!posfifo_empty) {                                                   \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                POSFIFO_## reg_prefix ##_R0, POS_X, MULT_BIT_PARAM,             \
+                data->pos_x, NO_FMT_FUNC);                                      \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                POSFIFO_## reg_prefix ##_R1, POS_Y, MULT_BIT_PARAM,             \
+                data->pos_y, NO_FMT_FUNC);                                      \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                POSFIFO_## reg_prefix ##_R2, POS_Q, MULT_BIT_PARAM,             \
+                data->pos_q, NO_FMT_FUNC);                                      \
+            GET_PARAM(self, dsp, 0x0, POS_CALC,                                 \
+                POSFIFO_## reg_prefix ##_R3, POS_SUM, MULT_BIT_PARAM,           \
+                data->pos_sum, NO_FMT_FUNC);                                    \
+        }                                                                       \
+                                                                                \
+        if (!ampfifo_empty) {                                                   \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp_exp] Data AMP "   \
+                "for "#reg_prefix": %u %u %u %u\n",                             \
+                data->amp_ch0, data->amp_ch1, data->amp_ch2, data->amp_ch3);    \
+            data->new_amp_data = true;                                          \
+            err = sizeof (*data);                                               \
+        }                                                                       \
+                                                                                \
+        if (!posfifo_empty) {                                                   \
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:dsp_exp] Data POS "   \
+                "for "#reg_prefix": %d %d %d %d\n",                             \
+                data->pos_x, data->pos_y, data->pos_q, data->pos_sum);          \
+            data->new_pos_data = true;                                          \
+            err = sizeof (*data);                                               \
+        }                                                                       \
+                                                                                \
+        /* Return the whole dsp_data structure even if we don't have new data. */ \
+        /* This avoids specific treatment for client handling */                \
+        err = sizeof (*data);                                                   \
+                                                                                \
+err_get_dsp_handler:                                                            \
+        return err;                                                             \
+    } while(0)
+
 #define POS_CALC_SW_TAG_EN_MIN                  0
 #define POS_CALC_SW_TAG_EN_MAX                  1
 RW_PARAM_FUNC(dsp, sw_tag_en) {
@@ -498,6 +628,7 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_pos_q),
     RW_PARAM_FUNC_NAME(dsp, monit_pos_sum),
     RW_PARAM_FUNC_NAME(dsp, monit_updt),
+    _dsp_monit_poll_time,
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch0),
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch1),
     RW_PARAM_FUNC_NAME(dsp, monit1_amp_ch2),

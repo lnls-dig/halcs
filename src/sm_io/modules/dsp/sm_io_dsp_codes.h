@@ -120,7 +120,9 @@ struct _smio_dsp_monit_data_t {
 #define DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT \
                                             38
 #define DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT   "dsp_set_get_tbt_tag_desync_cnt"
-#define DSP_OPCODE_END                      39
+#define DSP_OPCODE_SET_GET_MONIT_POLL_TIME  39
+#define DSP_NAME_SET_GET_MONIT_POLL_TIME    "dsp_set_get_monit_poll_time"
+#define DSP_OPCODE_END                      40
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
