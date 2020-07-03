@@ -21,6 +21,7 @@ void print_help (char *program_name)
             "\t-b <broker_endpoint> Broker endpoint\n"
             "\t-board <AMC board = [0|1|2|3|4|5]>\n"
             "\t-halcs <HALCS number = [0|1]>\n"
+            "\t-poll_time <ms>\n"
             , program_name);
 }
 
@@ -30,6 +31,7 @@ int main (int argc, char *argv [])
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
+    char *poll_time_str = NULL;
     char **str_p = NULL;
 
     if (argc < 2) {
@@ -61,6 +63,10 @@ int main (int argc, char *argv [])
         {
             str_p = &halcs_number_str;
         }
+        else if (streq(argv[i], "-poll_time"))
+        {
+            str_p = &poll_time_str;
+        }
         /* Fallout for options with parameters */
         else {
             *str_p = strdup (argv[i]);
@@ -86,7 +92,7 @@ int main (int argc, char *argv [])
     /* Set default halcs number */
     uint32_t halcs_number;
     if (halcs_number_str == NULL) {
-        fprintf (stderr, "[client:leds]: Setting default value to HALCS number: %u\n",
+        fprintf (stderr, "[client:monit_amp]: Setting default value to HALCS number: %u\n",
                 DFLT_HALCS_NUMBER);
         halcs_number = DFLT_HALCS_NUMBER;
     }
@@ -94,14 +100,22 @@ int main (int argc, char *argv [])
         halcs_number = strtoul (halcs_number_str, NULL, 10);
 
         if (halcs_number > MAX_HALCS_NUMBER) {
-            fprintf (stderr, "[client:leds]: HALCS number too big! Defaulting to: %u\n",
+            fprintf (stderr, "[client:monit_amp]: HALCS number too big! Defaulting to: %u\n",
                     MAX_HALCS_NUMBER);
             halcs_number = MAX_HALCS_NUMBER;
         }
     }
 
+    /* Set default halcs number */
+    uint32_t poll_time;
+    if (poll_time_str != NULL) {
+        poll_time = strtoul (poll_time_str, NULL, 10);
+    }
+
+    char producer[50];
     char service[50];
-    snprintf (service, sizeof (service), "HALCS%u:DEVIO:DSP%u:%s", board_number, halcs_number, "DATA_PRODUCER");
+    snprintf (producer, sizeof (producer), "HALCS%u:DEVIO:DSP%u:%s", board_number, halcs_number, "DATA_PRODUCER");
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:DSP%u", board_number, halcs_number);
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
@@ -109,7 +123,16 @@ int main (int argc, char *argv [])
         goto err_halcs_client_new;
     }
 
-    halcs_client_err_e err = halcs_set_monit_subscription (halcs_client, service, "MONIT_AMP");
+    halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
+    if (poll_time_str != NULL) {
+        err = halcs_set_monit_poll_time (halcs_client, service, poll_time);
+        if (err != HALCS_CLIENT_SUCCESS) {
+            fprintf (stderr, "[client:monit_amp]: halcs_set_monit_poll_time failed\n");
+            goto err_set_poll_time;
+        }
+    }
+
+    err = halcs_set_monit_subscription (halcs_client, producer, "MONIT_AMP");
     if (err != HALCS_CLIENT_SUCCESS) {
         fprintf (stderr, "[client:monit_amp]: halcs_set_monit_subscription failed\n");
         goto err_set_monit_subscription;
@@ -135,6 +158,7 @@ int main (int argc, char *argv [])
 
     halcs_remove_monit_subscription (halcs_client, "MONIT_AMP");
 err_set_monit_subscription:
+err_set_poll_time:
     halcs_client_destroy (&halcs_client);
 err_halcs_client_new:
     str_p = &board_number_str;
