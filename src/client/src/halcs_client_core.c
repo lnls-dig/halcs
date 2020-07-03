@@ -1636,12 +1636,10 @@ halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, const cha
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
     int rc = mlm_client_set_consumer (self->mlm_client, stream, pattern);
-    ASSERT_TEST(rc == 0, "Could not set monit subscription",
-            err_set_monit_subscription);
+    if (rc != 0) {
+        err = HALCS_CLIENT_ERR_TIMEOUT;
+    }
 
-    return err;
-
-err_set_monit_subscription:
     return err;
 }
 
@@ -1652,12 +1650,10 @@ halcs_client_err_e halcs_remove_monit_subscription (halcs_client_t *self, const 
     halcs_client_err_e err = HALCS_CLIENT_SUCCESS;
 
     int rc = mlm_client_remove_consumer (self->mlm_client, stream);
-    ASSERT_TEST(rc == 0, "Could not remove monit subscription",
-            err_remove_monit_subscription);
+    if (rc != 0) {
+        err = HALCS_CLIENT_ERR_TIMEOUT;
+    }
 
-    return err;
-
-err_remove_monit_subscription:
     return err;
 }
 
