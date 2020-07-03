@@ -17,8 +17,8 @@
 
 /* version macros for compile-time API detection */
 
-#define HUTILS_VERSION_MAJOR 1
-#define HUTILS_VERSION_MINOR 11
+#define HUTILS_VERSION_MAJOR 2
+#define HUTILS_VERSION_MINOR 0
 #define HUTILS_VERSION_PATCH 0
 
 #define HUTILS_MAKE_VERSION(major, minor, patch) \

@@ -36,8 +36,8 @@
 #endif
 
 /* CZMQ */
-#if CZMQ_VERSION < 30001
-#error "HALCS requires at least czmq/3.0.1"
+#if CZMQ_VERSION < 40002
+#error "HALCS requires at least czmq/4.0.2"
 #endif
 
 /* MLM */

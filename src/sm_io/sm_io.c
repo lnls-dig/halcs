@@ -30,6 +30,7 @@
     CHECK_HAL_ERR(err, SM_IO, "[sm_io]",                    \
             smio_err_str (err_type))
 
+#define SMIO_RCV_TIMEOUT                   5000       /* ms */
 #define SMIO_POLLER_TIMEOUT                100000     /* in msec */
 #define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
 
@@ -42,6 +43,7 @@ struct _smio_t {
     uint64_t base;                      /* Base SMIO address */
     char *name;                         /* Identification of this sm_io instance */
     char *service;                      /* Exported service name */
+    char *endpoint;                     /* Broker endpoint */
     /* int verbose; */                  /* Print activity to stdout */
     mlm_client_t *worker;               /* zeroMQ Malamute client (worker) */
     void *smio_handler;                 /* Generic pointer to a device handler. This
@@ -50,10 +52,10 @@ struct _smio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
     zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
+    zsock_t *pipe_msg2;                 /* Pipe back to parent to exchange Payload messages 2 */
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
-    zpoller_t *poller;                  /* Poller for internal DEVIO <-> SMIO sockets */
 
     /* Specific SMIO operations dispatch table for exported operations */
     disp_table_t *exp_ops_dtable;
@@ -80,6 +82,10 @@ static disp_table_err_e _smio_check_msg_args (disp_table_t *disp_table,
 static smio_err_e _smio_set_name (smio_t *self, const char *name);
 static const char *_smio_get_name (smio_t *self);
 static char *_smio_clone_name (smio_t *self);
+static const char *_smio_get_endpoint (smio_t *self);
+static char *_smio_clone_endpoint (smio_t *self);
+static const char *_smio_get_service (smio_t *self);
+static char *_smio_clone_service (smio_t *self);
 
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
@@ -88,7 +94,7 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
-        zsock_t *pipe_msg, char *service)
+        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service)
 {
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
@@ -101,6 +107,10 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->service = strdup (service);
     ASSERT_ALLOC(self->service, err_service_alloc);
 
+    /* Setup endpoint name */
+    self->endpoint = strdup (args->broker);
+    ASSERT_ALLOC(self->endpoint, err_endpoint_alloc);
+
     /* Setup Dispatch table */
     self->exp_ops_dtable = disp_table_new (&smio_disp_table_ops);
     ASSERT_ALLOC(self->exp_ops_dtable, err_exp_ops_dtable_alloc);
@@ -108,7 +118,14 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->pipe_mgmt = pipe_mgmt;
     self->pipe_msg = pipe_msg;
+    self->pipe_msg2 = pipe_msg2;
     self->inst_id = args->inst_id;
+
+    /* Set maximum receive wait for PIPE MSG sockets. This is important
+     * so as to not block DEVIO <-> SMIO communication if something is
+     * wrong */
+    zsock_set_rcvtimeo (self->pipe_msg, SMIO_RCV_TIMEOUT);
+    zsock_set_rcvtimeo (self->pipe_msg2, SMIO_RCV_TIMEOUT);
 
     /* Setup pipes for zloop interrupting */
     self->pipe_frontend = zsys_create_pipe (&self->pipe_backend);
@@ -129,10 +146,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
      * interrupting the loop to check for rebuilds */
     _smio_engine_handle_socket (self, self->pipe_backend, _smio_handle_pipe_backend);
 
-    /* Set-up poller for internal DEVIO <-> SMIO sockets */
-    self->poller = zpoller_new (self->pipe_msg, NULL);
-    ASSERT_TEST(self->poller != NULL, "Could not create zpoller", err_poller_alloc);
-
     /* Initialize SMIO base address */
     self->base = args->base;
 
@@ -144,15 +157,13 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
 
     int rc = mlm_client_connect (self->worker, args->broker, 1000, service);
-    ASSERT_TEST(rc >= 0, "Could not connect MLM to broker", err_mlm_connect);
+    ASSERT_TEST(rc >= 0, "Could not connect MLM worker to broker", err_mlm_worker_connect);
 
     return self;
 
-err_mlm_connect:
+err_mlm_worker_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
-    zpoller_destroy (&self->poller);
-err_poller_alloc:
     zloop_timer_end (self->loop, self->timer_id);
 err_timer_alloc:
     zloop_destroy (&self->loop);
@@ -160,9 +171,12 @@ err_loop_alloc:
     zsock_destroy (&self->pipe_backend);
     zsock_destroy (&self->pipe_frontend);
 err_pipe_frontend_alloc:
+    zsock_destroy (&self->pipe_msg2);
     zsock_destroy (&self->pipe_msg);
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
+    free (self->endpoint);
+err_endpoint_alloc:
     free (self->service);
 err_service_alloc:
     free (self);
@@ -178,11 +192,11 @@ smio_err_e smio_destroy (smio_t **self_p)
         smio_t *self = *self_p;
 
         mlm_client_destroy (&self->worker);
-        zpoller_destroy (&self->poller);
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
+        zsock_destroy (&self->pipe_msg2);
         zsock_destroy (&self->pipe_msg);
         /* Don't destroy pipe_mgmt as this is taken care of by the
          * zactor infrastructure, s_thread_shim (void *args) on CZMQ
@@ -192,6 +206,7 @@ smio_err_e smio_destroy (smio_t **self_p)
         disp_table_destroy (&self->exp_ops_dtable);
         self->thsafe_client_ops = NULL;
         self->ops = NULL;
+        free (self->endpoint);
         free (self->service);
         free (self->name);
 
@@ -311,7 +326,7 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 }
 
 /* zloop handler for MSG PIPE */
-static int _smio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
+static int _smio_handle_worker (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
     smio_err_e err = SMIO_SUCCESS;
@@ -390,7 +405,7 @@ smio_err_e smio_loop (smio_t *self)
 
     /* Set-up server register commands handler */
     _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
-    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_pipe_msg);
+    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
 
     /* Run reactor until there's a termination signal */
     zloop_start (self->loop);
@@ -430,7 +445,7 @@ err_send_mgmt_msg:
 }
 
 smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
-    uint32_t smio_inst, uint64_t vid, uint32_t did, 
+    uint32_t smio_inst, uint64_t vid, uint32_t did,
     sdbutils_info_t *sdbutils_info)
 {
     assert (self);
@@ -446,12 +461,12 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
     ASSERT_TEST(zerr == 0, "Could not send SDB_DEVICE_INFO message", err_send_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
 
-    /* Wait for reply. Note here we expect the reply over the same socket, 
+    /* Wait for reply. Note here we expect the reply over the same socket,
      * event though the receiving channel was registered in a zloop engine.
      * The zloop reader was canceled before and will be reinserted in the engine
      * in after receving the message */
     char command[50];
-    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class, 
+    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class,
         &sdbutils_info->abi_ver_major, &sdbutils_info->abi_ver_minor, &sdbutils_info->bus_specific);
     ASSERT_TEST(zerr == 0, "Could not receive SDB_DEVICE_INFO message", err_recv_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
@@ -657,6 +672,34 @@ char *smio_clone_name (smio_t *self)
     return _smio_clone_name (self);
 }
 
+/* Get SMIO endpoint */
+const char *smio_get_endpoint (smio_t *self)
+{
+    assert (self);
+    return _smio_get_endpoint (self);
+}
+
+/* Clone SMIO endpoint */
+char *smio_clone_endpoint (smio_t *self)
+{
+    assert (self);
+    return _smio_clone_endpoint (self);
+}
+
+/* Get SMIO service */
+const char *smio_get_service (smio_t *self)
+{
+    assert (self);
+    return _smio_get_service (self);
+}
+
+/* Clone SMIO service */
+char *smio_clone_service (smio_t *self)
+{
+    assert (self);
+    return _smio_clone_service (self);
+}
+
 smio_err_e smio_set_exp_ops (smio_t *self, const disp_op_t **exp_ops)
 {
     assert (self);
@@ -704,12 +747,6 @@ const smio_thsafe_client_ops_t *smio_get_thsafe_client_ops (smio_t *self)
 {
     assert (self);
     return self->thsafe_client_ops;
-}
-
-zpoller_t *smio_get_poller (smio_t *self)
-{
-    assert (self);
-    return self->poller;
 }
 
 /**************** Static Functions ***************/
@@ -795,29 +832,78 @@ err_alloc:
     return name;
 }
 
+/* Get SMIO endpoint */
+static const char *_smio_get_endpoint (smio_t *self)
+{
+    assert (self);
+    return self->endpoint;
+}
+
+/* Clone SMIO endpoint */
+static char *_smio_clone_endpoint (smio_t *self)
+{
+    assert (self);
+
+    char *endpoint = strdup (self->endpoint);
+    ASSERT_ALLOC(endpoint, err_alloc);
+
+err_alloc:
+    return endpoint;
+}
+
+/* Get SMIO service */
+static const char *_smio_get_service (smio_t *self)
+{
+    assert (self);
+    return self->service;
+}
+
+/* Clone SMIO service */
+static char *_smio_clone_service (smio_t *self)
+{
+    assert (self);
+
+    char *service = strdup (self->service);
+    ASSERT_ALLOC(service, err_alloc);
+
+err_alloc:
+    return service;
+}
+
 smio_err_e smio_set_handler (smio_t *self, void *smio_handler)
 {
+    assert (self);
     self->smio_handler = smio_handler;
     return SMIO_SUCCESS;
 }
 
 void *smio_get_handler (smio_t *self)
 {
+    assert (self);
     return self->smio_handler;
 }
 
 mlm_client_t *smio_get_worker (smio_t *self)
 {
+    assert (self);
     return self->worker;
 }
 
 zsock_t *smio_get_pipe_msg (smio_t *self)
 {
+    assert (self);
     return self->pipe_msg;
+}
+
+zsock_t *smio_get_pipe_msg2 (smio_t *self)
+{
+    assert (self);
+    return self->pipe_msg2;
 }
 
 zsock_t *smio_get_pipe_mgmt (smio_t *self)
 {
+    assert (self);
     return self->pipe_mgmt;
 }
 
@@ -843,119 +929,142 @@ zsock_t *smio_get_pipe_mgmt (smio_t *self)
     } while(0)
 
 /* Declare wrapper for all SMIO functions API */
-#define SMIO_FUNC_WRAPPER(func_name, ...)                   \
+#define SMIO_FUNC_WRAPPER(func_name, sock, ...)             \
 {                                                           \
     ASSERT_FUNC(func_name);                                 \
-    return self->thsafe_client_ops->func_name (self, ##__VA_ARGS__);  \
+    return self->thsafe_client_ops->func_name (sock, ##__VA_ARGS__);  \
 }
 
 /**** Open device ****/
 int smio_thsafe_client_open (smio_t *self, llio_endpoint_t *endpoint)
-    SMIO_FUNC_WRAPPER (thsafe_client_open, endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_open, self->pipe_msg, endpoint)
+
+int smio_thsafe_client_open_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_open, sock, endpoint)
 
 /**** Release device ****/
 int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint)
-    SMIO_FUNC_WRAPPER (thsafe_client_release, endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_release, self->pipe_msg, endpoint)
+
+int smio_thsafe_client_release_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_release, sock, endpoint)
 
 /**** Read data from device ****/
 ssize_t smio_thsafe_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
-{
-    ASSERT_FUNC(thsafe_client_read_16);
-    return self->thsafe_client_ops->thsafe_client_read_16 (self, self->base | offs, data);
-}
-
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->pipe_msg, self->base | offs, data)
 ssize_t smio_thsafe_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_read_32);
-    return self->thsafe_client_ops->thsafe_client_read_32 (self, self->base | offs, data);
-}
-
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->pipe_msg, self->base | offs, data)
 ssize_t smio_thsafe_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
-{
-    ASSERT_FUNC(thsafe_client_read_64);
-    return self->thsafe_client_ops->thsafe_client_read_64 (self, self->base | offs, data);
-}
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->pipe_msg, self->base | offs, data)
 
 ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_16, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->pipe_msg, offs, data)
 ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_32, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->pipe_msg, offs, data)
 ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_64, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->pipe_msg, offs, data)
+
+ssize_t smio_thsafe_client_read_16_gen (smio_t *self, void *sock, uint64_t offs, uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, sock, self->base | offs, data)
+ssize_t smio_thsafe_client_read_32_gen (smio_t *self, void *sock, uint64_t offs, uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, sock, self->base | offs, data)
+ssize_t smio_thsafe_client_read_64_gen (smio_t *self, void *sock, uint64_t offs, uint64_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, sock, self->base | offs, data)
+
+ssize_t smio_thsafe_raw_client_read_16_gen (smio_t *self, void *sock, uint64_t offs, uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, sock, offs, data)
+ssize_t smio_thsafe_raw_client_read_32_gen (smio_t *self, void *sock, uint64_t offs, uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, sock, offs, data)
+ssize_t smio_thsafe_raw_client_read_64_gen (smio_t *self, void *sock, uint64_t offs, uint64_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, sock, offs, data)
 
 /**** Write data to device ****/
 ssize_t smio_thsafe_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
-{
-    ASSERT_FUNC(thsafe_client_write_16);
-    return self->thsafe_client_ops->thsafe_client_write_16 (self, self->base | offs, data);
-}
-
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->pipe_msg, self->base | offs, data)
 ssize_t smio_thsafe_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_write_32);
-    return self->thsafe_client_ops->thsafe_client_write_32 (self, self->base | offs, data);
-}
-
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->pipe_msg, self->base | offs, data)
 ssize_t smio_thsafe_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
-{
-    ASSERT_FUNC(thsafe_client_write_64);
-    return self->thsafe_client_ops->thsafe_client_write_64 (self, self->base | offs, data);
-}
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->pipe_msg, self->base | offs, data)
 
 ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_16, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->pipe_msg, offs, data)
 ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_32, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->pipe_msg, offs, data)
 ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_64, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->pipe_msg, offs, data)
+
+ssize_t smio_thsafe_client_write_16_gen (smio_t *self, void *sock, uint64_t offs, const uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, sock, self->base | offs, data)
+ssize_t smio_thsafe_client_write_32_gen (smio_t *self, void *sock, uint64_t offs, const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, sock, self->base | offs, data)
+ssize_t smio_thsafe_client_write_64_gen (smio_t *self, void *sock, uint64_t offs, const uint64_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, sock, self->base | offs, data)
+
+ssize_t smio_thsafe_raw_client_write_16_gen (smio_t *self, void *sock, uint64_t offs, const uint16_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, sock, offs, data)
+ssize_t smio_thsafe_raw_client_write_32_gen (smio_t *self, void *sock, uint64_t offs, const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, sock, offs, data)
+ssize_t smio_thsafe_raw_client_write_64_gen (smio_t *self, void *sock, uint64_t offs, const uint64_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, sock, offs, data)
 
 /**** Read data block from device function pointer, size in bytes ****/
 ssize_t smio_thsafe_client_read_block (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_read_block);
-    return self->thsafe_client_ops->thsafe_client_read_block (self, self->base | offs,
-            size, data);
-}
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->pipe_msg, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size,
+        uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->pipe_msg, offs, size, data)
 
-ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_block, offs, size, data)
+ssize_t smio_thsafe_client_read_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, sock, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_read_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, sock, offs, size, data)
 
 /**** Write data block from device function pointer, size in bytes ****/
 ssize_t smio_thsafe_client_write_block (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_write_block);
-    return self->thsafe_client_ops->thsafe_client_write_block (self, self->base | offs,
-            size, data);
-}
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->pipe_msg, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->pipe_msg, offs, size, data)
 
-ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_block, offs, size, data)
+ssize_t smio_thsafe_client_write_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, sock, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_write_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, sock, offs, size, data)
 
 /**** Read data block via DMA from device, size in bytes ****/
 ssize_t smio_thsafe_client_read_dma (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_read_dma);
-    return self->thsafe_client_ops->thsafe_client_read_dma (self, self->base | offs,
-            size, data);
-}
-
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->pipe_msg, self->base | offs, size, data)
 ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->pipe_msg, offs, size, data)
+
+ssize_t smio_thsafe_client_read_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, sock, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_read_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, sock, offs, size, data)
 
 /**** Write data block via DMA from device, size in bytes ****/
 ssize_t smio_thsafe_client_write_dma (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-{
-    ASSERT_FUNC(thsafe_client_write_dma);
-    return self->thsafe_client_ops->thsafe_client_write_dma (self, self->base | offs,
-            size, data);
-}
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->pipe_msg, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->pipe_msg, offs, size, data)
 
-ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, offs, size, data)
+ssize_t smio_thsafe_client_write_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, sock, self->base | offs, size, data)
+ssize_t smio_thsafe_raw_client_write_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
+        const uint32_t *data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, sock, offs, size, data)
 
 /**** Read device information function pointer ****/
 /* int smio_thsafe_raw_client_read_info (smio_t *self, llio_dev_info_t *dev_info)

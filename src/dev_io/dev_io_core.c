@@ -226,7 +226,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     /* Initialize the sockets structure to talk to nodes */
     self->pipes_mgmt = zmalloc (sizeof (*self->pipes_mgmt) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_mgmt, err_pipes_mgmt_alloc);
-    self->pipes_msg = zmalloc (sizeof (*self->pipes_msg) * NODES_MAX_LEN);
+    self->pipes_msg = zmalloc (sizeof (*self->pipes_msg) * NODES_MAX_PIPE_MSG_LEN);
     ASSERT_ALLOC(self->pipes_msg, err_pipes_msg_alloc);
     self->pipes_config = zmalloc (sizeof (*self->pipes_config) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_config, err_pipes_config_alloc);
@@ -486,12 +486,17 @@ devio_err_e devio_destroy (devio_t **self_p)
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                     "[dev_io_core:destroy] Destroying possible remaining actors, instance #%u\n", i);
             zactor_destroy (&self->pipes_config [i]);
-            zsock_destroy (&self->pipes_msg [i]);
             zactor_destroy (&self->pipes_mgmt [i]);
         }
 
+        for (i = 0; i < NODES_MAX_PIPE_MSG_LEN; ++i) {
+            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                    "[dev_io_core:destroy] Destroying possible remaining PIPE MSG, instance #%u\n", i);
+            zsock_destroy (&self->pipes_msg [i]);
+        }
+
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-                "[dev_io_core:destroy] All actors destroyed\n");
+                "[dev_io_core:destroy] All actors and PIPE MSG destroyed\n");
         free (self->pipes_config);
         free (self->pipes_msg);
         free (self->pipes_mgmt);
@@ -1053,20 +1058,23 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Increment PIPE indexes */
     pipe_mgmt_idx = self->nnodes++;
-    pipe_msg_idx = pipe_mgmt_idx;
+    pipe_msg_idx = NUM_PIPE_MSG_PER_SMIO * pipe_mgmt_idx;
     pipe_config_idx = pipe_mgmt_idx;
 
     /* Create PIPE message to talk to SMIO */
-    zsock_t *pipe_msg_backend;
-    self->pipes_msg [pipe_msg_idx] = zsys_create_pipe (&pipe_msg_backend);
-    ASSERT_TEST (self->pipes_msg [pipe_msg_idx] != NULL, "Could not create message PIPE",
-            err_create_pipe_msg);
+    zsock_t *pipe_msg_backend[NUM_PIPE_MSG_PER_SMIO];
+    uint32_t i;
+    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
+        self->pipes_msg [pipe_msg_idx+i] = zsys_create_pipe (&pipe_msg_backend[i]);
+        ASSERT_TEST (self->pipes_msg [pipe_msg_idx+i] != NULL, "Could not create message PIPE",
+                err_create_pipe_msg);
 
-    /* Register socket handlers */
-    err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx],
-            _devio_handle_pipe_msg);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
-            err_pipes_msg_handle);
+        /* Register socket handlers */
+        err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx+i],
+                _devio_handle_pipe_msg);
+        ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
+                err_pipes_msg_handle);
+    }
 
     /* Alloacate thread arguments struct and pass it to the
      * thread. It is the responsability of the calling thread
@@ -1075,7 +1083,8 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     ASSERT_ALLOC (th_args, err_th_args_alloc);
     th_args->args = NULL;
     th_args->smio_handler = smio_mod_handler;
-    th_args->pipe_msg = pipe_msg_backend;
+    th_args->pipe_msg = pipe_msg_backend[0];
+    th_args->pipe_msg2 = pipe_msg_backend[1];
     th_args->broker = self->endpoint_broker;
     th_args->service = self->name;
     th_args->verbose = self->verbose;
@@ -1166,10 +1175,14 @@ err_pipes_mgmt_handle:
 err_spawn_smio_thread:
     free (th_args);
 err_th_args_alloc:
-    _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx], NULL);
+    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
+        _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx+i], NULL);
+    }
 err_pipes_msg_handle:
-    zsock_destroy (&self->pipes_msg [pipe_msg_idx]);
-    zsock_destroy (&pipe_msg_backend);
+    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
+        zsock_destroy (&self->pipes_msg [pipe_msg_idx+i]);
+        zsock_destroy (&pipe_msg_backend[i]);
+    }
 err_create_pipe_msg:
 err_inv_key:
     free (key);
