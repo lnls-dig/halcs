@@ -1616,6 +1616,17 @@ PARAM_FUNC_CLIENT_READ(monit_updt)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_UPDT, monit_updt);
 }
 
+/* Monitoring Update value */
+PARAM_FUNC_CLIENT_WRITE(monit_poll_time)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_POLL_TIME, monit_poll_time);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_poll_time)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_POLL_TIME, monit_poll_time);
+}
+
 halcs_client_err_e halcs_set_monit_subscription (halcs_client_t *self, const char *stream,
         const char *pattern)
 {
