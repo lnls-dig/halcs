@@ -13,7 +13,7 @@ ExternalProject_Add(bsmp_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/libbsmp
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/bsmp
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND make
+    BUILD_COMMAND make clean && make
     INSTALL_COMMAND ""
     # BSMP assumes in-source build
     BUILD_IN_SOURCE ON

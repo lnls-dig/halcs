@@ -14,7 +14,7 @@ ExternalProject_Add(pciedriver_ext
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/pciedriver
     CONFIGURE_COMMAND ""
     # Build only library, not the driver
-    BUILD_COMMAND make lib_driver
+    BUILD_COMMAND make clean && make lib_driver
     INSTALL_COMMAND ""
     # PCIEDRIVER assumes in-source build
     BUILD_IN_SOURCE ON
