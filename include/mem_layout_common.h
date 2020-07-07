@@ -32,28 +32,9 @@ extern "C" {
 #define FMC_250M_AMC7823_RAW_SPI_OFFS               0x04000
 #define FMC_250M_ISLA216P_RAW_SPI_OFFS              0x05000
 
-/* DSP Components */
-#define DSP_CTRL_RAW_REGS_OFFS                      0x0000
-#define DSP_HALCS_RAW_SWAP_OFFS                     0x0100
-
-/* AFC DIAG Components */
-#define WB_AFC_DIAG_CTRL_RAW_REGS_OFFS              0x0000
-
-/* ACQ Components */
-#define WB_ACQ_CORE_CTRL_RAW_REGS_OFFS              0x0000
-
-/* Trigger Interface Components */
-#define WB_TRIGGER_IFACE_RAW_REG_OFFS               0x0000
-
-/* Trigger Mux Components */
-#define WB_TRIGGER_MUX_RAW_REG_OFFS                 0x0000
-
 /* AFC MGMT Component */
 #define AFC_MGMT_CTRL_RAW_REGS_OFFS                 0x0000
 #define AFC_MGMT_SI57X_RAW_I2C_OFFS                 0x0100
-
-/* Timing Receiver Component */
-#define TIM_RCV_RAW_REGS_OFFS                       0x0000
 
 /* Large Memory RAW Addresses. It lives at address 0 */
 #define LARGE_MEM_RAW_ADDR                          0x00000000
@@ -83,25 +64,9 @@ extern "C" {
 #define FMC_250M_AMC7823_SPI_OFFS                   (FMC_250M_AMC7823_RAW_SPI_OFFS)
 #define FMC_250M_ISLA216P_SPI_OFFS                  (FMC_250M_ISLA216P_RAW_SPI_OFFS)
 
-/* DSP Components */
-#define DSP_CTRL_REGS_OFFS                          (DSP_CTRL_RAW_REGS_OFFS)
-#define DSP_BPM_SWAP_OFFS                           (DSP_BPM_RAW_SWAP_OFFS)
-
-/* ACQ Components */
-#define WB_ACQ_CORE_CTRL_REGS_OFFS                  (WB_ACQ_CORE_CTRL_RAW_REGS_OFFS)
-
-/* Trigger Interface Components */
-#define WB_TRIGGER_IFACE_REG_OFFS                   (WB_TRIGGER_IFACE_RAW_REG_OFFS)
-
-/* Trigger Mux Components */
-#define WB_TRIGGER_MUX_REG_OFFS                     (WB_TRIGGER_MUX_RAW_REG_OFFS)
-
 /* AFC_MGMT Component */
 #define AFC_MGMT_CTRL_REGS_OFFS                     (AFC_MGMT_CTRL_RAW_REGS_OFFS)
 #define AFC_MGMT_SI57X_I2C_OFFS                     (AFC_MGMT_SI57X_RAW_I2C_OFFS)
-
-/* Timing Receiver Component */
-#define TIM_RCV_REGS_OFFS                           (TIM_RCV_RAW_REGS_OFFS)
 
 /* The following is a bit of a hack.
  * We employ a generic API for talking to the hardware.
