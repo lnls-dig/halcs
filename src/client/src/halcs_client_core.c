@@ -1920,7 +1920,7 @@ PARAM_FUNC_CLIENT_READ(sw_tag_desync_cnt)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_SW_TAG_DESYNC_CNT, sw_tag_desync_cnt);
 }
 
-/* SW Tag Desync Counter Reset */
+/* TBT Tag Desync Counter Reset */
 PARAM_FUNC_CLIENT_WRITE(tbt_tag_desync_cnt_rst)
 {
     return param_client_write (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST, tbt_tag_desync_cnt_rst);
@@ -1931,10 +1931,154 @@ PARAM_FUNC_CLIENT_READ(tbt_tag_desync_cnt_rst)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT_RST, tbt_tag_desync_cnt_rst);
 }
 
-/* SW Tag Desync Counter */
+/* TBT Tag Desync Counter */
 PARAM_FUNC_CLIENT_READ(tbt_tag_desync_cnt)
 {
     return param_client_read (self, service, DSP_OPCODE_SET_GET_TBT_TAG_DESYNC_CNT, tbt_tag_desync_cnt);
+}
+
+/* MONIT1 Tag Enable */
+PARAM_FUNC_CLIENT_WRITE(monit1_tag_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_EN, monit1_tag_en);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_tag_en)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_EN, monit1_tag_en);
+}
+
+/* MONIT1 Tag Delay */
+PARAM_FUNC_CLIENT_WRITE(monit1_tag_dly)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_DLY, monit1_tag_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_tag_dly)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_DLY, monit1_tag_dly);
+}
+
+/* MONIT1 Data Mask Enable */
+PARAM_FUNC_CLIENT_WRITE(monit1_data_mask_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_EN, monit1_data_mask_en);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_data_mask_en)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_EN, monit1_data_mask_en);
+}
+
+/* MONIT1 Data Mask Samples Begginning */
+PARAM_FUNC_CLIENT_WRITE(monit1_data_mask_samples_beg)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG, monit1_data_mask_samples_beg);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_data_mask_samples_beg)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG, monit1_data_mask_samples_beg);
+}
+
+/* MONIT1 Data Mask Samples Ending */
+PARAM_FUNC_CLIENT_WRITE(monit1_data_mask_samples_end)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_END, monit1_data_mask_samples_end);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_data_mask_samples_end)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_END, monit1_data_mask_samples_end);
+}
+
+/* MONIT1 Tag Desync Counter Reset */
+PARAM_FUNC_CLIENT_WRITE(monit1_tag_desync_cnt_rst)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT_RST, monit1_tag_desync_cnt_rst);
+}
+
+PARAM_FUNC_CLIENT_READ(monit1_tag_desync_cnt_rst)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT_RST, monit1_tag_desync_cnt_rst);
+}
+
+/* MONIT1 Tag Desync Counter */
+PARAM_FUNC_CLIENT_READ(monit1_tag_desync_cnt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT, monit1_tag_desync_cnt);
+}
+
+/* MONIT Tag Enable */
+PARAM_FUNC_CLIENT_WRITE(monit_tag_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_EN, monit_tag_en);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_tag_en)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_EN, monit_tag_en);
+}
+
+/* MONIT Tag Delay */
+PARAM_FUNC_CLIENT_WRITE(monit_tag_dly)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DLY, monit_tag_dly);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_tag_dly)
+{
+     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DLY, monit_tag_dly);
+}
+
+/* MONIT Data Mask Enable */
+PARAM_FUNC_CLIENT_WRITE(monit_data_mask_en)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_EN, monit_data_mask_en);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_data_mask_en)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_EN, monit_data_mask_en);
+}
+
+/* MONIT Data Mask Samples Begginning */
+PARAM_FUNC_CLIENT_WRITE(monit_data_mask_samples_beg)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG, monit_data_mask_samples_beg);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_data_mask_samples_beg)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG, monit_data_mask_samples_beg);
+}
+
+/* MONIT Data Mask Samples Ending */
+PARAM_FUNC_CLIENT_WRITE(monit_data_mask_samples_end)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_END, monit_data_mask_samples_end);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_data_mask_samples_end)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_END, monit_data_mask_samples_end);
+}
+
+/* MONIT Tag Desync Counter Reset */
+PARAM_FUNC_CLIENT_WRITE(monit_tag_desync_cnt_rst)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT_RST, monit_tag_desync_cnt_rst);
+}
+
+PARAM_FUNC_CLIENT_READ(monit_tag_desync_cnt_rst)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT_RST, monit_tag_desync_cnt_rst);
+}
+
+/* MONIT Tag Desync Counter */
+PARAM_FUNC_CLIENT_READ(monit_tag_desync_cnt)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT, monit_tag_desync_cnt);
 }
 
 /**************** Swap SMIO Functions ****************/
