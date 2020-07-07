@@ -478,6 +478,174 @@ disp_op_t dsp_set_get_tbt_tag_desync_cnt_exp = {
     }
 };
 
+disp_op_t dsp_set_get_monit1_tag_en_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_TAG_EN,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_TAG_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_tag_dly_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_TAG_DLY,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_TAG_DLY,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_data_mask_en_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_DATA_MASK_EN,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_data_mask_samples_beg_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_data_mask_samples_end_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_DATA_MASK_SAMPLES_END,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_tag_desync_cnt_rst_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_TAG_DESYNC_CNT_RST,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit1_tag_desync_cnt_exp = {
+    .name = DSP_NAME_SET_GET_MONIT1_TAG_DESYNC_CNT,
+    .opcode = DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_tag_en_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_TAG_EN,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_TAG_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_tag_dly_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_TAG_DLY,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_TAG_DLY,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_data_mask_en_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_DATA_MASK_EN,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_DATA_MASK_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_data_mask_samples_beg_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_data_mask_samples_end_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_DATA_MASK_SAMPLES_END,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_END,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_tag_desync_cnt_rst_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_TAG_DESYNC_CNT_RST,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_monit_tag_desync_cnt_exp = {
+    .name = DSP_NAME_SET_GET_MONIT_TAG_DESYNC_CNT,
+    .opcode = DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -519,6 +687,20 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_sw_tag_desync_cnt_exp,
     &dsp_set_get_tbt_tag_desync_cnt_rst_exp,
     &dsp_set_get_tbt_tag_desync_cnt_exp,
+    &dsp_set_get_monit1_tag_en_exp,
+    &dsp_set_get_monit1_tag_dly_exp,
+    &dsp_set_get_monit1_data_mask_en_exp,
+    &dsp_set_get_monit1_data_mask_samples_beg_exp,
+    &dsp_set_get_monit1_data_mask_samples_end_exp,
+    &dsp_set_get_monit1_tag_desync_cnt_rst_exp,
+    &dsp_set_get_monit1_tag_desync_cnt_exp,
+    &dsp_set_get_monit_tag_en_exp,
+    &dsp_set_get_monit_tag_dly_exp,
+    &dsp_set_get_monit_data_mask_en_exp,
+    &dsp_set_get_monit_data_mask_samples_beg_exp,
+    &dsp_set_get_monit_data_mask_samples_end_exp,
+    &dsp_set_get_monit_tag_desync_cnt_rst_exp,
+    &dsp_set_get_monit_tag_desync_cnt_exp,
     NULL
 };
 
