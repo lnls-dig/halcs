@@ -168,26 +168,14 @@ at your distribution. As all of them use semantic versioning, you can install an
 version that is greater or equal than the specified ones for *minor* and *revision*:
 numbers.
 
-Additionally, it's often interesting to install customized udev scripts, so
-your application will automatically start a given program when some ID is
-detected:
+UDEV scripts
+''''''''''''
 
-.. code-block:: bash
-  :linenos:
-
-  git clone --recursive https://github.com/lnls-dig/halcs-generic-udev.git && \
-  for project in halcs-generic-udev; do
-      cd $project && \
-      git submodule update --init --recursive &&
-      sudo make install && \
-      cd ..
-
-      # Check last command return status
-      if [ $? -ne 0 ]; then
-          echo "Could not compile/install project $project." >&2
-          exit 1
-      fi
-  done
+HALCS includes two udev scripts, a generic one that sets the device permissions
+to the appropriate ones (called ``60-udev-fpga-rules``) and customized udev script,
+in which you can automatically start a userspace application if a certain condition
+is detected (called ``50-udev-fpga-rules``). If this, an application will
+automatically start a given program when some ID is detected.
 
 Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
 ``synthesis-name`` that is baked inside the FPGA Gateware.
@@ -198,8 +186,7 @@ Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ prop
 .. |SDB Wiki| replace:: https://ohwr.org/project/fpga-config-space/wikis/home
 
 To add your specific program to start when some ID is found, the ``run-fpga-program.sh``
-(typically installed in ``/usr/local/share/halcs/scripts`` or under
-``halcs-generic-udev`` repository path ``scripts/share/halcs/scripts``) script
+(typically installed in ``/usr/local/share/halcs`` or ``/usr/share/halcs``) script
 can be modified. Below, an excerpt of the script is shown with a possible
 modification to allow starting another program:
 

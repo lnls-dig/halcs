@@ -999,6 +999,92 @@ halcs_client_err_e halcs_get_tbt_tag_desync_cnt_rst (halcs_client_t *self, char 
 halcs_client_err_e halcs_get_tbt_tag_desync_cnt (halcs_client_t *self, char *service,
         uint32_t *tbt_tag_desync_cnt);
 
+/* MONIT1 Tag Enable. This sets/gets the tag synchronization */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_monit1_tag_en (halcs_client_t *self, char *service,
+        uint32_t monit1_tag_en);
+halcs_client_err_e halcs_get_monit1_tag_en (halcs_client_t *self, char *service,
+        uint32_t *monit1_tag_en);
+
+/* MONIT1 Tag Delay. This sets/gets the tag delay synchronization */
+halcs_client_err_e halcs_set_monit1_tag_dly (halcs_client_t *self, char *service,
+        uint32_t monit1_tag_dly);
+halcs_client_err_e halcs_get_monit1_tag_dly (halcs_client_t *self, char *service,
+        uint32_t *monit1_tag_dly);
+
+/* MONIT1 Data Mask Enable. This sets/gets the MONIT1 masking of samples*/
+halcs_client_err_e halcs_set_monit1_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t monit1_data_mask_en);
+halcs_client_err_e halcs_get_monit1_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t *monit1_data_mask_en);
+
+/* MONIT1 Data Mask. This sets/gets the MONIT1 mask to the specified number of samples at the beginning */
+halcs_client_err_e halcs_set_monit1_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t monit1_data_mask_samples_beg);
+halcs_client_err_e halcs_get_monit1_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t *monit1_data_mask_samples_beg);
+
+/* MONIT1 Data Mask Ending. This sets/gets the MONIT1 mask to the specified number of samples at the end*/
+halcs_client_err_e halcs_set_monit1_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t monit1_data_mask_samples_end);
+halcs_client_err_e halcs_get_monit1_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t *monit1_data_mask_samples_end);
+
+/* MONIT1 Tag Desync Counter Reset. This sets/gets the MONIT1 Tag desync counter reset */
+halcs_client_err_e halcs_set_monit1_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t monit1_tag_desync_cnt_rst);
+halcs_client_err_e halcs_get_monit1_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t *monit1_tag_desync_cnt_rst);
+
+/* MONIT1 tag desync counter. This gets the Swithcing tag desync counter */
+halcs_client_err_e halcs_get_monit1_tag_desync_cnt (halcs_client_t *self, char *service,
+        uint32_t *monit1_tag_desync_cnt);
+
+/* MONIT Tag Enable. This sets/gets the tag synchronization */
+/* All of the functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h
+ * for all possible errors)*/
+halcs_client_err_e halcs_set_monit_tag_en (halcs_client_t *self, char *service,
+        uint32_t monit_tag_en);
+halcs_client_err_e halcs_get_monit_tag_en (halcs_client_t *self, char *service,
+        uint32_t *monit_tag_en);
+
+/* MONIT Tag Delay. This sets/gets the tag delay synchronization */
+halcs_client_err_e halcs_set_monit_tag_dly (halcs_client_t *self, char *service,
+        uint32_t monit_tag_dly);
+halcs_client_err_e halcs_get_monit_tag_dly (halcs_client_t *self, char *service,
+        uint32_t *monit_tag_dly);
+
+/* MONIT Data Mask Enable. This sets/gets the MONIT masking of samples*/
+halcs_client_err_e halcs_set_monit_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t monit_data_mask_en);
+halcs_client_err_e halcs_get_monit_data_mask_en (halcs_client_t *self, char *service,
+        uint32_t *monit_data_mask_en);
+
+/* MONIT Data Mask. This sets/gets the MONIT mask to the specified number of samples at the beginning */
+halcs_client_err_e halcs_set_monit_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t monit_data_mask_samples_beg);
+halcs_client_err_e halcs_get_monit_data_mask_samples_beg (halcs_client_t *self, char *service,
+        uint32_t *monit_data_mask_samples_beg);
+
+/* MONIT Data Mask Ending. This sets/gets the MONIT mask to the specified number of samples at the end*/
+halcs_client_err_e halcs_set_monit_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t monit_data_mask_samples_end);
+halcs_client_err_e halcs_get_monit_data_mask_samples_end (halcs_client_t *self, char *service,
+        uint32_t *monit_data_mask_samples_end);
+
+/* MONIT Tag Desync Counter Reset. This sets/gets the MONIT Tag desync counter reset */
+halcs_client_err_e halcs_set_monit_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t monit_tag_desync_cnt_rst);
+halcs_client_err_e halcs_get_monit_tag_desync_cnt_rst (halcs_client_t *self, char *service,
+        uint32_t *monit_tag_desync_cnt_rst);
+
+/* MONIT tag desync counter. This gets the Swithcing tag desync counter */
+halcs_client_err_e halcs_get_monit_tag_desync_cnt (halcs_client_t *self, char *service,
+        uint32_t *monit_tag_desync_cnt);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */

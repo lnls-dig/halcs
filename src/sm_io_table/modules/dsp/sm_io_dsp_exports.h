@@ -49,6 +49,20 @@ extern disp_op_t dsp_set_get_sw_tag_desync_cnt_rst_exp;
 extern disp_op_t dsp_set_get_sw_tag_desync_cnt_exp;
 extern disp_op_t dsp_set_get_tbt_tag_desync_cnt_rst_exp;
 extern disp_op_t dsp_set_get_tbt_tag_desync_cnt_exp;
+extern disp_op_t dsp_set_get_monit1_tag_en_exp;
+extern disp_op_t dsp_set_get_monit1_tag_dly_exp;
+extern disp_op_t dsp_set_get_monit1_data_mask_en_exp;
+extern disp_op_t dsp_set_get_monit1_data_mask_samples_beg_exp;
+extern disp_op_t dsp_set_get_monit1_data_mask_samples_end_exp;
+extern disp_op_t dsp_set_get_monit1_tag_desync_cnt_rst_exp;
+extern disp_op_t dsp_set_get_monit1_tag_desync_cnt_exp;
+extern disp_op_t dsp_set_get_monit_tag_en_exp;
+extern disp_op_t dsp_set_get_monit_tag_dly_exp;
+extern disp_op_t dsp_set_get_monit_data_mask_en_exp;
+extern disp_op_t dsp_set_get_monit_data_mask_samples_beg_exp;
+extern disp_op_t dsp_set_get_monit_data_mask_samples_end_exp;
+extern disp_op_t dsp_set_get_monit_tag_desync_cnt_rst_exp;
+extern disp_op_t dsp_set_get_monit_tag_desync_cnt_exp;
 
 extern const disp_op_t *dsp_exp_ops [];
 

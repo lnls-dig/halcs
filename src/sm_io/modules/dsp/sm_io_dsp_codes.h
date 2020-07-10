@@ -122,7 +122,55 @@ struct _smio_dsp_monit_data_t {
 #define DSP_NAME_SET_GET_TBT_TAG_DESYNC_CNT   "dsp_set_get_tbt_tag_desync_cnt"
 #define DSP_OPCODE_SET_GET_MONIT_POLL_TIME  39
 #define DSP_NAME_SET_GET_MONIT_POLL_TIME    "dsp_set_get_monit_poll_time"
-#define DSP_OPCODE_END                      40
+#define DSP_OPCODE_SET_GET_MONIT1_TAG_EN    40
+#define DSP_NAME_SET_GET_MONIT1_TAG_EN      "dsp_set_get_monit1_tag_en"
+#define DSP_OPCODE_SET_GET_MONIT1_TAG_DLY   41
+#define DSP_NAME_SET_GET_MONIT1_TAG_DLY     "dsp_set_get_monit1_tag_dly"
+#define DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_EN \
+                                            42
+#define DSP_NAME_SET_GET_MONIT1_DATA_MASK_EN \
+                                            "dsp_set_get_monit1_data_mask_en"
+#define DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG  \
+                                            43
+#define DSP_NAME_SET_GET_MONIT1_DATA_MASK_SAMPLES_BEG    \
+                                            "dsp_set_get_monit1_data_mask_samples_beg"
+#define DSP_OPCODE_SET_GET_MONIT1_DATA_MASK_SAMPLES_END  \
+                                            44
+#define DSP_NAME_SET_GET_MONIT1_DATA_MASK_SAMPLES_END    \
+                                            "dsp_set_get_monit1_data_mask_samples_end"
+#define DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT_RST \
+                                            45
+#define DSP_NAME_SET_GET_MONIT1_TAG_DESYNC_CNT_RST \
+                                            "dsp_set_get_monit1_tag_desync_cnt_rst"
+#define DSP_OPCODE_SET_GET_MONIT1_TAG_DESYNC_CNT \
+                                            46
+#define DSP_NAME_SET_GET_MONIT1_TAG_DESYNC_CNT \
+                                            "dsp_set_get_monit1_tag_desync_cnt"
+#define DSP_OPCODE_SET_GET_MONIT_TAG_EN     47
+#define DSP_NAME_SET_GET_MONIT_TAG_EN       "dsp_set_get_monit_tag_en"
+#define DSP_OPCODE_SET_GET_MONIT_TAG_DLY    48
+#define DSP_NAME_SET_GET_MONIT_TAG_DLY      "dsp_set_get_monit_tag_dly"
+#define DSP_OPCODE_SET_GET_MONIT_DATA_MASK_EN \
+                                            49
+#define DSP_NAME_SET_GET_MONIT_DATA_MASK_EN \
+                                            "dsp_set_get_monit_data_mask_en"
+#define DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG  \
+                                            50
+#define DSP_NAME_SET_GET_MONIT_DATA_MASK_SAMPLES_BEG    \
+                                            "dsp_set_get_monit_data_mask_samples_beg"
+#define DSP_OPCODE_SET_GET_MONIT_DATA_MASK_SAMPLES_END  \
+                                            51
+#define DSP_NAME_SET_GET_MONIT_DATA_MASK_SAMPLES_END    \
+                                            "dsp_set_get_monit_data_mask_samples_end"
+#define DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT_RST \
+                                            52
+#define DSP_NAME_SET_GET_MONIT_TAG_DESYNC_CNT_RST \
+                                            "dsp_set_get_monit_tag_desync_cnt_rst"
+#define DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT \
+                                            53
+#define DSP_NAME_SET_GET_MONIT_TAG_DESYNC_CNT \
+                                            "dsp_set_get_monit_tag_desync_cnt"
+#define DSP_OPCODE_END                      54
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
