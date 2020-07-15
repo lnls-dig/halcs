@@ -1,16 +1,24 @@
 # Read header file and extract version numbers
 
-# PCIe Driver doesn't have the notion of version numbers....
-# assign 1.0.0
+file(READ
+    "${PROJECT_SOURCE_DIR}/foreign/pcie-driver/include/pcie/driver/pciDriver.h"
+    _pciedriver_H_CONTENTS
+)
 
-set(pciedriver_VERSION_MAJOR
-    1
+string(REGEX REPLACE
+    ".*#define PCIEDRIVER_VERSION_MAJOR ([0-9]+).*"
+    "\\1" pciedriver_VERSION_MAJOR
+    "${_pciedriver_H_CONTENTS}"
 )
-set(pciedriver_VERSION_MINOR
-    0
+string(REGEX REPLACE
+    ".*#define PCIEDRIVER_VERSION_MINOR ([0-9]+).*"
+    "\\1" pciedriver_VERSION_MINOR
+    "${_pciedriver_H_CONTENTS}"
 )
-set(pciedriver_VERSION_PATCH
-    0
+string(REGEX REPLACE
+    ".*#define PCIEDRIVER_VERSION_PATCH ([0-9]+).*"
+    "\\1" pciedriver_VERSION_PATCH
+    "${_pciedriver_H_CONTENTS}"
 )
 
 set(pciedriver_VERSION
