@@ -51,6 +51,8 @@ SCRIPTS_ETC_PREFIX ?=
 # Installation prefix for the share scripts.
 # Usually this is set to /usr/local
 SCRIPTS_SHARE_PREFIX ?= /usr/local
+# LDCONF script
+LDCONF_ETC_PREFIX ?= /etc/ld.so.conf.d
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -65,6 +67,8 @@ export SUPPORTED_AFCV3_BOARDS
 TOP := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 SRC_DIR := $(TOP)/src
 export TOP
+
+LDCONF_DIR := ldconf
 
 # Libraries
 LIBS_DIR := $(TOP)/libs
@@ -219,6 +223,9 @@ CFLAGS_DEBUG += -g
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM = -Wl,-T,$(LD_SCRIPT)
 
+# Install halcsd LDCONFIG files
+LDCONF = ldconf
+
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmlm
 
@@ -262,6 +269,7 @@ include $(SRC_DIR)/revision/revision.mk
 include $(SRC_DIR)/boards/$(BOARD)/board.mk
 include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
+include $(LDCONF_DIR)/ldconf.mk
 
 # Project boards
 boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
@@ -316,6 +324,7 @@ apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
 apps_ETC_SCRIPTS = $(foreach app,$(APPS),$($(app)_ETC_SCRIPTS))
 apps_SHARE_SCRIPTS = $(foreach app,$(APPS),$($(app)_SHARE_SCRIPTS))
+ldconfig_ETC_SCRIPTS = $(foreach ldconf,$(LDCONF),$($(ldconf)_ETC_SCRIPTS))
 
 .SECONDEXPANSION:
 
@@ -663,8 +672,10 @@ scripts_install:
 	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(ldconf_script)) ${LDCONF_ETC_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_uninstall:
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),rm -f ${LDCONF_ETC_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
