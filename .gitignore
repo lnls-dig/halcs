@@ -36,3 +36,6 @@ czmq
 libsodium
 libzmq
 malamute
+
+# Generated files from .in templates
+ldconf/halcs.conf
