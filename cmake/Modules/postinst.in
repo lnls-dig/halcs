@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Adapted from Xilinx XRT project:
+# https://github.com/Xilinx/XRT/blob/master/src/CMake/config/postinst.in
+
+rmmodules()
+{
+    find /lib/modules -type f -name pciDriver.ko -delete
+    depmod -A
+}
+
+
+echo "Unloading old pciDriver Linux kernel modules"
+rmmod pciDriver
+
+PCIDRIVER_VERSION_STRING_OLD=`dkms status -m pciDriver | awk -F, '{print $2}'`
+for OLD in $PCIDRIVER_VERSION_STRING_OLD; do
+    echo "Unregistering old pciDriver Linux kernel module sources $OLD from dkms"
+    dkms remove -m pciDriver -v $OLD --all
+    break
+done
+
+rmmodules
+
+echo "Invoking DKMS common.postinst for pciDriver"
+/usr/lib/dkms/common.postinst pciDriver @PCIDRIVER_VERSION_STRING@ "" "" $2
+
+if [ $? -eq 0 ]; then
+    echo "Finished DKMS common.postinst"
+    install -m 644 /usr/src/pciDriver-@PCIDRIVER_VERSION_STRING@/60-udev_fpga.rules /etc/udev/rules.d
+
+    echo "Loading new pciDriver Linux kernel modules"
+    udevadm control --reload-rules
+    modprobe pciDriver
+    udevadm trigger
+fi
+
+if [ -z "`dkms status -m pciDriver -v @PCIDRIVER_VERSION_STRING@ |grep installed`" ]; then
+    echo "****************************************************************"
+    echo "* DKMS failed to install pciDriver drivers."
+    echo "* Please check if kernel development headers are installed for OS variant used."
+    echo "* "
+    echo "* Check build logs in /var/lib/dkms/pciDriver/@PCIDRIVER_VERSION_STRING@"
+    echo "****************************************************************"
+fi
+
+exit 0

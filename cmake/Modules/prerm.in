@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Adapted from Xilinx XRT project:
+# https://github.com/Xilinx/XRT/blob/master/src/CMake/config/postinst.in
+
+lsb_release -si | grep -Eq "^RedHat|^CentOS"
+if [ $? -eq 0 ] && [ $1 -ge 1 ]; then
+    echo "Cleanup is skipped for package upgrade/downgrade/re-install on RHEL/CentOS"
+    exit 0
+fi
+
+lsb_release -si | grep -Eq "^Ubuntu|^Debian"
+if [ $? -eq 0 ] && [ "$1" = "upgrade" ]; then
+    echo "Unregistering old pciDriver Linux kernel module sources @PCIDRIVER_VERSION_STRING@ from dkms on Ubuntu/Debian"
+    dkms remove -m pciDriver -v @PCIDRIVER_VERSION_STRING@ --all
+    echo "Cleanup is skipped for package upgrade/downgrade/re-install on Ubuntu/Debian"
+    exit 0
+fi
+
+# If we are here pciDriver is being uninstalled. It is NOT one of upgrade, downgrade or
+# re-install.
+
+echo "Unloading old pciDriver Linux kernel modules"
+rmmod pciDriver
+
+echo "Unregistering pciDriver Linux kernel module sources @PCIDRIVER_VERSION_STRING@ from dkms"
+dkms remove -m pciDriver -v @PCIDRIVER_VERSION_STRING@ --all
+find /lib/modules -type f -name pciDriver.ko -delete
+depmod -A
+
+rm -f /etc/udev/rules.d/60-udev_fpga.rules
+
+exit 0
