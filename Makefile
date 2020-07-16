@@ -52,7 +52,7 @@ SCRIPTS_ETC_PREFIX ?=
 # Usually this is set to /usr/local
 SCRIPTS_SHARE_PREFIX ?= /usr/local
 # LDCONF script
-LDCONF_ETC_PREFIX ?= /etc/ld.so.conf.d
+LDCONF_ETC_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -69,6 +69,7 @@ SRC_DIR := $(TOP)/src
 export TOP
 
 LDCONF_DIR := ldconf
+LDCONF_PREFIX := $(LDCONF_ETC_PREFIX)/etc/ld.so.conf.d
 
 # Libraries
 LIBS_DIR := $(TOP)/libs
@@ -672,10 +673,10 @@ scripts_install:
 	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(ldconf_script)) ${LDCONF_ETC_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(ldconf_script)) ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_uninstall:
-	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),rm -f ${LDCONF_ETC_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),rm -f ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
