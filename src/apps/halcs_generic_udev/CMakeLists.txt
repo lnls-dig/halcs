@@ -108,13 +108,13 @@ if(BUILD_halcs_generic_udev)
 
         # udev rules
         install(CODE "set(input_file
-            \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/40-udev_fpga.rules.in\")")
+            \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/81-udev_fpga.rules.in\")")
         install(CODE "set(output_file
-            \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/40-udev_fpga.rules\")")
+            \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/81-udev_fpga.rules\")")
         install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
 
         install(FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/40-udev_fpga.rules
+            ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/81-udev_fpga.rules
             DESTINATION ${UDEV_SYSCONFDIR}
             PERMISSIONS
             OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
