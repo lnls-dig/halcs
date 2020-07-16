@@ -673,6 +673,7 @@ scripts_install:
 	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconf_ETC_SCRIPTS),mkdir -p $(dir ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:)) $(CMDSEP))
 	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(ldconf_script)) ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_uninstall:
