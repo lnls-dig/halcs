@@ -100,7 +100,21 @@ char *hutils_stringify_dec_key (uint32_t key)
 
 char *hutils_stringify_hex_key (uint32_t key)
 {
-    return hutils_stringify_key (key, 16);
+    size_t size = sizeof (key);
+    uint8_t *data = (uint8_t *) &key;
+    char *key_c = zmalloc (size * 2 + 1);
+    ASSERT_ALLOC (key_c, err_key_c_alloc);
+
+    static const char hex_char [] = "0123456789ABCDEF";
+    uint32_t i = 0;
+    for (i = 0; i < size; ++i) {
+        key_c [i * 2 + 0] = hex_char [data [i] >> 4];
+        key_c [i * 2 + 1] = hex_char [data [i] & 15];
+    }
+    key_c [size * 2] = 0;
+
+err_key_c_alloc:
+    return key_c;
 }
 
 uint32_t hutils_numerify_key (const char *key, uint32_t base)
