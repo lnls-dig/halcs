@@ -45,7 +45,7 @@ static void _smio_dsp_monit (zsock_t *pipe_mgmt, void *th_boot_args);
 /* Thread boot args structure */
 typedef struct {
     smio_t *parent;                                         /* SMIO parent */
-    zsock_t *pipe_msg;                                      /* Aditional Message PIPE to DEVIO */
+    zsock_t *dealer;                                        /* Aditional Message PIPE to DEVIO */
     const char *endpoint;                                   /* Endpoint to connect to broker */
     const char *service;                                    /* (part of) the service name to be exported */
 } th_dsp_boot_args_t;
@@ -66,7 +66,7 @@ smio_dsp_t * smio_dsp_new (smio_t *parent)
     th_dsp_boot_args_t *th_args = zmalloc (sizeof *th_args);
     ASSERT_ALLOC (th_args, err_th_args_alloc);
     th_args->parent = parent;
-    th_args->pipe_msg = smio_get_pipe_msg2(parent);
+    th_args->dealer = smio_get_dealer2(parent);
     th_args->endpoint = smio_get_endpoint(parent);
     th_args->service = smio_get_service(parent);
 
@@ -112,7 +112,7 @@ zactor_t *smio_dsp_get_actor (smio_dsp_t *self)
 /************************************************************/
 
 /* Creates a new instance of Device Information */
-smio_dsp_monit_t* smio_dsp_monit_new (zsock_t *pipe_mgmt, zsock_t *pipe_msg,
+smio_dsp_monit_t* smio_dsp_monit_new (zsock_t *pipe_mgmt, zsock_t *dealer,
     smio_t *parent, const char *endpoint, const char *service)
 {
     smio_dsp_monit_t *self = (smio_dsp_monit_t *) zmalloc (sizeof *self);
@@ -120,7 +120,7 @@ smio_dsp_monit_t* smio_dsp_monit_new (zsock_t *pipe_mgmt, zsock_t *pipe_msg,
 
     self->parent = parent;
     self->pipe_mgmt = pipe_mgmt;
-    self->pipe_msg = pipe_msg;
+    self->dealer = dealer;
 
     /* Set monit update time */
     self->monit_poll_time = SMIO_DSP_POLLER_TIMEOUT;
@@ -156,7 +156,7 @@ err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
     /* Already destroyed at sm_io.c */
-    /* zsock_destroy (&self->pipe_msg); */
+    /* zsock_destroy (&self->dealer); */
     free(self);
 err_self_alloc:
     return NULL;
@@ -174,7 +174,7 @@ smio_err_e smio_dsp_monit_destroy (smio_dsp_monit_t **self_p)
         zloop_timer_end (self->loop, self->timer_id);
         zloop_destroy (&self->loop);
         /* Already destroyed at sm_io.c */
-        /* zsock_destroy (&self->pipe_msg); */
+        /* zsock_destroy (&self->dealer); */
         /* Don't destroy pipe_mgmt as this is taken care of by the
          * zactor infrastructure, s_thread_shim (void *args) on CZMQ
          * 3.0.2 src/zactor.c
@@ -193,10 +193,10 @@ zsock_t *smio_dsp_monit_get_pipe_mgmt (smio_dsp_monit_t *self)
     return self->pipe_mgmt;
 }
 
-zsock_t *smio_dsp_monit_get_pipe_msg (smio_dsp_monit_t *self)
+zsock_t *smio_dsp_monit_get_dealer (smio_dsp_monit_t *self)
 {
     assert (self);
-    return self->pipe_msg;
+    return self->dealer;
 }
 
 /*
@@ -306,7 +306,7 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
     uint32_t ampfifo_empty;
     RW_REPLY_TYPE err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_CSR, EMPTY,
         SINGLE_BIT_PARAM, ampfifo_empty, NO_FMT_FUNC,
-        smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+        smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
     ASSERT_TEST(err == RW_OK, "Could not get ampfifo empty register", err_get_monit_amp, -1);
 
     zmsg_t *msg = NULL;
@@ -314,22 +314,22 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
     if (!ampfifo_empty) {
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R0, AMP_CH0,
             MULT_BIT_PARAM, monit_data.amp_ch0, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp0 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R1, AMP_CH1,
             MULT_BIT_PARAM, monit_data.amp_ch1, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp1 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R2, AMP_CH2,
             MULT_BIT_PARAM, monit_data.amp_ch2, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp2 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R3, AMP_CH3,
             MULT_BIT_PARAM, monit_data.amp_ch3, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_pipe_msg2 (self->parent));
+            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp3 register", err_get_monit_amp, -1);
 
         /* Send message */
@@ -414,14 +414,14 @@ static void _smio_dsp_monit (zsock_t *pipe_mgmt, void *th_boot_args)
     char *service_producer = hutils_concat_strings (th_args->service, "DATA_PRODUCER", ':');
     ASSERT_ALLOC(service_producer, err_service_prod_alloc);
 
-    smio_dsp_monit_t *self = smio_dsp_monit_new (pipe_mgmt, th_args->pipe_msg, 
+    smio_dsp_monit_t *self = smio_dsp_monit_new (pipe_mgmt, th_args->dealer, 
         th_args->parent, th_args->endpoint, service_producer);
     if (self) {
         zsock_signal (pipe_mgmt, 0);
 
         /* Set up handler for the sockets it uses */
         _smio_dsp_monit_engine_handle_socket (self, self->pipe_mgmt, _smio_dsp_monit_handle_pipe_mgmt);
-        /* _smio_dsp_monit_engine_handle_socket (self, self->pipe_msg, _smio_dsp_monit_handle_pipe_msg); */
+        /* _smio_dsp_monit_engine_handle_socket (self, self->dealer, _smio_dsp_monit_handle_dealer); */
 
         /* Run reactor until there's a termination signal */
         zloop_start (self->loop);
