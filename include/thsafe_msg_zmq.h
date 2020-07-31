@@ -19,7 +19,8 @@ struct _zmq_server_args_t {
      * CZMQ 3.0.0 available at https://github.com/zeromq/czmq/blob/master/src/zmsg.c */
     uint32_t tag;
     zmsg_t **msg;
-    void *reply_to;
+    zsock_t *reply_to;
+    devio_proto_t *proto;
 };
 
 /* SMIO THSAFE ZMQ server function arguments macros */
