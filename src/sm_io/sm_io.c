@@ -121,9 +121,9 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     ASSERT_ALLOC(self->dealer, err_dealer_alloc);
     self->dealer2 = zsock_new (ZMQ_DEALER);
     ASSERT_ALLOC(self->dealer2, err_dealer2_alloc);
-    int zerr = zsock_connect (self->dealer, devio_endpoint);
+    int zerr = zsock_connect (self->dealer, "%s", devio_endpoint);
     ASSERT_TEST(zerr == 0, "Could not connect DEALER socket to DEVIO endpoint", err_dealer_connect);
-    zerr = zsock_connect (self->dealer2, devio_endpoint);
+    zerr = zsock_connect (self->dealer2, "%s", devio_endpoint);
     ASSERT_TEST(zerr == 0, "Could not connect DEALER 2 docker to DEVIO endpoint", err_dealer2_connect);
 
     self->inst_id = args->inst_id;
