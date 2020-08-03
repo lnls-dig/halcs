@@ -306,7 +306,7 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
     uint32_t ampfifo_empty;
     RW_REPLY_TYPE err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_CSR, EMPTY,
         SINGLE_BIT_PARAM, ampfifo_empty, NO_FMT_FUNC,
-        smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
+        smio_thsafe_client_read_32_gen, self->dealer);
     ASSERT_TEST(err == RW_OK, "Could not get ampfifo empty register", err_get_monit_amp, -1);
 
     zmsg_t *msg = NULL;
@@ -314,22 +314,22 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
     if (!ampfifo_empty) {
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R0, AMP_CH0,
             MULT_BIT_PARAM, monit_data.amp_ch0, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
+            smio_thsafe_client_read_32_gen, self->dealer);
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp0 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R1, AMP_CH1,
             MULT_BIT_PARAM, monit_data.amp_ch1, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
+            smio_thsafe_client_read_32_gen, self->dealer);
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp1 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R2, AMP_CH2,
             MULT_BIT_PARAM, monit_data.amp_ch2, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
+            smio_thsafe_client_read_32_gen, self->dealer);
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp2 register", err_get_monit_amp, -1);
 
         err = GET_PARAM_GEN(self->parent, dsp, 0x0, POS_CALC, AMPFIFO_MONIT_R3, AMP_CH3,
             MULT_BIT_PARAM, monit_data.amp_ch3, NO_FMT_FUNC,
-            smio_thsafe_client_read_32_gen, smio_get_dealer2 (self->parent));
+            smio_thsafe_client_read_32_gen, self->dealer);
         ASSERT_TEST(err == RW_OK, "Could not get ampfifo amp3 register", err_get_monit_amp, -1);
 
         /* Send message */
