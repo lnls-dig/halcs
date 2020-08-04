@@ -179,7 +179,7 @@ static devio_sig_handler_t devio_sigchld_handler =
 };
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
+devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
         const char *log_file_name, const char *log_info_file_name)
 {
@@ -226,6 +226,9 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
             || (self->log_info_file != NULL && log_info_file_name != NULL),
             "Error setting log file!", err_log_info_file);
 
+    /* Initialize pipe to talk to parent */
+    self->pipe = pipe;
+
     /* Initialize the sockets structure to talk to nodes */
     self->pipes_mgmt = zmalloc (sizeof (*self->pipes_mgmt) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_mgmt, err_pipes_mgmt_alloc);
@@ -248,7 +251,6 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
 
     self->pipes_config = zmalloc (sizeof (*self->pipes_config) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_config, err_pipes_config_alloc);
-    self->pipe = NULL;
     /* 0 nodes for now... */
     self->nnodes = 0;
 
@@ -493,12 +495,6 @@ devio_err_e devio_destroy (devio_t **self_p)
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
 
-        /* Do not destroy PIPE as CZMQ actor thread will do it.
-         * See github issue #116 (https://github.com/lnls-dig/halcs/issues/116)
-         *
-         *  zsock_destroy(&self->pipe);
-         * */
-
         /* Destroy all remamining sockets if any */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying all actors\n");
@@ -509,6 +505,12 @@ devio_err_e devio_destroy (devio_t **self_p)
             zactor_destroy (&self->pipes_config [i]);
             zactor_destroy (&self->pipes_mgmt [i]);
         }
+
+        /* Do not destroy PIPE as CZMQ actor thread will do it.
+         * See github issue #116 (https://github.com/lnls-dig/halcs/issues/116)
+         *
+         *  zsock_destroy(&self->pipe);
+         * */
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] All actors and ROUTER destroyed\n");
@@ -811,13 +813,13 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     int zerr = zsock_recv (reader, "s484s", &command, &smio_id, &base, &inst_id,
             &smio_key);
     if (zerr == -1) {
-        return 0; /* Malformed message */
+        return -1; /* Malformed ot interrupted */
     }
 
+    bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        free (command);
-        return -1;
+        terminated = true;
     }
     else if (streq (command, "$REGISTER_SMIO_ALL")) {
         /* Register all SMIOs */
@@ -865,9 +867,17 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
                 "received an invalid command: %s\n", command);
     }
 
-    free (command);
-    free (smio_key);
-    return 0;
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
+    zstr_free (&smio_key);
+    return terminated? -1: 0;
 }
 
 /* zloop handler for PIPE backend */
@@ -1580,8 +1590,7 @@ void devio_loop (zsock_t *pipe, void *args)
     assert (args);
 
     /* Initialize */
-    devio_t *self = (devio_t *) args;
-    self->pipe = pipe;
+    devio_args_t *devio_args = (devio_args_t *) args;
 
     /* Unblock signals for this thread only. We can't use the regular
      * signal handlers as all thread will inherit and we want only
@@ -1590,19 +1599,41 @@ void devio_loop (zsock_t *pipe, void *args)
     sigemptyset (&signal_mask);
     pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
 
-    /* Tell parent we are initializing */
-    zsock_signal (pipe, 0);
+    devio_t *self = devio_new (devio_args->devio_service, pipe,
+            devio_args->dev_id,
+            devio_args->dev_entry, devio_args->llio_ops,
+            devio_args->broker_endp, devio_args->verbose,
+            devio_args->devio_log_filename,
+            devio_args->devio_log_info_filename);
+    if (self) {
+        /* Tell parent we are initializing */
+        zsock_signal (pipe, 0);
+    
+        /* Set-up server register commands handler */
+        _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
+        _devio_engine_handle_socket (self, self->router, _devio_handle_protocol);
+    
+        /* Initialize signal handlers for specific signals */
+        zactor_t *server = zactor_new (signal_actor, self);
+        UNUSED(server);
+    
+        /* Run reactor until there's a termination signal */
+        zloop_start (self->loop);
 
-    /* Set-up server register commands handler */
-    _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
-    _devio_engine_handle_socket (self, self->router, _devio_handle_protocol);
+        /*  Reactor has ended */
+        devio_destroy (&self);
+    }
+    else {
+        zsock_signal (pipe, -1);
+    }
 
-    /* Initialize signal handlers for specific signals */
-    zactor_t *server = zactor_new (signal_actor, self);
-    UNUSED(server);
-
-    /* Run reactor until there's a termination signal */
-    zloop_start (self->loop);
+    /* Our responsability to clear this up */
+    zstr_free (&devio_args->devio_service);
+    zstr_free (&devio_args->dev_entry);
+    zstr_free (&devio_args->broker_endp);
+    zstr_free (&devio_args->devio_log_filename);
+    zstr_free (&devio_args->devio_log_info_filename);
+    free (devio_args);
 }
 
 devio_err_e devio_do_smio_op (devio_t *self, void *msg)
