@@ -114,8 +114,8 @@ char *hutils_stringify_hex_key (uint32_t key)
     static const char hex_char [] = "0123456789ABCDEF";
     uint32_t i = 0;
     for (i = 0; i < size; ++i) {
-        key_c [i * 2 + 0] = hex_char [data [i] >> 4];
-        key_c [i * 2 + 1] = hex_char [data [i] & 15];
+        key_c [i * 2 + 0] = hex_char [data [size-1-i] >> 4];
+        key_c [i * 2 + 1] = hex_char [data [size-1-i] & 15];
     }
     key_c [size * 2] = 0;
 
