@@ -593,7 +593,6 @@ int main (int argc, char *argv[])
 
     /* Wait until all SMIO configuration is executed */
     while (true) {
-        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Waiting for DEVIO MESSAGE\n");
         char *message = zstr_recv (server);
         if (message == NULL) {
             DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Interrupted while waiting for $SMIO_CFG_DONE\n");
