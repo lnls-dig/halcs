@@ -1095,7 +1095,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
             "[dev_io_core:register_sm] Calling boot func for SMIO \"%s\" @ %016"PRIX64", instance %u\n",
             smio_mod_handler->name, base, used_inst_id);
 
-    self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_startup, th_args);
+    self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_loop, th_args);
     ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
             err_spawn_smio_thread);
 
@@ -1130,7 +1130,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Create actor just for configuring the new recently created SMIO. We will
        check for its end later on poll_all_sm function */
-    self->pipes_config [pipe_config_idx] = zactor_new (smio_config_defaults,
+    self->pipes_config [pipe_config_idx] = zactor_new (smio_cfg_loop,
             th_config_args);
     ASSERT_TEST (self->pipes_config [pipe_config_idx] != NULL,
             "Could not spawn config thread", err_spawn_config_thread);
