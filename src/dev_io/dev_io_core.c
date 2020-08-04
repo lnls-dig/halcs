@@ -653,18 +653,14 @@ static int _devio_handle_protocol (zloop_t *loop, zsock_t *reader, void *args)
             return -1; /* Interrupted */
         }
 
-        zmsg_t *content = devio_proto_get_content_move (devio->message);
         /* Prepare the args structure */
         zmq_server_args_t server_args = {
             .tag = ZMQ_SERVER_ARGS_TAG,
-            .msg = &content,
-            .reply_to = devio->router,
-            .proto = devio->message};
+            .proto = devio->message,
+            .reply_to = devio->router
+        };
         /* Do the actual work */
         _devio_do_smio_op (devio, &server_args);
-
-        /* Cleanup */
-        zmsg_destroy (&content);
     }
 
     return 0;
