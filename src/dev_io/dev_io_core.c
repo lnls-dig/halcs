@@ -756,8 +756,6 @@ static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
                 "[dev_io_core:poll_all_sm] Config thread signalled "
                 "CONFIG DONE. Terminating thread\n");
         /* Terminate config thread */
-        zstr_sendx (reader, "$TERM", NULL);
-        /* Lastly, destroy the actor */
         err = _devio_destroy_smio (devio, devio->sm_io_cfg_h, service_id);
         ASSERT_TEST(err == DEVIO_SUCCESS, "devio_loop: Could not destroy SMIO",
                 err_poller_destroy_cfg_smio, -1);
