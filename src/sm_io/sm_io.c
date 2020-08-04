@@ -93,7 +93,7 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
         const char *devio_endpoint, char *service)
 {
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
@@ -147,12 +147,12 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     /* Initialize SMIO base address */
     self->base = args->base;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
             args->broker, service, args->verbose);
     self->worker = mlm_client_new ();
     ASSERT_ALLOC(self->worker, err_worker_alloc);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Worker created\n");
 
     int rc = mlm_client_connect (self->worker, args->broker, 1000, service);
     ASSERT_TEST(rc >= 0, "Could not connect MLM worker to broker", err_mlm_worker_connect);
@@ -267,31 +267,27 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
 
-    /* Arguments for command */
-    char *command = NULL;
-
     smio_err_e err = SMIO_SUCCESS;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
     UNUSED(smio);
 
     /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    char *command = zstr_recv (reader);
+    if (command == NULL) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
+    bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        free (command);
-        zmsg_destroy (&recv_msg);
-        return -1;
+        terminated = true;    
     }
     else if (streq (command, "$MGMT_MSG_SMIO")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
                "received MGMT_MSG_SMIO command.\n");
 
+        zmsg_t *recv_msg = zmsg_recv (reader);
         /* Call SMIO MGMT callback, passing a zmsg_t argument */
         err = _smio_do_mgmt_msg (smio, recv_msg);
 
@@ -301,18 +297,19 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
                     "_smio_handle_pipe_mgmt smio_do_mgmt_msg: %s\n",
                     smio_err_str (err));
         }
-
-        free (command);
         zmsg_destroy (&recv_msg);
-        return 0;
     }
 
-    /* Invalid message received. Discard message and continue normally */
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
-            "received an invalid command\n");
-    free (command);
-    zmsg_destroy (&recv_msg);
-    return 0;
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
+    return terminated? -1: 0;
 }
 
 /* zloop handler for MSG PIPE */
@@ -341,7 +338,7 @@ static int _smio_handle_worker (zloop_t *loop, zsock_t *reader, void *args)
         /* What can I do in case of error ?*/
         if (err != SMIO_SUCCESS) {
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                    "[sm_io_bootstrap] smio_do_op: %s\n",
+                    "[sm_io] smio_do_op: %s\n",
                     smio_err_str (err));
         }
 
@@ -357,50 +354,127 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
 {
     UNUSED(loop);
 
-    char *command = NULL;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
     UNUSED(smio);
 
     /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    char *command = zstr_recv (reader);
+    if (command == NULL) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
     if (streq (command, "$REBUILD_POLL")) {
         /* If we are executing this is because zloop interrupted and will rebuild the poll
          * set as soon as this handler exits. So, we don't actually need to do anything
          * here */
-        free (command);
-        zmsg_destroy (&recv_msg);
-        return 0;
+        zstr_free (&command);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_smio_handle_pipe_backend] PIPE "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_backend] PIPE "
                 "received an invalid command\n");
     }
 
-    free (command);
-    zmsg_destroy (&recv_msg);
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_backend] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
     return 0;
 }
 
-smio_err_e smio_loop (smio_t *self)
+void smio_loop (zsock_t *pipe, void *args)
 {
-    assert (self);
-    smio_err_e err = SMIO_SUCCESS;
+    /* FIXME: priv pointer is unused for now! We should use it to differentiate
+     * between multiple smio instances of the same type controlling multiple
+     * modules of the same type */
+    th_boot_args_t *th_args = (th_boot_args_t *) args;
+    const char *devio_endpoint = th_args->devio_endpoint;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
-    /* Set-up server register commands handler */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
-    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
+    /* We must export our service as the combination of the
+     * devio name (coming from devio parent) and our own name ID
+     * followed by an optional parameter coming from priv pointer */
+    char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = hutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch->name, inst_id_str, ':');
+    ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
-    /* Run reactor until there's a termination signal */
-    zloop_start (self->loop);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io] SMIO Thread %s "
+            "starting ...\n", smio_service);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io] SMIO Thread %s "
+            "allocating resources ...\n", smio_service);
 
-    return err;
+    smio_t *self = smio_new (th_args, pipe, devio_endpoint, smio_service);
+    if (self) {
+        /* Signal parent we are ready. It's important to signal the parent only
+         * after we have register to the broker, as we must expire a possible
+         * existing client with the same address before the config_defaults
+         * actor send the messages to the old client reference.
+         * However, we can't signal the parent after SMIO init function, as
+         * it probably send messages to DEVIO/LLIO and we won't be able to poll
+         * them if we are waiting here. */
+        zsock_signal (pipe, 0);
+
+        /* Atach this SMIO instance to its parent */
+        smio_err_e err = smio_attach (self, th_args->args);
+        ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
+
+        /* Call SMIO init function to finish initializing its internal strucutres */
+        err = SMIO_DISPATCH_FUNC_WRAPPER (init, smio_mod_dispatch);
+        ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
+
+        /* Export SMIO specific operations */
+        const disp_op_t **smio_exp_ops = smio_get_exp_ops (self);
+        ASSERT_TEST (smio_exp_ops != NULL, "Could not get SMIO exported operations",
+                err_smio_get_exp_ops);
+
+        err = smio_export_ops (self, smio_exp_ops);
+        ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
+                err_smio_export);
+
+        /* Set-up server register commands handler */
+        _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
+        _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
+
+        /* Run reactor until there's a termination signal */
+        zloop_start (self->loop);
+
+        /*  Reactor has ended */
+        /* Unexport SMIO specific operations */
+        smio_unexport_ops (self);
+err_smio_export:
+        /* Nullify exp ops */
+        smio_set_exp_ops (self, NULL);
+err_smio_get_exp_ops:
+        /* FIXME: Poll PIPE sockets and on receiving any message calls shutdown () */
+        SMIO_DISPATCH_FUNC_WRAPPER (shutdown, smio_mod_dispatch);
+err_call_init:
+        smio_deattach (self);
+err_call_attach:
+        /* Destroy what we did in _smio_new */
+        smio_destroy (&self);
+        /* We can't output this message at a later time as we depend on the smio_service
+         * variable. This is not so bad, though, as most of the time we will not fail
+         * in hutils_concat_strings () function */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io] SMIO Thread %s exiting\n",
+                smio_service);
+    }
+    else {
+        zsock_signal (pipe, -1);
+    }
+
+    zstr_free (&smio_service);
+err_smio_service_alloc:
+    zstr_free (&inst_id_str);
+err_inst_id_str_alloc:
+    free (th_args);
 }
 
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,

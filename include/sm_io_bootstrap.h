@@ -29,6 +29,7 @@ typedef struct {
     smio_config_defaults_fp config_defaults;
 } smio_bootstrap_ops_t;
 
+#if 0
 /************************************************************/
 /************************ Our methods ***********************/
 /************************************************************/
@@ -37,6 +38,7 @@ typedef struct {
 void smio_startup (zsock_t *pipe, void *args);
 /* SMIO CZMQ Actor interface for configuration only */
 void smio_config_defaults (zsock_t *pipe, void *args);
+#endif
 
 #ifdef __cplusplus
 }

@@ -125,7 +125,7 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 /* Destroy an instance of the Low-level I/O */
 smio_err_e smio_destroy (smio_t **self_p);
 /* Loop through all interface sockets */
-smio_err_e smio_loop (smio_t *self);
+void smio_loop (zsock_t *pipe, void *args);
 /* Register SMIO */
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id);
