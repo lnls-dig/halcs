@@ -515,13 +515,22 @@ int main (int argc, char *argv[])
             devio_name = "DEVIO";
     }
 
-    char devio_service_str [DEVIO_SERVICE_LEN];
+    char *devio_service_str = zmalloc (DEVIO_SERVICE_LEN * sizeof (char));
+    ASSERT_ALLOC (devio_service_str, err_devio_service_str_alloc);
     snprintf (devio_service_str, DEVIO_SERVICE_LEN-1, "HALCS%u:%s", dev_id,
         devio_name);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
-    devio_t *devio = devio_new (devio_service_str, dev_id, dev_entry, llio_ops,
-            broker_endp, verbose, devio_log_filename, devio_log_info_filename);
-    ASSERT_ALLOC (devio, err_devio_alloc);
+
+    devio_args_t *devio_args = zmalloc (sizeof *devio_args);
+    ASSERT_ALLOC (devio_args, err_devio_args_alloc);
+    devio_args->devio_service = devio_service_str; 
+    devio_args->dev_id = dev_id;
+    devio_args->dev_entry = dev_entry;
+    devio_args->llio_ops = llio_ops;
+    devio_args->broker_endp = broker_endp;
+    devio_args->verbose = verbose;
+    devio_args->devio_log_filename = devio_log_filename;
+    devio_args->devio_log_info_filename = devio_log_info_filename;
 
     /*  Start DEVIO loop */
 
@@ -533,7 +542,7 @@ int main (int argc, char *argv[])
      * handle, like messages from smios */
     /*      Step 3.5: If we do, call devio_handle_smio () and treat its
      *      request as appropriate */
-    zactor_t *server = zactor_new (devio_loop, devio);
+    zactor_t *server = zactor_new (devio_loop, devio_args);
     if (server == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Could not spawn "
                 "server\n");
@@ -644,8 +653,10 @@ smio_cfg_done_err:
 err_plat_devio:
     zactor_destroy (&server);
 err_server:
-    devio_destroy (&devio);
-err_devio_alloc:
+    free (devio_args);
+err_devio_args_alloc:
+    free (devio_service_str);
+err_devio_service_str_alloc:
     free (devio_log_info_filename);
 err_devio_log_info_filename_alloc:
     free (devio_log_filename);

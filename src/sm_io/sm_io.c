@@ -31,8 +31,6 @@
             smio_err_str (err_type))
 
 #define SMIO_RCV_TIMEOUT                   5000       /* ms */
-#define SMIO_POLLER_TIMEOUT                100000     /* in msec */
-#define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
 
 /* Main class object that every sm_io must implement */
 struct _smio_t {
@@ -51,8 +49,8 @@ struct _smio_t {
                                             devices functions */
     zloop_t *loop;                      /* Reactor for server sockets */
     zsock_t *pipe_mgmt;                 /* Pipe back to parent to exchange Management messages */
-    zsock_t *pipe_msg;                  /* Pipe back to parent to exchange Payload messages */
-    zsock_t *pipe_msg2;                 /* Pipe back to parent to exchange Payload messages 2 */
+    zsock_t *dealer;                    /* Socket to talk to DEVIO */
+    zsock_t *dealer2;                   /* Socket 2 to talk to DEVIO */
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
     zsock_t *pipe_backend;              /* Force zloop to interrupt and rebuild poll set. This is used to receive messages */
     int timer_id;                       /* Timer ID */
@@ -89,14 +87,13 @@ static char *_smio_clone_service (smio_t *self);
 
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
-static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
-        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service)
+        const char *devio_endpoint, char *service)
 {
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Initializing SMIO\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Initializing SMIO\n");
     smio_t *self = (smio_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
 
@@ -117,15 +114,22 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 
     self->smio_handler = NULL;      /* This is set by the device functions */
     self->pipe_mgmt = pipe_mgmt;
-    self->pipe_msg = pipe_msg;
-    self->pipe_msg2 = pipe_msg2;
+    self->dealer = zsock_new (ZMQ_DEALER);
+    ASSERT_ALLOC(self->dealer, err_dealer_alloc);
+    self->dealer2 = zsock_new (ZMQ_DEALER);
+    ASSERT_ALLOC(self->dealer2, err_dealer2_alloc);
+    int zerr = zsock_connect (self->dealer, "%s", devio_endpoint);
+    ASSERT_TEST(zerr == 0, "Could not connect DEALER socket to DEVIO endpoint", err_dealer_connect);
+    zerr = zsock_connect (self->dealer2, "%s", devio_endpoint);
+    ASSERT_TEST(zerr == 0, "Could not connect DEALER 2 docker to DEVIO endpoint", err_dealer2_connect);
+
     self->inst_id = args->inst_id;
 
     /* Set maximum receive wait for PIPE MSG sockets. This is important
      * so as to not block DEVIO <-> SMIO communication if something is
      * wrong */
-    zsock_set_rcvtimeo (self->pipe_msg, SMIO_RCV_TIMEOUT);
-    zsock_set_rcvtimeo (self->pipe_msg2, SMIO_RCV_TIMEOUT);
+    zsock_set_rcvtimeo (self->dealer, SMIO_RCV_TIMEOUT);
+    zsock_set_rcvtimeo (self->dealer2, SMIO_RCV_TIMEOUT);
 
     /* Setup pipes for zloop interrupting */
     self->pipe_frontend = zsys_create_pipe (&self->pipe_backend);
@@ -135,12 +139,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
 
-    /* Set loop timeout. This is needed to ensure zloop will
-     * frequently check for rebuilding its poll set */
-    self->timer_id = zloop_timer (self->loop, SMIO_POLLER_TIMEOUT, SMIO_POLLER_NTIMES,
-        _smio_handle_timer, NULL);
-    ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
-
     /* Set-up backend handler for forcing interrupting the zloop and rebuild
      * the poll set. This avoids having to setup a short timer to periodically
      * interrupting the loop to check for rebuilds */
@@ -149,12 +147,12 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     /* Initialize SMIO base address */
     self->base = args->base;
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Creating worker\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Creating worker\n");
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "\tbroker = %s, service = %s, verbose = %d\n",
             args->broker, service, args->verbose);
     self->worker = mlm_client_new ();
     ASSERT_ALLOC(self->worker, err_worker_alloc);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_bootstrap] Worker created\n");
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io] Worker created\n");
 
     int rc = mlm_client_connect (self->worker, args->broker, 1000, service);
     ASSERT_TEST(rc >= 0, "Could not connect MLM worker to broker", err_mlm_worker_connect);
@@ -164,15 +162,17 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_worker_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
-    zloop_timer_end (self->loop, self->timer_id);
-err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
     zsock_destroy (&self->pipe_backend);
     zsock_destroy (&self->pipe_frontend);
 err_pipe_frontend_alloc:
-    zsock_destroy (&self->pipe_msg2);
-    zsock_destroy (&self->pipe_msg);
+err_dealer2_connect:
+err_dealer_connect:
+    zsock_destroy (&self->dealer2);
+err_dealer2_alloc:
+    zsock_destroy (&self->dealer);
+err_dealer_alloc:
     disp_table_destroy (&self->exp_ops_dtable);
 err_exp_ops_dtable_alloc:
     free (self->endpoint);
@@ -196,8 +196,8 @@ smio_err_e smio_destroy (smio_t **self_p)
         zloop_destroy (&self->loop);
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
-        zsock_destroy (&self->pipe_msg2);
-        zsock_destroy (&self->pipe_msg);
+        zsock_destroy (&self->dealer2);
+        zsock_destroy (&self->dealer);
         /* Don't destroy pipe_mgmt as this is taken care of by the
          * zactor infrastructure, s_thread_shim (void *args) on CZMQ
          * 3.0.2 src/zactor.c
@@ -262,23 +262,10 @@ err_zsock_is:
     return err;
 }
 
-/* zloop handler for timer */
-static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
-{
-    UNUSED(loop);
-    UNUSED(timer_id);
-    UNUSED(arg);
-
-    return 0;
-}
-
 /* zloop handler for CFG PIPE */
 static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
-
-    /* Arguments for command */
-    char *command = NULL;
 
     smio_err_e err = SMIO_SUCCESS;
     /* We expect a smio instance e as reference */
@@ -286,22 +273,21 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     UNUSED(smio);
 
     /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    char *command = zstr_recv (reader);
+    if (command == NULL) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
+    bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        free (command);
-        zmsg_destroy (&recv_msg);
-        return -1;
+        terminated = true;    
     }
     else if (streq (command, "$MGMT_MSG_SMIO")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
                "received MGMT_MSG_SMIO command.\n");
 
+        zmsg_t *recv_msg = zmsg_recv (reader);
         /* Call SMIO MGMT callback, passing a zmsg_t argument */
         err = _smio_do_mgmt_msg (smio, recv_msg);
 
@@ -311,18 +297,19 @@ static int _smio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
                     "_smio_handle_pipe_mgmt smio_do_mgmt_msg: %s\n",
                     smio_err_str (err));
         }
-
-        free (command);
         zmsg_destroy (&recv_msg);
-        return 0;
     }
 
-    /* Invalid message received. Discard message and continue normally */
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
-            "received an invalid command\n");
-    free (command);
-    zmsg_destroy (&recv_msg);
-    return 0;
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_mgmt] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
+    return terminated? -1: 0;
 }
 
 /* zloop handler for MSG PIPE */
@@ -351,7 +338,7 @@ static int _smio_handle_worker (zloop_t *loop, zsock_t *reader, void *args)
         /* What can I do in case of error ?*/
         if (err != SMIO_SUCCESS) {
             DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                    "[sm_io_bootstrap] smio_do_op: %s\n",
+                    "[sm_io] smio_do_op: %s\n",
                     smio_err_str (err));
         }
 
@@ -367,50 +354,127 @@ static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args
 {
     UNUSED(loop);
 
-    char *command = NULL;
     /* We expect a smio instance e as reference */
     smio_t *smio = (smio_t *) args;
     UNUSED(smio);
 
     /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    char *command = zstr_recv (reader);
+    if (command == NULL) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
     if (streq (command, "$REBUILD_POLL")) {
         /* If we are executing this is because zloop interrupted and will rebuild the poll
          * set as soon as this handler exits. So, we don't actually need to do anything
          * here */
-        free (command);
-        zmsg_destroy (&recv_msg);
-        return 0;
+        zstr_free (&command);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_smio_handle_pipe_backend] PIPE "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_backend] PIPE "
                 "received an invalid command\n");
     }
 
-    free (command);
-    zmsg_destroy (&recv_msg);
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io:_smio_handle_pipe_backend] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
     return 0;
 }
 
-smio_err_e smio_loop (smio_t *self)
+void smio_loop (zsock_t *pipe, void *args)
 {
-    assert (self);
-    smio_err_e err = SMIO_SUCCESS;
+    /* FIXME: priv pointer is unused for now! We should use it to differentiate
+     * between multiple smio instances of the same type controlling multiple
+     * modules of the same type */
+    th_boot_args_t *th_args = (th_boot_args_t *) args;
+    const char *devio_endpoint = th_args->devio_endpoint;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
 
-    /* Set-up server register commands handler */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
-    _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
+    /* We must export our service as the combination of the
+     * devio name (coming from devio parent) and our own name ID
+     * followed by an optional parameter coming from priv pointer */
+    char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = hutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch->name, inst_id_str, ':');
+    ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
-    /* Run reactor until there's a termination signal */
-    zloop_start (self->loop);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io] SMIO Thread %s "
+            "starting ...\n", smio_service);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io] SMIO Thread %s "
+            "allocating resources ...\n", smio_service);
 
-    return err;
+    smio_t *self = smio_new (th_args, pipe, devio_endpoint, smio_service);
+    if (self) {
+        /* Signal parent we are ready. It's important to signal the parent only
+         * after we have register to the broker, as we must expire a possible
+         * existing client with the same address before the config_defaults
+         * actor send the messages to the old client reference.
+         * However, we can't signal the parent after SMIO init function, as
+         * it probably send messages to DEVIO/LLIO and we won't be able to poll
+         * them if we are waiting here. */
+        zsock_signal (pipe, 0);
+
+        /* Atach this SMIO instance to its parent */
+        smio_err_e err = smio_attach (self, th_args->args);
+        ASSERT_TEST(err == SMIO_SUCCESS, "Could not attach SMIO", err_call_attach);
+
+        /* Call SMIO init function to finish initializing its internal strucutres */
+        err = SMIO_DISPATCH_FUNC_WRAPPER (init, smio_mod_dispatch);
+        ASSERT_TEST(err == SMIO_SUCCESS, "Could not initialize SMIO", err_call_init);
+
+        /* Export SMIO specific operations */
+        const disp_op_t **smio_exp_ops = smio_get_exp_ops (self);
+        ASSERT_TEST (smio_exp_ops != NULL, "Could not get SMIO exported operations",
+                err_smio_get_exp_ops);
+
+        err = smio_export_ops (self, smio_exp_ops);
+        ASSERT_TEST (err == SMIO_SUCCESS, "Could not export specific SMIO operations",
+                err_smio_export);
+
+        /* Set-up server register commands handler */
+        _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
+        _smio_engine_handle_socket (self, mlm_client_msgpipe (self->worker), _smio_handle_worker);
+
+        /* Run reactor until there's a termination signal */
+        zloop_start (self->loop);
+
+        /*  Reactor has ended */
+        /* Unexport SMIO specific operations */
+        smio_unexport_ops (self);
+err_smio_export:
+        /* Nullify exp ops */
+        smio_set_exp_ops (self, NULL);
+err_smio_get_exp_ops:
+        /* FIXME: Poll PIPE sockets and on receiving any message calls shutdown () */
+        SMIO_DISPATCH_FUNC_WRAPPER (shutdown, smio_mod_dispatch);
+err_call_init:
+        smio_deattach (self);
+err_call_attach:
+        /* Destroy what we did in _smio_new */
+        smio_destroy (&self);
+        /* We can't output this message at a later time as we depend on the smio_service
+         * variable. This is not so bad, though, as most of the time we will not fail
+         * in hutils_concat_strings () function */
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io] SMIO Thread %s exiting\n",
+                smio_service);
+    }
+    else {
+        zsock_signal (pipe, -1);
+    }
+
+    zstr_free (&smio_service);
+err_smio_service_alloc:
+    zstr_free (&inst_id_str);
+err_inst_id_str_alloc:
+    free (th_args);
 }
 
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
@@ -889,16 +953,16 @@ mlm_client_t *smio_get_worker (smio_t *self)
     return self->worker;
 }
 
-zsock_t *smio_get_pipe_msg (smio_t *self)
+zsock_t *smio_get_dealer (smio_t *self)
 {
     assert (self);
-    return self->pipe_msg;
+    return self->dealer;
 }
 
-zsock_t *smio_get_pipe_msg2 (smio_t *self)
+zsock_t *smio_get_dealer2 (smio_t *self)
 {
     assert (self);
-    return self->pipe_msg2;
+    return self->dealer2;
 }
 
 zsock_t *smio_get_pipe_mgmt (smio_t *self)
@@ -937,32 +1001,32 @@ zsock_t *smio_get_pipe_mgmt (smio_t *self)
 
 /**** Open device ****/
 int smio_thsafe_client_open (smio_t *self, llio_endpoint_t *endpoint)
-    SMIO_FUNC_WRAPPER (thsafe_client_open, self->pipe_msg, endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_open, self->dealer, endpoint)
 
 int smio_thsafe_client_open_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint)
     SMIO_FUNC_WRAPPER (thsafe_client_open, sock, endpoint)
 
 /**** Release device ****/
 int smio_thsafe_client_release (smio_t *self, llio_endpoint_t *endpoint)
-    SMIO_FUNC_WRAPPER (thsafe_client_release, self->pipe_msg, endpoint)
+    SMIO_FUNC_WRAPPER (thsafe_client_release, self->dealer, endpoint)
 
 int smio_thsafe_client_release_gen (smio_t *self, void *sock, llio_endpoint_t *endpoint)
     SMIO_FUNC_WRAPPER (thsafe_client_release, sock, endpoint)
 
 /**** Read data from device ****/
 ssize_t smio_thsafe_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->dealer, self->base | offs, data)
 ssize_t smio_thsafe_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->dealer, self->base | offs, data)
 ssize_t smio_thsafe_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->dealer, self->base | offs, data)
 
 ssize_t smio_thsafe_raw_client_read_16 (smio_t *self, uint64_t offs, uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_16, self->dealer, offs, data)
 ssize_t smio_thsafe_raw_client_read_32 (smio_t *self, uint64_t offs, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_32, self->dealer, offs, data)
 ssize_t smio_thsafe_raw_client_read_64 (smio_t *self, uint64_t offs, uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_64, self->dealer, offs, data)
 
 ssize_t smio_thsafe_client_read_16_gen (smio_t *self, void *sock, uint64_t offs, uint16_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_read_16, sock, self->base | offs, data)
@@ -980,18 +1044,18 @@ ssize_t smio_thsafe_raw_client_read_64_gen (smio_t *self, void *sock, uint64_t o
 
 /**** Write data to device ****/
 ssize_t smio_thsafe_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->dealer, self->base | offs, data)
 ssize_t smio_thsafe_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->dealer, self->base | offs, data)
 ssize_t smio_thsafe_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->pipe_msg, self->base | offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->dealer, self->base | offs, data)
 
 ssize_t smio_thsafe_raw_client_write_16 (smio_t *self, uint64_t offs, const uint16_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_16, self->dealer, offs, data)
 ssize_t smio_thsafe_raw_client_write_32 (smio_t *self, uint64_t offs, const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_32, self->dealer, offs, data)
 ssize_t smio_thsafe_raw_client_write_64 (smio_t *self, uint64_t offs, const uint64_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->pipe_msg, offs, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_64, self->dealer, offs, data)
 
 ssize_t smio_thsafe_client_write_16_gen (smio_t *self, void *sock, uint64_t offs, const uint16_t *data)
     SMIO_FUNC_WRAPPER (thsafe_client_write_16, sock, self->base | offs, data)
@@ -1010,10 +1074,10 @@ ssize_t smio_thsafe_raw_client_write_64_gen (smio_t *self, void *sock, uint64_t 
 /**** Read data block from device function pointer, size in bytes ****/
 ssize_t smio_thsafe_client_read_block (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->pipe_msg, self->base | offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->dealer, self->base | offs, size, data)
 ssize_t smio_thsafe_raw_client_read_block (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->pipe_msg, offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_block, self->dealer, offs, size, data)
 
 ssize_t smio_thsafe_client_read_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
         uint32_t *data)
@@ -1025,10 +1089,10 @@ ssize_t smio_thsafe_raw_client_read_block_gen (smio_t *self, void *sock, uint64_
 /**** Write data block from device function pointer, size in bytes ****/
 ssize_t smio_thsafe_client_write_block (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->pipe_msg, self->base | offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->dealer, self->base | offs, size, data)
 ssize_t smio_thsafe_raw_client_write_block (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->pipe_msg, offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_block, self->dealer, offs, size, data)
 
 ssize_t smio_thsafe_client_write_block_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
         const uint32_t *data)
@@ -1040,9 +1104,9 @@ ssize_t smio_thsafe_raw_client_write_block_gen (smio_t *self, void *sock, uint64
 /**** Read data block via DMA from device, size in bytes ****/
 ssize_t smio_thsafe_client_read_dma (smio_t *self, uint64_t offs, size_t size,
         uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->pipe_msg, self->base | offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->dealer, self->base | offs, size, data)
 ssize_t smio_thsafe_raw_client_read_dma (smio_t *self, uint64_t offs, size_t size, uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->pipe_msg, offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_read_dma, self->dealer, offs, size, data)
 
 ssize_t smio_thsafe_client_read_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
         uint32_t *data)
@@ -1054,10 +1118,10 @@ ssize_t smio_thsafe_raw_client_read_dma_gen (smio_t *self, void *sock, uint64_t 
 /**** Write data block via DMA from device, size in bytes ****/
 ssize_t smio_thsafe_client_write_dma (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->pipe_msg, self->base | offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->dealer, self->base | offs, size, data)
 ssize_t smio_thsafe_raw_client_write_dma (smio_t *self, uint64_t offs, size_t size,
         const uint32_t *data)
-    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->pipe_msg, offs, size, data)
+    SMIO_FUNC_WRAPPER (thsafe_client_write_dma, self->dealer, offs, size, data)
 
 ssize_t smio_thsafe_client_write_dma_gen (smio_t *self, void *sock, uint64_t offs, size_t size,
         const uint32_t *data)

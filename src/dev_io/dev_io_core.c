@@ -43,10 +43,13 @@
 
 #define DEVIO_DFLT_MONITOR_INTERVAL         1000        /* /n ms */
 
+#define DEVIO_ROUTER_ENDPOINT               "inproc://DEVIO_CORE"
+
 struct _devio_t {
     /* General information */
     zactor_t **pipes_mgmt;              /* Address nodes using this array of actors (Management PIPES) */
-    zsock_t **pipes_msg;                /* Address nodes using this array of actors (Message PIPES) */
+    zsock_t *router;                    /* Socket to talk to SMIO clients */
+    devio_proto_t *message;             /* Message received or sent */
     zactor_t **pipes_config;            /* Address config actors using this array of actors (Config PIPES) */
     zsock_t *pipe;                      /* Address the DEVIO instance using this sock */
     zsock_t *pipe_frontend;             /* Force zloop to interrupt and rebuild poll set. This is used to send messages */
@@ -176,7 +179,7 @@ static devio_sig_handler_t devio_sigchld_handler =
 };
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
+devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
         const char *log_file_name, const char *log_info_file_name)
 {
@@ -223,14 +226,31 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
             || (self->log_info_file != NULL && log_info_file_name != NULL),
             "Error setting log file!", err_log_info_file);
 
+    /* Initialize pipe to talk to parent */
+    self->pipe = pipe;
+
     /* Initialize the sockets structure to talk to nodes */
     self->pipes_mgmt = zmalloc (sizeof (*self->pipes_mgmt) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_mgmt, err_pipes_mgmt_alloc);
-    self->pipes_msg = zmalloc (sizeof (*self->pipes_msg) * NODES_MAX_PIPE_MSG_LEN);
-    ASSERT_ALLOC(self->pipes_msg, err_pipes_msg_alloc);
+    self->router = zsock_new (ZMQ_ROUTER);
+    ASSERT_ALLOC(self->router, err_router_alloc);
+    /* 
+     * By default the socket will discard outgoing messages above the
+     * HWM of 1,000. This isn't helpful for high-volume streaming. We
+     * will use a unbounded queue here. If applications need to guard
+     * against queue overflow, they should use a credit-based flow
+     * control scheme.
+     */
+    zsock_set_unbounded (self->router);
+    int err = zsock_bind (self->router, DEVIO_ROUTER_ENDPOINT);
+    ASSERT_TEST(err == 0, "Error binding ROUTER to inproc endpoint",
+            err_bind_router);
+
+    self->message = devio_proto_new ();
+    ASSERT_ALLOC(self->message, err_alloc_message);
+
     self->pipes_config = zmalloc (sizeof (*self->pipes_config) * NODES_MAX_LEN);
     ASSERT_ALLOC(self->pipes_config, err_pipes_config_alloc);
-    self->pipe = NULL;
     /* 0 nodes for now... */
     self->nnodes = 0;
 
@@ -293,7 +313,7 @@ devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
     ASSERT_ALLOC(self->llio, err_llio_alloc);
 
     /* We try to open the device */
-    int err = llio_open (self->llio, NULL);
+    err = llio_open (self->llio, NULL);
     ASSERT_TEST(err==0, "Error opening device!", err_llio_open);
 
     /* Specifically ask to reset the device */
@@ -392,8 +412,11 @@ err_loop_alloc:
 err_pipe_frontend_alloc:
     free (self->pipes_config);
 err_pipes_config_alloc:
-    free (self->pipes_msg);
-err_pipes_msg_alloc:
+    devio_proto_destroy (&self->message);
+err_alloc_message:
+err_bind_router:
+    zsock_destroy (&self->router);
+err_router_alloc:
     free (self->pipes_mgmt);
 err_pipes_mgmt_alloc:
     free (self->log_info_file);
@@ -472,12 +495,6 @@ devio_err_e devio_destroy (devio_t **self_p)
         zsock_destroy (&self->pipe_backend);
         zsock_destroy (&self->pipe_frontend);
 
-        /* Do not destroy PIPE as CZMQ actor thread will do it.
-         * See github issue #116 (https://github.com/lnls-dig/halcs/issues/116)
-         *
-         *  zsock_destroy(&self->pipe);
-         * */
-
         /* Destroy all remamining sockets if any */
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
                 "[dev_io_core:destroy] Destroying all actors\n");
@@ -489,16 +506,21 @@ devio_err_e devio_destroy (devio_t **self_p)
             zactor_destroy (&self->pipes_mgmt [i]);
         }
 
-        for (i = 0; i < NODES_MAX_PIPE_MSG_LEN; ++i) {
-            DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-                    "[dev_io_core:destroy] Destroying possible remaining PIPE MSG, instance #%u\n", i);
-            zsock_destroy (&self->pipes_msg [i]);
-        }
+        /* Do not destroy PIPE as CZMQ actor thread will do it.
+         * See github issue #116 (https://github.com/lnls-dig/halcs/issues/116)
+         *
+         *  zsock_destroy(&self->pipe);
+         * */
 
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
-                "[dev_io_core:destroy] All actors and PIPE MSG destroyed\n");
+                "[dev_io_core:destroy] All actors and ROUTER destroyed\n");
         free (self->pipes_config);
-        free (self->pipes_msg);
+
+        devio_proto_destroy (&self->message);
+        DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO,
+                "[dev_io_core:destroy] Destroying ROUTER socket\n");
+        zsock_destroy (&self->router);
+
         free (self->pipes_mgmt);
         free (self->log_info_file);
         free (self->log_file);
@@ -616,7 +638,7 @@ err_zloop_timer:
 /************************************************************/
 
 /* zloop handler for MSG PIPE */
-static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
+static int _devio_handle_protocol (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
     /* We expect a devio instance e as reference */
@@ -627,21 +649,19 @@ static int _devio_handle_pipe_msg (zloop_t *loop, zsock_t *reader, void *args)
      * of polling and the reactor */
     while (zsock_events (reader) & ZMQ_POLLIN) {
         /* Receive message */
-        zmsg_t *recv_msg = zmsg_recv (reader);
-        if (recv_msg == NULL) {
+        devio_err_e err = devio_proto_recv (devio->message, reader);
+        if (err != DEVIO_SUCCESS) {
             return -1; /* Interrupted */
         }
 
         /* Prepare the args structure */
         zmq_server_args_t server_args = {
             .tag = ZMQ_SERVER_ARGS_TAG,
-            .msg = &recv_msg,
-            .reply_to = reader};
+            .proto = devio->message,
+            .reply_to = reader
+        };
         /* Do the actual work */
         _devio_do_smio_op (devio, &server_args);
-
-        /* Cleanup */
-        zmsg_destroy (&recv_msg);
     }
 
     return 0;
@@ -738,8 +758,6 @@ static int _devio_handle_pipe_cfg (zloop_t *loop, zsock_t *reader, void *args)
                 "[dev_io_core:poll_all_sm] Config thread signalled "
                 "CONFIG DONE. Terminating thread\n");
         /* Terminate config thread */
-        zstr_sendx (reader, "$TERM", NULL);
-        /* Lastly, destroy the actor */
         err = _devio_destroy_smio (devio, devio->sm_io_cfg_h, service_id);
         ASSERT_TEST(err == DEVIO_SUCCESS, "devio_loop: Could not destroy SMIO",
                 err_poller_destroy_cfg_smio, -1);
@@ -795,13 +813,13 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     int zerr = zsock_recv (reader, "s484s", &command, &smio_id, &base, &inst_id,
             &smio_key);
     if (zerr == -1) {
-        return 0; /* Malformed message */
+        return -1; /* Malformed ot interrupted */
     }
 
+    bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        free (command);
-        return -1;
+        terminated = true;
     }
     else if (streq (command, "$REGISTER_SMIO_ALL")) {
         /* Register all SMIOs */
@@ -849,9 +867,17 @@ static int _devio_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
                 "received an invalid command: %s\n", command);
     }
 
-    free (command);
-    free (smio_key);
-    return 0;
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[dev_io_core:_devio_handle_pipe] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
+    zstr_free (&smio_key);
+    return terminated? -1: 0;
 }
 
 /* zloop handler for PIPE backend */
@@ -1022,7 +1048,6 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
      * if found, call the correspondent bootstrap code to initilize
      * the sm_io module */
     uint32_t pipe_mgmt_idx = 0;
-    uint32_t pipe_msg_idx = 0;
     uint32_t pipe_config_idx = 0;
     volatile const smio_mod_dispatch_t *smio_mod_handler = NULL;
 
@@ -1058,23 +1083,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Increment PIPE indexes */
     pipe_mgmt_idx = self->nnodes++;
-    pipe_msg_idx = NUM_PIPE_MSG_PER_SMIO * pipe_mgmt_idx;
     pipe_config_idx = pipe_mgmt_idx;
-
-    /* Create PIPE message to talk to SMIO */
-    zsock_t *pipe_msg_backend[NUM_PIPE_MSG_PER_SMIO];
-    uint32_t i;
-    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
-        self->pipes_msg [pipe_msg_idx+i] = zsys_create_pipe (&pipe_msg_backend[i]);
-        ASSERT_TEST (self->pipes_msg [pipe_msg_idx+i] != NULL, "Could not create message PIPE",
-                err_create_pipe_msg);
-
-        /* Register socket handlers */
-        err = _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx+i],
-                _devio_handle_pipe_msg);
-        ASSERT_TEST (err == DEVIO_SUCCESS, "Could not register message socket handler",
-                err_pipes_msg_handle);
-    }
 
     /* Alloacate thread arguments struct and pass it to the
      * thread. It is the responsability of the calling thread
@@ -1083,8 +1092,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
     ASSERT_ALLOC (th_args, err_th_args_alloc);
     th_args->args = NULL;
     th_args->smio_handler = smio_mod_handler;
-    th_args->pipe_msg = pipe_msg_backend[0];
-    th_args->pipe_msg2 = pipe_msg_backend[1];
+    th_args->devio_endpoint = DEVIO_ROUTER_ENDPOINT;
     th_args->broker = self->endpoint_broker;
     th_args->service = self->name;
     th_args->verbose = self->verbose;
@@ -1095,7 +1103,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
             "[dev_io_core:register_sm] Calling boot func for SMIO \"%s\" @ %016"PRIX64", instance %u\n",
             smio_mod_handler->name, base, used_inst_id);
 
-    self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_startup, th_args);
+    self->pipes_mgmt [pipe_mgmt_idx] = zactor_new (smio_loop, th_args);
     ASSERT_TEST (self->pipes_mgmt [pipe_mgmt_idx] != NULL, "Could not spawn SMIO thread",
             err_spawn_smio_thread);
 
@@ -1130,7 +1138,7 @@ static devio_err_e _devio_register_sm_raw (devio_t *self, uint32_t smio_id, uint
 
     /* Create actor just for configuring the new recently created SMIO. We will
        check for its end later on poll_all_sm function */
-    self->pipes_config [pipe_config_idx] = zactor_new (smio_config_defaults,
+    self->pipes_config [pipe_config_idx] = zactor_new (smio_cfg_loop,
             th_config_args);
     ASSERT_TEST (self->pipes_config [pipe_config_idx] != NULL,
             "Could not spawn config thread", err_spawn_config_thread);
@@ -1175,15 +1183,6 @@ err_pipes_mgmt_handle:
 err_spawn_smio_thread:
     free (th_args);
 err_th_args_alloc:
-    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
-        _devio_engine_handle_socket (self, self->pipes_msg [pipe_msg_idx+i], NULL);
-    }
-err_pipes_msg_handle:
-    for (i = 0; i < NUM_PIPE_MSG_PER_SMIO; ++i) {
-        zsock_destroy (&self->pipes_msg [pipe_msg_idx+i]);
-        zsock_destroy (&pipe_msg_backend[i]);
-    }
-err_create_pipe_msg:
 err_inv_key:
     free (key);
 err_key_alloc:
@@ -1591,8 +1590,7 @@ void devio_loop (zsock_t *pipe, void *args)
     assert (args);
 
     /* Initialize */
-    devio_t *self = (devio_t *) args;
-    self->pipe = pipe;
+    devio_args_t *devio_args = (devio_args_t *) args;
 
     /* Unblock signals for this thread only. We can't use the regular
      * signal handlers as all thread will inherit and we want only
@@ -1601,18 +1599,41 @@ void devio_loop (zsock_t *pipe, void *args)
     sigemptyset (&signal_mask);
     pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
 
-    /* Tell parent we are initializing */
-    zsock_signal (pipe, 0);
+    devio_t *self = devio_new (devio_args->devio_service, pipe,
+            devio_args->dev_id,
+            devio_args->dev_entry, devio_args->llio_ops,
+            devio_args->broker_endp, devio_args->verbose,
+            devio_args->devio_log_filename,
+            devio_args->devio_log_info_filename);
+    if (self) {
+        /* Tell parent we are initializing */
+        zsock_signal (pipe, 0);
+    
+        /* Set-up server register commands handler */
+        _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
+        _devio_engine_handle_socket (self, self->router, _devio_handle_protocol);
+    
+        /* Initialize signal handlers for specific signals */
+        zactor_t *server = zactor_new (signal_actor, self);
+        UNUSED(server);
+    
+        /* Run reactor until there's a termination signal */
+        zloop_start (self->loop);
 
-    /* Set-up server register commands handler */
-    _devio_engine_handle_socket (self, pipe, _devio_handle_pipe);
+        /*  Reactor has ended */
+        devio_destroy (&self);
+    }
+    else {
+        zsock_signal (pipe, -1);
+    }
 
-    /* Initialize signal handlers for specific signals */
-    zactor_t *server = zactor_new (signal_actor, self);
-    UNUSED(server);
-
-    /* Run reactor until there's a termination signal */
-    zloop_start (self->loop);
+    /* Our responsability to clear this up */
+    zstr_free (&devio_args->devio_service);
+    zstr_free (&devio_args->dev_entry);
+    zstr_free (&devio_args->broker_endp);
+    zstr_free (&devio_args->devio_log_filename);
+    zstr_free (&devio_args->devio_log_info_filename);
+    free (devio_args);
 }
 
 devio_err_e devio_do_smio_op (devio_t *self, void *msg)

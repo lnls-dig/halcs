@@ -30,7 +30,7 @@ smio_cfg_t *smio_cfg_new (th_config_args_t *config_args,
 /* Destroys instance of smio_cfg */
 smio_err_e smio_cfg_destroy (smio_cfg_t **self_p);
 /* Loop through all interface sockets executing registered callbacks on them */
-smio_err_e smio_cfg_loop (smio_cfg_t *self);
+void smio_cfg_loop (zsock_t *pipe, void *args);
 
 /************************************************************/
 /********************* Accessor methods *********************/

@@ -19,6 +19,18 @@ extern "C" {
 #define NUM_PIPE_MSG_PER_SMIO           2
 #define NODES_MAX_PIPE_MSG_LEN          (NUM_PIPE_MSG_PER_SMIO * NODES_MAX_LEN)
 
+/* DEVIO actor args structure */
+typedef struct {
+    char *devio_service;
+    uint32_t dev_id;
+    char *dev_entry;
+    const llio_ops_t *llio_ops;
+    char *broker_endp;
+    int verbose;
+    char *devio_log_filename;
+    char *devio_log_info_filename;
+} devio_args_t;
+
 /* Node of sig_ops list */
 typedef struct {
     int signal;         /* Signal identifier, e.g., SIGINT, SIGKILL, etc... */
@@ -58,9 +70,11 @@ typedef struct {
 /***************** Our methods *****************/
 
 /* Creates a new instance of Device Information */
-devio_t * devio_new (char *name, uint32_t id, char *endpoint_dev,
-        const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
-        const char *log_file_name, const char *log_info_file_name);
+devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, 
+        char *endpoint_dev, const llio_ops_t *reg_ops, 
+        char *endpoint_broker, int verbose, 
+        const char *log_file_name, 
+        const char *log_info_file_name);
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);
 

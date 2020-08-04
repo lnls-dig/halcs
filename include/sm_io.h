@@ -109,8 +109,7 @@ typedef struct {
 typedef struct {
     void *args;                                                 /* Generic arguments for SMIO */
     volatile const smio_mod_dispatch_t *smio_handler;           /* SMIO table handler */
-    zsock_t *pipe_msg;                                          /* Message PIPE to actor */
-    zsock_t *pipe_msg2;                                         /* Message PIPE to actor 2 */
+    const char *devio_endpoint;                                 /* Message PIPE to actor */
     char *broker;                                               /* Endpoint to connect to broker */
     char *service;                                              /* (part of) the service name to be exported */
     int verbose;                                                /* Print trace information to stdout*/
@@ -122,11 +121,11 @@ typedef struct {
 
 /* Creates a new instance of the SMIO */
 smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
-        zsock_t *pipe_msg, zsock_t *pipe_msg2, char *service);
+        const char *devio_endpoint, char *service);
 /* Destroy an instance of the Low-level I/O */
 smio_err_e smio_destroy (smio_t **self_p);
 /* Loop through all interface sockets */
-smio_err_e smio_loop (smio_t *self);
+void smio_loop (zsock_t *pipe, void *args);
 /* Register SMIO */
 smio_err_e smio_register_sm (smio_t *self, uint32_t smio_id, uint64_t base,
         uint32_t inst_id);
@@ -185,10 +184,10 @@ char *smio_clone_endpoint (smio_t *self);
 const char *smio_get_service (smio_t *self);
 /* Clone SMIO service */
 char *smio_clone_service (smio_t *self);
-/* Get SMIO PIPE Message */
-zsock_t *smio_get_pipe_msg (smio_t *self);
-/* Get SMIO PIPE Message 2 */
-zsock_t *smio_get_pipe_msg2 (smio_t *self);
+/* Get SMIO Dealer Socket */
+zsock_t *smio_get_dealer (smio_t *self);
+/* Get SMIO Dealer Socket 2 */
+zsock_t *smio_get_dealer2 (smio_t *self);
 /* Get SMIO PIPE Management */
 zsock_t *smio_get_pipe_mgmt (smio_t *self);
 

@@ -36,6 +36,7 @@ target_link_libraries(dev_io_compiler_flags
 # Source files
 
 set(dev_io_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_proto.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_core.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_err.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dev_io_utils.c
@@ -54,6 +55,7 @@ list(APPEND dev_io_other_search_dirs "")
 #######################################
 
 set(dev_io_public_headers
+    ${common_INCLUDE_DIR}/dev_io_proto.h
     ${common_INCLUDE_DIR}/dev_io_core.h
     ${common_INCLUDE_DIR}/dev_io_err.h
     ${common_INCLUDE_DIR}/dev_io_utils.h

@@ -53,7 +53,6 @@ list(APPEND sm_io_LIBRARIES sm_io_rw_param)
 
 set(sm_io_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_bootstrap.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_cfg.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_err.c
 )

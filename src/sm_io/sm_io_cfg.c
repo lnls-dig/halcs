@@ -192,13 +192,13 @@ static int _smio_cfg_handle_timer (zloop_t *loop, int timer_id, void *arg)
             smio_cfg->smio_mod_dispatch->name, smio_cfg->inst_id_str);
     ASSERT_ALLOC(smio_service_suffix, err_smio_service_suffix_alloc);
 
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Sending CONFIG DONE "
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg] Sending CONFIG DONE "
             "message over PIPE due to socket inactivity\n");
 
     int zerr = zstr_sendx (smio_cfg->pipe, smio_service_suffix, "CONFIG DONE", NULL);
     ASSERT_TEST (zerr >= 0, "Config thread could not send CONFIG DONE message "
             "over PIPE. Destroying ourselves", err_send_config_done);
-    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] Config Thread %s "
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg] Config Thread %s "
             "sent CONFIG DONE over PIPE\n", smio_cfg->service);
 
 err_send_config_done:
@@ -212,27 +212,22 @@ static int _smio_cfg_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
 
-    /* Arguments for command */
-    char *command = NULL;
-
     /* We expect a smio instance as reference */
     smio_cfg_t *smio_cfg = (smio_cfg_t *) args;
 
     /* Receive message */
-    zmsg_t *recv_msg = zmsg_recv (reader);
-    if (recv_msg == NULL) {
+    char *command = zstr_recv (reader);
+    if (command == NULL) {
         return -1; /* Interrupted */
     }
 
-    command = zmsg_popstr (recv_msg);
+    bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        free (command);
-        zmsg_destroy (&recv_msg);
-        return -1;
+        terminated = true;    
     }
     else if (streq (command, "RECONFIGURE SMIO")) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_bootstrap] "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg:_smio_cfg_handle_pipe] "
                 "Reconfiguring SMIO %s as it was requested by command "
                 "\"RECONFIGURE SMIO\"\n", smio_cfg->service);
         SMIO_DISPATCH_FUNC_WRAPPER_GEN(config_defaults, smio_cfg->smio_mod_dispatch,
@@ -240,27 +235,68 @@ static int _smio_cfg_handle_pipe (zloop_t *loop, zsock_t *reader, void *args)
     }
     /* Invalid message received. Log the error, but continue normally */
     else {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_bootstrap] Config Thread %s "
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_cfg:_smio_cfg_handle_pipe] Config Thread %s "
                 "received an invalid command over PIPE\n", smio_cfg->service);
     }
 
-    free (command);
-    zmsg_destroy (&recv_msg);
-    return 0;
+    /*  Cleanup pipe if any argument frames are still waiting to be eaten */
+    if (zsock_rcvmore (reader)) {
+        zmsg_t *more = zmsg_recv (reader);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_WARN, "[sm_io_cfg:_smio_cfg_handle_pipe] PIPE "
+               "received invalid frames, consuming them.\n");
+        zmsg_destroy (&more);
+    }
+
+    zstr_free (&command);
+    return terminated? -1: 0;
 }
 
-smio_err_e smio_cfg_loop (smio_cfg_t *self)
+void smio_cfg_loop (zsock_t *pipe, void *args)
 {
-    assert (self);
-    smio_err_e err = SMIO_SUCCESS;
+    th_config_args_t *th_args = (th_config_args_t *) args;
+    volatile const smio_mod_dispatch_t *smio_mod_dispatch = th_args->smio_handler;
+        
+    /* We must export our service as the combination of the
+     * devio name (coming from devio parent) and our own name ID
+     * followed by an optional parameter coming from priv pointer */
+    char *inst_id_str = hutils_stringify_dec_key (th_args->inst_id);
+    ASSERT_ALLOC(inst_id_str, err_inst_id_str_alloc);
+    char *smio_service = hutils_concat_strings3 (th_args->service,
+            smio_mod_dispatch->name, inst_id_str, ':');
+    ASSERT_ALLOC(smio_service, err_smio_service_alloc);
 
-    /* Set-up server register commands handler */
-    _smio_cfg_engine_handle_socket (self, self->pipe, _smio_cfg_handle_pipe);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg] Config Thread %s "
+            "starting ...\n", smio_service);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg] Config Thread %s "
+            "allocating resources ...\n", smio_service);
 
-    /* Run reactor until there's a termination signal */
-    zloop_start (self->loop);
+    /* Signal parent we are ready before creating ourselves, as DEVIO needs
+     * to add handlers for our messages that are sent in smio_cfg_new () */
+    zsock_signal (pipe, 0);
 
-    return err;
+    smio_cfg_t *self = smio_cfg_new (th_args, smio_mod_dispatch, pipe,
+            smio_service, inst_id_str);
+    if (self) {
+        /* Set-up server register commands handler */
+        _smio_cfg_engine_handle_socket (self, self->pipe, _smio_cfg_handle_pipe);
+
+        /* Run reactor until there's a termination signal */
+        zloop_start (self->loop);
+
+        /*  Reactor has ended */
+        smio_cfg_destroy (&self);
+        DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io_cfg] Config Thread %s "
+                "terminating with success\n", smio_service);
+    }
+    else {
+        zsock_signal (pipe, -1);
+    }
+
+    zstr_free (&smio_service);
+err_smio_service_alloc:
+    zstr_free (&inst_id_str);
+err_inst_id_str_alloc:
+    free (th_args);
 }
 
 /************************************************************/

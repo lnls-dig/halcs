@@ -6,6 +6,7 @@ dev_io_core_utils_OBJS = $(dev_io_DIR)/dev_io_utils.o
 # more objects to this target. This is done in the hal.mk
 # makefile
 dev_io_core_OBJS = $(dev_io_DIR)/dev_io_core.o \
+		   $(dev_io_DIR)/dev_io_proto.o \
 		   $(dev_io_DIR)/dev_io_err.o \
 		   $(dev_io_core_utils_OBJS)
 
