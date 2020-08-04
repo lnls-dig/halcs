@@ -639,16 +639,15 @@ err_zloop_timer:
 static int _devio_handle_protocol (zloop_t *loop, zsock_t *reader, void *args)
 {
     UNUSED(loop);
-    UNUSED(reader);
     /* We expect a devio instance e as reference */
     devio_t *devio = (devio_t *) args;
     UNUSED(devio);
 
     /* We process as many messages as we can, to reduce the overhead
      * of polling and the reactor */
-    while (zsock_events (devio->router) & ZMQ_POLLIN) {
+    while (zsock_events (reader) & ZMQ_POLLIN) {
         /* Receive message */
-        devio_err_e err = devio_proto_recv (devio->message, devio->router);
+        devio_err_e err = devio_proto_recv (devio->message, reader);
         if (err != DEVIO_SUCCESS) {
             return -1; /* Interrupted */
         }
@@ -657,7 +656,7 @@ static int _devio_handle_protocol (zloop_t *loop, zsock_t *reader, void *args)
         zmq_server_args_t server_args = {
             .tag = ZMQ_SERVER_ARGS_TAG,
             .proto = devio->message,
-            .reply_to = devio->router
+            .reply_to = reader
         };
         /* Do the actual work */
         _devio_do_smio_op (devio, &server_args);
