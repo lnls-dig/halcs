@@ -119,6 +119,8 @@ char *hutils_stringify_hex_key (uint32_t key)
     }
     key_c [size * 2] = 0;
 
+    return key_c;
+
 err_key_c_alloc:
     return key_c;
 }
