@@ -31,8 +31,6 @@
             smio_err_str (err_type))
 
 #define SMIO_RCV_TIMEOUT                   5000       /* ms */
-#define SMIO_POLLER_TIMEOUT                100000     /* in msec */
-#define SMIO_POLLER_NTIMES                 0          /* 0 for infinte */
 
 /* Main class object that every sm_io must implement */
 struct _smio_t {
@@ -89,7 +87,6 @@ static char *_smio_clone_service (smio_t *self);
 
 static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
         zloop_reader_fn handler);
-static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg);
 static int _smio_handle_pipe_backend (zloop_t *loop, zsock_t *reader, void *args);
 
 /* Boot new SMIO instance. Better used as a thread (CZMQ actor) init function */
@@ -142,12 +139,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
     self->loop = zloop_new ();
     ASSERT_ALLOC(self->loop, err_loop_alloc);
 
-    /* Set loop timeout. This is needed to ensure zloop will
-     * frequently check for rebuilding its poll set */
-    self->timer_id = zloop_timer (self->loop, SMIO_POLLER_TIMEOUT, SMIO_POLLER_NTIMES,
-        _smio_handle_timer, NULL);
-    ASSERT_TEST(self->timer_id != -1, "Could not create zloop timer", err_timer_alloc);
-
     /* Set-up backend handler for forcing interrupting the zloop and rebuild
      * the poll set. This avoids having to setup a short timer to periodically
      * interrupting the loop to check for rebuilds */
@@ -171,8 +162,6 @@ smio_t *smio_new (th_boot_args_t *args, zsock_t *pipe_mgmt,
 err_mlm_worker_connect:
     mlm_client_destroy (&self->worker);
 err_worker_alloc:
-    zloop_timer_end (self->loop, self->timer_id);
-err_timer_alloc:
     zloop_destroy (&self->loop);
 err_loop_alloc:
     zsock_destroy (&self->pipe_backend);
@@ -271,16 +260,6 @@ static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
 err_zloop_reader:
 err_zsock_is:
     return err;
-}
-
-/* zloop handler for timer */
-static int _smio_handle_timer (zloop_t *loop, int timer_id, void *arg)
-{
-    UNUSED(loop);
-    UNUSED(timer_id);
-    UNUSED(arg);
-
-    return 0;
 }
 
 /* zloop handler for CFG PIPE */
