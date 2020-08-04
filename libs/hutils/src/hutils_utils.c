@@ -66,17 +66,15 @@ uint32_t hutils_dec_to_str_len (uint32_t key)
 
 char *hutils_stringify_key (uint32_t key, uint32_t base)
 {
-    uint32_t key_len = hutils_num_to_str_len (key, base) + 1; /* +1 for \0 */
-    char *key_c = zmalloc (key_len * sizeof (char));
-    ASSERT_ALLOC (key_c, err_key_c_alloc);
+    char *key_c = NULL;
 
     switch (base) {
         case 10:
-            snprintf(key_c, key_len, "%u", key);
+            key_c = hutils_stringify_dec_key (key);
         break;
 
         case 16:
-            snprintf(key_c, key_len, "%x", key);
+            key_c = hutils_stringify_hex_key (key);
         break;
 
         default:
@@ -89,13 +87,21 @@ char *hutils_stringify_key (uint32_t key, uint32_t base)
     return key_c;
 
 err_inv_base:
-err_key_c_alloc:
-    return NULL;
+    return key_c;
 }
 
 char *hutils_stringify_dec_key (uint32_t key)
 {
-    return hutils_stringify_key (key, 10);
+    size_t key_len = hutils_num_to_str_len (key, 10) + 1; /* +1 for \0 */
+    char *key_c = zmalloc (key_len);
+    ASSERT_ALLOC (key_c, err_key_c_alloc);
+
+    snprintf(key_c, key_len, "%u", key);
+
+    return key_c;
+
+err_key_c_alloc:
+    return key_c;
 }
 
 char *hutils_stringify_hex_key (uint32_t key)
@@ -112,6 +118,8 @@ char *hutils_stringify_hex_key (uint32_t key)
         key_c [i * 2 + 1] = hex_char [data [i] & 15];
     }
     key_c [size * 2] = 0;
+
+    return key_c;
 
 err_key_c_alloc:
     return key_c;

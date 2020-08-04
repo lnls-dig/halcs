@@ -18,13 +18,13 @@ struct _zmq_server_args_t {
     /* This allows us to do a runtime typing and validation. Idea from
      * CZMQ 3.0.0 available at https://github.com/zeromq/czmq/blob/master/src/zmsg.c */
     uint32_t tag;
-    zmsg_t **msg;
-    void *reply_to;
+    devio_proto_t *proto;
+    zsock_t *reply_to;
 };
 
 /* SMIO THSAFE ZMQ server function arguments macros */
 #define __THSAFE_MSG_ZMQ_ARGS_2_MSG(args)               ((zmq_server_args_t *) args)
-#define THSAFE_MSG_ZMQ(args)                            (*__THSAFE_MSG_ZMQ_ARGS_2_MSG(args)->msg)
+#define THSAFE_MSG_ZMQ(args)                            (devio_proto_get_content (__THSAFE_MSG_ZMQ_ARGS_2_MSG(args)->proto))
 
 #define THSAFE_MSG_ZMQ_POP_NEXT_ARG(args)               GEN_MSG_ZMQ_POP_NEXT_ARG(THSAFE_MSG_ZMQ(args))
 #define THSAFE_MSG_CLENUP_ARG(arg_p)                    GEN_MSG_ZMQ_CLENUP_ARG(arg_p)

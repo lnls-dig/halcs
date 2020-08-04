@@ -48,7 +48,7 @@ static void _msg_send_client_response_mlm (RW_REPLY_TYPE reply_code, uint32_t re
         uint32_t *data_out, bool with_data_frame, mlm_client_t *worker,
         zframe_t *reply_to);
 static void _msg_send_client_response_sock (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, zframe_t *reply_to);
+        uint32_t *data_out, bool with_data_frame, zsock_t *reply_to, devio_proto_t *proto);
 
 msg_type_e msg_guess_type (void *msg)
 {
@@ -146,13 +146,13 @@ msg_err_e msg_handle_sock_request (void *owner, void *args,
 
     /* Send response back to client */
     _msg_send_client_response_sock (reply_code, disp_table_ret, ret, with_data_frame,
-           msg->reply_to);
+           msg->reply_to, msg->proto);
 
     return err;
 
 err_format_response:
 err_get_opcode:
-    _msg_send_client_response_sock (PARAM_ERR, 0, NULL, false, msg->reply_to);
+    _msg_send_client_response_sock (PARAM_ERR, 0, NULL, false, msg->reply_to, msg->proto);
 err_inv_msg:
     return err;
 }
@@ -350,14 +350,16 @@ err_fmt_client_message:
 }
 
 static void _msg_send_client_response_sock (RW_REPLY_TYPE reply_code, uint32_t reply_size,
-        uint32_t *data_out, bool with_data_frame, zframe_t *reply_to)
+        uint32_t *data_out, bool with_data_frame, zsock_t *reply_to, devio_proto_t *proto)
 {
     zmsg_t *msg = _msg_create_client_response (reply_code, reply_size, data_out,
             with_data_frame);
     ASSERT_TEST(msg != NULL, "Could format client message",
             err_fmt_client_message);
 
-    zmsg_send (&msg, reply_to);
+    /* Set content and send */
+    devio_proto_set_content_move (proto, &msg);
+    devio_proto_send (proto, reply_to);
 err_fmt_client_message:
     return;
 }

@@ -58,6 +58,8 @@ typedef struct _dmngr_t dmngr_t;
 typedef enum _devio_err_e devio_err_e;
 /* Forward devio_type_e declaration enumeration */
 typedef enum _devio_type_e devio_type_e;
+/* Opaque devio_proto_t structure */
+typedef struct _devio_proto_t devio_proto_t;
 /* Opaque devio_t structure */
 typedef struct _devio_t devio_t;
 
@@ -122,6 +124,7 @@ typedef struct _zmq_server_args_t zmq_server_args_t;
 #include "dev_io_err.h"
 #include "dev_io_utils.h"
 #include "dev_io_exports.h"
+#include "dev_io_proto.h"
 #include "dev_io_core.h"
 
 /* SM_PR */

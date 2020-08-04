@@ -119,7 +119,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_gen_fp) (smio_t *self, void *sock, 
 #define GET_PARAM(self, module, base_addr, prefix, reg, field, single_bit, var, \
         fmt_funcp)                                                              \
             GET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, var, \
-               fmt_funcp, smio_thsafe_client_read_32_gen, smio_get_pipe_msg (self))
+               fmt_funcp, smio_thsafe_client_read_32_gen, smio_get_dealer (self))
 
 /* SET or CLEAR parameter based on the last macro parameter "clr_field" */
 #define SET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, value, \
@@ -188,7 +188,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_gen_fp) (smio_t *self, void *sock, 
         min, max, chk_funcp, clr_field)                                         \
             SET_PARAM_GEN(self, module, base_addr, prefix, reg, field, single_bit, value, \
                 min, max, chk_funcp, clr_field, smio_thsafe_client_read_32_gen,  \
-                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
+                    smio_thsafe_client_write_32_gen, smio_get_dealer (self))
 
 /* zmq message in SET_GET_PARAM macro is:
  * frame 0: operation code
@@ -232,7 +232,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_gen_fp) (smio_t *self, void *sock, 
         max, chk_funcp, fmt_funcp, clr_field)                                   \
             SET_GET_PARAM_GEN(module, base_addr, prefix, reg, field, single_bit, min,   \
                 max, chk_funcp, fmt_funcp, clr_field, smio_thsafe_client_read_32_gen, \
-                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
+                    smio_thsafe_client_write_32_gen, smio_get_dealer (self))
 
 /* zmq message in SET_GET_PARAM_CHANNEL macro is:
  * frame 0: operation code
@@ -286,7 +286,7 @@ typedef ssize_t (*smio_thsafe_client_read_32_gen_fp) (smio_t *self, void *sock, 
             SET_GET_PARAM_CHANNEL_GEN(module, base_addr, prefix, reg, field,    \
                     chan_offset, chan_num, single_bit, min, max, chk_funcp,     \
                     fmt_funcp, clr_field, smio_thsafe_client_read_32_gen,       \
-                    smio_thsafe_client_write_32_gen, smio_get_pipe_msg (self))
+                    smio_thsafe_client_write_32_gen, smio_get_dealer (self))
 
 #define GET_PARAM_CHANNEL(self, module, base_addr, prefix, reg, field, chan_offset,   \
         chan_num, single_bit, var, fmt_funcp)                                   \
