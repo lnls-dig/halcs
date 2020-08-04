@@ -227,6 +227,9 @@ static disp_table_err_e _disp_table_insert (disp_table_t *self, const disp_op_t 
 
     char *key_c = hutils_stringify_hex_key (disp_op_handler->op->opcode);
     ASSERT_ALLOC (key_c, err_key_c_alloc);
+    DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_TRACE,
+        "[disp_table] Inserting function (key = %u, key_c = %s) into dispatch table\n",
+        disp_op_handler->op->opcode, key_c);
     int zerr = zhashx_insert (self->table_h, key_c, disp_op_handler);
     ASSERT_TEST(zerr == 0, "Could not insert item into dispatch table",
             err_insert_hash);
