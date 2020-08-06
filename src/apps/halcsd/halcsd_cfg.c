@@ -234,14 +234,14 @@ int main (int argc, char *argv[])
 
     devio_args_t *devio_args = zmalloc (sizeof *devio_args);
     ASSERT_ALLOC (devio_args, err_devio_args_alloc);
-    devio_args->devio_service = devio_service_str; 
+    devio_args->devio_service = &devio_service_str; 
     devio_args->dev_id = dev_id;
-    devio_args->dev_entry = dev_entry;
+    devio_args->dev_entry = &dev_entry;
     devio_args->llio_ops = llio_ops;
-    devio_args->broker_endp = broker_endp;
+    devio_args->broker_endp = &broker_endp;
     devio_args->verbose = verbose;
-    devio_args->devio_log_filename = devio_log_filename;
-    devio_args->devio_log_info_filename = devio_log_info_filename;
+    devio_args->devio_log_filename = &devio_log_filename;
+    devio_args->devio_log_info_filename = &devio_log_info_filename;
 
     /* Step 1: Loop though all the SDB records and intialize (boot) the
      * smio modules*/
