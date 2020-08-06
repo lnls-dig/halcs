@@ -385,6 +385,8 @@ static void _hutils_hints_free_item (void **data)
         item->fmc_board = NULL;
         free (item->bind);
         item->bind = NULL;
+        free (item->proto);
+        item->proto = NULL;
         free (item);
         *data = NULL;
     }
