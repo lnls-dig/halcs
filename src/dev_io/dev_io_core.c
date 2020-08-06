@@ -1592,6 +1592,12 @@ void devio_loop (zsock_t *pipe, void *args)
     devio_args_t *devio_args = *devio_args_p;
     ASSERT_ALLOC(devio_args, err_devio_args);
 
+    assert (devio_args->devio_service);
+    assert (devio_args->dev_entry);
+    assert (devio_args->broker_endp);
+    assert (devio_args->devio_log_filename);
+    assert (devio_args->devio_log_info_filename);
+
     /* Initialize */
 
     /* Unblock signals for this thread only. We can't use the regular
@@ -1601,12 +1607,12 @@ void devio_loop (zsock_t *pipe, void *args)
     sigemptyset (&signal_mask);
     pthread_sigmask (SIG_UNBLOCK, &signal_mask, NULL);
 
-    devio_t *self = devio_new (devio_args->devio_service, pipe,
+    devio_t *self = devio_new (*devio_args->devio_service, pipe,
             devio_args->dev_id,
-            devio_args->dev_entry, devio_args->llio_ops,
-            devio_args->broker_endp, devio_args->verbose,
-            devio_args->devio_log_filename,
-            devio_args->devio_log_info_filename);
+            *devio_args->dev_entry, devio_args->llio_ops,
+            *devio_args->broker_endp, devio_args->verbose,
+            *devio_args->devio_log_filename,
+            *devio_args->devio_log_info_filename);
     if (self) {
         /* Tell parent we are initializing */
         zsock_signal (pipe, 0);
@@ -1630,11 +1636,11 @@ void devio_loop (zsock_t *pipe, void *args)
     }
 
     /* Our responsability to clear this up */
-    zstr_free (&devio_args->devio_service);
-    zstr_free (&devio_args->dev_entry);
-    zstr_free (&devio_args->broker_endp);
-    zstr_free (&devio_args->devio_log_filename);
-    zstr_free (&devio_args->devio_log_info_filename);
+    zstr_free (devio_args->devio_service);
+    zstr_free (devio_args->dev_entry);
+    zstr_free (devio_args->broker_endp);
+    zstr_free (devio_args->devio_log_filename);
+    zstr_free (devio_args->devio_log_info_filename);
     free (devio_args);
     *devio_args_p = NULL;
 err_devio_args:
