@@ -189,6 +189,7 @@ err_sdb_info:
 err_atom_width:
 err_num_atoms:
 err_num_coalesce:
+    free(self->acq_buf);
 err_acq_buf_alloc:
 err_int_ch_width:
     free (self);
@@ -204,7 +205,7 @@ smio_err_e smio_acq_destroy (smio_acq_t **self_p)
     if (*self_p) {
         smio_acq_t *self = *self_p;
 
-        self->acq_buf = NULL;
+        free(self->acq_buf);
         free (self);
         *self_p = NULL;
     }
