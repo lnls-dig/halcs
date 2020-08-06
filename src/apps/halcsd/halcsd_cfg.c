@@ -251,7 +251,7 @@ int main (int argc, char *argv[])
      * handle, like messages from smios */
     /*      Step 3.5: If we do, call devio_handle_smio () and treat its
      *      request as appropriate */
-    zactor_t *server = zactor_new (devio_loop, devio_args);
+    zactor_t *server = zactor_new (devio_loop, &devio_args);
     if (server == NULL) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd] Could not spawn "
                 "server\n");
