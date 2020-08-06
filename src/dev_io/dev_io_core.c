@@ -1587,10 +1587,12 @@ void signal_actor (zsock_t *pipe, void *args)
 /* Main devio loop implemented as actor */
 void devio_loop (zsock_t *pipe, void *args)
 {
-    assert (args);
+    devio_args_t **devio_args_p = (devio_args_t **) args;
+    assert (devio_args_p);
+    devio_args_t *devio_args = *devio_args_p;
+    ASSERT_ALLOC(devio_args, err_devio_args);
 
     /* Initialize */
-    devio_args_t *devio_args = (devio_args_t *) args;
 
     /* Unblock signals for this thread only. We can't use the regular
      * signal handlers as all thread will inherit and we want only
@@ -1634,6 +1636,9 @@ void devio_loop (zsock_t *pipe, void *args)
     zstr_free (&devio_args->devio_log_filename);
     zstr_free (&devio_args->devio_log_info_filename);
     free (devio_args);
+    *devio_args_p = NULL;
+err_devio_args:
+    return;
 }
 
 devio_err_e devio_do_smio_op (devio_t *self, void *msg)
