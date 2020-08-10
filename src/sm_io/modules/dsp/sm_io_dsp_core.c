@@ -59,7 +59,7 @@ smio_dsp_t * smio_dsp_new (smio_t *parent)
 {
     smio_dsp_t *self = (smio_dsp_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
-    
+
     /* Alloacate thread arguments struct and pass it to the
      * thread. It is the responsability of the calling thread
      * to clear this structure after using it! */
@@ -224,7 +224,7 @@ zsock_t *smio_dsp_monit_get_dealer (smio_dsp_monit_t *self)
  *    any arguments. Returns 0 if successful, -1 if sending failed for any
  *    reason.
  */
-smio_err_e smio_send_dsp_monit_mgmt_msg (zactor_t *actor, 
+smio_err_e smio_send_dsp_monit_mgmt_msg (zactor_t *actor,
     const char *picture, ...)
 {
     assert (actor);
@@ -234,7 +234,7 @@ smio_err_e smio_send_dsp_monit_mgmt_msg (zactor_t *actor,
     va_start(argptr, picture);
     int zerr = zsock_vsend (actor, picture, argptr);
     va_end(argptr);
-    ASSERT_TEST(zerr == 0, "Could not send MGMT message to DSP MONIT", 
+    ASSERT_TEST(zerr == 0, "Could not send MGMT message to DSP MONIT",
         err_send_mgmt_msg,
         SMIO_ERR_INV_SOCKET);
 
@@ -242,7 +242,7 @@ err_send_mgmt_msg:
     return err;
 }
 
-smio_err_e smio_recv_dsp_monit_mgmt_msg (zactor_t *actor, 
+smio_err_e smio_recv_dsp_monit_mgmt_msg (zactor_t *actor,
     const char *picture, ...)
 {
     assert (actor);
@@ -252,7 +252,7 @@ smio_err_e smio_recv_dsp_monit_mgmt_msg (zactor_t *actor,
     va_start(argptr, picture);
     int zerr = zsock_vrecv (actor, picture, argptr);
     va_end(argptr);
-    ASSERT_TEST(zerr == 0, "Could not recv MGMT message from DSP MONIT", 
+    ASSERT_TEST(zerr == 0, "Could not recv MGMT message from DSP MONIT",
         err_recv_mgmt_msg,
         SMIO_ERR_INV_SOCKET);
 
@@ -343,7 +343,7 @@ static int _smio_dsp_monit_handle_timer (zloop_t *loop, int timer_id, void *arg)
         ASSERT_TEST(rc==0, "Could not send MONIT data message", err_send_msg);
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_dsp_core:_smio_dsp_monit_handle_timer] Data sent:\n"
-            "amp0 = %u, amp1 = %u, amp2 = %u, amp3 = %u\n", monit_data.amp_ch0, monit_data.amp_ch1,
+            "amp0 = %d, amp1 = %d, amp2 = %d, amp3 = %d\n", monit_data.amp_ch0, monit_data.amp_ch1,
             monit_data.amp_ch2, monit_data.amp_ch3);
     }
 
@@ -374,7 +374,7 @@ static int _smio_dsp_monit_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, voi
     bool terminated = false;
     if (streq (command, "$TERM")) {
         /* Shutdown the engine */
-        terminated = true;    
+        terminated = true;
     }
     else if (streq (command, "MONIT_POLL_TIME_W")) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io_dsp_core:_smio_dsp_monit_handle_pipe_mgmt] PIPE "
@@ -414,7 +414,7 @@ static void _smio_dsp_monit (zsock_t *pipe_mgmt, void *th_boot_args)
     char *service_producer = hutils_concat_strings (th_args->service, "DATA_PRODUCER", ':');
     ASSERT_ALLOC(service_producer, err_service_prod_alloc);
 
-    smio_dsp_monit_t *self = smio_dsp_monit_new (pipe_mgmt, th_args->dealer, 
+    smio_dsp_monit_t *self = smio_dsp_monit_new (pipe_mgmt, th_args->dealer,
         th_args->parent, th_args->endpoint, service_producer);
     if (self) {
         zsock_signal (pipe_mgmt, 0);
