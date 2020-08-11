@@ -7,8 +7,8 @@
 *tags
 
 # Binaries
-dev_mngr
-halcsd
+/dev_mngr
+/halcsd
 
 # Dependency files
 *.d
@@ -36,3 +36,6 @@ czmq
 libsodium
 libzmq
 malamute
+
+# Generated files from .in templates
+ldconf/halcs.conf

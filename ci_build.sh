@@ -18,8 +18,17 @@ mkdir -p tmp
 mkdir -p tmp/etc
 
 # Build and local install repositories
-BUILD_PREFIX=$PWD/tmp
-SCRIPTS_PREFIX=$PWD/tmp/etc
+BUILD_PREFIX_BASENAME=tmp
+BUILD_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
+SCRIPTS_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
+SCRIPTS_SHARE_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}/usr/local
+LDCONF_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
+
+# With sonarqube or not
+STATIC_ANALYSIS_WRAPPER=""
+if [ "$SONARQUBE" = yes ]; then
+    STATIC_ANALYSIS_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
+fi
 
 # CCache setup
 PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
@@ -74,10 +83,10 @@ else
     fi
 fi
 
-LIBSODIUM_VER=1.0.3
-LIBZMQ_VER=v4.2.2
+LIBSODIUM_VER=1.0.8
+LIBZMQ_VER=v4.2.5
 LIBCZMQ_VER=v4.0.2
-MALAMUTE_VER=v1.4.3
+MALAMUTE_VER=v1.6.2
 
 CONFIG_FLAGS=()
 CONFIG_FLAGS+=("CFLAGS=-I${BUILD_PREFIX}/include")
@@ -93,13 +102,20 @@ HALCS_OPTS=()
 HALCS_OPTS+=(${CONFIG_FLAGS[@]})
 HALCS_OPTS+=(${KERNEL_FLAGS[@]})
 HALCS_OPTS+=("PREFIX=${BUILD_PREFIX}")
-HALCS_OPTS+=("SCRIPTS_PREFIX=${SCRIPTS_PREFIX}")
+HALCS_OPTS+=("SCRIPTS_ETC_PREFIX=${SCRIPTS_ETC_PREFIX}")
+HALCS_OPTS+=("SCRIPTS_SHARE_PREFIX=${SCRIPTS_SHARE_PREFIX}")
+HALCS_OPTS+=("LDCONF_ETC_PREFIX=${LDCONF_ETC_PREFIX}")
 
 CONFIG_OPTS=()
 CONFIG_OPTS+=(${CONFIG_FLAGS[@]})
 CONFIG_OPTS+=("PKG_CONFIG_PATH=${BUILD_PREFIX}/lib/pkgconfig")
 CONFIG_OPTS+=("--prefix=${BUILD_PREFIX}")
 CONFIG_OPTS+=("--with-docs=no")
+CONFIG_OPTS+=("CFLAGS=-Wno-format-truncation")
+CONFIG_OPTS+=("CPPFLAGS=-Wno-format-truncation")
+
+ZMQ_CONFIG_OPTS=()
+ZMQ_CONFIG_OPTS+=("--with-libsodium")
 
 # CCache CCACHE_PATH setup
 if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
@@ -168,145 +184,205 @@ if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
     CONFIG_OPTS+=("CXX=${CXX}")
     CONFIG_OPTS+=("CPP=${CPP}")
 fi
+# Clone and build dependencies, if not yet installed to Travis env as DEBs
+echo "`date`: Starting build of dependencies (if any)..."
 
 ###########   libsodium
-echo ""
-BASE_PWD=${PWD}
-echo "`date`: INFO: Building prerequisite 'libsodium' from Git repository..." >&2
-git clone --branch=${LIBSODIUM_VER} git://github.com/jedisct1/libsodium.git
-cd libsodium
+if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsodium-dev >/dev/null 2>&1); then
+    echo ""
+    BASE_PWD=${PWD}
+    echo "`date`: INFO: Building prerequisite 'libsodium' from Git repository..." >&2
+    git clone --branch=${LIBSODIUM_VER} git://github.com/jedisct1/libsodium.git
+    cd libsodium
 
-# CCache directory
-CCACHE_BASEDIR=${PWD}
-export CCACHE_BASEDIR
+    # CCache directory
+    CCACHE_BASEDIR=${PWD}
+    export CCACHE_BASEDIR
 
-git --no-pager log --oneline -n1o
+    git --no-pager log --oneline -n1o
 
-# Build/Install
-if [ -e autogen.sh ]; then
-    ./autogen.sh 2> /dev/null
+    # Build/Install
+    if [ -e autogen.sh ]; then
+        ./autogen.sh 2> /dev/null
+    fi
+    if [ -e buildconf ]; then
+        ./buildconf 2> /dev/null
+    fi
+    if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+        libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+    fi
+    ./configure "${CONFIG_OPTS[@]}"
+    make -j4
+    make install
+    cd "${BASE_PWD}"
 fi
-if [ -e buildconf ]; then
-    ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    libtoolize --copy --force && \
-        aclocal -I . && \
-        autoheader && \
-        automake --add-missing --copy && \
-        autoconf || \
-        autoreconf -fiv
-fi
-./configure "${CONFIG_OPTS[@]}"
-make -j4
-make install
-cd "${BASE_PWD}"
 
 ###########   libzmq
-echo ""
-BASE_PWD=${PWD}
-echo "`date`: INFO: Building prerequisite 'libzmq' from Git repository..." >&2
-git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git
-cd libzmq
+if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1); then
+    echo ""
+    BASE_PWD=${PWD}
+    echo "`date`: INFO: Building prerequisite 'libzmq' from Git repository..." >&2
+    git clone --branch=${LIBZMQ_VER} git://github.com/zeromq/libzmq.git
+    cd libzmq
 
-# CCache directory
-CCACHE_BASEDIR=${PWD}
-export CCACHE_BASEDIR
+    # CCache directory
+    CCACHE_BASEDIR=${PWD}
+    export CCACHE_BASEDIR
 
-git --no-pager log --oneline -n1o
+    git --no-pager log --oneline -n1o
 
-# Build/Install
-if [ -e autogen.sh ]; then
-    ./autogen.sh 2> /dev/null
+    # Build/Install
+    if [ -e autogen.sh ]; then
+        ./autogen.sh 2> /dev/null
+    fi
+    if [ -e buildconf ]; then
+        ./buildconf 2> /dev/null
+    fi
+    if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+        libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+    fi
+    ./configure "${CONFIG_OPTS[@]}" "${ZMQ_CONFIG_OPTS[@]}"
+    make -j4
+    make install
+    cd "${BASE_PWD}"
 fi
-if [ -e buildconf ]; then
-    ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    libtoolize --copy --force && \
-        aclocal -I . && \
-        autoheader && \
-        automake --add-missing --copy && \
-        autoconf || \
-        autoreconf -fiv
-fi
-./configure "${CONFIG_OPTS[@]}"
-make -j4
-make install
-cd "${BASE_PWD}"
 
 ###########   CZMQ
-echo ""
-BASE_PWD=${PWD}
-echo "`date`: INFO: Building prerequisite 'czmq' from Git repository..." >&2
-git clone --branch=${LIBCZMQ_VER} git://github.com/zeromq/czmq.git
-cd czmq
+if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/dev/null 2>&1); then
+    echo ""
+    BASE_PWD=${PWD}
+    echo "`date`: INFO: Building prerequisite 'czmq' from Git repository..." >&2
+    git clone --branch=${LIBCZMQ_VER} git://github.com/zeromq/czmq.git
+    cd czmq
 
-# CCache directory
-CCACHE_BASEDIR=${PWD}
-export CCACHE_BASEDIR
+    # CCache directory
+    CCACHE_BASEDIR=${PWD}
+    export CCACHE_BASEDIR
 
-git --no-pager log --oneline -n1o
+    git --no-pager log --oneline -n1o
 
-# Build/Install
-if [ -e autogen.sh ]; then
-    ./autogen.sh 2> /dev/null
+    # Build/Install
+    if [ -e autogen.sh ]; then
+        ./autogen.sh 2> /dev/null
+    fi
+    if [ -e buildconf ]; then
+        ./buildconf 2> /dev/null
+    fi
+    if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+        libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+    fi
+    ./configure "${CONFIG_OPTS[@]}"
+    make -j4
+    make install
+    cd "${BASE_PWD}"
 fi
-if [ -e buildconf ]; then
-    ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    libtoolize --copy --force && \
-        aclocal -I . && \
-        autoheader && \
-        automake --add-missing --copy && \
-        autoconf || \
-        autoreconf -fiv
-fi
-./configure "${CONFIG_OPTS[@]}"
-make -j4
-make install
-cd "${BASE_PWD}"
 
 ###########   Malamute
-echo ""
-BASE_PWD=${PWD}
-echo "`date`: INFO: Building prerequisite 'malamute' from Git repository..." >&2
-git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git
-cd malamute
+if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libmlm-dev >/dev/null 2>&1); then
+    echo ""
+    BASE_PWD=${PWD}
+    echo "`date`: INFO: Building prerequisite 'malamute' from Git repository..." >&2
+    git clone --branch=${MALAMUTE_VER} git://github.com/lnls-dig/malamute.git
+    cd malamute
 
-# CCache directory
-CCACHE_BASEDIR=${PWD}
-export CCACHE_BASEDIR
+    # CCache directory
+    CCACHE_BASEDIR=${PWD}
+    export CCACHE_BASEDIR
 
-git --no-pager log --oneline -n1o
+    git --no-pager log --oneline -n1o
 
-# Build/Install
-if [ -e autogen.sh ]; then
-    ./autogen.sh 2> /dev/null
+    # Build/Install
+    if [ -e autogen.sh ]; then
+        ./autogen.sh 2> /dev/null
+    fi
+    if [ -e buildconf ]; then
+        ./buildconf 2> /dev/null
+    fi
+    if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+        libtoolize --copy --force && \
+            aclocal -I . && \
+            autoheader && \
+            automake --add-missing --copy && \
+            autoconf || \
+            autoreconf -fiv
+    fi
+    ./configure "${CONFIG_OPTS[@]}"
+    make -j4
+    make install
+    cd "${BASE_PWD}"
 fi
-if [ -e buildconf ]; then
-    ./buildconf 2> /dev/null
-fi
-if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-    libtoolize --copy --force && \
-        aclocal -I . && \
-        autoheader && \
-        automake --add-missing --copy && \
-        autoconf || \
-        autoreconf -fiv
-fi
-./configure "${CONFIG_OPTS[@]}"
-make -j4
-make install
-cd "${BASE_PWD}"
 
 ########## HALCS
-if [ -z "$GRADLE" ]; then
-    build-wrapper-linux-x86-64 --out-dir bw-output ./compile.sh -b $BOARD -a "${APP}" -e $EXAMPLES -l $SYSTEM_INTEGRATION -x "${HALCS_OPTS[*]}"
+if [ "$PURE_MAKE" = yes ]; then
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
+    make ${HALCS_OPTS[*]} install
+
+    if [ "$EXAMPLES" = yes ]; then
+        make ${HALCS_OPTS[*]} examples
+    fi
+
+    if [ "$SYSTEM_INTEGRATION" = yes ]; then
+        make ${HALCS_OPTS[*]} scripts_install
+    fi
+
+elif [ "$COMPILE_SCRIPT" = yes ]; then
+    ${STATIC_ANALYSIS_WRAPPER} ./compile.sh \
+            -b $BOARD \
+            -a "${APP}" \
+            -e $EXAMPLES \
+            -l $SYSTEM_INTEGRATION \
+            -x "${HALCS_OPTS[*]}"
+elif [ "$CMAKE" = yes ]; then
+    mkdir -p build
+    cd build
+    cmake \
+        -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DBUILD_PCIE_DRIVER=OFF \
+        -Dhalcs_BOARD_OPT="$BOARD" ../
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        VERBOSE=1
+    make DESTDIR="${BUILD_PREFIX}" install
+    cd "${BASE_PWD}"
+elif [ "$CPACK" = yes ]; then
+    # all of these options are relative to the docker container filesystem
+    LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
+    PACKPACK_OPTS=()
+    PACKPACK_OPTS+=("${CPACK_GENERATORS}")
+    PACKPACK_OPTS+=("-Dhalcs_DISTRO_VERSION=${CPACK_DISTRO_VERSION}")
+    PACKPACK_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
+    PACKPACK_OPTS+=("-DBUILD_PCIE_DRIVER=ON")
+    PACKPACK_OPTS+=("-Dhalcs_BOARD_OPT=${CPACK_BOARDS}")
+    # only expand and add ":" to LD_LIBRARY_PATH if non-empty
+    LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+        SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
+    cd "${BASE_PWD}"
 else
-    export ${CONFIG_FLAGS[@]}
-    ./gradlew $GRADLE
+    mkdir -p build
+    cd build
+    cmake \
+        -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        -DBUILD_PCIE_DRIVER=OFF \
+        -Dhalcs_BOARD_OPT="$BOARD" ../
+    ${STATIC_ANALYSIS_WRAPPER} make \
+        VERBOSE=1
+    make DESTDIR="${BUILD_PREFIX}" install
+    cd "${BASE_PWD}"
 fi
 
 # Get CCache statistics

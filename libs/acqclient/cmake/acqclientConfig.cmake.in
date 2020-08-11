@@ -1,0 +1,46 @@
+# acqclient cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   acqclient-static
+#   acqclient
+#
+# This module sets the following variables in your project::
+#
+#   acqclient_FOUND - true if acqclient found on the system
+#   acqclient_INCLUDE_DIRS - the directory containing acqclient headers
+#   acqclient_LIBRARIES -
+#   acqclient_STATIC_LIBRARIES
+
+@PACKAGE_INIT@
+
+if(NOT TARGET acqclient AND NOT TARGET acqclient-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET acqclient)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            acqclient
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            acqclient-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET acqclient)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES acqclient)
+    endif()
+    if (TARGET acqclient-static)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES acqclient-static)
+    endif()
+endif()
+
+check_required_components("@PROJECT_NAME@")

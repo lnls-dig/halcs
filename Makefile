@@ -13,14 +13,23 @@ MAKE ?=		make
 DEPMOD ?=	depmod
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= ml605
-# Select which application we want to generate. Options are: halcsd
-APPS ?= halcsd
+BOARD ?= afcv3_1
+# Select which application we want to generate. Options are: halcsd, halcs_generic_udev
+APPS ?= halcsd halcs_generic_udev
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
 # This is a TEMPORARY fix until the AFCv3 FPGA firmware is fixed. If unsure, select (y)es.
-SHRINK_AFCV3_DDR_SIZE ?= y
+SHRINK_AFCV3_DDR_SIZE ?= n
 #Select if we want to compile code with all messages outputs. Options are: y(es) or n(o)
 LOCAL_MSG_DBG ?= n
+#Select if we want to compile with debug mode on. Options are: y(es) or n(o)
+ERRHAND_DBG=y
+export ERRHAND_DBG
+# Select the minimum debug verbosity. See liberrhand file errhand_opts.h for more info.
+ERRHAND_MIN_LEVEL=DBG_LVL_WARN
+export ERRHAND_MIN_LEVEL
+# Select the subsytems which will have the debug on. See liberrhand file errhand_opts.h for more info.
+ERRHAND_SUBSYS_ON="(DBG_DEV_MNGR | DBG_DEV_IO | DBG_SM_IO | DBG_LIB_CLIENT | DBG_SM_PR | DBG_SM_CH | DBG_LL_IO | DBG_HAL_UTILS)"
+export ERRHAND_SUBSYS_ON
 #Select if we want to compile with debug mode on. Options are: y(es) or n(o)
 DBE_DBG ?= y
 # Select the FMC ADC board type. Options are: passive or active
@@ -35,10 +44,15 @@ AFE_RFFE_TYPE ?= 2
 # Selects if we want to compile specfic APP Config. Options are: y(es) or n(o).
 # If selected, the FPGA firmware must have the AFC diagnostics module
 # synthesized.
-WITH_APP_CFG ?= y
-# Installation prefix for the scripts. This is mainly used for testing the build
-# system. Usually this is empty
-SCRIPTS_PREFIX ?=
+WITH_APP_CFG ?= n
+# Installation prefix for the etc scripts.
+# This is mainly used for testing the build system. Usually this is empty
+SCRIPTS_ETC_PREFIX ?=
+# Installation prefix for the share scripts.
+# Usually this is set to /usr/local
+SCRIPTS_SHARE_PREFIX ?= /usr/local
+# LDCONF script
+LDCONF_ETC_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
@@ -49,18 +63,27 @@ export SUPPORTED_ML605_BOARDS
 SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
 export SUPPORTED_AFCV3_BOARDS
 
+# Top Makefile directory
+TOP := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+SRC_DIR := $(TOP)/src
+export TOP
+
+LDCONF_DIR := ldconf
+LDCONF_PREFIX := $(LDCONF_ETC_PREFIX)/etc/ld.so.conf.d
+
+# Libraries
+LIBS_DIR := $(TOP)/libs
+export LIBS_DIR
+
+# Subdmoules and third-party codes
+FOREIGN_DIR := $(TOP)/foreign
+export FOREIGN_DIR
+
 # Linker script
-LD_SCRIPT = linker/halcs.ld
+LD_SCRIPT = $(TOP)/linker/halcs.ld
 
 # Init sripts
 INIT_SCRIPTS =
-
-# Subdmoules and third-party codes
-FOREIGN_DIR = foreign
-
-# Our submodules and third-party codes
-LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
-PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
 
 # PCIe driver stuff (pcie driver and library) relative
 # directory
@@ -68,16 +91,31 @@ KERNEL_VERSION ?= $(shell uname -r)
 DRIVER_OBJ = /lib/modules/$(KERNEL_VERSION)/extra/pciDriver.ko
 
 # Project libraries
-LIBERRHAND_DIR = libs/errhand
-LIBCONVC_DIR = libs/convc
-LIBHUTILS_DIR = libs/hutils
-LIBDISPTABLE_DIR = libs/disptable
-LIBLLIO_DIR = libs/llio
-LIBHALCSCLIENT_DIR = libs/halcsclient
-LIBACQCLIENT_DIR = libs/acqclient
-LIBBPMCLIENT_DIR = libs/bpmclient
-LIBSDBUTILS_DIR = libs/sdbutils
-LIBSDBFS_DIR = foreign/libsdbfs
+LIBERRHAND_DIR = $(LIBS_DIR)/errhand
+export LIBERRHAND_DIR
+LIBCONVC_DIR = $(LIBS_DIR)/convc
+export LIBCONVC_DIR
+LIBHUTILS_DIR = $(LIBS_DIR)/hutils
+export LIBHUTILS_DIR
+LIBDISPTABLE_DIR = $(LIBS_DIR)/disptable
+export LIBDISPTABLE_DIR
+LIBLLIO_DIR = $(LIBS_DIR)/llio
+export LIBLLIO_DIR
+LIBHALCSCLIENT_DIR = $(SRC_DIR)/client
+export LIBHALCSCLIENT_DIR
+LIBACQCLIENT_DIR = $(LIBS_DIR)/acqclient
+export LIBACQCLIENT_DIR
+LIBBPMCLIENT_DIR = $(LIBS_DIR)/bpmclient
+export LIBBPMCLIENT_DIR
+LIBSDBFS_DIR = $(LIBS_DIR)/sdbfs
+export LIBSDBFS_DIR
+LIBSDBUTILS_DIR = $(LIBS_DIR)/sdbutils
+export LIBSDBUTILS_DIR
+# Our submodules and third-party codes
+LIBBSMP_DIR = $(FOREIGN_DIR)/libbsmp
+export LIBBSMP_DIR
+PCIE_DRIVER_DIR = $(FOREIGN_DIR)/pcie-driver
+export PCIE_DRIVER_DIR
 
 # General C/CPP flags
 CFLAGS_USR = -std=gnu99 -O2
@@ -186,6 +224,9 @@ CFLAGS_DEBUG += -g
 CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM = -Wl,-T,$(LD_SCRIPT)
 
+# Install halcsd LDCONFIG files
+LDCONF = ldconf
+
 # Libraries
 LIBS = -lm -lzmq -lczmq -lmlm
 
@@ -199,39 +240,61 @@ PROJECT_LIBS = -lerrhand -lconvc -lhutils -ldisptable -lllio -lhalcsclient \
 			   -lpthread
 
 # General library flags -L<libdir>
-LFLAGS = -Lforeign/libsdbfs
+LFLAGS = -L$(LIBSDBFS_DIR) \
+	     -L$(LIBBSMP_DIR) \
+	     -L$(PCIE_DRIVER_DIR)/lib/pcie
+
+LFLAGS += -L$(LIBERRHAND_DIR) \
+	      -L$(LIBCONVC_DIR) \
+	      -L$(LIBHUTILS_DIR) \
+	      -L$(LIBDISPTABLE_DIR) \
+	      -L$(LIBLLIO_DIR) \
+	      -L$(LIBHALCSCLIENT_DIR) \
+	      -L$(LIBACQCLIENT_DIR) \
+	      -L$(LIBBPMCLIENT_DIR) \
+	      -L$(LIBSDBUTILS_DIR)
 
 # Specific platform objects
 OBJS_PLATFORM =
 
-# Source directory
-SRC_DIR = .
-
 # Prepare "apps" include
-APPS_MKS = $(foreach mk,$(APPS),apps/$(mk)/$(mk).mk)
+APPS_MKS = $(foreach mk,$(APPS),$(SRC_DIR)/apps/$(mk)/$(mk).mk)
 
 # Include other Makefiles as needed here
-include $(SRC_DIR)/core/sm_io/sm_io.mk
-include $(SRC_DIR)/core/sm_io_table/sm_io_table.mk
-include $(SRC_DIR)/core/dev_mngr/dev_mngr.mk
-include $(SRC_DIR)/core/dev_io/dev_io.mk
-include $(SRC_DIR)/core/msg/msg.mk
-include $(SRC_DIR)/core/revision/revision.mk
-include $(SRC_DIR)/core/boards/$(BOARD)/board.mk
-include $(SRC_DIR)/core/boards/common/common.mk
+include $(SRC_DIR)/sm_io/sm_io.mk
+include $(SRC_DIR)/sm_io_table/sm_io_table.mk
+include $(SRC_DIR)/dev_mngr/dev_mngr.mk
+include $(SRC_DIR)/dev_io/dev_io.mk
+include $(SRC_DIR)/msg/msg.mk
+include $(SRC_DIR)/revision/revision.mk
+include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
+include $(LDCONF_DIR)/ldconf.mk
 
 # Project boards
-boards_INCLUDE_DIRS = -Icommon/include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
+
+# We need this until we merge smio and smio_table modules
+# together
+smio_table_DIRS = $(shell find $(SRC_DIR)/sm_io_table/modules -type d -print)
+smio_table_INCLUDE_DIRS = $(addprefix -I, $(smio_table_DIRS))
 
 # Include directories
 INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	       -Icore/common/include \
-	       -Icore/revision/include \
-	       -Icore/sm_io/include \
-	       -Icore/sm_io_table/include \
-	       -Iforeign/libsdbfs/include \
-	       -Ilibs/llio/include \
+	        $(smio_table_INCLUDE_DIRS) \
+	       -Iinclude \
+	       -I$(LIBBSMP_DIR)/include \
+	       -I$(LIBSDBFS_DIR)/include \
+           -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBCONVC_DIR)/include \
+	       -I$(LIBHUTILS_DIR)/include \
+	       -I$(LIBDISPTABLE_DIR)/include \
+	       -I$(LIBLLIO_DIR)/include \
+	       -I$(LIBHALCSCLIENT_DIR)/include \
+	       -I$(LIBACQCLIENT_DIR)/include \
+	       -I$(LIBBPMCLIENT_DIR)/include \
+	       -I$(LIBSDBUTILS_DIR)/include \
 	       -I${PREFIX}/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
@@ -260,7 +323,9 @@ common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
-apps_SCRIPTS = $(foreach app,$(APPS),$($(app)_SCRIPTS))
+apps_ETC_SCRIPTS = $(foreach app,$(APPS),$($(app)_ETC_SCRIPTS))
+apps_SHARE_SCRIPTS = $(foreach app,$(APPS),$($(app)_SHARE_SCRIPTS))
+ldconfig_ETC_SCRIPTS = $(foreach ldconf,$(LDCONF),$($(ldconf)_ETC_SCRIPTS))
 
 .SECONDEXPANSION:
 
@@ -305,7 +370,7 @@ revision_SRCS = $(patsubst %.o,%.c,$(revision_OBJS))
 .SECONDARY: $(OBJS_all)
 
 # Makefile rules
-all: $(OUT)
+all: deps libs $(OUT)
 
 # Output Rule
 $(OUT): $$($$@_OBJS) $(common_app_OBJS) $(revision_OBJS)
@@ -591,6 +656,7 @@ deps_clean: libbsmp_clean lib_pcie_driver_clean
 deps_mrproper: libbsmp_mrproper lib_pcie_driver_mrproper
 
 core_install:
+	mkdir -p ${PREFIX}/bin
 	$(foreach core_bin,$(OUT),install -m 755 $(core_bin) ${PREFIX}/bin $(CMDSEP))
 
 core_uninstall:
@@ -603,19 +669,17 @@ core_mrproper:
 	rm -f $(ALL_OUT)
 
 scripts_install:
-	$(foreach app_script,$(apps_SCRIPTS),mkdir -p $(dir ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
-	$(foreach app_script,$(apps_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} install
+	$(foreach app_script,$(apps_ETC_SCRIPTS),mkdir -p $(dir ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),mkdir -p $(dir ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),cp --preserve=mode $(subst :,,$(app_script)) ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconf_ETC_SCRIPTS),mkdir -p $(dir ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:)) $(CMDSEP))
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),cp --preserve=mode $(subst :,,$(ldconf_script)) ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
 
 scripts_uninstall:
-	$(foreach app_script,$(apps_SCRIPTS),rm -f ${SCRIPTS_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
-	$(MAKE) -C scripts SCRIPTS_PREFIX=${SCRIPTS_PREFIX} uninstall
-
-scripts_clean:
-	$(MAKE) -C scripts clean
-
-scripts_mrproper:
-	$(MAKE) -C scripts mrproper
+	$(foreach ldconf_script,$(ldconfig_ETC_SCRIPTS),rm -f ${LDCONF_PREFIX}/$(shell echo $(ldconf_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_SHARE_SCRIPTS),rm -f ${SCRIPTS_SHARE_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
+	$(foreach app_script,$(apps_ETC_SCRIPTS),rm -f ${SCRIPTS_ETC_PREFIX}/$(shell echo $(app_script) | cut -f2 -d:) $(CMDSEP))
 
 tests:
 	$(MAKE) -C tests all
@@ -651,9 +715,8 @@ uninstall: core_uninstall deps_uninstall liberrhand_uninstall libconvc_uninstall
 clean: core_clean deps_clean liberrhand_clean libconvc_clean libsdbutils_clean \
     libhutils_clean libdisptable_clean libllio_clean libhalcsclient_clean \
     libacqclient_clean libbpmclient_clean examples_clean tests_clean \
-    scripts_clean
 
 mrproper: clean core_mrproper deps_mrproper liberrhand_mrproper libconvc_mrproper \
     libsdbutils_mrproper libhutils_mrproper libdisptable_mrproper libllio_mrproper \
     libhalcsclient_mrproper libacqclient_mrproper libbpmclient_mrproper \
-    examples_mrproper tests_mrproper scripts_mrproper
+    examples_mrproper tests_mrproper

@@ -3,6 +3,6 @@
 # help debug
 set -x
 
-if [ -z "$GRADLE" ]; then
+if [ -n "$CMAKE" ] && [ "$SONARQUBE" == "yes" ] ; then
     sonar-scanner
 fi

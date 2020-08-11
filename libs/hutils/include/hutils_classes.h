@@ -9,7 +9,7 @@
 #define _HUTILS_CLASSES_H_
 
 /* Set up environment for the application */
-#include "convc_prelude.h"
+#include "hutils_prelude.h"
 
 /* External dependencies */
 #include <czmq.h>
@@ -17,9 +17,9 @@
 
 /* version macros for compile-time API detection */
 
-#define HUTILS_VERSION_MAJOR 1
-#define HUTILS_VERSION_MINOR 5
-#define HUTILS_VERSION_PATCH 0
+#define HUTILS_VERSION_MAJOR 2
+#define HUTILS_VERSION_MINOR 1
+#define HUTILS_VERSION_PATCH 1
 
 #define HUTILS_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

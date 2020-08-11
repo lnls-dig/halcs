@@ -11,10 +11,12 @@ OBJCOPY ?=	$(CROSS_COMPILE)objcopy
 SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 
+TOP ?= ../..
+
 PWD = 		$(shell pwd)
 
 # Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= ml605
+BOARD ?= afcv3_1
 
 LIBNAME_RAW = acqclient
 LIBNAME = lib$(LIBNAME_RAW)
@@ -85,15 +87,15 @@ LIBS =
 LFLAGS =
 
 # Source directory
-SRC_DIR = src/acqclient/c
+SRC_DIR = src
 # Include directory
 INCLUDE_DIR = include
 
-SMIO_DIR = ../../core/sm_io
-SMIO_SRC_DIR = $(SMIO_DIR)/src/sm_io/c
+SMIO_DIR = $(TOP)/src/sm_io
+SMIO_SRC_DIR = $(SMIO_DIR)
 
-SMIO_TABLE_DIR = ../../core/sm_io_table
-SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)/src/sm_io_table/c
+SMIO_TABLE_DIR = $(TOP)/src/sm_io_table
+SMIO_TABLE_SRC_DIR = $(SMIO_TABLE_DIR)
 
 # Specific board objects
 OBJS_BOARD =
@@ -104,42 +106,59 @@ OBJS_PLATFORM =
 OBJS_EXTERNAL =
 
 # Project boards
-boards_INCLUDE_DIRS = -I../../../include/boards/$(BOARD)
+boards_INCLUDE_DIRS = -I$(TOP)/include/boards/$(BOARD)
 
 # Include directories
 INCLUDE_DIRS = -I. -Iinclude \
 	       $(boards_INCLUDE_DIRS) \
-	       -I../../../include \
-		   -I../../core/common/include \
-		   -I$(SMIO_DIR)/include \
+	       -I$(TOP)/include \
+	       -I$(SMIO_DIR) \
 	       -I$(SMIO_SRC_DIR)/modules \
 	       -I$(SMIO_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_SRC_DIR)/modules/fmc250m_4ch \
+	       -I$(SMIO_SRC_DIR)/modules/fmc100m_4ch \
+	       -I$(SMIO_SRC_DIR)/modules/fmcpico1m_4ch \
 	       -I$(SMIO_SRC_DIR)/modules/fmc_adc_common \
 	       -I$(SMIO_SRC_DIR)/modules/fmc_active_clk \
 	       -I$(SMIO_SRC_DIR)/modules/acq \
 	       -I$(SMIO_SRC_DIR)/modules/swap \
 	       -I$(SMIO_SRC_DIR)/modules/dsp \
 	       -I$(SMIO_SRC_DIR)/modules/rffe \
+	       -I$(SMIO_SRC_DIR)/modules/rffe_scpi \
 	       -I$(SMIO_SRC_DIR)/modules/afc_diag \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_SRC_DIR)/modules/afc_timing \
-		   -I$(SMIO_TABLE_DIR)/include \
+	       -I$(SMIO_SRC_DIR)/modules/acq_pm \
+	       -I$(SMIO_SRC_DIR)/modules/init \
+	       -I$(SMIO_SRC_DIR)/modules/afc_mgmt \
+	       -I$(SMIO_SRC_DIR)/modules/tim_rcv \
+	       -I$(SMIO_TABLE_DIR) \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc250m_4ch \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc100m_4ch \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmcpico1m_4ch \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc_adc_common \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc_active_clk \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/acq \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/swap \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/dsp \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/rffe \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/rffe_scpi \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_diag \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_iface \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_timing \
-	       -I${PREFIX}/include
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/acq_pm \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/init \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv \
+	       -I${PREFIX}/include \
+	       -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBHUTILS_DIR)/include \
+	       -I$(LIBDISPTABLE_DIR)/include \
+	       -I$(LIBHALCSCLIENT_DIR)/include
 
 # Merge all flags. We expect tghese variables to be appended to the possible
 # command-line options
@@ -160,39 +179,53 @@ common_OBJS = $(OBJS_BOARD) $(OBJS_PLATFORM) $(OBJS_EXTERNAL)
 # Objects for each version of library
 $(LIBNAME)_OBJS = $(common_OBJS) $($(LIBNAME)_OBJS_LIB)
 $(LIBNAME)_CODE_HEADERS = \
-	../../core/common/include/acq_chan_gen_defs.h
+	$(TOP)/include/acq_chan_gen_defs.h
 
-$(LIBNAME)_SMIO_CODES = $(SMIO_DIR)/include/sm_io_fmc130m_4ch_codes.h \
-	$(SMIO_DIR)/include/sm_io_fmc250m_4ch_codes.h \
-	$(SMIO_DIR)/include/sm_io_fmc_adc_common_codes.h \
-	$(SMIO_DIR)/include/sm_io_fmc_active_clk_codes.h \
-	$(SMIO_DIR)/include/sm_io_acq_codes.h \
-	$(SMIO_DIR)/include/sm_io_dsp_codes.h \
-	$(SMIO_DIR)/include/sm_io_swap_codes.h \
-	$(SMIO_DIR)/include/sm_io_rffe_codes.h \
-	$(SMIO_DIR)/include/sm_io_afc_diag_codes.h \
-	$(SMIO_DIR)/include/sm_io_trigger_iface_codes.h \
-	$(SMIO_DIR)/include/sm_io_trigger_mux_codes.h \
-	$(SMIO_DIR)/include/sm_io_afc_timing_codes.h \
-	$(SMIO_DIR)/include/sm_io_codes.h
+$(LIBNAME)_SMIO_CODES = \
+	$(SMIO_SRC_DIR)/modules/fmc130m_4ch/sm_io_fmc130m_4ch_codes.h \
+	$(SMIO_SRC_DIR)/modules/fmc250m_4ch/sm_io_fmc250m_4ch_codes.h \
+	$(SMIO_SRC_DIR)/modules/fmc100m_4ch/sm_io_fmc100m_4ch_codes.h \
+	$(SMIO_SRC_DIR)/modules/fmcpico1m_4ch/sm_io_fmcpico1m_4ch_codes.h \
+	$(SMIO_SRC_DIR)/modules/fmc_adc_common/sm_io_fmc_adc_common_codes.h \
+	$(SMIO_SRC_DIR)/modules/fmc_active_clk/sm_io_fmc_active_clk_codes.h \
+	$(SMIO_SRC_DIR)/modules/acq/sm_io_acq_codes.h \
+	$(SMIO_SRC_DIR)/modules/dsp/sm_io_dsp_codes.h \
+	$(SMIO_SRC_DIR)/modules/swap/sm_io_swap_codes.h \
+	$(SMIO_SRC_DIR)/modules/rffe/sm_io_rffe_codes.h \
+	$(SMIO_SRC_DIR)/modules/afc_diag/sm_io_afc_diag_codes.h \
+	$(SMIO_SRC_DIR)/modules/trigger_iface/sm_io_trigger_iface_codes.h \
+	$(SMIO_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_codes.h \
+	$(SMIO_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_codes.h \
+	$(SMIO_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_codes.h \
+	$(SMIO_SRC_DIR)/modules/init/sm_io_init_codes.h \
+	$(SMIO_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_codes.h \
+	$(SMIO_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_codes.h \
+	$(SMIO_TABLE_DIR)/sm_io_codes.h
 
-$(LIBNAME)_SMIO_EXPORTS = $(SMIO_TABLE_DIR)/include/sm_io_fmc130m_4ch_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_fmc250m_4ch_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_fmc_adc_common_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_fmc_active_clk_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_acq_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_dsp_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_swap_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_rffe_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_afc_diag_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_trigger_iface_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_trigger_mux_exports.h \
-	$(SMIO_TABLE_DIR)/include/sm_io_afc_timing_exports.h
+$(LIBNAME)_SMIO_EXPORTS = \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmc250m_4ch/sm_io_fmc250m_4ch_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmc100m_4ch/sm_io_fmc100m_4ch_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmcpico1m_4ch/sm_io_fmcpico1m_4ch_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmc_adc_common/sm_io_fmc_adc_common_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/fmc_active_clk/sm_io_fmc_active_clk_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/acq/sm_io_acq_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/dsp/sm_io_dsp_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/swap/sm_io_swap_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/rffe/sm_io_rffe_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/afc_diag/sm_io_afc_diag_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/trigger_iface/sm_io_trigger_iface_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/trigger_mux/sm_io_trigger_mux_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/afc_timing/sm_io_afc_timing_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/init/sm_io_init_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
 $(LIBNAME)_ACQ_HEADERS = \
-	../../core/common/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
+	$(TOP)/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 $(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
 
 # Copy non-standard headers
@@ -303,11 +336,11 @@ pre_clean:
 		rm -f $(header) $(CMDSEP))
 
 install: all
-	$(foreach lib,$(TARGET_SHARED_VER),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach lib,$(TARGET_SHARED_VER),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib) $(CMDSEP))
 	$(foreach lib,$(TARGET_SHARED),ln -sf $(lib).$(LIB_VER) $(PREFIX)/lib/$(lib).$(LIB_VER_MAJOR) $(CMDSEP))
-	$(foreach lib,$(TARGET_STATIC),install -m 755 $(lib) $(PREFIX)/lib $(CMDSEP))
-	$(foreach header,$($(LIBNAME)_INST_HEADERS),install -m 755 $(header) $(PREFIX)/include $(CMDSEP))
+	$(foreach lib,$(TARGET_STATIC),install -m 644 $(lib) $(PREFIX)/lib $(CMDSEP))
+	$(foreach header,$($(LIBNAME)_INST_HEADERS),install -m 644 $(header) $(PREFIX)/include $(CMDSEP))
 
 uninstall:
 	$(foreach lib,$(TARGET_SHARED),rm -f $(PREFIX)/lib/$(lib).$(LIB_VER) $(CMDSEP))

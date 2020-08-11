@@ -1,0 +1,11 @@
+# Permissions for the fpga devices
+
+KERNEL=="fpga*", ACTION=="add", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/share/halcs/scripts/get-fpga-gateware-properties.sh -i %k", SYMLINK+="fpga/%c{2}", RUN+="/usr/local/share/halcs/scripts/run-fpga-program.sh %c{1+}"
+
+# We can't run get-fpga-gateware-properties.sh on "remove" action, as this happens
+# after the fpga* structure is removed, so we won't be able to access the device at
+# this point.
+#
+# Instead, we can just stop the corresponding halcs instance, as all of the
+# dependent systemd units will be removed appropriately.
+KERNEL=="fpga*", ACTION=="remove", PROGRAM="/usr/local/share/halcs/scripts/generate-dev-idx.sh %k", RUN+="/usr/local/share/halcs/scripts/stop-fpga-program.sh %c{1+}"

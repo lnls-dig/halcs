@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
-VALID_APPS_STR="Valid values are: \"halcsd\"."
+VALID_APPS_STR="Valid values are: \"halcsd\", \"halcs_generic_udev\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
@@ -14,6 +14,7 @@ function usage() {
 }
 
 LIBSDIR="libs"
+SRCDIR="src"
 
 #######################################
 # All of our Makefile options
@@ -146,8 +147,8 @@ WITH_APP_CFG=n
 # Install HALCS only if requested
 if [ "$WITH_HALCS" = "yes" ]; then
     COMMAND_DEPS="\
-        make ${EXTRA_FLAGS} deps && \
-        make ${EXTRA_FLAGS} deps_install"
+        make ${EXTRA_FLAGS} deps \
+        && sudo make ${EXTRA_FLAGS} deps_install"
 
     COMMAND_LIBS="\
         make \
@@ -156,14 +157,21 @@ if [ "$WITH_HALCS" = "yes" ]; then
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
         ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
-        LOCAL_MSG_DBG=${LOCAL_MSG_DBG}  \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        && sudo make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
         libs_compile_install"
 
     COMMAND_CORE="\
         make \
         ${EXTRA_FLAGS} \
         BOARD=${BOARD} \
-        APPS=${APPS} \
+        APPS='"${APPS}"' \
         SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
@@ -173,10 +181,22 @@ if [ "$WITH_HALCS" = "yes" ]; then
         FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
         WITH_DEV_MNGR=${WITH_DEV_MNGR} \
         AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
-        WITH_APP_CFG=${WITH_APP_CFG} && \
-        make \
         WITH_APP_CFG=${WITH_APP_CFG} \
-        ${EXTRA_FLAGS} core_install"
+        && sudo make \
+        ${EXTRA_FLAGS} \
+        BOARD=${BOARD} \
+        APPS='"${APPS}"' \
+        SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
+        ERRHAND_DBG=${ERRHAND_DBG} \
+        ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
+        ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
+        LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
+        FMC130M_4CH_TYPE=${FMC130M_4CH_TYPE} \
+        FMC130M_4CH_EEPROM_PROGRAM=${FMC130M_4CH_EEPROM_PROGRAM} \
+        WITH_DEV_MNGR=${WITH_DEV_MNGR} \
+        AFE_RFFE_TYPE=${AFE_RFFE_TYPE} \
+        WITH_APP_CFG=${WITH_APP_CFG} \
+        core_install"
 
     if [ "$WITH_EXAMPLES" = "yes" ]; then
     COMMAND_EXAMPLES="\
@@ -194,8 +214,10 @@ fi
 if [ "$WITH_HALCS" = "yes" ]; then
     if [ "$WITH_SYSTEM_INTEGRATION" = "yes" ]; then
         COMMAND_SYSTEM_INTEGRATION="\
-            make scripts_install && \
-            ldconfig"
+            sudo make
+            APPS='"${APPS}"' \
+            scripts_install && \
+            sudo ldconfig"
     else
         COMMAND_SYSTEM_INTEGRATION=""
     fi
@@ -204,7 +226,7 @@ fi
 if [ "$WITH_DRIVER" = "yes" ]; then
     COMMAND_DRIVER="\
         make ${EXTRA_FLAGS} pcie_driver && \
-        make ${EXTRA_FLAGS} pcie_driver_install"
+        sudo make ${EXTRA_FLAGS} pcie_driver_install"
 else
     COMMAND_DRIVER=""
 fi
@@ -213,7 +235,7 @@ if [ "$WITH_HALCS" = "yes" ]; then
     # Meta target to remove copied headers
     COMMAND_CLEAN="make -C ${LIBSDIR}/acqclient pre_clean && \
         make -C ${LIBSDIR}/bpmclient pre_clean &&
-        make -C ${LIBSDIR}/halcsclient pre_clean"
+        make -C ${SRCDIR}/client pre_clean"
 else
     COMMAND_CLEAN=""
 fi

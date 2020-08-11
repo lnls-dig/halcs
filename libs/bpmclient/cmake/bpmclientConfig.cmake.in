@@ -1,0 +1,46 @@
+# bpmclient cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   bpmclient-static
+#   bpmclient
+#
+# This module sets the following variables in your project::
+#
+#   bpmclient_FOUND - true if bpmclient found on the system
+#   bpmclient_INCLUDE_DIRS - the directory containing bpmclient headers
+#   bpmclient_LIBRARIES -
+#   bpmclient_STATIC_LIBRARIES
+
+@PACKAGE_INIT@
+
+if(NOT TARGET bpmclient AND NOT TARGET bpmclient-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET bpmclient)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            bpmclient
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            bpmclient-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET bpmclient)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES bpmclient)
+    endif()
+    if (TARGET bpmclient-static)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES bpmclient-static)
+    endif()
+endif()
+
+check_required_components("@PROJECT_NAME@")

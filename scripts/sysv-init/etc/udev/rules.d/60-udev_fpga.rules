@@ -1,4 +1,0 @@
-# Permissions for the fpga devices
-
-ACTION=="add", KERNEL=="fpga*", OWNER="root", GROUP="users", MODE="660", PROGRAM="/usr/local/bin/eat-dashes.sh %k", SYMLINK+="fpga/%c", RUN+="/etc/init.d/halcs start %c"
-ACTION=="remove", KERNEL=="fpga*", PROGRAM="/usr/local/bin/eat-dashes.sh %k", RUN+="/etc/init.d/halcs stop %c"

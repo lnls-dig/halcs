@@ -1,0 +1,46 @@
+# disptable cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   disptable-static
+#   disptable
+#
+# This module sets the following variables in your project::
+#
+#   disptable_FOUND - true if disptable found on the system
+#   disptable_INCLUDE_DIRS - the directory containing disptable headers
+#   disptable_LIBRARIES -
+#   disptable_STATIC_LIBRARIES
+
+@PACKAGE_INIT@
+
+if(NOT TARGET disptable AND NOT TARGET disptable-static)
+    include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+    if (TARGET disptable)
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            disptable
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    else ()
+        get_target_property(@PROJECT_NAME@_INCLUDE_DIRS
+            disptable-static
+            INTERFACE_INCLUDE_DIRECTORIES
+        )
+    endif()
+
+    if (TARGET disptable)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES disptable)
+    endif()
+    if (TARGET disptable-static)
+        # Prefer target names as they container more properties that are
+        # inherited
+        set(@PROJECT_NAME@_LIBRARIES disptable-static)
+    endif()
+endif()
+
+check_required_components("@PROJECT_NAME@")
