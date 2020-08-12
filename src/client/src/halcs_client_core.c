@@ -1686,7 +1686,7 @@ halcs_client_err_e halcs_get_monit_stream (halcs_client_t *self,
 
     uint32_t *data_out = (uint32_t *) zframe_data (frame);
     memcpy (monit_data, data_out, sizeof (*monit_data));
-    
+
 err_msg_size:
     zframe_destroy (&frame);
 err_msg_alloc:
@@ -3232,4 +3232,234 @@ PARAM_FUNC_CLIENT_WRITE(dmtd_b_valid)
 PARAM_FUNC_CLIENT_READ(dmtd_b_valid)
 {
     return param_client_read (self, service, TIM_RCV_OPCODE_DMTD_B_VALID, dmtd_b_valid);
+}
+
+/**************** ORBIT INTLK SMIO Functions ****************/
+
+/* Orbit interlock enable */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_en)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_EN, orbit_intlk_en);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_en)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_EN, orbit_intlk_en);
+}
+
+/* Orbit interlock clear */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_clr)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_CLR, orbit_intlk_clr);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_clr)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_CLR, orbit_intlk_clr);
+}
+
+/* Orbit interlock minimum SUM to trigger interlock enable */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_min_sum_en)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM_EN, orbit_intlk_min_sum_en);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_min_sum_en)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM_EN, orbit_intlk_min_sum_en);
+}
+
+/* Orbit interlock translation enable */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_en)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_EN, orbit_intlk_trans_en);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_en)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_EN, orbit_intlk_trans_en);
+}
+
+/* Orbit interlock translation clear */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_clr)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_CLR, orbit_intlk_trans_clr);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_clr)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_CLR, orbit_intlk_trans_clr);
+}
+
+/* Orbit interlock angular enable */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_en)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_EN, orbit_intlk_ang_en);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_en)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_EN, orbit_intlk_ang_en);
+}
+
+/* Orbit interlock angular clear */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_clr)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_CLR, orbit_intlk_ang_clr);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_clr)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_CLR, orbit_intlk_ang_clr);
+}
+
+/* Orbit interlock translation trip X */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_X, orbit_intlk_trans_bigger_x);
+}
+
+/* Orbit interlock translation trip Y */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_Y, orbit_intlk_trans_bigger_y);
+}
+
+/* Orbit interlock translation trip X latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_ltc_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_LTC_X, orbit_intlk_trans_bigger_ltc_x);
+}
+
+/* Orbit interlock translation trip Y latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_ltc_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_LTC_Y, orbit_intlk_trans_bigger_ltc_y);
+}
+
+/* Orbit interlock translation any trip */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_any)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_ANY, orbit_intlk_trans_bigger_any);
+}
+
+/* Orbit interlock translation any trip masked with enabled */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER, orbit_intlk_trans_bigger);
+}
+
+/* Orbit interlock translation any trip masked with enabled latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_bigger_ltc)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_BIGGER_LTC, orbit_intlk_trans_bigger_ltc);
+}
+
+/* Orbit interlock angular trip X */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_X, orbit_intlk_ang_bigger_x);
+}
+
+/* Orbit interlock angular trip Y */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_Y, orbit_intlk_ang_bigger_y);
+}
+
+/* Orbit interlock angular trip X latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_ltc_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_LTC_X, orbit_intlk_ang_bigger_ltc_x);
+}
+
+/* Orbit interlock angular trip Y latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_ltc_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_LTC_Y, orbit_intlk_ang_bigger_ltc_y);
+}
+
+/* Orbit interlock angular any trip */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_any)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_ANY, orbit_intlk_ang_bigger_any);
+}
+
+/* Orbit interlock angular any trip masked with enabled */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER, orbit_intlk_ang_bigger);
+}
+
+/* Orbit interlock angular any trip masked with enabled latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_ltc)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_LTC, orbit_intlk_ang_bigger_ltc);
+}
+
+/* Orbit interlock trip */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_bigger)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER, orbit_intlk_bigger);
+}
+
+/* Orbit interlock trip latched */
+PARAM_FUNC_CLIENT_READ(orbit_intlk_bigger_ltc)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC, orbit_intlk_bigger_ltc);
+}
+
+/* Orbit interlock minium sum */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_min_sum)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM, orbit_intlk_min_sum);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_min_sum)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM, orbit_intlk_min_sum);
+}
+
+/* Orbit interlock translation max X */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_max_x)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_max_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
+}
+
+/* Orbit interlock translation max Y */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_max_y)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_max_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
+}
+
+/* Orbit interlock angular max X */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_max_x)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_max_x)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
+}
+
+/* Orbit interlock angular max Y */
+PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_max_y)
+{
+    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
+}
+
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_max_y)
+{
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
 }
