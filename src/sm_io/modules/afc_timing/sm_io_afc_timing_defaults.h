@@ -8,7 +8,6 @@
 #ifndef _AFC_TIMING_DEFAULTS_H_
 #define _AFC_TIMING_DEFAULTS_H_
 
-#define AFC_TIMING_DFLT_FREQ_SAMPLE_RATE_PRESCALE                        0x989680
 #define AFC_TIMING_DFLT_RTM_RFREQ_HI                                     0x3017
 #define AFC_TIMING_DFLT_RTM_RFREQ_LO                                     0xa66ad
 #define AFC_TIMING_DFLT_RTM_N1                                           0x3

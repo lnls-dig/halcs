@@ -2666,15 +2666,6 @@ PARAM_FUNC_CLIENT_READ_MOD(afc_timing, alive)
     return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_ALIVE, alive);
 }
 
-PARAM_FUNC_CLIENT_WRITE_MOD(afc_timing, freq_sample_rate_prescale)
-{
-    return param_client_write (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE, freq_sample_rate_prescale);
-}
-PARAM_FUNC_CLIENT_READ_MOD(afc_timing, freq_sample_rate_prescale)
-{
-    return param_client_read (self, service, AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE, freq_sample_rate_prescale);
-}
-
 // AMC channels
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_en, chan, amc_en)
 {
@@ -2730,6 +2721,15 @@ PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_amc_dir, chan, amc_dir)
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_DIR, chan, amc_dir);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_count_rst, chan, amc_count_rst)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_COUNT_RST, chan, amc_count_rst);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_amc_count_rst, chan, amc_count_rst)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_COUNT_RST, chan, amc_count_rst);
+}
+
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_pulses, chan, amc_pulses)
 {
     return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES, chan, amc_pulses);
@@ -2737,6 +2737,15 @@ PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_pulses, chan, amc_pulses)
 PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_amc_pulses, chan, amc_pulses)
 {
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_PULSES, chan, amc_pulses);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_count, chan, amc_count)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_COUNT, chan, amc_count);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_amc_count, chan, amc_count)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_AMC_COUNT, chan, amc_count);
 }
 
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_amc_evt, chan, amc_evt)
@@ -2821,6 +2830,15 @@ PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc1_dir, chan, fmc1_dir)
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_DIR, chan, fmc1_dir);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc1_count_rst, chan, fmc1_count_rst)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT_RST, chan, fmc1_count_rst);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc1_count_rst, chan, fmc1_count_rst)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT_RST, chan, fmc1_count_rst);
+}
+
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc1_pulses, chan, fmc1_pulses)
 {
     return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES, chan, fmc1_pulses);
@@ -2828,6 +2846,15 @@ PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc1_pulses, chan, fmc1_pulses)
 PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc1_pulses, chan, fmc1_pulses)
 {
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES, chan, fmc1_pulses);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc1_count, chan, fmc1_count)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT, chan, fmc1_count);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc1_count, chan, fmc1_count)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT, chan, fmc1_count);
 }
 
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc1_evt, chan, fmc1_evt)
@@ -2912,6 +2939,15 @@ PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc2_dir, chan, fmc2_dir)
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_DIR, chan, fmc2_dir);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc2_count_rst, chan, fmc2_count_rst)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT_RST, chan, fmc2_count_rst);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc2_count_rst, chan, fmc2_count_rst)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT_RST, chan, fmc2_count_rst);
+}
+
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc2_pulses, chan, fmc2_pulses)
 {
     return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES, chan, fmc2_pulses);
@@ -2919,6 +2955,15 @@ PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc2_pulses, chan, fmc2_pulses)
 PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc2_pulses, chan, fmc2_pulses)
 {
     return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES, chan, fmc2_pulses);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc2_count, chan, fmc2_count)
+{
+    return param_client_write2 (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT, chan, fmc2_count);
+}
+PARAM_FUNC_CLIENT_WRITE_READ(afc_timing_fmc2_count, chan, fmc2_count)
+{
+    return param_client_write_read (self, service, AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT, chan, fmc2_count);
 }
 
 PARAM_FUNC_CLIENT_WRITE2(afc_timing_fmc2_evt, chan, fmc2_evt)

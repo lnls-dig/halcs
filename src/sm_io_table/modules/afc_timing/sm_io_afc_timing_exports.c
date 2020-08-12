@@ -70,18 +70,6 @@ disp_op_t afc_timing_set_get_alive_exp = {
     }
 };
 
-disp_op_t afc_timing_set_get_freq_sample_rate_prescale_exp = {
-    .name = AFC_TIMING_NAME_SET_GET_FREQ_SAMPLE_RATE_PRESCALE,
-    .opcode = AFC_TIMING_OPCODE_SET_GET_FREQ_SAMPLE_RATE_PRESCALE,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
 disp_op_t afc_timing_set_get_amc_en_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_EN,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_EN,
@@ -160,9 +148,35 @@ disp_op_t afc_timing_set_get_amc_dir_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_amc_count_rst_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_COUNT_RST,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_COUNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_amc_pulses_exp = {
     .name = AFC_TIMING_NAME_SET_GET_AMC_PULSES,
     .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_PULSES,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_amc_count_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_AMC_COUNT,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_AMC_COUNT,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -290,9 +304,35 @@ disp_op_t afc_timing_set_get_fmc1_dir_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_fmc1_count_rst_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_FMC1_COUNT_RST,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_fmc1_pulses_exp = {
     .name = AFC_TIMING_NAME_SET_GET_FMC1_PULSES,
     .opcode = AFC_TIMING_OPCODE_SET_GET_FMC1_PULSES,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_fmc1_count_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_FMC1_COUNT,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -420,9 +460,35 @@ disp_op_t afc_timing_set_get_fmc2_dir_exp = {
     }
 };
 
+disp_op_t afc_timing_set_get_fmc2_count_rst_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_FMC2_COUNT_RST,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT_RST,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t afc_timing_set_get_fmc2_pulses_exp = {
     .name = AFC_TIMING_NAME_SET_GET_FMC2_PULSES,
     .opcode = AFC_TIMING_OPCODE_SET_GET_FMC2_PULSES,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t afc_timing_set_get_fmc2_count_exp = {
+    .name = AFC_TIMING_NAME_SET_GET_FMC2_COUNT,
+    .opcode = AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -719,14 +785,15 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_ref_clk_locked_exp,
   &afc_timing_set_get_evren_exp,
   &afc_timing_set_get_alive_exp,
-  &afc_timing_set_get_freq_sample_rate_prescale_exp,
   &afc_timing_set_get_amc_en_exp,
   &afc_timing_set_get_amc_pol_exp,
   &afc_timing_set_get_amc_log_exp,
   &afc_timing_set_get_amc_itl_exp,
   &afc_timing_set_get_amc_src_exp,
   &afc_timing_set_get_amc_dir_exp,
+  &afc_timing_set_get_amc_count_rst_exp,
   &afc_timing_set_get_amc_pulses_exp,
+  &afc_timing_set_get_amc_count_exp,
   &afc_timing_set_get_amc_evt_exp,
   &afc_timing_set_get_amc_dly_exp,
   &afc_timing_set_get_amc_wdt_exp,
@@ -736,7 +803,9 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_fmc1_itl_exp,
   &afc_timing_set_get_fmc1_src_exp,
   &afc_timing_set_get_fmc1_dir_exp,
+  &afc_timing_set_get_fmc1_count_rst_exp,
   &afc_timing_set_get_fmc1_pulses_exp,
+  &afc_timing_set_get_fmc1_count_exp,
   &afc_timing_set_get_fmc1_evt_exp,
   &afc_timing_set_get_fmc1_dly_exp,
   &afc_timing_set_get_fmc1_wdt_exp,
@@ -746,7 +815,9 @@ const disp_op_t *afc_timing_exp_ops [] = {
   &afc_timing_set_get_fmc2_itl_exp,
   &afc_timing_set_get_fmc2_src_exp,
   &afc_timing_set_get_fmc2_dir_exp,
+  &afc_timing_set_get_fmc2_count_rst_exp,
   &afc_timing_set_get_fmc2_pulses_exp,
+  &afc_timing_set_get_fmc2_count_exp,
   &afc_timing_set_get_fmc2_evt_exp,
   &afc_timing_set_get_fmc2_dly_exp,
   &afc_timing_set_get_fmc2_wdt_exp,
