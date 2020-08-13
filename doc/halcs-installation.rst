@@ -44,8 +44,8 @@ follow the same naming convention.
 About the source code
 ---------------------
 
-Build from sources
-''''''''''''''''''
+Introduction
+''''''''''''
 
 The HALCS software makes use of two build systems: ``make`` [#make]_
 and ``cmake`` [#cmake]_. Both of them should produce the same binaries, but
@@ -87,6 +87,9 @@ mlm |malamute-version|
 .. |Libzmq Repository| replace:: https://github.com/zeromq/libzmq/tree/|libzmq-version|
 .. |Libczmq Repository| replace:: https://github.com/zeromq/czmq/tree/|libczmq-version|
 .. |Malamute Repository| replace:: https://github.com/lnls-dig/malamute/tree/|malamute-version|
+
+Installing dependencies
+'''''''''''''''''''''''
 
 In order to install them with versions that are known to be compatible use the
 following snippet:
@@ -168,10 +171,13 @@ at your distribution. As all of them use semantic versioning, you can install an
 version that is greater or equal than the specified ones for *minor* and *revision*:
 numbers.
 
+Installing HALCS server
+'''''''''''''''''''''''
+
 Using CMake Build System
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another way to build the source code is to use ``cmake``:
+The recommended way to build the source code is to use ``cmake``:
 
 1. Install ``make`` and ``gcc``:
 
@@ -400,6 +406,130 @@ The full procedure would be:
   git clone --recursive https://github.com/lnls-dig/halcs && \
   cd halcs && \
   ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
+
+Installing HALCS client
+'''''''''''''''''''''''
+
+Using CMake Build System
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The recommended way to build the client libraries is to use ``cmake``:
+
+Build and install libraries:
+
+.. code-block:: bash
+  :linenos:
+
+  TOP=$(pwd)
+  for lib in \
+      errhand \
+      convc \
+      hutils \
+      disptable \
+      llio \
+      halcsclient \
+      acqclient \
+      bpmclient \
+      sdbfs \
+      sdbutils; do
+
+      (
+          cd ${TOP}/libs/${lib} && \
+          mkdir -p build && \
+          cd build && \
+          cmake ../ && \
+          make && \
+          sudo make install
+      )
+  done
+
+If you need to uninstall the libraries you can do with:
+
+.. code-block:: bash
+  :linenos:
+
+  TOP=$(pwd)
+  for lib in \
+      sdbutils \
+      sdbfs \
+      bpmclient \
+      acqclient \
+      halcsclient \
+      llio \
+      disptable \
+      hutils \
+      convc \
+      errhand; do
+
+      (
+          cd ${TOP}/libs/${lib} && \
+          mkdir -p build && \
+          cd build && \
+          cmake ../ && \
+          sudo make uninstall
+      )
+  done
+
+Using Make Build System
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to build the client libraries is to use ``make``:
+
+Build and install inner dependencies:
+
+.. code-block:: bash
+  :linenos:
+
+  make deps
+  sudo make deps_install
+
+And, then the client libraries themselves:
+
+.. code-block:: bash
+  :linenos:
+
+  make libs
+  sudo make libs_install
+
+If you need to uninstall the libraries do:
+
+.. code-block:: bash
+  :linenos:
+
+  sudo make libs_uninstall
+
+Installing HALCS examples
+'''''''''''''''''''''''''
+
+Change to the examples folder:
+
+.. code-block:: bash
+  :linenos:
+
+  cd examples
+
+Using CMake Build System
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The recommended way to build the examples is to use ``cmake``:
+
+.. code-block:: bash
+  :linenos:
+
+  mkdir -p build
+  cd build
+  cmake ../
+  make
+
+Using Make Build System
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Another way to build the examples is to use ``make``:
+
+.. code-block:: bash
+  :linenos:
+
+  make
 
 UDEV scripts
 ''''''''''''
