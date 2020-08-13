@@ -534,11 +534,11 @@ Another way to build the examples is to use ``make``:
 UDEV scripts
 ''''''''''''
 
-HALCS includes two udev scripts, a generic one that sets the device permissions
-to the appropriate ones (called ``60-udev-fpga-rules``) and customized udev script,
-in which you can automatically start a userspace application if a certain condition
-is detected (called ``50-udev-fpga-rules``). If this, an application will
-automatically start a given program when some ID is detected.
+HALCS includes three udev scripts, two generic one that sets the device permissions
+to the appropriate ones (called ``60-udev-fpga-rules`` and ``80-udev-fpga-rules``)
+and another customized udev script, in which you can automatically start a userspace
+application if a certain condition is detected (called ``81-udev-fpga-rules``). If this,
+an application will automatically start a given program when some ID is detected.
 
 Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
 ``synthesis-name`` that is baked inside the FPGA Gateware.
@@ -608,7 +608,6 @@ modification to allow starting another program:
   done
 
   ...
-
 
 Updating Dependencies
 '''''''''''''''''''''
