@@ -168,84 +168,6 @@ at your distribution. As all of them use semantic versioning, you can install an
 version that is greater or equal than the specified ones for *minor* and *revision*:
 numbers.
 
-UDEV scripts
-''''''''''''
-
-HALCS includes two udev scripts, a generic one that sets the device permissions
-to the appropriate ones (called ``60-udev-fpga-rules``) and customized udev script,
-in which you can automatically start a userspace application if a certain condition
-is detected (called ``50-udev-fpga-rules``). If this, an application will
-automatically start a given program when some ID is detected.
-
-Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
-``synthesis-name`` that is baked inside the FPGA Gateware.
-
-.. [#sdb] |SDB Wiki|_
-
-.. _`SDB Wiki`: https://ohwr.org/project/fpga-config-space/wikis/home
-.. |SDB Wiki| replace:: https://ohwr.org/project/fpga-config-space/wikis/home
-
-To add your specific program to start when some ID is found, the ``run-fpga-program.sh``
-(typically installed in ``/usr/local/share/halcs`` or ``/usr/share/halcs``) script
-can be modified. Below, an excerpt of the script is shown with a possible
-modification to allow starting another program:
-
-.. code-block:: bash
-  :linenos:
-  :emphasize-lines: 38-40
-
-  ...
-
-  for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
-      prog_inst=$((i-1));
-      case "${GATEWARE_NAME}" in
-          bpm-gw*)
-              case "${FMC_NAMES[$prog_inst]}" in
-                  LNLS_FMC250M*)
-                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                      ;;
-                  LNLS_FMC130M*)
-                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-                      ;;
-                  *)
-                      echo "Unsupported Gateware Module: "${FPGA_FMC_NAME} >&2
-                      exit 1
-                      ;;
-              esac
-              ;;
-
-          tim-receiver*)
-              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-              ;;
-
-          afc-tim*)
-              # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
-              if [ $((prog_inst%2)) -eq 0 ]; then
-                  START_PROGRAM="/usr/bin/systemctl --no-block start tim-rx-ioc@${HALCS_IDXS[$prog_inst]}.service"
-              else
-                  START_PROGRAM=""
-              fi
-              ;;
-
-          pbpm-gw*)
-              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
-              ;;
-
-          <ADD YOU GATEWARE NAME HERE>*)
-              START_PROGRAM="<ADD YOUR START PROGRAM HERE>"
-              ;;
-
-          *)
-              echo "Invalid Gateware: "${GATEWARE_NAME} >&2
-              exit 2
-              ;;
-      esac
-
-      eval ${START_PROGRAM}
-  done
-
-  ...
-
 Using CMake Build System
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -347,6 +269,35 @@ All in all, the full script to install HALCS with ``cmake`` is:
   cmake ../
   make
   sudo make install
+
+Optionally you can build HALCS by creating a ``.deb`` or ``.rpm`` and
+install them. You can do that by following the instructions:
+
+For Debian-based distributions:
+
+.. code-block:: bash
+  :linenos:
+
+  git clone --recursive https://github.com/lnls-dig/halcs && \
+  cd halcs && \
+  mkdir -p build
+  cd build
+  cmake ../
+  cpack -G "DEB"
+
+For Redhat-based distributions:
+
+.. code-block:: bash
+  :linenos:
+
+  git clone --recursive https://github.com/lnls-dig/halcs && \
+  cd halcs && \
+  mkdir -p build
+  cd build
+  cmake ../
+  cpack -G "RPM"
+
+Then, just proceed normally with installing the packages on your system.
 
 Using Make Build System
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -450,8 +401,87 @@ The full procedure would be:
   cd halcs && \
   ./compile.sh -b afcv3_1 -a halcsd -e yes -l yes -d yes
 
+UDEV scripts
+''''''''''''
+
+HALCS includes two udev scripts, a generic one that sets the device permissions
+to the appropriate ones (called ``60-udev-fpga-rules``) and customized udev script,
+in which you can automatically start a userspace application if a certain condition
+is detected (called ``50-udev-fpga-rules``). If this, an application will
+automatically start a given program when some ID is detected.
+
+Typically the ID used is the *Gateware Name* represented by the SDB [#sdb]_ property
+``synthesis-name`` that is baked inside the FPGA Gateware.
+
+.. [#sdb] |SDB Wiki|_
+
+.. _`SDB Wiki`: https://ohwr.org/project/fpga-config-space/wikis/home
+.. |SDB Wiki| replace:: https://ohwr.org/project/fpga-config-space/wikis/home
+
+To add your specific program to start when some ID is found, the ``run-fpga-program.sh``
+(typically installed in ``/usr/local/share/halcs`` or ``/usr/share/halcs``) script
+can be modified. Below, an excerpt of the script is shown with a possible
+modification to allow starting another program:
+
+.. code-block:: bash
+  :linenos:
+  :emphasize-lines: 38-40
+
+  ...
+
+  for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
+      prog_inst=$((i-1));
+      case "${GATEWARE_NAME}" in
+          bpm-gw*)
+              case "${FMC_NAMES[$prog_inst]}" in
+                  LNLS_FMC250M*)
+                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                      ;;
+                  LNLS_FMC130M*)
+                      START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                      ;;
+                  *)
+                      echo "Unsupported Gateware Module: "${FPGA_FMC_NAME} >&2
+                      exit 1
+                      ;;
+              esac
+              ;;
+
+          tim-receiver*)
+              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+              ;;
+
+          afc-tim*)
+              # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
+              if [ $((prog_inst%2)) -eq 0 ]; then
+                  START_PROGRAM="/usr/bin/systemctl --no-block start tim-rx-ioc@${HALCS_IDXS[$prog_inst]}.service"
+              else
+                  START_PROGRAM=""
+              fi
+              ;;
+
+          pbpm-gw*)
+              START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+              ;;
+
+          <ADD YOU GATEWARE NAME HERE>*)
+              START_PROGRAM="<ADD YOUR START PROGRAM HERE>"
+              ;;
+
+          *)
+              echo "Invalid Gateware: "${GATEWARE_NAME} >&2
+              exit 2
+              ;;
+      esac
+
+      eval ${START_PROGRAM}
+  done
+
+  ...
+
+
 Updating Dependencies
-~~~~~~~~~~~~~~~~~~~~~
+'''''''''''''''''''''
 
 If you already have dependencies installed and wish to remote update to a
 specific release you can run the following snippet. Be advised that you
@@ -553,7 +583,7 @@ would need to change the repository locations to match your environment:
   done
 
 Updating HALCS
-~~~~~~~~~~~~~~
+''''''''''''''
 
 If you already have the software installed and wish to remote update to the
 latest release you can run the following snippet. Be advised that this is just
