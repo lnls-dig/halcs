@@ -13,7 +13,7 @@ Software for creating controlling daemons for devices
 
 https://lnls-dig.github.io/halcs
 
-## Prerequisites:
+## Prerequisites
 
 Make sure you have the following libraries installed, either by download
 the binaries or executing the instructions below:
@@ -23,7 +23,7 @@ the binaries or executing the instructions below:
 * czmq-4.0.2 (https://github.com/zeromq/czmq/tree/v4.0.2)
 * mlm-1.6.1 (https://github.com/lnls-dig/malamute/tree/v1.6.1)
 
-## Optional libraries:
+## Optional libraries
 
 * uuid (distribution available):
 
