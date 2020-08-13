@@ -9,7 +9,9 @@
 
 Software for creating controlling daemons for devices
 
-Documentation: https://lnls-dig.github.io/halcs
+## Documentation
+
+https://lnls-dig.github.io/halcs
 
 ## Prerequisites:
 
