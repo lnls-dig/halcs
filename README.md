@@ -115,18 +115,56 @@ git clone --recursive https://github.com/lnls-dig/halcs.git
 
 ### Server
 
-Compile everything with debug info. The superuser access
-is necessary because it checks (and installs if needed)
-the PCIe kernel driver.
+To install the server-side you'll need `libsodium`, `zeromq`, `czmq` and `mlm`.
+Check the documentation or the previous section for details.
 
-If the PCIe driver is already installed, you could
-run it without superuser.
+Currently we support 2 build systems: Make and CMake. The recommended approach
+is to use CMake.
+
+#### CMake
+
+To use CMake do the following steps:
 
 ```bash
-make && sudo make install
+mkdir -p build
+cd build
+cmake ../
+make
+sudo make install
 ```
 
-or
+HALCS CMake scripts also supports CPack. So you can easilly generated
+`.deb` or `.rpm` packages for your distribution with:
+
+For Debian-based distros:
+
+```bash
+mkdir -p build
+cd build
+cmake ../
+cpack -G "DEB"
+```
+
+For Redhat-based distros:
+
+```bash
+mkdir -p build
+cd build
+cmake ../
+cpack -G "RPM"
+```
+
+#### Make
+
+To use Make do the following steps:
+
+```bash
+make
+sudo make install
+```
+
+Alternatively, you can use the `compile.sh` script that wraps
+the make options into command-line options:
 
 ```bash
 ./compile.sh [-b <board>] [-a <applications>] [-e <with examples = yes/no>] \
@@ -135,17 +173,145 @@ or
 
 ### Client
 
+To install the server-side you'll need `libsodium`, `zeromq` and `czmq`.
+Check the documentation or the previous section for details.
+
+#### CMake
+
+To use CMake do the following steps:
+
 ```bash
-make libhalcsclient && sudo libhalcsclient_install
+TOP=$(pwd)
+for lib in \
+    errhand \
+    convc \
+    hutils \
+    disptable \
+    llio \
+    halcsclient \
+    acqclient \
+    bpmclient \
+    sdbfs \
+    sdbutils; do
+
+    (
+        cd ${TOP}/libs/${lib} && \
+        mkdir -p build && \
+        cd build && \
+        cmake ../ && \
+        make && \
+        sudo make install
+    )
+done
+
 ```
 
-or
+If you need to uninstall the libraries do:
 
 ```bash
-cd libs/halcsclient && ./compile.sh [<board>]
+TOP=$(pwd)
+for lib in \
+    sdbutils \
+    sdbfs \
+    bpmclient \
+    acqclient \
+    halcsclient \
+    llio \
+    disptable \
+    hutils \
+    convc \
+    errhand; do
+
+    (
+        cd ${TOP}/libs/${lib} && \
+        mkdir -p build && \
+        cd build && \
+        cmake ../ && \
+        sudo make uninstall
+    )
+done
+
 ```
 
-### PCIe Installation Instructions (if needed)
+#### Make
+
+To use Make do the following steps:
+
+Install the inner dependencies:
+
+```bash
+make deps
+sudo make deps_install
+```
+
+And, then the client libraries themselves:
+
+```bash
+make libs
+sudo make libs_install
+```
+
+If you need to uninstall the libraries do:
+
+```bash
+sudo make libs_uninstall
+```
+
+## Examples
+
+### Compilation Instructions
+
+Change to the examples folder
+
+```bash
+cd examples
+```
+
+#### CMake
+
+Compile the examples using CMake (recommended):
+
+```bash
+mkdir -p build
+cd build
+cmake ../
+make
+```
+
+#### Make
+
+if needed, compile the examples with Make:
+
+```bash
+make
+```
+
+### Running the examples
+
+Run an example application, for instance, the leds example
+
+```bash
+./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
+```
+
+Typically, one should choose the IPC transport method
+for its faster than TCP. For instance:
+
+```bash
+./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
+```
+
+If one would like to use TCP, it should call, for instance:
+
+```bash
+./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
+```
+
+Leds should be blinking in the FMC ADC board
+
+## Additional PCIe driver instructions
+
+### Installation instructions (if not installed with the main application)
 
 Install linux header files
 
@@ -326,39 +492,3 @@ space.
 
 This is not actually an error or a failure, it is just trying to
 allocate more memory than the kernel has available.
-
-
-## Running the examples
-
-Change to the examples folder
-
-```bash
-cd examples
-```
-
-Compile the examples
-
-```bash
-make
-```
-
-Run an example application, for instance, the leds example
-
-```bash
-./leds -v -b <broker_endpoint> -board <board_number> -halcs <halcs_number>
-```
-
-Typically, one should choose the IPC transport method
-for its faster than TCP. For instance:
-
-```bash
-./leds -v -b ipc:///tmp/halcs -board <board_number> -halcs <halcs_number>
-```
-
-If one would like to use TCP, it should call, for instance:
-
-```bash
-./leds -v -b tcp://127.0.0.1:8888 -board <board_number> -halcs <halcs_number>
-```
-
-Leds should be blinking in the FMC ADC board
