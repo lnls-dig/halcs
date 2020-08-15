@@ -8,19 +8,18 @@
 #ifndef _AFC_TIMING_DEFAULTS_H_
 #define _AFC_TIMING_DEFAULTS_H_
 
-#define AFC_TIMING_DFLT_RTM_RFREQ_HI                                     0x2dee
-#define AFC_TIMING_DFLT_RTM_RFREQ_LO                                     0x7dfb9
-#define AFC_TIMING_DFLT_RTM_N1                                           0x5
-#define AFC_TIMING_DFLT_RTM_HS_DIV                                       0x3
-#define AFC_TIMING_DFLT_AFC_RFREQ_HI                                     0x2bbe
-#define AFC_TIMING_DFLT_AFC_RFREQ_LO                                     0x905d5
-#define AFC_TIMING_DFLT_AFC_N1                                           0xb
-#define AFC_TIMING_DFLT_AFC_HS_DIV                                       0x2
+#define AFC_TIMING_DFLT_RTM_RFREQ_HI                                     0x3017
+#define AFC_TIMING_DFLT_RTM_RFREQ_LO                                     0xa66ad
+#define AFC_TIMING_DFLT_RTM_N1                                           0x3
+#define AFC_TIMING_DFLT_RTM_HS_DIV                                       0x7
+#define AFC_TIMING_DFLT_AFC_RFREQ_HI                                     0x2bb8
+#define AFC_TIMING_DFLT_AFC_RFREQ_LO                                     0x68be3
+#define AFC_TIMING_DFLT_AFC_N1                                           0x7
+#define AFC_TIMING_DFLT_AFC_HS_DIV                                       0x5
 #define AFC_TIMING_DFLT_AFC_FREQ_KP                                      0x1
 #define AFC_TIMING_DFLT_AFC_FREQ_KI                                      0xc00
-#define AFC_TIMING_DFLT_AFC_PHASE_KP                                     0x28
+#define AFC_TIMING_DFLT_AFC_PHASE_KP                                     0xa
 #define AFC_TIMING_DFLT_AFC_PHASE_KI                                     0x0
-#define AFC_TIMING_DFLT_AFC_PHASE_SET                                    0x47
 #define AFC_TIMING_DFLT_AFC_PHASE_NAVG                                   0x7
 #define AFC_TIMING_DFLT_AFC_PHASE_DIV                                    0x1
 
