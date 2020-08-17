@@ -9,10 +9,10 @@
 #define _SM_IO_DSP_CODES_H_
 
 struct _smio_dsp_data_t {
-    uint32_t amp_ch0;                    /* Amplitude CH0 */
-    uint32_t amp_ch1;                    /* Amplitude CH1 */
-    uint32_t amp_ch2;                    /* Amplitude CH2 */
-    uint32_t amp_ch3;                    /* Amplitude CH3 */
+    int32_t amp_ch0;                     /* Amplitude CH0 */
+    int32_t amp_ch1;                     /* Amplitude CH1 */
+    int32_t amp_ch2;                     /* Amplitude CH2 */
+    int32_t amp_ch3;                     /* Amplitude CH3 */
     uint32_t new_amp_data;               /* Do we have new AMP data? */
     int32_t pos_x;                       /* Position X */
     int32_t pos_y;                       /* Position Y */
@@ -22,10 +22,10 @@ struct _smio_dsp_data_t {
 };
 
 struct _smio_dsp_monit_data_t {
-    uint32_t amp_ch0;                    /* Amplitude CH0 */
-    uint32_t amp_ch1;                    /* Amplitude CH1 */
-    uint32_t amp_ch2;                    /* Amplitude CH2 */
-    uint32_t amp_ch3;                    /* Amplitude CH3 */
+    int32_t amp_ch0;                     /* Amplitude CH0 */
+    int32_t amp_ch1;                     /* Amplitude CH1 */
+    int32_t amp_ch2;                     /* Amplitude CH2 */
+    int32_t amp_ch3;                     /* Amplitude CH3 */
 };
 
 /* Messaging OPCODES */

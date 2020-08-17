@@ -21,14 +21,14 @@ extern "C" {
 
 /* DEVIO actor args structure */
 typedef struct {
-    char *devio_service;
+    char **devio_service;
     uint32_t dev_id;
-    char *dev_entry;
+    char **dev_entry;
     const llio_ops_t *llio_ops;
-    char *broker_endp;
+    char **broker_endp;
     int verbose;
-    char *devio_log_filename;
-    char *devio_log_info_filename;
+    char **devio_log_filename;
+    char **devio_log_info_filename;
 } devio_args_t;
 
 /* Node of sig_ops list */

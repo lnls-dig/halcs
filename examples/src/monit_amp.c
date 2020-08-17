@@ -144,15 +144,15 @@ int main (int argc, char *argv [])
         err = halcs_get_monit_stream (halcs_client, "MONIT_AMP", &monit_data);
         if(err == HALCS_CLIENT_SUCCESS) {
             struct timespec ts;
-            clock_gettime(CLOCK_REALTIME, &ts); 
+            clock_gettime(CLOCK_REALTIME, &ts);
 
             fprintf (stdout, "[client:monit_amp]: %lld.%.9ld "
-                    "ch0/ch1/ch2/ch3 = %d %d %d %d\n", 
+                    "ch0/ch1/ch2/ch3 = %d %d %d %d\n",
                     (long long)ts.tv_sec, ts.tv_nsec,
-                    (int32_t) monit_data.amp_ch0,
-                    (int32_t) monit_data.amp_ch1,
-                    (int32_t) monit_data.amp_ch2,
-                    (int32_t) monit_data.amp_ch3);
+                    monit_data.amp_ch0,
+                    monit_data.amp_ch1,
+                    monit_data.amp_ch2,
+                    monit_data.amp_ch3);
         }
     }
 

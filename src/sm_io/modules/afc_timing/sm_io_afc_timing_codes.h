@@ -92,8 +92,6 @@
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_KP                "afc_timing_set_get_rtm_phase_kp"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_KI              38
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_KI                "afc_timing_set_get_rtm_phase_ki"
-#define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_SET             39
-#define AFC_TIMING_NAME_SET_GET_RTM_PHASE_SET               "afc_timing_set_get_rtm_phase_set"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_NAVG            40
 #define AFC_TIMING_NAME_SET_GET_RTM_PHASE_NAVG              "afc_timing_set_get_rtm_phase_navg"
 #define AFC_TIMING_OPCODE_SET_GET_RTM_PHASE_DIV_EXP         41
@@ -114,8 +112,6 @@
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_KP                "afc_timing_set_get_afc_phase_kp"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_KI              49
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_KI                "afc_timing_set_get_afc_phase_ki"
-#define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_SET             50
-#define AFC_TIMING_NAME_SET_GET_AFC_PHASE_SET               "afc_timing_set_get_afc_phase_set"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_NAVG            51
 #define AFC_TIMING_NAME_SET_GET_AFC_PHASE_NAVG              "afc_timing_set_get_afc_phase_navg"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_PHASE_DIV_EXP         52
@@ -128,8 +124,20 @@
 #define AFC_TIMING_NAME_SET_GET_AFC_N1                      "afc_timing_set_get_afc_n1"
 #define AFC_TIMING_OPCODE_SET_GET_AFC_HS_DIV                56
 #define AFC_TIMING_NAME_SET_GET_AFC_HS_DIV                  "afc_timing_set_get_afc_hs_div"
+#define AFC_TIMING_OPCODE_SET_GET_AMC_COUNT_RST             58
+#define AFC_TIMING_NAME_SET_GET_AMC_COUNT_RST               "afc_timing_set_get_amc_count_rst"
+#define AFC_TIMING_OPCODE_SET_GET_AMC_COUNT                 59
+#define AFC_TIMING_NAME_SET_GET_AMC_COUNT                   "afc_timing_set_get_amc_count"
+#define AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT_RST            60
+#define AFC_TIMING_NAME_SET_GET_FMC1_COUNT_RST              "afc_timing_set_get_fmc1_count_rst"
+#define AFC_TIMING_OPCODE_SET_GET_FMC1_COUNT                61
+#define AFC_TIMING_NAME_SET_GET_FMC1_COUNT                  "afc_timing_set_get_fmc1_count"
+#define AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT_RST            62
+#define AFC_TIMING_NAME_SET_GET_FMC2_COUNT_RST              "afc_timing_set_get_fmc2_count_rst"
+#define AFC_TIMING_OPCODE_SET_GET_FMC2_COUNT                63
+#define AFC_TIMING_NAME_SET_GET_FMC2_COUNT                  "afc_timing_set_get_fmc2_count"
 
-#define AFC_TIMING_OPCODE_END                               57
+#define AFC_TIMING_OPCODE_END                               64
 
 #endif
 

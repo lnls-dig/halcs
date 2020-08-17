@@ -51,6 +51,7 @@ set(sm_io_table_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/init/sm_io_init_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/afc_mgmt/sm_io_afc_mgmt_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/modules/tim_rcv/sm_io_tim_rcv_exports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/modules/orbit_intlk/sm_io_orbit_intlk_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sm_io_codes.c
 )
 
@@ -86,6 +87,7 @@ set(sm_io_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/init/sm_io_init_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/afc_mgmt/sm_io_afc_mgmt_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/modules/tim_rcv/sm_io_tim_rcv_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/modules/orbit_intlk/sm_io_orbit_intlk_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/sm_io_codes.h
 )
 

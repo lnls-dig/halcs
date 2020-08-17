@@ -122,7 +122,8 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/init/sm_io_init_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_exports.o \
-                $(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.o
+                $(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.o \
+                $(SMIO_TABLE_SRC_DIR)/modules/orbit_intlk/sm_io_orbit_intlk_exports.o
 
 # Project boards
 boards_INCLUDE_DIRS = -I$(TOP)/include/boards/$(BOARD)
@@ -152,6 +153,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_SRC_DIR)/modules/init \
 	       -I$(SMIO_SRC_DIR)/modules/afc_mgmt \
 	       -I$(SMIO_SRC_DIR)/modules/tim_rcv \
+	       -I$(SMIO_SRC_DIR)/modules/orbit_intlk \
 	       -I$(SMIO_TABLE_DIR) \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch \
@@ -173,6 +175,7 @@ INCLUDE_DIRS = -I. -Iinclude \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/init \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt \
 	       -I$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv \
+	       -I$(SMIO_TABLE_SRC_DIR)/modules/orbit_intlk \
 	       -I${PREFIX}/include \
 	       -I$(LIBERRHAND_DIR)/include \
 	       -I$(LIBHUTILS_DIR)/include \
@@ -219,6 +222,7 @@ $(LIBNAME)_SMIO_CODES = \
 	$(SMIO_SRC_DIR)/modules/init/sm_io_init_codes.h \
 	$(SMIO_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_codes.h \
 	$(SMIO_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_codes.h \
+	$(SMIO_SRC_DIR)/modules/orbit_intlk/sm_io_orbit_intlk_codes.h \
 	$(SMIO_TABLE_DIR)/sm_io_codes.h
 
 $(LIBNAME)_SMIO_EXPORTS = \
@@ -239,7 +243,8 @@ $(LIBNAME)_SMIO_EXPORTS = \
 	$(SMIO_TABLE_SRC_DIR)/modules/acq_pm/sm_io_acq_pm_exports.h \
 	$(SMIO_TABLE_SRC_DIR)/modules/init/sm_io_init_exports.h \
 	$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_exports.h \
-	$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.h
+	$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.h \
+	$(SMIO_TABLE_SRC_DIR)/modules/orbit_intlk/sm_io_orbit_intlk_exports.h
 
 # Copy specific acq_chan.h defintions according to the BOARD MACRO
 $(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
