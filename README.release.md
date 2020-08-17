@@ -24,7 +24,7 @@ src/client/include/halcs_client_classes.h
 
 3. Update ABI version number (SOVERSION) in CMake files following libtool versioning scheme.
 
-Libtool versioning: `https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html`
+Libtool versioning: https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 
 CMakeLists.txt files:
 
