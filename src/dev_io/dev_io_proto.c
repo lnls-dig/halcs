@@ -68,7 +68,7 @@ devio_err_e devio_proto_recv (devio_proto_t *self, zsock_t *input)
     if (zsock_type (input) == ZMQ_ROUTER) {
         zframe_destroy (&self->routing_id);
         self->routing_id = zframe_recv (input);
-        ASSERT_TEST (self->routing_id && zsock_rcvmore (input), 
+        ASSERT_TEST (self->routing_id && zsock_rcvmore (input),
             "No routing ID", err_recv_msg, DEVIO_ERR_BAD_MSG);
     }
 
@@ -81,9 +81,9 @@ devio_err_e devio_proto_recv (devio_proto_t *self, zsock_t *input)
         self->content = zmsg_new ();
     }
 
-    ASSERT_TEST (self->content, "Could not reveive message", 
+    ASSERT_TEST (self->content, "Could not receive message",
         err_recv_msg, DEVIO_ERR_BAD_MSG);
-   
+
     return err;
 
 err_recv_msg:
@@ -99,7 +99,7 @@ devio_err_e devio_proto_send (devio_proto_t *self, zsock_t *output)
 
     if (zsock_type (output) == ZMQ_ROUTER) {
         rc = zframe_send (&self->routing_id, output, ZFRAME_MORE + ZFRAME_REUSE);
-        ASSERT_TEST (rc >= 0, "Could not send routing ID message", 
+        ASSERT_TEST (rc >= 0, "Could not send routing ID message",
             err_send_msg, DEVIO_ERR_BAD_MSG);
     }
 
@@ -114,7 +114,7 @@ devio_err_e devio_proto_send (devio_proto_t *self, zsock_t *output)
     else {
         zmq_send (zsock_resolve (output), NULL, 0, 0);
     }
-   
+
     return err;
 
 err_send_msg:
