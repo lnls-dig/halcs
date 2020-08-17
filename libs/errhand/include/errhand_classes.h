@@ -20,8 +20,8 @@
 /* version macros for compile-time API detection */
 
 #define ERRHAND_VERSION_MAJOR 2
-#define ERRHAND_VERSION_MINOR 1
-#define ERRHAND_VERSION_PATCH 1
+#define ERRHAND_VERSION_MINOR 2
+#define ERRHAND_VERSION_PATCH 0
 
 #define ERRHAND_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
