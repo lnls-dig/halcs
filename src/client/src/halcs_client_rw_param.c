@@ -163,6 +163,14 @@ halcs_client_err_e param_client_write_byte (halcs_client_t *self, char *service,
             sizeof (param), NULL, 0, NULL, 0);
 }
 
+halcs_client_err_e param_client_write_signed (halcs_client_t *self, char *service,
+        uint32_t operation, int32_t param)
+{
+    uint32_t rw = WRITE_MODE;
+    return param_client_write_gen (self, service, operation, rw, &param,
+            sizeof (param), NULL, 0, NULL, 0);
+}
+
 halcs_client_err_e param_client_write_double (halcs_client_t *self, char *service,
         uint32_t operation, double param)
 {
@@ -291,6 +299,15 @@ halcs_client_err_e param_client_read (halcs_client_t *self, char *service,
 
 halcs_client_err_e param_client_read_byte (halcs_client_t *self, char *service,
         uint32_t operation, uint8_t *param_out)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, operation, rw, param_out,
+            sizeof (*param_out), NULL, 0, NULL, 0, param_out, sizeof (*param_out));
+}
+
+
+halcs_client_err_e param_client_read_signed (halcs_client_t *self, char *service,
+        uint32_t operation, int32_t *param_out)
 {
     uint32_t rw = READ_MODE;
     return param_client_read_gen (self, service, operation, rw, param_out,

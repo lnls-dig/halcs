@@ -47,6 +47,10 @@ extern "C" {
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
             char *service, uint8_t reg)
 
+#define PARAM_FUNC_CLIENT_WRITE_SIGNED(reg)                                     \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
+            char *service, int32_t reg)
+
 #define PARAM_FUNC_CLIENT_WRITE_DOUBLE(reg)                                     \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_WRITE(reg) (halcs_client_t *self,     \
             char *service, double reg)
@@ -75,6 +79,10 @@ extern "C" {
 #define PARAM_FUNC_CLIENT_READ_BYTE(reg)                                        \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
             char *service, uint8_t *reg)
+
+#define PARAM_FUNC_CLIENT_READ_SIGNED(reg)                                      \
+    halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
+            char *service, int32_t *reg)
 
 #define PARAM_FUNC_CLIENT_READ_DOUBLE(reg)                                      \
     halcs_client_err_e PARAM_FUNC_CLIENT_NAME_READ(reg) (halcs_client_t *self,      \
@@ -118,6 +126,8 @@ halcs_client_err_e param_client_write3 (halcs_client_t *self, char *service,
         uint32_t operation, uint32_t param1, uint32_t param2, uint32_t param3);
 halcs_client_err_e param_client_write_byte (halcs_client_t *self, char *service,
         uint32_t operation, uint8_t param);
+halcs_client_err_e param_client_write_signed (halcs_client_t *self, char *service,
+        uint32_t operation, int32_t param);
 halcs_client_err_e param_client_write_double (halcs_client_t *self, char *service,
         uint32_t operation, double param1);
 halcs_client_err_e param_client_write_double2 (halcs_client_t *self, char *service,
@@ -137,6 +147,8 @@ halcs_client_err_e param_client_write2_read (halcs_client_t *self, char *service
         uint32_t operation, uint32_t param1, uint32_t param2, uint32_t *param_out);
 halcs_client_err_e param_client_read_byte (halcs_client_t *self, char *service,
         uint32_t operation, uint8_t *param_out);
+halcs_client_err_e param_client_read_signed (halcs_client_t *self, char *service,
+        uint32_t operation, int32_t *param_out);
 halcs_client_err_e param_client_read_double (halcs_client_t *self, char *service,
         uint32_t operation, double *param_out);
 halcs_client_err_e param_client_write_read_double (halcs_client_t *self, char *service,
