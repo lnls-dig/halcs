@@ -1085,6 +1085,18 @@ halcs_client_err_e halcs_get_monit_tag_desync_cnt_rst (halcs_client_t *self, cha
 halcs_client_err_e halcs_get_monit_tag_desync_cnt (halcs_client_t *self, char *service,
         uint32_t *monit_tag_desync_cnt);
 
+/* Position calc offset X */
+halcs_client_err_e halcs_set_offset_x (halcs_client_t *self, char *service,
+        int32_t offset_x);
+halcs_client_err_e halcs_get_offset_x (halcs_client_t *self, char *service,
+        int32_t *offset_x);
+
+/* Position calc offset Y */
+halcs_client_err_e halcs_set_offset_y (halcs_client_t *self, char *service,
+        int32_t offset_y);
+halcs_client_err_e halcs_get_offset_y (halcs_client_t *self, char *service,
+        int32_t *offset_y);
+
 /********************** SWAP Functions ********************/
 
 /* Switching functions */

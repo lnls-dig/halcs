@@ -2081,6 +2081,28 @@ PARAM_FUNC_CLIENT_READ(monit_tag_desync_cnt)
     return param_client_read (self, service, DSP_OPCODE_SET_GET_MONIT_TAG_DESYNC_CNT, monit_tag_desync_cnt);
 }
 
+/* Offset X value */
+PARAM_FUNC_CLIENT_WRITE_SIGNED(offset_x)
+{
+    return param_client_write_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_X, offset_x);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(offset_x)
+{
+     return param_client_read_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_X, offset_x);
+}
+
+/* Offset Y value */
+PARAM_FUNC_CLIENT_WRITE_SIGNED(offset_y)
+{
+    return param_client_write_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_Y, offset_y);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(offset_y)
+{
+     return param_client_read_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_Y, offset_y);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */
