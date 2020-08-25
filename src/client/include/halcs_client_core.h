@@ -1968,33 +1968,33 @@ halcs_client_err_e halcs_get_orbit_intlk_min_sum (halcs_client_t *self, char *se
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_trans_max_x (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_trans_max_x);
+        int32_t orbit_intlk_trans_max_x);
 halcs_client_err_e halcs_get_orbit_intlk_trans_max_x (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_trans_max_x);
+        int32_t *orbit_intlk_trans_max_x);
 
 /* Orbit interlock translation max Y threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_trans_max_y (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_trans_max_y);
+        int32_t orbit_intlk_trans_max_y);
 halcs_client_err_e halcs_get_orbit_intlk_trans_max_y (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_trans_max_y);
+        int32_t *orbit_intlk_trans_max_y);
 
 /* Orbit interlock angular max X threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_ang_max_x (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_ang_max_x);
+        int32_t orbit_intlk_ang_max_x);
 halcs_client_err_e halcs_get_orbit_intlk_ang_max_x (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_ang_max_x);
+        int32_t *orbit_intlk_ang_max_x);
 
 /* Orbit interlock angular max Y threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_ang_max_y (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_ang_max_y);
+        int32_t orbit_intlk_ang_max_y);
 halcs_client_err_e halcs_get_orbit_intlk_ang_max_y (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_ang_max_y);
+        int32_t *orbit_intlk_ang_max_y);
 
 /* Orbit interlock translation smaller X function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
@@ -2096,33 +2096,33 @@ halcs_client_err_e halcs_get_orbit_intlk_smaller_ltc (halcs_client_t *self, char
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_trans_min_x (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_trans_min_x);
+        int32_t orbit_intlk_trans_min_x);
 halcs_client_err_e halcs_get_orbit_intlk_trans_min_x (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_trans_min_x);
+        int32_t *orbit_intlk_trans_min_x);
 
 /* Orbit interlock translation min Y threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_trans_min_y (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_trans_min_y);
+        int32_t orbit_intlk_trans_min_y);
 halcs_client_err_e halcs_get_orbit_intlk_trans_min_y (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_trans_min_y);
+        int32_t *orbit_intlk_trans_min_y);
 
 /* Orbit interlock angular min X threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_ang_min_x (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_ang_min_x);
+        int32_t orbit_intlk_ang_min_x);
 halcs_client_err_e halcs_get_orbit_intlk_ang_min_x (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_ang_min_x);
+        int32_t *orbit_intlk_ang_min_x);
 
 /* Orbit interlock angular min Y threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_orbit_intlk_ang_min_y (halcs_client_t *self, char *service,
-        uint32_t orbit_intlk_ang_min_y);
+        int32_t orbit_intlk_ang_min_y);
 halcs_client_err_e halcs_get_orbit_intlk_ang_min_y (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_ang_min_y);
+        int32_t *orbit_intlk_ang_min_y);
 
 #ifdef __cplusplus
 }

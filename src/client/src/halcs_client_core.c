@@ -3479,47 +3479,47 @@ PARAM_FUNC_CLIENT_READ(orbit_intlk_min_sum)
 }
 
 /* Orbit interlock translation max X */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_max_x)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_trans_max_x)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_max_x)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_max_x)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X, orbit_intlk_trans_max_x);
 }
 
 /* Orbit interlock translation max Y */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_max_y)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_trans_max_y)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_max_y)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_max_y)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y, orbit_intlk_trans_max_y);
 }
 
 /* Orbit interlock angular max X */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_max_x)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_ang_max_x)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_max_x)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_max_x)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X, orbit_intlk_ang_max_x);
 }
 
 /* Orbit interlock angular max Y */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_max_y)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_ang_max_y)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_max_y)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_max_y)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y, orbit_intlk_ang_max_y);
 }
 
 /* Orbit interlock translation trip X */
@@ -3619,45 +3619,45 @@ PARAM_FUNC_CLIENT_READ(orbit_intlk_smaller_ltc)
 }
 
 /* Orbit interlock translation min X */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_min_x)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_trans_min_x)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X, orbit_intlk_trans_min_x);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X, orbit_intlk_trans_min_x);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_min_x)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_min_x)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X, orbit_intlk_trans_min_x);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X, orbit_intlk_trans_min_x);
 }
 
 /* Orbit interlock translation min Y */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_trans_min_y)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_trans_min_y)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y, orbit_intlk_trans_min_y);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y, orbit_intlk_trans_min_y);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_trans_min_y)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_min_y)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y, orbit_intlk_trans_min_y);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y, orbit_intlk_trans_min_y);
 }
 
 /* Orbit interlock angular min X */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_min_x)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_ang_min_x)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X, orbit_intlk_ang_min_x);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X, orbit_intlk_ang_min_x);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_min_x)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_min_x)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X, orbit_intlk_ang_min_x);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X, orbit_intlk_ang_min_x);
 }
 
 /* Orbit interlock angular min Y */
-PARAM_FUNC_CLIENT_WRITE(orbit_intlk_ang_min_y)
+PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_ang_min_y)
 {
-    return param_client_write (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
+    return param_client_write_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
 }
 
-PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_min_y)
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_min_y)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
 }
