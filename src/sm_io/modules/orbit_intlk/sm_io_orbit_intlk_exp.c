@@ -239,6 +239,128 @@ RW_PARAM_FUNC(orbit_intlk, intlk_ang_max_y) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_X,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_Y,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_ltc_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_LTC_X,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_ltc_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_LTC_Y,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_any) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_ANY,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, trans_smaller_ltc) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, TRANS_SMALLER_LTC,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_X,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_Y,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_ltc_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_LTC_X,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_ltc_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_LTC_Y,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_any) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_ANY,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(orbit_intlk, ang_smaller_ltc) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, ANG_SMALLER_LTC,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_TRANS_MIN_X_R(val)           (val)
+#define ORBIT_INTLK_TRANS_MIN_X_W(val)           (val)
+#define ORBIT_INTLK_TRANS_MIN_X_MASK             ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, intlk_trans_min_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_X, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_TRANS_MIN_Y_R(val)           (val)
+#define ORBIT_INTLK_TRANS_MIN_Y_W(val)           (val)
+#define ORBIT_INTLK_TRANS_MIN_Y_MASK             ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, intlk_trans_min_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_Y, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_ANG_MIN_X_R(val)           (val)
+#define ORBIT_INTLK_ANG_MIN_X_W(val)           (val)
+#define ORBIT_INTLK_ANG_MIN_X_MASK             ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, intlk_ang_min_x) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_X, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_ANG_MIN_Y_R(val)           (val)
+#define ORBIT_INTLK_ANG_MIN_Y_W(val)           (val)
+#define ORBIT_INTLK_ANG_MIN_Y_MASK             ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, intlk_ang_min_y) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_Y, /* No field */,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, en),
@@ -269,6 +391,24 @@ const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_max_y),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_max_x),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_max_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_ltc_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_ltc_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_any),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_ltc),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_ltc_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_ltc_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_any),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_ltc),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_min_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_min_y),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_min_x),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_min_y),
     NULL
 };
 
