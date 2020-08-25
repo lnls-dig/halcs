@@ -646,6 +646,30 @@ disp_op_t dsp_set_get_monit_tag_desync_cnt_exp = {
     }
 };
 
+disp_op_t dsp_set_get_offset_x_exp = {
+    .name = DSP_NAME_SET_GET_OFFSET_X,
+    .opcode = DSP_OPCODE_SET_GET_OFFSET_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_offset_y_exp = {
+    .name = DSP_NAME_SET_GET_OFFSET_Y,
+    .opcode = DSP_OPCODE_SET_GET_OFFSET_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -701,6 +725,8 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_monit_data_mask_samples_end_exp,
     &dsp_set_get_monit_tag_desync_cnt_rst_exp,
     &dsp_set_get_monit_tag_desync_cnt_exp,
+    &dsp_set_get_offset_x_exp,
+    &dsp_set_get_offset_y_exp,
     NULL
 };
 
