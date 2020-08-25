@@ -757,7 +757,7 @@ static int _dsp_offset_x (void *owner, void *args, void *ret)
         GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X,
             /* No field */, MULT_BIT_PARAM,
             value, NO_FMT_FUNC);
-        *(uint32_t *) ret = value;
+        *(int32_t *) ret = value;
         return sizeof(value);
     }
     else {
@@ -799,7 +799,7 @@ static int _dsp_offset_y (void *owner, void *args, void *ret)
         GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y,
             /* No field */, MULT_BIT_PARAM,
             value, NO_FMT_FUNC);
-        *(uint32_t *) ret = value;
+        *(int32_t *) ret = value;
         return sizeof(value);
     }
     else {
