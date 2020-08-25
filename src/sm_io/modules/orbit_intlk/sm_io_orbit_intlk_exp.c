@@ -203,40 +203,172 @@ RW_PARAM_FUNC(orbit_intlk, intlk_min_sum) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define ORBIT_INTLK_TRANS_MAX_X_R(val)           (val)
-#define ORBIT_INTLK_TRANS_MAX_X_W(val)           (val)
-#define ORBIT_INTLK_TRANS_MAX_X_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_trans_max_x) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_X, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Translation Max X */
+#define ORBIT_INTLK_TRANS_MAX_X_R(val)       (val)
+#define ORBIT_INTLK_TRANS_MAX_X_W(val)       (val)
+#define ORBIT_INTLK_TRANS_MAX_X_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_trans_max_x (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_TRANS_MAX_Y_R(val)           (val)
-#define ORBIT_INTLK_TRANS_MAX_Y_W(val)           (val)
-#define ORBIT_INTLK_TRANS_MAX_Y_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_trans_max_y) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_Y, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Translation Max Y */
+#define ORBIT_INTLK_TRANS_MAX_Y_R(val)       (val)
+#define ORBIT_INTLK_TRANS_MAX_Y_W(val)       (val)
+#define ORBIT_INTLK_TRANS_MAX_Y_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_trans_max_y (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MAX_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_ANG_MAX_X_R(val)           (val)
-#define ORBIT_INTLK_ANG_MAX_X_W(val)           (val)
-#define ORBIT_INTLK_ANG_MAX_X_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_ang_max_x) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_X, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Angular Max X */
+#define ORBIT_INTLK_ANG_MAX_X_R(val)       (val)
+#define ORBIT_INTLK_ANG_MAX_X_W(val)       (val)
+#define ORBIT_INTLK_ANG_MAX_X_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_ang_max_x (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_ANG_MAX_Y_R(val)           (val)
-#define ORBIT_INTLK_ANG_MAX_Y_W(val)           (val)
-#define ORBIT_INTLK_ANG_MAX_Y_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_ang_max_y) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_Y, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Angular Max Y */
+#define ORBIT_INTLK_ANG_MAX_Y_R(val)       (val)
+#define ORBIT_INTLK_ANG_MAX_Y_W(val)       (val)
+#define ORBIT_INTLK_ANG_MAX_Y_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_ang_max_y (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MAX_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
 RW_PARAM_FUNC(orbit_intlk, trans_smaller_x) {
@@ -325,40 +457,172 @@ RW_PARAM_FUNC(orbit_intlk, ang_smaller_ltc) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define ORBIT_INTLK_TRANS_MIN_X_R(val)           (val)
-#define ORBIT_INTLK_TRANS_MIN_X_W(val)           (val)
-#define ORBIT_INTLK_TRANS_MIN_X_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_trans_min_x) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_X, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Translation Min X */
+#define ORBIT_INTLK_TRANS_MIN_X_R(val)       (val)
+#define ORBIT_INTLK_TRANS_MIN_X_W(val)       (val)
+#define ORBIT_INTLK_TRANS_MIN_X_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_trans_min_x (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_TRANS_MIN_Y_R(val)           (val)
-#define ORBIT_INTLK_TRANS_MIN_Y_W(val)           (val)
-#define ORBIT_INTLK_TRANS_MIN_Y_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_trans_min_y) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_Y, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Translation Min Y */
+#define ORBIT_INTLK_TRANS_MIN_Y_R(val)       (val)
+#define ORBIT_INTLK_TRANS_MIN_Y_W(val)       (val)
+#define ORBIT_INTLK_TRANS_MIN_Y_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_trans_min_y (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, TRANS_MIN_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_ANG_MIN_X_R(val)           (val)
-#define ORBIT_INTLK_ANG_MIN_X_W(val)           (val)
-#define ORBIT_INTLK_ANG_MIN_X_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_ang_min_x) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_X, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Angular Min X */
+#define ORBIT_INTLK_ANG_MIN_X_R(val)       (val)
+#define ORBIT_INTLK_ANG_MIN_X_W(val)       (val)
+#define ORBIT_INTLK_ANG_MIN_X_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_ang_min_x (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_X,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
-#define ORBIT_INTLK_ANG_MIN_Y_R(val)           (val)
-#define ORBIT_INTLK_ANG_MIN_Y_W(val)           (val)
-#define ORBIT_INTLK_ANG_MIN_Y_MASK             ((1ULL<<32)-1)
-RW_PARAM_FUNC(orbit_intlk, intlk_ang_min_y) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_Y, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No minimum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+/* Angular Min Y */
+#define ORBIT_INTLK_ANG_MIN_Y_R(val)       (val)
+#define ORBIT_INTLK_ANG_MIN_Y_W(val)       (val)
+#define ORBIT_INTLK_ANG_MIN_Y_MASK         ((1ULL<<32)-1)
+static int _orbit_intlk_ang_min_y (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_orbit_intlk_t *orbit_intlk = smio_get_handler (self);
+    ASSERT_TEST(orbit_intlk != NULL, "Could not get SMIO DSP handler",
+            err_get_orbit_intlk_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(int32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, orbit_intlk, 0x0, ORBIT_INTLK, ANG_MIN_Y,
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No minimum check */,
+            NO_CHK_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_orbit_intlk_handler:
+    return err;
 }
 
 /* Exported function pointers */
@@ -387,10 +651,10 @@ const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ltc),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_min_sum),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_max_x),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_max_y),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_max_x),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_max_y),
+    _orbit_intlk_trans_max_x,
+    _orbit_intlk_trans_max_y,
+    _orbit_intlk_ang_max_x,
+    _orbit_intlk_ang_max_y,
     RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_x),
     RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_y),
     RW_PARAM_FUNC_NAME(orbit_intlk, trans_smaller_ltc_x),
@@ -405,10 +669,10 @@ const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_any),
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller),
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_smaller_ltc),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_min_x),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_min_y),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_min_x),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ang_min_y),
+    _orbit_intlk_trans_min_x,
+    _orbit_intlk_trans_min_y,
+    _orbit_intlk_ang_min_x,
+    _orbit_intlk_ang_min_y,
     NULL
 };
 
