@@ -730,6 +730,84 @@ RW_PARAM_FUNC(dsp, monit_tag_desync_cnt) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+/* Offset X */
+static int _dsp_offset_x (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_dsp_t *dsp = smio_get_handler (self);
+    ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",
+            err_get_dsp_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(uint32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_dsp_handler:
+    return err;
+}
+
+/* Offset Y */
+static int _dsp_offset_y (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+
+    int err = -DSP_OK;
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_dsp_t *dsp = smio_get_handler (self);
+    ASSERT_TEST(dsp != NULL, "Could not get SMIO DSP handler",
+            err_get_dsp_handler, -DSP_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw      R /W    1 = read mode, 0 = write mode
+     * frame 2: value to be written (rw = 0) or dummy value (rw = 1)
+     * */
+     uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+     int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    if (rw) {
+        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y
+            /* No field */, MULT_BIT_PARAM,
+            value, NO_FMT_FUNC);
+        *(uint32_t *) ret = value;
+        return sizeof(value);
+    }
+    else {
+        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y
+            /* No field */, MULT_BIT_PARAM,
+            value, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+        return -DSP_OK;
+    }
+
+err_get_dsp_handler:
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -785,6 +863,8 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_data_mask_samples_end),
     RW_PARAM_FUNC_NAME(dsp, monit_tag_desync_cnt_rst),
     RW_PARAM_FUNC_NAME(dsp, monit_tag_desync_cnt),
+    _dsp_offset_x,
+    _dsp_offset_y,
     NULL
 };
 

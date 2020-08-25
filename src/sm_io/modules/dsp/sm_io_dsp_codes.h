@@ -170,7 +170,11 @@ struct _smio_dsp_monit_data_t {
                                             53
 #define DSP_NAME_SET_GET_MONIT_TAG_DESYNC_CNT \
                                             "dsp_set_get_monit_tag_desync_cnt"
-#define DSP_OPCODE_END                      54
+#define DSP_OPCODE_SET_GET_OFFSET_X         54
+#define DSP_NAME_SET_GET_OFFSET_X           "dsp_set_get_offset_x"
+#define DSP_OPCODE_SET_GET_OFFSET_Y         55
+#define DSP_NAME_SET_GET_OFFSET_Y           "dsp_set_get_offset_y"
+#define DSP_OPCODE_END                      56
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
