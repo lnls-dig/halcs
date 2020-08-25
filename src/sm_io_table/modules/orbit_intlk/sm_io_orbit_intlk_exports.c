@@ -262,9 +262,9 @@ disp_op_t orbit_intlk_set_get_ang_bigger_ltc_exp = {
     }
 };
 
-disp_op_t orbit_intlk_set_get_intlk_bigger_exp = {
-    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER,
-    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER,
+disp_op_t orbit_intlk_set_get_intlk_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_INTLK,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -274,9 +274,9 @@ disp_op_t orbit_intlk_set_get_intlk_bigger_exp = {
     }
 };
 
-disp_op_t orbit_intlk_set_get_intlk_bigger_ltc_exp = {
-    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC,
-    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC,
+disp_op_t orbit_intlk_set_get_intlk_ltc_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_LTC,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -585,8 +585,8 @@ const disp_op_t *orbit_intlk_exp_ops [] = {
     &orbit_intlk_set_get_ang_bigger_any_exp,
     &orbit_intlk_set_get_ang_bigger_exp,
     &orbit_intlk_set_get_ang_bigger_ltc_exp,
-    &orbit_intlk_set_get_intlk_bigger_exp,
-    &orbit_intlk_set_get_intlk_bigger_ltc_exp,
+    &orbit_intlk_set_get_intlk_exp,
+    &orbit_intlk_set_get_intlk_ltc_exp,
     &orbit_intlk_set_get_min_sum_exp,
     &orbit_intlk_set_get_trans_max_x_exp,
     &orbit_intlk_set_get_trans_max_y_exp,

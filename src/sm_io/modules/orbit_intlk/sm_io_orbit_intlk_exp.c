@@ -182,14 +182,14 @@ RW_PARAM_FUNC(orbit_intlk, ang_bigger_ltc) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(orbit_intlk, intlk_bigger) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, INTLK_BIGGER,
+RW_PARAM_FUNC(orbit_intlk, intlk) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, INTLK,
             SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(orbit_intlk, intlk_bigger_ltc) {
-    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, INTLK_BIGGER_LTC,
+RW_PARAM_FUNC(orbit_intlk, intlk_ltc) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, STS, INTLK_LTC,
             SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -384,8 +384,8 @@ const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_bigger_any),
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_bigger),
     RW_PARAM_FUNC_NAME(orbit_intlk, ang_bigger_ltc),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_bigger),
-    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_bigger_ltc),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk),
+    RW_PARAM_FUNC_NAME(orbit_intlk, intlk_ltc),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_min_sum),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_max_x),
     RW_PARAM_FUNC_NAME(orbit_intlk, intlk_trans_max_y),

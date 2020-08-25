@@ -54,10 +54,10 @@
 #define ORBIT_INTLK_NAME_SET_GET_ANG_BIGGER            "orbit_intlk_set_get_ang_bigger"
 #define ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_LTC      20
 #define ORBIT_INTLK_NAME_SET_GET_ANG_BIGGER_LTC        "orbit_intlk_set_get_ang_bigger_ltc"
-#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER        21
-#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER          "orbit_intlk_set_get_intlk_bigger"
-#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC    22
-#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC      "orbit_intlk_set_get_intlk_bigger_ltc"
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK               21
+#define ORBIT_INTLK_NAME_SET_GET_INTLK                 "orbit_intlk_set_get_intlk"
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC           22
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_LTC             "orbit_intlk_set_get_intlk_ltc"
 #define ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM             23
 #define ORBIT_INTLK_NAME_SET_GET_MIN_SUM               "orbit_intlk_set_get_min_sum"
 #define ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X         24
@@ -109,6 +109,12 @@
 #define ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y            47
 #define ORBIT_INTLK_NAME_SET_GET_ANG_MIN_Y              "orbit_intlk_set_get_ang_min_y"
 #define ORBIT_INTLK_OPCODE_END                          48
+
+/* For compatibility with older API. Don't remove these without changing libclient on clients */
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER         ORBIT_INTLK_OPCODE_SET_GET_INTLK
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER           ORBIT_INTLK_NAME_SET_GET_INTLK 
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC     ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC       ORBIT_INTLK_NAME_SET_GET_INTLK_LTC
 
 /* Messaging Reply OPCODES */
 #define ORBIT_INTLK_REPLY_TYPE                      uint32_t
