@@ -731,6 +731,9 @@ RW_PARAM_FUNC(dsp, monit_tag_desync_cnt) {
 }
 
 /* Offset X */
+#define POS_CALC_OFFSET_X_R(val)       (val)
+#define POS_CALC_OFFSET_X_W(val)       (val)
+#define POS_CALC_OFFSET_X_MASK         ((1ULL<<32)-1)
 static int _dsp_offset_x (void *owner, void *args, void *ret)
 {
     assert (owner);
@@ -751,17 +754,17 @@ static int _dsp_offset_x (void *owner, void *args, void *ret)
      int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     if (rw) {
-        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X
+        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X,
             /* No field */, MULT_BIT_PARAM,
             value, NO_FMT_FUNC);
         *(uint32_t *) ret = value;
         return sizeof(value);
     }
     else {
-        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X
+        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_X,
             /* No field */, MULT_BIT_PARAM,
             value, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+            NO_CHK_FUNC, SET_FIELD);
         return -DSP_OK;
     }
 
@@ -770,6 +773,9 @@ err_get_dsp_handler:
 }
 
 /* Offset Y */
+#define POS_CALC_OFFSET_Y_R(val)       (val)
+#define POS_CALC_OFFSET_Y_W(val)       (val)
+#define POS_CALC_OFFSET_Y_MASK         ((1ULL<<32)-1)
 static int _dsp_offset_y (void *owner, void *args, void *ret)
 {
     assert (owner);
@@ -790,17 +796,17 @@ static int _dsp_offset_y (void *owner, void *args, void *ret)
      int32_t value = *(int32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     if (rw) {
-        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y
+        GET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y,
             /* No field */, MULT_BIT_PARAM,
             value, NO_FMT_FUNC);
         *(uint32_t *) ret = value;
         return sizeof(value);
     }
     else {
-        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y
+        SET_PARAM(self, dsp, 0x0, POS_CALC, OFFSET_Y,
             /* No field */, MULT_BIT_PARAM,
             value, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+            NO_CHK_FUNC, SET_FIELD);
         return -DSP_OK;
     }
 
