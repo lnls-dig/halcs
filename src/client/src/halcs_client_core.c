@@ -3456,15 +3456,15 @@ PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_bigger_ltc)
 }
 
 /* Orbit interlock trip */
-PARAM_FUNC_CLIENT_READ(orbit_intlk_bigger)
+PARAM_FUNC_CLIENT_READ(orbit_intlk)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER, orbit_intlk_bigger);
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK, orbit_intlk);
 }
 
 /* Orbit interlock trip latched */
-PARAM_FUNC_CLIENT_READ(orbit_intlk_bigger_ltc)
+PARAM_FUNC_CLIENT_READ(orbit_intlk_ltc)
 {
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC, orbit_intlk_bigger_ltc);
+    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC, orbit_intlk_ltc);
 }
 
 /* Orbit interlock minium sum */

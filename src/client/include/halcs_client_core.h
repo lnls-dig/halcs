@@ -1941,14 +1941,20 @@ halcs_client_err_e halcs_get_orbit_intlk_ang_bigger_ltc (halcs_client_t *self, c
 /* Orbit interlock trip function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_orbit_intlk_bigger (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_bigger);
+halcs_client_err_e halcs_get_orbit_intlk (halcs_client_t *self, char *service,
+        uint32_t *orbit_intlk);
+
+/* Macros for compatibility */
+#define halcs_get_orbit_intlk_bigger halcs_get_orbit_intlk
 
 /* Orbit interlock trip latched function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_orbit_intlk_bigger_ltc (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_bigger_ltc);
+halcs_client_err_e halcs_get_orbit_intlk_ltc (halcs_client_t *self, char *service,
+        uint32_t *orbit_intlk_ltc);
+
+/* Macros for compatibility */
+#define halcs_get_orbit_intlk_bigger_ltc halcs_get_orbit_intlk_ltc
 
 /* Orbit interlock minum sum threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
