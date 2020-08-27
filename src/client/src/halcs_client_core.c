@@ -3606,18 +3606,6 @@ PARAM_FUNC_CLIENT_READ(orbit_intlk_ang_smaller_ltc)
     return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC, orbit_intlk_ang_smaller_ltc);
 }
 
-/* Orbit interlock trip */
-PARAM_FUNC_CLIENT_READ(orbit_intlk_smaller)
-{
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_SMALLER, orbit_intlk_smaller);
-}
-
-/* Orbit interlock trip latched */
-PARAM_FUNC_CLIENT_READ(orbit_intlk_smaller_ltc)
-{
-    return param_client_read (self, service, ORBIT_INTLK_OPCODE_SET_GET_INTLK_SMALLER_LTC, orbit_intlk_smaller_ltc);
-}
-
 /* Orbit interlock translation min X */
 PARAM_FUNC_CLIENT_WRITE_SIGNED(orbit_intlk_trans_min_x)
 {

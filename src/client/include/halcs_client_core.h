@@ -2080,18 +2080,6 @@ halcs_client_err_e halcs_get_orbit_intlk_ang_smaller (halcs_client_t *self, char
 halcs_client_err_e halcs_get_orbit_intlk_ang_smaller_ltc (halcs_client_t *self, char *service,
         uint32_t *orbit_intlk_ang_smaller_ltc);
 
-/* Orbit interlock trip function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_orbit_intlk_smaller (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_smaller);
-
-/* Orbit interlock trip latched function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_orbit_intlk_smaller_ltc (halcs_client_t *self, char *service,
-        uint32_t *orbit_intlk_smaller_ltc);
-
 /* Orbit interlock translation min X threshold function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
