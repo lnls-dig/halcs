@@ -328,7 +328,10 @@ if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libmlm-dev >/de
 fi
 
 ########## HALCS
-if [ "$PURE_MAKE" = yes ]; then
+
+case "${BUILD_TYPE}" in
+
+pure_make)
     ${STATIC_ANALYSIS_WRAPPER} make \
         BOARD="$BOARD" APPS="${APP}" ${HALCS_OPTS[*]}
     make ${HALCS_OPTS[*]} install
@@ -340,15 +343,18 @@ if [ "$PURE_MAKE" = yes ]; then
     if [ "$SYSTEM_INTEGRATION" = yes ]; then
         make ${HALCS_OPTS[*]} scripts_install
     fi
+    ;;
 
-elif [ "$COMPILE_SCRIPT" = yes ]; then
+compile_script)
     ${STATIC_ANALYSIS_WRAPPER} ./compile.sh \
-            -b $BOARD \
-            -a "${APP}" \
-            -e $EXAMPLES \
-            -l $SYSTEM_INTEGRATION \
-            -x "${HALCS_OPTS[*]}"
-elif [ "$CMAKE" = yes ]; then
+        -b $BOARD \
+        -a "${APP}" \
+        -e $EXAMPLES \
+        -l $SYSTEM_INTEGRATION \
+        -x "${HALCS_OPTS[*]}"
+    ;;
+
+cmake)
     mkdir -p build
     cd build
     cmake \
@@ -359,7 +365,9 @@ elif [ "$CMAKE" = yes ]; then
         VERBOSE=1
     make DESTDIR="${BUILD_PREFIX}" install
     cd "${BASE_PWD}"
-elif [ "$CPACK" = yes ]; then
+    ;;
+
+cpack)
     # all of these options are relative to the docker container filesystem
     LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
     PACKPACK_OPTS=()
@@ -372,18 +380,12 @@ elif [ "$CPACK" = yes ]; then
     LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
         SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
     cd "${BASE_PWD}"
-else
-    mkdir -p build
-    cd build
-    cmake \
-        -DCMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
-        -DBUILD_PCIE_DRIVER=OFF \
-        -Dhalcs_BOARD_OPT="$BOARD" ../
-    ${STATIC_ANALYSIS_WRAPPER} make \
-        VERBOSE=1
-    make DESTDIR="${BUILD_PREFIX}" install
-    cd "${BASE_PWD}"
-fi
+    ;;
+
+*)
+    pushd "./builds/${BUILD_TYPE}" && REPO_DIR="$(dirs -l +1)" ./ci_build.sh
+    ;;
+esac
 
 # Get CCache statistics
 if [ "$HAVE_CCACHE" = yes ]; then

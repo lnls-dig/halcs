@@ -21,7 +21,7 @@
 /* version macros for compile-time API detection */
 
 #define DISPTABLE_VERSION_MAJOR 2
-#define DISPTABLE_VERSION_MINOR 2
+#define DISPTABLE_VERSION_MINOR 3
 #define DISPTABLE_VERSION_PATCH 0
 
 #define DISPTABLE_MAKE_VERSION(major, minor, patch) \

@@ -16,6 +16,9 @@
 /* WARNING!! This file was hand-modified to add switching tag / data mask
    at the end of the register map and not in the middle as wbgen2 does for
    FIFO regsiters*/
+/* WARNING!! This file was hand-modified to add offset X/Y
+   at the end of the register map and not in the middle as wbgen2 does for
+   FIFO regsiters*/
 
 #ifndef __WBGEN2_REGDEFS_WB_POS_CALC_REGS_WB
 #define __WBGEN2_REGDEFS_WB_POS_CALC_REGS_WB
@@ -847,4 +850,8 @@
 #define POS_CALC_REG_MONIT_DATA_MASK_CTL 0x00000010c
 /* [0x110]: REG MONIT Data Masking Samples */
 #define POS_CALC_REG_MONIT_DATA_MASK_SAMPLES 0x00000110
+/* [0x114]: REG BPM X position offset parameter register */
+#define POS_CALC_REG_OFFSET_X 0x000000114
+/* [0x118]: REG BPM Y position offset parameter register */
+#define POS_CALC_REG_OFFSET_Y 0x00000118
 #endif

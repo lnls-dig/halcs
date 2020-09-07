@@ -63,6 +63,8 @@ extern disp_op_t dsp_set_get_monit_data_mask_samples_beg_exp;
 extern disp_op_t dsp_set_get_monit_data_mask_samples_end_exp;
 extern disp_op_t dsp_set_get_monit_tag_desync_cnt_rst_exp;
 extern disp_op_t dsp_set_get_monit_tag_desync_cnt_exp;
+extern disp_op_t dsp_set_get_offset_x_exp;
+extern disp_op_t dsp_set_get_offset_y_exp;
 
 extern const disp_op_t *dsp_exp_ops [];
 

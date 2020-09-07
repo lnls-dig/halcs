@@ -11,7 +11,7 @@
 /* version macros for compile-time API detection */
 
 #define HALCS_EXAMPLES_VERSION_MAJOR 2
-#define HALCS_EXAMPLES_VERSION_MINOR 2
+#define HALCS_EXAMPLES_VERSION_MINOR 3
 #define HALCS_EXAMPLES_VERSION_PATCH 0
 
 #define HALCS_EXAMPLES_MAKE_VERSION(major, minor, patch) \

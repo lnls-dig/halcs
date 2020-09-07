@@ -54,10 +54,10 @@
 #define ORBIT_INTLK_NAME_SET_GET_ANG_BIGGER            "orbit_intlk_set_get_ang_bigger"
 #define ORBIT_INTLK_OPCODE_SET_GET_ANG_BIGGER_LTC      20
 #define ORBIT_INTLK_NAME_SET_GET_ANG_BIGGER_LTC        "orbit_intlk_set_get_ang_bigger_ltc"
-#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER        21
-#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER          "orbit_intlk_set_get_intlk_bigger"
-#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC    22
-#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC      "orbit_intlk_set_get_intlk_bigger_ltc"
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK               21
+#define ORBIT_INTLK_NAME_SET_GET_INTLK                 "orbit_intlk_set_get_intlk"
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC           22
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_LTC             "orbit_intlk_set_get_intlk_ltc"
 #define ORBIT_INTLK_OPCODE_SET_GET_MIN_SUM             23
 #define ORBIT_INTLK_NAME_SET_GET_MIN_SUM               "orbit_intlk_set_get_min_sum"
 #define ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X         24
@@ -68,7 +68,49 @@
 #define ORBIT_INTLK_NAME_SET_GET_ANG_MAX_X             "orbit_intlk_set_get_ang_max_x"
 #define ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y           27
 #define ORBIT_INTLK_NAME_SET_GET_ANG_MAX_Y             "orbit_intlk_set_get_ang_max_y"
-#define ORBIT_INTLK_OPCODE_END                         28
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_X     28
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_X       "orbit_intlk_set_get_trans_smaller_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_Y     29
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_Y       "orbit_intlk_set_get_trans_smaller_y"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC_X  30
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC_X    "orbit_intlk_set_get_trans_smaller_ltc_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC_Y  31
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC_Y    "orbit_intlk_set_get_trans_smaller_ltc_y"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_ANY    32
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_ANY      "orbit_intlk_set_get_trans_smaller_any"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER        33
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER          "orbit_intlk_set_get_trans_smaller"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC    34
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC      "orbit_intlk_set_get_trans_smaller_ltc"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_X        35
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_X          "orbit_intlk_set_get_ang_smaller_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_Y        36
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_Y          "orbit_intlk_set_get_ang_smaller_y"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC_X    37
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC_X      "orbit_intlk_set_get_ang_smaller_ltc_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC_Y    38
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC_Y      "orbit_intlk_set_get_ang_smaller_ltc_y"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_ANY      39
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_ANY        "orbit_intlk_set_get_ang_smaller_any"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER          40
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER            "orbit_intlk_set_get_ang_smaller"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC      41
+#define ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC        "orbit_intlk_set_get_ang_smaller_ltc"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X          42
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_MIN_X            "orbit_intlk_set_get_trans_min_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y          43
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_MIN_Y            "orbit_intlk_set_get_trans_min_y"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X            44
+#define ORBIT_INTLK_NAME_SET_GET_ANG_MIN_X              "orbit_intlk_set_get_ang_min_x"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y            45
+#define ORBIT_INTLK_NAME_SET_GET_ANG_MIN_Y              "orbit_intlk_set_get_ang_min_y"
+#define ORBIT_INTLK_OPCODE_END                          46
+
+/* For compatibility with older API. Don't remove these without changing libclient on clients */
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER         ORBIT_INTLK_OPCODE_SET_GET_INTLK
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER           ORBIT_INTLK_NAME_SET_GET_INTLK 
+#define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC     ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC       ORBIT_INTLK_NAME_SET_GET_INTLK_LTC
 
 /* Messaging Reply OPCODES */
 #define ORBIT_INTLK_REPLY_TYPE                      uint32_t

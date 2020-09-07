@@ -262,9 +262,9 @@ disp_op_t orbit_intlk_set_get_ang_bigger_ltc_exp = {
     }
 };
 
-disp_op_t orbit_intlk_set_get_intlk_bigger_exp = {
-    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER,
-    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER,
+disp_op_t orbit_intlk_set_get_intlk_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_INTLK,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -274,9 +274,9 @@ disp_op_t orbit_intlk_set_get_intlk_bigger_exp = {
     }
 };
 
-disp_op_t orbit_intlk_set_get_intlk_bigger_ltc_exp = {
-    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC,
-    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC,
+disp_op_t orbit_intlk_set_get_intlk_ltc_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_INTLK_LTC,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -301,11 +301,11 @@ disp_op_t orbit_intlk_set_get_min_sum_exp = {
 disp_op_t orbit_intlk_set_get_trans_max_x_exp = {
     .name = ORBIT_INTLK_NAME_SET_GET_TRANS_MAX_X,
     .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_X,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
         DISP_ARG_END
     }
 };
@@ -313,11 +313,11 @@ disp_op_t orbit_intlk_set_get_trans_max_x_exp = {
 disp_op_t orbit_intlk_set_get_trans_max_y_exp = {
     .name = ORBIT_INTLK_NAME_SET_GET_TRANS_MAX_Y,
     .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_MAX_Y,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
         DISP_ARG_END
     }
 };
@@ -325,6 +325,30 @@ disp_op_t orbit_intlk_set_get_trans_max_y_exp = {
 disp_op_t orbit_intlk_set_get_ang_max_x_exp = {
     .name = ORBIT_INTLK_NAME_SET_GET_ANG_MAX_X,
     .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_max_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_MAX_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_X,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -334,14 +358,206 @@ disp_op_t orbit_intlk_set_get_ang_max_x_exp = {
     }
 };
 
-disp_op_t orbit_intlk_set_get_ang_max_y_exp = {
-    .name = ORBIT_INTLK_NAME_SET_GET_ANG_MAX_Y,
-    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_MAX_Y,
+disp_op_t orbit_intlk_set_get_trans_smaller_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_Y,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_ltc_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_ltc_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_any_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_ANY,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_ANY,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_smaller_ltc_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_SMALLER_LTC,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_SMALLER_LTC,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_ltc_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_ltc_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_any_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_ANY,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_ANY,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_smaller_ltc_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_SMALLER_LTC,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_SMALLER_LTC,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_min_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_MIN_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_min_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_MIN_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_MIN_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_min_x_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_MIN_X,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_X,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_min_y_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_MIN_Y,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
         DISP_ARG_END
     }
 };
@@ -369,13 +585,31 @@ const disp_op_t *orbit_intlk_exp_ops [] = {
     &orbit_intlk_set_get_ang_bigger_any_exp,
     &orbit_intlk_set_get_ang_bigger_exp,
     &orbit_intlk_set_get_ang_bigger_ltc_exp,
-    &orbit_intlk_set_get_intlk_bigger_exp,
-    &orbit_intlk_set_get_intlk_bigger_ltc_exp,
+    &orbit_intlk_set_get_intlk_exp,
+    &orbit_intlk_set_get_intlk_ltc_exp,
     &orbit_intlk_set_get_min_sum_exp,
     &orbit_intlk_set_get_trans_max_x_exp,
     &orbit_intlk_set_get_trans_max_y_exp,
     &orbit_intlk_set_get_ang_max_x_exp,
     &orbit_intlk_set_get_ang_max_y_exp,
+    &orbit_intlk_set_get_trans_smaller_x_exp,
+    &orbit_intlk_set_get_trans_smaller_y_exp,
+    &orbit_intlk_set_get_trans_smaller_ltc_x_exp,
+    &orbit_intlk_set_get_trans_smaller_ltc_y_exp,
+    &orbit_intlk_set_get_trans_smaller_any_exp,
+    &orbit_intlk_set_get_trans_smaller_exp,
+    &orbit_intlk_set_get_trans_smaller_ltc_exp,
+    &orbit_intlk_set_get_ang_smaller_x_exp,
+    &orbit_intlk_set_get_ang_smaller_y_exp,
+    &orbit_intlk_set_get_ang_smaller_ltc_x_exp,
+    &orbit_intlk_set_get_ang_smaller_ltc_y_exp,
+    &orbit_intlk_set_get_ang_smaller_any_exp,
+    &orbit_intlk_set_get_ang_smaller_exp,
+    &orbit_intlk_set_get_ang_smaller_ltc_exp,
+    &orbit_intlk_set_get_trans_min_x_exp,
+    &orbit_intlk_set_get_trans_min_y_exp,
+    &orbit_intlk_set_get_ang_min_x_exp,
+    &orbit_intlk_set_get_ang_min_y_exp,
     NULL
 };
 
