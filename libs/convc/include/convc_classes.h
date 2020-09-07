@@ -18,7 +18,7 @@
 /* version macros for compile-time API detection */
 
 #define CONVC_VERSION_MAJOR 2
-#define CONVC_VERSION_MINOR 2
+#define CONVC_VERSION_MINOR 3
 #define CONVC_VERSION_PATCH 0
 
 #define CONVC_MAKE_VERSION(major, minor, patch) \
