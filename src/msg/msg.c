@@ -289,13 +289,10 @@ static msg_err_e _msg_gen_get_opcode (zmsg_t *zmq_msg, uint32_t *opcode)
             MSG_ERR_WRONG_ARGS);
 
     *opcode = *(uint32_t *) zframe_data (opcode_frm);
-    ASSERT_TEST(*opcode < MSG_OPCODE_MAX, "Invalid opcode received",
-            err_invalid_opcode, MSG_ERR_WRONG_ARGS);
 
     zframe_destroy (&opcode_frm);
     return err;
 
-err_invalid_opcode:
 err_wrong_opcode_size:
     zframe_destroy (&opcode_frm);
 err_null_opcode:
