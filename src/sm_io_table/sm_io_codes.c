@@ -27,6 +27,7 @@ const disp_op_t **smio_exp_ops [] = {
     afc_mgmt_exp_ops,
     tim_rcv_exp_ops,
     orbit_intlk_exp_ops,
+    fofb_ctrl_exp_ops,
     NULL
 };
 
