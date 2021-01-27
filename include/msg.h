@@ -13,8 +13,6 @@ extern "C" {
 #endif
 
 #define MSG_OPCODE_SIZE                     (sizeof (uint32_t))
-/* Arbitrary number*/
-#define MSG_OPCODE_MAX                      200
 
 /* We add more message types here */
 typedef enum {
