@@ -23,6 +23,17 @@
 #define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
 #endif
 
+/* Regular registers */
+
+#define FOFB_CC_REG_CFG_VAL                  FOFB_CC_REGS_CFG_VAL 
+
+/* Definitions for FOFB_CC_REG_CFG_VAL */
+#define FOFB_CC_CFG_VAL_ACT_PART             FOFB_CC_REGS_CFG_VAL_ACT_PART 
+#define FOFB_CC_CFG_VAL_UNUSED               FOFB_CC_REGS_CFG_VAL_UNUSED 
+#define FOFB_CC_CFG_VAL_ERR_CLR              FOFB_CC_REGS_CFG_VAL_ERR_CLR 
+#define FOFB_CC_CFG_VAL_CC_ENABLE            FOFB_CC_REGS_CFG_VAL_CC_ENABLE 
+#define FOFB_CC_CFG_VAL_TFS_OVERRIDE         FOFB_CC_REGS_CFG_VAL_TFS_OVERRIDE 
+
 #define FOFB_CC_REGS_RAM_START               (FOFB_CC_REGS_RAM_REG)
 
 /* RAM-based registers. Write from Bus, Read from Device */
