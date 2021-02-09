@@ -26,11 +26,12 @@ static struct option long_options[] =
     {"halcsnumber",         required_argument,   NULL, 's'},
     {"boardslot",           required_argument,   NULL, 'o'},
     {"bpm_id",              required_argument,   NULL, 't'},
+    {"time_frame_len",      required_argument,   NULL, 'f'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:c";
+static const char* shortopt = "hb:vo:s:t:f:c";
 
 void print_help (char *program_name)
 {
@@ -44,6 +45,8 @@ void print_help (char *program_name)
             "  -s  --halcsnumber <HALCS number = [0|1]> HALCS number\n"
             "                                       Board slot number\n"
             "  -t  --bpm_id <ID=[0-512]>            BPM ID\n"
+            "  -f  --time_frame_len <Length in clock cycles>\n"
+            "                                       Timeframe length\n"
             "  -c  --firmware_ver                   Firmware version\n",
             program_name);
 }
@@ -56,6 +59,7 @@ int main (int argc, char *argv [])
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
     char *bpm_id_str = NULL;
+    char *time_frame_len_str = NULL;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -85,6 +89,10 @@ int main (int argc, char *argv [])
 
             case 't':
                 bpm_id_str = strdup (optarg);
+                break;
+
+            case 'f':
+                time_frame_len_str = strdup (optarg);
                 break;
 
             case 'c':
@@ -153,6 +161,17 @@ int main (int argc, char *argv [])
             fprintf (stderr, "[client:fofb_ctrl]: halcs_set_bpm_id failed\n");
             goto err_halcs_exit;
         }
+
+    uint32_t time_frame_len = 0;
+    if (time_frame_len_str != NULL) {
+        time_frame_len = strtoul (time_frame_len_str, NULL, 10);
+
+        fprintf (stdout, "[client:fofb_ctrl]: time_frame_len = 0x%08X\n", time_frame_len);
+        err = halcs_set_fofb_ctrl_time_frame_len (halcs_client, service, time_frame_len);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_time_frame_len failed\n");
+            goto err_halcs_exit;
+        }
     }
 
     /* At the end of all register set we need to call acq_part funcion
@@ -177,6 +196,8 @@ err_halcs_exit:
     /* Try to read up until the point where the error occurs, anyway */
     halcs_set_fofb_ctrl_act_part (halcs_client, service, 0x1);
 err_halcs_client_new:
+    free (time_frame_len_str);
+    time_frame_len_str = NULL;
     free (bpm_id_str);
     bpm_id_str = NULL;
     free (board_number_str);
