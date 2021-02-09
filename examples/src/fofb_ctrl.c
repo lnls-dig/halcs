@@ -28,10 +28,11 @@ static struct option long_options[] =
     {"bpm_id",              required_argument,   NULL, 't'},
     {"time_frame_len",      required_argument,   NULL, 'f'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
+    {"link_partners",       no_argument,         NULL, 'l'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:c";
+static const char* shortopt = "hb:vo:s:t:f:cl";
 
 void print_help (char *program_name)
 {
@@ -47,7 +48,8 @@ void print_help (char *program_name)
             "  -t  --bpm_id <ID=[0-512]>            BPM ID\n"
             "  -f  --time_frame_len <Length in clock cycles>\n"
             "                                       Timeframe length\n"
-            "  -c  --firmware_ver                   Firmware version\n",
+            "  -c  --firmware_ver                   Firmware version\n"
+            "  -l  --link_partners                  Link partners ID\n",
             program_name);
 }
 
@@ -55,6 +57,7 @@ int main (int argc, char *argv [])
 {
     int verbose = 0;
     int firmware_ver = 0;
+    int link_partners = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
@@ -97,6 +100,10 @@ int main (int argc, char *argv [])
 
             case 'c':
                 firmware_ver = 1;
+                break;
+
+            case 'l':
+                link_partners = 1;
                 break;
 
             case '?':
@@ -200,6 +207,23 @@ int main (int argc, char *argv [])
             goto err_halcs_exit;
         }
         fprintf (stdout, "[client:fofb_ctrl]: firmware_ver = 0x%08X\n", firmware_ver_get);
+    }
+
+    uint32_t link_partners_get[4] = {0};
+    if (link_partners) {
+        err = halcs_get_fofb_ctrl_link_partner_1 (halcs_client, service, &link_partners_get[0]);
+        err |= halcs_get_fofb_ctrl_link_partner_2 (halcs_client, service, &link_partners_get[1]);
+        err |= halcs_get_fofb_ctrl_link_partner_3 (halcs_client, service, &link_partners_get[2]);
+        err |= halcs_get_fofb_ctrl_link_partner_4 (halcs_client, service, &link_partners_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_link_partner_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: link_partner_1 = %u\n", link_partners_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: link_partner_2 = %u\n", link_partners_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: link_partner_3 = %u\n", link_partners_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: link_partner_4 = %u\n", link_partners_get[3]);
     }
 
 err_halcs_exit:
