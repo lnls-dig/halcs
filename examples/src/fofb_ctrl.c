@@ -162,6 +162,16 @@ int main (int argc, char *argv [])
             goto err_halcs_exit;
         }
 
+        err = halcs_get_fofb_ctrl_bpm_id_rdback (halcs_client, service, &bpm_id);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_bpm_id_rdback failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: bpm_id_rdback = 0x%08X\n", bpm_id);
+    }
+
+
     uint32_t time_frame_len = 0;
     if (time_frame_len_str != NULL) {
         time_frame_len = strtoul (time_frame_len_str, NULL, 10);
