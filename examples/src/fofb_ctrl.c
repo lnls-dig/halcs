@@ -27,12 +27,13 @@ static struct option long_options[] =
     {"boardslot",           required_argument,   NULL, 'o'},
     {"bpm_id",              required_argument,   NULL, 't'},
     {"time_frame_len",      required_argument,   NULL, 'f'},
+    {"cc_enable",           required_argument,   NULL, 'e'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
     {"link_partners",       no_argument,         NULL, 'l'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:cl";
+static const char* shortopt = "hb:vo:s:t:f:e:cl";
 
 void print_help (char *program_name)
 {
@@ -48,6 +49,8 @@ void print_help (char *program_name)
             "  -t  --bpm_id <ID=[0-512]>            BPM ID\n"
             "  -f  --time_frame_len <Length in clock cycles>\n"
             "                                       Timeframe length\n"
+            "  -e  --cc_enable <Enable[0|1]>\n"
+            "                                       CC enable\n"
             "  -c  --firmware_ver                   Firmware version\n"
             "  -l  --link_partners                  Link partners ID\n",
             program_name);
@@ -63,6 +66,7 @@ int main (int argc, char *argv [])
     char *halcs_number_str = NULL;
     char *bpm_id_str = NULL;
     char *time_frame_len_str = NULL;
+    char *cc_enable_str = NULL;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -96,6 +100,10 @@ int main (int argc, char *argv [])
 
             case 'f':
                 time_frame_len_str = strdup (optarg);
+                break;
+
+            case 'e':
+                cc_enable_str = strdup (optarg);
                 break;
 
             case 'c':
@@ -191,6 +199,22 @@ int main (int argc, char *argv [])
         }
     }
 
+    uint32_t cc_enable = 0;
+    if (cc_enable_str != NULL) {
+        cc_enable = strtoul (cc_enable_str, NULL, 10);
+        if (cc_enable != 0 && cc_enable != 1) {
+            fprintf (stderr, "[client:fofb_ctrl]: Invalid cc_enable argument\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: cc_enable = 0x%08X\n", cc_enable);
+        err = halcs_set_fofb_ctrl_cc_enable (halcs_client, service, cc_enable);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_cc_enable failed\n");
+            goto err_halcs_exit;
+        }
+    }
+
     /* At the end of all register set we need to call acq_part funcion
      * to trigger FOFB ram readout by the device */
     err = halcs_set_fofb_ctrl_act_part (halcs_client, service, 0x1);
@@ -230,6 +254,8 @@ err_halcs_exit:
     /* Try to read up until the point where the error occurs, anyway */
     halcs_set_fofb_ctrl_act_part (halcs_client, service, 0x1);
 err_halcs_client_new:
+    free (cc_enable_str);
+    cc_enable_str = NULL;
     free (time_frame_len_str);
     time_frame_len_str = NULL;
     free (bpm_id_str);
