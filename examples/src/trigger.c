@@ -286,6 +286,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_src failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_rcv_src (halcs_client, service_mux, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_rcv_src: %u\n", arg);
         }
 
         uint32_t rcvsel = 0;
@@ -296,6 +300,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_sel failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_rcv_in_sel (halcs_client, service_mux, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_rcv_in_sel: %u\n", arg);
         }
 
         if (rcvcount == 1) {
@@ -317,6 +325,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_sel failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_transm_src (halcs_client, service_mux, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_transm_src: %u\n", arg);
         }
 
         uint32_t transmsel = 0;
@@ -327,6 +339,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_sel failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_transm_out_sel (halcs_client, service_mux, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_transm_out_sel: %u\n", arg);
         }
 
         if (transmcount == 1) {
@@ -348,6 +364,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_rcv_len failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_rcv_len (halcs_client, service_iface, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_rcv_len: %u\n", arg);
         }
 
         uint32_t trnlen = 0;
@@ -358,6 +378,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_len failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_transm_len (halcs_client, service_iface, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_transm_len: %u\n", arg);
         }
 
         uint32_t dir = 0;
@@ -368,6 +392,10 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_dir failed\n");
                 goto err_halcs_set;
             }
+
+            uint32_t arg = 0;
+            halcs_get_trigger_dir (halcs_client, service_iface, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_dir: %u\n", arg);
         }
 
         uint32_t dirpol = 0;
@@ -378,26 +406,11 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_dir_pol failed\n");
                 goto err_halcs_set;
             }
-        }
 
-        /* Read all parameters from this channel */
-        uint32_t arg = 0;
-        halcs_get_trigger_rcv_src (halcs_client, service_mux, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_rcv_src: %u\n", arg);
-        halcs_get_trigger_rcv_in_sel (halcs_client, service_mux, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_rcv_in_sel: %u\n", arg);
-        halcs_get_trigger_transm_src (halcs_client, service_mux, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_transm_src: %u\n", arg);
-        halcs_get_trigger_transm_out_sel (halcs_client, service_mux, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_transm_out_sel: %u\n", arg);
-        halcs_get_trigger_rcv_len (halcs_client, service_iface, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_rcv_len: %u\n", arg);
-        halcs_get_trigger_transm_len (halcs_client, service_iface, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_transm_len: %u\n", arg);
-        halcs_get_trigger_dir (halcs_client, service_iface, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_dir: %u\n", arg);
-        halcs_get_trigger_dir_pol (halcs_client, service_iface, chan, &arg);
-        printf ("[client:trigger]: halcs_get_trigger_dir_pol: %u\n", arg);
+            uint32_t arg = 0;
+            halcs_get_trigger_dir_pol (halcs_client, service_iface, chan, &arg);
+            printf ("[client:trigger]: halcs_get_trigger_dir_pol: %u\n", arg);
+        }
     }
 
 err_halcs_set:
