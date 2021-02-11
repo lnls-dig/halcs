@@ -30,8 +30,10 @@ static struct option long_options[] =
     {"channumber",          required_argument,   NULL, 'c'},
     {"rcvsrc",              required_argument,   NULL, 'r'},
     {"rcvsel",              required_argument,   NULL, 'p'},
+    {"rcvcount",            no_argument,         NULL, 'a'},
     {"transmsrc",           required_argument,   NULL, 't'},
     {"transsel",            required_argument,   NULL, 'u'},
+    {"transmcount",         no_argument,         NULL, 'e'},
     {"rcvlen",              required_argument,   NULL, 'l'},
     {"trnlen",              required_argument,   NULL, 'm'},
     {"dir",                 required_argument,   NULL, 'd'},
@@ -39,7 +41,7 @@ static struct option long_options[] =
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:r:p:t:u:l:m:d:x:";
+static const char* shortopt = "hb:vo:s:c:r:p:at:u:el:m:d:x:";
 
 void print_help (char *program_name)
 {
@@ -63,8 +65,10 @@ void print_help (char *program_name)
             "                                     17 -> Swithcing Clock]\n"
             "  -r  --rcvsrc <Receive source for the selected channel = [0 = trigger backplane, 1 = FPGA internal]> \n"
             "  -p  --rcvsel <Receive selection source for the selected channel = [TBD]> \n"
+            "  -a  --rcvcount                     Receiver pulse counter\n"
             "  -t  --transmsrc <Transmit source for the selected channel = [0 = trigger backplane, 1 = FPGA internal]> \n"
             "  -u  --transmsel <Transmit selection source for the selected channel = [TBD]> \n"
+            "  -e  --transmcount                  Transmitter pulse counter\n"
             "  -l  --rcvlen <Receive debounce length> \n"
 
             "  -m  --trnlen <Transmit extension length> \n"
@@ -86,6 +90,7 @@ int main (int argc, char *argv [])
     int rcvsrc_sel = 0;
     char *rcvsel_str = NULL;
     int rcvsel_sel = 0;
+    int rcvcount = 0;
     char *transmsrc_str = NULL;
     int transmsrc_sel = 0;
     char *transmsel_str = NULL;
@@ -94,6 +99,7 @@ int main (int argc, char *argv [])
     int rcvlen_sel = 0;
     char *trnlen_str = NULL;
     int trnlen_sel = 0;
+    int transmcount = 0;
     char *dir_str = NULL;
     int dir_sel = 0;
     char *dirpol_str = NULL;
@@ -140,6 +146,10 @@ int main (int argc, char *argv [])
                 rcvsel_sel = 1;
                 break;
 
+            case 'a':
+                rcvcount = 1;
+                break;
+
             case 't':
                 transmsrc_str = strdup (optarg);
                 transmsrc_sel = 1;
@@ -148,6 +158,10 @@ int main (int argc, char *argv [])
             case 'u':
                 transmsel_str = strdup (optarg);
                 transmsel_sel = 1;
+                break;
+
+            case 'e':
+                transmcount = 1;
                 break;
 
             case 'l':
@@ -284,6 +298,17 @@ int main (int argc, char *argv [])
             }
         }
 
+        if (rcvcount == 1) {
+            uint32_t arg = 0;
+            halcs_client_err_e err = halcs_get_trigger_count_rcv (halcs_client, service_iface, chan, &arg);
+
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_get_trigger_count_rcv failed\n");
+                goto err_halcs_set;
+            }
+            printf ("[client:trigger]: halcs_get_trigger_count_rcv: %u\n", arg);
+        }
+
         uint32_t transmsrc = 0;
         if (transmsrc_sel == 1) {
             transmsrc = strtoul (transmsrc_str, NULL, 10);
@@ -302,6 +327,17 @@ int main (int argc, char *argv [])
                 fprintf (stderr, "[client:trigger]: halcs_set_trigger_transm_sel failed\n");
                 goto err_halcs_set;
             }
+        }
+
+        if (transmcount == 1) {
+            uint32_t arg = 0;
+            halcs_client_err_e err = halcs_get_trigger_count_transm (halcs_client, service_iface, chan, &arg);
+
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:trigger]: halcs_get_trigger_count_transm failed\n");
+                goto err_halcs_set;
+            }
+            printf ("[client:trigger]: halcs_get_trigger_count_transm: %u\n", arg);
         }
 
         uint32_t rcvlen = 0;
