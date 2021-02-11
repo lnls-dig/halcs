@@ -25,7 +25,7 @@ static struct option long_options[] =
     {"help",                no_argument,         NULL, 'h'},
     {"brokerendp",          required_argument,   NULL, 'b'},
     {"verbose",             no_argument,         NULL, 'v'},
-    {"halcsnumber",           required_argument,   NULL, 's'},
+    {"halcsnumber",         required_argument,   NULL, 's'},
     {"boardslot",           required_argument,   NULL, 'o'},
     {"channumber",          required_argument,   NULL, 'c'},
     {"rcvsrc",              required_argument,   NULL, 'r'},
