@@ -32,7 +32,7 @@ static struct option long_options[] =
     {"rcvsel",              required_argument,   NULL, 'p'},
     {"rcvcount",            no_argument,         NULL, 'a'},
     {"transmsrc",           required_argument,   NULL, 't'},
-    {"transsel",            required_argument,   NULL, 'u'},
+    {"transmsel",           required_argument,   NULL, 'u'},
     {"transmcount",         no_argument,         NULL, 'e'},
     {"rcvlen",              required_argument,   NULL, 'l'},
     {"trnlen",              required_argument,   NULL, 'm'},
