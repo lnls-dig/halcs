@@ -30,10 +30,12 @@ static struct option long_options[] =
     {"cc_enable",           required_argument,   NULL, 'e'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
     {"link_partners",       no_argument,         NULL, 'l'},
+    {"rx_pck_cnt",          no_argument,         NULL, 'r'},
+    {"tx_pck_cnt",          no_argument,         NULL, 'x'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:e:cl";
+static const char* shortopt = "hb:vo:s:t:f:e:clrx";
 
 void print_help (char *program_name)
 {
@@ -49,10 +51,11 @@ void print_help (char *program_name)
             "  -t  --bpm_id <ID=[0-512]>            BPM ID\n"
             "  -f  --time_frame_len <Length in clock cycles>\n"
             "                                       Timeframe length\n"
-            "  -e  --cc_enable <Enable[0|1]>\n"
-            "                                       CC enable\n"
+            "  -e  --cc_enable <Enable[0|1]>        CC enable\n"
             "  -c  --firmware_ver                   Firmware version\n"
-            "  -l  --link_partners                  Link partners ID\n",
+            "  -l  --link_partners                  Link partners ID\n"
+            "  -r  --rx_pck_cnt                     RX packet count\n"
+            "  -x  --tx_pck_cnt                     TX packet count\n",
             program_name);
 }
 
@@ -61,6 +64,8 @@ int main (int argc, char *argv [])
     int verbose = 0;
     int firmware_ver = 0;
     int link_partners = 0;
+    int rx_pck_cnt = 0;
+    int tx_pck_cnt = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
@@ -112,6 +117,14 @@ int main (int argc, char *argv [])
 
             case 'l':
                 link_partners = 1;
+                break;
+
+            case 'r':
+                rx_pck_cnt = 1;
+                break;
+
+            case 'x':
+                tx_pck_cnt = 1;
                 break;
 
             case '?':
@@ -248,6 +261,40 @@ int main (int argc, char *argv [])
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_2 = %u\n", link_partners_get[1]);
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_3 = %u\n", link_partners_get[2]);
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_4 = %u\n", link_partners_get[3]);
+    }
+
+    uint32_t rx_pck_cnt_get[4] = {0};
+    if (rx_pck_cnt) {
+        err = halcs_get_fofb_ctrl_rx_pck_cnt_1 (halcs_client, service, &rx_pck_cnt_get[0]);
+        err |= halcs_get_fofb_ctrl_rx_pck_cnt_2 (halcs_client, service, &rx_pck_cnt_get[1]);
+        err |= halcs_get_fofb_ctrl_rx_pck_cnt_3 (halcs_client, service, &rx_pck_cnt_get[2]);
+        err |= halcs_get_fofb_ctrl_rx_pck_cnt_4 (halcs_client, service, &rx_pck_cnt_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_rx_pck_cnt_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_1 = %u\n", rx_pck_cnt_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_2 = %u\n", rx_pck_cnt_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_3 = %u\n", rx_pck_cnt_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_4 = %u\n", rx_pck_cnt_get[3]);
+    }
+
+    uint32_t tx_pck_cnt_get[4] = {0};
+    if (tx_pck_cnt) {
+        err = halcs_get_fofb_ctrl_tx_pck_cnt_1 (halcs_client, service, &tx_pck_cnt_get[0]);
+        err |= halcs_get_fofb_ctrl_tx_pck_cnt_2 (halcs_client, service, &tx_pck_cnt_get[1]);
+        err |= halcs_get_fofb_ctrl_tx_pck_cnt_3 (halcs_client, service, &tx_pck_cnt_get[2]);
+        err |= halcs_get_fofb_ctrl_tx_pck_cnt_4 (halcs_client, service, &tx_pck_cnt_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_tx_pck_cnt_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_1 = %u\n", tx_pck_cnt_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_2 = %u\n", tx_pck_cnt_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_3 = %u\n", tx_pck_cnt_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_4 = %u\n", tx_pck_cnt_get[3]);
     }
 
 err_halcs_exit:
