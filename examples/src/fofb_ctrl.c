@@ -30,6 +30,9 @@ static struct option long_options[] =
     {"cc_enable",           required_argument,   NULL, 'e'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
     {"link_partners",       no_argument,         NULL, 'l'},
+    {"soft_err_cnt",        no_argument,         NULL, 'm'},
+    {"hard_err_cnt",        no_argument,         NULL, 'n'},
+    {"frame_err_cnt",       no_argument,         NULL, 'j'},
     {"rx_pck_cnt",          no_argument,         NULL, 'r'},
     {"tx_pck_cnt",          no_argument,         NULL, 'x'},
     {"fod_process_time",    no_argument,         NULL, 'y'},
@@ -38,7 +41,7 @@ static struct option long_options[] =
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:e:clrxykw";
+static const char* shortopt = "hb:vo:s:t:f:e:clrxykwmnj";
 
 void print_help (char *program_name)
 {
@@ -57,6 +60,9 @@ void print_help (char *program_name)
             "  -e  --cc_enable <Enable[0|1]>        CC enable\n"
             "  -c  --firmware_ver                   Firmware version\n"
             "  -l  --link_partners                  Link partners ID\n"
+            "  -m  --soft_err_cnt                   Number of soft errors\n"
+            "  -n  --hard_err_cnt                   Number of hard errors\n"
+            "  -j  --frame_err_cnt                  Link partners ID\n"
             "  -r  --rx_pck_cnt                     RX packet count\n"
             "  -x  --tx_pck_cnt                     TX packet count\n"
             "  -y  --fod_process_time               FOD process time [in userclk cycles]\n"
@@ -70,6 +76,9 @@ int main (int argc, char *argv [])
     int verbose = 0;
     int firmware_ver = 0;
     int link_partners = 0;
+    int soft_err_cnt = 0;
+    int hard_err_cnt = 0;
+    int frame_err_cnt = 0;
     int rx_pck_cnt = 0;
     int tx_pck_cnt = 0;
     int fod_process_time = 0;
@@ -126,6 +135,18 @@ int main (int argc, char *argv [])
 
             case 'l':
                 link_partners = 1;
+                break;
+
+            case 'm':
+                soft_err_cnt = 1;
+                break;
+
+            case 'n':
+                hard_err_cnt = 1;
+                break;
+
+            case 'j':
+                frame_err_cnt = 1;
                 break;
 
             case 'r':
@@ -282,6 +303,57 @@ int main (int argc, char *argv [])
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_2 = %u\n", link_partners_get[1]);
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_3 = %u\n", link_partners_get[2]);
         fprintf (stdout, "[client:fofb_ctrl]: link_partner_4 = %u\n", link_partners_get[3]);
+    }
+
+    uint32_t soft_err_cnt_get[4] = {0};
+    if (soft_err_cnt) {
+        err = halcs_get_fofb_ctrl_soft_err_cnt_1 (halcs_client, service, &soft_err_cnt_get[0]);
+        err |= halcs_get_fofb_ctrl_soft_err_cnt_2 (halcs_client, service, &soft_err_cnt_get[1]);
+        err |= halcs_get_fofb_ctrl_soft_err_cnt_3 (halcs_client, service, &soft_err_cnt_get[2]);
+        err |= halcs_get_fofb_ctrl_soft_err_cnt_4 (halcs_client, service, &soft_err_cnt_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_soft_err_cnt_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_1 = %u\n", soft_err_cnt_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_2 = %u\n", soft_err_cnt_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_3 = %u\n", soft_err_cnt_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_4 = %u\n", soft_err_cnt_get[3]);
+    }
+
+    uint32_t hard_err_cnt_get[4] = {0};
+    if (hard_err_cnt) {
+        err = halcs_get_fofb_ctrl_hard_err_cnt_1 (halcs_client, service, &hard_err_cnt_get[0]);
+        err |= halcs_get_fofb_ctrl_hard_err_cnt_2 (halcs_client, service, &hard_err_cnt_get[1]);
+        err |= halcs_get_fofb_ctrl_hard_err_cnt_3 (halcs_client, service, &hard_err_cnt_get[2]);
+        err |= halcs_get_fofb_ctrl_hard_err_cnt_4 (halcs_client, service, &hard_err_cnt_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_hard_err_cnt_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_1 = %u\n", hard_err_cnt_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_2 = %u\n", hard_err_cnt_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_3 = %u\n", hard_err_cnt_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_4 = %u\n", hard_err_cnt_get[3]);
+    }
+
+    uint32_t frame_err_cnt_get[4] = {0};
+    if (frame_err_cnt) {
+        err = halcs_get_fofb_ctrl_frame_err_cnt_1 (halcs_client, service, &frame_err_cnt_get[0]);
+        err |= halcs_get_fofb_ctrl_frame_err_cnt_2 (halcs_client, service, &frame_err_cnt_get[1]);
+        err |= halcs_get_fofb_ctrl_frame_err_cnt_3 (halcs_client, service, &frame_err_cnt_get[2]);
+        err |= halcs_get_fofb_ctrl_frame_err_cnt_4 (halcs_client, service, &frame_err_cnt_get[3]);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_frame_err_cnt_X failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_1 = %u\n", frame_err_cnt_get[0]);
+        fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_2 = %u\n", frame_err_cnt_get[1]);
+        fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_3 = %u\n", frame_err_cnt_get[2]);
+        fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_4 = %u\n", frame_err_cnt_get[3]);
     }
 
     uint32_t rx_pck_cnt_get[4] = {0};
