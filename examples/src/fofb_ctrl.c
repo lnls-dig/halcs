@@ -32,10 +32,13 @@ static struct option long_options[] =
     {"link_partners",       no_argument,         NULL, 'l'},
     {"rx_pck_cnt",          no_argument,         NULL, 'r'},
     {"tx_pck_cnt",          no_argument,         NULL, 'x'},
+    {"fod_process_time",    no_argument,         NULL, 'y'},
+    {"bpm_cnt",             no_argument,         NULL, 'k'},
+    {"timeframe_cnt",       no_argument,         NULL, 'w'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:e:clrx";
+static const char* shortopt = "hb:vo:s:t:f:e:clrxykw";
 
 void print_help (char *program_name)
 {
@@ -55,7 +58,10 @@ void print_help (char *program_name)
             "  -c  --firmware_ver                   Firmware version\n"
             "  -l  --link_partners                  Link partners ID\n"
             "  -r  --rx_pck_cnt                     RX packet count\n"
-            "  -x  --tx_pck_cnt                     TX packet count\n",
+            "  -x  --tx_pck_cnt                     TX packet count\n"
+            "  -y  --fod_process_time               FOD process time [in userclk cycles]\n"
+            "  -k  --bpm_cnt                        BPM count in current timeframe\n"
+            "  -w  --timeframe_cnt                  Total number of timeframes\n",
             program_name);
 }
 
@@ -66,6 +72,9 @@ int main (int argc, char *argv [])
     int link_partners = 0;
     int rx_pck_cnt = 0;
     int tx_pck_cnt = 0;
+    int fod_process_time = 0;
+    int bpm_cnt = 0;
+    int timeframe_cnt = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
     char *halcs_number_str = NULL;
@@ -125,6 +134,18 @@ int main (int argc, char *argv [])
 
             case 'x':
                 tx_pck_cnt = 1;
+                break;
+
+            case 'y':
+                fod_process_time = 1;
+                break;
+
+            case 'k':
+                bpm_cnt = 1;
+                break;
+
+            case 'w':
+                timeframe_cnt = 1;
                 break;
 
             case '?':
@@ -295,6 +316,39 @@ int main (int argc, char *argv [])
         fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_2 = %u\n", tx_pck_cnt_get[1]);
         fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_3 = %u\n", tx_pck_cnt_get[2]);
         fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_4 = %u\n", tx_pck_cnt_get[3]);
+    }
+
+    uint32_t fod_process_time_get = 0;
+    if (fod_process_time) {
+        err = halcs_get_fofb_ctrl_fod_process_time (halcs_client, service, &fod_process_time_get);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_fod_process_time failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: fod_process_time = %u usrclk cycles\n", fod_process_time_get);
+    }
+
+    uint32_t bpm_cnt_get = 0;
+    if (bpm_cnt) {
+        err = halcs_get_fofb_ctrl_bpm_count (halcs_client, service, &bpm_cnt_get);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_bpm_count failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: bpm_cnt = %u\n", bpm_cnt_get);
+    }
+
+    uint32_t timeframe_cnt_get = 0;
+    if (timeframe_cnt) {
+        err = halcs_get_fofb_ctrl_time_frame_count (halcs_client, service, &timeframe_cnt_get);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_time_frame_count failed\n");
+            goto err_halcs_exit;
+        }
+
+        fprintf (stdout, "[client:fofb_ctrl]: timeframe_cnt = %u\n", timeframe_cnt_get);
     }
 
 err_halcs_exit:
