@@ -34,6 +34,50 @@
 #define FOFB_CC_CFG_VAL_CC_ENABLE            FOFB_CC_REGS_CFG_VAL_CC_ENABLE 
 #define FOFB_CC_CFG_VAL_TFS_OVERRIDE         FOFB_CC_REGS_CFG_VAL_TFS_OVERRIDE 
 
+#define FOFB_CC_REG_TOA_CTL                  FOFB_CC_REGS_TOA_CTL
+
+/* Definitions for FOFB CC Time-of-Arrival configuration register */
+#define FOFB_CC_TOA_CTL_RD_EN                FOFB_CC_REGS_TOA_CTL_RD_EN 
+#define FOFB_CC_TOA_CTL_RD_STR               FOFB_CC_REGS_TOA_CTL_RD_STR
+
+#define FOFB_CC_REG_TOA_DATA                 FOFB_CC_REGS_TOA_DATA
+
+/* Definitions for FOFB CC Time-of-Arrival data */
+#define FOFB_CC_TOA_DATA_VAL_MASK            FOFB_CC_REGS_TOA_DATA_VAL_MASK 
+#define FOFB_CC_TOA_DATA_VAL_SHIFT           FOFB_CC_REGS_TOA_DATA_VAL_SHIFT
+
+#define FOFB_CC_REG_RCB_CTL                  FOFB_CC_REGS_RCB_CTL
+
+/* Definitions for FOFB CC Received Buffer configuration register */
+#define FOFB_CC_RCB_CTL_RD_EN                FOFB_CC_REGS_RCB_CTL_RD_EN 
+#define FOFB_CC_RCB_CTL_RD_STR               FOFB_CC_REGS_RCB_CTL_RD_STR
+
+#define FOFB_CC_REG_RCB_DATA                 FOFB_CC_REGS_RCB_DATA 
+
+/* Definitions for FOFB CC Received Buffer data */
+#define FOFB_CC_RCB_DATA_VAL_MASK            FOFB_CC_REGS_RCB_DATA_VAL_MASK 
+#define FOFB_CC_RCB_DATA_VAL_SHIFT           FOFB_CC_REGS_RCB_DATA_VAL_SHIFT
+
+#define FOFB_CC_REG_XY_BUFF_CTL              FOFB_CC_REGS_XY_BUFF_CTL
+
+/* Definitions for FOFB CC X/Y buffer configuration register */
+#define FOFB_CC_XY_BUFF_CTL_UNUSED_MASK      FOFB_CC_REGS_XY_BUFF_CTL_UNUSED_MASK 
+#define FOFB_CC_XY_BUFF_CTL_UNUSED_SHIFT     FOFB_CC_REGS_XY_BUFF_CTL_UNUSED_SHIFT
+#define FOFB_CC_XY_BUFF_CTL_ADDR_MASK        FOFB_CC_REGS_XY_BUFF_CTL_ADDR_MASK 
+#define FOFB_CC_XY_BUFF_CTL_ADDR_SHIFT       FOFB_CC_REGS_XY_BUFF_CTL_ADDR_SHIFT
+
+#define  FOFB_CC_REG_XY_BUFF_DATA_MSB        FOFB_CC_REGS_XY_BUFF_DATA_MSB
+
+/* Definitions for FOFB CC X/Y buffer MSB */
+#define FOFB_CC_XY_BUFF_DATA_MSB_VAL_MASK    FOFB_CC_REGS_XY_BUFF_DATA_MSB_VAL_MASK 
+#define FOFB_CC_XY_BUFF_DATA_MSB_VAL_SHIFT   FOFB_CC_REGS_XY_BUFF_DATA_MSB_VAL_SHIFT
+
+#define FOFB_CC_REG_XY_BUFF_DATA_LSB         FOFB_CC_REGS_XY_BUFF_DATA_LSB
+
+/* Definitions for FOFB CC X/Y buffer LSB */
+#define FOFB_CC_XY_BUFF_DATA_LSB_VAL_MASK    FOFB_CC_REGS_XY_BUFF_DATA_LSB_VAL_MASK 
+#define FOFB_CC_XY_BUFF_DATA_LSB_VAL_SHIFT   FOFB_CC_REGS_XY_BUFF_DATA_LSB_VAL_SHIFT
+
 #define FOFB_CC_REGS_RAM_START               (FOFB_CC_REGS_RAM_REG)
 
 /* RAM-based registers. Write from Bus, Read from Device */
