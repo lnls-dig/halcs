@@ -2446,6 +2446,70 @@ halcs_client_err_e halcs_get_fofb_ctrl_loopback_rdback (halcs_client_t *self, ch
 halcs_client_err_e halcs_get_fofb_ctrl_faival_rdback (halcs_client_t *self, char *service,
         uint32_t *fofb_ctrl_faival_rdback);
 
+/********************** RTMLAMP_OHWR Functions ********************/
+
+/* RTMLAMP_OHWR Controller sta function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_rtmlamp_ohwr_sta (halcs_client_t *self, char *service,
+        uint32_t *rtmlamp_ohwr_sta);
+
+/* RTMLAMP_OHWR Controller dac_data_from_wb function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service, 
+        uint32_t rtmlamp_ohwr_dac_data_from_wb);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
+        uint32_t *rtmlamp_ohwr_dac_data_from_wb);
+
+/* RTMLAMP_OHWR Controller AMP flags functions. The functions returns
+ * amplifier flags of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_iflag_l (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amp_iflag_l);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_iflag_l (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amp_iflag_l);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_tflag_l (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amp_tflag_l);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_tflag_l (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amp_tflag_l);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_iflag_r (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amp_iflag_r);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_iflag_r (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amp_iflag_r);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_tflag_r (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amp_tflag_r);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_tflag_r (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amp_tflag_r);
+
+/* RTMLAMP_OHWR Controller AMP enable function. The function set/get
+ * amplifier enable of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t amp_en);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *amp_en);
+
+/* RTMLAMP_OHWR Controller DAC function. The function set/get
+ * DAC data of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t dac_data);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *dac_data);
+
+/* RTMLAMP_OHWR Controller DAC write function. The function set/get
+ * DAC data write to external IC of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_wr (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t dac_wr);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_wr (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *dac_wr);
+
 #ifdef __cplusplus
 }
 #endif

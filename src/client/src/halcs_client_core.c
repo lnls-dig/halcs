@@ -3977,3 +3977,109 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_faival_rdback)
 {
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FAIVAL_RDBACK, fofb_ctrl_faival_rdback);
 }
+
+/**************** RTMLAM_OHWR SMIO Functions ****************/
+
+PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_sta)
+{
+    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_STA, rtmlamp_ohwr_sta);
+}
+
+PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_sta)
+{
+    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_STA, rtmlamp_ohwr_sta);
+}
+
+PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_dac_data_from_wb)
+{
+    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA_FROM_WB, rtmlamp_ohwr_dac_data_from_wb);
+}
+
+PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_dac_data_from_wb)
+{
+    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA_FROM_WB, rtmlamp_ohwr_dac_data_from_wb);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_iflag_l, chan, amp_iflag_l)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_IFLAG_L,
+            chan, amp_iflag_l);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_iflag_l, chan, amp_iflag_l)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_AMP_IFLAG_L,
+            chan, amp_iflag_l);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_tflag_l, chan, amp_tflag_l)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_TFLAG_L,
+            chan, amp_tflag_l);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_tflag_l, chan, amp_tflag_l)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_AMP_TFLAG_L,
+            chan, amp_tflag_l);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_iflag_r, chan, amp_iflag_r)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_IFLAG_R,
+            chan, amp_iflag_r);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_iflag_r, chan, amp_iflag_r)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_AMP_IFLAG_R,
+            chan, amp_iflag_r);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_tflag_r, chan, amp_tflag_r)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_TFLAG_R,
+            chan, amp_tflag_r);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_tflag_r, chan, amp_tflag_r)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_AMP_TFLAG_R,
+            chan, amp_tflag_r);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_en, chan, amp_en)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_EN,
+            chan, amp_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_en, chan, amp_en)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_AMP_EN,
+            chan, amp_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_dac_data, chan, dac_data)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA,
+            chan, dac_data);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_dac_data, chan, dac_data)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA,
+            chan, dac_data);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_dac_wr, chan, dac_wr)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_DAC_WR,
+            chan, dac_wr);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_dac_wr, chan, dac_wr)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_WR,
+            chan, dac_wr);
+}
