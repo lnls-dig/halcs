@@ -125,19 +125,19 @@ int main (int argc, char *argv [])
                 break;
 
             case 'r':
-                amp_iflag_l_sel = 0;
+                amp_iflag_l_sel = 1;
                 break;
 
             case 'p':
-                amp_tflag_l_sel = 0;
+                amp_tflag_l_sel = 1;
                 break;
 
             case 'a':
-                amp_iflag_r_sel = 0;
+                amp_iflag_r_sel = 1;
                 break;
 
             case 't':
-                amp_iflag_r_sel = 0;
+                amp_iflag_r_sel = 1;
                 break;
 
             case 'u':
