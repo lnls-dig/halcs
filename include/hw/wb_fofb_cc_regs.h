@@ -1,0 +1,142 @@
+#ifndef __WB_FOFB_CC_REGS_H__
+#define __WB_FOFB_CC_REGS_H__
+
+#include "__wb_fofb_cc_regs.h"
+
+#ifdef __KERNEL__
+#include <linux/types.h>
+#else
+#include <inttypes.h>
+#endif
+
+#if defined( __GNUC__)
+#define PACKED __attribute__ ((packed))
+#else
+#error "Unsupported compiler?"
+#endif
+
+#ifndef __WBGEN2_MACROS_DEFINED__
+#define __WBGEN2_MACROS_DEFINED__
+#define WBGEN2_GEN_MASK(offset, size) (((1<<(size))-1) << (offset))
+#define WBGEN2_GEN_WRITE(value, offset, size) (((value) & ((1<<(size))-1)) << (offset))
+#define WBGEN2_GEN_READ(reg, offset, size) (((reg) >> (offset)) & ((1<<(size))-1))
+#define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
+#endif
+
+/* Regular registers */
+
+#define FOFB_CC_REG_CFG_VAL                  FOFB_CC_REGS_CFG_VAL 
+
+/* Definitions for FOFB_CC_REG_CFG_VAL */
+#define FOFB_CC_CFG_VAL_ACT_PART             FOFB_CC_REGS_CFG_VAL_ACT_PART 
+#define FOFB_CC_CFG_VAL_UNUSED               FOFB_CC_REGS_CFG_VAL_UNUSED 
+#define FOFB_CC_CFG_VAL_ERR_CLR              FOFB_CC_REGS_CFG_VAL_ERR_CLR 
+#define FOFB_CC_CFG_VAL_CC_ENABLE            FOFB_CC_REGS_CFG_VAL_CC_ENABLE 
+#define FOFB_CC_CFG_VAL_TFS_OVERRIDE         FOFB_CC_REGS_CFG_VAL_TFS_OVERRIDE 
+
+#define FOFB_CC_REG_TOA_CTL                  FOFB_CC_REGS_TOA_CTL
+
+/* Definitions for FOFB CC Time-of-Arrival configuration register */
+#define FOFB_CC_TOA_CTL_RD_EN                FOFB_CC_REGS_TOA_CTL_RD_EN 
+#define FOFB_CC_TOA_CTL_RD_STR               FOFB_CC_REGS_TOA_CTL_RD_STR
+
+#define FOFB_CC_REG_TOA_DATA                 FOFB_CC_REGS_TOA_DATA
+
+/* Definitions for FOFB CC Time-of-Arrival data */
+#define FOFB_CC_TOA_DATA_VAL_MASK            FOFB_CC_REGS_TOA_DATA_VAL_MASK 
+#define FOFB_CC_TOA_DATA_VAL_SHIFT           FOFB_CC_REGS_TOA_DATA_VAL_SHIFT
+
+#define FOFB_CC_REG_RCB_CTL                  FOFB_CC_REGS_RCB_CTL
+
+/* Definitions for FOFB CC Received Buffer configuration register */
+#define FOFB_CC_RCB_CTL_RD_EN                FOFB_CC_REGS_RCB_CTL_RD_EN 
+#define FOFB_CC_RCB_CTL_RD_STR               FOFB_CC_REGS_RCB_CTL_RD_STR
+
+#define FOFB_CC_REG_RCB_DATA                 FOFB_CC_REGS_RCB_DATA 
+
+/* Definitions for FOFB CC Received Buffer data */
+#define FOFB_CC_RCB_DATA_VAL_MASK            FOFB_CC_REGS_RCB_DATA_VAL_MASK 
+#define FOFB_CC_RCB_DATA_VAL_SHIFT           FOFB_CC_REGS_RCB_DATA_VAL_SHIFT
+
+#define FOFB_CC_REG_XY_BUFF_CTL              FOFB_CC_REGS_XY_BUFF_CTL
+
+/* Definitions for FOFB CC X/Y buffer configuration register */
+#define FOFB_CC_XY_BUFF_CTL_UNUSED_MASK      FOFB_CC_REGS_XY_BUFF_CTL_UNUSED_MASK 
+#define FOFB_CC_XY_BUFF_CTL_UNUSED_SHIFT     FOFB_CC_REGS_XY_BUFF_CTL_UNUSED_SHIFT
+#define FOFB_CC_XY_BUFF_CTL_ADDR_MASK        FOFB_CC_REGS_XY_BUFF_CTL_ADDR_MASK 
+#define FOFB_CC_XY_BUFF_CTL_ADDR_SHIFT       FOFB_CC_REGS_XY_BUFF_CTL_ADDR_SHIFT
+
+#define  FOFB_CC_REG_XY_BUFF_DATA_MSB        FOFB_CC_REGS_XY_BUFF_DATA_MSB
+
+/* Definitions for FOFB CC X/Y buffer MSB */
+#define FOFB_CC_XY_BUFF_DATA_MSB_VAL_MASK    FOFB_CC_REGS_XY_BUFF_DATA_MSB_VAL_MASK 
+#define FOFB_CC_XY_BUFF_DATA_MSB_VAL_SHIFT   FOFB_CC_REGS_XY_BUFF_DATA_MSB_VAL_SHIFT
+
+#define FOFB_CC_REG_XY_BUFF_DATA_LSB         FOFB_CC_REGS_XY_BUFF_DATA_LSB
+
+/* Definitions for FOFB CC X/Y buffer LSB */
+#define FOFB_CC_XY_BUFF_DATA_LSB_VAL_MASK    FOFB_CC_REGS_XY_BUFF_DATA_LSB_VAL_MASK 
+#define FOFB_CC_XY_BUFF_DATA_LSB_VAL_SHIFT   FOFB_CC_REGS_XY_BUFF_DATA_LSB_VAL_SHIFT
+
+#define FOFB_CC_REGS_RAM_START               (FOFB_CC_REGS_RAM_REG)
+
+/* RAM-based registers. Write from Bus, Read from Device */
+
+#define FOFB_CC_REGS_CTL_OFFS                (0x0 << 10)
+
+#define FOFB_CC_REG_BPM_ID                   ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x00)
+#define FOFB_CC_REG_TIME_FRAME_LEN           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x04)
+#define FOFB_CC_REG_MGT_POWERDOWN            ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x08)
+#define FOFB_CC_REG_MGT_LOOPBACK             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x0C)
+#define FOFB_CC_REG_TIME_FRAME_DLY           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x10)
+#define FOFB_CC_REG_GOLDEN_ORB_X             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x14)
+#define FOFB_CC_REG_GOLDEN_ORB_Y             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x18)
+#define FOFB_CC_REG_CUST_FEATURE             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x1C)
+#define FOFB_CC_REG_RXPOLARITY               ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x20)
+#define FOFB_CC_REG_PAYLOADSEL               ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x24)
+#define FOFB_CC_REG_FOFBDATASEL              ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_CTL_OFFS) + 0x28)
+
+/* RAM-based registers. Read from Bus, Write from Device */
+
+#define FOFB_CC_REGS_STA_OFFS                (0x3 << 10)
+
+#define FOFB_CC_REG_FIRMWARE_VER             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x3FC)
+#define FOFB_CC_REG_SYS_STATUS               ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x00)
+#define FOFB_CC_REG_LINK_PARTNER_1           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x04)
+#define FOFB_CC_REG_LINK_PARTNER_2           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x08)
+#define FOFB_CC_REG_LINK_PARTNER_3           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x0C)
+#define FOFB_CC_REG_LINK_PARTNER_4           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x10)
+#define FOFB_CC_REG_LINK_UP                  ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x14)
+#define FOFB_CC_REG_TIME_FRAME_COUNT         ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x18)
+#define FOFB_CC_REG_HARD_ERR_CNT_1           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x1C)
+#define FOFB_CC_REG_HARD_ERR_CNT_2           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x20)
+#define FOFB_CC_REG_HARD_ERR_CNT_3           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x24)
+#define FOFB_CC_REG_HARD_ERR_CNT_4           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x28)
+#define FOFB_CC_REG_SOFT_ERR_CNT_1           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x2C)
+#define FOFB_CC_REG_SOFT_ERR_CNT_2           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x30)
+#define FOFB_CC_REG_SOFT_ERR_CNT_3           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x34)
+#define FOFB_CC_REG_SOFT_ERR_CNT_4           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x38)
+#define FOFB_CC_REG_FRAME_ERR_CNT_1          ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x3C)
+#define FOFB_CC_REG_FRAME_ERR_CNT_2          ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x40)
+#define FOFB_CC_REG_FRAME_ERR_CNT_3          ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x44)
+#define FOFB_CC_REG_FRAME_ERR_CNT_4          ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x48)
+#define FOFB_CC_REG_RX_PCK_CNT_1             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x4C)
+#define FOFB_CC_REG_RX_PCK_CNT_2             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x50)
+#define FOFB_CC_REG_RX_PCK_CNT_3             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x54)
+#define FOFB_CC_REG_RX_PCK_CNT_4             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x58)
+#define FOFB_CC_REG_TX_PCK_CNT_1             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x5C)
+#define FOFB_CC_REG_TX_PCK_CNT_2             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x60)
+#define FOFB_CC_REG_TX_PCK_CNT_3             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x64)
+#define FOFB_CC_REG_TX_PCK_CNT_4             ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x68)
+#define FOFB_CC_REG_FOD_PROCESS_TIME         ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x6C)
+#define FOFB_CC_REG_BPM_COUNT                ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x70)
+#define FOFB_CC_REG_BPM_ID_RDBACK            ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x74)
+#define FOFB_CC_REG_TF_LENGTH_RDBACK         ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x78)
+#define FOFB_CC_REG_POWERDOWN_RDBACK         ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x7C)
+#define FOFB_CC_REG_LOOPBACK_RDBACK          ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x80)
+#define FOFB_CC_REG_FAIVAL_RDBACK            ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x84)
+#define FOFB_CC_REG_FEATURE_RDBACK           ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x88)
+#define FOFB_CC_REG_RX_MAXCOUNT              ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x8C)
+#define FOFB_CC_REG_TX_MAXCOUNT              ((FOFB_CC_REGS_RAM_START | FOFB_CC_REGS_STA_OFFS) + 0x90)
+
+#endif /* __WB_FOFB_CC_REGS_H__ */

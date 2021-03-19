@@ -37,6 +37,15 @@ for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
             START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
             ;;
 
+        afc_fofb_ctrl*)
+            # Only start HALCSs for even-numbered instances, as there is no device for odd-numbered instances
+            if [ $((prog_inst%2)) -eq 0 ]; then
+                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-be@${HALCS_IDXS[$prog_inst]}.service"
+            else
+                START_PROGRAM=""
+            fi
+            ;;
+
         afc-tim*)
             # Only start IOCs for even-numbered instances, as there is no device for odd-numbered instances
             if [ $((prog_inst%2)) -eq 0 ]; then
@@ -49,9 +58,14 @@ for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
         pbpm-gw*)
             START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
             ;;
+
         *)
-            echo "Invalid Gateware: "${GATEWARE_NAME} >&2
-            exit 2
+            # Only start HALCSs for even-numbered instances, as there is no device for odd-numbered instances
+            if [ $((prog_inst%2)) -eq 0 ]; then
+                START_PROGRAM="/usr/bin/systemctl --no-block start halcs-be@${HALCS_IDXS[$prog_inst]}.service"
+            else
+                START_PROGRAM=""
+            fi
             ;;
     esac
 

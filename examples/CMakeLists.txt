@@ -416,6 +416,18 @@ if(BUILD_EXAMPLE_trigger)
     list(APPEND bin_target_outputs "trigger")
 endif()
 
+option(BUILD_EXAMPLE_fofb_ctrl "Whether or not to build example fofb_ctrl tool" ON)
+
+if(BUILD_EXAMPLE_fofb_ctrl)
+    list(APPEND bin_target_outputs "fofb_ctrl")
+endif()
+
+option(BUILD_EXAMPLE_rtmlamp_ohwr_ctl "Whether or not to build example rtmlamp_ohwr_ctl tool" ON)
+
+if(BUILD_EXAMPLE_rtmlamp_ohwr_ctl)
+    list(APPEND bin_target_outputs "rtmlamp_ohwr_ctl")
+endif()
+
 foreach(bin_target ${bin_target_outputs})
     # add binary tool
     add_executable(${bin_target} src/${bin_target}.c)
