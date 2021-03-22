@@ -39,7 +39,7 @@ static struct option long_options[] =
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:yw:rpatu:e:r:";
+static const char* shortopt = "hb:vo:s:c:yw:rpatu:e:x:";
 
 void print_help (char *program_name)
 {
@@ -351,7 +351,7 @@ int main (int argc, char *argv [])
 
             uint32_t arg = 0;
             halcs_get_rtmlamp_ohwr_dac_wr (halcs_client, service, chan, &arg);
-            printf ("[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_rcv_src: 0x%08X\n", arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_dac_wr: 0x%08X\n", arg);
         }
     }
 
