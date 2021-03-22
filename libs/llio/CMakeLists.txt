@@ -520,6 +520,9 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_VERSION_PATCH ${llio_VERSION_PATCH})
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "llio Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "llio Temporary CPack Directory")
+    # Generate debuginfo package
+    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 
     include(CPack)
 
