@@ -367,7 +367,7 @@ int main (int argc, char *argv [])
     else {
         chan = strtoul (chan_str, NULL, 10);
 
-        if (chan > END_CHAN_ID-1) {
+        if (chan > MAX_NUM_CHANS-1) {
             fprintf (stderr, "[client:acq]: Channel number too big. Maximum number is: %u\n",
                     MAX_NUM_CHANS);
             goto err_opt_exit;
