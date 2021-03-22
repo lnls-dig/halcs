@@ -250,8 +250,8 @@ set(gcc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:GNU>>")
 set(clang_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:Clang>>")
 target_compile_options(halcs_examples_compiler_flags
     INTERFACE
-    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-O2;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-cpp>>"
-    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-O2;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-error=\#warnings>>"
+    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-O2;-g;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-cpp>>"
+    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-O2;-g;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-error=\#warnings>>"
 )
 
 # add binaries to bin_target_outputs
