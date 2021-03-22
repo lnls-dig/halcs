@@ -79,6 +79,9 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 
     self->curr_chan = 0;
 
+    uint32_t __acq_buf_max_inst_id = ARRAY_SIZE(__acq_buf)-1;
+    uint32_t __acq_buf_max_chan = ARRAY_SIZE(__acq_buf[0])-1;
+
     /* Initialize sample_size and max_samples for acq_buf */
     for (uint32_t i = 0; i < self->num_chan; i++) {
         /* These are all in bit sizes */
@@ -91,9 +94,14 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         uint32_t max_samples = 0;
         uint32_t first_addr = 0;
         uint32_t last_addr = 0;
-        uint32_t acq_buf_id =  __acq_buf[inst_id][i].id;
-        uint32_t acq_buf_start_addr = __acq_buf[inst_id][i].start_addr;
-        uint32_t acq_buf_end_addr = __acq_buf[inst_id][i].end_addr;
+        uint32_t acq_buf_id =  (inst_id > __acq_buf_max_inst_id ||
+                                i > __acq_buf_max_chan)? i : __acq_buf[inst_id][i].id;
+        uint32_t acq_buf_start_addr = (inst_id > __acq_buf_max_inst_id ||
+                                i > __acq_buf_max_chan)? (MEM_TOTAL_SIZE-MEM_REGION_SIZE) : 
+                                    __acq_buf[inst_id][i].start_addr;
+        uint32_t acq_buf_end_addr =(inst_id > __acq_buf_max_inst_id ||
+                                i > __acq_buf_max_chan)? (MEM_TOTAL_SIZE-DDR3_DATA_WIDTH) : 
+                                    __acq_buf[inst_id][i].end_addr;
 
         /* Get channel properties */
         GET_PARAM_CHANNEL(parent, acq, 0x0, ACQ_CORE, CH0_DESC, INT_WIDTH,
@@ -142,6 +150,10 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
             self->acq_buf[i].end_addr, self->acq_buf[i].sample_size, self->acq_buf[i].max_samples);
     }
 
+    /* Initialize acq_params */
+    self->acq_params = (acq_params_t *) zmalloc ((sizeof *self->acq_params) * self->num_chan);
+    ASSERT_ALLOC (self->acq_params, err_acq_params_alloc);
+
     /* Set default value for all channels */
     for (uint32_t i = 0; i < self->num_chan; i++) {
         self->acq_params[i].num_samples_pre = num_samples_pre;
@@ -157,12 +169,6 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
             "\tTrigger Address = 0x%08X\n",
             inst_id, i, self->acq_params[i].num_samples_pre, self->acq_params[i].num_samples_post,
             self->acq_params[i].num_shots, self->acq_params[i].trig_addr);
-    }
-
-    /* initilize acquisition buffer areas. Defined in ddr3_map.h */
-    if (inst_id > NUM_ACQ_CORE_SMIOS-1) {
-        DBE_DEBUG (DBG_SM_IO | DBG_LVL_ERR, "[sm_io:acq_core] Instance ID invalid\n");
-        return NULL;
     }
 
 #if 0
@@ -186,6 +192,8 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 #if 0
 err_sdb_info:
 #endif
+err_acq_params_alloc:
+    free (self->acq_params);
 err_atom_width:
 err_num_atoms:
 err_num_coalesce:
@@ -205,7 +213,8 @@ smio_err_e smio_acq_destroy (smio_acq_t **self_p)
     if (*self_p) {
         smio_acq_t *self = *self_p;
 
-        free(self->acq_buf);
+        free (self->acq_params);
+        free (self->acq_buf);
         free (self);
         *self_p = NULL;
     }
