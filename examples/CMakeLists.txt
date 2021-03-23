@@ -250,8 +250,8 @@ set(gcc_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:GNU>>")
 set(clang_c "$<$<COMPILE_LANGUAGE:C>:$<C_COMPILER_ID:Clang>>")
 target_compile_options(halcs_examples_compiler_flags
     INTERFACE
-    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-O2;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-cpp>>"
-    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-O2;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-error=\#warnings>>"
+    "$<${gcc_c}:$<BUILD_INTERFACE:-Wall;-O2;-g;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-cpp>>"
+    "$<${clang_c}:$<BUILD_INTERFACE:-Wall;-O2;-g;-Wno-missing-field-initializers;-Wno-missing-braces;-Wno-error=\#warnings>>"
 )
 
 # add binaries to bin_target_outputs
@@ -416,6 +416,18 @@ if(BUILD_EXAMPLE_trigger)
     list(APPEND bin_target_outputs "trigger")
 endif()
 
+option(BUILD_EXAMPLE_fofb_ctrl "Whether or not to build example fofb_ctrl tool" ON)
+
+if(BUILD_EXAMPLE_fofb_ctrl)
+    list(APPEND bin_target_outputs "fofb_ctrl")
+endif()
+
+option(BUILD_EXAMPLE_rtmlamp_ohwr_ctl "Whether or not to build example rtmlamp_ohwr_ctl tool" ON)
+
+if(BUILD_EXAMPLE_rtmlamp_ohwr_ctl)
+    list(APPEND bin_target_outputs "rtmlamp_ohwr_ctl")
+endif()
+
 foreach(bin_target ${bin_target_outputs})
     # add binary tool
     add_executable(${bin_target} src/${bin_target}.c)
@@ -498,6 +510,8 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    # Generate debuginfo package
+    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
@@ -529,6 +543,9 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_VERSION_PATCH ${halcs_examples_VERSION_PATCH})
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "HALCS examples Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "HALCS examples Temporary CPack Directory")
+    # Generate debuginfo package
+    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 
     include(CPack)
 

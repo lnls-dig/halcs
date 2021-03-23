@@ -474,12 +474,14 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2)")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2), dkms")
+    # Generate debuginfo package
+    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
-    set(CPACK_RPM_PACKAGE_REQUIRE "libsodium-devel >= 1.0.8, zeromq-devel >= 4.2.5, czmq-devel >= 4.0.2")
+    set(CPACK_RPM_PACKAGE_REQUIRE "libsodium-devel >= 1.0.8, zeromq-devel >= 4.2.5, czmq-devel >= 4.0.2, dkms")
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
         /lib
         /usr/etc
@@ -509,6 +511,9 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_VERSION_PATCH ${halcs_VERSION_PATCH})
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsd Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "halcsd Temporary CPack Directory")
+    # Generate debuginfo package
+    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 
     include(CPack)
 

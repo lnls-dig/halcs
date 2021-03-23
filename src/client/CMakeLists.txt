@@ -287,6 +287,8 @@ set(halcsclient_smio_table_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/afc_mgmt/sm_io_afc_mgmt_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/tim_rcv/sm_io_tim_rcv_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/orbit_intlk/sm_io_orbit_intlk_exports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.c
 )
 
@@ -343,6 +345,8 @@ set(halcsclient_smio_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/afc_mgmt/sm_io_afc_mgmt_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/tim_rcv/sm_io_tim_rcv_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/orbit_intlk/sm_io_orbit_intlk_codes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_ctrl/sm_io_fofb_ctrl_codes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_codes.h
 )
 
 # Get directory names only
@@ -394,6 +398,8 @@ set(halcsclient_smio_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/afc_mgmt/sm_io_afc_mgmt_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/tim_rcv/sm_io_tim_rcv_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/orbit_intlk/sm_io_orbit_intlk_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.h
 )
 
@@ -785,6 +791,8 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    # Generate debuginfo package
+    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
@@ -816,6 +824,9 @@ if(ENABLE_CPACK)
     set(CPACK_PACKAGE_VERSION_PATCH ${halcsclient_VERSION_PATCH})
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsclient Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "halcsclient Temporary CPack Directory")
+    # Generate debuginfo package
+    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 
     include(CPack)
 

@@ -48,7 +48,7 @@ typedef struct {
 
 typedef struct {
     sdbutils_info_t sdbutils_info;          /* SDB information for this core */
-    acq_params_t acq_params[END_CHAN_ID];   /* Parameters for each channel */
+    acq_params_t *acq_params;               /* Parameters for each channel */
     uint32_t curr_chan;                     /* Current channel being acquired */
     uint32_t num_chan;                      /* Numbert of acquisition channels */
     uint32_t multishot_ram_size;            /* Multishot RAM size, in acquistion words */
