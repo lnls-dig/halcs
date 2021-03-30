@@ -124,6 +124,12 @@ set(HALCS_SYSCONFDIR ${HALCS_CFG_PREFIX}/${NOPREFIX_HALCS_SYSCONFDIR})
 # relative directory for halcs data files
 set(NOPREFIX_HALCS_DATADIR "halcs")
 
+# set postinst filenames
+set(DEBIAN_POSTINST_FILE_NAME "postinst.debian")
+set(REDHAT_POSTINST_FILE_NAME "postinst.redhat")
+
+set(HALCS_LOG_DIR "/var/log/halcs")
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -363,6 +369,20 @@ foreach(bin_target ${apps_halcsd})
             OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
+        set(halcsd_FULL_LOG_DIR ${HALCS_LOG_DIR})
+
+        configure_file (
+            "${CMAKE_CURRENT_SOURCE_DIR}/${DEBIAN_POSTINST_FILE_NAME}.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${DEBIAN_POSTINST_FILE_NAME}"
+            @ONLY
+        )
+
+        configure_file (
+            "${CMAKE_CURRENT_SOURCE_DIR}/${REDHAT_POSTINST_FILE_NAME}.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${REDHAT_POSTINST_FILE_NAME}"
+            @ONLY
+        )
+
         if(WITH_SYSTEMD)
             # service files. Use an install script so we are able to change the
             # absolute paths of systemd unit files on install, which can be
@@ -374,6 +394,7 @@ foreach(bin_target ${apps_halcsd})
             install(CODE "set(HALCS_SYSCONFDIR ${HALCS_SYSCONFDIR})")
             install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
             install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})")
+            install(CODE "set(HALCS_LOG_DIR ${HALCS_LOG_DIR})")
 
             install(CODE "set(input_file
                 \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-be@.service.in\")")
@@ -475,6 +496,8 @@ if(ENABLE_CPACK)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2), dkms")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_BINARY_DIR}/${DEBIAN_POSTINST_FILE_NAME}")
+
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
@@ -490,6 +513,13 @@ if(ENABLE_CPACK)
         /etc/udev
         /etc/udev/rules.d
     )
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${REDHAT_POSTINST_FILE_NAME}")
+
+    # Install all components but pciedriver: already packaged
+    get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+    list(REMOVE_ITEM CPACK_COMPONENTS_ALL "pciedriver")
+    message(STATUS "CPACK_COMPONENTS_ALL: ${CPACK_COMPONENTS_ALL}")
+
     set(CPACK_PACKAGE_NAME "halcsd")
     set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")
     string(APPEND halcs_VERSION "${halcs_DISTRO_VERSION}")
