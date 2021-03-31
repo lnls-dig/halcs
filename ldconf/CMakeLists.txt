@@ -32,6 +32,7 @@ if(INSTALL_LDCONFIG_halcs)
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/ldconf/halcs.conf
         DESTINATION ${LDCONF_SYSCONFDIR}
+        COMPONENT Scripts
         PERMISSIONS
         OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
     )

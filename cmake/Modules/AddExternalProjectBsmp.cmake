@@ -85,6 +85,7 @@ install(DIRECTORY
     ${bsmp_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT Libs
 )
 
 # as we can't intall IMPORTED libraries as TARGETS, just use plain
@@ -94,4 +95,5 @@ install(FILES
     ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.a
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT Libs
 )

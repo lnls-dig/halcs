@@ -509,7 +509,7 @@ if(ENABLE_CPACK)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
@@ -542,34 +542,37 @@ if(ENABLE_CPACK)
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "HALCS examples Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "HALCS examples Temporary CPack Directory")
 
-    include(CPack)
+    if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        include(CPack)
 
-    cpack_add_component_group(Development
-        DISPLAY_NAME "HALCS examples library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "HALCS examples source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "HALCS examples headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "HALCS examples runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
+        cpack_add_component_group(Development
+            DISPLAY_NAME "HALCS examples library"
+            EXPANDED
+        )
+        cpack_add_component(SourceCode
+            DISPLAY_NAME "HALCS examples source code"
+            DISABLED
+            INSTALL_TYPES FullInstall
+        )
+        cpack_add_component(SDK
+            DISPLAY_NAME "HALCS examples headers and libraries"
+            INSTALL_TYPES FullInstall DevInstall
+            GROUP Development
+        )
+        cpack_add_component(Runtime
+            DISPLAY_NAME "HALCS examples runtime files"
+            REQUIRED
+            INSTALL_TYPES FullInstall DevInstall MinInstall
+        )
+        cpack_add_install_type(FullInstall
+            DISPLAY_NAME "Full install, including source code"
+        )
+        cpack_add_install_type(DevInstall
+            DISPLAY_NAME "Developer install, headers and libraries"
+        )
+        cpack_add_install_type(MinInstall
+            DISPLAY_NAME "Minimal install, runtime only"
+        )
+    endif()
+
 endif()

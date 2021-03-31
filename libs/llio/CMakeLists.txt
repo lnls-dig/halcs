@@ -384,11 +384,11 @@ endif()
 
 install(TARGETS ${target_outputs} llio_compiler_flags
     EXPORT ${PROJECT_NAME}-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Libs
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
     FRAMEWORK DESTINATION "Library/Frameworks"
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Libs
 )
 
 # install headers that are inside another directory
@@ -396,6 +396,7 @@ install(DIRECTORY
     ${llio_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT Libs
 )
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
@@ -430,6 +431,7 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libllio.pc
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT Libs
 )
 
 # only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
@@ -460,12 +462,14 @@ if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${llio_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
         ${llio_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
 endif()
 
@@ -488,7 +492,7 @@ if(ENABLE_CPACK)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
@@ -521,34 +525,37 @@ if(ENABLE_CPACK)
     # set(CPACK_PACKAGE_INSTALL_DIRECTORY "llio Install Directory")
     # set(CPACK_TEMPORARY_DIRECTORY "llio Temporary CPack Directory")
 
-    include(CPack)
+    if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        include(CPack)
 
-    cpack_add_component_group(Development
-        DISPLAY_NAME "Low-level I/O library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "Low-level I/O source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "Low-level I/O headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "Low-level I/O runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
+        cpack_add_component_group(Development
+            DISPLAY_NAME "Low-level I/O library"
+            EXPANDED
+        )
+        cpack_add_component(SourceCode
+            DISPLAY_NAME "Low-level I/O source code"
+            DISABLED
+            INSTALL_TYPES FullInstall
+        )
+        cpack_add_component(SDK
+            DISPLAY_NAME "Low-level I/O headers and libraries"
+            INSTALL_TYPES FullInstall DevInstall
+            GROUP Development
+        )
+        cpack_add_component(Runtime
+            DISPLAY_NAME "Low-level I/O runtime files"
+            REQUIRED
+            INSTALL_TYPES FullInstall DevInstall MinInstall
+        )
+        cpack_add_install_type(FullInstall
+            DISPLAY_NAME "Full install, including source code"
+        )
+        cpack_add_install_type(DevInstall
+            DISPLAY_NAME "Developer install, headers and libraries"
+        )
+        cpack_add_install_type(MinInstall
+            DISPLAY_NAME "Minimal install, runtime only"
+        )
+    endif()
+
 endif()

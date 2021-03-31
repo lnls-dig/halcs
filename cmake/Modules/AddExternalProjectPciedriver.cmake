@@ -8,6 +8,10 @@ include(GNUInstallDirs)
 include(TestPciedriverVersion)
 # add external project
 include(ExternalProject)
+# detect target architecture
+include(TargetArch)
+
+target_architecture(ARCH)
 
 ExternalProject_Add(pciedriver_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/pcie-driver
@@ -98,7 +102,7 @@ install(DIRECTORY
     ${pciedriver_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT pciedriver
+    COMPONENT Libs
     FILES_MATCHING PATTERN
     "*.h"
 )
@@ -110,7 +114,7 @@ install(FILES
     ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.a
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT pciedriver
+    COMPONENT Libs
 )
 
 #######################################
@@ -203,16 +207,16 @@ if(BUILD_PCIE_DRIVER)
 
     install(FILES ${pciedriver_driver_SRCS}
         DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
-        COMPONENT pciedriver
+        COMPONENT Pciedriver
     )
     install(FILES ${pciedriver_driver_SCRIPT} DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
         PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        COMPONENT pciedriver
+        COMPONENT Pciedriver
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DKMS_FILE_NAME}
         DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
-        COMPONENT pciedriver
+        COMPONENT Pciedriver
     )
 
 endif()
@@ -229,25 +233,28 @@ if(ENABLE_CPACK)
 
     include(InstallRequiredSystemLibraries)
 
+    # set architecture as detected by TargetArch module
+    set(arch_name ${ARCH})
+
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
+    set(pciedriver_DISTRO_VERSION "" CACHE STRING "pciedriver distribution version")
+    string(APPEND pciedriver_VERSION "${pciedriver_DISTRO_VERSION}")
     set(CPACK_GENERATOR "DEB")
 
     set(CPACK_DEB_COMPONENT_INSTALL ON)
     set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_DEPENDS "dkms")
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_CONTROL_EXTRA
         "${CMAKE_CURRENT_BINARY_DIR}/postinst;${CMAKE_CURRENT_BINARY_DIR}/prerm"
     )
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_DEBIAN_PCIEDRIVER_FILE_NAME
-        "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}"
+        "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.deb"
     )
-    set(CPACK_DEBIAN_PCIEDRIVER_DESCRIPTION "pcieDriver library/driver")
-    set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_VERSION ${pciedriver_VERSION})
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
@@ -267,34 +274,30 @@ if(ENABLE_CPACK)
     set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm")
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_RPM_PCIEDRIVER_FILE_NAME
-        "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}"
+        "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.rpm"
     )
-    set(CPACK_RPM_PCIEDRIVER_PACKAGE_DESCRIPTION "pcieDriver library/driver")
-    set(CPACK_RPM_PCIEDRIVER_PACKAGE_VERSION ${pciedriver_VERSION})
 
-    set(pciedriver_DISTRO_VERSION "" CACHE STRING "pciedriver distribution version")
-    string(APPEND pciedriver_VERSION "${pciedriver_DISTRO_VERSION}")
+    set(CPACK_COMPONENT_PCIEDRIVER_DESCRIPTION "pcieDriver library/driver")
     set(CPACK_PACKAGE_VENDOR "LNLS")
     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
 
-    # Install pciedriver component
-    set(CPACK_COMPONENTS_ALL "pciedriver")
-    message(STATUS "CPACK_COMPONENTS_ALL: ${CPACK_COMPONENTS_ALL}")
-
-    include(CPack)
-
-    cpack_add_component_group(PcieDriver
-        DISPLAY_NAME "pcieDriver drivers, headers and libraries"
-    )
-
-    cpack_add_component(pciedriver
-        DISPLAY_NAME "pcieDriver drivers, headers and libraries"
-        GROUP PcieDriver
-        INSTALL_TYPES FullDriver
-    )
-
-    cpack_add_install_type(FullDriver
-        DISPLAY_NAME "Full drivers, headers and libraries"
-    )
+    # if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+    #     include(CPack)
+    #
+    #        cpack_add_component_group(PciedriverAll
+    #            DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #        )
+    #
+    #        cpack_add_component(Pciedriver
+    #            DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #            GROUP PciedriverAll
+    #            INSTALL_TYPES FullDriver
+    #        )
+    #
+    #        cpack_add_install_type(FullDriver
+    #            DISPLAY_NAME "Full drivers, headers and libraries"
+    #        )
+    #
+    # endif()
 
 endif()
