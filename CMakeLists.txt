@@ -276,6 +276,11 @@ set(cpack_components_all_OPT "Binaries;Libs;Scripts;Tools"
 )
 set(CPACK_COMPONENTS_ALL "${cpack_components_all_OPT}")
 
+# Any CPACK generator
+set(cpack_generator_OPT "DEB"
+    CACHE STRING "CPack CPACK_GENERATOR variable"
+)
+
 # CPack rules
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
@@ -293,7 +298,7 @@ if(ENABLE_CPACK)
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
-    set(CPACK_GENERATOR "DEB")
+    set(CPACK_GENERATOR "${cpack_generator_OPT}")
 
     set(CPACK_DEB_COMPONENT_INSTALL ON)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
