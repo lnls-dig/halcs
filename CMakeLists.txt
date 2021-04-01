@@ -227,6 +227,9 @@ add_subdirectory(libs/bpmclient)
 # Sources/Headers definitions
 ########################################################################
 
+# HALCS postinst file directory
+set(halcs_POSTINST_FILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/halcs")
+
 set(common_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
@@ -307,7 +310,7 @@ if(ENABLE_CPACK)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2)")
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${halcs_POSTINST_FILE_DIR}/debian/${DEBIAN_POSTINST_FILE_NAME}")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${halcs_POSTINST_FILE_DIR}/debian/postinst")
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
@@ -325,7 +328,7 @@ if(ENABLE_CPACK)
         /etc/udev
         /etc/udev/rules.d
     )
-    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${halcs_POSTINST_FILE_DIR}/redhat/${REDHAT_POSTINST_FILE_NAME}")
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${halcs_POSTINST_FILE_DIR}/redhat/postinst")
     set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/halcsd-${halcs_VERSION}")
     set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
 
