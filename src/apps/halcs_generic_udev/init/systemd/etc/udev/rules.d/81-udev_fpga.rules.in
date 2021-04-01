@@ -1,6 +1,6 @@
 # Permissions for the fpga devices
 
-KERNEL=="fpga*", ACTION=="add", OWNER="root", GROUP="users", MODE="660", PROGRAM="@halcs_generic_udev_HALCS_INSTALL_FULL_DATADIR@/get-fpga-gateware-properties.sh -i %k", SYMLINK+="fpga/%c{2}", RUN+="@halcs_generic_udev_HALCS_INSTALL_FULL_DATADIR@/run-fpga-program.sh %c{1+}"
+KERNEL=="fpga*", ACTION=="add", OWNER="root", GROUP="users", MODE="666", PROGRAM="@halcs_generic_udev_HALCS_INSTALL_FULL_DATADIR@/get-fpga-gateware-properties.sh -i %k", SYMLINK+="fpga/%c{2}", RUN+="@halcs_generic_udev_HALCS_INSTALL_FULL_DATADIR@/run-fpga-program.sh %c{1+}"
 
 # We can't run get-fpga-gateware-properties.sh on "remove" action, as this happens
 # after the fpga* structure is removed, so we won't be able to access the device at
