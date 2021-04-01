@@ -302,7 +302,7 @@ if(ENABLE_CPACK)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2)")
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_BINARY_DIR}/${DEBIAN_POSTINST_FILE_NAME}")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_BINARY_DIR}/debian/${DEBIAN_POSTINST_FILE_NAME}")
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)
@@ -320,7 +320,7 @@ if(ENABLE_CPACK)
         /etc/udev
         /etc/udev/rules.d
     )
-    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${REDHAT_POSTINST_FILE_NAME}")
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/redhat/${REDHAT_POSTINST_FILE_NAME}")
 
     set(CPACK_PACKAGE_NAME "halcsd")
     set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")

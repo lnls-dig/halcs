@@ -121,6 +121,7 @@ set(NOPREFIX_HALCS_DATADIR "halcs")
 # set postinst filenames
 set(DEBIAN_POSTINST_FILE_NAME "postinst.debian")
 set(REDHAT_POSTINST_FILE_NAME "postinst.redhat")
+set(POSTINST_FILE_NAME "postinst")
 
 set(HALCS_LOG_DIR "/var/log/halcs")
 
@@ -370,13 +371,13 @@ foreach(bin_target ${apps_halcsd})
 
         configure_file (
             "${CMAKE_CURRENT_SOURCE_DIR}/${DEBIAN_POSTINST_FILE_NAME}.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/${DEBIAN_POSTINST_FILE_NAME}"
+            "${CMAKE_CURRENT_BINARY_DIR}/debian/${POSTINST_FILE_NAME}"
             @ONLY
         )
 
         configure_file (
             "${CMAKE_CURRENT_SOURCE_DIR}/${REDHAT_POSTINST_FILE_NAME}.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/${REDHAT_POSTINST_FILE_NAME}"
+            "${CMAKE_CURRENT_BINARY_DIR}/redhat/${POSTINST_FILE_NAME}"
             @ONLY
         )
 

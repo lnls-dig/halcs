@@ -145,7 +145,7 @@ if(BUILD_PCIE_DRIVER)
 
     configure_file (
         "${pciedriver_driver_KO_DIRECTORY}/${DKMS_FILE_NAME}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_FILE_NAME}"
+        "${BINARY_DIR}/${DKMS_FILE_NAME}"
         @ONLY
     )
 
@@ -155,13 +155,13 @@ if(BUILD_PCIE_DRIVER)
 
     configure_file (
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/${DKMS_POSTINST}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_POSTINST}"
+        "${BINARY_DIR}/${DKMS_POSTINST}"
         @ONLY
     )
 
     configure_file (
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/${DKMS_PRERM}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_PRERM}"
+        "${BINARY_DIR}/${DKMS_PRERM}"
         @ONLY
     )
 
@@ -215,7 +215,7 @@ if(BUILD_PCIE_DRIVER)
         OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         COMPONENT Pciedriver
     )
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DKMS_FILE_NAME}
+    install(FILES ${BINARY_DIR}/${DKMS_FILE_NAME}
         DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
         COMPONENT Pciedriver
     )
@@ -250,7 +250,7 @@ if(ENABLE_CPACK)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_DEPENDS "dkms")
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_CONTROL_EXTRA
-        "${CMAKE_CURRENT_BINARY_DIR}/postinst;${CMAKE_CURRENT_BINARY_DIR}/prerm"
+        "${BINARY_DIR}/postinst;${BINARY_DIR}/prerm"
     )
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_DEBIAN_PCIEDRIVER_FILE_NAME
@@ -271,8 +271,8 @@ if(ENABLE_CPACK)
         /etc/udev
         /etc/udev/rules.d
     )
-    set(CPACK_RPM_PCIEDRIVER_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst")
-    set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm")
+    set(CPACK_RPM_PCIEDRIVER_POST_INSTALL_SCRIPT_FILE "${BINARY_DIR}/postinst")
+    set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${BINARY_DIR}/prerm")
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_RPM_PCIEDRIVER_FILE_NAME
         "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.rpm"
