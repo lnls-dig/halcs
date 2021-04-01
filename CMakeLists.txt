@@ -321,6 +321,7 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/redhat/${REDHAT_POSTINST_FILE_NAME}")
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/halcsd-${halcs_VERSION}")
     set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
 
     set(CPACK_PACKAGE_NAME "halcsd")
