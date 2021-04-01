@@ -80,7 +80,7 @@ add_library(pciedriver SHARED IMPORTED)
 set_target_properties(pciedriver
     PROPERTIES
     IMPORTED_LOCATION
-    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
+    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so.1
     INTERFACE_INCLUDE_DIRECTORIES
     "${pciedriver_INCLUDE_DIRECTORIES}"
     PUBLIC_HEADER
@@ -110,6 +110,7 @@ install(DIRECTORY
 # as we can't intall IMPORTED libraries as TARGETS, just use plain
 # install(FILES)
 install(FILES
+    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so.1
     ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
     ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.a
     DESTINATION
