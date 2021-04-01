@@ -368,6 +368,7 @@ foreach(bin_target ${apps_halcsd})
         )
 
         set(halcsd_FULL_LOG_DIR ${HALCS_LOG_DIR})
+        set(halcs_POSTINST_FILE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
         configure_file (
             "${CMAKE_CURRENT_SOURCE_DIR}/${DEBIAN_POSTINST_FILE_NAME}.in"
