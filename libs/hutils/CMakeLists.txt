@@ -417,55 +417,60 @@ endif()
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
 if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    endif()
-
-    include(InstallRequiredSystemLibraries)
-
-    # set architecture as detected by TargetArch module
-    set(arch_name ${ARCH})
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
-    set(CPACK_PACKAGE_NAME "hutils")
-    set(hutils_DISTRO_VERSION "" CACHE STRING "hutils distribution version")
-    string(APPEND hutils_VERSION "${hutils_DISTRO_VERSION}")
-    set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}_${hutils_VERSION}_${arch_name}"
-    )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS utilities library")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
-    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
-    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${hutils_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${hutils_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${hutils_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${hutils_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "hutils Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "hutils Temporary CPack Directory")
-
     if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+        endif()
+
+        include(InstallRequiredSystemLibraries)
+
+        # set architecture as detected by TargetArch module
+        set(arch_name ${ARCH})
+
+        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        # Generate debuginfo package
+        set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_PACKAGE_AUTOREQ no)
+        set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+            /lib
+            /usr/etc
+            /etc/systemd
+            /lib/systemd
+            /etc/systemd/system
+            /lib/systemd/system
+            /etc/udev
+            /etc/udev/rules.d
+        )
+        set(CPACK_PACKAGE_NAME "hutils")
+        set(hutils_DISTRO_VERSION "" CACHE STRING "hutils distribution version")
+        string(APPEND hutils_VERSION "${hutils_DISTRO_VERSION}")
+        set(CPACK_PACKAGE_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${hutils_VERSION}_${arch_name}"
+        )
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS utilities library")
+        set(CPACK_PACKAGE_VENDOR "LNLS")
+        set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+        # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
+        # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
+        # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
+        set(CPACK_PACKAGE_VERSION ${hutils_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${hutils_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${hutils_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${hutils_VERSION_PATCH})
+        # set(CPACK_PACKAGE_INSTALL_DIRECTORY "hutils Install Directory")
+        # set(CPACK_TEMPORARY_DIRECTORY "hutils Temporary CPack Directory")
+        # Generate debuginfo package
+        set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
         include(CPack)
 
         cpack_add_component_group(Development

@@ -226,28 +226,16 @@ endif()
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
 if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    endif()
-
-    include(InstallRequiredSystemLibraries)
-
     # set architecture as detected by TargetArch module
     set(arch_name ${ARCH})
 
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-
     set(pciedriver_DISTRO_VERSION "" CACHE STRING "pciedriver distribution version")
     string(APPEND pciedriver_VERSION "${pciedriver_DISTRO_VERSION}")
-    set(CPACK_GENERATOR "DEB")
 
-    set(CPACK_DEB_COMPONENT_INSTALL ON)
-    set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+
+    # Generate debuginfo package
+    set(CPACK_DEBIAN_PCIEDRIVER_DEBUGINFO_PACKAGE ON)
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_DEPENDS "dkms")
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_CONTROL_EXTRA
         "${BINARY_DIR}/postinst;${BINARY_DIR}/prerm"
@@ -257,48 +245,70 @@ if(ENABLE_CPACK)
         "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.deb"
     )
 
-    set(CPACK_RPM_COMPONENT_INSTALL ON)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_REQUIRE "dkms")
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
     set(CPACK_RPM_PCIEDRIVER_POST_INSTALL_SCRIPT_FILE "${BINARY_DIR}/postinst")
     set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${BINARY_DIR}/prerm")
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_RPM_PCIEDRIVER_FILE_NAME
         "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.rpm"
     )
+    # Generate debuginfo package
+    set(CPACK_RPM_PCIEDRIVER_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_PCIEDRIVER_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}-${pciedriver_VERSION}")
 
     set(CPACK_COMPONENT_PCIEDRIVER_DESCRIPTION "pcieDriver library/driver")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
 
+    # This is always true as this is included in the main
+    # CMakeLists.txt. Kept here for reference, as main CMakeLists.txt
+    # already includes CPack
     # if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+    #     if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    #         set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+    #         set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+    #         set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    #     endif()
+    #
+    #     include(InstallRequiredSystemLibraries)
+    #
+    #     set(CPACK_GENERATOR "DEB")
+    #
+    #     set(CPACK_DEB_COMPONENT_INSTALL ON)
+    #     set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+    #     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+    #     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+    #     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    #     set(CPACK_RPM_COMPONENT_INSTALL ON)
+    #     set(CPACK_RPM_PACKAGE_AUTOREQ no)
+    #     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+    #     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+    #         /lib
+    #         /usr/etc
+    #         /etc/systemd
+    #         /lib/systemd
+    #         /etc/systemd/system
+    #         /lib/systemd/system
+    #         /etc/udev
+    #         /etc/udev/rules.d
+    #     )
+    #     set(CPACK_PACKAGE_VENDOR "LNLS")
+    #     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+    #
     #     include(CPack)
-    #
-    #        cpack_add_component_group(PciedriverAll
-    #            DISPLAY_NAME "pcieDriver drivers, headers and libraries"
-    #        )
-    #
-    #        cpack_add_component(Pciedriver
-    #            DISPLAY_NAME "pcieDriver drivers, headers and libraries"
-    #            GROUP PciedriverAll
-    #            INSTALL_TYPES FullDriver
-    #        )
-    #
-    #        cpack_add_install_type(FullDriver
-    #            DISPLAY_NAME "Full drivers, headers and libraries"
-    #        )
-    #
+    # 
+    #     cpack_add_component_group(PciedriverAll
+    #         DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #     )
+    # 
+    #     cpack_add_component(Pciedriver
+    #         DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #         GROUP PciedriverAll
+    #         INSTALL_TYPES FullDriver
+    #     )
+    # 
+    #     cpack_add_install_type(FullDriver
+    #         DISPLAY_NAME "Full drivers, headers and libraries"
+    #     )
+    # 
     # endif()
 
 endif()
