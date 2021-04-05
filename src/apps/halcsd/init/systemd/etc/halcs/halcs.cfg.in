@@ -17,156 +17,156 @@ dev_io
     board1
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board2
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board3
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board4
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board5
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board6
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board7
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board8
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board9
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board10
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board11
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
     board12
         halcs0
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =
         halcs1
             dbe
-                fmc_board = fmc250m_4ch
+                board_type = afcv3.1
             afe
                 bind =
                 proto =

@@ -35,7 +35,7 @@ extern "C" {
 typedef struct {
     char *bind;                 /* AFE Endpoint address to bind to */
     char *proto;                /* RFFE protocol (scpi / bsmp) */
-    char *fmc_board;            /* FMC board type */
+    char *board_type;           /* DBE board type (e.g., afcv3.1) */
 } hutils_hints_t;
 
 /************************ Our methods *****************************/

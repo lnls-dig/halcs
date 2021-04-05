@@ -416,13 +416,13 @@ And it should show something like:
         board1
             halcs0
                 dbe
-                    fmc_board = fmc250m_4ch
+                    board_type = afcv3.1
                 afe
                     bind =
                     proto =
             halcs1
                 dbe
-                    fmc_board = fmc250m_4ch
+                    board_type = afcv3.1
                 afe
                     bind =
                     proto =

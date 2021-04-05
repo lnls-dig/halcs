@@ -381,8 +381,8 @@ static void _hutils_hints_free_item (void **data)
 
     if (*data) {
         hutils_hints_t *item = *data;
-        free (item->fmc_board);
-        item->fmc_board = NULL;
+        free (item->board_type);
+        item->board_type = NULL;
         free (item->bind);
         item->bind = NULL;
         free (item->proto);
@@ -439,16 +439,16 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
             item = (hutils_hints_t *) zmalloc (sizeof *item);
             ASSERT_ALLOC(item, err_hash_item_alloc, HUTILS_ERR_ALLOC);
 
-            /* We expect to the FMC board type of this halcs/board instance
+            /* We expect a DBE board type of this halcs/board instance
              * in the configuration file */
-            char *fmc_board = zconfig_resolve (halcs_cfg, "/dbe/fmc_board",
+            char *board_type = zconfig_resolve (halcs_cfg, "/dbe/board_type",
                     NULL);
-            ASSERT_TEST (fmc_board != NULL, "[hutils:utils] Could not find "
-                    "FMC Board type (fmc_board = <value>) in configuration file", err_fmc_board,
+            ASSERT_TEST (board_type != NULL, "[hutils:utils] Could not find "
+                    "DBE Board type (board_type = <value>) in configuration file", err_board_type,
                     HUTILS_ERR_CFG);
 
-            item->fmc_board = strdup (fmc_board);
-            ASSERT_ALLOC(item->fmc_board, err_hash_fmc_board, HUTILS_ERR_ALLOC);
+            item->board_type = strdup (board_type);
+            ASSERT_ALLOC(item->board_type, err_hash_board_type, HUTILS_ERR_ALLOC);
 
             /* Now, we expect to find the bind address of this halcs/board instance
              * in the configuration file */
@@ -489,8 +489,8 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
                     "configuration file\n", err_gen_hash_key, HUTILS_ERR_CFG);
 
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[hutils:utils] CFG hints "
-                    "hash key: \"%s\", fmc_board: \"%s\", bind: \"%s\"\n",
-                    hints_key, fmc_board, afe_bind);
+                    "hash key: \"%s\", board_type: \"%s\", bind: \"%s\"\n",
+                    hints_key, board_type, afe_bind);
 
             /* Insert this value in the hash table */
             errs = zhashx_insert (hints_h, hints_key, item);
@@ -510,9 +510,9 @@ err_hash_proto_alloc:
     free (item->bind);
 err_hash_bind_alloc:
 err_afe_bind:
-    free (item->fmc_board);
-err_hash_fmc_board:
-err_fmc_board:
+    free (item->board_type);
+err_hash_board_type:
+err_board_type:
     free (item);
 err_hash_item_alloc:
 err_cfg_exit:
