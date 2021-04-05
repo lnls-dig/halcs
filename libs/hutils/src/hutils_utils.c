@@ -474,46 +474,6 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
 
             ASSERT_ALLOC(item->proto, err_hash_proto_alloc, HUTILS_ERR_ALLOC);
 
-            /* Read if the user ask us to spawn the EPICS IOC in the
-             * configuration file */
-            char *spawn_dbe_epics_ioc = zconfig_resolve (halcs_cfg, "/dbe/spawn_epics_ioc",
-                    NULL);
-            ASSERT_TEST (spawn_dbe_epics_ioc != NULL, "[hutils:utils] Could not find "
-                    "DBE EPICS IOC (spawn_epics_ioc = <value>) in configuration file",
-                    err_spawn_dbe_epics_ioc, HUTILS_ERR_CFG);
-
-            /* Convert yes/no to bool */
-            if (streq (spawn_dbe_epics_ioc, "yes")) {
-                item->spawn_dbe_epics_ioc = 1;
-            }
-            else if (streq (spawn_dbe_epics_ioc, "no")) {
-                item->spawn_dbe_epics_ioc = 0;
-            }
-            else {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[dev_mngr] Invalid option "
-                        "for spawn_dbe_epics_ioc configuration variable\n");
-                goto err_inv_spawn_dbe_epics_ioc;
-            }
-
-            char *spawn_afe_epics_ioc = zconfig_resolve (halcs_cfg, "/afe/spawn_epics_ioc",
-                    NULL);
-            ASSERT_TEST (spawn_afe_epics_ioc != NULL, "[hutils:utils] Could not find "
-                    "AFE EPICS IOC (spawn_epics_ioc = <value>) in configuration file",
-                    err_spawn_afe_epics_ioc, HUTILS_ERR_CFG);
-
-            /* Convert yes/no to bool */
-            if (streq (spawn_afe_epics_ioc, "yes")) {
-                item->spawn_afe_epics_ioc = 1;
-            }
-            else if (streq (spawn_afe_epics_ioc, "no")) {
-                item->spawn_afe_epics_ioc = 0;
-            }
-            else {
-                DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_FATAL, "[dev_mngr] Invalid option "
-                        "for spawn_afe_epics_ioc configuration variable\n");
-                goto err_inv_spawn_afe_epics_ioc;
-            }
-
             /* Now, we only need to generate a valid key to insert in the hash.
              * we choose the combination of the type "board%u/halcs%u/afe" or
              * board%u/halcs%u/dbe */
@@ -526,18 +486,16 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
              * it is guaranteed that the string was written successfully */
             ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
                     "[hutils:utils] Could not generate AFE bind address from "
-                    "configuration file\n", err_cfg_exit, HUTILS_ERR_CFG);
+                    "configuration file\n", err_gen_hash_key, HUTILS_ERR_CFG);
 
             DBE_DEBUG (DBG_HAL_UTILS | DBG_LVL_INFO, "[hutils:utils] CFG hints "
-                    "hash key: \"%s\", fmc_board: \"%s\", bind: \"%s\", "
-                    "spawn_dbe_epics_ioc: %s, spwan_afe_epics_ioc: %s\n",
-                    hints_key, fmc_board, afe_bind, spawn_dbe_epics_ioc,
-                    spawn_afe_epics_ioc);
+                    "hash key: \"%s\", fmc_board: \"%s\", bind: \"%s\"\n",
+                    hints_key, fmc_board, afe_bind);
 
             /* Insert this value in the hash table */
             errs = zhashx_insert (hints_h, hints_key, item);
             ASSERT_TEST (errs == 0, "Could not insert CFG item to hints "
-                    "hash table", err_cfg_exit, HUTILS_ERR_CFG);
+                    "hash table", err_hash_insert, HUTILS_ERR_CFG);
         }
     }
 
@@ -545,10 +503,8 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
 
     /* Free only the last item on error. The other ones will be freed by the hash table,
      * on destruction */
-err_inv_spawn_afe_epics_ioc:
-err_spawn_afe_epics_ioc:
-err_inv_spawn_dbe_epics_ioc:
-err_spawn_dbe_epics_ioc:
+err_hash_insert:
+err_gen_hash_key:
     free (item->proto);
 err_hash_proto_alloc:
     free (item->bind);
