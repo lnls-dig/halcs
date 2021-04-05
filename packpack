@@ -185,7 +185,7 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
     echo "fi";
-    echo "cpack -V -G \"\${CPACK_GENERATORS}\"";
+    echo "make VERBOSE=1 package";
 ) > ${BUILDDIR}/usercmd.sh
 
 chmod a+x ${BUILDDIR}/usercmd.sh
