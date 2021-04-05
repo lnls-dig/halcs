@@ -10,15 +10,16 @@ LANG=C
 LC_ALL=C
 export LANG LC_ALL
 
-if [ -d "./tmp" ]; then
-    rm -rf ./tmp
+BUILD_PREFIX_BASENAME=tmp
+
+if [ -d "./${BUILD_PREFIX_BASENAME}" ]; then
+    rm -rf ./${BUILD_PREFIX_BASENAME}
 fi
 
-mkdir -p tmp
-mkdir -p tmp/etc
+mkdir -p ${BUILD_PREFIX_BASENAME}
+mkdir -p ${BUILD_PREFIX_BASENAME}/usr/local
 
 # Build and local install repositories
-BUILD_PREFIX_BASENAME=tmp
 BUILD_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 SCRIPTS_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 SCRIPTS_SHARE_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}/usr/local
