@@ -280,7 +280,7 @@ set(cpack_components_all_OPT "Binaries;Libs;Scripts;Tools"
 set(CPACK_COMPONENTS_ALL "${cpack_components_all_OPT}")
 
 # Any CPACK generator
-set(cpack_generator_OPT "DEB"
+set(cpack_generator_OPT "RPM"
     CACHE STRING "CPack CPACK_GENERATOR variable"
 )
 
