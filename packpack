@@ -15,9 +15,6 @@ DOCKER_REPO=${DOCKER_REPO:-packpack/packpack}
 # Extra parameters for docker run.
 PACKPACK_EXTRA_DOCKER_RUN_PARAMS="${PACKPACK_EXTRA_DOCKER_RUN_PARAMS:-}"
 
-# CPACK generators
-CPACK_GENERATORS="${CPACK_GENERATORS:-DEB}"
-
 # Set CI variable to CI provider name
 CI=""
 if [ "${APPVEYOR:-}" = "True" -o "${APPVEYOR:-}" = "true" ]; then
@@ -143,8 +140,6 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
 (
     echo "#!/bin/sh";
     echo "set -x";
-    echo "CPACK_GENERATORS=\"\$1\"";
-    echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
     echo "cd /build";
     echo "if [ -f \"/etc/debian_version\" ]; then";
