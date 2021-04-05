@@ -173,9 +173,9 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
     echo "fi";
-    echo "cmake3 \${CMAKE_OPTS} /source";
+    echo "cmake3 \${CMAKE_OPTS} /source/build/halcsd/long-path-so-debuginfo-works";
     echo "if [ \"\$?\" -ne 0 ]; then";
-    echo "    cmake \${CMAKE_OPTS} /source";
+    echo "    cmake \${CMAKE_OPTS} /source/build/halcsd/long-path-so-debuginfo-works";
     echo "fi";
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
@@ -210,7 +210,7 @@ set -ex
 docker pull ${DOCKER_REPO}:${DOCKER_IMAGE}
 docker run \
         ${PACKPACK_EXTRA_DOCKER_RUN_PARAMS} \
-        --volume "${SOURCEDIR}:/source:ro" \
+        --volume "${SOURCEDIR}:/source/build/halcsd/long-path-so-debuginfo-works:ro" \
         --volume "${BUILDDIR}:/build" \
         --env-file ${BUILDDIR}/env \
         --workdir /build \
