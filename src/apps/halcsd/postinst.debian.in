@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "Creating user/group halcs"
+adduser --system --quiet --group --no-create-home halcs || :
+echo "Adding user halcs to group users"
+usermod -a -G users halcs || :
+echo "Creating /var/log/halcs directory"
+mkdir -p @halcsd_FULL_LOG_DIR@
+echo "Changing permissions"
+chown -R halcs:halcs @halcsd_FULL_LOG_DIR@
+echo "Reloading systemd"
+systemctl daemon-reload || :
+
+exit 0

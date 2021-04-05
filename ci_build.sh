@@ -370,15 +370,34 @@ cmake)
 cpack)
     # all of these options are relative to the docker container filesystem
     LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
+
+    # Build regular package
     PACKPACK_OPTS=()
-    PACKPACK_OPTS+=("${CPACK_GENERATORS}")
+    PACKPACK_OPTS+=("-Dcpack_generator_OPT=${CPACK_GENERATORS}")
+    PACKPACK_OPTS+=("-Dcpack_components_grouping_OPT=ALL_COMPONENTS_IN_ONE")
+    PACKPACK_OPTS+=("-Dcpack_components_all_OPT=\"Binaries;Libs;Scripts;Tools\"")
     PACKPACK_OPTS+=("-Dhalcs_DISTRO_VERSION=${CPACK_DISTRO_VERSION}")
     PACKPACK_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
-    PACKPACK_OPTS+=("-DBUILD_PCIE_DRIVER=ON")
+    PACKPACK_OPTS+=("-DBUILD_PCIE_DRIVER=OFF")
     PACKPACK_OPTS+=("-Dhalcs_BOARD_OPT=${CPACK_BOARDS}")
     # only expand and add ":" to LD_LIBRARY_PATH if non-empty
     LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
         SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
+
+    if [ "$BUILD_PCIEDRIVER_PACKAGE" = yes ]; then
+        # Build driver package
+        PACKPACK_PCIEDRIVER_OPTS=()
+        PACKPACK_PCIEDRIVER_OPTS+=("-Dcpack_generator_OPT=${CPACK_GENERATORS}")
+        PACKPACK_PCIEDRIVER_OPTS+=("-Dcpack_components_grouping_OPT=ONE_PER_GROUP")
+        PACKPACK_PCIEDRIVER_OPTS+=("-Dcpack_components_all_OPT=\"Pciedriver\"")
+        PACKPACK_PCIEDRIVER_OPTS+=("-Dhalcs_DISTRO_VERSION=${CPACK_DISTRO_VERSION}")
+        PACKPACK_PCIEDRIVER_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
+        PACKPACK_PCIEDRIVER_OPTS+=("-DBUILD_PCIE_DRIVER=ON")
+        # only expand and add ":" to LD_LIBRARY_PATH if non-empty
+        LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+            SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_PCIEDRIVER_OPTS[@]}"
+    fi
+
     cd "${BASE_PWD}"
     ;;
 

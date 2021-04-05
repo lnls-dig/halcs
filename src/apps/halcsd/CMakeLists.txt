@@ -3,16 +3,10 @@
 ########################################################################
 
 include(FindThreads)
-# detect target architecture
-include(TargetArch)
 # set installation variables compliant with distributions
 include(GNUInstallDirs)
 # Get systemd service directories'
 include(TestSystemd)
-# extract version numbers from header file
-include(TestHalcsVersion)
-
-target_architecture(ARCH)
 
 # halcsd basename
 set (halcsd_OUTPUT_BASENAME "halcsd"
@@ -123,6 +117,12 @@ set(HALCS_SYSCONFDIR ${HALCS_CFG_PREFIX}/${NOPREFIX_HALCS_SYSCONFDIR})
 
 # relative directory for halcs data files
 set(NOPREFIX_HALCS_DATADIR "halcs")
+
+# set postinst filenames
+set(DEBIAN_POSTINST_FILE_NAME "postinst.debian")
+set(REDHAT_POSTINST_FILE_NAME "postinst.redhat")
+
+set(HALCS_LOG_DIR "/var/log/halcs")
 
 ########################################################################
 # Library compile options
@@ -351,7 +351,9 @@ foreach(bin_target ${apps_halcsd})
     if(TARGET halcsd)
         # general scripts location
         set(halcsd_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR}/${NOPREFIX_HALCS_DATADIR})
-        install(DIRECTORY DESTINATION ${halcsd_INSTALL_DATADIR})
+        install(DIRECTORY
+            DESTINATION ${halcsd_INSTALL_DATADIR}
+            COMPONENT Scripts)
 
         # general scripts
         install(FILES
@@ -359,8 +361,23 @@ foreach(bin_target ${apps_halcsd})
             ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/generate-board-halcs-idx.sh
             ${CMAKE_CURRENT_SOURCE_DIR}/init-generic/share/halcs/scripts/generate-dev-idx.sh
             DESTINATION ${halcsd_INSTALL_DATADIR}
+            COMPONENT Scripts
             PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
+
+        set(halcsd_FULL_LOG_DIR ${HALCS_LOG_DIR})
+
+        configure_file (
+            "${CMAKE_CURRENT_SOURCE_DIR}/${DEBIAN_POSTINST_FILE_NAME}.in"
+            "${halcs_POSTINST_FILE_DIR}/debian/postinst"
+            @ONLY
+        )
+
+        configure_file (
+            "${CMAKE_CURRENT_SOURCE_DIR}/${REDHAT_POSTINST_FILE_NAME}.in"
+            "${halcs_POSTINST_FILE_DIR}/redhat/postinst"
+            @ONLY
         )
 
         if(WITH_SYSTEMD)
@@ -368,77 +385,132 @@ foreach(bin_target ${apps_halcsd})
             # absolute paths of systemd unit files on install, which can be
             # prefixed by CMAKE_INSTALL_PREFIX. SYSTEMD variables are always fixed
             # to an absolute path.
-            install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})")
-            install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})")
-            install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})")
-            install(CODE "set(HALCS_SYSCONFDIR ${HALCS_SYSCONFDIR})")
-            install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})")
-            install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})")
+            install(CODE "set(SYSTEMD_SERVICES_INSTALL_DIR ${SYSTEMD_SERVICES_INSTALL_DIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(SYSTEMD_CONF_INSTALL_DIR ${SYSTEMD_CONF_INSTALL_DIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(UDEV_SYSCONFDIR ${UDEV_SYSCONFDIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(HALCS_SYSCONFDIR ${HALCS_SYSCONFDIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(NOPREFIX_HALCS_SYSCONFDIR ${NOPREFIX_HALCS_SYSCONFDIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(NOPREFIX_HALCS_DATADIR ${NOPREFIX_HALCS_DATADIR})"
+                COMPONENT Scripts
+            )
+            install(CODE "set(HALCS_LOG_DIR ${HALCS_LOG_DIR})"
+                COMPONENT Scripts
+            )
 
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-be@.service.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-be@.service.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-be@.service\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-be@.service\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-fe@.service.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs-fe@.service.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-fe@.service\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-fe@.service\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs@.target.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/systemd/system/halcs@.target.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs@.target\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs@.target\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-be@.service
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-fe@.service
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs@.target
                 DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}
+                COMPONENT Scripts
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
             )
             # sysconfig files
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/sysconfig/halcs-board.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/sysconfig/halcs-board.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-board\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-board\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-board
                 DESTINATION ${SYSTEMD_CONF_INSTALL_DIR}
+                COMPONENT Scripts
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
             )
 
             # halcs.cfg file
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/halcs/halcs.cfg.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/halcs/halcs.cfg.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs.cfg\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs.cfg\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs.cfg
                 DESTINATION ${HALCS_SYSCONFDIR}
+                COMPONENT Scripts
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
             )
 
             # udev rules
             install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/80-udev_fpga.rules.in\")")
+                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/80-udev_fpga.rules.in\")"
+                COMPONENT Scripts
+            )
             install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules\")")
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake")
+                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules\")"
+                COMPONENT Scripts
+            )
+            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                COMPONENT Scripts
+            )
 
             install(FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules
                 DESTINATION ${UDEV_SYSCONFDIR}
+                COMPONENT Scripts
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
             )
@@ -451,98 +523,3 @@ endforeach()
 
 # set list to global, as linker options are passed through this
 set(apps_halcsd ${apps_halcsd} PARENT_SCOPE)
-
-# CPack rules
-option(ENABLE_CPACK "Enables cpack rules" ON)
-
-if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    endif()
-
-    include(InstallRequiredSystemLibraries)
-
-    # set architecture as detected by TargetArch module
-    set(arch_name ${ARCH})
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    # we also depend on malamute >= 1.0, but this has not been packaged into the official
-    # repositories yet
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2), dkms")
-    # Generate debuginfo package
-    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
-    # we also depend on malamute >= 1.0, but this has not been packaged into the official
-    # repositories yet
-    set(CPACK_RPM_PACKAGE_REQUIRE "libsodium-devel >= 1.0.8, zeromq-devel >= 4.2.5, czmq-devel >= 4.0.2, dkms")
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
-    set(CPACK_PACKAGE_NAME "halcsd")
-    set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")
-    string(APPEND halcs_VERSION "${halcs_DISTRO_VERSION}")
-    set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}_${arch_name}"
-    )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "halcsd daemon")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    #set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
-    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
-    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${halcs_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${halcs_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${halcs_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${halcs_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsd Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "halcsd Temporary CPack Directory")
-    # Generate debuginfo package
-    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-
-    include(CPack)
-
-    cpack_add_component_group(Development
-        DISPLAY_NAME "halcsd library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "halcsd source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "halcsd headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "halcsd runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
-endif()

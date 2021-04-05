@@ -407,11 +407,11 @@ endif()
 
 install(TARGETS ${target_outputs} acqclient_compiler_flags
     EXPORT ${PROJECT_NAME}-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Libs
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
     FRAMEWORK DESTINATION "Library/Frameworks"
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Libs
 )
 
 # CMake search path wants either "share" (AKA GNUInstallDirs DATAROOTDIR)
@@ -446,6 +446,7 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libacqclient.pc
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT Libs
 )
 
 # only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
@@ -476,12 +477,14 @@ if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${acqclient_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
         ${acqclient_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
 endif()
 
@@ -489,87 +492,90 @@ endif()
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
 if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+        endif()
+
+        include(InstallRequiredSystemLibraries)
+
+        # set architecture as detected by TargetArch module
+        set(arch_name ${ARCH})
+
+        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        # Generate debuginfo package
+        set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_PACKAGE_AUTOREQ no)
+        set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+            /lib
+            /usr/etc
+            /etc/systemd
+            /lib/systemd
+            /etc/systemd/system
+            /lib/systemd/system
+            /etc/udev
+            /etc/udev/rules.d
+        )
+        set(CPACK_PACKAGE_NAME "acqclient")
+        set(acqclient_DISTRO_VERSION "" CACHE STRING "acqclient distribution version")
+        string(APPEND acqclient_VERSION "${acqclient_DISTRO_VERSION}")
+        set(CPACK_PACKAGE_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${acqclient_VERSION}_${arch_name}"
+        )
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS acquisition library")
+        set(CPACK_PACKAGE_VENDOR "LNLS")
+        set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+        # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
+        # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
+        # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
+        set(CPACK_PACKAGE_VERSION ${acqclient_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${acqclient_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${acqclient_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${acqclient_VERSION_PATCH})
+        # set(CPACK_PACKAGE_INSTALL_DIRECTORY "acqclient Install Directory")
+        # set(CPACK_TEMPORARY_DIRECTORY "acqclient Temporary CPack Directory")
+        # Generate debuginfo package
+        set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
+        include(CPack)
+
+        cpack_add_component_group(Development
+            DISPLAY_NAME "Acquisition client library"
+            EXPANDED
+        )
+        cpack_add_component(SourceCode
+            DISPLAY_NAME "Acquisition client source code"
+            DISABLED
+            INSTALL_TYPES FullInstall
+        )
+        cpack_add_component(SDK
+            DISPLAY_NAME "Acquisition client headers and libraries"
+            INSTALL_TYPES FullInstall DevInstall
+            GROUP Development
+        )
+        cpack_add_component(Runtime
+            DISPLAY_NAME "Acquisition client runtime files"
+            REQUIRED
+            INSTALL_TYPES FullInstall DevInstall MinInstall
+        )
+        cpack_add_install_type(FullInstall
+            DISPLAY_NAME "Full install, including source code"
+        )
+        cpack_add_install_type(DevInstall
+            DISPLAY_NAME "Developer install, headers and libraries"
+        )
+        cpack_add_install_type(MinInstall
+            DISPLAY_NAME "Minimal install, runtime only"
+        )
     endif()
 
-    include(InstallRequiredSystemLibraries)
-
-    # set architecture as detected by TargetArch module
-    set(arch_name ${ARCH})
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    # Generate debuginfo package
-    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
-    set(CPACK_PACKAGE_NAME "acqclient")
-    set(acqclient_DISTRO_VERSION "" CACHE STRING "acqclient distribution version")
-    string(APPEND acqclient_VERSION "${acqclient_DISTRO_VERSION}")
-    set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}_${acqclient_VERSION}_${arch_name}"
-    )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS acquisition library")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
-    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
-    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${acqclient_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${acqclient_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${acqclient_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${acqclient_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "acqclient Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "acqclient Temporary CPack Directory")
-    # Generate debuginfo package
-    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-
-    include(CPack)
-
-    cpack_add_component_group(Development
-        DISPLAY_NAME "Acquisition client library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "Acquisition client source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "Acquisition client headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "Acquisition client runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
 endif()
