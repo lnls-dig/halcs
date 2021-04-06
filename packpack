@@ -15,6 +15,10 @@ DOCKER_REPO=${DOCKER_REPO:-packpack/packpack}
 # Extra parameters for docker run.
 PACKPACK_EXTRA_DOCKER_RUN_PARAMS="${PACKPACK_EXTRA_DOCKER_RUN_PARAMS:-}"
 
+# CMake top-level CMakeLists.txt directory
+SRC_TOP_LEVEL_DIR="${SRC_TOP_LEVEL_DIR:-/source/halcs}"
+BUILD_TOP_LEVEL_DIR="${BUILD_TOP_LEVEL_DIR:-/build/halcs}"
+
 # Set CI variable to CI provider name
 CI=""
 if [ "${APPVEYOR:-}" = "True" -o "${APPVEYOR:-}" = "true" ]; then
@@ -140,8 +144,12 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
 (
     echo "#!/bin/sh";
     echo "set -x";
+    echo "SRC_TOP_LEVEL_DIR=\"\$1\"";
+    echo "shift 1";
+    echo "BUILD_TOP_LEVEL_DIR=\"\$1\"";
+    echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
-    echo "cd /build";
+    echo "cd \${BUILD_TOP_LEVEL_DIR}";
     echo "if [ -f \"/etc/debian_version\" ]; then";
     echo "    case \"\$(cat /etc/debian_version)\" in";
     echo "        *stretch* | 9.* )";
@@ -158,7 +166,7 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "            make -j\$(nproc)";
     echo "            sudo make install";
     echo "            cmake --version";
-    echo "            cd /build";
+    echo "            cd \${BUILD_TOP_LEVEL_DIR}";
     echo "        ;;"
     echo "    esac";
     echo "fi";
@@ -173,9 +181,9 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
     echo "fi";
-    echo "cmake3 \${CMAKE_OPTS} /source/build/halcsd/long-path-so-debuginfo-works";
+    echo "cmake3 \${CMAKE_OPTS} \${SRC_TOP_LEVEL_DIR}";
     echo "if [ \"\$?\" -ne 0 ]; then";
-    echo "    cmake \${CMAKE_OPTS} /source/build/halcsd/long-path-so-debuginfo-works";
+    echo "    cmake \${CMAKE_OPTS} \${SRC_TOP_LEVEL_DIR}";
     echo "fi";
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
@@ -210,19 +218,19 @@ set -ex
 docker pull ${DOCKER_REPO}:${DOCKER_IMAGE}
 docker run \
         ${PACKPACK_EXTRA_DOCKER_RUN_PARAMS} \
-        --volume "${SOURCEDIR}:/source/build/halcsd/long-path-so-debuginfo-works:ro" \
-        --volume "${BUILDDIR}:/build" \
+        --volume "${SOURCEDIR}:${SRC_TOP_LEVEL_DIR}:ro" \
+        --volume "${BUILDDIR}:${BUILD_TOP_LEVEL_DIR}" \
         --env-file ${BUILDDIR}/env \
-        --workdir /build \
+        --workdir ${BUILD_TOP_LEVEL_DIR} \
         --rm=true --tty=true \
-        --entrypoint=/build/userwrapper.sh \
+        --entrypoint=${BUILD_TOP_LEVEL_DIR}/userwrapper.sh \
         -e XDG_CACHE_HOME=/cache \
         -e CCACHE_DIR=/cache/ccache \
         -e TMPDIR=/tmp \
         -e CI=${CI} \
         --volume "${CACHE_DIR}:/cache" \
         ${DOCKER_REPO}:${DOCKER_IMAGE} \
-        /build/usercmd.sh "$@"
+        ${BUILD_TOP_LEVEL_DIR}/usercmd.sh "${SRC_TOP_LEVEL_DIR}" "${BUILD_TOP_LEVEL_DIR}" "$@"
 retcode=$?
 rm -f ${BUILDDIR}/userwrapper.sh ${BUILDDIR}/usercmd.sh ${BUILDDIR}/env
 exit $retcode

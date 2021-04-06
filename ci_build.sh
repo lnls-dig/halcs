@@ -25,6 +25,10 @@ SCRIPTS_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 SCRIPTS_SHARE_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}/usr/local
 LDCONF_ETC_PREFIX=$PWD/${BUILD_PREFIX_BASENAME}
 
+# CMake docker top-level directory
+DOCKER_SRC_TOP_LEVEL_DIR=/source/halcs/long-path-so-debuginfo-works-for-rpm
+DOCKER_BUILD_TOP_LEVEL_DIR=/build/halcs/long-path-so-debuginfo-works-for-rpm
+
 # With sonarqube or not
 STATIC_ANALYSIS_WRAPPER=""
 if [ "$SONARQUBE" = yes ]; then
@@ -370,7 +374,7 @@ cmake)
 
 cpack)
     # all of these options are relative to the docker container filesystem
-    LOCAL_LD_LIBRARY_PATH=/source/${BUILD_PREFIX_BASENAME}/lib:/source/${BUILD_PREFIX_BASENAME}/lib64
+    LOCAL_LD_LIBRARY_PATH=${DOCKER_SRC_TOP_LEVEL_DIR}/${BUILD_PREFIX_BASENAME}/lib:${DOCKER_SRC_TOP_LEVEL_DIR}/${BUILD_PREFIX_BASENAME}/lib64
 
     # Build regular package
     PACKPACK_OPTS=()
@@ -378,12 +382,14 @@ cpack)
     PACKPACK_OPTS+=("-Dcpack_components_grouping_OPT=ALL_COMPONENTS_IN_ONE")
     PACKPACK_OPTS+=("-Dcpack_components_all_OPT=\"Binaries;Libs;Scripts;Tools\"")
     PACKPACK_OPTS+=("-Dhalcs_DISTRO_VERSION=${CPACK_DISTRO_VERSION}")
-    PACKPACK_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
+    PACKPACK_OPTS+=("-DCMAKE_PREFIX_PATH=${DOCKER_SRC_TOP_LEVEL_DIR}/${BUILD_PREFIX_BASENAME}")
     PACKPACK_OPTS+=("-DBUILD_PCIE_DRIVER=OFF")
     PACKPACK_OPTS+=("-Dhalcs_BOARD_OPT=${CPACK_BOARDS}")
     # only expand and add ":" to LD_LIBRARY_PATH if non-empty
     LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-        SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_OPTS[@]}"
+        SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build SRC_TOP_LEVEL_DIR=${DOCKER_SRC_TOP_LEVEL_DIR} \
+        BUILD_TOP_LEVEL_DIR=${DOCKER_BUILD_TOP_LEVEL_DIR} \
+        ./packpack "${PACKPACK_OPTS[@]}"
 
     if [ "$BUILD_PCIEDRIVER_PACKAGE" = yes ]; then
         # Build driver package
@@ -392,11 +398,13 @@ cpack)
         PACKPACK_PCIEDRIVER_OPTS+=("-Dcpack_components_grouping_OPT=ONE_PER_GROUP")
         PACKPACK_PCIEDRIVER_OPTS+=("-Dcpack_components_all_OPT=\"Pciedriver\"")
         PACKPACK_PCIEDRIVER_OPTS+=("-Dhalcs_DISTRO_VERSION=${CPACK_DISTRO_VERSION}")
-        PACKPACK_PCIEDRIVER_OPTS+=("-DCMAKE_PREFIX_PATH=/source/${BUILD_PREFIX_BASENAME}")
+        PACKPACK_PCIEDRIVER_OPTS+=("-DCMAKE_PREFIX_PATH=${DOCKER_SRC_TOP_LEVEL_DIR}/${BUILD_PREFIX_BASENAME}")
         PACKPACK_PCIEDRIVER_OPTS+=("-DBUILD_PCIE_DRIVER=ON")
         # only expand and add ":" to LD_LIBRARY_PATH if non-empty
         LD_LIBRARY_PATH=${LOCAL_LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
-            SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build ./packpack "${PACKPACK_PCIEDRIVER_OPTS[@]}"
+            SOURCEDIR=$(pwd) BUILDDIR=$(pwd)/build SRC_TOP_LEVEL_DIR=${DOCKER_SRC_TOP_LEVEL_DIR} \
+            BUILD_TOP_LEVEL_DIR=${DOCKER_BUILD_TOP_LEVEL_DIR} \
+            ./packpack "${PACKPACK_PCIEDRIVER_OPTS[@]}"
     fi
 
     cd "${BASE_PWD}"
