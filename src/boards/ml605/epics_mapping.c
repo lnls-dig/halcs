@@ -36,12 +36,3 @@ const board_epics_map_t board_epics_map[NUM_MAX_HALCSS+1] = {
     /* 1            */ {1,   0},
     /* 2            */ {1,   1},
 };
-
-/* Reverse halcs <-> EPICS board mapping */
-const board_epics_rev_map_t board_epics_rev_map[NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLOT] = {
-     /* board, halcs */    /* halcs_id */
-    /* 0, 0 (INVALID) */ {{-1},
-    /* 0, 1 (INVALID) */  {-1}},
-    /* 1, 0           */ {{1},
-    /* 1, 1           */  {2}}
-};
