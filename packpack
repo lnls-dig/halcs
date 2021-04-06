@@ -163,7 +163,7 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "            tar -xzvf cmake-\$version.\$build.tar.gz";
     echo "            cd cmake-\$version.\$build/";
     echo "            ./bootstrap";
-    echo "            make -j\$(nproc)";
+    echo "            make -j\$(nproc) > /dev/null";
     echo "            sudo make install";
     echo "            cmake --version";
     echo "            cd \${BUILD_TOP_LEVEL_DIR}";
