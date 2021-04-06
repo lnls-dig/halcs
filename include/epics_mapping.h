@@ -23,16 +23,9 @@ typedef struct {
     int halcs_id;
 } board_epics_rev_map_t;
 
-typedef struct {
-    int telnet_port;
-    int telnet_afe_port;
-} board_epics_opts_t;
-
-
 /* EPICS mapping definitions */
 extern const board_epics_map_t board_epics_map[NUM_MAX_HALCSS+1];
 extern const board_epics_rev_map_t board_epics_rev_map [NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLOT];
-extern const board_epics_opts_t board_epics_opts [NUM_MAX_SLOTS+1][NUM_MAX_HALCS_PER_SLOT];
 
 #ifdef __cplusplus
 }
