@@ -9,7 +9,6 @@ PartOf=halcs@%i.target
 [Service]
 User=halcs
 Group=halcs
-EnvironmentFile=@halcsd_SYSTEMD_CONF_INSTALL_DIR@/halcs-board
 Environment=HALCS_LOG_DIR=@halcsd_HALCS_FULL_LOG_DIR@
 ExecStartPre=/bin/mkdir -p ${HALCS_LOG_DIR}
 ExecStart=@halcsd_CMAKE_INSTALL_FULL_BINDIR@/halcsd -f @halcsd_HALCS_INSTALL_FULL_SYSCONFDIR@/halcs.cfg -n be -t pcie -i %i -b ipc:///tmp/malamute -l ${HALCS_LOG_DIR}
