@@ -305,8 +305,8 @@ int main (int argc, char *argv[])
                 "Device ID is out of range", err_exit);
 
         /* Extract device and smio IDs */
-        dev_id = board_epics_map [full_dev_id].dev_id;
-        fe_smio_id = board_epics_map [full_dev_id].smio_id;
+        dev_id = board_device_map [full_dev_id].dev_id;
+        fe_smio_id = board_device_map [full_dev_id].smio_id;
     }
     else {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Dev_id parameter "
@@ -363,8 +363,8 @@ int main (int argc, char *argv[])
                 ASSERT_TEST (full_dev_id > 0 && full_dev_id < NUM_MAX_HALCSS+1,
                         "Device ID is out of range", err_exit);
                 /* Extract device and smio IDs */
-                dev_id = board_epics_map [full_dev_id].dev_id;
-                fe_smio_id = board_epics_map [full_dev_id].smio_id;
+                dev_id = board_device_map [full_dev_id].dev_id;
+                fe_smio_id = board_device_map [full_dev_id].smio_id;
             }
 
             if (dev_entry == NULL && dev_id_str != NULL) {

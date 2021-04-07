@@ -32,7 +32,7 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io:epics]",                    \
             devio_err_str (err_type))
 
-const board_epics_map_t board_epics_map[NUM_MAX_HALCSS+1] = {
+const board_device_map_t board_device_map[NUM_MAX_HALCSS+1] = {
          /* board, halcs*/
     /* 0 (INVALID)  */ {-1, -1},
     /* 1            */ {1,   0},

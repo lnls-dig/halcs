@@ -16,10 +16,10 @@ extern "C" {
 typedef struct {
     int dev_id;
     int smio_id;
-} board_epics_map_t;
+} board_device_map_t;
 
 /* EPICS mapping definitions */
-extern const board_epics_map_t board_epics_map[NUM_MAX_HALCSS+1];
+extern const board_device_map_t board_device_map[NUM_MAX_HALCSS+1];
 
 #ifdef __cplusplus
 }
