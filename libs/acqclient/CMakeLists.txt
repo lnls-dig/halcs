@@ -530,9 +530,8 @@ if(ENABLE_CPACK)
         )
         set(CPACK_PACKAGE_NAME "acqclient")
         set(acqclient_DISTRO_VERSION "" CACHE STRING "acqclient distribution version")
-        string(APPEND acqclient_VERSION "${acqclient_DISTRO_VERSION}")
         set(CPACK_PACKAGE_FILE_NAME
-            "${CPACK_PACKAGE_NAME}_${acqclient_VERSION}_${arch_name}"
+            "${CPACK_PACKAGE_NAME}_${acqclient_VERSION}${acqclient_DISTRO_VERSION}_${arch_name}"
         )
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS acquisition library")
         set(CPACK_PACKAGE_VENDOR "LNLS")

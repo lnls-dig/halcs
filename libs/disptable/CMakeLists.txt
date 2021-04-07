@@ -447,9 +447,8 @@ if(ENABLE_CPACK)
         )
         set(CPACK_PACKAGE_NAME "disptable")
         set(disptable_DISTRO_VERSION "" CACHE STRING "disptable distribution version")
-        string(APPEND disptable_VERSION "${disptable_DISTRO_VERSION}")
         set(CPACK_PACKAGE_FILE_NAME
-            "${CPACK_PACKAGE_NAME}_${disptable_VERSION}_${arch_name}"
+            "${CPACK_PACKAGE_NAME}_${disptable_VERSION}${disptable_DISTRO_VERSION}_${arch_name}"
         )
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Dispatch Table library")
         set(CPACK_PACKAGE_VENDOR "LNLS")

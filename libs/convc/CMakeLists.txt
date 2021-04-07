@@ -424,9 +424,8 @@ if(ENABLE_CPACK)
         )
         set(CPACK_PACKAGE_NAME "convc")
         set(convc_DISTRO_VERSION "" CACHE STRING "convc distribution version")
-        string(APPEND convc_VERSION "${convc_DISTRO_VERSION}")
         set(CPACK_PACKAGE_FILE_NAME
-            "${CPACK_PACKAGE_NAME}_${convc_VERSION}_${arch_name}"
+            "${CPACK_PACKAGE_NAME}_${convc_VERSION}${convc_DISTRO_VERSION}_${arch_name}"
         )
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
         set(CPACK_PACKAGE_VENDOR "LNLS")

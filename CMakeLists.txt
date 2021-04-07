@@ -298,10 +298,13 @@ if(ENABLE_CPACK)
 
     # set architecture as detected by TargetArch module
     set(arch_name ${ARCH})
+    
+    set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
     set(CPACK_GENERATOR "${cpack_generator_OPT}")
+    set(CPACK_PACKAGE_NAME "halcsd")
 
     set(CPACK_DEB_COMPONENT_INSTALL ON)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
@@ -336,14 +339,11 @@ if(ENABLE_CPACK)
         /etc/udev/rules.d
     )
     set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${halcs_POSTINST_FILE_DIR}/redhat/postinst")
-    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/halcsd-${halcs_VERSION}")
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${halcs_VERSION}")
     set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
 
-    set(CPACK_PACKAGE_NAME "halcsd")
-    set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")
-    string(APPEND halcs_VERSION "${halcs_DISTRO_VERSION}")
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}_${arch_name}"
+        "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}${halcs_DISTRO_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "halcsd daemon")
     set(CPACK_PACKAGE_VENDOR "LNLS")

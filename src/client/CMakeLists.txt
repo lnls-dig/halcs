@@ -817,9 +817,8 @@ if(ENABLE_CPACK)
         )
         set(CPACK_PACKAGE_NAME "halcsclient")
         set(halcsclient_DISTRO_VERSION "" CACHE STRING "halcsclient distribution version")
-        string(APPEND halcsclient_VERSION "${halcsclient_DISTRO_VERSION}")
         set(CPACK_PACKAGE_FILE_NAME
-            "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}_${arch_name}"
+            "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}${halcsclient_DISTRO_VERSION}_${arch_name}"
         )
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
         set(CPACK_PACKAGE_VENDOR "LNLS")

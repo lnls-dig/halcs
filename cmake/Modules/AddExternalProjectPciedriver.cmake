@@ -230,7 +230,6 @@ if(ENABLE_CPACK)
     set(arch_name ${ARCH})
 
     set(pciedriver_DISTRO_VERSION "" CACHE STRING "pciedriver distribution version")
-    string(APPEND pciedriver_VERSION "${pciedriver_DISTRO_VERSION}")
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -247,7 +246,7 @@ if(ENABLE_CPACK)
     )
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_DEBIAN_PCIEDRIVER_FILE_NAME
-        "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.deb"
+        "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}${pciedriver_DISTRO_VERSION}_${arch_name}.deb"
     )
 
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_REQUIRE "dkms")
@@ -255,7 +254,7 @@ if(ENABLE_CPACK)
     set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${BINARY_DIR}/prerm")
     set(CPACK_RPM_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
     set(CPACK_RPM_PCIEDRIVER_FILE_NAME
-        "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}_${arch_name}.rpm"
+        "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}${pciedriver_DISTRO_VERSION}_${arch_name}.rpm"
     )
     # Generate debuginfo package
     set(CPACK_RPM_PCIEDRIVER_DEBUGINFO_PACKAGE ON)
