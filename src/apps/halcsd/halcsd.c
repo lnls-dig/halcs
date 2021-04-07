@@ -66,8 +66,6 @@
 #define DEVIO_NAME                      "/usr/local/bin/halcsd"
 #define DEVIO_CFG_NAME                  "/usr/local/bin/halcsd_cfg"
 #define DEVIO_CFG_TIMEOUT               5000       /* in ms */
-#define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
-#define EPICS_HALCS_RUN_SCRIPT_NAME       "./run.sh"
 
 #define DEVIO_LIBHALCSCLIENT_LOG_MODE   "a"
 #define DEVIO_KILL_CFG_SIGNAL           SIGINT
