@@ -1,18 +1,8 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "defs.h"
-
-/****************************/
-/*    General Definitions  */
-/****************************/
-/* CPU Clock frequency in hertz */
-#define SYS_CLOCK 100000000ULL
-
-/* Baud rate of the builtin UART (does not apply to the VUART) */
-#define UART_BAUDRATE 115200ULL
-
-int board_init();
-int board_update();
+#include "ddr3_defs.h"
+#include "ddr3_map.h"
+#include "mem_layout.h"
 
 #endif
