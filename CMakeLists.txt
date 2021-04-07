@@ -311,6 +311,13 @@ if(ENABLE_CPACK)
     # repositories yet
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2)")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${halcs_POSTINST_FILE_DIR}/debian/postinst")
+    # Seems broken in CMake and crashes with 
+    # CPack: Create package
+    # terminate called after throwing an instance of 'std::logic_error'
+    #   what():  basic_string::_M_construct null not valid
+    # Makefile:81: recipe for target 'package' failed
+    # make: *** [package] Aborted (core dumped)
+    # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
     set(CPACK_RPM_PACKAGE_AUTOREQ no)

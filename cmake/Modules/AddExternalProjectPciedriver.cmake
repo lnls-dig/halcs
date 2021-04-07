@@ -234,8 +234,13 @@ if(ENABLE_CPACK)
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
-    # Generate debuginfo package
-    set(CPACK_DEBIAN_PCIEDRIVER_DEBUGINFO_PACKAGE ON)
+    # Seems broken in CMake and crashes with 
+    # CPack: Create package
+    # terminate called after throwing an instance of 'std::logic_error'
+    #   what():  basic_string::_M_construct null not valid
+    # Makefile:81: recipe for target 'package' failed
+    # make: *** [package] Aborted (core dumped)
+    # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_DEPENDS "dkms")
     set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_CONTROL_EXTRA
         "${BINARY_DIR}/postinst;${BINARY_DIR}/prerm"

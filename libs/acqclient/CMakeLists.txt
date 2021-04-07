@@ -509,8 +509,13 @@ if(ENABLE_CPACK)
         set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
         set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
         set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        # Generate debuginfo package
-        set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+        # Seems broken in CMake and crashes with 
+        # CPack: Create package
+        # terminate called after throwing an instance of 'std::logic_error'
+        #   what():  basic_string::_M_construct null not valid
+        # Makefile:81: recipe for target 'package' failed
+        # make: *** [package] Aborted (core dumped)
+        # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
         set(CPACK_RPM_PACKAGE_AUTOREQ no)
         set(CPACK_RPM_PACKAGE_AUTOPROV yes)
         set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
