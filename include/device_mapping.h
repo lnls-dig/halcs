@@ -5,8 +5,8 @@
  * Released according to the GNU GPL, version 3 or any later version.
  */
 
-#ifndef _EPICS_MAPPING_H_
-#define _EPICS_MAPPING_H_
+#ifndef _DEVICE_MAPPING_H_
+#define _DEVICE_MAPPING_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +18,7 @@ typedef struct {
     int smio_id;
 } board_device_map_t;
 
-/* EPICS mapping definitions */
+/* Device mapping definitions */
 extern const board_device_map_t board_device_map[NUM_MAX_HALCSS+1];
 
 #ifdef __cplusplus

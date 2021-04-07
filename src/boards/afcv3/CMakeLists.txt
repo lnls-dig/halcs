@@ -31,7 +31,7 @@ set (boards_afcv3_OUTPUT_BASENAME "boards_afcv3"
 set(boards_afcv3_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ddr3_map.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/epics_mapping.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/device_mapping.c
 )
 
 # for IDE project generation

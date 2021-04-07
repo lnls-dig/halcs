@@ -28,7 +28,7 @@
 #include "board.h"
 #include "mem_layout_common.h"
 #include "chips_addr_common.h"
-#include "epics_mapping.h"
+#include "device_mapping.h"
 #include "revision.h"
 #include "acq_chan_gen_defs.h"
 #include "ddr3_map_structs.h"

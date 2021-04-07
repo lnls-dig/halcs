@@ -31,7 +31,7 @@ set (boards_ml605_OUTPUT_BASENAME "boards_ml605"
 set(boards_ml605_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ddr3_map.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/epics_mapping.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/device_mapping.c
 )
 
 # for IDE project generation
