@@ -82,6 +82,7 @@ usage() {
     echo " * DIST - the version of distribution, e.g. xenial or 24 (${DIST})"
     echo " * BUILDDIR - directory used for out-of-source build (${BUILDDIR})"
     echo " * DOCKER_REPO - Docker repository to use (${DOCKER_REPO})"
+    echo " * MORE_LD_LIBRARY_PATH - Additional paths to append to Docker LD_LIBRARY_PATH"
     echo ""
     echo "The actual list of distribution is available on Docker Hub:"
     echo ""
@@ -119,6 +120,7 @@ if [ "${OS}" = "alpine" ]; then
         echo "adduser $USER wheel";
         echo "adduser $USER abuild";
         echo "export HOME=/home/$USER" ;
+        echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}\${MORE_LD_LIBRARY_PATH:+:\$MORE_LD_LIBRARY_PATH}" ;
         echo "abuild-keygen -a -i -n";
         echo "su-exec $USER \"\$@\"";
     ) > ${BUILDDIR}/userwrapper.sh
@@ -131,6 +133,7 @@ else
         echo "usermod -a -G wheel $USER 2>/dev/null || :";
         echo "usermod -a -G adm $USER 2>/dev/null || :";
         echo "export HOME=/home/$USER" ;
+        echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}\${MORE_LD_LIBRARY_PATH:+:\$MORE_LD_LIBRARY_PATH}" ;
         echo "exec chroot --userspec=$USER / \"\$@\"";
     ) > ${BUILDDIR}/userwrapper.sh
 fi
@@ -196,7 +199,7 @@ chmod a+x ${BUILDDIR}/usercmd.sh
 #
 # Save defined configuration variables to ./env file
 #
-env | grep -E "^PRODUCT=|^VERSION=|^RELEASE=|^ABBREV=|^TARBALL_|^CHANGELOG_|^CCACHE_|^PACKAGECLOUD_|^SMPFLAGS=|^OS=|^DIST=|^VAR_|^LD_LIBRARY_PATH=" \
+env | grep -E "^PRODUCT=|^VERSION=|^RELEASE=|^ABBREV=|^TARBALL_|^CHANGELOG_|^CCACHE_|^PACKAGECLOUD_|^SMPFLAGS=|^OS=|^DIST=|^VAR_|^MORE_LD_LIBRARY_PATH=" \
     > ${BUILDDIR}/env
 
 #
