@@ -129,6 +129,12 @@ smio_fmc250m_4ch_t * smio_fmc250m_4ch_new (smio_t *parent)
 #endif
     _smio_fmc250m_4ch_set_type (self, 0x0);
 
+    self->smpr_spi_isla216p_adc = zmalloc (sizeof *self->smpr_spi_isla216p_adc * NUM_FMC250M_4CH_ISLA216P);
+    ASSERT_ALLOC(self->smpr_spi_isla216p_adc, err_smpr_spi_isla216p_adc_arr_alloc);
+    
+    self->smch_isla216p_adc = zmalloc (sizeof *self->smch_isla216p_adc * NUM_FMC250M_4CH_ISLA216P);
+    ASSERT_ALLOC(self->smch_isla216p_adc, err_smch_isla216p_adc_arr_alloc);
+
     /* Setup ISLA216P ADC SPI communication */
     uint32_t i;
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
@@ -166,6 +172,10 @@ err_smpr_spi_isla216p_adc_alloc:
     for (i = 0; i < NUM_FMC250M_4CH_ISLA216P; ++i) {
         smpr_spi_destroy (&self->smpr_spi_isla216p_adc[i]);
     }
+    free (self->smch_isla216p_adc);
+err_smch_isla216p_adc_arr_alloc:
+    free (self->smpr_spi_isla216p_adc);
+err_smpr_spi_isla216p_adc_arr_alloc:
 #if 0
 #ifdef __FMC250M_4CH_EEPROM_PROGRAM__
 err_smch_ad9510_alloc:
@@ -216,6 +226,8 @@ smio_err_e smio_fmc250m_4ch_destroy (smio_fmc250m_4ch_t **self_p)
             smpr_i2c_destroy (&self->smpr_i2c_pca9547);
         }
 
+        free (self->smch_isla216p_adc);
+        free (self->smpr_spi_isla216p_adc);
         free (self);
         *self_p = NULL;
     }

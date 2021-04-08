@@ -13,6 +13,7 @@
 #include "sm_io_fmc250m_4ch_core.h"
 #include "sm_io_fmc250m_4ch_exp.h"
 #include "hw/wb_fmc250m_4ch_regs.h"
+#include "chips_addr.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
