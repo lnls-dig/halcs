@@ -262,6 +262,15 @@ set(halcsclient_sources
 )
 
 #######################################
+# ACQ sources definitions
+#######################################
+
+# ADD MORE BOARDS HERE!
+set(halcsclient_acq_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/../boards/${halcsclient_BOARD_OPT}/acq_chan.c
+)
+
+#######################################
 # SMIO TABLE sources definitions
 #######################################
 
@@ -295,6 +304,7 @@ set(halcsclient_smio_table_sources
 # for IDE project generation
 source_group("Source Files" FILES
     ${halcsclient_sources}
+    ${halcsclient_acq_sources}
     ${halcsclient_smio_table_sources}
 )
 
@@ -526,6 +536,7 @@ set(readme-docs
 if(BUILD_SHARED)
     add_library(halcsclient SHARED
         ${halcsclient_sources}
+        ${halcsclient_acq_sources}
         ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}
@@ -545,6 +556,7 @@ endif()
 if(BUILD_STATIC)
     add_library(halcsclient-static STATIC
         ${halcsclient_sources}
+        ${halcsclient_acq_sources}
         ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}

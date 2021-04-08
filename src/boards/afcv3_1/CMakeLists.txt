@@ -29,6 +29,7 @@ set (boards_afcv3_1_OUTPUT_BASENAME "boards_afcv3_1"
 # Source files
 
 set(boards_afcv3_1_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/acq_chan.c
     ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ddr3_map.c
     ${CMAKE_CURRENT_SOURCE_DIR}/device_mapping.c

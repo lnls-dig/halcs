@@ -62,9 +62,6 @@ if(boards_SHRINK_AFCV3_DDR_SIZE_VALUE STREQUAL y)
     )
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
-list(APPEND boards_LIBRARIES boards_common)
-
 # select board directory to include
 string(TOLOWER ${halcs_BOARD_OPT} halcs_BOARD_OPT_LOWER)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${halcs_BOARD_OPT_LOWER})

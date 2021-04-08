@@ -8,16 +8,39 @@
 #ifndef _CHIPS_ADDR_H_
 #define _CHIPS_ADDR_H_
 
-extern const uint32_t fmc130m_4ch_24aa64_addr[NUM_FMC130M_4CH_SMIOS];
-extern const uint32_t fmc130m_4ch_lm75a_addr[NUM_FMC130M_4CH_SMIOS][NUM_FMC130M_4CH_LM75A];
+#include "mem_layout_common.h"
+#include "boards/ml605/acq_chan.h"
 
-extern const uint32_t fmc130m_4ch_pca9547_addr[NUM_FMC130M_4CH_SMIOS];
+#define __NUM_FMC130M_4CH_SMIOS         1
+extern const size_t NUM_FMC130M_4CH_SMIOS;
+#define __NUM_FMC130M_4CH_LM75A         2
+extern const size_t NUM_FMC130M_4CH_LM75A;
+#define __NUM_FMC250M_4CH_SMIOS         1
+extern const size_t NUM_FMC250M_4CH_SMIOS;
+#define __NUM_FMC250M_4CH_ISLA216P      4
+extern const size_t NUM_FMC250M_4CH_ISLA216P;
 
-extern const uint32_t fmc250m_4ch_24aa64_addr[NUM_FMC250M_4CH_SMIOS];
+/************************* ML605 Gateware Options *************************/
 
-extern const uint32_t fmc250m_4ch_amc7823_addr[NUM_FMC250M_4CH_SMIOS];
-extern const uint32_t fmc250m_4ch_isla216p_addr[NUM_FMC250M_4CH_SMIOS][NUM_FMC250M_4CH_ISLA216P];
+/********************* FMC130M_4CH SMIO Gateware Options ******************/
 
-extern const uint32_t fmc250m_4ch_pca9547_addr[NUM_FMC250M_4CH_SMIOS];
+/* Chip SPI slave select lines and I2C address */
+
+extern const uint32_t fmc130m_4ch_si571_addr[__NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_ad9510_addr[__NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_24aa64_addr[__NUM_FMC130M_4CH_SMIOS];
+extern const uint32_t fmc130m_4ch_lm75a_addr[__NUM_FMC130M_4CH_SMIOS][__NUM_FMC130M_4CH_LM75A];
+extern const uint32_t fmc130m_4ch_pca9547_addr[__NUM_FMC130M_4CH_SMIOS];
+
+/********************* FMC250M_4CH SMIO Gateware Options ******************/
+
+/* Chip SPI slave select lines and I2C address */
+
+extern const uint32_t fmc250m_4ch_amc7823_addr[__NUM_FMC250M_4CH_SMIOS];
+extern const uint32_t fmc250m_4ch_isla216p_addr[__NUM_FMC250M_4CH_SMIOS][__NUM_FMC250M_4CH_ISLA216P];
+extern const uint32_t fmc250m_4ch_ad9510_addr[__NUM_FMC250M_4CH_SMIOS];
+extern const uint32_t fmc250m_4ch_si571_addr[__NUM_FMC250M_4CH_SMIOS];
+extern const uint32_t fmc250m_4ch_24aa64_addr[__NUM_FMC250M_4CH_SMIOS];
+extern const uint32_t fmc250m_4ch_pca9547_addr[__NUM_FMC250M_4CH_SMIOS];
 
 #endif

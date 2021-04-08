@@ -105,12 +105,8 @@ OBJS_PLATFORM =
 # our library, as it eases some tasks for us
 OBJS_EXTERNAL =
 
-# Project boards
-boards_INCLUDE_DIRS = -I$(TOP)/include/boards/$(BOARD)
-
 # Include directories
 INCLUDE_DIRS = -I. -Iinclude \
-	       $(boards_INCLUDE_DIRS) \
 	       -I$(TOP)/include \
 	       -I$(SMIO_DIR) \
 	       -I$(SMIO_SRC_DIR)/modules \

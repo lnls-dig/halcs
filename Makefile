@@ -268,12 +268,8 @@ include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
 include $(SRC_DIR)/boards/$(BOARD)/board.mk
-include $(SRC_DIR)/boards/common/common.mk
 include $(APPS_MKS)
 include $(LDCONF_DIR)/ldconf.mk
-
-# Project boards
-boards_INCLUDE_DIRS = -Iinclude/boards/$(BOARD)
 
 # We need this until we merge smio and smio_table modules
 # together
@@ -281,12 +277,11 @@ smio_table_DIRS = $(shell find $(SRC_DIR)/sm_io_table/modules -type d -print)
 smio_table_INCLUDE_DIRS = $(addprefix -I, $(smio_table_DIRS))
 
 # Include directories
-INCLUDE_DIRS = $(boards_INCLUDE_DIRS) \
-	        $(smio_table_INCLUDE_DIRS) \
+INCLUDE_DIRS =  $(smio_table_INCLUDE_DIRS) \
 	       -Iinclude \
 	       -I$(LIBBSMP_DIR)/include \
 	       -I$(LIBSDBFS_DIR)/include \
-           -I$(LIBERRHAND_DIR)/include \
+	       -I$(LIBERRHAND_DIR)/include \
 	       -I$(LIBCONVC_DIR)/include \
 	       -I$(LIBHUTILS_DIR)/include \
 	       -I$(LIBDISPTABLE_DIR)/include \

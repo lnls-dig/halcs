@@ -29,6 +29,7 @@ set (boards_afcv3_OUTPUT_BASENAME "boards_afcv3"
 # Source files
 
 set(boards_afcv3_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/acq_chan.c
     ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ddr3_map.c
     ${CMAKE_CURRENT_SOURCE_DIR}/device_mapping.c
@@ -50,8 +51,8 @@ set(boards_afcv3_public_headers
     ${common_INCLUDE_DIR}/boards/afcv3/acq_chan.h
     ${common_INCLUDE_DIR}/boards/afcv3/board.h
     ${common_INCLUDE_DIR}/boards/afcv3/chips_addr.h
+    ${common_INCLUDE_DIR}/boards/afcv3/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/afcv3/ddr3_map.h
-    ${common_INCLUDE_DIR}/boards/afcv3/defs.h
     ${common_INCLUDE_DIR}/boards/afcv3/mem_layout.h
 )
 

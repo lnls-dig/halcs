@@ -18,9 +18,6 @@ typedef struct {
     int smio_id;
 } board_device_map_t;
 
-/* Device mapping definitions */
-extern const board_device_map_t board_device_map[NUM_MAX_HALCSS+1];
-
 #ifdef __cplusplus
 }
 #endif

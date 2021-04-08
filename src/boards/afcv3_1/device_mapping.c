@@ -32,7 +32,17 @@
     CHECK_HAL_ERR(err, DEV_IO, "[dev_io:device]",                   \
             devio_err_str (err_type))
 
-const board_device_map_t board_device_map[NUM_MAX_HALCSS+1] = {
+const size_t NUM_MAX_SLOTS              = __NUM_MAX_SLOTS;
+const size_t NUM_MAX_HALCS_PER_SLOT     = __NUM_MAX_HALCS_PER_SLOT;
+const size_t NUM_MAX_HALCSS             = __NUM_MAX_HALCSS;
+
+/*********************** Static AFCv3 FPGA layout ***********************/
+
+const size_t SDB_ADDRESS                = 0x00000000;
+
+/**************************** Device map ********************************/
+
+const board_device_map_t board_device_map[__NUM_MAX_HALCSS+1] = {
          /* board, halcs*/
     /* 0 (INVALID)  */ {-1, -1},
     /* 1            */ {1,   0},

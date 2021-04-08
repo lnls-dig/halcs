@@ -1,8 +1,8 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "ddr3_defs.h"
-#include "ddr3_map.h"
-#include "mem_layout.h"
+#include "boards/afcv3/ddr3_defs.h"
+#include "boards/afcv3/ddr3_map.h"
+#include "boards/afcv3/mem_layout.h"
 
 #endif

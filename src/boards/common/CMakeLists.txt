@@ -29,7 +29,6 @@ set (boards_common_OUTPUT_BASENAME "boards_common"
 # Source files
 
 set(boards_common_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr_common.c
 )
 
 # for IDE project generation
@@ -45,7 +44,6 @@ list(APPEND boards_common_other_search_dirs "")
 #######################################
 
 set(boards_common_public_headers
-    ${common_INCLUDE_DIR}/chips_addr_common.h
 )
 
 # Get directory names only

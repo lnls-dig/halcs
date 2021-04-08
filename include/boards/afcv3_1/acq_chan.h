@@ -1,68 +1,95 @@
 #ifndef _ACQ_CHAN_H_
 #define _ACQ_CHAN_H_
 
+#include "ddr3_map_structs.h"
 #include <acq_chan_gen_defs.h>
+#include <stdint.h>
 
-#define NUM_ACQ_CORE_SMIOS              4
+#define __NUM_ACQ_CORE_SMIOS              4
 
 /************************ Acquistion 0 Channel Parameters **************/
 
+typedef enum {
+    __ADC_CHAN_ID = 0,
+    __ADCSWAP_CHAN_ID = 1,
+    __MIXIQ_CHAN_ID,
+    __DUMMY0_CHAN_ID,
+    __TBTDECIMIQ_CHAN_ID,
+    __DUMMY1_CHAN_ID,
+    __TBTAMP_CHAN_ID,
+    __TBTPHA_CHAN_ID,
+    __TBTPOS_CHAN_ID,
+    __FOFBDECIMIQ_CHAN_ID,
+    __DUMMY2_CHAN_ID,
+    __FOFBAMP_CHAN_ID,
+    __FOFBPHA_CHAN_ID,
+    __FOFBPOS_CHAN_ID,
+    __MONIT1AMP_CHAN_ID,
+    __MONIT1POS_CHAN_ID,
+    __MONITAMP_CHAN_ID,
+    __MONITPOS_CHAN_ID,
+    __END_CHAN_ID
+} acq_channel_ids;
+
 /* ADC */
-#define ADC_CHAN_ID                     0
+extern const uint32_t ADC_CHAN_ID;
 
 /* ADC SWAPPED (after the switching module) */
-#define ADCSWAP_CHAN_ID                 (ADC_CHAN_ID + 1)
+extern const uint32_t ADCSWAP_CHAN_ID;
 
 /* MIXER I/Q */
-#define MIXIQ_CHAN_ID                   (ADCSWAP_CHAN_ID + 1)
+extern const uint32_t MIXIQ_CHAN_ID;
 
 /* DUMMY 0 */
-#define DUMMY0_CHAN_ID                  (MIXIQ_CHAN_ID + 1)
+extern const uint32_t DUMMY0_CHAN_ID;
 
 /* TBTDECIM I/Q */
-#define TBTDECIMIQ_CHAN_ID              (DUMMY0_CHAN_ID + 1)
+extern const uint32_t TBTDECIMIQ_CHAN_ID;
 
 /* DUMMY 1 */
-#define DUMMY1_CHAN_ID                  (TBTDECIMIQ_CHAN_ID + 1)
+extern const uint32_t DUMMY1_CHAN_ID;
 
 /* TBT AMP */
-#define TBTAMP_CHAN_ID                  (DUMMY1_CHAN_ID + 1)
+extern const uint32_t TBTAMP_CHAN_ID;
 
 /* TBT PHASE */
-#define TBTPHA_CHAN_ID                  (TBTAMP_CHAN_ID + 1)
+extern const uint32_t TBTPHA_CHAN_ID;
 
 /* TBT POS */
-#define TBTPOS_CHAN_ID                  (TBTPHA_CHAN_ID + 1)
+extern const uint32_t TBTPOS_CHAN_ID;
 
 /* FOFBDECIM I/Q */
-#define FOFBDECIMIQ_CHAN_ID             (TBTPOS_CHAN_ID + 1)
+extern const uint32_t FOFBDECIMIQ_CHAN_ID;
 
 /* DUMMY 2 */
-#define DUMMY2_CHAN_ID                  (FOFBDECIMIQ_CHAN_ID + 1)
+extern const uint32_t DUMMY2_CHAN_ID;
 
 /* FOFB AMP */
-#define FOFBAMP_CHAN_ID                 (DUMMY2_CHAN_ID + 1)
+extern const uint32_t FOFBAMP_CHAN_ID;
 
 /* FOFB PHA */
-#define FOFBPHA_CHAN_ID                 (FOFBAMP_CHAN_ID + 1)
+extern const uint32_t FOFBPHA_CHAN_ID;
 
 /* FOFB POS */
-#define FOFBPOS_CHAN_ID                 (FOFBPHA_CHAN_ID + 1)
+extern const uint32_t FOFBPOS_CHAN_ID;
 
 /* MONIT1 AMP */
-#define MONIT1AMP_CHAN_ID               (FOFBPOS_CHAN_ID + 1)
+extern const uint32_t MONIT1AMP_CHAN_ID;
 
 /* MONIT1 POS */
-#define MONIT1POS_CHAN_ID               (MONIT1AMP_CHAN_ID + 1)
+extern const uint32_t MONIT1POS_CHAN_ID;
 
 /* MONIT AMP */
-#define MONITAMP_CHAN_ID                (MONIT1POS_CHAN_ID + 1)
+extern const uint32_t MONITAMP_CHAN_ID;
 
 /* MONIT POS */
-#define MONITPOS_CHAN_ID                (MONITAMP_CHAN_ID + 1)
+extern const uint32_t MONITPOS_CHAN_ID;
 
 /* End of channels placeholder */
-#define END_CHAN_ID                     (MONITPOS_CHAN_ID + 1)
+extern const uint32_t END_CHAN_ID;
+
+/* Channel buffer definition */
+extern const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID];
 
 #endif
 
