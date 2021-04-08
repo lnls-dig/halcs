@@ -45,14 +45,5 @@ extern const uint32_t fmc250m_4ch_si571_addr[NUM_FMC250M_4CH_SMIOS];
 extern const uint32_t fmc250m_4ch_24aa64_addr[NUM_FMC250M_4CH_SMIOS];
 extern const uint32_t fmc250m_4ch_pca9547_addr[NUM_FMC250M_4CH_SMIOS];
 
-/*********************** SMIO ACQ Gateware Options ***********************/
-/* FIXME: The Gateware does not support yet a way of reading which
- * ACQ channels are valid. So, we hardcoded it here for now. This issue
- * should be addressed soon */
-
-/* We define 10 Channels: ADC 1, TBT AMP 1, TBT POS 1, FOFB AMP 1, FOFB POS 1,
- * ADC 2, TBT AMP 2, TBT POS 2, FOFB AMP 2, FOFB POS 2 */
-#define SMIO_ACQ_NUM_CHANNELS                       END_CHAN_ID
-
 #endif
 
