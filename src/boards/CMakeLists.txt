@@ -2,6 +2,11 @@
 # Library setup
 ########################################################################
 
+# set installation variables compliant with distributions
+include(GNUInstallDirs)
+# configure and generate *.Config.cmake files
+include(CMakePackageConfigHelpers)
+
 # library basename
 set (boards_OUTPUT_BASENAME "boards"
     CACHE STRING
@@ -141,3 +146,18 @@ target_link_libraries(boards
     ${boards_LIBRARIES}
     ${halcs_LIBRARIES}
 )
+
+########################################################################
+# Installer
+########################################################################
+
+foreach(target ${boards_LIBRARIES})
+    install(TARGETS ${target} boards_compiler_flags
+        EXPORT $<TARGET_FILE_BASE_NAME:${target}>-targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Libs
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+        FRAMEWORK DESTINATION "Library/Frameworks"
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Libs
+    )
+endforeach()
