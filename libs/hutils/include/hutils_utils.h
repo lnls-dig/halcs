@@ -86,6 +86,10 @@ char *hutils_concat_strings_no_sep (const char *str1, const char* str2);
 char *hutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);
 
+/* Concatenates 3 strings together. Returns the string if OK, NULL in case of error */
+char *hutils_concat_strings3_no_sep (const char *str1, const char* str2,
+        const char* str3);
+
 /* Calculates necessary padding so that a given value is a multiple of a given
  * alignment */
 uint32_t hutils_calculate_padding(uint32_t value, uint32_t alignment);

@@ -202,6 +202,12 @@ char *hutils_concat_strings3 (const char *str1, const char* str2,
     return _hutils_concat_strings_raw (str1, str2, str3, true, sep);
 }
 
+char *hutils_concat_strings3_no_sep (const char *str1, const char* str2,
+        const char* str3)
+{
+    return _hutils_concat_strings_raw (str1, str2, str3, false, 0);
+}
+
 /*******************************************************************/
 /*****************  Byte manipulation functions ********************/
 /*******************************************************************/
