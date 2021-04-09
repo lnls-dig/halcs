@@ -129,10 +129,14 @@ target_link_libraries(sm_io_modules
 # as linker will add the symbol to the final binary if it has an unresolved symbol,
 # but for modules this is always the case. This was extracted from:
 # https://stackoverflow.com/questions/53071878/using-whole-archive-linker-option-with-cmake-and-libraries-with-other-library
+set(sm_io_module_LIBRARIES_GENEX "")
+foreach(lib ${sm_io_modules_LIBRARIES})
+    list(APPEND sm_io_module_LIBRARIES_GENEX $<TARGET_LINKER_FILE:${lib}>)
+endforeach()
+
+string(REPLACE ";" "," sm_io_module_LIBRARIES_GENEX_COMMA "${sm_io_module_LIBRARIES_GENEX}")
 
 target_link_libraries(sm_io_modules
     INTERFACE
-    -Wl,--whole-archive
-    ${sm_io_modules_LIBRARIES}
-    -Wl,--no-whole-archive
+    -Wl,--whole-archive,${sm_io_module_LIBRARIES_GENEX_COMMA},--no-whole-archive
 )
