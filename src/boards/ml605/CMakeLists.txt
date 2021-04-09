@@ -2,6 +2,9 @@
 # Library setup
 ########################################################################
 
+# extract version numbers from header file
+include(TestHalcsVersion)
+
 # library basename
 set (boards_ml605_OUTPUT_BASENAME "boards_ml605"
     CACHE STRING
@@ -87,14 +90,17 @@ source_group("Header Files" FILES
 # Library declaration
 ########################################################################
 
-# build static library
-add_library(boards_ml605 STATIC
+# build dynamic library
+add_library(boards_ml605 SHARED
     ${boards_ml605_sources}
     ${boards_ml605_public_headers}
 )
 
 set_target_properties(boards_ml605 PROPERTIES
   PUBLIC_HEADER "${boards_ml605_public_headers}"
+  SOVERSION "1"
+  VERSION "${halcs_VERSION}"
+  COMPILE_DEFINITIONS "DLL_EXPORT"
   OUTPUT_NAME "${boards_ml605_OUTPUT_BASENAME}"
   PREFIX "lib")
 

@@ -2,6 +2,9 @@
 # Library setup
 ########################################################################
 
+# extract version numbers from header file
+include(TestHalcsVersion)
+
 # library basename
 set (boards_afcv3_1_OUTPUT_BASENAME "boards_afcv3_1"
     CACHE STRING
@@ -87,14 +90,17 @@ source_group("Header Files" FILES
 # Library declaration
 ########################################################################
 
-# build static library
-add_library(boards_afcv3_1 STATIC
+# build dynamic library
+add_library(boards_afcv3_1 SHARED
     ${boards_afcv3_1_sources}
     ${boards_afcv3_1_public_headers}
 )
 
 set_target_properties(boards_afcv3_1 PROPERTIES
   PUBLIC_HEADER "${boards_afcv3_1_public_headers}"
+  SOVERSION "1"
+  VERSION "${halcs_VERSION}"
+  COMPILE_DEFINITIONS "DLL_EXPORT"
   OUTPUT_NAME "${boards_afcv3_1_OUTPUT_BASENAME}"
   PREFIX "lib")
 
