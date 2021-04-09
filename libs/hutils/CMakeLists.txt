@@ -140,6 +140,34 @@ if (NEED_LINKING_AGAINST_LIBM)
     list(APPEND MORE_LIBRARIES m)
 endif()
 
+#########################################################################
+# libdl dependency
+#########################################################################
+
+find_library (
+    libdl_LIBRARIES
+    NAMES libdl dl
+)
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(
+    libdl
+    REQUIRED_VARS libdl_LIBRARIES
+)
+mark_as_advanced(
+    libdl_FOUND
+    libdl_LIBRARIES
+)
+
+if(libdl_FOUND)
+    list(APPEND MORE_LIBRARIES ${libdl_LIBRARIES})
+    set(pkg_config_libs_private "${pkg_config_libs_private} -ldl")
+else()
+    message(FATAL_ERROR
+        "libdl is not installed. Install it, then run CMake again." )
+endif()
+
 ########################################################################
 # Library compile options
 ########################################################################
@@ -191,6 +219,7 @@ set(hutils_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hutils_err.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hutils_math.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hutils_utils.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hutils_symload.c
 )
 
 # for IDE project generation
@@ -205,6 +234,8 @@ set(hutils_public_headers
     ${CMAKE_CURRENT_SOURCE_DIR}/include/hutils_err.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/hutils_math.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/hutils_utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/hutils_symload.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/hutils_sharelib.h
 )
 
 # for IDE project generation
