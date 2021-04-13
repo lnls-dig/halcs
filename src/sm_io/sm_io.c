@@ -529,8 +529,7 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
      * event though the receiving channel was registered in a zloop engine.
      * The zloop reader was canceled before and will be reinserted in the engine
      * in after receving the message */
-    char command[50];
-    zerr = zsock_recv (self->pipe_mgmt, "s2114", command, &sdbutils_info->abi_class,
+    zerr = zsock_recv (self->pipe_mgmt, "s2114", NULL, &sdbutils_info->abi_class,
         &sdbutils_info->abi_ver_major, &sdbutils_info->abi_ver_minor, &sdbutils_info->bus_specific);
     ASSERT_TEST(zerr == 0, "Could not receive SDB_DEVICE_INFO message", err_recv_sdb_info_msg,
             SMIO_ERR_REGISTER_SM);
