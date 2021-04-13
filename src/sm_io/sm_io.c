@@ -541,6 +541,34 @@ err_send_sdb_info_msg:
     return err;
 }
 
+smio_err_e smio_get_board_type (smio_t *self, char **board_type)
+{
+    assert (self);
+    smio_err_e err = SMIO_SUCCESS;
+
+    /* Cancel zloop on pipe_mgmt, as we will receive the message in the following
+     * receive in a blocking call */
+    _smio_engine_handle_socket (self, self->pipe_mgmt, NULL);
+
+    int zerr = zsock_send (self->pipe_mgmt, "s", "$BOARD_TYPE");
+    ASSERT_TEST(zerr == 0, "Could not send BOARD_TYPE message", err_send_board_type_msg,
+            SMIO_ERR_REGISTER_SM);
+
+    /* Wait for reply. Note here we expect the reply over the same socket,
+     * event though the receiving channel was registered in a zloop engine.
+     * The zloop reader was canceled before and will be reinserted in the engine
+     * in after receving the message */
+    zerr = zsock_recv (self->pipe_mgmt, "ss", NULL, board_type);
+    ASSERT_TEST(zerr == 0, "Could not receive BOARD_TYPE message", err_recv_board_type_msg,
+            SMIO_ERR_REGISTER_SM);
+
+err_recv_board_type_msg:
+err_send_board_type_msg:
+    /* Re-register pipe_mgmt in zloop */
+    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
+    return err;
+}
+
 /************************************************************/
 /***************** Dispatch table callbacks *****************/
 /************************************************************/
