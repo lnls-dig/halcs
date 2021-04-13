@@ -232,6 +232,8 @@ int main (int argc, char *argv[])
         devio_name);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
 
+    /* devio_cfg doesn't need this info */
+    char *board_type = strdup ("undef");
     devio_args_t *devio_args = zmalloc (sizeof *devio_args);
     ASSERT_ALLOC (devio_args, err_devio_args_alloc);
     devio_args->devio_service = &devio_service_str; 
@@ -242,6 +244,7 @@ int main (int argc, char *argv[])
     devio_args->verbose = verbose;
     devio_args->devio_log_filename = &devio_log_filename;
     devio_args->devio_log_info_filename = &devio_log_info_filename;
+    devio_args->board_type = &board_type;
 
     /* Step 1: Loop though all the SDB records and intialize (boot) the
      * smio modules*/
