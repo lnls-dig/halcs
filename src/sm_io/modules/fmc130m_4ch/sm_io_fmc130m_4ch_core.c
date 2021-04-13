@@ -43,20 +43,48 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     smio_fmc130m_4ch_t *self = (smio_fmc130m_4ch_t *) zmalloc (sizeof *self);
     ASSERT_ALLOC(self, err_self_alloc);
     uint32_t inst_id = smio_get_inst_id (parent);
+    char *board_type = NULL;
+
+    smio_err_e err = smio_get_board_type (parent, &board_type);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not get board_type",
+            err_get_board_type);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_core] board_type: %s, Inst ID: %u\n",
+            board_type, inst_id);
+
+    /* Lookup symbol */
+    const uint32_t **num_fmc130m_4ch_smios_p =
+        hutils_lookup_symbol ("pvar_const_uint32_t_p_", board_type, "_num_fmc130m_4ch_smios");
+    ASSERT_ALLOC(num_fmc130m_4ch_smios_p, err_lookup_sym);
+    const uint32_t num_fmc130m_4ch_smios = **num_fmc130m_4ch_smios_p;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_core] num_fmc130m_4ch_smios: %u, "
+            "Inst ID = %u\n", num_fmc130m_4ch_smios, inst_id);
+
+    const uint32_t **fmc130m_4ch_pca9547_addr = 
+        hutils_lookup_symbol ("pvar_const_uint32_t_p_", board_type, "_fmc130m_4ch_pca9547_addr");
+    ASSERT_ALLOC(fmc130m_4ch_pca9547_addr, err_lookup_sym);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_core] PCA9547 address, "
+            " addr: 0x%08X, Inst ID: %u\n", (*fmc130m_4ch_pca9547_addr)[inst_id],
+            inst_id);
+    const uint32_t **fmc130m_4ch_24aa64_addr = 
+        hutils_lookup_symbol ("pvar_const_uint32_t_p_", board_type, "_fmc130m_4ch_24aa64_addr");
+    ASSERT_ALLOC(fmc130m_4ch_24aa64_addr, err_lookup_sym);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:fmc130m_4ch_core] 24AA64 address, "
+            " addr: 0x%02X, Inst ID: %u\n", 
+            (*fmc130m_4ch_24aa64_addr)[inst_id], inst_id);
 
     /* Check if Instance ID is within our expected limits */
-    ASSERT_TEST(inst_id < NUM_FMC130M_4CH_SMIOS, "Number of FMC130M_4CH SMIOs instances exceeded",
+    ASSERT_TEST(inst_id < num_fmc130m_4ch_smios, "Number of FMC130M_4CH SMIOs instances exceeded",
             err_num_fmc130m_4ch_smios);
 
     /* FMC130M_4CH isntance 0 is the one controlling this CI */
     /* FIXME: This breaks generality for this class */
     if (inst_id == 0) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] PCA9547 initializing, "
-                " addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_pca9547_addr[inst_id],
+                " addr: 0x%08X, Inst ID: %u\n", (*fmc130m_4ch_pca9547_addr)[inst_id],
                 inst_id);
 
         /* Create I2C protocol for pca9547 chip */
-        self->smpr_i2c_pca9547 = smpr_i2c_new (0, fmc130m_4ch_pca9547_addr[inst_id]);
+        self->smpr_i2c_pca9547 = smpr_i2c_new (0, (*fmc130m_4ch_pca9547_addr)[inst_id]);
         ASSERT_ALLOC(self->smpr_i2c_pca9547, err_smpr_i2c_pca9547_alloc);
 
         /* FPGA I2C Switch */
@@ -73,11 +101,11 @@ smio_fmc130m_4ch_t * smio_fmc130m_4ch_new (smio_t *parent)
     }
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fmc130m_4ch_core] 24AA64 initializing, "
-            "addr: 0x%08X, Inst ID: %u\n", fmc130m_4ch_24aa64_addr[inst_id],
+            "addr: 0x%08X, Inst ID: %u\n", (*fmc130m_4ch_24aa64_addr)[inst_id],
             inst_id);
 
     /* Create I2C protocol for 24aa64 chip */
-    self->smpr_i2c_24aa64 = smpr_i2c_new (0, fmc130m_4ch_24aa64_addr[inst_id]);
+    self->smpr_i2c_24aa64 = smpr_i2c_new (0, (*fmc130m_4ch_24aa64_addr)[inst_id]);
     ASSERT_ALLOC(self->smpr_i2c_24aa64, err_smpr_i2c_24aa64_alloc);
 
     /* EEPROM  is on the same I2C bus as the LM75A */
@@ -137,9 +165,12 @@ err_smch_pca9547_alloc:
     }
 err_smpr_i2c_pca9547_alloc:
 err_num_fmc130m_4ch_smios:
+err_lookup_sym:
     free (self);
 err_self_alloc:
+err_get_board_type:
     return NULL;
+
 }
 
 /* Destroy an instance of the Device Information */
