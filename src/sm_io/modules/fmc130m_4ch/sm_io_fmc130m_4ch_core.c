@@ -9,7 +9,6 @@
 /* Private headers */
 #include "sm_io_fmc130m_4ch_defaults.h"
 #include "sm_io_fmc130m_4ch_core.h"
-#include "chips_addr.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST
