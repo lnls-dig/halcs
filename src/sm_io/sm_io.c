@@ -248,13 +248,13 @@ static smio_err_e _smio_engine_handle_socket (smio_t *smio, void *sock,
             ASSERT_TEST(rc == 0, "Could not register zloop_reader",
                     err_zloop_reader, SMIO_ERR_ALLOC);
             zloop_reader_set_tolerant (self->loop, (zsock_t *) sock);
-
-            /* Send message to pipe_backend to force zloop to rebuild poll_set */
-            zstr_sendx (smio->pipe_frontend, "$REBUILD_POLL", NULL);
         }
         else {
             zloop_reader_end (self->loop, (zsock_t *) sock);
         }
+
+        /* Send message to pipe_backend to force zloop to rebuild poll_set */
+        zstr_sendx (smio->pipe_frontend, "$REBUILD_POLL", NULL);
     }
 
 err_zloop_reader:
@@ -517,7 +517,7 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
 
     /* Cancel zloop on pipe_mgmt, as we will receive the message in the following
      * receive in a blocking call */
-    zloop_reader_end (self->loop, self->pipe_mgmt);
+    _smio_engine_handle_socket (self, self->pipe_mgmt, NULL);
 
     int zerr = zsock_send (self->pipe_mgmt, "s48444s84", "$SDB_DEVICE_INFO",
             smio_id, self->base, smio_inst, 0x0, 0x0,
