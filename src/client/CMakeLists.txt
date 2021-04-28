@@ -444,6 +444,7 @@ list(APPEND halcsclient_public_headers
 set(halcsclient_acq_public_headers
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan_gen_defs.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/ddr3_map_structs.h
 )
 
 # Get directory names only
