@@ -508,16 +508,13 @@ err_send_mgmt_msg:
     return err;
 }
 
+/* Only safe to use before SMIO initialization (inside SMIO init routine) */
 smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
     uint32_t smio_inst, uint64_t vid, uint32_t did,
     sdbutils_info_t *sdbutils_info)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-
-    /* Cancel zloop on pipe_mgmt, as we will receive the message in the following
-     * receive in a blocking call */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, NULL);
 
     int zerr = zsock_send (self->pipe_mgmt, "s48444s84", "$SDB_DEVICE_INFO",
             smio_id, self->base, smio_inst, 0x0, 0x0,
@@ -536,19 +533,14 @@ smio_err_e smio_get_sdb_info (smio_t *self, uint32_t smio_id,
 
 err_recv_sdb_info_msg:
 err_send_sdb_info_msg:
-    /* Re-register pipe_mgmt in zloop */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
     return err;
 }
 
+/* Only safe to use before SMIO initialization (inside SMIO init routine) */
 smio_err_e smio_get_board_type (smio_t *self, char **board_type)
 {
     assert (self);
     smio_err_e err = SMIO_SUCCESS;
-
-    /* Cancel zloop on pipe_mgmt, as we will receive the message in the following
-     * receive in a blocking call */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, NULL);
 
     int zerr = zsock_send (self->pipe_mgmt, "s", "$BOARD_TYPE");
     ASSERT_TEST(zerr == 0, "Could not send BOARD_TYPE message", err_send_board_type_msg,
@@ -564,8 +556,6 @@ smio_err_e smio_get_board_type (smio_t *self, char **board_type)
 
 err_recv_board_type_msg:
 err_send_board_type_msg:
-    /* Re-register pipe_mgmt in zloop */
-    _smio_engine_handle_socket (self, self->pipe_mgmt, _smio_handle_pipe_mgmt);
     return err;
 }
 
