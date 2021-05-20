@@ -172,8 +172,8 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
     uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
-    uint32_t samples_alignment =
-        DDR3_PAYLOAD_SIZE/channel_sample_size;
+    uint32_t samples_alignment = (DDR3_PAYLOAD_SIZE > channel_sample_size)?
+        DDR3_PAYLOAD_SIZE/channel_sample_size : 1;
     /* We are not allowed to acquire less than DDR3_PAYLOAD_SIZE bytes or in
      * anything not multiple of that number in neither pre_samples nor
      * post_samples. That's because the FPGA gateware expects at least one
