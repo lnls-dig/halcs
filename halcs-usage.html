@@ -1,0 +1,582 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HALCS Usage &#8212; HALCS 1.10.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HALCS Architecture" href="halcs-architecture.html" />
+    <link rel="prev" title="HALCS Installation" href="halcs-installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="halcs-usage">
+<span id="id1"></span><h1>HALCS Usage<a class="headerlink" href="#halcs-usage" title="Permalink to this headline">¶</a></h1>
+<p>After installing all of the dependencies and HALCS itself
+to the desired versions, see <a class="reference internal" href="halcs-installation.html#halcs-installation"><span class="std std-ref">HALCS Installation</span></a> for
+more information, we can check if all of the needed parts
+are up and running.</p>
+<div class="section" id="things-to-check">
+<h2>Things to check<a class="headerlink" href="#things-to-check" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="device-detection">
+<h3>Device detection<a class="headerlink" href="#device-detection" title="Permalink to this headline">¶</a></h3>
+<p>The first thing to check is if your device is found by the OS. In the most
+typical usage of HALCS this would be a <em>PCIe</em> device.</p>
+<p>If using the <a class="reference external" href="https://github.com/lnls-dig/fpga_pcie_driver">FPGA PCIe driver</a> you can check if your device was
+enumerated by checking the <em>/dev/fpga-&lt;PCIe slot number&gt;</em> or
+<em>/dev/fpga/&lt;PCIe slot number&gt;</em>. If the board was detected a file
+should be created at <em>/dev</em>.</p>
+<p>Another way to check if the board was detected is by looking at the
+system logs, specifically in <em>/var/log/messages</em>, <em>/var/log/dmesg</em> or
+via the <code class="docutils literal notranslate"><span class="pre">dmesg</span></code> command. A common output of the <cite>FPGA PCIe driver</cite>
+is shown below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pending interrupts 0x0009 from Slot Status
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: Button pressed on Slot<span class="o">(</span><span class="m">8</span><span class="o">)</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: Card present on Slot<span class="o">(</span><span class="m">8</span><span class="o">)</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_get_power_status: SLOTCTRL <span class="m">80</span> value <span class="nb">read</span> <span class="m">1431</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: PCI slot <span class="c1">#8 - powering on due to button press</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:14 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_get_power_status: SLOTCTRL <span class="m">80</span> value <span class="nb">read</span> <span class="m">1431</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pending interrupts 0x0010 from Slot Status
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_power_on_slot: SLOTCTRL <span class="m">80</span> write cmd <span class="m">0</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: __pciehp_link_set: <span class="nv">lnk_ctrl</span> <span class="o">=</span> <span class="m">0</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pending interrupts 0x0100 from Slot Status
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_check_link_active: <span class="nv">lnk_status</span> <span class="o">=</span> <span class="m">2041</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: slot<span class="o">(</span><span class="m">8</span><span class="o">)</span>: Link Up event
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: Link Up event ignored on slot<span class="o">(</span><span class="m">8</span><span class="o">)</span>: already powering on
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_check_link_active: <span class="nv">lnk_status</span> <span class="o">=</span> <span class="m">2041</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciehp <span class="m">0000</span>:02:08.0:pcie24: pciehp_check_link_status: <span class="nv">lnk_status</span> <span class="o">=</span> <span class="m">2041</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: <span class="o">[</span>10ee:7014<span class="o">]</span> <span class="nb">type</span> <span class="m">00</span> class 0x118000
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: reg 0x10: <span class="o">[</span>mem 0x00000000-0x000007ff 64bit<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: reg 0x18: <span class="o">[</span>mem 0x00000000-0x000fffff 64bit pref<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: reg 0x20: <span class="o">[</span>mem 0x00000000-0x0007ffff 64bit<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: Max Payload Size <span class="nb">set</span> to <span class="m">256</span> <span class="o">(</span>was <span class="m">128</span>, max <span class="m">512</span><span class="o">)</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: BAR <span class="m">2</span>: assigned <span class="o">[</span>mem 0x91000000-0x910fffff 64bit pref<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: BAR <span class="m">4</span>: assigned <span class="o">[</span>mem 0x93900000-0x9397ffff 64bit<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pci <span class="m">0000</span>:0b:00.0: BAR <span class="m">0</span>: assigned <span class="o">[</span>mem 0x93980000-0x939807ff 64bit<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pcieport <span class="m">0000</span>:02:08.0: PCI bridge to <span class="o">[</span>bus 0b<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pcieport <span class="m">0000</span>:02:08.0:   bridge window <span class="o">[</span>io  0xa000-0xafff<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pcieport <span class="m">0000</span>:02:08.0:   bridge window <span class="o">[</span>mem 0x93900000-0x93cfffff<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pcieport <span class="m">0000</span>:02:08.0:   bridge window <span class="o">[</span>mem 0x91000000-0x911fffff 64bit pref<span class="o">]</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver <span class="m">0000</span>:0b:00.0:  probe <span class="k">for</span> device 000b:0000
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_probe : Found uTCA AMC board at <span class="m">0000</span>:0b:00.0
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver <span class="m">0000</span>:0b:00.0: enabling device <span class="o">(</span><span class="m">0000</span> -&gt; <span class="m">0002</span><span class="o">)</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver <span class="m">0000</span>:0b:00.0: Creating device name fpga-8
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_probe_irq : Registered Interrupt Handler at pin <span class="m">1</span>, line <span class="m">255</span>, IRQ <span class="m">16</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_probe : pcidriver_probe: <span class="nv">user_refcount</span> <span class="o">=</span> <span class="m">1</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_open : pcidriver_open: <span class="nv">user_refcount</span> <span class="o">=</span> <span class="m">2</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap : Entering mmap
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_pci : Entering mmap_pci
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap : Entering mmap
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_pci : Entering mmap_pci
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap : Entering mmap
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_pci : Entering mmap_pci
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap : Entering mmap
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_kmem : Entering mmap_kmem
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_kmem : Got kmem_entry with id: <span class="m">0</span>
+<span class="o">[</span>Fri Feb <span class="m">28</span> <span class="m">11</span>:24:15 <span class="m">2020</span><span class="o">]</span> pciDriver - pcidriver_mmap_kmem : Mapping address 44ba00000 / PFN 0044ba00
+</pre></div>
+</div>
+</div>
+<div class="section" id="device-simple-readout">
+<h3>Device simple readout<a class="headerlink" href="#device-simple-readout" title="Permalink to this headline">¶</a></h3>
+<p>If the driver is working ok, you can read/write to/from device registers
+by using a simple program called <code class="docutils literal notranslate"><span class="pre">regAccess</span></code>. This is shipped with
+<a class="reference external" href="https://github.com/lnls-dig/fpga_pcie_driver">FPGA PCIe driver</a> and is located at <code class="docutils literal notranslate"><span class="pre">tests/pcie/bin</span></code>. From then
+HALCS source tree you can located it at <code class="docutils literal notranslate"><span class="pre">foreign/pcie-driver/tests/pcie/bin</span></code>.</p>
+<p>The usage is as follows:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  Simple Register Access to FPGA
+  Usage: ./bin/regAccess <span class="o">[</span>options<span class="o">]</span>
+    -h  --help                           Display this usage information
+    -b  --devicefile &lt;Device File&gt;       Device File
+    -v  --verbose                        Verbose output
+    -r  --read                           Perform <span class="nb">read</span> access
+    -w  --write                          Perform write access
+    -n  --barno &lt;BAR <span class="nv">number</span> <span class="o">=</span> <span class="o">[</span><span class="m">0</span><span class="p">|</span><span class="m">2</span><span class="p">|</span><span class="m">4</span><span class="o">]</span>    Bar Number
+    -a  --address &lt;FPGA Address in hex&gt;  Address to read/write
+    -d  --data &lt;FPGA Data in hex&gt;        Data to write to FPGA
+</pre></div>
+</td></tr></table></div>
+<p>In that case, if we want to read a register from board located at slot 1,
+at address 0x0 from BAR 4, which is the Wishbone register space in most cases,
+you could issue the following:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  $ ./bin/regAccess <span class="se">\</span>
+      --devicefile /dev/fpga-1
+      --read <span class="se">\</span>
+      --barno <span class="m">4</span> <span class="se">\</span>
+      --address 0x0
+  0x0000AA55
+</pre></div>
+</td></tr></table></div>
+<p>To write a value to register address <code class="docutils literal notranslate"><span class="pre">0x0</span></code> you could issue:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  $ ./bin/regAccess <span class="se">\</span>
+      --devicefile /dev/fpga-1
+      --write <span class="se">\</span>
+      --barno <span class="m">4</span> <span class="se">\</span>
+      --address 0x0 <span class="se">\</span>
+      --data 0xAA55AA55
+  0xAA55AA55
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="sdb-readout">
+<h3>SDB readout<a class="headerlink" href="#sdb-readout" title="Permalink to this headline">¶</a></h3>
+<p>On gateware projects that support SDB you can read its contents by
+using the <code class="docutils literal notranslate"><span class="pre">sdb-read-lnls</span></code> program located at <code class="docutils literal notranslate"><span class="pre">foreign/libsdbfs/tools</span></code>.</p>
+<p>The usage is as follows:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  sdb-read-lnls: Use: <span class="s2">&quot;sdb-read-lnls [options] &lt;image-file&gt; [&lt;file&gt;]</span>
+<span class="s2">     -l          long listing (like ls -l)</span>
+<span class="s2">     -v          verbose</span>
+<span class="s2">     -e &lt;num&gt;    entry point offset</span>
+</pre></div>
+</td></tr></table></div>
+<p>To read the SDB information from a board located at slot 11, from starting address
+<code class="docutils literal notranslate"><span class="pre">0x0</span></code>, you could issue:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  $ sdb-read-lnls -l -e 0x0 /dev/fpga-11
+  INFO : <span class="o">[</span><span class="m">20</span>-03-31 <span class="m">11</span>:46:59<span class="o">]</span> <span class="o">[</span>ll_io<span class="o">]</span> Ops <span class="nb">set</span>
+  INFO : <span class="o">[</span><span class="m">20</span>-03-31 <span class="m">11</span>:46:59<span class="o">]</span> <span class="o">[</span>ll_io<span class="o">]</span> Created instance of llio
+  INFO : <span class="o">[</span><span class="m">20</span>-03-31 <span class="m">11</span>:46:59<span class="o">]</span> <span class="o">[</span>ll_io_pcie<span class="o">]</span> Opened PCIe device located at /dev/fpga-11
+  sdb-read-lnls: listing format is to be defined
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00000000</span>-007fffff WB4-Crossbar-GSI
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00310000</span>-00310fff WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00310000</span>-003107ff   WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:1bafbf1e @ <span class="m">00310000</span>-003100ff   LNLS_POS_CALC_REGS
+  <span class="m">1000000000001215</span>:12897592 @ <span class="m">00310100</span>-003101ff   LNLS_BPM_SWAP
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00320000</span>-0032ffff WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00320000</span>-00327fff   WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:68e3b1af @ <span class="m">00320000</span>-003200ff   LNLS_FMC250M_REGS
+  <span class="m">1000000000001215</span>:2403f569 @ <span class="m">00321000</span>-003210ff   LNLS_ACOMMON_REGS
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00322000</span>-00322fff   WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00322000</span>-003223ff     WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:88c67d9c @ <span class="m">00322000</span>-003220ff     LNLS_ACLK_REGS
+  000000000000ce42:123c5443 @ <span class="m">00322100</span>-003221ff     WB-I2C-Master
+  000000000000ce42:e503947e @ <span class="m">00322200</span>-003222ff     WB-SPI.Control
+  000000000000ce42:123c5443 @ <span class="m">00323000</span>-003230ff   WB-I2C-Master
+  000000000000ce42:e503947e @ <span class="m">00324000</span>-003240ff   WB-SPI.Control
+  000000000000ce42:e503947e @ <span class="m">00325000</span>-003250ff   WB-SPI.Control
+  <span class="m">1000000000001215</span>:4519a0ad @ <span class="m">00330000</span>-00330fff LNLS_BPM_ACQ_CORE
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00340000</span>-00340fff WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00340000</span>-003407ff   WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:1bafbf1e @ <span class="m">00340000</span>-003400ff   LNLS_POS_CALC_REGS
+  <span class="m">1000000000001215</span>:12897592 @ <span class="m">00340100</span>-003401ff   LNLS_BPM_SWAP
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00350000</span>-0035ffff WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00350000</span>-00357fff   WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:68e3b1af @ <span class="m">00350000</span>-003500ff   LNLS_FMC250M_REGS
+  <span class="m">1000000000001215</span>:2403f569 @ <span class="m">00351000</span>-003510ff   LNLS_ACOMMON_REGS
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00352000</span>-00352fff   WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00352000</span>-003523ff     WB4-Crossbar-GSI
+  <span class="m">1000000000001215</span>:88c67d9c @ <span class="m">00352000</span>-003520ff     LNLS_ACLK_REGS
+  000000000000ce42:123c5443 @ <span class="m">00352100</span>-003521ff     WB-I2C-Master
+  000000000000ce42:e503947e @ <span class="m">00352200</span>-003522ff     WB-SPI.Control
+  000000000000ce42:123c5443 @ <span class="m">00353000</span>-003530ff   WB-I2C-Master
+  000000000000ce42:e503947e @ <span class="m">00354000</span>-003540ff   WB-SPI.Control
+  000000000000ce42:e503947e @ <span class="m">00355000</span>-003550ff   WB-SPI.Control
+  <span class="m">1000000000001215</span>:4519a0ad @ <span class="m">00360000</span>-00360fff LNLS_BPM_ACQ_CORE
+  <span class="m">0000000000000651</span>:eef0b198 @ <span class="m">00370000</span>-00370fff WB4-Bridge-GSI
+  <span class="m">0000000000000651</span>:e6a542c9 @ <span class="m">00370000</span>-003707ff   WB4-Crossbar-GSI
+  000000000000ce42:8a5719ae @ <span class="m">00370000</span>-003700ff   CERN_SIMPLE_UART
+  <span class="m">0000000000000651</span>:35aa6b95 @ <span class="m">00370100</span>-003701ff   GSI_GPIO_32
+  <span class="m">0000000000000651</span>:35aa6b95 @ <span class="m">00370200</span>-003702ff   GSI_GPIO_32
+  000000000000ce42:fdafb9dd @ <span class="m">00370300</span>-0037030f   CERN_TICS_COUNTER
+  <span class="m">1000000000001215</span>:51954750 @ <span class="m">00380000</span>-003800ff LNLS_AFCDIAG
+  <span class="m">1000000000001215</span>:bcbb78d2 @ <span class="m">00390000</span>-003903ff LNLS_TRIGGER_IFACE
+  <span class="m">1000000000001215</span>:84b6a5ac @ <span class="m">00400000</span>-004003ff LNLS_TRIGGER_MUX
+  <span class="m">1000000000001215</span>:84b6a5ac @ <span class="m">00410000</span>-004103ff LNLS_TRIGGER_MUX
+  <span class="m">1000000000001215</span>:7f9e3377 @ <span class="m">00420000</span>-00420fff LNLS_ACQ_CORE_PM
+  <span class="m">1000000000001215</span>:7f9e3377 @ <span class="m">00430000</span>-00430fff LNLS_ACQ_CORE_PM
+  <span class="m">1000000000001215</span>:84b6a5ac @ <span class="m">00440000</span>-004403ff LNLS_TRIGGER_MUX
+  <span class="m">1000000000001215</span>:84b6a5ac @ <span class="m">00450000</span>-004503ff LNLS_TRIGGER_MUX
+  repo-url: https://github.com/lnls-dig/bpm-gw.git
+  synthesis-name: bpm-gw-sr-siriu+
+    commit-id: 4bf1f18fedb7a9694e8d5a80a859bc4e
+    tool-name: VIVADO
+    tool-version: 0x00020183
+    build-date: <span class="m">20191206</span>
+    build-user: LRusso
+  synthesis-name: dsp-cores+
+    commit-id: 31d42c16f00e75e3fa3d52ef2951ba71
+  synthesis-name: general-cores+
+    commit-id: b056d1983e92c723a20c78eecebea2cb
+  synthesis-name: infra-cores+
+    commit-id: dd80bd238f200c16e77f4125e31bc160
+  INFO : <span class="o">[</span><span class="m">20</span>-03-31 <span class="m">11</span>:46:59<span class="o">]</span> <span class="o">[</span>ll_io_pcie<span class="o">]</span> Closed PCIe device located at /dev/fpga-11
+  INFO : <span class="o">[</span><span class="m">20</span>-03-31 <span class="m">11</span>:46:59<span class="o">]</span> <span class="o">[</span>ll_io<span class="o">]</span> Ops <span class="nb">unset</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="malamute-application">
+<h3>Malamute application<a class="headerlink" href="#malamute-application" title="Permalink to this headline">¶</a></h3>
+<p>If the board was successfully detected, the next thing to check is
+the state of the <em>Malamute</em> daemon configuration file and state.</p>
+<p>The daemon state can be check with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl status malamute
+</pre></div>
+</div>
+<p>And the output should be something as the following:</p>
+<div class="highlight-bash notranslate" id="malamute-systemd-status"><div class="highlight"><pre><span></span>  * malamute.service - malamute service
+     Loaded: loaded <span class="o">(</span>/usr/lib/systemd/system/malamute.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: disabled<span class="o">)</span>
+<span class="hll">     Active: active <span class="o">(</span>running<span class="o">)</span> since Tue <span class="m">2020</span>-03-10 <span class="m">12</span>:24:52 -03<span class="p">;</span> 3s ago
+</span>   Main PID: <span class="m">18844</span> <span class="o">(</span>malamute<span class="o">)</span>
+     CGroup: /system.slice/malamute.service
+<span class="hll">             └─18844 /usr/bin/malamute -f /usr/etc/malamute/malamute.cfg
+</span>
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">705</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;8fd66a4a-7acd-79b8-fb12-1c6d80f61121&#39;</span> - closed connection
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">705</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;8fd66a4a-7acd-79b8-fb12-1c6d80f61121&#39;</span> - de-registering
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">716</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;469b0b4b-e012-2366-0693-ccd4e4391b81&#39;</span> - registering
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">713</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;a2fb9c93-6d13-eb32-1ce2-1f7c3076ee54&#39;</span> - closed connection
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">713</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;a2fb9c93-6d13-eb32-1ce2-1f7c3076ee54&#39;</span> - de-registering
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">715</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;367d4945-8da9-9c22-658d-497016a61ca2&#39;</span> - closed connection
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">715</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;367d4945-8da9-9c22-658d-497016a61ca2&#39;</span> - de-registering
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">717</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;HALCS6:DEVIO:INIT0&#39;</span> - registering
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">716</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;469b0b4b-e012-2366-0693-ccd4e4391b81&#39;</span> - closed connection
+  Mar <span class="m">10</span> <span class="m">12</span>:24:53 ia-testrabpmco-iocsrv malamute<span class="o">[</span><span class="m">18844</span><span class="o">]</span>: client <span class="m">716</span> <span class="nv">address</span><span class="o">=</span><span class="s1">&#39;469b0b4b-e012-2366-0693-ccd4e4391b81&#39;</span> - de-registering
+</pre></div>
+</div>
+<p>The daemon should be in a <em>running</em> state as shown above and highlighted at the
+<strong>Active:</strong> line. Also, the configuration file in use by the daemon is shown
+after the <cite>-f</cite> option shown above and highlighted at the <strong>/usr/bin/malamute</strong>
+line.</p>
+<p>If the application is not in a <em>running</em> state you can start it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl status malamute
+</pre></div>
+</div>
+<p>Be sure that Malamute is <em>enabled</em> to start automatically. You can
+check if it is with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl is-enabled malamute
+</pre></div>
+</div>
+<p>And it should output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>enabled
+</pre></div>
+</div>
+<p>If the output is not <em>enabled</em> you can enable it with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl <span class="nb">enable</span> malamute
+</pre></div>
+</div>
+<p>Lastly, the configuration file contents used by Malamute
+(the pathname given after the <cite>-f</cite> option) can be shown with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cat /usr/etc/malamute/malamute.cfg
+</pre></div>
+</div>
+<p>And it should show something like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#   Malamute configuration</span>
+
+<span class="c1">#   Apply to the whole broker</span>
+server
+    <span class="nv">timeout</span> <span class="o">=</span> <span class="m">10000</span>     <span class="c1">#   Client connection timeout, msec</span>
+    <span class="nv">background</span> <span class="o">=</span> <span class="m">0</span>      <span class="c1">#   Run as background process</span>
+    <span class="nv">workdir</span> <span class="o">=</span> .         <span class="c1">#   Working directory for daemon</span>
+    <span class="nv">verbose</span> <span class="o">=</span> <span class="m">0</span>
+    auth
+        <span class="nv">verbose</span> <span class="o">=</span> <span class="m">0</span>
+        <span class="nv">plain</span> <span class="o">=</span>
+
+<span class="c1">#   Apply to the Malamute service</span>
+mlm_server
+    security
+        <span class="nv">mechanism</span> <span class="o">=</span> null
+    <span class="nb">echo</span> <span class="o">=</span> binding Malamute service to <span class="s1">&#39;ipc:///tmp/malamute&#39;</span>
+    <span class="nb">bind</span>
+        <span class="nv">endpoint</span> <span class="o">=</span> ipc:///tmp/malamute
+    service
+        queue
+            size-limit <span class="o">=</span> max     <span class="c1"># Maximum size of service queue (in bytes)</span>
+            size-warn <span class="o">=</span> max      <span class="c1"># Warn if a service queue reaches this size</span>
+    mailbox
+        size-limit <span class="o">=</span> max        <span class="c1"># Maximum mailbox size (integer or &quot;max&quot;)</span>
+        size-warn <span class="o">=</span> max         <span class="c1"># Warn if a mailbox reaches this size</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="halcs-application">
+<h3>HALCS application<a class="headerlink" href="#halcs-application" title="Permalink to this headline">¶</a></h3>
+<p>The HALCS application state itself can also be checked with <code class="docutils literal notranslate"><span class="pre">systemctl</span></code>
+commands. In order to do that, we must figure it out the correct HALCS
+instance number.</p>
+<p>For PCIe devices, it is given by the formula:</p>
+<div class="math">
+<p><span class="math">HALCS\_instance\_number = 2 * &lt;board\_slot\_number&gt; - 1</span></p>
+</div><p>In which <span class="math">board slot number</span> is the slot in which the board
+is plugged in. It usually is in the range <span class="math">[1...number\_of\_slots]</span>.</p>
+<p>For other device types it could anything and it is application-specific.</p>
+<p>Once the instance number is known, you can check its state with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl status halcs-be@&lt;HALCS_instance_number&gt;
+</pre></div>
+</div>
+<p>For example, in a system with a PCIe board using HALCS in slot 6, you
+would run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo systemctl status halcs-be@11
+</pre></div>
+</div>
+<p>And the output should be something like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>  * halcs-be@11.service - HALCS server instance <span class="m">11</span>
+     Loaded: loaded <span class="o">(</span>/etc/systemd/system/halcs-be@.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: disabled<span class="o">)</span>
+<span class="hll">     Active: active <span class="o">(</span>running<span class="o">)</span> since Tue <span class="m">2020</span>-03-10 <span class="m">12</span>:24:52 -03<span class="p">;</span> 1h 58min ago
+</span>    Process: <span class="m">18846</span> <span class="nv">ExecStartPre</span><span class="o">=</span>/bin/mkdir -p <span class="si">${</span><span class="nv">HALCS_LOG_DIR</span><span class="si">}</span> <span class="o">(</span><span class="nv">code</span><span class="o">=</span>exited, <span class="nv">status</span><span class="o">=</span><span class="m">0</span>/SUCCESS<span class="o">)</span>
+   Main PID: <span class="m">18852</span> <span class="o">(</span>halcsd<span class="o">)</span>
+     CGroup: /system.slice/system-halcs<span class="se">\x</span>2dbe.slice/halcs-be@11.service
+<span class="hll">             └─18852 /usr/local/bin/halcsd -f /usr/local/etc/halcs/halcs.cfg -n be -t pcie -i <span class="m">11</span> -b ipc:///tmp/malamute -l /var/log/halcs
+</span>
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>hutils:utils<span class="o">]</span> CFG hints <span class="nb">hash</span> key: <span class="s2">&quot;board11/halcs0&quot;</span>, ...
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>hutils:utils<span class="o">]</span> CFG hints <span class="nb">hash</span> key: <span class="s2">&quot;board11/halcs1&quot;</span>, ...
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>hutils:utils<span class="o">]</span> CFG hints <span class="nb">hash</span> key: <span class="s2">&quot;board12/halcs0&quot;</span>, ...
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>hutils:utils<span class="o">]</span> CFG hints <span class="nb">hash</span> key: <span class="s2">&quot;board12/halcs1&quot;</span>, ...
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>halcsd<span class="o">]</span> Dev_id parameter was set, but Dev_entry was not.
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: Defaulting Dev_entry to /dev/fpga-&lt;dev_id&gt;
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>halcsd<span class="o">]</span> Dev_entry parameter was <span class="nb">set</span> to /dev/fpga-6.
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>halcsd<span class="o">]</span> Dev_id parameter was <span class="nb">set</span> to <span class="m">6</span>.
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: INFO : <span class="o">[</span><span class="m">20</span>-03-10 <span class="m">12</span>:24:52<span class="o">]</span> <span class="o">[</span>halcsd<span class="o">]</span> Smio_id parameter was <span class="nb">set</span> to <span class="m">0</span>.
+  Mar <span class="m">10</span> <span class="m">12</span>:24:52 ia-testrabpmco-iocsrv halcsd<span class="o">[</span><span class="m">18852</span><span class="o">]</span>: I: <span class="m">20</span>-03-10 <span class="m">12</span>:24:52 My address is <span class="s1">&#39;HALCS6:DEVIO:AFC_DIAG0&#39;</span>
+</pre></div>
+</div>
+<p>The important lines here are the same ones as the <a class="reference internal" href="#malamute-systemd-status"><span class="std std-ref">Systemd Malamute Status</span></a>,
+the daemon status and the command-line executed.</p>
+<p>With the HALCS application checked and in a <em>running</em> state everything should be
+in place for running client applications and communicating with this HALCS
+instance. For more information refer to <a class="reference internal" href="halcs-tools.html#halcs-tools"><span class="std std-ref">HALCS Tools</span></a>.</p>
+<p>Lastly, the configuration file contents used by HALCS
+(the pathname given after the <cite>-f</cite> option) can be shown with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cat /usr/local/etc/halcs/halcs.cfg
+</pre></div>
+</div>
+<p>And it should show something like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#   HALCS configuration file</span>
+
+<span class="c1"># Device manager configurations</span>
+dev_mngr
+    broker
+        <span class="nb">bind</span> <span class="o">=</span> tcp://127.0.0.1:9999
+    log
+        <span class="nv">dir</span> <span class="o">=</span> /media/remote_logs
+        <span class="nv">filename</span> <span class="o">=</span> dev_mngr.log
+    <span class="nv">verbose</span> <span class="o">=</span> <span class="m">1</span>             <span class="c1"># Ask for a trace</span>
+    <span class="nv">daemonize</span> <span class="o">=</span> no          <span class="c1"># Ask for daemonize process (options are: yes or no)</span>
+    <span class="nv">workdir</span> <span class="o">=</span> .             <span class="c1">#   Working directory for daemon</span>
+    <span class="nv">spawn_broker</span> <span class="o">=</span> no       <span class="c1"># Ask to spawn broker (options are: yes or no)</span>
+
+<span class="c1"># Device I/O configurations</span>
+dev_io
+    board1
+        halcs0
+            dbe
+                <span class="nv">board_type</span> <span class="o">=</span> afcv3.1
+            afe
+                <span class="nb">bind</span> <span class="o">=</span>
+                <span class="nv">proto</span> <span class="o">=</span>
+        halcs1
+            dbe
+                <span class="nv">board_type</span> <span class="o">=</span> afcv3.1
+            afe
+                <span class="nb">bind</span> <span class="o">=</span>
+                <span class="nv">proto</span> <span class="o">=</span>
+
+    ...
+</pre></div>
+</div>
+<p>The configuration file would have an entry for each board slot <em>board&lt;board_slot&gt;</em>,
+and two entries for each instance of that slot <em>halcs&lt;instance_number&gt;</em>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">HALCS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="halcs-installation.html">HALCS Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HALCS Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#things-to-check">Things to check</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#device-detection">Device detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#device-simple-readout">Device simple readout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sdb-readout">SDB readout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#malamute-application">Malamute application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#halcs-application">HALCS application</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-architecture.html">HALCS Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-development.html">HALCS Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-tools.html">HALCS Tools</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="halcs-installation.html" title="previous chapter">HALCS Installation</a></li>
+      <li>Next: <a href="halcs-architecture.html" title="next chapter">HALCS Architecture</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Lucas Russo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/halcs-usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

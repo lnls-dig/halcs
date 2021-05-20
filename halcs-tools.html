@@ -1,0 +1,618 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HALCS Tools &#8212; HALCS 1.10.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="HALCS Development" href="halcs-development.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="halcs-tools">
+<span id="id1"></span><h1>HALCS Tools<a class="headerlink" href="#halcs-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="smio-modules-available">
+<h2>SMIO modules available<a class="headerlink" href="#smio-modules-available" title="Permalink to this headline">¶</a></h2>
+<p>HALCS provides a set of example tools that can be used with the provided
+<em>SMIOs</em>. As of this version the following <em>SMIOs</em> are present and known
+to HALCS:</p>
+<dl class="docutils">
+<dt>Acquisition (acq)</dt>
+<dd>General-purpose acquisition module, supporting multiple channels,
+generic number of pre-trigger and post-trigger samples, along with
+external and data threshold triggers.</dd>
+<dt>AFC Diagnostics (afc_diag)</dt>
+<dd>Specific module for collecting sensor data from the AFC <a class="footnote-reference" href="#afc" id="id2">[1]</a>
+carrier board.</dd>
+<dt>AFC management (afc_mgmt)</dt>
+<dd>Specific module for controlling the AFC clock generator.</dd>
+<dt>AFC Timing (afc_timing)</dt>
+<dd>Specific module for controlling and monitoring all the
+functions provided by the AFC timing receiver gateware.</dd>
+<dt>DSP (dsp)</dt>
+<dd>Specific module for controlling the DSP module for the LNLS BPM <a class="footnote-reference" href="#bpm" id="id3">[2]</a>
+project</dd>
+<dt>FMC ADC 100MSPS 4 Channel (fmc100m_4ch)</dt>
+<dd>Module for controlling and monitoring the FMC ADC 100MSPS 14 bits,
+4 Channel <a class="footnote-reference" href="#fmcadc100m" id="id4">[3]</a>.</dd>
+<dt>FMC ADC 130MSPS 4 Channel (fmc130m_4ch)</dt>
+<dd>Module for controlling and monitoring the FMC ADC 130MSPS 16 bits,
+4 Channel <a class="footnote-reference" href="#fmcadc130m" id="id5">[4]</a>.</dd>
+<dt>FMC ADC 250MSPS 4 Channel (fmc250m_4ch)</dt>
+<dd>Module for controlling and monitoring the FMC ADC 250MSPS 14 bits,
+4 Channel <a class="footnote-reference" href="#fmcadc250m" id="id6">[5]</a>.</dd>
+<dt>FMC Active Clock (fmc_active_clk)</dt>
+<dd>Generic module containing drivers for the AD9510, Si57x. This is commonly
+used with <code class="docutils literal notranslate"><span class="pre">fmc130m_4ch</span></code> and <code class="docutils literal notranslate"><span class="pre">fmc250m_4ch</span></code> modules.</dd>
+<dt>FMC ADC Common (fmc_adc_common)</dt>
+<dd>Generic module containing drivers for trigger components and LEDs.
+This is commonly used with <code class="docutils literal notranslate"><span class="pre">fmc130m_4ch</span></code> and <code class="docutils literal notranslate"><span class="pre">fmc250m_4ch</span></code> modules.</dd>
+<dt>FMC ADC Pico 1MSPS 4 Channel (fmcpico1m_4ch)</dt>
+<dd>Specific module for controlling and monitoring the FMC ADC Pico 1MSPS,
+4 Channel <a class="footnote-reference" href="#fmcpico1m-4ch" id="id7">[6]</a></dd>
+<dt>Initialization (init)</dt>
+<dd>This is a meta-module used so clients can be sure the whole HALCS
+instance has initialized and is ready to receive commands.</dd>
+<dt>LNLS BPM RFFE with BSMP protocol (rffe)</dt>
+<dd>Module used for controlling and monitoring the LNLS BPM RFFE
+project <a class="footnote-reference" href="#rffe" id="id8">[7]</a>. This module implements the first protocol used by
+the RFFE, which is based on a binary RPC protocol called BSMP <a class="footnote-reference" href="#bsmp" id="id9">[8]</a>.</dd>
+<dt>LNLS BPM RFFE with SCPI protocol (rffe_scpi)</dt>
+<dd>Module used for controlling and monitoring the LNLS BPM RFFE
+project. This module implements the second protocol used
+by the RFFE, which is based on an ASCII text protocol (i.e., SCPI).</dd>
+<dt>LNLS BPM Switching (swap)</dt>
+<dd>Module for controlling the switching scheme used by the
+LNLS BPM electronics. This basically configures the clock
+generation parameters for the LNLS BPM RFFE.</dd>
+<dt>MTCA Trigger Interface (trigger_iface)</dt>
+<dd>Module for controlling and monitoring the trigger interface used
+by AFC. This controls the buffer directions, debouncing,
+length and trigger counter.</dd>
+<dt>Trigger Multiplexer (trigger_mux)</dt>
+<dd>Generic module used to multiplex a set of incoming triggers from
+different sources and a set of outgoing triggers to different
+destination.</dd>
+</dl>
+<table class="docutils footnote" frame="void" id="afc" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><a class="reference external" href="https://ohwr.org/project/afc/wikis/home"><a class="reference external" href="https://ohwr.org/project/afc/wikis/home">https://ohwr.org/project/afc/wikis/home</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="bpm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td><a class="reference external" href="https://github.com/lnls-dig/bpm-gw"><a class="reference external" href="https://github.com/lnls-dig/bpm-gw">https://github.com/lnls-dig/bpm-gw</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="fmcadc100m" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-100m14b4cha/wikis/home"><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-100m14b4cha/wikis/home">https://www.ohwr.org/project/fmc-adc-100m14b4cha/wikis/home</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="fmcadc130m" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[4]</a></td><td><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-130m-16b-4cha/wikis/home"><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-130m-16b-4cha/wikis/home">https://www.ohwr.org/project/fmc-adc-130m-16b-4cha/wikis/home</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="fmcadc250m" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[5]</a></td><td><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-250m-16b-4cha/wikis/home"><a class="reference external" href="https://www.ohwr.org/project/fmc-adc-250m-16b-4cha/wikis/home">https://www.ohwr.org/project/fmc-adc-250m-16b-4cha/wikis/home</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="fmcpico1m-4ch" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[6]</a></td><td><a class="reference external" href="https://www.caenels.com/products/fmc-pico-1m4"><a class="reference external" href="https://www.caenels.com/products/fmc-pico-1m4">https://www.caenels.com/products/fmc-pico-1m4</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rffe" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[7]</a></td><td><a class="reference external" href="https://www.ohwr.org/project/bpm-rffe/wikis/home"><a class="reference external" href="https://www.ohwr.org/project/bpm-rffe/wikis/home">https://www.ohwr.org/project/bpm-rffe/wikis/home</a></a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="bsmp" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[8]</a></td><td><a class="reference external" href="https://github.com/lnls-sirius/libbsmp"><a class="reference external" href="https://github.com/lnls-sirius/libbsmp">https://github.com/lnls-sirius/libbsmp</a></a></td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example-tools">
+<h2>Example Tools<a class="headerlink" href="#example-tools" title="Permalink to this headline">¶</a></h2>
+<p>Inside the <code class="docutils literal notranslate"><span class="pre">examples/src</span></code> directory under the project source tree
+you can find tools to control and monitor most of the mentioned modules.
+If HALCS was installed via <code class="docutils literal notranslate"><span class="pre">make</span></code> or <code class="docutils literal notranslate"><span class="pre">cmake</span></code> then the examples will be
+available at the system <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. Otherwise, you will need to use the examples
+build directory.</p>
+<p>If in doubt which build system was used you can always build the examples
+by using one of the following options:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">Make</span></code></dt>
+<dd>With <code class="docutils literal notranslate"><span class="pre">make</span></code> you can build the examples from the root of HALCS with:</dd>
+</dl>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span></span>make examples
+sudo make examples_install
+</pre></div>
+</td></tr></table></div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">CMake</span></code></dt>
+<dd>With <code class="docutils literal notranslate"><span class="pre">cmake</span></code> you can build the examples from the root of HALCS with:</dd>
+</dl>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span>mkdir -p build
+<span class="nb">cd</span> build
+cmake ../examples
+make
+sudo make install
+</pre></div>
+</td></tr></table></div>
+<p>And the examples should be installed in your system <code class="docutils literal notranslate"><span class="pre">PATH</span></code> (either
+<code class="docutils literal notranslate"><span class="pre">/usr/local/bin</span></code> or <code class="docutils literal notranslate"><span class="pre">/usr/bin</span></code>).</p>
+<div class="section" id="acquisition">
+<h3>Acquisition<a class="headerlink" href="#acquisition" title="Permalink to this headline">¶</a></h3>
+<p>The acquisition example, also called <code class="docutils literal notranslate"><span class="pre">acq</span></code>, can be used if the <code class="docutils literal notranslate"><span class="pre">wb_acq</span></code>
+module is instantiated by the FPGA gateware. If this is available, HALCS will
+spawn the <em>SMIO</em> <code class="docutils literal notranslate"><span class="pre">acq</span></code> module to interface with <code class="docutils literal notranslate"><span class="pre">wb_acq</span></code>. This module
+uses the <code class="docutils literal notranslate"><span class="pre">SDB</span></code> <strong>vendor id</strong> 0x1000000000001215ULL and <strong>device id</strong>
+0x4519a0ad.</p>
+<p>The summary of all command-line <code class="docutils literal notranslate"><span class="pre">acq</span></code> options are below:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre></div></td><td class="code"><div class="highlight"><pre><span></span>HALCSD Acquisition Utility
+Usage: ./examples/build/exe/acq/production/afcv3_1/acq <span class="o">[</span>options<span class="o">]</span>
+
+  -h  --help                            Display this usage information
+  -b  --brokerendp &lt;Broker endpoint&gt;    Broker endpoint
+  -v  --verbose                         Verbose output
+  -o  --boardslot &lt;Board slot <span class="nv">number</span> <span class="o">=</span> <span class="o">[</span><span class="m">1</span>-12<span class="o">]</span>&gt;
+                                        Board slot number
+  -s  --halcsnumber &lt;HALCS <span class="nv">number</span> <span class="o">=</span> <span class="o">[</span><span class="m">0</span><span class="p">|</span><span class="m">1</span><span class="o">]</span>&gt;
+                                        HALCS instance number
+  -c  --channumber &lt;Channel&gt;            Channel number
+                                            &lt;Channel&gt; is dependant on the FPGA firmware
+  -n  --numsamples &lt;Number of samples&gt;  Number of samples or number of pre-trigger
+                                            samples <span class="k">if</span> using triggered mode
+  -p  --postsamples &lt;Number of samples&gt; Number of post-trigger samples
+                                            <span class="k">if</span> using triggered mode
+  -t  --numshots &lt;Number of shots&gt;      Number of shots
+                                            <span class="k">if</span> using triggered mode
+  -g  --triggertype &lt;Trigger type&gt;      Trigger type. <span class="m">0</span> is immediate, <span class="m">1</span> is external trigger,
+                                            <span class="m">2</span> is data-driver trigger and <span class="m">3</span> is software trigger
+  -e  --datatriggerthres &lt;Trigger threshold&gt;
+                                        Trigger threshold level <span class="k">for</span> data-driven trigger
+  -l  --datatriggerpol &lt;Trigger polarity&gt;
+                                        Trigger polarity. <span class="m">0</span> is positive edge, <span class="m">1</span> is negative edge
+  -z  --datatriggersel &lt;Trigger data selection&gt;
+                                        Trigger data selection within one channel to compare <span class="k">for</span> threshold level
+  -i  --datatriggerfilt &lt;Trigger hysteresis&gt;
+                                        Trigger hysteresis value <span class="k">for</span> data trigger detection
+  -r  --datatriggerchan &lt;Trigger channel&gt;
+                                        Trigger data channel to be compared with the threshold level
+  -d  --triggerdelay &lt;Trigger delay&gt;    Trigger delay <span class="k">for</span> all triggers
+  -f  --filefmt &lt;Output <span class="nv">format</span> <span class="o">=</span> <span class="o">[</span><span class="nv">0</span> <span class="o">=</span> text <span class="p">|</span> <span class="nv">1</span> <span class="o">=</span> binary<span class="o">]</span>&gt;
+                                        Output format
+  -a  --newcq &lt;Trigger new <span class="nv">acquisition</span> <span class="o">=</span> <span class="o">[</span><span class="nv">0</span> <span class="o">=</span> no <span class="p">|</span> <span class="nv">1</span> <span class="o">=</span> yes<span class="o">]</span>
+</pre></div>
+</td></tr></table></div>
+<p>An example of acquiring 10 samples from acquisition channel 0, from a MTCA
+board located at slot 6, FMC 1, broker endpoint <code class="docutils literal notranslate"><span class="pre">ipc:///tmp/malamute</span></code>,
+could be issued like the following:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span>$ ./examples/build/exe/acq/production/afcv3_1/acq <span class="se">\</span>
+    -b ipc:///tmp/malamute <span class="se">\</span>
+    --boardslot <span class="m">6</span> <span class="se">\</span>
+    --halcsnumber <span class="m">1</span> <span class="se">\</span>
+    --channumber <span class="m">0</span> <span class="se">\</span>
+    --numsamples <span class="m">10</span>
+  <span class="m">17</span>        -3              <span class="m">10</span>               <span class="m">5</span>
+  <span class="m">16</span>         <span class="m">0</span>               <span class="m">7</span>               <span class="m">4</span>
+  <span class="m">15</span>        -2               <span class="m">7</span>               <span class="m">5</span>
+  <span class="m">15</span>         <span class="m">1</span>              <span class="m">10</span>               <span class="m">1</span>
+  <span class="m">13</span>        -4               <span class="m">7</span>               <span class="m">5</span>
+   <span class="m">8</span>        -1               <span class="m">8</span>               <span class="m">9</span>
+  <span class="m">13</span>         <span class="m">0</span>               <span class="m">5</span>               <span class="m">7</span>
+  <span class="m">12</span>        -4               <span class="m">7</span>               <span class="m">7</span>
+  <span class="m">19</span>        -1              <span class="m">10</span>               <span class="m">6</span>
+  <span class="m">17</span>         <span class="m">0</span>              <span class="m">10</span>               <span class="m">6</span>
+</pre></div>
+</td></tr></table></div>
+<p>Each column in the above example is a different data channel from acquisition
+channel 0. The way the data channels are organized is dependent on the FPGA
+gateware. In the example shown, each data channel is a 16-bit, signed number,
+from a 100MSPS ADC board.</p>
+<p>A more complex example of acquiring 2 shots, 10 pre-trigger samples each,
+0 post-trigger samples each, with a data-driven trigger, and data threshold
+of 1000 is shown below:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span>$ ./examples/build/exe/acq/production/afcv3_1/acq <span class="se">\</span>
+    -b ipc:///tmp/malamute <span class="se">\</span>
+    --boardslot <span class="m">6</span> <span class="se">\</span>
+    --halcsnumber <span class="m">1</span> <span class="se">\</span>
+    --channumber <span class="m">0</span> <span class="se">\</span>
+    --numsamples <span class="m">10</span> <span class="se">\</span>
+    --postsamples <span class="m">0</span> <span class="se">\</span>
+    --numshots <span class="m">2</span> <span class="se">\</span>
+    --triggertype <span class="m">2</span> <span class="se">\</span>
+    --datatriggerthres <span class="m">1000</span>
+   <span class="m">409</span>               <span class="m">391</span>             <span class="m">779</span>             <span class="m">765</span>
+  <span class="m">1490</span>              <span class="m">1513</span>             <span class="m">735</span>             <span class="m">772</span>
+  <span class="m">2156</span>              <span class="m">2150</span>            <span class="m">1475</span>            <span class="m">1527</span>
+  <span class="m">1337</span>              <span class="m">1281</span>            <span class="m">1809</span>            <span class="m">1817</span>
+   <span class="m">344</span>               <span class="m">295</span>            <span class="m">1197</span>            <span class="m">1183</span>
+   <span class="m">776</span>               <span class="m">778</span>             <span class="m">630</span>             <span class="m">640</span>
+  <span class="m">1926</span>              <span class="m">1944</span>            <span class="m">1009</span>            <span class="m">1057</span>
+  <span class="m">1965</span>              <span class="m">1941</span>            <span class="m">1727</span>            <span class="m">1763</span>
+   <span class="m">824</span>               <span class="m">762</span>            <span class="m">1644</span>            <span class="m">1639</span>
+<span class="hll">   <span class="m">319</span>               <span class="m">303</span>             <span class="m">883</span>             <span class="m">872</span>
+</span>  <span class="m">1045</span>              <span class="m">1059</span>             <span class="m">631</span>             <span class="m">649</span>
+  <span class="m">2089</span>              <span class="m">2107</span>            <span class="m">1192</span>            <span class="m">1239</span>
+  <span class="m">1765</span>              <span class="m">1727</span>            <span class="m">1806</span>            <span class="m">1832</span>
+   <span class="m">595</span>               <span class="m">528</span>            <span class="m">1492</span>            <span class="m">1482</span>
+   <span class="m">438</span>               <span class="m">427</span>             <span class="m">752</span>             <span class="m">742</span>
+  <span class="m">1550</span>              <span class="m">1575</span>             <span class="m">770</span>             <span class="m">801</span>
+  <span class="m">2150</span>              <span class="m">2144</span>            <span class="m">1513</span>            <span class="m">1562</span>
+  <span class="m">1274</span>              <span class="m">1221</span>            <span class="m">1798</span>            <span class="m">1805</span>
+   <span class="m">324</span>               <span class="m">290</span>            <span class="m">1161</span>            <span class="m">1145</span>
+   <span class="m">823</span>               <span class="m">838</span>             <span class="m">628</span>             <span class="m">635</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note the crossing point in which the sample goes from a value below
+1000 to a value above 1000 at line 20. Each 10 samples in the above example
+correspond to one shot.</p>
+</div>
+<div class="section" id="fmc-adc-100msps-4-channel">
+<h3>FMC ADC 100MSPS 4 Channel<a class="headerlink" href="#fmc-adc-100msps-4-channel" title="Permalink to this headline">¶</a></h3>
+<p>The FMC ADC 100m example, also called <code class="docutils literal notranslate"><span class="pre">fmc100m_4ch_ctl</span></code>, can be used if the
+<code class="docutils literal notranslate"><span class="pre">wb_fmc100m_4ch</span></code> module is instantiated by the FPGA gateware. If this is available,
+HALCS will spawn the <em>SMIO</em> <code class="docutils literal notranslate"><span class="pre">fmc100m_4ch</span></code> module to interface with <code class="docutils literal notranslate"><span class="pre">wb_fmc100m_4ch</span></code>.
+This module uses the <code class="docutils literal notranslate"><span class="pre">SDB</span></code> <strong>vendor id</strong> 0x000000000000CE42ULL and <strong>device id</strong>
+0x00000608.</p>
+<p>The summary of all command-line <code class="docutils literal notranslate"><span class="pre">acq</span></code> options are below:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span></span>HALCSD FMC ADC 100M control utility
+Usage: ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl <span class="o">[</span>options<span class="o">]</span>
+
+  -h  --help                           Display this usage information
+  -b  --brokerendp &lt;Broker endpoint&gt;   Broker endpoint
+  -v  --verbose                        Verbose output
+  -o  --boardslot &lt;Board slot <span class="nv">number</span> <span class="o">=</span> <span class="o">[</span><span class="m">1</span>-12<span class="o">]</span>&gt;
+  -s  --halcsnumber &lt;HALCS <span class="nv">number</span> <span class="o">=</span> <span class="o">[</span><span class="m">0</span><span class="p">|</span><span class="m">1</span><span class="o">]</span>&gt; HALCS number
+                                       Board slot number
+  -t  --test_pattern &lt;Pattern&gt;         Test pattern
+  -e  --test_pattern_en &lt;Enable&gt;       Enable <span class="nb">test</span> pattern
+  -c  --channel &lt;<span class="nv">Channel</span><span class="o">=[</span><span class="m">0</span>-3<span class="o">]</span>&gt;        Channel to apply operation. Select <span class="m">4</span>, <span class="k">for</span> all channel
+  -r  --ssr &lt;SSR option&gt;               Select SSR option
+  -m  --termination &lt;<span class="nv">Term</span><span class="o">=[</span><span class="m">0</span><span class="p">|</span><span class="m">1</span><span class="o">]</span>&gt;       Select <span class="m">50</span>-ohm termination
+</pre></div>
+</td></tr></table></div>
+<p>An example of configuring the ADC to output a test pattern <span class="math">10101010101010</span>
+(<span class="math">10922</span>) from a MTCA board located at slot 6, FMC 1, broker endpoint
+<code class="docutils literal notranslate"><span class="pre">ipc:///tmp/malamute</span></code>, could be issued like the following:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span>$ ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl <span class="se">\</span>
+    -b ipc:///tmp/malamute <span class="se">\</span>
+    --boardslot <span class="m">6</span> <span class="se">\</span>
+    --halcsnumber <span class="m">1</span> <span class="se">\</span>
+    --test_pattern_en <span class="m">1</span> <span class="se">\</span>
+    --test_pattern <span class="m">10922</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">test_pattern</span> <span class="o">=</span> 0x00002AAA
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">test_pattern_en</span> <span class="o">=</span> 0x00000001
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#0 status = 0x0000AAA8</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#1 status = 0x0000AAA8</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#2 status = 0x0000AAA8</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#3 status = 0x0000AAA8</span>
+</pre></div>
+</td></tr></table></div>
+<p>The information displayed after executing the command gives you a feedback
+of the test pattern set, which was <span class="math">10101010101010</span> in binary,
+<span class="math">10922</span> in decimal or <span class="math">0x2AAA</span> in hexadecimal. It also shows
+the raw ADC data from all 4 ADC channels.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Keep in mind that we are using a 14-bit ADC (FMC ADC 100M 14-bit
+4 Channel). To make acquisition easier, the ADC in the example,
+LTC2174, has a mode in which it sends a 16-bit data with the 2
+LSB fixed to 0. This make acquisition easier, as we can treat the
+date as 2 bytes. However, it’s important to know that we can only
+have control over the 14 MSB, so the test pattern we set refers
+to those 14 MSB, as well. As such, when setting the <span class="math">0x2AAA</span>
+test pattern, the expected acquired data would be <span class="math">0x2AAA &lt;&lt; 2</span>,
+which is equal to <span class="math">0xAAA8</span> as shown in the example.</p>
+</div>
+<p>A more complex example of setting the ADC to acquire real data (no test pattern),
+100 mVpp ADC range (<code class="docutils literal notranslate"><span class="pre">--ssr</span></code> option 2), for all ADC channels (<code class="docutils literal notranslate"><span class="pre">--channel</span></code> option
+4), with 50 <cite>ohm</cite> termination enabled is shown below:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span></span>$ ./examples/build/exe/fmc100m_4ch_ctl/production/afcv3_1/fmc100m_4ch_ctl <span class="se">\</span>
+    -b ipc:///tmp/malamute <span class="se">\</span>
+    --boardslot <span class="m">6</span> <span class="se">\</span>
+    --halcsnumber <span class="m">1</span> <span class="se">\</span>
+    --test_pattern_en <span class="m">0</span> <span class="se">\</span>
+    --test_pattern <span class="m">1</span> <span class="se">\</span>
+    --ssr <span class="m">2</span> <span class="se">\</span>
+    --channel <span class="m">4</span> <span class="se">\</span>
+    --termination <span class="m">1</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">test_pattern_en</span> <span class="o">=</span> 0x00000000
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">termination</span> <span class="o">=</span> 0x00000001
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">channel</span> <span class="o">=</span> 0x00000004
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: <span class="nv">ssr</span> <span class="o">=</span> 0x00000002
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: ssr option 0x00000002, ssr bits 0x0000002B <span class="nb">set</span> <span class="k">for</span> channel <span class="c1">#0</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: ssr option 0x00000002, ssr bits 0x0000002B <span class="nb">set</span> <span class="k">for</span> channel <span class="c1">#1</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: ssr option 0x00000002, ssr bits 0x0000002B <span class="nb">set</span> <span class="k">for</span> channel <span class="c1">#2</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: ssr option 0x00000002, ssr bits 0x0000002B <span class="nb">set</span> <span class="k">for</span> channel <span class="c1">#3</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#0 status = 0x0000013C</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#1 status = 0x0000014C</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#2 status = 0x0000FD3C</span>
+<span class="o">[</span>client:fmc100m_4ch_ctl<span class="o">]</span>: FMC channel <span class="c1">#3 status = 0x0000FE00</span>
+</pre></div>
+</td></tr></table></div>
+<p>And a subsequent acquisition of the ADCs in that configuration could be done with:</p>
+<div class="highlight-bash notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span>$ ./examples/build/exe/acq/production/afcv3_1/acq <span class="se">\</span>
+    -b ipc:///tmp/malamute <span class="se">\</span>
+    --boardslot <span class="m">6</span> <span class="se">\</span>
+    --halcsnumber <span class="m">1</span> <span class="se">\</span>
+    --channumber <span class="m">0</span> <span class="se">\</span>
+    --numsamples <span class="m">10</span>
+-193      -216            -216            -200
+-139      -167            -177            -166
+ -83      -112            -124            -110
+ -19       -44             -63             -53
+  <span class="m">46</span>        <span class="m">29</span>               <span class="m">7</span>              <span class="m">13</span>
+ <span class="m">112</span>        <span class="m">91</span>              <span class="m">74</span>              <span class="m">77</span>
+ <span class="m">161</span>       <span class="m">137</span>             <span class="m">124</span>             <span class="m">136</span>
+ <span class="m">192</span>       <span class="m">166</span>             <span class="m">169</span>             <span class="m">180</span>
+ <span class="m">205</span>       <span class="m">180</span>             <span class="m">192</span>             <span class="m">203</span>
+ <span class="m">205</span>       <span class="m">169</span>             <span class="m">192</span>             <span class="m">198</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">HALCS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="halcs-installation.html">HALCS Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-usage.html">HALCS Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-architecture.html">HALCS Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="halcs-development.html">HALCS Development</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HALCS Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#smio-modules-available">SMIO modules available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-tools">Example Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acquisition">Acquisition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fmc-adc-100msps-4-channel">FMC ADC 100MSPS 4 Channel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="halcs-development.html" title="previous chapter">HALCS Development</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Lucas Russo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/halcs-tools.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
