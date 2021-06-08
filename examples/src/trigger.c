@@ -13,9 +13,7 @@
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_HALCS_NUMBER             0
-#define MAX_HALCS_NUMBER              1
-
+#define DFLT_HALCS_NUMBER           0
 #define DFLT_BOARD_NUMBER           0
 
 #define DFLT_CHAN_NUM               0
@@ -251,18 +249,12 @@ int main (int argc, char *argv [])
     /* Set default halcs number */
     uint32_t halcs_number;
     if (halcs_number_str == NULL) {
-        fprintf (stderr, "[client:trigger]: Setting default value to HALCS number: %u\n",
+        fprintf (stderr, "[client:fofb_ctrl]: Setting default value to HALCS number: %u\n",
                 DFLT_HALCS_NUMBER);
         halcs_number = DFLT_HALCS_NUMBER;
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
-
-        if (halcs_number > MAX_HALCS_NUMBER) {
-            fprintf (stderr, "[client:trigger]: HALCS number too big! Defaulting to: %u\n",
-                    MAX_HALCS_NUMBER);
-            halcs_number = MAX_HALCS_NUMBER;
-        }
     }
 
     char service_iface[50];
