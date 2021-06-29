@@ -44,6 +44,57 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 #if 0
     uint32_t smio_id = smio_get_id (parent);
 #endif
+    char *board_type = NULL;
+
+    smio_err_e err = smio_get_board_type (parent, &board_type);
+    ASSERT_TEST(err == SMIO_SUCCESS, "Could not get board_type",
+            err_get_board_type);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] board_type: %s, Inst ID: %u\n",
+            board_type, inst_id);
+
+    /* Lookup symbols */
+    const size_t **acq_core_num_acq_core_smios_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_num_acq_core_smios");
+    ASSERT_ALLOC(acq_core_num_acq_core_smios_p, err_lookup_sym);
+    const size_t acq_core_num_acq_core_smios = **acq_core_num_acq_core_smios_p;
+
+    const uint32_t **acq_core_end_chan_id_p =
+        hutils_lookup_symbol ("pvar_const_uint32_t_p_", board_type, "_end_chan_id");
+    ASSERT_ALLOC(acq_core_end_chan_id_p, err_lookup_sym);
+    const uint32_t acq_core_end_chan_id = **acq_core_end_chan_id_p;
+
+    const acq_buf_t **acq_core_buf =
+        hutils_lookup_symbol ("pvar_const_acq_buf_t_p_", board_type, "_acq_buf");
+    ASSERT_ALLOC(acq_core_buf, err_lookup_sym);
+
+    const size_t **acq_core_mem_total_size_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_mem_total_size");
+    ASSERT_ALLOC(acq_core_mem_total_size_p, err_lookup_sym);
+    const size_t acq_core_mem_total_size = **acq_core_mem_total_size_p;
+
+    const size_t **acq_core_mem_region_size_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_mem_region_size");
+    ASSERT_ALLOC(acq_core_mem_region_size_p, err_lookup_sym);
+    const size_t acq_core_mem_region_size = **acq_core_mem_region_size_p;
+
+    const size_t **acq_core_ddr3_data_width_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_data_width");
+    ASSERT_ALLOC(acq_core_ddr3_data_width_p, err_lookup_sym);
+    const size_t acq_core_ddr3_data_width = **acq_core_ddr3_data_width_p;
+
+    const size_t **acq_core_ddr3_byte_2_bit_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_byte_2_bit");
+    ASSERT_ALLOC(acq_core_ddr3_byte_2_bit_p, err_lookup_sym);
+    const size_t acq_core_ddr3_byte_2_bit = **acq_core_ddr3_byte_2_bit_p;
+
+    self->ddr_byte_2_bit = acq_core_ddr3_byte_2_bit;
+
+    const size_t **acq_core_ddr3_payload_size_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_payload_size");
+    ASSERT_ALLOC(acq_core_ddr3_payload_size_p, err_lookup_sym);
+    const size_t acq_core_ddr3_payload_size = **acq_core_ddr3_payload_size_p;
+
+    self->ddr_payload_size = acq_core_ddr3_payload_size;
 
     /* Get the number of acquisition channels. If 0, this register is probably
      * unimplemented in gateware, so default it to the board END_CHAN_ID */
@@ -51,8 +102,8 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
             NUM_CHAN, MULT_BIT_PARAM, self->num_chan, NO_FMT_FUNC);
     if (self->num_chan == 0) {
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Number of channels is 0. "
-            "using board defaults: %u\n", END_CHAN_ID);
-        self->num_chan = END_CHAN_ID;
+            "using board defaults: %u\n", acq_core_end_chan_id);
+        self->num_chan = acq_core_end_chan_id;
     }
 
     /* Get the number of multishot RAM size */
@@ -79,8 +130,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
 
     self->curr_chan = 0;
 
-    uint32_t __acq_buf_max_inst_id = ARRAY_SIZE(__acq_buf)-1;
-    uint32_t __acq_buf_max_chan = ARRAY_SIZE(__acq_buf[0])-1;
+    uint32_t __acq_buf_max_inst_id = acq_core_num_acq_core_smios-1;
 
     /* Initialize sample_size and max_samples for acq_buf */
     for (uint32_t i = 0; i < self->num_chan; i++) {
@@ -94,14 +144,18 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         uint32_t max_samples = 0;
         uint32_t first_addr = 0;
         uint32_t last_addr = 0;
-        uint32_t acq_buf_id =  (inst_id > __acq_buf_max_inst_id ||
-                                i > __acq_buf_max_chan)? i : __acq_buf[inst_id][i].id;
+        uint32_t acq_buf_id = (inst_id > __acq_buf_max_inst_id ||
+                                i > self->num_chan-1)? 
+                                    i :
+                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].id;
         uint32_t acq_buf_start_addr = (inst_id > __acq_buf_max_inst_id ||
-                                i > __acq_buf_max_chan)? (MEM_TOTAL_SIZE-MEM_REGION_SIZE) : 
-                                    __acq_buf[inst_id][i].start_addr;
+                                i > self->num_chan-1)? 
+                                    (acq_core_mem_total_size - acq_core_mem_region_size) : 
+                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].start_addr;
         uint32_t acq_buf_end_addr =(inst_id > __acq_buf_max_inst_id ||
-                                i > __acq_buf_max_chan)? (MEM_TOTAL_SIZE-DDR3_DATA_WIDTH) : 
-                                    __acq_buf[inst_id][i].end_addr;
+                                i > self->num_chan-1)? 
+                                    (acq_core_mem_total_size - acq_core_ddr3_data_width) : 
+                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].end_addr;
 
         /* Get channel properties */
         GET_PARAM_CHANNEL(parent, acq, 0x0, ACQ_CORE, CH0_DESC, INT_WIDTH,
@@ -126,7 +180,7 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         UNUSED(num_atoms);
         UNUSED(atom_width);
 
-        sample_size = int_ch_width/DDR3_BYTE_2_BIT * num_coalesce;
+        sample_size = int_ch_width/acq_core_ddr3_byte_2_bit * num_coalesce;
         first_addr = acq_buf_start_addr;
         /* This is the last possible address to store a sample. be safe in case
          * this is a dummy area with 0 bytes space */
@@ -197,9 +251,11 @@ err_acq_params_alloc:
 err_atom_width:
 err_num_atoms:
 err_num_coalesce:
+err_int_ch_width:
     free(self->acq_buf);
 err_acq_buf_alloc:
-err_int_ch_width:
+err_lookup_sym:
+err_get_board_type:
     free (self);
 err_self_alloc:
     return NULL;
