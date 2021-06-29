@@ -9,23 +9,32 @@
 #include "ddr3_map_structs.h"
 #include "boards/ml605/ddr3_map.h"
 
+// for HUTILS_EXPORT_SYMBOL
+#include "hutils.h"
+
 #include <stddef.h>
 
 /******************************************************/
 /*                   Memory definitions               */
 /******************************************************/
 
-const size_t MEM_TOTAL_SIZE             = __MEM_TOTAL_SIZE;
+const size_t ml605_mem_total_size             = __MEM_TOTAL_SIZE;
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_mem_total_size);
 
-const size_t MEM_REGION_SIZE            = __MEM_REGION_SIZE;
+const size_t ml605_mem_region_size            = __MEM_REGION_SIZE;
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_mem_region_size);
 /* FPGA Specific */
-const size_t DDR3_PAYLOAD_SIZE          = 32;                     /* In Bytes: Virtex6 (ML605) */
+const size_t ml605_ddr3_payload_size          = 32;                     /* In Bytes: Virtex6 (ML605) */
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_ddr3_payload_size);
 
 /* DDR3 Specific */
 
 /* DDR3 for ML605 has a 64-bit interface */
 #define __DDR3_DATA_WIDTH               64
-const size_t DDR3_DATA_WIDTH            = __DDR3_DATA_WIDTH;      /* In Bits */
+const size_t ml605_ddr3_data_width            = __DDR3_DATA_WIDTH;      /* In Bits */
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_ddr3_data_width);
 #define __DDR3_BYTE_2_BIT               8
-const size_t DDR3_BYTE_2_BIT            = __DDR3_BYTE_2_BIT;
-const size_t DDR3_ADDR_WORD_2_BYTE      = (__DDR3_DATA_WIDTH/__DDR3_BYTE_2_BIT);
+const size_t ml605_ddr3_byte_2_bit            = __DDR3_BYTE_2_BIT;
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_ddr3_byte_2_bit);
+const size_t ml605_ddr3_addr_word_2_byte      = (__DDR3_DATA_WIDTH/__DDR3_BYTE_2_BIT);
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_ddr3_addr_word_2_byte);

@@ -9,13 +9,17 @@
 #include "boards/ml605/acq_chan.h"
 #include "boards/ml605/ddr3_map.h"
 
+// for HUTILS_EXPORT_SYMBOL
+#include "hutils.h"
+
 #include <stddef.h>
 
 /******************************************************/
 /*                 Channels definitions               */
 /******************************************************/
 
-const size_t NUM_ACQ_CORE_SMIOS         = __NUM_ACQ_CORE_SMIOS;
+const size_t ml605_num_acq_core_smios         = __NUM_ACQ_CORE_SMIOS;
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_num_acq_core_smios);
 
 /* ADC */
 const uint32_t ADC_CHAN_ID              = __ADC_CHAN_ID;
@@ -43,6 +47,7 @@ const uint32_t MONIT1POS_CHAN_ID        = __MONIT1POS_CHAN_ID;
 
 /* End of channels placeholder */
 const uint32_t END_CHAN_ID              = __END_CHAN_ID;
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_1_end_chan_id);
 
 const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
     /*** Acquistion 0 Channel Parameters ***/
@@ -89,3 +94,6 @@ const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
         }
     }
 };
+
+/* Acessed as a 1D-array */
+HUTILS_EXPORT_SYMBOL(const acq_buf_t *, const_acq_buf_t_p, ml605_acq_buf);
