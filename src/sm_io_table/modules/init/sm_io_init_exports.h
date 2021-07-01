@@ -11,8 +11,8 @@
 #include "disptable.h"
 
 extern disp_op_t init_set_get_check_exp;
+extern disp_op_t init_set_get_board_type_exp;
 
 extern const disp_op_t *init_exp_ops [];
 
 #endif
-
