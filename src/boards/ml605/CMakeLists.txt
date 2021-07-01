@@ -52,7 +52,6 @@ list(APPEND boards_ml605_other_search_dirs "")
 
 set(boards_ml605_public_headers
     ${common_INCLUDE_DIR}/boards/ml605/acq_chan.h
-    ${common_INCLUDE_DIR}/boards/ml605/board.h
     ${common_INCLUDE_DIR}/boards/ml605/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/ml605/ddr3_map.h
 )

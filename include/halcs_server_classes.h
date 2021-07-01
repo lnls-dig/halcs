@@ -25,7 +25,6 @@
 #include "hal_stddef.h"
 
 /* General dependencies */
-#include "board.h"
 #include "mem_layout_common.h"
 #include "revision.h"
 #include "acq_chan_gen_defs.h"

@@ -52,7 +52,6 @@ list(APPEND boards_afcv3_1_other_search_dirs "")
 
 set(boards_afcv3_1_public_headers
     ${common_INCLUDE_DIR}/boards/afcv3_1/acq_chan.h
-    ${common_INCLUDE_DIR}/boards/afcv3_1/board.h
     ${common_INCLUDE_DIR}/boards/afcv3_1/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/afcv3_1/ddr3_map.h
 )
