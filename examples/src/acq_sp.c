@@ -134,6 +134,8 @@ int main (int argc, char *argv [])
 
     char service[50];
     snprintf (service, sizeof (service), "HALCS%u:DEVIO:ACQ%u", board_number, halcs_number);
+    char service_board[50];
+    snprintf (service_board, sizeof (service_board), "HALCS%u:DEVIO:INIT0", board_number);
 
     bpm_parameters_t bpm_parameters = {.kx       = 10000000,
                                        .ky       = 10000000,
@@ -144,7 +146,7 @@ int main (int argc, char *argv [])
                                        .offset_q = 0
                                        };
     bpm_single_pass_t *bpm_single_pass = bpm_single_pass_new (broker_endp, verbose, NULL,
-        service, &bpm_parameters, num_samples, num_samples, 1);
+        service, service_board, &bpm_parameters, num_samples, num_samples, 1);
     if (bpm_single_pass == NULL) {
         fprintf (stderr, "[client:acq_sp]: bpm_single_pass could not be created\n");
         goto err_bpm_single_pass_new;
