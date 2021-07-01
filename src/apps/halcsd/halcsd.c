@@ -73,8 +73,6 @@
 
 static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
         zhashx_t *hints, char **dev_entry, uint32_t *rffe_id);
-static devio_err_e _dbe_get_board_type (uint32_t dev_id,
-        zhashx_t *hints, char **board_type);
 static char *_create_log_filename (char *log_prefix, char *log_filename_pattern,
         uint32_t dev_id, const char *devio_type, uint32_t smio_inst_id);
 static devio_err_e _spawn_platform_smios (void *pipe, devio_type_e devio_type,
@@ -487,7 +485,7 @@ int main (int argc, char *argv[])
     /* Get board type name */
     err = DEVIO_SUCCESS;
     char *board_type = NULL;
-    err = _dbe_get_board_type (dev_id, devio_hints, &board_type);
+    err = hutils_get_board_type (devio_hints, dev_id, &board_type);
     ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get board_type from config file",
             err_exit);
 
@@ -738,36 +736,6 @@ static devio_err_e _rffe_get_dev_entry (uint32_t dev_id, uint32_t fe_smio_id,
     }
 
 err_alloc_entry:
-err_cfg_exit:
-    return err;
-}
-
-static devio_err_e _dbe_get_board_type (uint32_t dev_id,
-        zhashx_t *hints, char **board_type)
-{
-    assert (hints);
-    devio_err_e err = DEVIO_SUCCESS;
-
-    char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
-    int errs = snprintf (hints_key, sizeof (hints_key),
-            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
-
-    /* Only when the number of characters written is less than the whole buffer,
-     * it is guaranteed that the string was written successfully */
-    ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
-            "Could not generate configuration hash key for configuration "
-            "file", err_cfg_exit, DEVIO_ERR_CFG);
-
-    hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
-    /* If key is not found, assume we don't have any more AFE to
-     * prepare */
-    ASSERT_TEST (cfg_item != NULL && cfg_item->board_type != NULL && !streq (cfg_item->board_type, ""),
-            "Board type not specified in config file", err_cfg_exit, DEVIO_ERR_CFG);
-
-    *board_type = strdup (cfg_item->board_type);
-    ASSERT_ALLOC (*board_type, err_board_type_entry, DEVIO_ERR_ALLOC);
-
-err_board_type_entry:
 err_cfg_exit:
     return err;
 }

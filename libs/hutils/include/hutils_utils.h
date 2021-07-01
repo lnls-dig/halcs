@@ -123,6 +123,10 @@ int hutils_copy_str (char *dest, const char *src, size_t size);
  * and store them in hash table in the form <property name / property value> */
 hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h);
 
+/* Get board type string from config file */
+hutils_err_e hutils_get_board_type (zhashx_t *hints, uint32_t dev_id, 
+    char **board_type);
+
 #ifdef __cplusplus
 }
 #endif
