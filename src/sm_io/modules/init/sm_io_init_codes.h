@@ -8,13 +8,21 @@
 #ifndef _SM_IO_INIT_CODES_H_
 #define _SM_IO_INIT_CODES_H_
 
+#define INIT_BOARD_TYPE_SIZE                 50
+
+struct _smio_init_board_type_t {
+    char name[INIT_BOARD_TYPE_SIZE];
+};
+
 /* Messaging OPCODES */
 #define INIT_OPCODE_TYPE                     uint32_t
 #define INIT_OPCODE_SIZE                     (sizeof (INIT_OPCODE_TYPE))
 
 #define INIT_OPCODE_SET_GET_CHECK            0
 #define INIT_NAME_SET_GET_CHECK              "check"
-#define INIT_OPCODE_END                      1
+#define INIT_OPCODE_SET_GET_BOARD_TYPE       1
+#define INIT_NAME_SET_GET_BOARD_TYPE         "board_type"
+#define INIT_OPCODE_END                      2
 
 /* Messaging Reply OPCODES */
 #define INIT_REPLY_TYPE                      uint32_t

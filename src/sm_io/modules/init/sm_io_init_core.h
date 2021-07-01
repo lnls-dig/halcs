@@ -9,7 +9,7 @@
 #define _SM_IO_INIT_CORE_H_
 
 typedef struct {
-    const uint32_t example;
+    char *board_type;       // board type string
 } smio_init_t;
 
 /***************** Our methods *****************/
