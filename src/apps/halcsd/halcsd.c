@@ -301,12 +301,11 @@ int main (int argc, char *argv[])
         /* Use the passed ID, interpret it as decimal number */
         full_dev_id = strtoul (dev_id_str, NULL, 10);
         /* Check if we are withing range */
-        ASSERT_TEST (full_dev_id > 0 && full_dev_id < NUM_MAX_HALCSS+1,
-                "Device ID is out of range", err_exit);
+        ASSERT_TEST (full_dev_id > 0, "Device ID must be > 0", err_exit);
 
         /* Extract device and smio IDs */
-        dev_id = board_device_map [full_dev_id].dev_id;
-        fe_smio_id = board_device_map [full_dev_id].smio_id;
+        dev_id = (full_dev_id+1) / 2;
+        fe_smio_id = (full_dev_id+1) % 2;
     }
     else {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Dev_id parameter "
@@ -319,13 +318,7 @@ int main (int argc, char *argv[])
                 "\tUsing the passed parameters\n");
     }
 
-    /* Get board type name */
     devio_err_e err = DEVIO_SUCCESS;
-    char *board_type = NULL;
-    err = _dbe_get_board_type (dev_id, devio_hints, &board_type);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get board_type from config file",
-            err_exit);
-
     const llio_ops_t *llio_ops = NULL;
     /* Check Dev_type */
     switch (llio_type) {
@@ -366,11 +359,11 @@ int main (int argc, char *argv[])
                 }
 
                 /* Check if we are withing range */
-                ASSERT_TEST (full_dev_id > 0 && full_dev_id < NUM_MAX_HALCSS+1,
-                        "Device ID is out of range", err_exit);
+                ASSERT_TEST (full_dev_id > 0, "Device ID must be > 0", err_exit);
+
                 /* Extract device and smio IDs */
-                dev_id = board_device_map [full_dev_id].dev_id;
-                fe_smio_id = board_device_map [full_dev_id].smio_id;
+                dev_id = (full_dev_id+1) / 2;
+                fe_smio_id = (full_dev_id+1) % 2;
             }
 
             if (dev_entry == NULL && dev_id_str != NULL) {
@@ -490,6 +483,16 @@ int main (int argc, char *argv[])
     dev_type = NULL;
     free (dev_id_str);
     dev_id_str = NULL;
+
+    /* Get board type name */
+    err = DEVIO_SUCCESS;
+    char *board_type = NULL;
+    err = _dbe_get_board_type (dev_id, devio_hints, &board_type);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get board_type from config file",
+            err_exit);
+
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] board_type set to %s.\n",
+            board_type);
 
     /* Initilialize dev_io */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Creating DEVIO instance ...\n");

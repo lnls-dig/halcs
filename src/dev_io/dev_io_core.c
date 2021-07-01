@@ -334,11 +334,18 @@ devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
     self->sdbfs = zmalloc (sizeof *self->sdbfs);
     ASSERT_ALLOC(self->sdbfs, err_sdbfs_alloc);
 
+    const size_t **sdb_address_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_sdb_address");
+    ASSERT_ALLOC(sdb_address_p, err_lookup_sym);
+    const size_t sdb_address = **sdb_address_p;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:devio_core] sdb_address: 0x%08zx", 
+        sdb_address);
+
     /* Initialize the sdb filesystem itself */
     self->sdbfs->name = "sdb-area";
     self->sdbfs->drvdata = (void *) self;
     self->sdbfs->blocksize = 1; /* Not currently used */
-    self->sdbfs->entrypoint = SDB_ADDRESS;
+    self->sdbfs->entrypoint = sdb_address;
     self->sdbfs->data = 0;
     self->sdbfs->flags = 0;
     self->sdbfs->read = _devio_read_llio_block;
@@ -392,6 +399,7 @@ err_sm_io_h_alloc:
         sdbfs_dev_destroy (self->sdbfs);
     }
 err_sdbfs_create:
+err_lookup_sym:
     free (self->sdbfs);
 err_sdbfs_alloc:
     llio_release (self->llio, NULL);

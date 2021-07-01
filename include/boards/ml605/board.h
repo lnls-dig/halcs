@@ -3,6 +3,5 @@
 
 #include "boards/ml605/ddr3_defs.h"
 #include "boards/ml605/ddr3_map.h"
-#include "boards/ml605/mem_layout.h"
 
 #endif

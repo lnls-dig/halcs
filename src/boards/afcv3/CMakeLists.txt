@@ -55,7 +55,6 @@ set(boards_afcv3_public_headers
     ${common_INCLUDE_DIR}/boards/afcv3/board.h
     ${common_INCLUDE_DIR}/boards/afcv3/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/afcv3/ddr3_map.h
-    ${common_INCLUDE_DIR}/boards/afcv3/mem_layout.h
 )
 
 # Get directory names only

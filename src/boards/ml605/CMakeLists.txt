@@ -55,7 +55,6 @@ set(boards_ml605_public_headers
     ${common_INCLUDE_DIR}/boards/ml605/board.h
     ${common_INCLUDE_DIR}/boards/ml605/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/ml605/ddr3_map.h
-    ${common_INCLUDE_DIR}/boards/ml605/mem_layout.h
 )
 
 # Get directory names only
