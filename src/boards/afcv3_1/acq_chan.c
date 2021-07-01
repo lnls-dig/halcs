@@ -24,58 +24,12 @@ const size_t afcv3_1_num_acq_core_smios         = __NUM_ACQ_CORE_SMIOS;
 HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, afcv3_1_num_acq_core_smios);
 
 /* ADC */
-const uint32_t ADC_CHAN_ID              = __ADC_CHAN_ID;
+const uint32_t afcv3_1_adc_chan_id              = __ADC_CHAN_ID;
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_1_adc_chan_id);
 
 /* ADC SWAPPED (after the switching module) */
-const uint32_t ADCSWAP_CHAN_ID          = __ADCSWAP_CHAN_ID;
-
-/* MIXER I/Q */
-const uint32_t MIXIQ_CHAN_ID            = __MIXIQ_CHAN_ID;
-
-/* DUMMY 0 */
-const uint32_t DUMMY0_CHAN_ID           = __DUMMY0_CHAN_ID;
-
-/* TBTDECIM I/Q */
-const uint32_t TBTDECIMIQ_CHAN_ID       = __TBTDECIMIQ_CHAN_ID;
-
-/* DUMMY 1 */
-const uint32_t DUMMY1_CHAN_ID           = __DUMMY1_CHAN_ID;
-
-/* TBT AMP */
-const uint32_t TBTAMP_CHAN_ID           = __TBTAMP_CHAN_ID;
-
-/* TBT PHASE */
-const uint32_t TBTPHA_CHAN_ID           = __TBTPHA_CHAN_ID;
-
-/* TBT POS */
-const uint32_t TBTPOS_CHAN_ID           = __TBTPOS_CHAN_ID;
-
-/* FOFBDECIM I/Q */
-const uint32_t FOFBDECIMIQ_CHAN_ID      = __FOFBDECIMIQ_CHAN_ID;
-
-/* DUMMY 2 */
-const uint32_t DUMMY2_CHAN_ID           = __DUMMY2_CHAN_ID;
-
-/* FOFB AMP */
-const uint32_t FOFBAMP_CHAN_ID          = __FOFBAMP_CHAN_ID;
-
-/* FOFB PHA */
-const uint32_t FOFBPHA_CHAN_ID          = __FOFBPHA_CHAN_ID;
-
-/* FOFB POS */
-const uint32_t FOFBPOS_CHAN_ID          = __FOFBPOS_CHAN_ID;
-
-/* MONIT1 AMP */
-const uint32_t MONIT1AMP_CHAN_ID        = __MONIT1AMP_CHAN_ID;
-
-/* MONIT1 POS */
-const uint32_t MONIT1POS_CHAN_ID        = __MONIT1POS_CHAN_ID;
-
-/* MONIT AMP */
-const uint32_t MONITAMP_CHAN_ID         = __MONITAMP_CHAN_ID;
-
-/* MONIT POS */
-const uint32_t MONITPOS_CHAN_ID         = __MONITPOS_CHAN_ID;
+const uint32_t afcv3_1_adcswap_chan_id          = __ADCSWAP_CHAN_ID;
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_1_adcswap_chan_id);
 
 /* End of channels placeholder */
 const uint32_t afcv3_1_end_chan_id              = __END_CHAN_ID;

@@ -18,36 +18,20 @@
 /*                 Channels definitions               */
 /******************************************************/
 
-const size_t ml605_num_acq_core_smios         = __NUM_ACQ_CORE_SMIOS;
+const size_t ml605_num_acq_core_smios   = __NUM_ACQ_CORE_SMIOS;
 HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_num_acq_core_smios);
 
 /* ADC */
-const uint32_t ADC_CHAN_ID              = __ADC_CHAN_ID;
+const uint32_t ml605_adc_chan_id        = __ADC_CHAN_ID;
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, ml605_adc_chan_id);
 
-/* TBT AMP */
-const uint32_t TBTAMP_CHAN_ID           = __TBTAMP_CHAN_ID;
-
-/* TBT POS */
-const uint32_t TBTPOS_CHAN_ID           = __TBTPOS_CHAN_ID;
-
-/* FOFB AMP */
-const uint32_t FOFBAMP_CHAN_ID          = __FOFBAMP_CHAN_ID;
-
-/* FOFB POS */
-const uint32_t FOFBPOS_CHAN_ID          = __FOFBPOS_CHAN_ID;
-
-/* MONIT AMP */
-const uint32_t MONITAMP_CHAN_ID         = __MONITAMP_CHAN_ID;
-
-/* MONIT POS */
-const uint32_t MONITPOS_CHAN_ID         = __MONITPOS_CHAN_ID;
-
-/* MONIT1 POS */
-const uint32_t MONIT1POS_CHAN_ID        = __MONIT1POS_CHAN_ID;
+/* ADC SWAPPED (same as ADC as no switching module for ml605) */
+const uint32_t ml605_adcswap_chan_id    = __ADC_CHAN_ID;
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, ml605_adcswap_chan_id);
 
 /* End of channels placeholder */
 const uint32_t END_CHAN_ID              = __END_CHAN_ID;
-HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_1_end_chan_id);
+HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, ml605_end_chan_id);
 
 const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
     /*** Acquistion 0 Channel Parameters ***/
