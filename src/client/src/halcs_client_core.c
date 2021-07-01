@@ -3203,6 +3203,15 @@ PARAM_FUNC_CLIENT_READ(init_check)
     return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
 }
 
+halcs_client_err_e halcs_get_init_board_type (halcs_client_t *self, char *service,
+        struct _smio_init_board_type_t *init_board_type)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, INIT_OPCODE_SET_GET_BOARD_TYPE,
+            rw, init_board_type, sizeof (*init_board_type), NULL, 0, NULL, 0,
+            init_board_type, sizeof (*init_board_type));
+}
+
 /**************** TIM RCV SMIO Functions ****************/
 
 /* DMTD Number of averages function */
