@@ -10,5 +10,5 @@
 
 /*********************** Static AFCv3 FPGA layout ***********************/
 
-const size_t ml605_SDB_ADDRESS                = 0x00000000;
-HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_adb_address);
+const size_t ml605_sdb_address                = 0x00000000;
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, ml605_sdb_address);

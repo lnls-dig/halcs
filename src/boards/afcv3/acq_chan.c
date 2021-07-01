@@ -32,10 +32,10 @@ const uint32_t afcv3_adcswap_chan_id          = __ADCSWAP_CHAN_ID;
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_adcswap_chan_id);
 
 /* End of channels placeholder */
-const uint32_t afcv3_END_CHAN_ID              = __END_CHAN_ID;
+const uint32_t afcv3_end_chan_id              = __END_CHAN_ID;
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_end_chan_id);
 
-const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
+const acq_buf_t afcv3_acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
     /*** Acquisition Core 0 Channel Parameters ***/
     {
         {

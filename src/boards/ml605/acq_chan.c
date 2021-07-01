@@ -30,10 +30,10 @@ const uint32_t ml605_adcswap_chan_id    = __ADC_CHAN_ID;
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, ml605_adcswap_chan_id);
 
 /* End of channels placeholder */
-const uint32_t END_CHAN_ID              = __END_CHAN_ID;
+const uint32_t ml605_end_chan_id        = __END_CHAN_ID;
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, ml605_end_chan_id);
 
-const acq_buf_t __acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
+const acq_buf_t ml605_acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
     /*** Acquistion 0 Channel Parameters ***/
     {
         {
