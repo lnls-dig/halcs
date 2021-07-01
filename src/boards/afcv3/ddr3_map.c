@@ -14,8 +14,6 @@
 
 #include <stddef.h>
 
-#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
-
 /******************************************************/
 /*                   Memory definitions               */
 /******************************************************/
@@ -40,5 +38,3 @@ const size_t afcv3_ddr3_byte_2_bit            = __DDR3_BYTE_2_BIT;
 HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, afcv3_ddr3_byte_2_bit);
 const size_t afcv3_ddr3_addr_word_2_byte      = (__DDR3_DATA_WIDTH/__DDR3_BYTE_2_BIT);
 HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, afcv3_ddr3_addr_word_2_byte);
-
-#endif

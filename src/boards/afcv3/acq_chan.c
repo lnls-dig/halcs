@@ -14,8 +14,6 @@
 
 #include <stddef.h>
 
-#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
-
 /******************************************************/
 /*                 Channels definitions               */
 /******************************************************/
@@ -412,5 +410,3 @@ const acq_buf_t afcv3_acq_buf[__NUM_ACQ_CORE_SMIOS][__END_CHAN_ID] = {
 
 /* Acessed as a 1D-array */
 HUTILS_EXPORT_SYMBOL(const acq_buf_t *, const_acq_buf_t_p, afcv3_acq_buf);
-
-#endif

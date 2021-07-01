@@ -13,6 +13,18 @@ set (boards_OUTPUT_BASENAME "boards"
     "Output boards library base name"
 )
 
+# get all directories under a directory
+macro(subdirlist result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
+
 #########################################################################
 # XXX dependency
 #########################################################################
@@ -67,10 +79,16 @@ if(boards_SHRINK_AFCV3_DDR_SIZE_VALUE STREQUAL y)
     )
 endif()
 
-# select board directory to include
-string(TOLOWER ${halcs_BOARD_OPT} halcs_BOARD_OPT_LOWER)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${halcs_BOARD_OPT_LOWER})
-list(APPEND boards_LIBRARIES boards_${halcs_BOARD_OPT_LOWER})
+subdirlist(subdirs ${CMAKE_CURRENT_SOURCE_DIR})
+
+foreach(subdir ${subdirs})
+    add_subdirectory(${subdir})
+    list(APPEND boards_subdir ${subdir}})
+    list(APPEND boards_LIBRARIES boards_${subdir})
+endforeach()
+
+message(STATUS "boards_subdir: ${boards_subdir}")
+message(STATUS "boards_LIBRARIES: ${boards_LIBRARIES}")
 
 #######################################
 # Our sources

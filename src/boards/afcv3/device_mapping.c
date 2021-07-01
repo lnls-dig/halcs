@@ -8,11 +8,7 @@
 // for HUTILS_EXPORT_SYMBOL
 #include "hutils.h"
 
-#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
-
 /*********************** Static AFCv3 FPGA layout ***********************/
 
 const size_t afcv3_sdb_address                = 0x00000000;
-HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, afcv3_adb_address);
-
-#endif
+HUTILS_EXPORT_SYMBOL(const size_t *, const_size_t_p, afcv3_sdb_address);

@@ -7,8 +7,6 @@
 
 #include "halcs_server.h"
 
-#if defined __BOARD_AFCV3__ && !defined __BOARD_AFCV3_1__
-
 #define __NUM_FMC130M_4CH_SMIOS         2
 const size_t afcv3_num_fmc130m_4ch_smios      = __NUM_FMC130M_4CH_SMIOS;
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_num_fmc130m_4ch_smios);
@@ -56,5 +54,3 @@ HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_fmc250m_4ch_isla2
 /* This CI PCA9547 is located on the carrier, but it's controlled by the FMC250M_4CH */
 const uint32_t afcv3_fmc250m_4ch_pca9547_addr[__NUM_FMC250M_4CH_SMIOS] = {0x70, 0x70};
 HUTILS_EXPORT_SYMBOL(const uint32_t *, const_uint32_t_p, afcv3_fmc250m_4ch_pca9547_addr);
-
-#endif
