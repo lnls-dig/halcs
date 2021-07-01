@@ -314,7 +314,7 @@ dev_mngr_OBJS += $(dev_mngr_core_OBJS) $(debug_OBJS) \
 
 common_app_OBJS = $(dev_io_core_OBJS) $(ll_io_OBJS) \
                $(sm_io_OBJS) $(sm_io_table_OBJS) $(msg_OBJS) \
-               $(board_OBJS) $(board_common_OBJS)
+               $(board_OBJS)
 
 apps_OBJS = $(foreach app_obj,$(APPS),$($(app_obj)_all_OBJS))
 
@@ -336,7 +336,6 @@ OBJS_all = $(ll_io_OBJS) \
 	   $(dev_mngr_OBJS) \
 	   $(common_app_OBJS) \
 	   $(apps_OBJS) \
-	   $(board_common_OBJS) \
 	   $(revision_OBJS)
 
 # Sources
