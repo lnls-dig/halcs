@@ -202,6 +202,12 @@ char *hutils_concat_strings3 (const char *str1, const char* str2,
     return _hutils_concat_strings_raw (str1, str2, str3, true, sep);
 }
 
+char *hutils_concat_strings3_no_sep (const char *str1, const char* str2,
+        const char* str3)
+{
+    return _hutils_concat_strings_raw (str1, str2, str3, false, 0);
+}
+
 /*******************************************************************/
 /*****************  Byte manipulation functions ********************/
 /*******************************************************************/
@@ -409,13 +415,13 @@ hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h)
      * the corresponding keys */
 
     /* First find the dev_io property */
-    zconfig_t *devio_cfg = zconfig_locate (root_cfg, "/dev_io");
-    ASSERT_TEST (devio_cfg != NULL, "Could not find "
+    zconfig_t *hutils_cfg = zconfig_locate (root_cfg, "/dev_io");
+    ASSERT_TEST (hutils_cfg != NULL, "Could not find "
             "dev_io property in configuration file", err_cfg_exit,
             HUTILS_ERR_CFG);
 
     /* Now, find all of our child */
-    zconfig_t *board_cfg = zconfig_child (devio_cfg);
+    zconfig_t *board_cfg = zconfig_child (hutils_cfg);
     ASSERT_TEST (board_cfg != NULL, "Could not find "
             "board* property in configuration file", err_cfg_exit,
             HUTILS_ERR_CFG);
@@ -515,6 +521,36 @@ err_hash_board_type:
 err_board_type:
     free (item);
 err_hash_item_alloc:
+err_cfg_exit:
+    return err;
+}
+
+hutils_err_e hutils_get_board_type (zhashx_t *hints, uint32_t dev_id, 
+    char **board_type)
+{
+    assert (hints);
+    hutils_err_e err = HUTILS_SUCCESS;
+
+    char hints_key [HUTILS_CFG_HASH_KEY_MAX_LEN];
+    int errs = snprintf (hints_key, sizeof (hints_key),
+            HUTILS_CFG_HASH_KEY_PATTERN_COMPL, dev_id, 0);
+
+    /* Only when the number of characters written is less than the whole buffer,
+     * it is guaranteed that the string was written successfully */
+    ASSERT_TEST (errs >= 0 && (size_t) errs < sizeof (hints_key),
+            "Could not generate configuration hash key for configuration "
+            "file", err_cfg_exit, HUTILS_ERR_CFG);
+
+    hutils_hints_t *cfg_item = zhashx_lookup (hints, hints_key);
+    /* If key is not found, assume we don't have any more AFE to
+     * prepare */
+    ASSERT_TEST (cfg_item != NULL && cfg_item->board_type != NULL && !streq (cfg_item->board_type, ""),
+            "Board type not specified in config file", err_cfg_exit, HUTILS_ERR_CFG);
+
+    *board_type = strdup (cfg_item->board_type);
+    ASSERT_ALLOC (*board_type, err_board_type_entry, HUTILS_ERR_ALLOC);
+
+err_board_type_entry:
 err_cfg_exit:
     return err;
 }

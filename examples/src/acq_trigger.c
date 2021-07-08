@@ -157,12 +157,6 @@ int main (int argc, char *argv [])
     }
     else {
         chan = strtoul (chan_str, NULL, 10);
-
-        if (chan > END_CHAN_ID-1) {
-            fprintf (stderr, "[client:acq]: Channel number too big! Defaulting to: %u\n",
-                    MAX_NUM_CHANS);
-            chan = END_CHAN_ID-1;
-        }
     }
     //fprintf (stdout, "[client:acq]: chan = %u\n", chan);
 

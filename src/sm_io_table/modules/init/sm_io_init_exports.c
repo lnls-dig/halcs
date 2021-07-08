@@ -22,9 +22,22 @@ disp_op_t init_set_get_check_exp = {
     }
 };
 
+disp_op_t init_set_get_board_type_exp = {
+    .name = INIT_NAME_SET_GET_BOARD_TYPE,
+    .opcode = INIT_OPCODE_SET_GET_BOARD_TYPE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, smio_init_board_type_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_STRUCT, smio_init_board_type_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *init_exp_ops [] = {
     &init_set_get_check_exp,
+    &init_set_get_board_type_exp,
     NULL
 };
 

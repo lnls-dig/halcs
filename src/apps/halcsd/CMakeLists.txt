@@ -452,26 +452,6 @@ foreach(bin_target ${apps_halcsd})
                 PERMISSIONS
                 OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
             )
-            # sysconfig files
-            install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/sysconfig/halcs-board.in\")"
-                COMPONENT Scripts
-            )
-            install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-board\")"
-                COMPONENT Scripts
-            )
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
-                COMPONENT Scripts
-            )
-
-            install(FILES
-                ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/halcs-board
-                DESTINATION ${SYSTEMD_CONF_INSTALL_DIR}
-                COMPONENT Scripts
-                PERMISSIONS
-                OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-            )
 
             # halcs.cfg file
             install(CODE "set(input_file

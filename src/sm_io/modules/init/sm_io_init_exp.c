@@ -75,9 +75,50 @@ err_get_init_handler:
     return err;
 }
 
+static int _init_get_board_type (void *owner, void *args, void *ret)
+{
+    assert (owner);
+    assert (args);
+    int err = -INIT_OK;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:init] "
+            "Calling _init_get_board_check\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+    smio_init_t *init = smio_get_handler (self);
+    ASSERT_TEST(init != NULL, "Could not get SMIO INIT handler",
+            err_get_init_handler, -INIT_ERR);
+
+    /* Message is:
+     * frame 0: operation code
+     * frame 1: rw
+     * frame 2: arg (unused) 
+     */
+    uint32_t rw = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    uint32_t arg = *(uint32_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+    UNUSED(rw);
+    UNUSED(arg);
+
+    if (rw) {
+        int count = snprintf ((char *)ret, INIT_BOARD_TYPE_SIZE, "%s", init->board_type);
+        /* Only when the number of characters written is less than the whole buffer,
+         * it is guaranteed that the string was written successfully */
+	if (count <= 0 || (size_t) count >= INIT_BOARD_TYPE_SIZE) {
+            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:init] "
+                "Could not write full board name into \"ret\" = %s\n", init->board_type);
+        }
+        err = (count <= 0)? -INIT_ERR : count;
+    }
+
+    return err;
+
+err_get_init_handler:
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp init_exp_fp [] = {
     _init_check,
+    _init_get_board_type,
     NULL
 };
 

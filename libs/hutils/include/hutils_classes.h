@@ -48,5 +48,7 @@
 #include "hutils_core.h"
 #include "hutils_math.h"
 #include "hutils_utils.h"
+#include "hutils_symload.h"
+#include "hutils_sharelib.h"
 
 #endif

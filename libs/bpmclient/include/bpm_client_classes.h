@@ -21,9 +21,9 @@
 
 /* version macros for compile-time API detection */
 
-#define BPM_CLIENT_VERSION_MAJOR 2
-#define BPM_CLIENT_VERSION_MINOR 4
-#define BPM_CLIENT_VERSION_PATCH 1
+#define BPM_CLIENT_VERSION_MAJOR 3
+#define BPM_CLIENT_VERSION_MINOR 0
+#define BPM_CLIENT_VERSION_PATCH 0
 
 #define BPM_CLIENT_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))

@@ -86,6 +86,10 @@ char *hutils_concat_strings_no_sep (const char *str1, const char* str2);
 char *hutils_concat_strings3 (const char *str1, const char* str2,
         const char* str3, char sep);
 
+/* Concatenates 3 strings together. Returns the string if OK, NULL in case of error */
+char *hutils_concat_strings3_no_sep (const char *str1, const char* str2,
+        const char* str3);
+
 /* Calculates necessary padding so that a given value is a multiple of a given
  * alignment */
 uint32_t hutils_calculate_padding(uint32_t value, uint32_t alignment);
@@ -118,6 +122,10 @@ int hutils_copy_str (char *dest, const char *src, size_t size);
 /* Get properties from config file (defined in http://rfc.zeromq.org/spec:4)
  * and store them in hash table in the form <property name / property value> */
 hutils_err_e hutils_get_hints (zconfig_t *root_cfg, zhashx_t *hints_h);
+
+/* Get board type string from config file */
+hutils_err_e hutils_get_board_type (zhashx_t *hints, uint32_t dev_id, 
+    char **board_type);
 
 #ifdef __cplusplus
 }

@@ -59,7 +59,7 @@ CFLAGS_PLATFORM = -Wall -Wextra -Werror
 LDFLAGS_PLATFORM =
 
 # Libraries
-LIBS =
+LIBS = -ldl
 
 # General library flags -L<libdir>
 LFLAGS =
@@ -85,8 +85,10 @@ OUT = $(LIBNAME)
 .SECONDEXPANSION:
 
 # Library objects
-$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/hutils_utils.o $(SRC_DIR)/hutils_math.o \
-	$(SRC_DIR)/hutils_err.o
+$(LIBNAME)_OBJS_LIB = $(SRC_DIR)/hutils_utils.o \
+	$(SRC_DIR)/hutils_math.o \
+	$(SRC_DIR)/hutils_err.o \
+	$(SRC_DIR)/hutils_symload.o
 
 # Objects common for this library
 common_OBJS =
@@ -100,7 +102,9 @@ $(LIBNAME)_CODE_HEADERS = \
 	$(INCLUDE_DIR)/hutils_core.h \
 	$(INCLUDE_DIR)/hutils_err.h \
 	$(INCLUDE_DIR)/hutils_math.h \
-	$(INCLUDE_DIR)/hutils_utils.h
+	$(INCLUDE_DIR)/hutils_utils.h \
+	$(INCLUDE_DIR)/hutils_symload.h \
+	$(INCLUDE_DIR)/hutils_sharelib.h
 
 $(LIBNAME)_HEADERS = $($(LIBNAME)_CODE_HEADERS)
 
@@ -130,7 +134,7 @@ all: $(TARGET_STATIC) $(TARGET_SHARED_VER)
 
 # Compile dynamic library
 %.so.$(LIB_VER): $$($$*_OBJS) $(OBJ_REVISION)
-	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^
+	$(CC) $(LDFLAGS) -shared -fPIC -Wl,-soname,$@ -o $@ $^ $(LIBS)
 
 # Pull in dependency info for *existing* .o files and don't complain if the
 # corresponding .d file is not found

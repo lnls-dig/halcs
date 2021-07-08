@@ -17,6 +17,7 @@ struct _smio_rffe_version_t;
 struct _smio_afc_diag_revision_data_t;
 struct _smio_dsp_data_t;
 struct _smio_dsp_monit_data_t;
+struct _smio_init_board_type_t;
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -1727,6 +1728,10 @@ halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *servic
 
 halcs_client_err_e halcs_get_init_check (halcs_client_t *self, char *service,
         uint32_t *init_check_out);
+
+/* Get board type */
+halcs_client_err_e halcs_get_init_board_type (halcs_client_t *self, char *service,
+        struct _smio_init_board_type_t *init_board_type);
 
 /********************** TIM RCV Functions ********************/
 

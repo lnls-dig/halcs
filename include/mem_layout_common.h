@@ -23,6 +23,8 @@ extern "C" {
 #define FMC_130M_FMC_ACTIVE_CLK_RAW_OFFS            0x02000
 #define FMC_130M_EEPROM_RAW_I2C_OFFS                0x03000
 #define FMC_130M_LM75A_RAW_I2C_OFFS                 0x04000
+/* Number of LM75A per FMC130 */
+#define NUM_FMC130M_4CH_LM75A                       2
 
 /* FMC_250M Components */
 #define FMC_250M_CTRL_RAW_REGS_OFFS                 0x00000
@@ -31,6 +33,8 @@ extern "C" {
 #define FMC_250M_EEPROM_RAW_I2C_OFFS                0x03000
 #define FMC_250M_AMC7823_RAW_SPI_OFFS               0x04000
 #define FMC_250M_ISLA216P_RAW_SPI_OFFS              0x05000
+/* Number of ISLA216P per FMC250 */
+#define NUM_FMC250M_4CH_ISLA216P                    4
 
 /* AFC MGMT Component */
 #define AFC_MGMT_CTRL_RAW_REGS_OFFS                 0x0000

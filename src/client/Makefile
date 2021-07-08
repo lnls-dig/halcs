@@ -103,7 +103,8 @@ OBJS_BOARD =
 OBJS_PLATFORM =
 # Objects that are not specificaly related to the halcs_client, but composes
 # our library, as it eases some tasks for us
-OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/sm_io_codes.o \
+OBJS_EXTERNAL = ../boards/$(BOARD)/acq_chan.o \
+                $(SMIO_TABLE_SRC_DIR)/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/acq/sm_io_acq_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/dsp/sm_io_dsp_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fmc130m_4ch/sm_io_fmc130m_4ch_exports.o \
@@ -127,12 +128,8 @@ OBJS_EXTERNAL = $(SMIO_TABLE_SRC_DIR)/sm_io_codes.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.o \
                 $(SMIO_TABLE_SRC_DIR)/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.o
 
-# Project boards
-boards_INCLUDE_DIRS = -I$(TOP)/include/boards/$(BOARD)
-
 # Include directories
 INCLUDE_DIRS = -I. -Iinclude \
-	       $(boards_INCLUDE_DIRS) \
 	       -I$(TOP)/include \
 	       -I$(SMIO_DIR) \
 	       -I$(SMIO_SRC_DIR)/modules \
