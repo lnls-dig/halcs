@@ -178,6 +178,10 @@ RW_PARAM_FUNC(fofb_ctrl, fofbdatasel) {
 
 /* Read-Only registers. Read from bus, write from device */
 
+/* This must match the FPGA maximum number of channels */
+#define FOFB_CC_MAX_GT_CHAN               8
+#define FOFB_CC_GT_CHAN_OFFSET            0x04 /* 1 32-bit registers */
+
 #define FOFB_CC_FIRMWARE_VER_R(val)       (val)
 #define FOFB_CC_FIRMWARE_VER_W(val)       (val)
 #define FOFB_CC_FIRMWARE_VER_MASK         ((1ULL<<32)-1)
@@ -199,35 +203,9 @@ RW_PARAM_FUNC(fofb_ctrl, sys_status) {
 #define FOFB_CC_LINK_PARTNER_1_R(val)       (val)
 #define FOFB_CC_LINK_PARTNER_1_W(val)       (val)
 #define FOFB_CC_LINK_PARTNER_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, link_partner_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, LINK_PARTNER_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_LINK_PARTNER_2_R(val)       (val)
-#define FOFB_CC_LINK_PARTNER_2_W(val)       (val)
-#define FOFB_CC_LINK_PARTNER_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, link_partner_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, LINK_PARTNER_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_LINK_PARTNER_3_R(val)       (val)
-#define FOFB_CC_LINK_PARTNER_3_W(val)       (val)
-#define FOFB_CC_LINK_PARTNER_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, link_partner_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, LINK_PARTNER_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_LINK_PARTNER_4_R(val)       (val)
-#define FOFB_CC_LINK_PARTNER_4_W(val)       (val)
-#define FOFB_CC_LINK_PARTNER_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, link_partner_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, LINK_PARTNER_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, link_partner) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            LINK_PARTNER_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -253,35 +231,9 @@ RW_PARAM_FUNC(fofb_ctrl, time_frame_count) {
 #define FOFB_CC_HARD_ERR_CNT_1_R(val)       (val)
 #define FOFB_CC_HARD_ERR_CNT_1_W(val)       (val)
 #define FOFB_CC_HARD_ERR_CNT_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, HARD_ERR_CNT_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_HARD_ERR_CNT_2_R(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_2_W(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, HARD_ERR_CNT_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_HARD_ERR_CNT_3_R(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_3_W(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, HARD_ERR_CNT_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_HARD_ERR_CNT_4_R(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_4_W(val)       (val)
-#define FOFB_CC_HARD_ERR_CNT_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, HARD_ERR_CNT_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            HARD_ERR_CNT_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -289,35 +241,9 @@ RW_PARAM_FUNC(fofb_ctrl, hard_err_cnt_4) {
 #define FOFB_CC_SOFT_ERR_CNT_1_R(val)       (val)
 #define FOFB_CC_SOFT_ERR_CNT_1_W(val)       (val)
 #define FOFB_CC_SOFT_ERR_CNT_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, SOFT_ERR_CNT_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_SOFT_ERR_CNT_2_R(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_2_W(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, SOFT_ERR_CNT_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_SOFT_ERR_CNT_3_R(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_3_W(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, SOFT_ERR_CNT_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_SOFT_ERR_CNT_4_R(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_4_W(val)       (val)
-#define FOFB_CC_SOFT_ERR_CNT_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, SOFT_ERR_CNT_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            SOFT_ERR_CNT_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -325,35 +251,9 @@ RW_PARAM_FUNC(fofb_ctrl, soft_err_cnt_4) {
 #define FOFB_CC_FRAME_ERR_CNT_1_R(val)       (val)
 #define FOFB_CC_FRAME_ERR_CNT_1_W(val)       (val)
 #define FOFB_CC_FRAME_ERR_CNT_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, FRAME_ERR_CNT_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_FRAME_ERR_CNT_2_R(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_2_W(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, FRAME_ERR_CNT_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_FRAME_ERR_CNT_3_R(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_3_W(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, FRAME_ERR_CNT_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_FRAME_ERR_CNT_4_R(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_4_W(val)       (val)
-#define FOFB_CC_FRAME_ERR_CNT_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, FRAME_ERR_CNT_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            FRAME_ERR_CNT_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -361,35 +261,9 @@ RW_PARAM_FUNC(fofb_ctrl, frame_err_cnt_4) {
 #define FOFB_CC_RX_PCK_CNT_1_R(val)       (val)
 #define FOFB_CC_RX_PCK_CNT_1_W(val)       (val)
 #define FOFB_CC_RX_PCK_CNT_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RX_PCK_CNT_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_RX_PCK_CNT_2_R(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_2_W(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RX_PCK_CNT_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_RX_PCK_CNT_3_R(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_3_W(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RX_PCK_CNT_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_RX_PCK_CNT_4_R(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_4_W(val)       (val)
-#define FOFB_CC_RX_PCK_CNT_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RX_PCK_CNT_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            RX_PCK_CNT_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -397,35 +271,9 @@ RW_PARAM_FUNC(fofb_ctrl, rx_pck_cnt_4) {
 #define FOFB_CC_TX_PCK_CNT_1_R(val)       (val)
 #define FOFB_CC_TX_PCK_CNT_1_W(val)       (val)
 #define FOFB_CC_TX_PCK_CNT_1_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, tx_pck_cnt_1) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TX_PCK_CNT_1, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_TX_PCK_CNT_2_R(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_2_W(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_2_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, tx_pck_cnt_2) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TX_PCK_CNT_2, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_TX_PCK_CNT_3_R(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_3_W(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_3_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, tx_pck_cnt_3) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TX_PCK_CNT_3, /* No field */,
-            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-#define FOFB_CC_TX_PCK_CNT_4_R(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_4_W(val)       (val)
-#define FOFB_CC_TX_PCK_CNT_4_MASK         ((1ULL<<32)-1)
-RW_PARAM_FUNC(fofb_ctrl, tx_pck_cnt_4) {
-    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TX_PCK_CNT_4, /* No field */,
+RW_PARAM_FUNC(fofb_ctrl, tx_pck_cnt) {
+    SET_GET_PARAM_CHANNEL(fofb_ctrl, 0x0, FOFB_CC,
+            TX_PCK_CNT_1, /* No field */, FOFB_CC_GT_CHAN_OFFSET, FOFB_CC_MAX_GT_CHAN,
             MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -512,32 +360,14 @@ const disp_table_func_fp fofb_ctrl_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fofb_ctrl, fofbdatasel),
     RW_PARAM_FUNC_NAME(fofb_ctrl, firmware_ver),
     RW_PARAM_FUNC_NAME(fofb_ctrl, sys_status),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, link_partner_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, link_partner_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, link_partner_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, link_partner_4),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, link_partner),
     RW_PARAM_FUNC_NAME(fofb_ctrl, link_up),
     RW_PARAM_FUNC_NAME(fofb_ctrl, time_frame_count),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, hard_err_cnt_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, hard_err_cnt_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, hard_err_cnt_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, hard_err_cnt_4),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, soft_err_cnt_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, soft_err_cnt_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, soft_err_cnt_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, soft_err_cnt_4),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, frame_err_cnt_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, frame_err_cnt_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, frame_err_cnt_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, frame_err_cnt_4),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, rx_pck_cnt_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, rx_pck_cnt_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, rx_pck_cnt_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, rx_pck_cnt_4),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, tx_pck_cnt_1),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, tx_pck_cnt_2),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, tx_pck_cnt_3),
-    RW_PARAM_FUNC_NAME(fofb_ctrl, tx_pck_cnt_4),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, hard_err_cnt),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, soft_err_cnt),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, frame_err_cnt),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, rx_pck_cnt),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, tx_pck_cnt),
     RW_PARAM_FUNC_NAME(fofb_ctrl, fod_process_time),
     RW_PARAM_FUNC_NAME(fofb_ctrl, bpm_count),
     RW_PARAM_FUNC_NAME(fofb_ctrl, bpm_id_rdback),
