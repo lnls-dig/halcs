@@ -15,9 +15,6 @@
 #define DFLT_HALCS_NUMBER           0
 #define DFLT_BOARD_NUMBER           0
 
-#define MAX_CHANNEL_NUM             4
-#define ALL_CHANNELS_NUM            4
-
 static struct option long_options[] =
 {
     {"help",                no_argument,         NULL, 'h'},
@@ -28,6 +25,7 @@ static struct option long_options[] =
     {"bpm_id",              required_argument,   NULL, 't'},
     {"time_frame_len",      required_argument,   NULL, 'f'},
     {"cc_enable",           required_argument,   NULL, 'e'},
+    {"num_gts",             required_argument,   NULL, 'g'},
     {"firmware_ver",        no_argument,         NULL, 'c'},
     {"link_partners",       no_argument,         NULL, 'l'},
     {"soft_err_cnt",        no_argument,         NULL, 'm'},
@@ -41,7 +39,7 @@ static struct option long_options[] =
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:e:clrxykwmnj";
+static const char* shortopt = "hb:vo:s:t:f:e:g:clrxykwmnj";
 
 void print_help (char *program_name)
 {
@@ -58,11 +56,12 @@ void print_help (char *program_name)
             "  -f  --time_frame_len <Length in clock cycles>\n"
             "                                       Timeframe length\n"
             "  -e  --cc_enable <Enable[0|1]>        CC enable\n"
+            "  -g  --num_gts <Number of GTs>        Number of GTs\n"
             "  -c  --firmware_ver                   Firmware version\n"
             "  -l  --link_partners                  Link partners ID\n"
             "  -m  --soft_err_cnt                   Number of soft errors\n"
             "  -n  --hard_err_cnt                   Number of hard errors\n"
-            "  -j  --frame_err_cnt                  Link partners ID\n"
+            "  -j  --frame_err_cnt                  Number os frame errors\n"
             "  -r  --rx_pck_cnt                     RX packet count\n"
             "  -x  --tx_pck_cnt                     TX packet count\n"
             "  -y  --fod_process_time               FOD process time [in userclk cycles]\n"
@@ -71,17 +70,31 @@ void print_help (char *program_name)
             program_name);
 }
 
+#define FUNC_FOFB_CTRL_LINK_PARTNER_IDX         0
+#define FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX         1
+#define FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX         2
+#define FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX        3
+#define FUNC_FOFB_CTRL_RX_PCK_CNT_IDX           4
+#define FUNC_FOFB_CTRL_TX_PCK_CNT_IDX           5
+#define FUNC_FOFB_CTRL_END_IDX                  6
+
+#define MAX_NUM_FUNCS                           FUNC_FOFB_CTRL_END_IDX
+
+/* Our read function */
+typedef halcs_client_err_e (*halcs_func_fp) (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *value);
+
+typedef struct {
+    halcs_func_fp func;
+    const char *func_name;
+    int call;
+} func_call_t;
+
 int main (int argc, char *argv [])
 {
     int ret = 0;
     int verbose = 0;
     int firmware_ver = 0;
-    int link_partners = 0;
-    int soft_err_cnt = 0;
-    int hard_err_cnt = 0;
-    int frame_err_cnt = 0;
-    int rx_pck_cnt = 0;
-    int tx_pck_cnt = 0;
     int fod_process_time = 0;
     int bpm_cnt = 0;
     int timeframe_cnt = 0;
@@ -91,6 +104,8 @@ int main (int argc, char *argv [])
     char *bpm_id_str = NULL;
     char *time_frame_len_str = NULL;
     char *cc_enable_str = NULL;
+    char *num_gts_str = NULL;
+    func_call_t func_call [MAX_NUM_FUNCS] = {{0}};
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -130,32 +145,54 @@ int main (int argc, char *argv [])
                 cc_enable_str = strdup (optarg);
                 break;
 
+            case 'g':
+                num_gts_str = strdup (optarg);
+                break;
+
             case 'c':
                 firmware_ver = 1;
                 break;
 
             case 'l':
-                link_partners = 1;
+                func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].func = 
+                    &halcs_get_fofb_ctrl_link_partner;
+                func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].func_name = "link_partner";
+                func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].call = 1;
                 break;
 
             case 'm':
-                soft_err_cnt = 1;
+                func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].func = 
+                    &halcs_get_fofb_ctrl_soft_err_cnt;
+                func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].func_name = "soft_err_cnt";
+                func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'n':
-                hard_err_cnt = 1;
+                func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].func = 
+                    &halcs_get_fofb_ctrl_hard_err_cnt;
+                func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].func_name = "hard_err_cnt";
+                func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'j':
-                frame_err_cnt = 1;
+                func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].func = 
+                    &halcs_get_fofb_ctrl_frame_err_cnt;
+                func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].func_name = "frame_err_cnt";
+                func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'r':
-                rx_pck_cnt = 1;
+                func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].func = 
+                    &halcs_get_fofb_ctrl_rx_pck_cnt;
+                func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].func_name = "rx_pck_cnt";
+                func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].call = 1;
                 break;
 
             case 'x':
-                tx_pck_cnt = 1;
+                func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].func = 
+                    &halcs_get_fofb_ctrl_tx_pck_cnt;
+                func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].func_name = "tx_pck_cnt";
+                func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].call = 1;
                 break;
 
             case 'y':
@@ -210,6 +247,16 @@ int main (int argc, char *argv [])
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
+    }
+
+    uint32_t num_gts = 0;
+    if (num_gts_str == NULL) {
+        fprintf (stderr, "[client:fofb_ctrl]: num_gts option not set\n");
+        print_help (argv[0]);
+        goto err_halcs_exit;
+    }
+    else {
+        num_gts = strtoul (num_gts_str, NULL, 10);
     }
 
     char service[50];
@@ -305,147 +352,37 @@ int main (int argc, char *argv [])
         }
     }
 
-    uint32_t link_partners_get[4] = {0};
-    if (link_partners) {
-        err = halcs_get_fofb_ctrl_link_partner_1 (halcs_client, service, &link_partners_get[0]);
-        err |= halcs_get_fofb_ctrl_link_partner_2 (halcs_client, service, &link_partners_get[1]);
-        err |= halcs_get_fofb_ctrl_link_partner_3 (halcs_client, service, &link_partners_get[2]);
-        err |= halcs_get_fofb_ctrl_link_partner_4 (halcs_client, service, &link_partners_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_link_partner_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
+    for (uint32_t func = 0; func < MAX_NUM_FUNCS; ++func) {
+        if (func_call[func].call == 1) {
+            uint32_t param_get[num_gts];
+            err = HALCS_CLIENT_SUCCESS;
 
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: link_partner_1 = %u\n", link_partners_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: link_partner_2 = %u\n", link_partners_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: link_partner_3 = %u\n", link_partners_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: link_partner_4 = %u\n", link_partners_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", link_partners_get[0], link_partners_get[1],
-                link_partners_get[2], link_partners_get[3]);
-        }
-    }
+            for (uint32_t i = 0; i < num_gts; ++i) {
+                err |= func_call[func].func (halcs_client, service, i, &param_get[i]);
+            }
 
-    uint32_t soft_err_cnt_get[4] = {0};
-    if (soft_err_cnt) {
-        err = halcs_get_fofb_ctrl_soft_err_cnt_1 (halcs_client, service, &soft_err_cnt_get[0]);
-        err |= halcs_get_fofb_ctrl_soft_err_cnt_2 (halcs_client, service, &soft_err_cnt_get[1]);
-        err |= halcs_get_fofb_ctrl_soft_err_cnt_3 (halcs_client, service, &soft_err_cnt_get[2]);
-        err |= halcs_get_fofb_ctrl_soft_err_cnt_4 (halcs_client, service, &soft_err_cnt_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_soft_err_cnt_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:fofb_ctrl]: %s failed\n", func_call[func].func_name);
+                ret = 2;
+                goto err_halcs_exit;
+            }
 
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_1 = %u\n", soft_err_cnt_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_2 = %u\n", soft_err_cnt_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_3 = %u\n", soft_err_cnt_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: soft_err_cnt_4 = %u\n", soft_err_cnt_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", soft_err_cnt_get[0], soft_err_cnt_get[1],
-                soft_err_cnt_get[2], soft_err_cnt_get[3]);
-        }
-    }
+            for (uint32_t i = 0; i < num_gts; ++i) {
+                if (verbose) {
+                    fprintf (stdout, "[client:fofb_ctrl]: %s, chan %u = %u\n", func_call[func].func_name,
+                        i+1, param_get[i]);
+                }
+                else {
+                    fprintf (stdout, "%u", param_get[i]);
 
-    uint32_t hard_err_cnt_get[4] = {0};
-    if (hard_err_cnt) {
-        err = halcs_get_fofb_ctrl_hard_err_cnt_1 (halcs_client, service, &hard_err_cnt_get[0]);
-        err |= halcs_get_fofb_ctrl_hard_err_cnt_2 (halcs_client, service, &hard_err_cnt_get[1]);
-        err |= halcs_get_fofb_ctrl_hard_err_cnt_3 (halcs_client, service, &hard_err_cnt_get[2]);
-        err |= halcs_get_fofb_ctrl_hard_err_cnt_4 (halcs_client, service, &hard_err_cnt_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_hard_err_cnt_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
-
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_1 = %u\n", hard_err_cnt_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_2 = %u\n", hard_err_cnt_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_3 = %u\n", hard_err_cnt_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: hard_err_cnt_4 = %u\n", hard_err_cnt_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", hard_err_cnt_get[0], hard_err_cnt_get[1],
-                hard_err_cnt_get[2], hard_err_cnt_get[3]);
-        }
-    }
-
-    uint32_t frame_err_cnt_get[4] = {0};
-    if (frame_err_cnt) {
-        err = halcs_get_fofb_ctrl_frame_err_cnt_1 (halcs_client, service, &frame_err_cnt_get[0]);
-        err |= halcs_get_fofb_ctrl_frame_err_cnt_2 (halcs_client, service, &frame_err_cnt_get[1]);
-        err |= halcs_get_fofb_ctrl_frame_err_cnt_3 (halcs_client, service, &frame_err_cnt_get[2]);
-        err |= halcs_get_fofb_ctrl_frame_err_cnt_4 (halcs_client, service, &frame_err_cnt_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_frame_err_cnt_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
-
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_1 = %u\n", frame_err_cnt_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_2 = %u\n", frame_err_cnt_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_3 = %u\n", frame_err_cnt_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: frame_err_cnt_4 = %u\n", frame_err_cnt_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", frame_err_cnt_get[0], frame_err_cnt_get[1],
-                frame_err_cnt_get[2], frame_err_cnt_get[3]);
-        }
-    }
-
-    uint32_t rx_pck_cnt_get[4] = {0};
-    if (rx_pck_cnt) {
-        err = halcs_get_fofb_ctrl_rx_pck_cnt_1 (halcs_client, service, &rx_pck_cnt_get[0]);
-        err |= halcs_get_fofb_ctrl_rx_pck_cnt_2 (halcs_client, service, &rx_pck_cnt_get[1]);
-        err |= halcs_get_fofb_ctrl_rx_pck_cnt_3 (halcs_client, service, &rx_pck_cnt_get[2]);
-        err |= halcs_get_fofb_ctrl_rx_pck_cnt_4 (halcs_client, service, &rx_pck_cnt_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_rx_pck_cnt_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
-
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_1 = %u\n", rx_pck_cnt_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_2 = %u\n", rx_pck_cnt_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_3 = %u\n", rx_pck_cnt_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: rx_pck_cnt_4 = %u\n", rx_pck_cnt_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", rx_pck_cnt_get[0], rx_pck_cnt_get[1],
-                rx_pck_cnt_get[2], rx_pck_cnt_get[3]);
-        }
-    }
-
-    uint32_t tx_pck_cnt_get[4] = {0};
-    if (tx_pck_cnt) {
-        err = halcs_get_fofb_ctrl_tx_pck_cnt_1 (halcs_client, service, &tx_pck_cnt_get[0]);
-        err |= halcs_get_fofb_ctrl_tx_pck_cnt_2 (halcs_client, service, &tx_pck_cnt_get[1]);
-        err |= halcs_get_fofb_ctrl_tx_pck_cnt_3 (halcs_client, service, &tx_pck_cnt_get[2]);
-        err |= halcs_get_fofb_ctrl_tx_pck_cnt_4 (halcs_client, service, &tx_pck_cnt_get[3]);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:fofb_ctrl]: halcs_get_tx_pck_cnt_X failed\n");
-            ret = 2;
-            goto err_halcs_exit;
-        }
-
-        if (verbose) {
-            fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_1 = %u\n", tx_pck_cnt_get[0]);
-            fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_2 = %u\n", tx_pck_cnt_get[1]);
-            fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_3 = %u\n", tx_pck_cnt_get[2]);
-            fprintf (stdout, "[client:fofb_ctrl]: tx_pck_cnt_4 = %u\n", tx_pck_cnt_get[3]);
-        }
-        else {
-            fprintf (stdout, "%u,%u,%u,%u\n", tx_pck_cnt_get[0], tx_pck_cnt_get[1],
-                tx_pck_cnt_get[2], tx_pck_cnt_get[3]);
+                    if (i < num_gts-1) {
+                        fprintf (stdout, ",");
+                    }
+                    else {
+                        fprintf (stdout, "\n");
+                    }
+                }
+            }
         }
     }
 
