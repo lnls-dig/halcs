@@ -3822,24 +3822,10 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_sys_status)
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SYS_STATUS, fofb_ctrl_sys_status);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_link_partner, chan, partner)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_1, fofb_ctrl_link_partner_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_2, fofb_ctrl_link_partner_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_3, fofb_ctrl_link_partner_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_4, fofb_ctrl_link_partner_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER,
+            chan, partner);
 }
 
 PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_up)
@@ -3852,104 +3838,34 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_time_frame_count)
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TIME_FRAME_COUNT, fofb_ctrl_time_frame_count);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_hard_err_cnt, chan, hard_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_1, fofb_ctrl_hard_err_cnt_1);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT,
+            chan, hard_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_2)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_soft_err_cnt, chan, soft_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_2, fofb_ctrl_hard_err_cnt_2);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT,
+            chan, soft_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_3)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_frame_err_cnt, chan, frame_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_3, fofb_ctrl_hard_err_cnt_3);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT,
+            chan, frame_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_4)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_rx_pck_cnt, chan, rx_pck_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_4, fofb_ctrl_hard_err_cnt_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT,
+            chan, rx_pck_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_tx_pck_cnt, chan, tx_pck_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_1, fofb_ctrl_soft_err_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_2, fofb_ctrl_soft_err_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_3, fofb_ctrl_soft_err_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_4, fofb_ctrl_soft_err_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_1, fofb_ctrl_frame_err_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_2, fofb_ctrl_frame_err_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_3, fofb_ctrl_frame_err_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_4, fofb_ctrl_frame_err_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_1, fofb_ctrl_rx_pck_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_2, fofb_ctrl_rx_pck_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_3, fofb_ctrl_rx_pck_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_4, fofb_ctrl_rx_pck_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_1, fofb_ctrl_tx_pck_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_2, fofb_ctrl_tx_pck_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_3, fofb_ctrl_tx_pck_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_4, fofb_ctrl_tx_pck_cnt_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT,
+            chan, tx_pck_cnt);
 }
 
 PARAM_FUNC_CLIENT_READ(fofb_ctrl_fod_process_time)
