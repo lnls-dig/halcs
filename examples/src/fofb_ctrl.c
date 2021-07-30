@@ -253,7 +253,7 @@ int main (int argc, char *argv [])
     if (num_gts_str == NULL) {
         fprintf (stderr, "[client:fofb_ctrl]: num_gts option not set\n");
         print_help (argv[0]);
-        goto err_halcs_exit;
+        goto err_no_num_gts;
     }
     else {
         num_gts = strtoul (num_gts_str, NULL, 10);
@@ -440,7 +440,9 @@ int main (int argc, char *argv [])
 err_halcs_exit:
     /* Try to read up until the point where the error occurs, anyway */
     halcs_set_fofb_ctrl_act_part (halcs_client, service, 0x1);
+    halcs_client_destroy (&halcs_client);
 err_halcs_client_new:
+err_no_num_gts:
     free (cc_enable_str);
     cc_enable_str = NULL;
     free (time_frame_len_str);
@@ -453,7 +455,6 @@ err_halcs_client_new:
     halcs_number_str = NULL;
     free (broker_endp);
     broker_endp = NULL;
-    halcs_client_destroy (&halcs_client);
 
     return ret;
 }
