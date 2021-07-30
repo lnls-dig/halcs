@@ -4,8 +4,7 @@ set -euo pipefail
 
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )"
 
-BOARD="${1:-afcv3_1}"
-GENERATOR="${2:-RPM}"
+GENERATOR="${1:-RPM}"
 
 mkdir -p build
 cd build
@@ -16,7 +15,6 @@ cmake3 \
     ../
 make package
 cmake3 \
-    -Dhalcs_BOARD_OPT=${BOARD} \
     -Dcpack_generator_OPT=${GENERATOR} \
     -Dcpack_components_grouping_OPT=ALL_COMPONENTS_IN_ONE \
     -Dcpack_components_all_OPT="Binaries;Libs;Scripts;Tools" \
@@ -28,7 +26,7 @@ case "${GENERATOR}" in
         rpm -e halcsd || :
         rpm -e halcsd-debuginfo || :
         rpm -i halcsd-debuginfo*
-        rpm -i halcsd-*_x86_64.rpm 
+        rpm -i halcsd*_x86_64.rpm 
     ;;
     DEB)
         dpkg -r halcsd || :

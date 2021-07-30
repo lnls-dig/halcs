@@ -187,21 +187,6 @@ endif()
 # User compile-time options
 ########################################################################
 
-# which board do we want.
-
-set(halcsclient_BOARD_OPT "afcv3_1" CACHE STRING
-    "HALCS board")
-set(halcsclient_BOARD_VALUES
-    "ml605;afcv3;afcv3_1"
-)
-
-set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
-    ${halcsclient_BOARD_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option halcsclient_BOARD='${halcsclient_BOARD_OPT}'")
-
 ########################################################################
 # Library compile options
 ########################################################################
@@ -264,11 +249,6 @@ set(halcsclient_sources
 #######################################
 # ACQ sources definitions
 #######################################
-
-# ADD MORE BOARDS HERE!
-set(halcsclient_acq_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/../boards/${halcsclient_BOARD_OPT}/acq_chan.c
-)
 
 #######################################
 # SMIO TABLE sources definitions
@@ -442,7 +422,6 @@ list(APPEND halcsclient_public_headers
 
 # Ugly and weird set of sources outside the source directory
 set(halcsclient_acq_public_headers
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan_gen_defs.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/ddr3_map_structs.h
 )
@@ -591,33 +570,9 @@ foreach(target ${target_outputs})
     # setting PUBLIC compile options
     string(APPEND halcsclient_board_definitions "")
 
-    # setting board macros
-    if(halcsclient_BOARD_OPT STREQUAL ml605)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_ML605__
-        )
-    elseif(halcsclient_BOARD_OPT STREQUAL afcv3)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_AFCV3__
-        )
-    elseif(halcsclient_BOARD_OPT STREQUAL afcv3_1)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_AFCV3__
-            __BOARD_AFCV3_1__
-        )
-    endif()
-
     target_compile_definitions(${target} PUBLIC
         ${halcsclient_board_definitions}
     )
-
-    # for .pc file
-    foreach(board_def IN LISTS halcsclient_board_definitions)
-        string(APPEND
-            pkg_config_defines
-            " -D${board_def}"
-        )
-    endforeach()
 
     # set debug posfix in case of debug builds
     set_target_properties(${target} PROPERTIES

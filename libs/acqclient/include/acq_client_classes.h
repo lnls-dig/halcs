@@ -19,9 +19,6 @@
 #include <disptable.h>
 #include <halcs_client.h>
 
-/* Internal libraries dependencies */
-#include "acq_chan.h"
-
 /* version macros for compile-time API detection */
 
 #define ACQ_CLIENT_VERSION_MAJOR 2

@@ -12,8 +12,6 @@ SIZE ?=		$(CROSS_COMPILE)size
 MAKE ?=		make
 DEPMOD ?=	depmod
 
-# Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= afcv3_1
 # Select which application we want to generate. Options are: halcsd, halcs_generic_udev
 APPS ?= halcsd halcs_generic_udev
 # Select if we want to have the AFCv3 DDR memory shrink to 2^28 or the full size 2^32. Options are: (y)es ot (n)o.
@@ -56,12 +54,6 @@ LDCONF_ETC_PREFIX ?=
 # Selects the install location of the config file
 PREFIX ?= /usr/local
 export PREFIX
-
-# All of our supported boards
-SUPPORTED_ML605_BOARDS = ml605
-export SUPPORTED_ML605_BOARDS
-SUPPORTED_AFCV3_BOARDS = afcv3 afcv3_1
-export SUPPORTED_AFCV3_BOARDS
 
 # Top Makefile directory
 TOP := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -124,23 +116,8 @@ CFLAGS_USR = -std=gnu99 -O2
 override CPPFLAGS +=
 override CXXFLAGS +=
 
-ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
 ifeq ($(SHRINK_AFCV3_DDR_SIZE),y)
 CFLAGS_USR += -D__SHRINK_AFCV3_DDR_SIZE__
-endif
-endif
-
-# Board selection
-ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_ML605_BOARDS)))
-CFLAGS_USR += -D__BOARD_ML605__ -D__WR_SHIFT_FIX__=2
-endif
-
-ifeq ($(BOARD),afcv3_1)
-CFLAGS_USR += -D__BOARD_AFCV3_1__
-endif
-
-ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
-CFLAGS_USR += -D__BOARD_AFCV3__ -D__WR_SHIFT_FIX__=0
 endif
 
 # Program FMC130M_4CH EEPROM
@@ -228,7 +205,7 @@ LDFLAGS_PLATFORM = -Wl,-T,$(LD_SCRIPT)
 LDCONF = ldconf
 
 # Libraries
-LIBS = -lm -lzmq -lczmq -lmlm
+LIBS = -lm -lzmq -lczmq -lmlm -ldl
 
 # FIXME: make the project libraries easily interchangeable, specifying
 # the lib only a single time
@@ -267,7 +244,9 @@ include $(SRC_DIR)/dev_mngr/dev_mngr.mk
 include $(SRC_DIR)/dev_io/dev_io.mk
 include $(SRC_DIR)/msg/msg.mk
 include $(SRC_DIR)/revision/revision.mk
-include $(SRC_DIR)/boards/$(BOARD)/board.mk
+include $(SRC_DIR)/boards/afcv3_1/board.mk
+include $(SRC_DIR)/boards/afcv3/board.mk
+include $(SRC_DIR)/boards/ml605/board.mk
 include $(APPS_MKS)
 include $(LDCONF_DIR)/ldconf.mk
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-VALID_BOARDS_STR="Valid values are: \"ml605\", \"afcv3\" or \"afcv3_1\"."
 VALID_APPS_STR="Valid values are: \"halcsd\", \"halcs_generic_udev\"."
 VALID_WITH_EXAMPLES_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_SYSTEM_INTEGRATION_STR="Valid values are: \"yes\" or \"no\"."
@@ -8,7 +7,7 @@ VALID_WITH_DRIVER_STR="Valid values are: \"yes\" or \"no\"."
 VALID_WITH_HALCS_STR="Valid values are: \"yes\" or \"no\"."
 
 function usage() {
-    echo "Usage: $0 [-b <board>] [-a <applications>] [-e <with examples = yes/no>]"
+    echo "Usage: $0 [-a <applications>] [-e <with examples = yes/no>]"
     echo "    [-l <with system integration = yes/no>] [-d <with driver = yes/no>]"
     echo "    [-f <with HALCS = yes/no>] [-x <extra flags>]"
 }
@@ -20,7 +19,6 @@ SRCDIR="src"
 # All of our Makefile options
 #######################################
 
-BOARD=
 APPS=
 WITH_EXAMPLES="no"
 WITH_SYSTEM_INTEGRATION="no"
@@ -29,11 +27,8 @@ WITH_HALCS="yes"
 EXTRA_FLAGS=
 
 # Get command line options
-while getopts ":b:a:e:l:x:d:f:" opt; do
+while getopts ":a:e:l:x:d:f:" opt; do
     case $opt in
-        b)
-            BOARD=$OPTARG
-            ;;
         a)
             APPS=$OPTARG
             ;;
@@ -64,17 +59,6 @@ while getopts ":b:a:e:l:x:d:f:" opt; do
             ;;
     esac
 done
-
-if [ -z "$BOARD"  ]; then
-    echo "\"board\" variable unset."
-    usage
-    exit 1
-fi
-
-if [ "$BOARD" != "afcv3" ] && [ "$BOARD" != "afcv3_1" ] && [ "$BOARD" != "ml605" ]; then
-    echo "Unsupported board. "$VALID_BOARDS_STR
-    exit 1
-fi
 
 if [ -z "$APPS"  ]; then
     echo "\"applications\" variable unset."
@@ -153,14 +137,12 @@ if [ "$WITH_HALCS" = "yes" ]; then
     COMMAND_LIBS="\
         make \
         ${EXTRA_FLAGS} \
-        BOARD=${BOARD} \
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
         ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
         LOCAL_MSG_DBG=${LOCAL_MSG_DBG} \
         && sudo make \
         ${EXTRA_FLAGS} \
-        BOARD=${BOARD} \
         ERRHAND_DBG=${ERRHAND_DBG} \
         ERRHAND_MIN_LEVEL=${ERRHAND_MIN_LEVEL} \
         ERRHAND_SUBSYS_ON='"${ERRHAND_SUBSYS_ON}"' \
@@ -170,7 +152,6 @@ if [ "$WITH_HALCS" = "yes" ]; then
     COMMAND_CORE="\
         make \
         ${EXTRA_FLAGS} \
-        BOARD=${BOARD} \
         APPS='"${APPS}"' \
         SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
         ERRHAND_DBG=${ERRHAND_DBG} \
@@ -184,7 +165,6 @@ if [ "$WITH_HALCS" = "yes" ]; then
         WITH_APP_CFG=${WITH_APP_CFG} \
         && sudo make \
         ${EXTRA_FLAGS} \
-        BOARD=${BOARD} \
         APPS='"${APPS}"' \
         SHRINK_AFCV3_DDR_SIZE=${SHRINK_AFCV3_DDR_SIZE} \
         ERRHAND_DBG=${ERRHAND_DBG} \

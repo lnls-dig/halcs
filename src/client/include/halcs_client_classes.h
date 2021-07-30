@@ -19,7 +19,6 @@
 #include <disptable.h>
 
 /* Internal libraries dependencies */
-#include "acq_chan.h"
 #include "sm_io_codes.h"
 
 /* HALCS version macros for compile-time API detection */

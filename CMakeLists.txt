@@ -77,20 +77,6 @@ endmacro()
 # User compile-time options
 ########################################################################
 
-# which board do we want.
-set(halcs_BOARD_OPT "afcv3_1" CACHE STRING
-    "HALCS board")
-set(halcs_BOARD_VALUES
-    "ml605;afcv3;afcv3_1"
-)
-
-set_property(CACHE halcs_BOARD_OPT PROPERTY STRINGS
-    ${halcs_BOARD_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option halcs_BOARD='${halcs_BOARD_OPT}'")
-
 ########################################################################
 # Library options
 ########################################################################
@@ -197,10 +183,6 @@ list(APPEND halcs_LIBRARIES disptable)
 #########################################################################
 # HALCSCLIENT dependency
 #########################################################################
-
-# set compile options to halcsclient
-set(halcsclient_BOARD_OPT ${halcs_BOARD_OPT} CACHE STRING
-    "HALCS board" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
 
@@ -343,7 +325,7 @@ if(ENABLE_CPACK)
     set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
 
     set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}-${halcs_BOARD_OPT}_${halcs_VERSION}${halcs_DISTRO_VERSION}_${arch_name}"
+        "${CPACK_PACKAGE_NAME}_${halcs_VERSION}${halcs_DISTRO_VERSION}_${arch_name}"
     )
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "halcsd daemon")
     set(CPACK_PACKAGE_VENDOR "LNLS")

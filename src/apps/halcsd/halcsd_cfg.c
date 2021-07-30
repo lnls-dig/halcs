@@ -322,23 +322,12 @@ static devio_err_e _spawn_be_platform_smios (void *pipe)
 {
     devio_err_e err = DEVIO_SUCCESS;
 
-    /* ML605 specific */
-#if defined (__BOARD_ML605__)
-    UNUSED(pipe);
-    /* AFCv3 spefific */
-#elif defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
-
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Spawning AFCv3 specific SMIOs ...\n");
 
     err = devio_register_sm_by_id (pipe, afc_diag_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd_cfg] devio_register_sm error!\n");
     }
-
-#else
-#error "BE FPGA Board not supported!"
-#endif
 
     return err;
 }

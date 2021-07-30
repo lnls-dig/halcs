@@ -11,8 +11,6 @@
 
 */
 
-/* This file has been modified to include the ML605 fix! */
-
 #ifndef __WBGEN2_REGDEFS_ACQ_CORE_WB
 #define __WBGEN2_REGDEFS_ACQ_CORE_WB
 
@@ -30,12 +28,6 @@
 #define WBGEN2_GEN_WRITE(value, offset, size) (((value) & ((1<<(size))-1)) << (offset))
 #define WBGEN2_GEN_READ(reg, offset, size) (((reg) >> (offset)) & ((1<<(size))-1))
 #define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
-#endif
-
-#ifdef __BOARD_ML605__
-#   define __WR_SHIFT_FIX__ 2
-#else
-#   define __WR_SHIFT_FIX__ 0
 #endif
 
 /* definitions for register: Control register */
@@ -884,129 +876,129 @@
 #define ACQ_CORE_CH23_ATOM_DESC_ATOM_WIDTH_W(value) WBGEN2_GEN_WRITE(value, 16, 16)
 #define ACQ_CORE_CH23_ATOM_DESC_ATOM_WIDTH_R(reg) WBGEN2_GEN_READ(reg, 16, 16)
 /* [0x0]: REG Control register */
-#define ACQ_CORE_REG_CTL (0x00000000 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CTL 0x00000000
 /* [0x4]: REG Status register */
-#define ACQ_CORE_REG_STA (0x00000004 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_STA 0x00000004
 /* [0x8]: REG Trigger configuration */
-#define ACQ_CORE_REG_TRIG_CFG (0x00000008 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_TRIG_CFG 0x00000008
 /* [0xc]: REG Trigger data config threshold */
-#define ACQ_CORE_REG_TRIG_DATA_CFG (0x0000000c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_TRIG_DATA_CFG 0x0000000c
 /* [0x10]: REG Trigger data threshold */
-#define ACQ_CORE_REG_TRIG_DATA_THRES (0x00000010 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_TRIG_DATA_THRES 0x00000010
 /* [0x14]: REG Trigger delay */
-#define ACQ_CORE_REG_TRIG_DLY (0x00000014 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_TRIG_DLY 0x00000014
 /* [0x18]: REG Software trigger */
-#define ACQ_CORE_REG_SW_TRIG (0x00000018 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_SW_TRIG 0x00000018
 /* [0x1c]: REG Number of shots */
-#define ACQ_CORE_REG_SHOTS (0x0000001c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_SHOTS 0x0000001c
 /* [0x20]: REG Trigger address register */
-#define ACQ_CORE_REG_TRIG_POS (0x00000020 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_TRIG_POS 0x00000020
 /* [0x24]: REG Pre-trigger samples */
-#define ACQ_CORE_REG_PRE_SAMPLES (0x00000024 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_PRE_SAMPLES 0x00000024
 /* [0x28]: REG Post-trigger samples */
-#define ACQ_CORE_REG_POST_SAMPLES (0x00000028 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_POST_SAMPLES 0x00000028
 /* [0x2c]: REG Samples counter */
-#define ACQ_CORE_REG_SAMPLES_CNT (0x0000002c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_SAMPLES_CNT 0x0000002c
 /* [0x30]: REG DDR3 Start Address */
-#define ACQ_CORE_REG_DDR3_START_ADDR (0x00000030 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_DDR3_START_ADDR 0x00000030
 /* [0x34]: REG DDR3 End Address */
-#define ACQ_CORE_REG_DDR3_END_ADDR (0x00000034 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_DDR3_END_ADDR 0x00000034
 /* [0x38]: REG Acquisition channel control */
-#define ACQ_CORE_REG_ACQ_CHAN_CTL (0x00000038 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_ACQ_CHAN_CTL 0x00000038
 /* [0x3c]: REG Channel 0 Description */
-#define ACQ_CORE_REG_CH0_DESC (0x0000003c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH0_DESC 0x0000003c
 /* [0x40]: REG Channel 0 Atom Description */
-#define ACQ_CORE_REG_CH0_ATOM_DESC (0x00000040 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH0_ATOM_DESC 0x00000040
 /* [0x44]: REG Channel 1 Description */
-#define ACQ_CORE_REG_CH1_DESC (0x00000044 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH1_DESC 0x00000044
 /* [0x48]: REG Channel 1 Atom Description */
-#define ACQ_CORE_REG_CH1_ATOM_DESC (0x00000048 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH1_ATOM_DESC 0x00000048
 /* [0x4c]: REG Channel 2 Description */
-#define ACQ_CORE_REG_CH2_DESC (0x0000004c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH2_DESC 0x0000004c
 /* [0x50]: REG Channel 2 Atom Description */
-#define ACQ_CORE_REG_CH2_ATOM_DESC (0x00000050 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH2_ATOM_DESC 0x00000050
 /* [0x54]: REG Channel 3 Description */
-#define ACQ_CORE_REG_CH3_DESC (0x00000054 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH3_DESC 0x00000054
 /* [0x58]: REG Channel 3 Atom Description */
-#define ACQ_CORE_REG_CH3_ATOM_DESC (0x00000058 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH3_ATOM_DESC 0x00000058
 /* [0x5c]: REG Channel 4 Description */
-#define ACQ_CORE_REG_CH4_DESC (0x0000005c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH4_DESC 0x0000005c
 /* [0x60]: REG Channel 4 Atom Description */
-#define ACQ_CORE_REG_CH4_ATOM_DESC (0x00000060 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH4_ATOM_DESC 0x00000060
 /* [0x64]: REG Channel 5 Description */
-#define ACQ_CORE_REG_CH5_DESC (0x00000064 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH5_DESC 0x00000064
 /* [0x68]: REG Channel 5 Atom Description */
-#define ACQ_CORE_REG_CH5_ATOM_DESC (0x00000068 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH5_ATOM_DESC 0x00000068
 /* [0x6c]: REG Channel 6 Description */
-#define ACQ_CORE_REG_CH6_DESC (0x0000006c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH6_DESC 0x0000006c
 /* [0x70]: REG Channel 6 Atom Description */
-#define ACQ_CORE_REG_CH6_ATOM_DESC (0x00000070 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH6_ATOM_DESC 0x00000070
 /* [0x74]: REG Channel 7 Description */
-#define ACQ_CORE_REG_CH7_DESC (0x00000074 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH7_DESC 0x00000074
 /* [0x78]: REG Channel 7 Atom Description */
-#define ACQ_CORE_REG_CH7_ATOM_DESC (0x00000078 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH7_ATOM_DESC 0x00000078
 /* [0x7c]: REG Channel 8 Description */
-#define ACQ_CORE_REG_CH8_DESC (0x0000007c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH8_DESC 0x0000007c
 /* [0x80]: REG Channel 8 Atom Description */
-#define ACQ_CORE_REG_CH8_ATOM_DESC (0x00000080 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH8_ATOM_DESC 0x00000080
 /* [0x84]: REG Channel 9 Description */
-#define ACQ_CORE_REG_CH9_DESC (0x00000084 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH9_DESC 0x00000084
 /* [0x88]: REG Channel 9 Atom Description */
-#define ACQ_CORE_REG_CH9_ATOM_DESC (0x00000088 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH9_ATOM_DESC 0x00000088
 /* [0x8c]: REG Channel 10 Description */
-#define ACQ_CORE_REG_CH10_DESC (0x0000008c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH10_DESC 0x0000008c
 /* [0x90]: REG Channel 10 Atom Description */
-#define ACQ_CORE_REG_CH10_ATOM_DESC (0x00000090 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH10_ATOM_DESC 0x00000090
 /* [0x94]: REG Channel 11 Description */
-#define ACQ_CORE_REG_CH11_DESC (0x00000094 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH11_DESC 0x00000094
 /* [0x98]: REG Channel 11 Atom Description */
-#define ACQ_CORE_REG_CH11_ATOM_DESC (0x00000098 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH11_ATOM_DESC 0x00000098
 /* [0x9c]: REG Channel 12 Description */
-#define ACQ_CORE_REG_CH12_DESC (0x0000009c >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH12_DESC 0x0000009c
 /* [0xa0]: REG Channel 12 Atom Description */
-#define ACQ_CORE_REG_CH12_ATOM_DESC (0x000000a0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH12_ATOM_DESC 0x000000a0
 /* [0xa4]: REG Channel 13 Description */
-#define ACQ_CORE_REG_CH13_DESC (0x000000a4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH13_DESC 0x000000a4
 /* [0xa8]: REG Channel 13 Atom Description */
-#define ACQ_CORE_REG_CH13_ATOM_DESC (0x000000a8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH13_ATOM_DESC 0x000000a8
 /* [0xac]: REG Channel 14 Description */
-#define ACQ_CORE_REG_CH14_DESC (0x000000ac >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH14_DESC 0x000000ac
 /* [0xb0]: REG Channel 14 Atom Description */
-#define ACQ_CORE_REG_CH14_ATOM_DESC (0x000000b0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH14_ATOM_DESC 0x000000b0
 /* [0xb4]: REG Channel 15 Description */
-#define ACQ_CORE_REG_CH15_DESC (0x000000b4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH15_DESC 0x000000b4
 /* [0xb8]: REG Channel 15 Atom Description */
-#define ACQ_CORE_REG_CH15_ATOM_DESC (0x000000b8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH15_ATOM_DESC 0x000000b8
 /* [0xbc]: REG Channel 16 Description */
-#define ACQ_CORE_REG_CH16_DESC (0x000000bc >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH16_DESC 0x000000bc
 /* [0xc0]: REG Channel 16 Atom Description */
-#define ACQ_CORE_REG_CH16_ATOM_DESC (0x000000c0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH16_ATOM_DESC 0x000000c0
 /* [0xc4]: REG Channel 17 Description */
-#define ACQ_CORE_REG_CH17_DESC (0x000000c4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH17_DESC 0x000000c4
 /* [0xc8]: REG Channel 17 Atom Description */
-#define ACQ_CORE_REG_CH17_ATOM_DESC (0x000000c8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH17_ATOM_DESC 0x000000c8
 /* [0xcc]: REG Channel 18 Description */
-#define ACQ_CORE_REG_CH18_DESC (0x000000cc >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH18_DESC 0x000000cc
 /* [0xd0]: REG Channel 18 Atom Description */
-#define ACQ_CORE_REG_CH18_ATOM_DESC (0x000000d0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH18_ATOM_DESC 0x000000d0
 /* [0xd4]: REG Channel 19 Description */
-#define ACQ_CORE_REG_CH19_DESC (0x000000d4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH19_DESC 0x000000d4
 /* [0xd8]: REG Channel 19 Atom Description */
-#define ACQ_CORE_REG_CH19_ATOM_DESC (0x000000d8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH19_ATOM_DESC 0x000000d8
 /* [0xdc]: REG Channel 20 Description */
-#define ACQ_CORE_REG_CH20_DESC (0x000000dc >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH20_DESC 0x000000dc
 /* [0xe0]: REG Channel 20 Atom Description */
-#define ACQ_CORE_REG_CH20_ATOM_DESC (0x000000e0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH20_ATOM_DESC 0x000000e0
 /* [0xe4]: REG Channel 21 Description */
-#define ACQ_CORE_REG_CH21_DESC (0x000000e4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH21_DESC 0x000000e4
 /* [0xe8]: REG Channel 21 Atom Description */
-#define ACQ_CORE_REG_CH21_ATOM_DESC (0x000000e8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH21_ATOM_DESC 0x000000e8
 /* [0xec]: REG Channel 22 Description */
-#define ACQ_CORE_REG_CH22_DESC (0x000000ec >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH22_DESC 0x000000ec
 /* [0xf0]: REG Channel 22 Atom Description */
-#define ACQ_CORE_REG_CH22_ATOM_DESC (0x000000f0 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH22_ATOM_DESC 0x000000f0
 /* [0xf4]: REG Channel 23 Description */
-#define ACQ_CORE_REG_CH23_DESC (0x000000f4 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH23_DESC 0x000000f4
 /* [0xf8]: REG Channel 23 Atom Description */
-#define ACQ_CORE_REG_CH23_ATOM_DESC (0x000000f8 >> __WR_SHIFT_FIX__)
+#define ACQ_CORE_REG_CH23_ATOM_DESC 0x000000f8
 #endif

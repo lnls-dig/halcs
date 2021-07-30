@@ -15,9 +15,6 @@ TOP ?= ../..
 
 PWD = 		$(shell pwd)
 
-# Select board in which we will work. Options are: ml605 or afcv3
-BOARD ?= afcv3_1
-
 LIBNAME_RAW = bpmclient
 LIBNAME = lib$(LIBNAME_RAW)
 
@@ -39,14 +36,6 @@ CFLAGS_USR = -std=gnu99 -O2 -fPIC
 # command-line options
 override CPPFLAGS +=
 override CXXFLAGS +=
-
-ifeq ($(BOARD),ml605)
-CFLAGS_USR += -D__BOARD_ML605__
-endif
-
-ifeq ($(BOARD),$(filter $(BOARD),$(SUPPORTED_AFCV3_BOARDS)))
-CFLAGS_USR += -D__BOARD_AFCV3__
-endif
 
 # Malamute 1.0.0 requires this to be defined
 # as all of its API is in DRAFT state
@@ -219,12 +208,6 @@ $(LIBNAME)_SMIO_EXPORTS = \
 	$(SMIO_TABLE_SRC_DIR)/modules/afc_mgmt/sm_io_afc_mgmt_exports.h \
 	$(SMIO_TABLE_SRC_DIR)/modules/tim_rcv/sm_io_tim_rcv_exports.h
 
-# Copy specific acq_chan.h defintions according to the BOARD MACRO
-$(LIBNAME)_ACQ_HEADERS_BASENAME = acq_chan
-$(LIBNAME)_ACQ_HEADERS = \
-	$(TOP)/include/boards/$(BOARD)/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
-$(LIBNAME)_INST_ACQ_HEADERS = include/$($(LIBNAME)_ACQ_HEADERS_BASENAME).h
-
 # Copy non-standard headers
 $(LIBNAME)_SMIO_HEADERS_BASENAME = $(basename $(notdir $($(LIBNAME)_SMIO_CODES) $($(LIBNAME)_SMIO_EXPORTS)))
 $(LIBNAME)_SMIO_HEADERS = $($(LIBNAME)_SMIO_CODES) $($(LIBNAME)_SMIO_EXPORTS)
@@ -239,7 +222,7 @@ $(LIBNAME)_HEADERS = $($(LIBNAME)_HEADERS_LIB) $($(LIBNAME)_CODE_HEADERS) \
 	$($(LIBNAME)_INST_SMIO_HEADERS)
 
 # Installation headers
-$(LIBNAME)_INST_HEADERS = $($(LIBNAME)_HEADERS) $($(LIBNAME)_INST_ACQ_HEADERS)
+$(LIBNAME)_INST_HEADERS = $($(LIBNAME)_HEADERS)
 
 # Save a git repository description
 GIT_REVISION = $(shell git describe --dirty --always)
@@ -321,14 +304,10 @@ $(revision_OBJS): $(revision_SRCS)
 
 # Prepare the environment for install rule
 pre_inst:
-	$(foreach header,$($(LIBNAME)_ACQ_HEADERS),cp -p $(header) \
-		$(PWD)/$($(LIBNAME)_INST_ACQ_HEADERS) $(CMDSEP))
 	$(foreach header,$($(LIBNAME)_SMIO_HEADERS),cp -p $(header) \
 		$(PWD)/include/ $(CMDSEP))
 
 pre_clean:
-	$(foreach header,$(PWD)/$($(LIBNAME)_INST_ACQ_HEADERS), \
-		rm -f $(header) $(CMDSEP))
 	$(foreach header,$(PWD)/$($(LIBNAME)_INST_SMIO_HEADERS), \
 		rm -f $(header) $(CMDSEP))
 
