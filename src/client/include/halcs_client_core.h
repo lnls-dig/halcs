@@ -2343,6 +2343,54 @@ halcs_client_err_e halcs_get_fofb_ctrl_loopback_rdback (halcs_client_t *self, ch
 halcs_client_err_e halcs_get_fofb_ctrl_faival_rdback (halcs_client_t *self, char *service,
         uint32_t *fofb_ctrl_faival_rdback);
 
+/* FOFB Controller Time-of-arrival functions. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)
+ *
+ * To read TOA memory:
+ * *) Write 1 in halcs_set_fofb_ctrl_toa_rd_en ()
+ * *) For number_of_nodes:
+ * *)     Read data from halcs_get_fofb_ctrl_toa_data ()
+ * *)     Write 1 in halcs_set_fofb_ctrl_toa_rd_str ()
+ * *) Write 0 in halcs_set_fofb_ctrl_toa_rd_en ()
+ * */
+halcs_client_err_e halcs_set_fofb_ctrl_toa_rd_en (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_toa_rd_en);
+halcs_client_err_e halcs_get_fofb_ctrl_toa_rd_en (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_rd_en);
+
+halcs_client_err_e halcs_set_fofb_ctrl_toa_rd_str (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_toa_rd_str);
+halcs_client_err_e halcs_get_fofb_ctrl_toa_rd_str (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_rd_str);
+
+halcs_client_err_e halcs_get_fofb_ctrl_toa_data (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_data);
+
+/* FOFB Controller Received-count-buffer functions. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)
+ *
+ * To read TOA memory:
+ * *) Write 1 in halcs_set_fofb_ctrl_rcb_rd_en ()
+ * *) For number_of_nodes:
+ * *)     Read data from halcs_get_fofb_ctrl_rcb_data ()
+ * *)     Write 1 in halcs_set_fofb_ctrl_rcb_rd_str ()
+ * *) Write 0 in halcs_set_fofb_ctrl_rcb_rd_en ()
+ * */
+halcs_client_err_e halcs_set_fofb_ctrl_rcb_rd_en (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_rcb_rd_en);
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_rd_en (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_rd_en);
+
+halcs_client_err_e halcs_set_fofb_ctrl_rcb_rd_str (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_rcb_rd_str);
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_rd_str (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_rd_str);
+
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_data (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_data);
+
 /********************** RTMLAMP_OHWR Functions ********************/
 
 /* RTMLAMP_OHWR Controller sta function. The functions returns
@@ -2354,7 +2402,7 @@ halcs_client_err_e halcs_get_rtmlamp_ohwr_sta (halcs_client_t *self, char *servi
 /* RTMLAMP_OHWR Controller dac_data_from_wb function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service, 
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
         uint32_t rtmlamp_ohwr_dac_data_from_wb);
 halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
         uint32_t *rtmlamp_ohwr_dac_data_from_wb);

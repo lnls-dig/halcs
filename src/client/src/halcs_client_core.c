@@ -3903,6 +3903,56 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_faival_rdback)
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FAIVAL_RDBACK, fofb_ctrl_faival_rdback);
 }
 
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_toa_rd_en)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_EN, fofb_ctrl_toa_rd_en);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_rd_en)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_EN, fofb_ctrl_toa_rd_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_toa_rd_str)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_STR, fofb_ctrl_toa_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_rd_str)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_STR, fofb_ctrl_toa_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_data)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_DATA, fofb_ctrl_toa_data);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_rcb_rd_en)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_EN, fofb_ctrl_rcb_rd_en);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_rd_en)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_EN, fofb_ctrl_rcb_rd_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_rcb_rd_str)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_STR, fofb_ctrl_rcb_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_rd_str)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_STR, fofb_ctrl_rcb_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_data)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_DATA, fofb_ctrl_rcb_data);
+}
+
 /**************** RTMLAM_OHWR SMIO Functions ****************/
 
 PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_sta)
