@@ -1,6 +1,6 @@
 /*
  * Example for demonstrating the communication between a
- * a FOFB Ctrl module and a client  
+ * a FOFB Ctrl module and a client
  */
 
 #include <getopt.h>
@@ -36,10 +36,13 @@ static struct option long_options[] =
     {"fod_process_time",    no_argument,         NULL, 'y'},
     {"bpm_cnt",             no_argument,         NULL, 'k'},
     {"timeframe_cnt",       no_argument,         NULL, 'w'},
+    {"toa_data",            no_argument,         NULL, 'a'},
+    {"rcb_data",            no_argument,         NULL, 'd'},
+    {"num_nodes",           required_argument,   NULL, 'u'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:t:f:e:g:clrxykwmnj";
+static const char* shortopt = "hb:vo:s:t:f:e:g:u:clrxykwmnjad";
 
 void print_help (char *program_name)
 {
@@ -66,7 +69,10 @@ void print_help (char *program_name)
             "  -x  --tx_pck_cnt                     TX packet count\n"
             "  -y  --fod_process_time               FOD process time [in userclk cycles]\n"
             "  -k  --bpm_cnt                        BPM count in current timeframe\n"
-            "  -w  --timeframe_cnt                  Total number of timeframes\n",
+            "  -w  --timeframe_cnt                  Total number of timeframes\n"
+            "  -a  --toa_data                       Get Time-of-Arrival data (requires -u/--num_nodes option)\n"
+            "  -d  --rcb_data                       Get Receive-Count-Buffer data (requires -u/--num_nodes option)\n"
+            "  -u  --num_nodes                      Specify number of nodes in the network\n",
             program_name);
 }
 
@@ -97,6 +103,8 @@ int main (int argc, char *argv [])
     int firmware_ver = 0;
     int fod_process_time = 0;
     int bpm_cnt = 0;
+    int toa_data = 0;
+    int rcb_data = 0;
     int timeframe_cnt = 0;
     char *broker_endp = NULL;
     char *board_number_str = NULL;
@@ -105,6 +113,7 @@ int main (int argc, char *argv [])
     char *time_frame_len_str = NULL;
     char *cc_enable_str = NULL;
     char *num_gts_str = NULL;
+    char *num_nodes_str = NULL;
     func_call_t func_call [MAX_NUM_FUNCS] = {{0}};
     int opt;
 
@@ -149,47 +158,51 @@ int main (int argc, char *argv [])
                 num_gts_str = strdup (optarg);
                 break;
 
+            case 'u':
+                num_nodes_str = strdup (optarg);
+                break;
+
             case 'c':
                 firmware_ver = 1;
                 break;
 
             case 'l':
-                func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].func =
                     &halcs_get_fofb_ctrl_link_partner;
                 func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].func_name = "link_partner";
                 func_call [FUNC_FOFB_CTRL_LINK_PARTNER_IDX].call = 1;
                 break;
 
             case 'm':
-                func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].func =
                     &halcs_get_fofb_ctrl_soft_err_cnt;
                 func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].func_name = "soft_err_cnt";
                 func_call [FUNC_FOFB_CTRL_SOFT_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'n':
-                func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].func =
                     &halcs_get_fofb_ctrl_hard_err_cnt;
                 func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].func_name = "hard_err_cnt";
                 func_call [FUNC_FOFB_CTRL_HARD_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'j':
-                func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].func =
                     &halcs_get_fofb_ctrl_frame_err_cnt;
                 func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].func_name = "frame_err_cnt";
                 func_call [FUNC_FOFB_CTRL_FRAME_ERR_CNT_IDX].call = 1;
                 break;
 
             case 'r':
-                func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].func =
                     &halcs_get_fofb_ctrl_rx_pck_cnt;
                 func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].func_name = "rx_pck_cnt";
                 func_call [FUNC_FOFB_CTRL_RX_PCK_CNT_IDX].call = 1;
                 break;
 
             case 'x':
-                func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].func = 
+                func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].func =
                     &halcs_get_fofb_ctrl_tx_pck_cnt;
                 func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].func_name = "tx_pck_cnt";
                 func_call [FUNC_FOFB_CTRL_TX_PCK_CNT_IDX].call = 1;
@@ -201,6 +214,14 @@ int main (int argc, char *argv [])
 
             case 'k':
                 bpm_cnt = 1;
+                break;
+
+            case 'a':
+                toa_data = 1;
+                break;
+
+            case 'd':
+                rcb_data = 1;
                 break;
 
             case 'w':
@@ -257,6 +278,16 @@ int main (int argc, char *argv [])
     }
     else {
         num_gts = strtoul (num_gts_str, NULL, 10);
+    }
+
+    uint32_t num_nodes = 0;
+    if (num_nodes_str == NULL && (rcb_data || toa_data)) {
+        fprintf (stderr, "[client:fofb_ctrl]: num_nodes option not set, but toa_data or rcb_data set\n");
+        print_help (argv[0]);
+        goto err_no_num_nodes;
+    }
+    else if (num_nodes_str != NULL) {
+        num_nodes = strtoul (num_nodes_str, NULL, 10);
     }
 
     char service[50];
@@ -437,11 +468,93 @@ int main (int argc, char *argv [])
         }
     }
 
+    if (toa_data) {
+        err = halcs_set_fofb_ctrl_toa_rd_en (halcs_client, service, 1);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_toa_rd_en failed\n");
+            ret = 2;
+            goto err_halcs_exit;
+        }
+
+        /* Read data up to num_nodes */
+        for (uint32_t i = 0; i < num_nodes; ++i) {
+            uint32_t toa_data = 0;
+            uint32_t toa_data_min = 0;
+            uint32_t toa_data_max = 0;
+            halcs_get_fofb_ctrl_toa_data (halcs_client, service, &toa_data);
+
+            toa_data_max = (toa_data & 0xFFFF0000) >> 16;
+            toa_data_min = (toa_data & 0xFFFF);
+
+            if (verbose) {
+                fprintf (stdout, "[client:fofb_ctrl]: toa_data %03u: max: %5u, min: %5u\n",
+                    i, toa_data_max, toa_data_min);
+            }
+            else {
+                fprintf (stdout, "%u,%u,%u\n", i, toa_data_max, toa_data_min);
+            }
+
+            err = halcs_set_fofb_ctrl_toa_rd_str (halcs_client, service, 1);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_toa_rd_str failed\n");
+                ret = 2;
+                goto err_halcs_exit;
+            }
+        }
+
+        err = halcs_set_fofb_ctrl_toa_rd_en (halcs_client, service, 0);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_toa_rd_en failed\n");
+            ret = 2;
+            goto err_halcs_exit;
+        }
+    }
+
+    if (rcb_data) {
+        err = halcs_set_fofb_ctrl_rcb_rd_en (halcs_client, service, 1);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_rcb_rd_en failed\n");
+            ret = 2;
+            goto err_halcs_exit;
+        }
+
+        /* Read data up to num_nodes */
+        for (uint32_t i = 0; i < num_nodes; ++i) {
+            uint32_t rcb_data = 0;
+            halcs_get_fofb_ctrl_rcb_data (halcs_client, service, &rcb_data);
+            if (verbose) {
+                fprintf (stdout, "[client:fofb_ctrl]: rcb_data %03u: %u\n", i, rcb_data);
+            }
+            else {
+                fprintf (stdout, "%u,%u\n", i, rcb_data);
+            }
+
+            err = halcs_set_fofb_ctrl_rcb_rd_str (halcs_client, service, 1);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_rcb_rd_str failed\n");
+                ret = 2;
+                goto err_halcs_exit;
+            }
+        }
+
+        err = halcs_set_fofb_ctrl_rcb_rd_en (halcs_client, service, 0);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:fofb_ctrl]: halcs_set_fofb_ctrl_rcb_rd_en failed\n");
+            ret = 2;
+            goto err_halcs_exit;
+        }
+    }
+
 err_halcs_exit:
     /* Try to read up until the point where the error occurs, anyway */
     halcs_set_fofb_ctrl_act_part (halcs_client, service, 0x1);
     halcs_client_destroy (&halcs_client);
 err_halcs_client_new:
+    free (num_nodes_str);
+    num_nodes_str = NULL;
+err_no_num_nodes:
+    free (num_gts_str);
+    num_gts_str = NULL;
 err_no_num_gts:
     free (cc_enable_str);
     cc_enable_str = NULL;
