@@ -42,6 +42,12 @@ extern disp_op_t fofb_ctrl_set_get_tf_length_rdback_exp;
 extern disp_op_t fofb_ctrl_set_get_powerdown_rdback_exp;
 extern disp_op_t fofb_ctrl_set_get_loopback_rdback_exp;
 extern disp_op_t fofb_ctrl_set_get_faival_rdback_exp;
+extern disp_op_t fofb_ctrl_set_get_toa_rd_en_exp;
+extern disp_op_t fofb_ctrl_set_get_toa_rd_str_exp;
+extern disp_op_t fofb_ctrl_set_get_toa_data_exp;
+extern disp_op_t fofb_ctrl_set_get_rcb_rd_en_exp;
+extern disp_op_t fofb_ctrl_set_get_rcb_rd_str_exp;
+extern disp_op_t fofb_ctrl_set_get_rcb_data_exp;
 
 extern const disp_op_t *fofb_ctrl_exp_ops [];
 

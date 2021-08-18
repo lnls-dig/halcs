@@ -341,6 +341,54 @@ RW_PARAM_FUNC(fofb_ctrl, faival_rdback) {
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define FOFB_CC_TOA_CTL_RD_EN_MIN          0
+#define FOFB_CC_TOA_CTL_RD_EN_MAX          1
+RW_PARAM_FUNC(fofb_ctrl, toa_rd_en) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TOA_CTL, RD_EN, SINGLE_BIT_PARAM,
+            FOFB_CC_TOA_CTL_RD_EN_MIN, FOFB_CC_TOA_CTL_RD_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define FOFB_CC_TOA_CTL_RD_STR_MIN         0
+#define FOFB_CC_TOA_CTL_RD_STR_MAX         1
+RW_PARAM_FUNC(fofb_ctrl, toa_rd_str) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TOA_CTL, RD_STR, SINGLE_BIT_PARAM,
+            FOFB_CC_TOA_CTL_RD_STR_MIN, FOFB_CC_TOA_CTL_RD_STR_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define FOFB_CC_TOA_DATA_VAL_R(val)        (val)
+#define FOFB_CC_TOA_DATA_VAL_W(val)        (val)
+RW_PARAM_FUNC(fofb_ctrl, toa_data) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, TOA_DATA, VAL,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define FOFB_CC_RCB_CTL_RD_EN_MIN          0
+#define FOFB_CC_RCB_CTL_RD_EN_MAX          1
+RW_PARAM_FUNC(fofb_ctrl, rcb_rd_en) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RCB_CTL, RD_EN, SINGLE_BIT_PARAM,
+            FOFB_CC_RCB_CTL_RD_EN_MIN, FOFB_CC_RCB_CTL_RD_EN_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define FOFB_CC_RCB_CTL_RD_STR_MIN         0
+#define FOFB_CC_RCB_CTL_RD_STR_MAX         1
+RW_PARAM_FUNC(fofb_ctrl, rcb_rd_str) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RCB_CTL, RD_STR, SINGLE_BIT_PARAM,
+            FOFB_CC_RCB_CTL_RD_STR_MIN, FOFB_CC_RCB_CTL_RD_STR_MAX,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define FOFB_CC_RCB_DATA_VAL_R(val)        (val)
+#define FOFB_CC_RCB_DATA_VAL_W(val)        (val)
+RW_PARAM_FUNC(fofb_ctrl, rcb_data) {
+    SET_GET_PARAM(fofb_ctrl, 0x0, FOFB_CC, RCB_DATA, VAL,
+            MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fofb_ctrl_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fofb_ctrl, act_part),
@@ -375,6 +423,12 @@ const disp_table_func_fp fofb_ctrl_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fofb_ctrl, powerdown_rdback),
     RW_PARAM_FUNC_NAME(fofb_ctrl, loopback_rdback),
     RW_PARAM_FUNC_NAME(fofb_ctrl, faival_rdback),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, toa_rd_en),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, toa_rd_str),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, toa_data),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, rcb_rd_en),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, rcb_rd_str),
+    RW_PARAM_FUNC_NAME(fofb_ctrl, rcb_data),
     NULL
 };
 

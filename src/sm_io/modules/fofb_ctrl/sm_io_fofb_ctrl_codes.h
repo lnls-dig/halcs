@@ -79,7 +79,19 @@
 #define FOFB_CTRL_NAME_SET_GET_LOOPBACK_RDBACK                  "fofb_ctrl_set_get_loopback_rdback"
 #define FOFB_CTRL_OPCODE_SET_GET_FAIVAL_RDBACK                  249
 #define FOFB_CTRL_NAME_SET_GET_FAIVAL_RDBACK                    "fofb_ctrl_set_get_faival_rdback"
-#define FOFB_CTRL_OPCODE_END                                    250
+#define FOFB_CTRL_OPCODE_SET_GET_TOA_RD_EN                      250
+#define FOFB_CTRL_NAME_SET_GET_TOA_RD_EN                        "fofb_ctrl_set_get_toa_rd_en"
+#define FOFB_CTRL_OPCODE_SET_GET_TOA_RD_STR                     251
+#define FOFB_CTRL_NAME_SET_GET_TOA_RD_STR                       "fofb_ctrl_set_get_toa_rd_str"
+#define FOFB_CTRL_OPCODE_SET_GET_TOA_DATA                       252
+#define FOFB_CTRL_NAME_SET_GET_TOA_DATA                         "fofb_ctrl_set_get_toa_rd_data"
+#define FOFB_CTRL_OPCODE_SET_GET_RCB_RD_EN                      253
+#define FOFB_CTRL_NAME_SET_GET_RCB_RD_EN                        "fofb_ctrl_set_get_rcb_rd_en"
+#define FOFB_CTRL_OPCODE_SET_GET_RCB_RD_STR                     254
+#define FOFB_CTRL_NAME_SET_GET_RCB_RD_STR                       "fofb_ctrl_set_get_rcb_rd_str"
+#define FOFB_CTRL_OPCODE_SET_GET_RCB_DATA                       255
+#define FOFB_CTRL_NAME_SET_GET_RCB_DATA                         "fofb_ctrl_set_get_rcb_rd_data"
+#define FOFB_CTRL_OPCODE_END                                    256
 
 /* Messaging Reply OPCODES */
 #define FOFB_CTRL_REPLY_TYPE                      uint32_t
