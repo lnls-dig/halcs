@@ -7,7 +7,6 @@
 
 #include "halcs_server.h"
 /* Private headers */
-#include "ddr3_map.h"
 #include "sm_io_acq_codes.h"
 #include "sm_io_acq_exports.h"
 #include "sm_io_acq_core.h"
