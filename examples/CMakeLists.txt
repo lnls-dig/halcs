@@ -494,87 +494,94 @@ endforeach()
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
 if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+        endif()
+
+        include(InstallRequiredSystemLibraries)
+
+        # set architecture as detected by TargetArch module
+        set(arch_name ${ARCH})
+
+        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        # Seems broken in CMake and crashes with 
+        # CPack: Create package
+        # terminate called after throwing an instance of 'std::logic_error'
+        #   what():  basic_string::_M_construct null not valid
+        # Makefile:81: recipe for target 'package' failed
+        # make: *** [package] Aborted (core dumped)
+        # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_PACKAGE_AUTOREQ no)
+        set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+            /lib
+            /usr/etc
+            /etc/systemd
+            /lib/systemd
+            /etc/systemd/system
+            /lib/systemd/system
+            /etc/udev
+            /etc/udev/rules.d
+        )
+        set(CPACK_PACKAGE_NAME "halcs_examples")
+        set(halcs_examples_DISTRO_VERSION "" CACHE STRING "halcs_examples distribution version")
+        set(CPACK_PACKAGE_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${halcs_examples_VERSION}${halcs_examples_DISTRO_VERSION}_${arch_name}"
+        )
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB filesystem library")
+        set(CPACK_PACKAGE_VENDOR "LNLS")
+        set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+        # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
+        # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
+        # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
+        set(CPACK_PACKAGE_VERSION ${halcs_examples_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${halcs_examples_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${halcs_examples_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${halcs_examples_VERSION_PATCH})
+        # set(CPACK_PACKAGE_INSTALL_DIRECTORY "HALCS examples Install Directory")
+        # set(CPACK_TEMPORARY_DIRECTORY "HALCS examples Temporary CPack Directory")
+        # Generate debuginfo package
+        set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
+        include(CPack)
+
+        cpack_add_component_group(Development
+            DISPLAY_NAME "HALCS examples library"
+            EXPANDED
+        )
+        cpack_add_component(SourceCode
+            DISPLAY_NAME "HALCS examples source code"
+            DISABLED
+            INSTALL_TYPES FullInstall
+        )
+        cpack_add_component(SDK
+            DISPLAY_NAME "HALCS examples headers and libraries"
+            INSTALL_TYPES FullInstall DevInstall
+            GROUP Development
+        )
+        cpack_add_component(Runtime
+            DISPLAY_NAME "HALCS examples runtime files"
+            REQUIRED
+            INSTALL_TYPES FullInstall DevInstall MinInstall
+        )
+        cpack_add_install_type(FullInstall
+            DISPLAY_NAME "Full install, including source code"
+        )
+        cpack_add_install_type(DevInstall
+            DISPLAY_NAME "Developer install, headers and libraries"
+        )
+        cpack_add_install_type(MinInstall
+            DISPLAY_NAME "Minimal install, runtime only"
+        )
     endif()
 
-    include(InstallRequiredSystemLibraries)
-
-    # set architecture as detected by TargetArch module
-    set(arch_name ${ARCH})
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    # Generate debuginfo package
-    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
-    set(CPACK_PACKAGE_NAME "halcs_examples")
-    set(halcs_examples_DISTRO_VERSION "" CACHE STRING "halcs_examples distribution version")
-    string(APPEND halcs_examples_VERSION "${halcs_examples_DISTRO_VERSION}")
-    set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}_${halcs_examples_VERSION}_${arch_name}"
-    )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SDB filesystem library")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
-    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
-    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${halcs_examples_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${halcs_examples_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${halcs_examples_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${halcs_examples_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "HALCS examples Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "HALCS examples Temporary CPack Directory")
-    # Generate debuginfo package
-    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-
-    include(CPack)
-
-    cpack_add_component_group(Development
-        DISPLAY_NAME "HALCS examples library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "HALCS examples source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "HALCS examples headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "HALCS examples runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
 endif()

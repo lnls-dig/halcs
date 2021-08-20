@@ -416,18 +416,14 @@ And it should show something like:
         board1
             halcs0
                 dbe
-                    spawn_epics_ioc = no        # Ask to spawn DBE EPICS IOC (Options are: yes or no)
-                    fmc_board = fmc250m_4ch
+                    board_type = afcv3.1
                 afe
-                    spawn_epics_ioc = no        # Ask to spawn AFE EPICS IOC (Options are: yes or no)
                     bind =
                     proto =
             halcs1
                 dbe
-                    spawn_epics_ioc = no        # Ask to spawn DBE EPICS IOC (Options are: yes or no)
-                    fmc_board = fmc250m_4ch
+                    board_type = afcv3.1
                 afe
-                    spawn_epics_ioc = no        # Ask to spawn AFE EPICS IOC (Options are: yes or no)
                     bind =
                     proto =
 

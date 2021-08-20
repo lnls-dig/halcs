@@ -66,8 +66,6 @@
 #define DEVIO_NAME                      "/usr/local/bin/halcsd"
 #define DEVIO_CFG_NAME                  "/usr/local/bin/halcsd_cfg"
 #define DEVIO_CFG_TIMEOUT               5000       /* in ms */
-#define EPICS_PROCSERV_NAME             "/usr/local/bin/procServ"
-#define EPICS_HALCS_RUN_SCRIPT_NAME       "./run.sh"
 
 #define DEVIO_LIBHALCSCLIENT_LOG_MODE   "a"
 #define DEVIO_KILL_CFG_SIGNAL           SIGINT
@@ -301,12 +299,11 @@ int main (int argc, char *argv[])
         /* Use the passed ID, interpret it as decimal number */
         full_dev_id = strtoul (dev_id_str, NULL, 10);
         /* Check if we are withing range */
-        ASSERT_TEST (full_dev_id > 0 && full_dev_id < NUM_MAX_HALCSS+1,
-                "Device ID is out of range", err_exit);
+        ASSERT_TEST (full_dev_id > 0, "Device ID must be > 0", err_exit);
 
         /* Extract device and smio IDs */
-        dev_id = board_epics_map [full_dev_id].dev_id;
-        fe_smio_id = board_epics_map [full_dev_id].smio_id;
+        dev_id = (full_dev_id+1) / 2;
+        fe_smio_id = (full_dev_id+1) % 2;
     }
     else {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] Dev_id parameter "
@@ -360,11 +357,11 @@ int main (int argc, char *argv[])
                 }
 
                 /* Check if we are withing range */
-                ASSERT_TEST (full_dev_id > 0 && full_dev_id < NUM_MAX_HALCSS+1,
-                        "Device ID is out of range", err_exit);
+                ASSERT_TEST (full_dev_id > 0, "Device ID must be > 0", err_exit);
+
                 /* Extract device and smio IDs */
-                dev_id = board_epics_map [full_dev_id].dev_id;
-                fe_smio_id = board_epics_map [full_dev_id].smio_id;
+                dev_id = (full_dev_id+1) / 2;
+                fe_smio_id = (full_dev_id+1) % 2;
             }
 
             if (dev_entry == NULL && dev_id_str != NULL) {
@@ -401,7 +398,7 @@ int main (int argc, char *argv[])
 
     /* Spawn the Configure DEVIO to get the uTCA slot number. This is only
      * available in AFCv3 */
-#if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
+#if defined (__WITH_APP_CFG__)
     int child_devio_cfg_pid = 0;
     if (llio_type == PCIE_DEV) {
         /* Argument options are "process name", "device type" and
@@ -485,6 +482,16 @@ int main (int argc, char *argv[])
     free (dev_id_str);
     dev_id_str = NULL;
 
+    /* Get board type name */
+    err = DEVIO_SUCCESS;
+    char *board_type = NULL;
+    err = hutils_get_board_type (devio_hints, dev_id, &board_type);
+    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get board_type from config file",
+            err_exit);
+
+    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] board_type set to %s.\n",
+            board_type);
+
     /* Initilialize dev_io */
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_TRACE, "[halcsd] Creating DEVIO instance ...\n");
 
@@ -531,6 +538,7 @@ int main (int argc, char *argv[])
     devio_args->verbose = verbose;
     devio_args->devio_log_filename = &devio_log_filename;
     devio_args->devio_log_info_filename = &devio_log_info_filename;
+    devio_args->board_type = &board_type;
 
     /*  Start DEVIO loop */
 
@@ -661,7 +669,7 @@ err_devio_service_str_alloc:
 err_devio_log_info_filename_alloc:
     free (devio_log_filename);
 err_devio_log_filename_alloc:
-#if defined (__BOARD_AFCV3__) && (__WITH_APP_CFG__)
+#if defined (__WITH_APP_CFG__)
 err_card_slot:
     if (client_cfg != NULL) {
         halcs_client_destroy (&client_cfg);

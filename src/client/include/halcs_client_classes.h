@@ -19,13 +19,12 @@
 #include <disptable.h>
 
 /* Internal libraries dependencies */
-#include "acq_chan.h"
 #include "sm_io_codes.h"
 
 /* HALCS version macros for compile-time API detection */
 
 #define HALCS_CLIENT_VERSION_MAJOR 2
-#define HALCS_CLIENT_VERSION_MINOR 4
+#define HALCS_CLIENT_VERSION_MINOR 5
 #define HALCS_CLIENT_VERSION_PATCH 0
 
 #define HALCS_CLIENT_MAKE_VERSION(major, minor, patch) \

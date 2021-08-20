@@ -1,38 +1,24 @@
 #ifndef _ACQ_CHAN_H_
 #define _ACQ_CHAN_H_
 
+#include "ddr3_map_structs.h"
 #include <acq_chan_gen_defs.h>
+#include <stdint.h>
 
-#define NUM_ACQ_CORE_SMIOS              1
+#define __NUM_ACQ_CORE_SMIOS              1
 
 /************************ Acquistion 0 Channel Parameters **************/
 
-/* ADC */
-#define ADC_CHAN_ID                     0
-
-/* TBT AMP */
-#define TBTAMP_CHAN_ID                  (ADC_CHAN_ID + 1)
-
-/* TBT POS */
-#define TBTPOS_CHAN_ID                  (TBTAMP_CHAN_ID + 1)
-
-/* FOFB AMP */
-#define FOFBAMP_CHAN_ID                 (TBTPOS_CHAN_ID + 1)
-
-/* FOFB POS */
-#define FOFBPOS_CHAN_ID                 (FOFBAMP_CHAN_ID + 1)
-
-/* MONIT AMP */
-#define MONITAMP_CHAN_ID                (FOFBPOS_CHAN_ID + 1)
-
-/* MONIT POS */
-#define MONITPOS_CHAN_ID                (MONITAMP_CHAN_ID + 1)
-
-/* MONIT1 POS */
-#define MONIT1POS_CHAN_ID               (MONITPOS_CHAN_ID + 1)
-
-/* End of channels placeholder */
-#define END_CHAN_ID                     (MONIT1POS_CHAN_ID + 1)
+typedef enum {
+    __ADC_CHAN_ID = 0,
+    __TBTAMP_CHAN_ID,
+    __TBTPOS_CHAN_ID,
+    __FOFBAMP_CHAN_ID,
+    __FOFBPOS_CHAN_ID,
+    __MONITAMP_CHAN_ID,
+    __MONITPOS_CHAN_ID,
+    __MONIT1POS_CHAN_ID,
+    __END_CHAN_ID
+} acq_channel_ids;
 
 #endif
-

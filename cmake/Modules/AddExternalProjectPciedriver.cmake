@@ -8,6 +8,10 @@ include(GNUInstallDirs)
 include(TestPciedriverVersion)
 # add external project
 include(ExternalProject)
+# detect target architecture
+include(TargetArch)
+
+target_architecture(ARCH)
 
 ExternalProject_Add(pciedriver_ext
     URL ${CMAKE_CURRENT_SOURCE_DIR}/foreign/pcie-driver
@@ -76,7 +80,7 @@ add_library(pciedriver SHARED IMPORTED)
 set_target_properties(pciedriver
     PROPERTIES
     IMPORTED_LOCATION
-    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
+    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so.1
     INTERFACE_INCLUDE_DIRECTORIES
     "${pciedriver_INCLUDE_DIRECTORIES}"
     PUBLIC_HEADER
@@ -98,6 +102,7 @@ install(DIRECTORY
     ${pciedriver_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT Libs
     FILES_MATCHING PATTERN
     "*.h"
 )
@@ -105,10 +110,12 @@ install(DIRECTORY
 # as we can't intall IMPORTED libraries as TARGETS, just use plain
 # install(FILES)
 install(FILES
+    ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so.1
     ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.so
     ${pciedriver_LIBRARY_DIRECTORIES}/libpcidriver.a
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT Libs
 )
 
 #######################################
@@ -138,7 +145,7 @@ if(BUILD_PCIE_DRIVER)
 
     configure_file (
         "${pciedriver_driver_KO_DIRECTORY}/${DKMS_FILE_NAME}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_FILE_NAME}"
+        "${BINARY_DIR}/${DKMS_FILE_NAME}"
         @ONLY
     )
 
@@ -148,13 +155,13 @@ if(BUILD_PCIE_DRIVER)
 
     configure_file (
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/${DKMS_POSTINST}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_POSTINST}"
+        "${BINARY_DIR}/${DKMS_POSTINST}"
         @ONLY
     )
 
     configure_file (
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/${DKMS_PRERM}.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${DKMS_PRERM}"
+        "${BINARY_DIR}/${DKMS_PRERM}"
         @ONLY
     )
 
@@ -169,7 +176,7 @@ if(BUILD_PCIE_DRIVER)
         REALPATH
     )
 
-get_filename_component(pciedriver_driver_UDEV_ABS
+    get_filename_component(pciedriver_driver_UDEV_ABS
         ${pciedriver_driver_KO_DIRECTORY}/60-udev_fpga.rules
         REALPATH
     )
@@ -199,16 +206,113 @@ get_filename_component(pciedriver_driver_UDEV_ABS
         ${pciedriver_driver_KO_DIRECTORY}/version.sh
     )
 
-    install(FILES ${pciedriver_driver_SRCS} DESTINATION ${pciedriver_DKMS_INSTALL_DIR})
+    install(FILES ${pciedriver_driver_SRCS}
+        DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
+        COMPONENT Pciedriver
+    )
     install(FILES ${pciedriver_driver_SCRIPT} DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
         PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        COMPONENT Pciedriver
     )
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DKMS_FILE_NAME} DESTINATION ${pciedriver_DKMS_INSTALL_DIR})
+    install(FILES ${BINARY_DIR}/${DKMS_FILE_NAME}
+        DESTINATION ${pciedriver_DKMS_INSTALL_DIR}
+        COMPONENT Pciedriver
+    )
 
-    # For CPack
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_BINARY_DIR}/postinst;${CMAKE_CURRENT_BINARY_DIR}/prerm")
-    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/postinst")
-    set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${CMAKE_CURRENT_BINARY_DIR}/prerm")
+endif()
+
+# CPack rules
+option(ENABLE_CPACK "Enables cpack rules" ON)
+
+if(ENABLE_CPACK)
+    # set architecture as detected by TargetArch module
+    set(arch_name ${ARCH})
+
+    set(pciedriver_DISTRO_VERSION "" CACHE STRING "pciedriver distribution version")
+
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+
+    # Seems broken in CMake and crashes with 
+    # CPack: Create package
+    # terminate called after throwing an instance of 'std::logic_error'
+    #   what():  basic_string::_M_construct null not valid
+    # Makefile:81: recipe for target 'package' failed
+    # make: *** [package] Aborted (core dumped)
+    # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+    set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_DEPENDS "dkms")
+    set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_CONTROL_EXTRA
+        "${BINARY_DIR}/postinst;${BINARY_DIR}/prerm"
+    )
+    set(CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
+    set(CPACK_DEBIAN_PCIEDRIVER_FILE_NAME
+        "${CPACK_DEBIAN_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}${pciedriver_DISTRO_VERSION}_${arch_name}.deb"
+    )
+
+    set(CPACK_RPM_PCIEDRIVER_PACKAGE_REQUIRE "dkms")
+    set(CPACK_RPM_PCIEDRIVER_POST_INSTALL_SCRIPT_FILE "${BINARY_DIR}/postinst")
+    set(CPACK_RPM_PCIEDRIVER_PRE_UNINSTALL_SCRIPT_FILE "${BINARY_DIR}/prerm")
+    set(CPACK_RPM_PCIEDRIVER_PACKAGE_NAME "pcieDriver")
+    set(CPACK_RPM_PCIEDRIVER_FILE_NAME
+        "${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}_${pciedriver_VERSION}${pciedriver_DISTRO_VERSION}_${arch_name}.rpm"
+    )
+    # Generate debuginfo package
+    set(CPACK_RPM_PCIEDRIVER_DEBUGINFO_PACKAGE ON)
+    set(CPACK_RPM_PCIEDRIVER_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_RPM_PCIEDRIVER_PACKAGE_NAME}-${pciedriver_VERSION}")
+
+    set(CPACK_COMPONENT_PCIEDRIVER_DESCRIPTION "pcieDriver library/driver")
+
+    # This is always true as this is included in the main
+    # CMakeLists.txt. Kept here for reference, as main CMakeLists.txt
+    # already includes CPack
+    # if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+    #     if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    #         set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+    #         set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+    #         set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    #     endif()
+    #
+    #     include(InstallRequiredSystemLibraries)
+    #
+    #     set(CPACK_GENERATOR "DEB")
+    #
+    #     set(CPACK_DEB_COMPONENT_INSTALL ON)
+    #     set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+    #     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+    #     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+    #     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    #     set(CPACK_RPM_COMPONENT_INSTALL ON)
+    #     set(CPACK_RPM_PACKAGE_AUTOREQ no)
+    #     set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+    #     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+    #         /lib
+    #         /usr/etc
+    #         /etc/systemd
+    #         /lib/systemd
+    #         /etc/systemd/system
+    #         /lib/systemd/system
+    #         /etc/udev
+    #         /etc/udev/rules.d
+    #     )
+    #     set(CPACK_PACKAGE_VENDOR "LNLS")
+    #     set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+    #
+    #     include(CPack)
+    # 
+    #     cpack_add_component_group(PciedriverAll
+    #         DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #     )
+    # 
+    #     cpack_add_component(Pciedriver
+    #         DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    #         GROUP PciedriverAll
+    #         INSTALL_TYPES FullDriver
+    #     )
+    # 
+    #     cpack_add_install_type(FullDriver
+    #         DISPLAY_NAME "Full drivers, headers and libraries"
+    #     )
+    # 
+    # endif()
 
 endif()

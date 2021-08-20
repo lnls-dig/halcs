@@ -3203,6 +3203,15 @@ PARAM_FUNC_CLIENT_READ(init_check)
     return param_client_read (self, service, INIT_OPCODE_SET_GET_CHECK, init_check);
 }
 
+halcs_client_err_e halcs_get_init_board_type (halcs_client_t *self, char *service,
+        struct _smio_init_board_type_t *init_board_type)
+{
+    uint32_t rw = READ_MODE;
+    return param_client_read_gen (self, service, INIT_OPCODE_SET_GET_BOARD_TYPE,
+            rw, init_board_type, sizeof (*init_board_type), NULL, 0, NULL, 0,
+            init_board_type, sizeof (*init_board_type));
+}
+
 /**************** TIM RCV SMIO Functions ****************/
 
 /* DMTD Number of averages function */
@@ -3813,24 +3822,10 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_sys_status)
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SYS_STATUS, fofb_ctrl_sys_status);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_link_partner, chan, partner)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_1, fofb_ctrl_link_partner_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_2, fofb_ctrl_link_partner_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_3, fofb_ctrl_link_partner_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_partner_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER_4, fofb_ctrl_link_partner_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_LINK_PARTNER,
+            chan, partner);
 }
 
 PARAM_FUNC_CLIENT_READ(fofb_ctrl_link_up)
@@ -3843,104 +3838,34 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_time_frame_count)
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TIME_FRAME_COUNT, fofb_ctrl_time_frame_count);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_hard_err_cnt, chan, hard_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_1, fofb_ctrl_hard_err_cnt_1);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT,
+            chan, hard_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_2)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_soft_err_cnt, chan, soft_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_2, fofb_ctrl_hard_err_cnt_2);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT,
+            chan, soft_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_3)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_frame_err_cnt, chan, frame_err_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_3, fofb_ctrl_hard_err_cnt_3);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT,
+            chan, frame_err_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_hard_err_cnt_4)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_rx_pck_cnt, chan, rx_pck_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_HARD_ERR_CNT_4, fofb_ctrl_hard_err_cnt_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT,
+            chan, rx_pck_cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_1)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_ctrl_tx_pck_cnt, chan, tx_pck_cnt)
 {
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_1, fofb_ctrl_soft_err_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_2, fofb_ctrl_soft_err_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_3, fofb_ctrl_soft_err_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_soft_err_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_SOFT_ERR_CNT_4, fofb_ctrl_soft_err_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_1, fofb_ctrl_frame_err_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_2, fofb_ctrl_frame_err_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_3, fofb_ctrl_frame_err_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_frame_err_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FRAME_ERR_CNT_4, fofb_ctrl_frame_err_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_1, fofb_ctrl_rx_pck_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_2, fofb_ctrl_rx_pck_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_3, fofb_ctrl_rx_pck_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_rx_pck_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RX_PCK_CNT_4, fofb_ctrl_rx_pck_cnt_4);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_1)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_1, fofb_ctrl_tx_pck_cnt_1);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_2)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_2, fofb_ctrl_tx_pck_cnt_2);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_3)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_3, fofb_ctrl_tx_pck_cnt_3);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_ctrl_tx_pck_cnt_4)
-{
-     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT_4, fofb_ctrl_tx_pck_cnt_4);
+    return param_client_write_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TX_PCK_CNT,
+            chan, tx_pck_cnt);
 }
 
 PARAM_FUNC_CLIENT_READ(fofb_ctrl_fod_process_time)
@@ -3976,6 +3901,56 @@ PARAM_FUNC_CLIENT_READ(fofb_ctrl_loopback_rdback)
 PARAM_FUNC_CLIENT_READ(fofb_ctrl_faival_rdback)
 {
      return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_FAIVAL_RDBACK, fofb_ctrl_faival_rdback);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_toa_rd_en)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_EN, fofb_ctrl_toa_rd_en);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_rd_en)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_EN, fofb_ctrl_toa_rd_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_toa_rd_str)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_STR, fofb_ctrl_toa_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_rd_str)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_RD_STR, fofb_ctrl_toa_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_toa_data)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_TOA_DATA, fofb_ctrl_toa_data);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_rcb_rd_en)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_EN, fofb_ctrl_rcb_rd_en);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_rd_en)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_EN, fofb_ctrl_rcb_rd_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_rcb_rd_str)
+{
+    return param_client_write (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_STR, fofb_ctrl_rcb_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_rd_str)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_RD_STR, fofb_ctrl_rcb_rd_str);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_ctrl_rcb_data)
+{
+     return param_client_read (self, service, FOFB_CTRL_OPCODE_SET_GET_RCB_DATA, fofb_ctrl_rcb_data);
 }
 
 /**************** RTMLAM_OHWR SMIO Functions ****************/

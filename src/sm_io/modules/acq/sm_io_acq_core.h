@@ -52,6 +52,8 @@ typedef struct {
     uint32_t curr_chan;                     /* Current channel being acquired */
     uint32_t num_chan;                      /* Numbert of acquisition channels */
     uint32_t multishot_ram_size;            /* Multishot RAM size, in acquistion words */
+    uint32_t ddr_byte_2_bit;                /* DDR byte to bit conversion */
+    uint32_t ddr_payload_size;              /* DDR payload size */
     acq_buf_t *acq_buf;                     /* Channel properties */
 } smio_acq_t;
 

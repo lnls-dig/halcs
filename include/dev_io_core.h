@@ -29,6 +29,7 @@ typedef struct {
     int verbose;
     char **devio_log_filename;
     char **devio_log_info_filename;
+    char **board_type;
 } devio_args_t;
 
 /* Node of sig_ops list */
@@ -74,7 +75,8 @@ devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id,
         char *endpoint_dev, const llio_ops_t *reg_ops, 
         char *endpoint_broker, int verbose, 
         const char *log_file_name, 
-        const char *log_info_file_name);
+        const char *log_info_file_name,
+        const char *board_type);
 /* Destroy an instance of the Device Information */
 devio_err_e devio_destroy (devio_t **self_p);
 

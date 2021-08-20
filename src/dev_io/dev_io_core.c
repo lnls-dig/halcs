@@ -57,6 +57,7 @@ struct _devio_t {
     zloop_t *loop;                      /* Reactor for server sockets */
     unsigned int nnodes;                /* Number of actual nodes */
     char *name;                         /* Identification of this worker instance */
+    char *board_type;                   /* Board type name */
     uint32_t id;                        /* ID number of this instance */
     char *log_info_file;                /* Log filename for DEVIO INFO messages */
     char *log_file;                     /* Log filename for tracing and debugging */
@@ -139,6 +140,7 @@ static devio_err_e _devio_send_smio_mgmt_msg_raw (devio_t *self, uint32_t smio_i
         char *msg);
 static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
         uint32_t inst_id, uint64_t vid, uint32_t did);
+static devio_err_e _devio_send_board_type_raw (devio_t *self, zsock_t *reader);
 static devio_err_e _devio_register_sm_by_id_raw (devio_t *self, uint32_t smio_id);
 static devio_err_e _devio_register_all_sm_raw (devio_t *self);
 static devio_err_e _devio_unregister_sm_raw (devio_t *self, const char *smio_key);
@@ -181,7 +183,8 @@ static devio_sig_handler_t devio_sigchld_handler =
 /* Creates a new instance of Device Information */
 devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
         const llio_ops_t *reg_ops, char *endpoint_broker, int verbose,
-        const char *log_file_name, const char *log_info_file_name)
+        const char *log_file_name, const char *log_info_file_name,
+        const char *board_type)
 {
     assert (name);
     assert (endpoint_dev);
@@ -197,9 +200,10 @@ devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
     errhand_log_new (log_file_name, DEVIO_DFLT_LOG_MODE);
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[dev_io_core] Spawing DEVIO worker"
-            " with exported service %s, for a %s device \n\tlocated on %s,"
-            " broker address %s, with logfile on %s ...\n", name,
-            (reg_ops->name == NULL) ? "NULL" : reg_ops->name,
+            " with exported service %s, for a %s device,\n"
+            "\twith board type %s, located on %s, broker address %s,\n"
+            "\twith logfile on %s ...\n", 
+            name, (reg_ops->name == NULL) ? "NULL" : reg_ops->name, board_type,
             endpoint_dev, endpoint_broker, (log_file_name == NULL) ? "NULL" : log_file_name);
 
     /* Print Software info */
@@ -225,6 +229,9 @@ devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
     ASSERT_TEST((self->log_info_file == NULL && log_info_file_name == NULL)
             || (self->log_info_file != NULL && log_info_file_name != NULL),
             "Error setting log file!", err_log_info_file);
+
+    self->board_type = strdup (board_type);
+    ASSERT_ALLOC(self->board_type, err_board_type_alloc);
 
     /* Initialize pipe to talk to parent */
     self->pipe = pipe;
@@ -327,11 +334,18 @@ devio_t * devio_new (char *name, zsock_t *pipe, uint32_t id, char *endpoint_dev,
     self->sdbfs = zmalloc (sizeof *self->sdbfs);
     ASSERT_ALLOC(self->sdbfs, err_sdbfs_alloc);
 
+    const size_t **sdb_address_p =
+        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_sdb_address");
+    ASSERT_ALLOC(sdb_address_p, err_lookup_sym);
+    const size_t sdb_address = **sdb_address_p;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:devio_core] sdb_address: 0x%08zx", 
+        sdb_address);
+
     /* Initialize the sdb filesystem itself */
     self->sdbfs->name = "sdb-area";
     self->sdbfs->drvdata = (void *) self;
     self->sdbfs->blocksize = 1; /* Not currently used */
-    self->sdbfs->entrypoint = SDB_ADDRESS;
+    self->sdbfs->entrypoint = sdb_address;
     self->sdbfs->data = 0;
     self->sdbfs->flags = 0;
     self->sdbfs->read = _devio_read_llio_block;
@@ -385,6 +399,7 @@ err_sm_io_h_alloc:
         sdbfs_dev_destroy (self->sdbfs);
     }
 err_sdbfs_create:
+err_lookup_sym:
     free (self->sdbfs);
 err_sdbfs_alloc:
     llio_release (self->llio, NULL);
@@ -419,6 +434,8 @@ err_bind_router:
 err_router_alloc:
     free (self->pipes_mgmt);
 err_pipes_mgmt_alloc:
+    free (self->board_type);
+err_board_type_alloc:
     free (self->log_info_file);
 err_log_info_file:
     free (self->log_file);
@@ -522,6 +539,7 @@ devio_err_e devio_destroy (devio_t **self_p)
         zsock_destroy (&self->router);
 
         free (self->pipes_mgmt);
+        free (self->board_type);
         free (self->log_info_file);
         free (self->log_file);
         free (self);
@@ -713,6 +731,10 @@ static int _devio_handle_pipe_mgmt (zloop_t *loop, zsock_t *reader, void *args)
     else if (streq (command, "$SDB_DEVICE_INFO")) {
         /* Get specific SDB info */
         _devio_send_sdb_info_raw (devio, smio_id, inst_id, vid, did);
+    }
+    else if (streq (command, "$BOARD_TYPE")) {
+        /* Get board type string */
+        _devio_send_board_type_raw (devio, reader);
     }
     else {
         /* Invalid message received. Discard message and continue normally */
@@ -991,12 +1013,12 @@ static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
     ASSERT_TEST(sdb_device != NULL, "Could not get SDB device", err_sdb_device,
             DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
 
-            DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
-                    "_devio_send_sdb_info_raw: sending message to actor with:\n"
-                    "sdb_device->abi_class = %02X, sdb_device->abi_ver_major = %01X,"
-            "sdb_device->abi_ver_minor = %01X, sdb_device->bus_specific = %04X\n",
-            sdb_device->abi_class, sdb_device->abi_ver_major,
-            sdb_device->abi_ver_minor, sdb_device->bus_specific);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE,
+            "_devio_send_sdb_info_raw: sending message to actor with:\n"
+            "sdb_device->abi_class = %02X, sdb_device->abi_ver_major = %01X,"
+    "sdb_device->abi_ver_minor = %01X, sdb_device->bus_specific = %04X\n",
+    sdb_device->abi_class, sdb_device->abi_ver_major,
+    sdb_device->abi_ver_minor, sdb_device->bus_specific);
 
     /* Send message */
     int zerr = zsock_send (dest_smio_actor, "s2114", "$SDB_DEVICE_INFO",
@@ -1008,6 +1030,23 @@ static devio_err_e _devio_send_sdb_info_raw (devio_t *self, uint32_t smio_id,
 err_send_sdb_info_msg:
 err_sdb_device:
 err_get_smio_actor:
+    return err;
+}
+
+static devio_err_e _devio_send_board_type_raw (devio_t *self, zsock_t *reader)
+{
+    assert (self);
+    devio_err_e err = DEVIO_SUCCESS;
+
+    /* Get board type */
+    const char *board_type = self->board_type;
+
+    /* Send message */
+    int zerr = zsock_send (reader, "ss", "$BOARD_TYPE", board_type);
+    ASSERT_TEST(zerr == 0, "Could not send board type message", err_send_board_type_msg,
+            DEVIO_ERR_INV_SOCKET /* TODO: improve error handling? */);
+
+err_send_board_type_msg:
     return err;
 }
 
@@ -1597,6 +1636,7 @@ void devio_loop (zsock_t *pipe, void *args)
     assert (devio_args->broker_endp);
     assert (devio_args->devio_log_filename);
     assert (devio_args->devio_log_info_filename);
+    assert (devio_args->board_type);
 
     /* Initialize */
 
@@ -1612,7 +1652,8 @@ void devio_loop (zsock_t *pipe, void *args)
             *devio_args->dev_entry, devio_args->llio_ops,
             *devio_args->broker_endp, devio_args->verbose,
             *devio_args->devio_log_filename,
-            *devio_args->devio_log_info_filename);
+            *devio_args->devio_log_info_filename,
+            *devio_args->board_type);
     if (self) {
         /* Tell parent we are initializing */
         zsock_signal (pipe, 0);
@@ -1641,6 +1682,7 @@ void devio_loop (zsock_t *pipe, void *args)
     zstr_free (devio_args->broker_endp);
     zstr_free (devio_args->devio_log_filename);
     zstr_free (devio_args->devio_log_info_filename);
+    zstr_free (devio_args->board_type);
     free (devio_args);
     *devio_args_p = NULL;
 err_devio_args:

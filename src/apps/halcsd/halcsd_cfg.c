@@ -232,6 +232,8 @@ int main (int argc, char *argv[])
         devio_name);
     devio_service_str [DEVIO_SERVICE_LEN-1] = '\0'; /* Just in case ... */
 
+    /* devio_cfg doesn't need this info */
+    char *board_type = strdup ("undef");
     devio_args_t *devio_args = zmalloc (sizeof *devio_args);
     ASSERT_ALLOC (devio_args, err_devio_args_alloc);
     devio_args->devio_service = &devio_service_str; 
@@ -242,6 +244,7 @@ int main (int argc, char *argv[])
     devio_args->verbose = verbose;
     devio_args->devio_log_filename = &devio_log_filename;
     devio_args->devio_log_info_filename = &devio_log_info_filename;
+    devio_args->board_type = &board_type;
 
     /* Step 1: Loop though all the SDB records and intialize (boot) the
      * smio modules*/
@@ -319,23 +322,12 @@ static devio_err_e _spawn_be_platform_smios (void *pipe)
 {
     devio_err_e err = DEVIO_SUCCESS;
 
-    /* ML605 specific */
-#if defined (__BOARD_ML605__)
-    UNUSED(pipe);
-    /* AFCv3 spefific */
-#elif defined (__BOARD_AFCV3__)
     uint32_t afc_diag_id = 0x51954750;
-
-    DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd_cfg] Spawning AFCv3 specific SMIOs ...\n");
 
     err = devio_register_sm_by_id (pipe, afc_diag_id);
     if (err != DEVIO_SUCCESS) {
         DBE_DEBUG (DBG_DEV_IO | DBG_LVL_FATAL, "[halcsd_cfg] devio_register_sm error!\n");
     }
-
-#else
-#error "BE FPGA Board not supported!"
-#endif
 
     return err;
 }

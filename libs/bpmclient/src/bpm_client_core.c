@@ -33,12 +33,6 @@
                 halcs_client_err_str (result));                 \
     } while (0)
 
-#ifdef ADCSWAP_CHAN_ID
-#   define ADC_CHANNEL_ID_TO_USE ADCSWAP_CHAN_ID
-#else
-#   define ADC_CHANNEL_ID_TO_USE ADC_CHAN_ID
-#endif
-
 #define POSITIVE_SLOPE 0
 #define FIRST_SAMPLE 0
 
@@ -46,9 +40,11 @@
 struct _bpm_single_pass_t {
     acq_client_t *acq_client;               /* Acquisition client interface */
     char *service;                          /* Acquisition client service */
+    smio_init_board_type_t* board_type;     /* Board type name */
     bpm_parameters_t* bpm_parameters;       /* BPM parameters */
     acq_req_t request;                      /* Acquisition request parameters */
     acq_trans_t transaction;                /* Acquisition transaction */
+    uint32_t adc_chanswap_id;               /* ADC channel ID after swap/unswap */
 
     uint32_t trigger_type;                  /* Trigger source */
     uint32_t trigger_slope;                 /* Trigger slope selection */
@@ -63,7 +59,8 @@ struct _bpm_single_pass_t {
 /********************************************************/
 
 static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
-        char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        char *broker_endp, char *service, char *service_board, 
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre, 
         uint32_t samples_post, uint32_t num_shots);
 
 static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self);
@@ -92,7 +89,7 @@ static void _calculate_bpm_sample (bpm_parameters_t *parameters, double a,
 static void _release_transaction (bpm_single_pass_t *self);
 
 bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
-        const char *log_file_name, char *service,
+        const char *log_file_name, char *service, char *service_board,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post, uint32_t num_shots)
 {
@@ -101,15 +98,16 @@ bpm_single_pass_t *bpm_single_pass_new (char *broker_endp, int verbose,
 
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
-    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post, num_shots);
+    return _bpm_single_pass_new (acq_client, broker_endp, service, 
+            service_board, bpm_parameters, samples_pre, samples_post, 
+            num_shots);
 
 err_acq_client_new:
     return NULL;
 }
 
 bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
-        const char *log_file_name, int timeout, char *service,
+        const char *log_file_name, int timeout, char *service, char *service_board,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post, uint32_t num_shots)
 {
@@ -118,15 +116,16 @@ bpm_single_pass_t *bpm_single_pass_new_time (char *broker_endp, int verbose,
 
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
-    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post, num_shots);
+    return _bpm_single_pass_new (acq_client, broker_endp, service, 
+            service_board, bpm_parameters, samples_pre, samples_post, 
+            num_shots);
 
 err_acq_client_new:
     return NULL;
 }
 
 bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
-        const char *log_file_name, const char *log_mode, char *service,
+        const char *log_file_name, const char *log_mode, char *service, char *service_board,
         bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
         uint32_t samples_post, uint32_t num_shots)
 {
@@ -135,8 +134,9 @@ bpm_single_pass_t *bpm_single_pass_new_log_mode (char *broker_endp, int verbose,
 
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
-    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post, num_shots);
+    return _bpm_single_pass_new (acq_client, broker_endp, service, 
+            service_board, bpm_parameters, samples_pre, samples_post, 
+            num_shots);
 
 err_acq_client_new:
     return NULL;
@@ -144,23 +144,26 @@ err_acq_client_new:
 
 bpm_single_pass_t *bpm_single_pass_new_log_mode_time (char *broker_endp,
         int verbose, const char *log_file_name, const char *log_mode,
-        int timeout, char *service, bpm_parameters_t *bpm_parameters,
-        uint32_t samples_pre, uint32_t samples_post, uint32_t num_shots)
+        int timeout, char *service, char *service_board, 
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre, 
+        uint32_t samples_post, uint32_t num_shots)
 {
     acq_client_t *acq_client = acq_client_new_log_mode_time (broker_endp,
         verbose, log_file_name, log_mode, timeout);
 
     ASSERT_ALLOC (acq_client, err_acq_client_new);
 
-    return _bpm_single_pass_new (acq_client, service, bpm_parameters,
-            samples_pre, samples_post, num_shots);
+    return _bpm_single_pass_new (acq_client, broker_endp, service, 
+            service_board, bpm_parameters, samples_pre, samples_post, 
+            num_shots);
 
 err_acq_client_new:
     return NULL;
 }
 
 static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
-        char *service, bpm_parameters_t *bpm_parameters, uint32_t samples_pre,
+        char *broker_endp, char *service, char *service_board, 
+        bpm_parameters_t *bpm_parameters, uint32_t samples_pre, 
         uint32_t samples_post, uint32_t num_shots)
 {
     assert (service);
@@ -169,6 +172,28 @@ static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
 
     self->acq_client = acq_client;
     self->service = strdup (service);
+
+    self->board_type = zmalloc (sizeof (*self->board_type));
+
+    /* Get board_type with an ephemeral halcs_client */
+    halcs_client_t *halcs_client = halcs_client_new (broker_endp, 0,
+            NULL);
+    ASSERT_ALLOC (halcs_client, err_halcs_client_new);
+    halcs_client_err_e err = halcs_get_init_board_type (halcs_client,
+           service_board, self->board_type);
+    ASSERT_TEST (err == HALCS_CLIENT_SUCCESS, "Could not get board type",
+           err_halcs_get_init_board_type);
+
+    halcs_client_destroy (&halcs_client);
+
+    /* Get channel to use from dynamic loading the symbol */
+    const uint32_t **adc_channel_after_swap_p =
+        hutils_lookup_symbol ("pvar_const_uint32_t_p_", self->board_type->name, 
+            "_adcswap_chan_id");
+    ASSERT_ALLOC(adc_channel_after_swap_p, err_lookup_sym);
+    self->adc_chanswap_id = **adc_channel_after_swap_p;
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:libbpmclient] adc_channel_after_swap: %u\n", 
+        self->adc_chanswap_id);
 
     _configure_request (self, samples_pre, samples_post, num_shots);
     _setup_transaction (self);
@@ -184,6 +209,15 @@ static bpm_single_pass_t *_bpm_single_pass_new (acq_client_t *acq_client,
     self->trigger_threshold = 1;
 
     return self;
+
+err_lookup_sym:
+err_halcs_get_init_board_type:
+    halcs_client_destroy (&halcs_client);
+err_halcs_client_new:
+    free (self->board_type);
+    free (self->service);
+    free (self);
+    return NULL;
 }
 
 void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
@@ -196,6 +230,7 @@ void bpm_single_pass_destroy (bpm_single_pass_t **self_p)
         _release_transaction (self);
         acq_client_destroy (&self->acq_client);
 
+        free (self->board_type);
         free (self->service);
         free (self->bpm_parameters);
         free (self);
@@ -270,14 +305,12 @@ const acq_trans_t *bpm_single_pass_get_acq_transaction (bpm_single_pass_t *self)
 static void _configure_request (bpm_single_pass_t *self, uint32_t samples_pre,
         uint32_t samples_post, uint32_t num_shots)
 {
-    const uint32_t ADC_AFTER_UNSWAP = ADC_CHANNEL_ID_TO_USE;
-
     acq_req_t *request = &self->request;
 
     request->num_samples_pre = samples_pre;
     request->num_samples_post = samples_post;
     request->num_shots = num_shots;
-    request->chan = ADC_AFTER_UNSWAP;
+    request->chan = self->adc_chanswap_id;
 }
 
 static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
@@ -296,14 +329,12 @@ static halcs_client_err_e _configure_trigger (bpm_single_pass_t *self)
     CHECK_ERR (acq_set_hw_trig_dly (acq_client, service, delay));
 
     if (trigger_type == ACQ_CLIENT_TRIG_DATA_DRIVEN) {
-        const uint32_t ADC_CHANNEL = ADC_CHANNEL_ID_TO_USE;
-
         uint32_t threshold = self->trigger_threshold;
         uint32_t active_sample = self->trigger_active_sample;
 
         CHECK_ERR (acq_set_data_trig_thres (acq_client, service, threshold));
         CHECK_ERR (acq_set_data_trig_sel (acq_client, service, active_sample));
-        CHECK_ERR (acq_set_data_trig_chan (acq_client, service, ADC_CHANNEL));
+        CHECK_ERR (acq_set_data_trig_chan (acq_client, service, self->adc_chanswap_id));
     }
 
     return HALCS_CLIENT_SUCCESS;

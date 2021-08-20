@@ -2,11 +2,28 @@
 # Library setup
 ########################################################################
 
+# set installation variables compliant with distributions
+include(GNUInstallDirs)
+# configure and generate *.Config.cmake files
+include(CMakePackageConfigHelpers)
+
 # library basename
 set (boards_OUTPUT_BASENAME "boards"
     CACHE STRING
     "Output boards library base name"
 )
+
+# get all directories under a directory
+macro(subdirlist result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
 
 #########################################################################
 # XXX dependency
@@ -62,13 +79,16 @@ if(boards_SHRINK_AFCV3_DDR_SIZE_VALUE STREQUAL y)
     )
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/common)
-list(APPEND boards_LIBRARIES boards_common)
+subdirlist(subdirs ${CMAKE_CURRENT_SOURCE_DIR})
 
-# select board directory to include
-string(TOLOWER ${halcs_BOARD_OPT} halcs_BOARD_OPT_LOWER)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/${halcs_BOARD_OPT_LOWER})
-list(APPEND boards_LIBRARIES boards_${halcs_BOARD_OPT_LOWER})
+foreach(subdir ${subdirs})
+    add_subdirectory(${subdir})
+    list(APPEND boards_subdir ${subdir}})
+    list(APPEND boards_LIBRARIES boards_${subdir})
+endforeach()
+
+message(STATUS "boards_subdir: ${boards_subdir}")
+message(STATUS "boards_LIBRARIES: ${boards_LIBRARIES}")
 
 #######################################
 # Our sources
@@ -144,3 +164,18 @@ target_link_libraries(boards
     ${boards_LIBRARIES}
     ${halcs_LIBRARIES}
 )
+
+########################################################################
+# Installer
+########################################################################
+
+foreach(target ${boards_LIBRARIES})
+    install(TARGETS ${target} boards_compiler_flags
+        EXPORT $<TARGET_FILE_BASE_NAME:${target}>-targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Libs
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+        FRAMEWORK DESTINATION "Library/Frameworks"
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Libs
+    )
+endforeach()

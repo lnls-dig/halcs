@@ -63,7 +63,7 @@ add_library(bsmp SHARED IMPORTED)
 set_target_properties(bsmp
     PROPERTIES
     IMPORTED_LOCATION
-    ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so
+    ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so.1
     INTERFACE_INCLUDE_DIRECTORIES
     "${bsmp_INCLUDE_DIRECTORIES}"
     PUBLIC_HEADER
@@ -85,13 +85,16 @@ install(DIRECTORY
     ${bsmp_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT Libs
 )
 
 # as we can't intall IMPORTED libraries as TARGETS, just use plain
 # install(FILES)
 install(FILES
+    ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so.1
     ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.so
     ${bsmp_LIBRARY_DIRECTORIES}/libbsmp.a
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT Libs
 )

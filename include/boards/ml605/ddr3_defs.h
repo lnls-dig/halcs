@@ -1,17 +1,9 @@
 #ifndef _DDR3_DEFS_H_
 #define _DDR3_DEFS_H_
 
-#define MEM_TOTAL_SIZE                  (1UL << 28)             /* 256 MB */
-#define MEM_REGION_SIZE                 (MEM_TOTAL_SIZE / 8)
+#include <stddef.h>
 
-/* FPGA Specific */
-#define DDR3_PAYLOAD_SIZE               32                      /* In Bytes: Virtex6 (ML605) */
-
-/* DDR3 Specific */
-
-/* DDR3 for AFCv3 has a 32-bit interface */
-#define DDR3_DATA_WIDTH                 64                      /* In Bits */
-#define DDR3_BYTE_2_BIT                 8
-#define DDR3_ADDR_WORD_2_BYTE           (DDR3_DATA_WIDTH/DDR3_BYTE_2_BIT)
+#define __MEM_TOTAL_SIZE                (1ULL << 28) /* 256 MB reserved for position storage */
+#define  __MEM_REGION_SIZE              (__MEM_TOTAL_SIZE / 8)
 
 #endif

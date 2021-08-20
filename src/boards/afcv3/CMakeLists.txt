@@ -2,6 +2,9 @@
 # Library setup
 ########################################################################
 
+# extract version numbers from header file
+include(TestHalcsVersion)
+
 # library basename
 set (boards_afcv3_OUTPUT_BASENAME "boards_afcv3"
     CACHE STRING
@@ -29,9 +32,10 @@ set (boards_afcv3_OUTPUT_BASENAME "boards_afcv3"
 # Source files
 
 set(boards_afcv3_sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/acq_chan.c
     ${CMAKE_CURRENT_SOURCE_DIR}/chips_addr.c
     ${CMAKE_CURRENT_SOURCE_DIR}/ddr3_map.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/epics_mapping.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/device_mapping.c
 )
 
 # for IDE project generation
@@ -48,12 +52,8 @@ list(APPEND boards_afcv3_other_search_dirs "")
 
 set(boards_afcv3_public_headers
     ${common_INCLUDE_DIR}/boards/afcv3/acq_chan.h
-    ${common_INCLUDE_DIR}/boards/afcv3/board.h
-    ${common_INCLUDE_DIR}/boards/afcv3/chips_addr.h
     ${common_INCLUDE_DIR}/boards/afcv3/ddr3_defs.h
     ${common_INCLUDE_DIR}/boards/afcv3/ddr3_map.h
-    ${common_INCLUDE_DIR}/boards/afcv3/defs.h
-    ${common_INCLUDE_DIR}/boards/afcv3/mem_layout.h
 )
 
 # Get directory names only
@@ -87,14 +87,17 @@ source_group("Header Files" FILES
 # Library declaration
 ########################################################################
 
-# build static library
-add_library(boards_afcv3 STATIC
+# build dynamic library
+add_library(boards_afcv3 SHARED
     ${boards_afcv3_sources}
     ${boards_afcv3_public_headers}
 )
 
 set_target_properties(boards_afcv3 PROPERTIES
   PUBLIC_HEADER "${boards_afcv3_public_headers}"
+  SOVERSION "1"
+  VERSION "${halcs_VERSION}"
+  COMPILE_DEFINITIONS "DLL_EXPORT"
   OUTPUT_NAME "${boards_afcv3_OUTPUT_BASENAME}"
   PREFIX "lib")
 

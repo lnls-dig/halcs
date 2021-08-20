@@ -187,21 +187,6 @@ endif()
 # User compile-time options
 ########################################################################
 
-# which board do we want.
-
-set(halcsclient_BOARD_OPT "afcv3_1" CACHE STRING
-    "HALCS board")
-set(halcsclient_BOARD_VALUES
-    "ml605;afcv3;afcv3_1"
-)
-
-set_property(CACHE halcsclient_BOARD_OPT PROPERTY STRINGS
-    ${halcsclient_BOARD_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option halcsclient_BOARD='${halcsclient_BOARD_OPT}'")
-
 ########################################################################
 # Library compile options
 ########################################################################
@@ -262,6 +247,10 @@ set(halcsclient_sources
 )
 
 #######################################
+# ACQ sources definitions
+#######################################
+
+#######################################
 # SMIO TABLE sources definitions
 #######################################
 
@@ -295,6 +284,7 @@ set(halcsclient_smio_table_sources
 # for IDE project generation
 source_group("Source Files" FILES
     ${halcsclient_sources}
+    ${halcsclient_acq_sources}
     ${halcsclient_smio_table_sources}
 )
 
@@ -432,8 +422,8 @@ list(APPEND halcsclient_public_headers
 
 # Ugly and weird set of sources outside the source directory
 set(halcsclient_acq_public_headers
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/acq_chan_gen_defs.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/ddr3_map_structs.h
 )
 
 # Get directory names only
@@ -526,6 +516,7 @@ set(readme-docs
 if(BUILD_SHARED)
     add_library(halcsclient SHARED
         ${halcsclient_sources}
+        ${halcsclient_acq_sources}
         ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}
@@ -545,6 +536,7 @@ endif()
 if(BUILD_STATIC)
     add_library(halcsclient-static STATIC
         ${halcsclient_sources}
+        ${halcsclient_acq_sources}
         ${halcsclient_smio_table_sources}
         ${halcsclient_public_headers}
         ${readme-docs}
@@ -578,33 +570,9 @@ foreach(target ${target_outputs})
     # setting PUBLIC compile options
     string(APPEND halcsclient_board_definitions "")
 
-    # setting board macros
-    if(halcsclient_BOARD_OPT STREQUAL ml605)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_ML605__
-        )
-    elseif(halcsclient_BOARD_OPT STREQUAL afcv3)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_AFCV3__
-        )
-    elseif(halcsclient_BOARD_OPT STREQUAL afcv3_1)
-        list(APPEND halcsclient_board_definitions
-            __BOARD_AFCV3__
-            __BOARD_AFCV3_1__
-        )
-    endif()
-
     target_compile_definitions(${target} PUBLIC
         ${halcsclient_board_definitions}
     )
-
-    # for .pc file
-    foreach(board_def IN LISTS halcsclient_board_definitions)
-        string(APPEND
-            pkg_config_defines
-            " -D${board_def}"
-        )
-    endforeach()
 
     # set debug posfix in case of debug builds
     set_target_properties(${target} PROPERTIES
@@ -684,11 +652,11 @@ endif()
 
 install(TARGETS ${target_outputs} halcsclient_compiler_flags
     EXPORT ${PROJECT_NAME}-targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Libs
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libs
     FRAMEWORK DESTINATION "Library/Frameworks"
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Libs
 )
 
 # install headers that are inside another directory
@@ -696,6 +664,7 @@ install(DIRECTORY
     ${halcsclient_public_dirs}
     DESTINATION
     ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT Libs
     FILES_MATCHING PATTERN
     ${halcsclient_public_files_in_dirs}
 )
@@ -732,6 +701,7 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libhalcsclient.pc
     DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT Libs
 )
 
 # only available on CMake >= 3.0. Generates  <PROJECT_NAME>Targets.cmake
@@ -762,12 +732,14 @@ if(BUILD_SHARED OR BUILD_STATIC)
     install(EXPORT ${PROJECT_NAME}-targets
         FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${halcsclient_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION
         ${halcsclient_CMAKECONFIG_INSTALL_DIR}
+        COMPONENT Libs
     )
 endif()
 
@@ -775,87 +747,94 @@ endif()
 option(ENABLE_CPACK "Enables cpack rules" ON)
 
 if(ENABLE_CPACK)
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
-        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
-        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    if(CMAKE_CURRENT_BINARY_DIR STREQUAL CMAKE_BINARY_DIR)
+        if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+            set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+        endif()
+
+        include(InstallRequiredSystemLibraries)
+
+        # set architecture as detected by TargetArch module
+        set(arch_name ${ARCH})
+
+        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+        set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        # Seems broken in CMake and crashes with 
+        # CPack: Create package
+        # terminate called after throwing an instance of 'std::logic_error'
+        #   what():  basic_string::_M_construct null not valid
+        # Makefile:81: recipe for target 'package' failed
+        # make: *** [package] Aborted (core dumped)
+        # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_PACKAGE_AUTOREQ no)
+        set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+        set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+            /lib
+            /usr/etc
+            /etc/systemd
+            /lib/systemd
+            /etc/systemd/system
+            /lib/systemd/system
+            /etc/udev
+            /etc/udev/rules.d
+        )
+        set(CPACK_PACKAGE_NAME "halcsclient")
+        set(halcsclient_DISTRO_VERSION "" CACHE STRING "halcsclient distribution version")
+        set(CPACK_PACKAGE_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}${halcsclient_DISTRO_VERSION}_${arch_name}"
+        )
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
+        set(CPACK_PACKAGE_VENDOR "LNLS")
+        set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+        # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
+        # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
+        # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
+        set(CPACK_PACKAGE_VERSION ${halcsclient_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${halcsclient_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${halcsclient_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${halcsclient_VERSION_PATCH})
+        # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsclient Install Directory")
+        # set(CPACK_TEMPORARY_DIRECTORY "halcsclient Temporary CPack Directory")
+        # Generate debuginfo package
+        set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+        set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
+        include(CPack)
+
+        cpack_add_component_group(Development
+            DISPLAY_NAME "HALCS client library"
+            EXPANDED
+        )
+        cpack_add_component(SourceCode
+            DISPLAY_NAME "HALCS client source code"
+            DISABLED
+            INSTALL_TYPES FullInstall
+        )
+        cpack_add_component(SDK
+            DISPLAY_NAME "HALCS client headers and libraries"
+            INSTALL_TYPES FullInstall DevInstall
+            GROUP Development
+        )
+        cpack_add_component(Runtime
+            DISPLAY_NAME "HALCS client runtime files"
+            REQUIRED
+            INSTALL_TYPES FullInstall DevInstall MinInstall
+        )
+        cpack_add_install_type(FullInstall
+            DISPLAY_NAME "Full install, including source code"
+        )
+        cpack_add_install_type(DevInstall
+            DISPLAY_NAME "Developer install, headers and libraries"
+        )
+        cpack_add_install_type(MinInstall
+            DISPLAY_NAME "Minimal install, runtime only"
+        )
     endif()
 
-    include(InstallRequiredSystemLibraries)
-
-    # set architecture as detected by TargetArch module
-    set(arch_name ${ARCH})
-
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-    set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
-    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    # Generate debuginfo package
-    set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_PACKAGE_AUTOREQ no)
-    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
-    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
-        /etc/systemd
-        /lib/systemd
-        /etc/systemd/system
-        /lib/systemd/system
-        /etc/udev
-        /etc/udev/rules.d
-    )
-    set(CPACK_PACKAGE_NAME "halcsclient")
-    set(halcsclient_DISTRO_VERSION "" CACHE STRING "halcsclient distribution version")
-    string(APPEND halcsclient_VERSION "${halcsclient_DISTRO_VERSION}")
-    set(CPACK_PACKAGE_FILE_NAME
-        "${CPACK_PACKAGE_NAME}_${halcsclient_VERSION}_${arch_name}"
-    )
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HALCS Conversion library")
-    set(CPACK_PACKAGE_VENDOR "LNLS")
-    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
-    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
-    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
-    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
-    set(CPACK_PACKAGE_VERSION ${halcsclient_VERSION})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${halcsclient_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${halcsclient_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${halcsclient_VERSION_PATCH})
-    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsclient Install Directory")
-    # set(CPACK_TEMPORARY_DIRECTORY "halcsclient Temporary CPack Directory")
-    # Generate debuginfo package
-    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
-    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-
-    include(CPack)
-
-    cpack_add_component_group(Development
-        DISPLAY_NAME "HALCS client library"
-        EXPANDED
-    )
-    cpack_add_component(SourceCode
-        DISPLAY_NAME "HALCS client source code"
-        DISABLED
-        INSTALL_TYPES FullInstall
-    )
-    cpack_add_component(SDK
-        DISPLAY_NAME "HALCS client headers and libraries"
-        INSTALL_TYPES FullInstall DevInstall
-        GROUP Development
-    )
-    cpack_add_component(Runtime
-        DISPLAY_NAME "HALCS client runtime files"
-        REQUIRED
-        INSTALL_TYPES FullInstall DevInstall MinInstall
-    )
-    cpack_add_install_type(FullInstall
-        DISPLAY_NAME "Full install, including source code"
-    )
-    cpack_add_install_type(DevInstall
-        DISPLAY_NAME "Developer install, headers and libraries"
-    )
-    cpack_add_install_type(MinInstall
-        DISPLAY_NAME "Minimal install, runtime only"
-    )
 endif()

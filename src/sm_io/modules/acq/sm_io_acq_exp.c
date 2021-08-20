@@ -7,7 +7,6 @@
 
 #include "halcs_server.h"
 /* Private headers */
-#include "ddr3_map.h"
 #include "sm_io_acq_codes.h"
 #include "sm_io_acq_exports.h"
 #include "sm_io_acq_core.h"
@@ -172,9 +171,9 @@ static int _acq_data_acquire (void *owner, void *args, void *ret)
     smio_thsafe_client_write_32 (self, ACQ_CORE_REG_SHOTS, &acq_core_shots);
 
     uint32_t channel_sample_size = acq->acq_buf[chan].sample_size;
-    uint32_t samples_alignment =
-        DDR3_PAYLOAD_SIZE/channel_sample_size;
-    /* We are not allowed to acquire less than DDR3_PAYLOAD_SIZE bytes or in
+    uint32_t samples_alignment = (acq->ddr_payload_size > channel_sample_size)?
+        acq->ddr_payload_size/channel_sample_size : 1;
+    /* We are not allowed to acquire less than ddr3_payload_size bytes or in
      * anything not multiple of that number in neither pre_samples nor
      * post_samples. That's because the FPGA gateware expects at least one
      * valid aggregated sample to acquire */
@@ -925,7 +924,7 @@ static int _acq_sample_size (void *owner, void *args, void *ret)
         GET_PARAM_CHANNEL(self, acq, 0x0, ACQ_CORE, CH0_DESC, NUM_COALESCE,
                 ACQ_CORE_CHAN_DESC_OFFSET, channel_number, MULT_BIT_PARAM, num_coalesce,
                 NO_FMT_FUNC);
-        sample_size = int_ch_width/DDR3_BYTE_2_BIT * num_coalesce;
+        sample_size = int_ch_width/acq->ddr_byte_2_bit * num_coalesce;
 
         /* Return value to caller */
         *((uint32_t *) ret) = sample_size;

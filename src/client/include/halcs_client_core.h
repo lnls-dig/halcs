@@ -17,6 +17,7 @@ struct _smio_rffe_version_t;
 struct _smio_afc_diag_revision_data_t;
 struct _smio_dsp_data_t;
 struct _smio_dsp_monit_data_t;
+struct _smio_init_board_type_t;
 
 /********************************************************/
 /************************ Our API ***********************/
@@ -1728,6 +1729,10 @@ halcs_client_err_e afc_timing_get_afc_hs_div (halcs_client_t *self, char *servic
 halcs_client_err_e halcs_get_init_check (halcs_client_t *self, char *service,
         uint32_t *init_check_out);
 
+/* Get board type */
+halcs_client_err_e halcs_get_init_board_type (halcs_client_t *self, char *service,
+        struct _smio_init_board_type_t *init_board_type);
+
 /********************** TIM RCV Functions ********************/
 
 /* DMTD Number of averages function. The functions returns
@@ -2248,29 +2253,11 @@ halcs_client_err_e halcs_get_fofb_ctrl_firmware_ver (halcs_client_t *self, char 
 halcs_client_err_e halcs_get_fofb_ctrl_sys_status (halcs_client_t *self, char *service,
         uint32_t *fofb_ctrl_sys_status);
 
-/* FOFB Controller link_partner_1 function. The functions returns
+/* FOFB Controller link_partner function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_link_partner_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_link_partner_1);
-
-/* FOFB Controller link_partner_2 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_link_partner_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_link_partner_2);
-
-/* FOFB Controller link_partner_3 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_link_partner_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_link_partner_3);
-
-/* FOFB Controller link_partner_4 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_link_partner_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_link_partner_4);
+halcs_client_err_e halcs_get_fofb_ctrl_link_partner (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_link_partner);
 
 /* FOFB Controller link_up function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
@@ -2284,125 +2271,35 @@ halcs_client_err_e halcs_get_fofb_ctrl_link_up (halcs_client_t *self, char *serv
 halcs_client_err_e halcs_get_fofb_ctrl_time_frame_count (halcs_client_t *self, char *service,
         uint32_t *fofb_ctrl_time_frame_count);
 
-/* FOFB Controller hard_err_cnt_1 function. The functions returns
+/* FOFB Controller hard_err_cnt function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_hard_err_cnt_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_hard_err_cnt_1);
+halcs_client_err_e halcs_get_fofb_ctrl_hard_err_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_hard_err_cnt);
 
-/* FOFB Controller hard_err_cnt_2 function. The functions returns
+/* FOFB Controller soft_err_cnt function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_hard_err_cnt_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_hard_err_cnt_2);
+halcs_client_err_e halcs_get_fofb_ctrl_soft_err_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_soft_err_cnt);
 
-/* FOFB Controller hard_err_cnt_3 function. The functions returns
+/* FOFB Controller frame_err_cnt function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_hard_err_cnt_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_hard_err_cnt_3);
+halcs_client_err_e halcs_get_fofb_ctrl_frame_err_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_frame_err_cnt);
 
-/* FOFB Controller hard_err_cnt_4 function. The functions returns
+/* FOFB Controller rx_pck_cnt function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_hard_err_cnt_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_hard_err_cnt_4);
+halcs_client_err_e halcs_get_fofb_ctrl_rx_pck_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_rx_pck_cnt);
 
-/* FOFB Controller soft_err_cnt_1 function. The functions returns
+/* FOFB Controller tx_pck_cnt function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_soft_err_cnt_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_soft_err_cnt_1);
-
-/* FOFB Controller soft_err_cnt_2 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_soft_err_cnt_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_soft_err_cnt_2);
-
-/* FOFB Controller soft_err_cnt_3 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_soft_err_cnt_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_soft_err_cnt_3);
-
-/* FOFB Controller soft_err_cnt_4 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_soft_err_cnt_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_soft_err_cnt_4);
-
-/* FOFB Controller frame_err_cnt_1 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_frame_err_cnt_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_frame_err_cnt_1);
-
-/* FOFB Controller frame_err_cnt_2 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_frame_err_cnt_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_frame_err_cnt_2);
-
-/* FOFB Controller frame_err_cnt_3 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_frame_err_cnt_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_frame_err_cnt_3);
-
-/* FOFB Controller frame_err_cnt_4 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_frame_err_cnt_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_frame_err_cnt_4);
-
-/* FOFB Controller rx_pck_cnt_1 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_rx_pck_cnt_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_rx_pck_cnt_1);
-
-/* FOFB Controller rx_pck_cnt_2 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_rx_pck_cnt_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_rx_pck_cnt_2);
-
-/* FOFB Controller rx_pck_cnt_3 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_rx_pck_cnt_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_rx_pck_cnt_3);
-
-/* FOFB Controller rx_pck_cnt_4 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_rx_pck_cnt_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_rx_pck_cnt_4);
-
-/* FOFB Controller tx_pck_cnt_1 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_tx_pck_cnt_1 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_tx_pck_cnt_1);
-
-/* FOFB Controller tx_pck_cnt_2 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_tx_pck_cnt_2 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_tx_pck_cnt_2);
-
-/* FOFB Controller tx_pck_cnt_3 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_tx_pck_cnt_3 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_tx_pck_cnt_3);
-
-/* FOFB Controller tx_pck_cnt_4 function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_get_fofb_ctrl_tx_pck_cnt_4 (halcs_client_t *self, char *service,
-        uint32_t *fofb_ctrl_tx_pck_cnt_4);
+halcs_client_err_e halcs_get_fofb_ctrl_tx_pck_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *fofb_ctrl_tx_pck_cnt);
 
 /* FOFB Controller fod_process_time function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
@@ -2446,6 +2343,54 @@ halcs_client_err_e halcs_get_fofb_ctrl_loopback_rdback (halcs_client_t *self, ch
 halcs_client_err_e halcs_get_fofb_ctrl_faival_rdback (halcs_client_t *self, char *service,
         uint32_t *fofb_ctrl_faival_rdback);
 
+/* FOFB Controller Time-of-arrival functions. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)
+ *
+ * To read TOA memory:
+ * *) Write 1 in halcs_set_fofb_ctrl_toa_rd_en ()
+ * *) For number_of_nodes:
+ * *)     Read data from halcs_get_fofb_ctrl_toa_data ()
+ * *)     Write 1 in halcs_set_fofb_ctrl_toa_rd_str ()
+ * *) Write 0 in halcs_set_fofb_ctrl_toa_rd_en ()
+ * */
+halcs_client_err_e halcs_set_fofb_ctrl_toa_rd_en (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_toa_rd_en);
+halcs_client_err_e halcs_get_fofb_ctrl_toa_rd_en (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_rd_en);
+
+halcs_client_err_e halcs_set_fofb_ctrl_toa_rd_str (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_toa_rd_str);
+halcs_client_err_e halcs_get_fofb_ctrl_toa_rd_str (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_rd_str);
+
+halcs_client_err_e halcs_get_fofb_ctrl_toa_data (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_toa_data);
+
+/* FOFB Controller Received-count-buffer functions. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)
+ *
+ * To read TOA memory:
+ * *) Write 1 in halcs_set_fofb_ctrl_rcb_rd_en ()
+ * *) For number_of_nodes:
+ * *)     Read data from halcs_get_fofb_ctrl_rcb_data ()
+ * *)     Write 1 in halcs_set_fofb_ctrl_rcb_rd_str ()
+ * *) Write 0 in halcs_set_fofb_ctrl_rcb_rd_en ()
+ * */
+halcs_client_err_e halcs_set_fofb_ctrl_rcb_rd_en (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_rcb_rd_en);
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_rd_en (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_rd_en);
+
+halcs_client_err_e halcs_set_fofb_ctrl_rcb_rd_str (halcs_client_t *self, char *service,
+        uint32_t fofb_ctrl_rcb_rd_str);
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_rd_str (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_rd_str);
+
+halcs_client_err_e halcs_get_fofb_ctrl_rcb_data (halcs_client_t *self, char *service,
+        uint32_t *fofb_ctrl_rcb_data);
+
 /********************** RTMLAMP_OHWR Functions ********************/
 
 /* RTMLAMP_OHWR Controller sta function. The functions returns
@@ -2457,7 +2402,7 @@ halcs_client_err_e halcs_get_rtmlamp_ohwr_sta (halcs_client_t *self, char *servi
 /* RTMLAMP_OHWR Controller dac_data_from_wb function. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service, 
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
         uint32_t rtmlamp_ohwr_dac_data_from_wb);
 halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
         uint32_t *rtmlamp_ohwr_dac_data_from_wb);

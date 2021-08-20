@@ -24,6 +24,8 @@ typedef struct _smio_dsp_monit_data_t smio_dsp_monit_data_t;
 typedef struct _smio_rffe_data_block_t smio_rffe_data_block_t;
 /* Forward smio_rffe_version_t declaration structure */
 typedef struct _smio_rffe_version_t smio_rffe_version_t;
+/* Forward smio_init_board_type_t declaration structure */
+typedef struct _smio_init_board_type_t smio_init_board_type_t;
 
 /* Include all module's codes */
 #include "sm_io_fmc130m_4ch_codes.h"

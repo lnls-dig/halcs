@@ -25,25 +25,25 @@ jobs:
     - compiler: gcc
       env: OS=ubuntu DIST=bionic BUILD_TYPE=cpack CPACK_BOARDS="afcv3" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+ubu1804" DEPLOY="yes"
     - compiler: gcc
-      env: OS=ubuntu DIST=bionic BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+ubu1804" DEPLOY="yes"
+      env: OS=ubuntu DIST=bionic BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" BUILD_PCIEDRIVER_PACKAGE=yes CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+ubu1804" DEPLOY="yes"
     - compiler: gcc
       env: OS=centos DIST=7 BUILD_TYPE=cpack CPACK_BOARDS="ml605" CPACK_GENERATORS="RPM" CPACK_DISTRO_VERSION="+el7" DEPLOY="yes"
     - compiler: gcc
       env: OS=centos DIST=7 BUILD_TYPE=cpack CPACK_BOARDS="afcv3" CPACK_GENERATORS="RPM" CPACK_DISTRO_VERSION="+el7" DEPLOY="yes"
     - compiler: gcc
-      env: OS=centos DIST=7 BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="RPM" CPACK_DISTRO_VERSION="+el7" DEPLOY="yes"
+      env: OS=centos DIST=7 BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" BUILD_PCIEDRIVER_PACKAGE=yes CPACK_GENERATORS="RPM" CPACK_DISTRO_VERSION="+el7" DEPLOY="yes"
     - compiler: gcc
       env: OS=debian DIST=stretch BUILD_TYPE=cpack CPACK_BOARDS="ml605" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb9" DEPLOY="yes"
     - compiler: gcc
       env: OS=debian DIST=stretch BUILD_TYPE=cpack CPACK_BOARDS="afcv3" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb9" DEPLOY="yes"
     - compiler: gcc
-      env: OS=debian DIST=stretch BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb9" DEPLOY="yes"
+      env: OS=debian DIST=stretch BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" BUILD_PCIEDRIVER_PACKAGE=yes CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb9" DEPLOY="yes"
     - compiler: gcc
       env: OS=debian DIST=buster BUILD_TYPE=cpack CPACK_BOARDS="ml605" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb10" DEPLOY="yes"
     - compiler: gcc
       env: OS=debian DIST=buster BUILD_TYPE=cpack CPACK_BOARDS="afcv3" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb10" DEPLOY="yes"
     - compiler: gcc
-      env: OS=debian DIST=buster BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb10" DEPLOY="yes"
+      env: OS=debian DIST=buster BUILD_TYPE=cpack CPACK_BOARDS="afcv3_1" BUILD_PCIEDRIVER_PACKAGE=yes CPACK_GENERATORS="DEB" CPACK_DISTRO_VERSION="+deb10" DEPLOY="yes"
     - compiler: gcc
       env: BUILD_TYPE=cmake BOARD=afcv3_1 DEPLOY_PAGES="yes"
 

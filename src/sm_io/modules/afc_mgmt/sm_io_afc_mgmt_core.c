@@ -10,7 +10,6 @@
 #include "sm_io_afc_mgmt_defaults.h"
 #include "sm_io_afc_mgmt_core.h"
 #include "hw/wb_afc_mgmt_regs.h"
-#include "chips_addr.h"
 
 /* Undef ASSERT_ALLOC to avoid conflicting with other ASSERT_ALLOC */
 #ifdef ASSERT_TEST

@@ -15,8 +15,9 @@ DOCKER_REPO=${DOCKER_REPO:-packpack/packpack}
 # Extra parameters for docker run.
 PACKPACK_EXTRA_DOCKER_RUN_PARAMS="${PACKPACK_EXTRA_DOCKER_RUN_PARAMS:-}"
 
-# CPACK generators
-CPACK_GENERATORS="${CPACK_GENERATORS:-DEB}"
+# CMake top-level CMakeLists.txt directory
+SRC_TOP_LEVEL_DIR="${SRC_TOP_LEVEL_DIR:-/source/halcs}"
+BUILD_TOP_LEVEL_DIR="${BUILD_TOP_LEVEL_DIR:-/build/halcs}"
 
 # Set CI variable to CI provider name
 CI=""
@@ -81,6 +82,7 @@ usage() {
     echo " * DIST - the version of distribution, e.g. xenial or 24 (${DIST})"
     echo " * BUILDDIR - directory used for out-of-source build (${BUILDDIR})"
     echo " * DOCKER_REPO - Docker repository to use (${DOCKER_REPO})"
+    echo " * MORE_LD_LIBRARY_PATH - Additional paths to append to Docker LD_LIBRARY_PATH"
     echo ""
     echo "The actual list of distribution is available on Docker Hub:"
     echo ""
@@ -118,6 +120,7 @@ if [ "${OS}" = "alpine" ]; then
         echo "adduser $USER wheel";
         echo "adduser $USER abuild";
         echo "export HOME=/home/$USER" ;
+        echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}\${MORE_LD_LIBRARY_PATH:+:\$MORE_LD_LIBRARY_PATH}" ;
         echo "abuild-keygen -a -i -n";
         echo "su-exec $USER \"\$@\"";
     ) > ${BUILDDIR}/userwrapper.sh
@@ -130,6 +133,7 @@ else
         echo "usermod -a -G wheel $USER 2>/dev/null || :";
         echo "usermod -a -G adm $USER 2>/dev/null || :";
         echo "export HOME=/home/$USER" ;
+        echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}\${MORE_LD_LIBRARY_PATH:+:\$MORE_LD_LIBRARY_PATH}" ;
         echo "exec chroot --userspec=$USER / \"\$@\"";
     ) > ${BUILDDIR}/userwrapper.sh
 fi
@@ -143,10 +147,12 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
 (
     echo "#!/bin/sh";
     echo "set -x";
-    echo "CPACK_GENERATORS=\"\$1\"";
+    echo "SRC_TOP_LEVEL_DIR=\"\$1\"";
+    echo "shift 1";
+    echo "BUILD_TOP_LEVEL_DIR=\"\$1\"";
     echo "shift 1";
     echo "CMAKE_OPTS=\"\$@\"";
-    echo "cd /build";
+    echo "cd \${BUILD_TOP_LEVEL_DIR}";
     echo "if [ -f \"/etc/debian_version\" ]; then";
     echo "    case \"\$(cat /etc/debian_version)\" in";
     echo "        *stretch* | 9.* )";
@@ -160,17 +166,17 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "            tar -xzvf cmake-\$version.\$build.tar.gz";
     echo "            cd cmake-\$version.\$build/";
     echo "            ./bootstrap";
-    echo "            make -j\$(nproc)";
+    echo "            make -j\$(nproc) > /dev/null";
     echo "            sudo make install";
     echo "            cmake --version";
-    echo "            cd /build";
+    echo "            cd \${BUILD_TOP_LEVEL_DIR}";
     echo "        ;;"
     echo "    esac";
     echo "fi";
     echo "sudo apt-get -y update && \\";
     echo "    sudo apt-get -y install pkg-config systemd uuid-dev libsodium-dev libzmq3-dev libczmq-dev";
     echo "if [ \"\$?\" -ne 0 ]; then"
-    echo "    sudo yum install -y epel-release && \\";
+    echo "    sudo yum install -y epel-release centos-release-scl centos-release-scl-rh && \\";
     echo "       sudo yum-config-manager --add-repo http://download.opensuse.org/repositories/network:/messaging:/zeromq:/release-draft/CentOS_7/network:messaging:zeromq:release-draft.repo && \\";
     echo "       sudo yum install -y pkgconfig uuid-devel libsodium-devel zeromq-devel czmq-devel && \\";
     echo "       sudo sed -i -e '/Cflags:/ s/-I\${libdir}\/pgm-5.2\/include//' /usr/lib64/pkgconfig/openpgm-5.2.pc";
@@ -178,14 +184,14 @@ chmod a+x ${BUILDDIR}/userwrapper.sh
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
     echo "fi";
-    echo "cmake3 \${CMAKE_OPTS} /source";
+    echo "cmake3 \${CMAKE_OPTS} \${SRC_TOP_LEVEL_DIR}";
     echo "if [ \"\$?\" -ne 0 ]; then";
-    echo "    cmake \${CMAKE_OPTS} /source";
+    echo "    cmake \${CMAKE_OPTS} \${SRC_TOP_LEVEL_DIR}";
     echo "fi";
     echo "if [ \"\$?\" -ne 0 ]; then";
     echo "    exit 1";
     echo "fi";
-    echo "cpack -V -G \"\${CPACK_GENERATORS}\"";
+    echo "make package";
 ) > ${BUILDDIR}/usercmd.sh
 
 chmod a+x ${BUILDDIR}/usercmd.sh
@@ -193,7 +199,7 @@ chmod a+x ${BUILDDIR}/usercmd.sh
 #
 # Save defined configuration variables to ./env file
 #
-env | grep -E "^PRODUCT=|^VERSION=|^RELEASE=|^ABBREV=|^TARBALL_|^CHANGELOG_|^CCACHE_|^PACKAGECLOUD_|^SMPFLAGS=|^OS=|^DIST=|^VAR_|^LD_LIBRARY_PATH=" \
+env | grep -E "^PRODUCT=|^VERSION=|^RELEASE=|^ABBREV=|^TARBALL_|^CHANGELOG_|^CCACHE_|^PACKAGECLOUD_|^SMPFLAGS=|^OS=|^DIST=|^VAR_|^MORE_LD_LIBRARY_PATH=" \
     > ${BUILDDIR}/env
 
 #
@@ -215,19 +221,19 @@ set -ex
 docker pull ${DOCKER_REPO}:${DOCKER_IMAGE}
 docker run \
         ${PACKPACK_EXTRA_DOCKER_RUN_PARAMS} \
-        --volume "${SOURCEDIR}:/source:ro" \
-        --volume "${BUILDDIR}:/build" \
+        --volume "${SOURCEDIR}:${SRC_TOP_LEVEL_DIR}:ro" \
+        --volume "${BUILDDIR}:${BUILD_TOP_LEVEL_DIR}" \
         --env-file ${BUILDDIR}/env \
-        --workdir /build \
+        --workdir ${BUILD_TOP_LEVEL_DIR} \
         --rm=true --tty=true \
-        --entrypoint=/build/userwrapper.sh \
+        --entrypoint=${BUILD_TOP_LEVEL_DIR}/userwrapper.sh \
         -e XDG_CACHE_HOME=/cache \
         -e CCACHE_DIR=/cache/ccache \
         -e TMPDIR=/tmp \
         -e CI=${CI} \
         --volume "${CACHE_DIR}:/cache" \
         ${DOCKER_REPO}:${DOCKER_IMAGE} \
-        /build/usercmd.sh "$@"
+        ${BUILD_TOP_LEVEL_DIR}/usercmd.sh "${SRC_TOP_LEVEL_DIR}" "${BUILD_TOP_LEVEL_DIR}" "$@"
 retcode=$?
 rm -f ${BUILDDIR}/userwrapper.sh ${BUILDDIR}/usercmd.sh ${BUILDDIR}/env
 exit $retcode

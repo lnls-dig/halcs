@@ -13,6 +13,12 @@ list(APPEND CMAKE_MODULE_PATH ${halcs_CMAKE_MODULES_DIR})
 
 # add module to prevent in-source builds
 include(PreventInSourceBuilds)
+# detect target architecture
+include(TargetArch)
+# extract version numbers from header file
+include(TestHalcsVersion)
+
+target_architecture(ARCH)
 
 # find pkg-config
 find_package(PkgConfig)
@@ -70,20 +76,6 @@ endmacro()
 ########################################################################
 # User compile-time options
 ########################################################################
-
-# which board do we want.
-set(halcs_BOARD_OPT "afcv3_1" CACHE STRING
-    "HALCS board")
-set(halcs_BOARD_VALUES
-    "ml605;afcv3;afcv3_1"
-)
-
-set_property(CACHE halcs_BOARD_OPT PROPERTY STRINGS
-    ${halcs_BOARD_VALUES}
-)
-
-message(STATUS
-    "Setting compile-time option halcs_BOARD='${halcs_BOARD_OPT}'")
 
 ########################################################################
 # Library options
@@ -192,10 +184,6 @@ list(APPEND halcs_LIBRARIES disptable)
 # HALCSCLIENT dependency
 #########################################################################
 
-# set compile options to halcsclient
-set(halcsclient_BOARD_OPT ${halcs_BOARD_OPT} CACHE STRING
-    "HALCS board" FORCE)
-
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/client)
 
 # Add "target" name library dependency
@@ -220,6 +208,9 @@ add_subdirectory(libs/bpmclient)
 ########################################################################
 # Sources/Headers definitions
 ########################################################################
+
+# HALCS postinst file directory
+set(halcs_POSTINST_FILE_DIR "${CMAKE_CURRENT_BINARY_DIR}/halcs")
 
 set(common_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -253,6 +244,163 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/examples)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ldconf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/dev_mngr)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/apps)
+
+#################################################
+## CPack
+#################################################
+
+# ALL_COMPONENTS_IN_ONE or ONE_PER_GROUP
+set(cpack_components_grouping_OPT "ALL_COMPONENTS_IN_ONE"
+    CACHE STRING "CPack CPACK_COMPONENTS_GROUPING variable"
+)
+set(CPACK_COMPONENTS_GROUPING "${cpack_components_grouping_OPT}")
+
+# Any of Binaries;Libs;Scripts;Tools;Pciedriver
+set(cpack_components_all_OPT "Binaries;Libs;Scripts;Tools"
+    CACHE STRING "CPack CPACK_COMPONENTS_ALL variable"
+)
+set(CPACK_COMPONENTS_ALL "${cpack_components_all_OPT}")
+
+# Any CPACK generator
+set(cpack_generator_OPT "RPM"
+    CACHE STRING "CPack CPACK_GENERATOR variable"
+)
+
+# CPack rules
+option(ENABLE_CPACK "Enables cpack rules" ON)
+
+if(ENABLE_CPACK)
+    if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+        set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+        set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+    endif()
+
+    include(InstallRequiredSystemLibraries)
+
+    # set architecture as detected by TargetArch module
+    set(arch_name ${ARCH})
+    
+    set(halcs_DISTRO_VERSION "" CACHE STRING "halcs distribution version")
+
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+
+    set(CPACK_GENERATOR "${cpack_generator_OPT}")
+    set(CPACK_PACKAGE_NAME "halcsd")
+
+    set(CPACK_DEB_COMPONENT_INSTALL ON)
+    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    # we also depend on malamute >= 1.0, but this has not been packaged into the official
+    # repositories yet
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsodium-dev (>= 1.0.8), libzmq3-dev (>= 4.2.5), libczmq-dev (>= 4.0.2)")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${halcs_POSTINST_FILE_DIR}/debian/postinst")
+    # Seems broken in CMake and crashes with 
+    # CPack: Create package
+    # terminate called after throwing an instance of 'std::logic_error'
+    #   what():  basic_string::_M_construct null not valid
+    # Makefile:81: recipe for target 'package' failed
+    # make: *** [package] Aborted (core dumped)
+    # set(CPACK_DEBIAN_DEBUGINFO_PACKAGE ON)
+
+    set(CPACK_RPM_COMPONENT_INSTALL ON)
+    set(CPACK_RPM_PACKAGE_AUTOREQ no)
+    set(CPACK_RPM_PACKAGE_AUTOPROV yes)
+    # we also depend on malamute >= 1.0, but this has not been packaged into the official
+    # repositories yet
+    set(CPACK_RPM_PACKAGE_REQUIRE "libsodium-devel >= 1.0.8, zeromq-devel >= 4.2.5, czmq-devel >= 4.0.2")
+    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+        /lib
+        /usr/etc
+        /etc/systemd
+        /lib/systemd
+        /etc/systemd/system
+        /lib/systemd/system
+        /etc/udev
+        /etc/udev/rules.d
+    )
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${halcs_POSTINST_FILE_DIR}/redhat/postinst")
+    set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${halcs_VERSION}")
+    set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
+
+    set(CPACK_PACKAGE_FILE_NAME
+        "${CPACK_PACKAGE_NAME}_${halcs_VERSION}${halcs_DISTRO_VERSION}_${arch_name}"
+    )
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "halcsd daemon")
+    set(CPACK_PACKAGE_VENDOR "LNLS")
+    set(CPACK_PACKAGE_CONTACT "Lucas Russo <lucas.russo@lnls.br>")
+    #set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/COPYING.txt")
+    # set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
+    # set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/WELCOME.txt")
+    # set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/branding.bmp")
+
+    # if we are packaging Pciedriver use it's own version
+    if("${CPACK_COMPONENTS_ALL}" STREQUAL "Pciedriver")
+        set(CPACK_PACKAGE_VERSION ${pciedriver_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${pciedriver_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${pciedriver_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${pciedriver_VERSION_PATCH})
+    else()
+        set(CPACK_PACKAGE_VERSION ${halcs_VERSION})
+        set(CPACK_PACKAGE_VERSION_MAJOR ${halcs_VERSION_MAJOR})
+        set(CPACK_PACKAGE_VERSION_MINOR ${halcs_VERSION_MINOR})
+        set(CPACK_PACKAGE_VERSION_PATCH ${halcs_VERSION_PATCH})
+    endif()
+    # set(CPACK_PACKAGE_INSTALL_DIRECTORY "halcsd Install Directory")
+    # set(CPACK_TEMPORARY_DIRECTORY "halcsd Temporary CPack Directory")
+
+    include(CPack)
+
+    # For HALCS
+    cpack_add_component_group(HalcsFull
+        DISPLAY_NAME "HALCS libs, scripts, tools, headers and binaries"
+    )
+
+    cpack_add_component(Binaries
+        DISPLAY_NAME "Halcs binaries"
+        GROUP HalcsFull
+        INSTALL_TYPES FullHalcs
+    )
+
+    cpack_add_component(Libs
+        DISPLAY_NAME "Halcs libraries"
+        GROUP HalcsFull
+        INSTALL_TYPES FullHalcs
+    )
+
+    cpack_add_component(Scripts
+        DISPLAY_NAME "Halcs scripts"
+        GROUP HalcsFull
+        INSTALL_TYPES FullHalcs
+    )
+
+    cpack_add_component(Tools
+        DISPLAY_NAME "Halcs tools"
+        GROUP HalcsFull
+        INSTALL_TYPES FullHalcs
+    )
+
+    cpack_add_install_type(FullHalcs
+        DISPLAY_NAME "Full Halcs"
+    )
+
+    # For Pciedriver
+    cpack_add_component_group(Pciedriver
+        DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+    )
+
+    cpack_add_component(Pciedriver
+        DISPLAY_NAME "pcieDriver drivers, headers and libraries"
+        GROUP Pciedriver
+        INSTALL_TYPES FullDriver
+    )
+
+    cpack_add_install_type(FullDriver
+        DISPLAY_NAME "Full drivers, headers and libraries"
+    )
+
+endif()
 
 ########################################################################
 # Custom targets
