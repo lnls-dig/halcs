@@ -76,10 +76,10 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
     ASSERT_ALLOC(acq_core_mem_region_size_p, err_lookup_sym);
     const size_t acq_core_mem_region_size = **acq_core_mem_region_size_p;
 
-    const size_t **acq_core_ddr3_data_width_p =
-        hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_data_width");
-    ASSERT_ALLOC(acq_core_ddr3_data_width_p, err_lookup_sym);
-    const size_t acq_core_ddr3_data_width = **acq_core_ddr3_data_width_p;
+    //const size_t **acq_core_ddr3_data_width_p =
+    //    hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_data_width");
+    //ASSERT_ALLOC(acq_core_ddr3_data_width_p, err_lookup_sym);
+    //const size_t acq_core_ddr3_data_width = **acq_core_ddr3_data_width_p;
 
     const size_t **acq_core_ddr3_byte_2_bit_p =
         hutils_lookup_symbol ("pvar_const_size_t_p_", board_type, "_ddr3_byte_2_bit");
@@ -140,9 +140,9 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         uint32_t atom_width = 0;
         /* These are all in bytes */
         uint32_t sample_size = 0;
-        uint32_t max_samples = 0;
+        //uint32_t max_samples = 0;
         uint32_t first_addr = 0;
-        uint32_t last_addr = 0;
+        //uint32_t last_addr = 0;
         uint32_t acq_buf_id = (inst_id > __acq_buf_max_inst_id ||
                                 i > self->num_chan-1)? 
                                     i :
@@ -151,10 +151,10 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
                                 i > self->num_chan-1)? 
                                     (acq_core_mem_total_size - acq_core_mem_region_size) : 
                                     (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].start_addr;
-        uint32_t acq_buf_end_addr =(inst_id > __acq_buf_max_inst_id ||
-                                i > self->num_chan-1)? 
-                                    (acq_core_mem_total_size - acq_core_ddr3_data_width) : 
-                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].end_addr;
+        //uint32_t acq_buf_end_addr =(inst_id > __acq_buf_max_inst_id ||
+        //                        i > self->num_chan-1)? 
+        //                            (acq_core_mem_total_size - acq_core_ddr3_data_width) : 
+        //                            (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].end_addr;
 
         /* Get channel properties */
         GET_PARAM_CHANNEL(parent, acq, 0x0, ACQ_CORE, CH0_DESC, INT_WIDTH,
@@ -183,15 +183,15 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         first_addr = acq_buf_start_addr;
         /* This is the last possible address to store a sample. be safe in case
          * this is a dummy area with 0 bytes space */
-        last_addr = ((acq_buf_end_addr - sample_size) > acq_buf_start_addr)?
-            (acq_buf_end_addr - sample_size) : acq_buf_start_addr;
-        max_samples = (last_addr - first_addr) / sample_size;
+        //last_addr = ((acq_buf_end_addr - sample_size) > acq_buf_start_addr)?
+        //    (acq_buf_end_addr - sample_size) : acq_buf_start_addr;
+        //max_samples = (last_addr - first_addr) / sample_size;
 
         self->acq_buf[i].id = acq_buf_id;
         self->acq_buf[i].start_addr = first_addr;
-        self->acq_buf[i].end_addr = last_addr;
+        self->acq_buf[i].end_addr = first_addr + 0x0FFFFFF8;
         self->acq_buf[i].sample_size = sample_size;
-        self->acq_buf[i].max_samples = max_samples;
+        self->acq_buf[i].max_samples = 33554431;
 
         DBE_DEBUG (DBG_SM_IO | DBG_LVL_INFO, "[sm_io:acq_core] Channel properties, ACQ %u:\n"
             "\tID = %u\n"
