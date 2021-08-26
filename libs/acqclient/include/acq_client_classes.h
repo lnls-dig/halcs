@@ -23,7 +23,7 @@
 
 #define ACQ_CLIENT_VERSION_MAJOR 2
 #define ACQ_CLIENT_VERSION_MINOR 5
-#define ACQ_CLIENT_VERSION_PATCH 0
+#define ACQ_CLIENT_VERSION_PATCH 1
 
 #define ACQ_CLIENT_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
