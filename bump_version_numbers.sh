@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage () {
     echo "Usage:" >&2
-    echo "  $1 -t ["major"|"minor"|"patch"" >&2
+    echo "  $1 -t ["major"|"minor"|"patch"]" >&2
     echo >&2
     echo "  Options:" >&2
     echo "    -t                  bump the specified version number" >&2
