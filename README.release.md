@@ -2,7 +2,7 @@
 
 1. Update API version number in HALCS headers
 
-It's is located at:
+It is located at:
 
 `include/revision.h`
 
@@ -48,6 +48,14 @@ This is located at:
 examples/include/halcs_examples_classes.h
 ```
 
-5. Merge branch with `master` branch
+5. In order to update the version nubmer in the header files there is a script to do that
+automatically called "bump_version_numbers.sh". One can call it to bump the "major",
+"minor" or "patch" version numbers as:
 
-6. Tag the `master` branch with the release version with the HALCS API version number
+```
+./bump_version_numbers.sh -t [major|minor|patch]
+```
+
+6. Merge branch with `master` branch
+
+7. Tag the `master` branch with the release version with the HALCS API version number
