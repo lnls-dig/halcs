@@ -144,17 +144,17 @@ smio_acq_t * smio_acq_new (smio_t *parent, uint32_t num_samples_pre,
         uint32_t first_addr = 0;
         uint32_t last_addr = 0;
         uint32_t acq_buf_id = (inst_id > __acq_buf_max_inst_id ||
-                                i > self->num_chan-1)? 
+                                i > acq_core_end_chan_id-1)?
                                     i :
-                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].id;
+                                    (*acq_core_buf)[inst_id*acq_core_end_chan_id + i].id;
         uint32_t acq_buf_start_addr = (inst_id > __acq_buf_max_inst_id ||
-                                i > self->num_chan-1)? 
-                                    (acq_core_mem_total_size - acq_core_mem_region_size) : 
-                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].start_addr;
+                                i > acq_core_end_chan_id-1)?
+                                    (acq_core_mem_total_size - acq_core_mem_region_size) :
+                                    (*acq_core_buf)[inst_id*acq_core_end_chan_id + i].start_addr;
         uint32_t acq_buf_end_addr =(inst_id > __acq_buf_max_inst_id ||
-                                i > self->num_chan-1)? 
-                                    (acq_core_mem_total_size - acq_core_ddr3_data_width) : 
-                                    (*acq_core_buf)[inst_id*acq_core_num_acq_core_smios + i].end_addr;
+                                i > acq_core_end_chan_id-1)?
+                                    (acq_core_mem_total_size - acq_core_ddr3_data_width) :
+                                    (*acq_core_buf)[inst_id*acq_core_end_chan_id + i].end_addr;
 
         /* Get channel properties */
         GET_PARAM_CHANNEL(parent, acq, 0x0, ACQ_CORE, CH0_DESC, INT_WIDTH,
