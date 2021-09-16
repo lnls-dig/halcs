@@ -12,9 +12,6 @@
 
 #define DFLT_BIND_FOLDER            "/tmp/halcs"
 
-#define DFLT_HALCS_NUMBER             0
-#define MAX_HALCS_NUMBER              1
-
 #define DFLT_BOARD_NUMBER           0
 
 #define DFLT_CHAN_NUM               0
@@ -34,12 +31,27 @@ static struct option long_options[] =
     {"amp_iflag_r",         no_argument,         NULL, 'a'},
     {"amp_tflag_r",         no_argument,         NULL, 't'},
     {"amp_en",              required_argument,   NULL, 'u'},
+    {"pi_ol_triang_en",     required_argument,   NULL, 'l'},
+    {"pi_ol_square_en",     required_argument,   NULL, 'q'},
+    {"pi_sp_square_en",     required_argument,   NULL, 'n'},
+    {"pi_en",               required_argument,   NULL, 'i'},
     {"dac_data",            required_argument,   NULL, 'e'},
     {"dac_wr",              required_argument,   NULL, 'x'},
+    {"pi_kp",               required_argument,   NULL, 'k'},
+    {"pi_ti",               required_argument,   NULL, 'z'},
+    {"pi_sp",               required_argument,   NULL, 'j'},
+    {"pi_ol_dac_cnt_max",   required_argument,   NULL, 'd'},
+    {"pi_sp_lim_inf",       required_argument,   NULL, 'm'},
     {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:c:yw:rpatu:e:x:";
+extern disp_op_t rtmlamp_ohwr_pi_kp_exp;
+extern disp_op_t rtmlamp_ohwr_pi_ti_exp;
+extern disp_op_t rtmlamp_ohwr_pi_sp_exp;
+extern disp_op_t rtmlamp_ohwr_pi_ol_dac_cnt_max_exp;
+extern disp_op_t rtmlamp_ohwr_pi_sp_lim_inf_exp;
+
+static const char* shortopt = "hb:vo:s:c:yw:rpatu:l:q:n:i:e:x:k:z:j:d:m:";
 
 void print_help (char *program_name)
 {
@@ -61,9 +73,22 @@ void print_help (char *program_name)
             "  -a  --amp_iflag_r                    Amplifier right overcurrent flag \n"
             "  -t  --amp_tflag_r                    Amplifier right overtemperature flag \n"
             "  -u  --amp_en <[0 = disable, 1 = enable>\n"
-            "                                       Amplifier enable\n"
+            "                                       Amplifier enable (must set --channnumber)\n"
+            "  -l  --pi_ol_triang_en <[0 = disable, 1 = enable>\n"
+            "                                       PI open-loop triangular wave enable (must set --channnumber)\n"
+            "  -q  --pi_ol_square_en <[0 = disable, 1 = enable>\n"
+            "                                       PI open-loop square wave enable (must set --channnumber)\n"
+            "  -n  --pi_sp_square_en <[0 = disable, 1 = enable>\n"
+            "                                       PI setpoint closed-loop square wave enable (must set --channnumber)\n"
+            "  -i  --pi_en <[0 = disable, 1 = enable>\n"
+            "                                       PI enable (must set --channnumber)\n"
             "  -e  --dac_data                       DAC to be sent to DAC\n"
-            "  -x  --dac_wr                         Write DAC data to external IC\n",
+            "  -x  --dac_wr                         Write DAC data to external IC\n"
+            "  -k  --pi_kp                          PI KP parameter\n"
+            "  -z  --pi_ti                          PI TI parameter\n"
+            "  -j  --pi_sp                          PI setpoint (also used for PI test modes)\n"
+            "  -d  --pi_ol_dac_cnt_max              PI open-loop counter max (defines PI test mode waveform period)\n"
+            "  -m  --pi_sp_lim_inf                  PI setpoint inferior limit (for PI test modes)\n",
             program_name);
 }
 
@@ -82,8 +107,17 @@ int main (int argc, char *argv [])
     int amp_iflag_r_sel = 0;
     int amp_tflag_r_sel = 0;
     char *amp_en_str = NULL;
+    char *pi_ol_triang_enable_str = NULL;
+    char *pi_ol_square_enable_str = NULL;
+    char *pi_sp_square_enable_str = NULL;
+    char *pi_enable_str = NULL;
     char *dac_data_str = NULL;
     char *dac_wr_str = NULL;
+    char *pi_kp_str = NULL;
+    char *pi_ti_str = NULL;
+    char *pi_sp_str = NULL;
+    char *pi_ol_dac_cnt_max_str = NULL;
+    char *pi_sp_lim_inf_str = NULL;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -144,12 +178,48 @@ int main (int argc, char *argv [])
                 amp_en_str = strdup (optarg);
                 break;
 
+            case 'l':
+                pi_ol_triang_enable_str = strdup (optarg);
+                break;
+
+            case 'q':
+                pi_ol_square_enable_str = strdup (optarg);
+                break;
+
+            case 'n':
+                pi_sp_square_enable_str = strdup (optarg);
+                break;
+
+            case 'i':
+                pi_enable_str = strdup (optarg);
+                break;
+
             case 'e':
                 dac_data_str = strdup (optarg);
                 break;
 
             case 'x':
                 dac_wr_str = strdup (optarg);
+                break;
+
+            case 'k':
+                pi_kp_str = strdup (optarg);
+                break;
+
+            case 'z':
+                pi_ti_str = strdup (optarg);
+                break;
+
+            case 'j':
+                pi_sp_str = strdup (optarg);
+                break;
+
+            case 'd':
+                pi_ol_dac_cnt_max_str = strdup (optarg);
+                break;
+
+            case 'm':
+                pi_sp_lim_inf_str = strdup (optarg);
                 break;
 
             case '?':
@@ -166,12 +236,16 @@ int main (int argc, char *argv [])
     }
 
     /* If we want to change a channel property, we must select a channel first */
-    if ((amp_iflag_l_sel == 1 || 
-         amp_tflag_l_sel == 1 || 
-         amp_iflag_r_sel == 1 || 
+    if ((amp_iflag_l_sel == 1 ||
+         amp_tflag_l_sel == 1 ||
+         amp_iflag_r_sel == 1 ||
          amp_iflag_r_sel == 1 ||
          amp_en_str != NULL ||
-         dac_data_str != NULL) && 
+         pi_ol_triang_enable_str != NULL ||
+         pi_ol_square_enable_str != NULL ||
+         pi_sp_square_enable_str != NULL ||
+         pi_enable_str != NULL ||
+         dac_data_str != NULL) &&
              chan_sel == 0) {
         fprintf (stderr, "[client:rtmlamp_ohwr]: Channel number not selected (use -c or --channumber option)\n");
         exit (1);
@@ -197,13 +271,13 @@ int main (int argc, char *argv [])
             if (sscanf (chan_str, "%u", &chan_min) != 1) {
                 fprintf (stderr, "[client:rtmlamp_ohwr]: Unexpected channel format\n");
                 exit (1);
-            }   
+            }
             chan_max = chan_min+1;
         }
         else {
             chan_max++;
         }
-   
+
         if (chan_max < chan_min) {
             fprintf (stderr, "[client:rtmlamp_ohwr]: Channel range must be ascending\n");
             exit (1);
@@ -221,21 +295,14 @@ int main (int argc, char *argv [])
         board_number = strtoul (board_number_str, NULL, 10);
     }
 
-    /* Set default halcs number */
+    /* Set halcs number */
     uint32_t halcs_number;
     if (halcs_number_str == NULL) {
-        fprintf (stderr, "[client:rtmlamp_ohwr]: Setting default value to HALCS number: %u\n",
-                DFLT_HALCS_NUMBER);
-        halcs_number = DFLT_HALCS_NUMBER;
+        fprintf (stderr, "[client:rtmlamp_ohwr]: No halcs instance specified. Please use --halcsnumber option\n");
+        goto err_halcs_set;
     }
     else {
         halcs_number = strtoul (halcs_number_str, NULL, 10);
-
-        if (halcs_number > MAX_HALCS_NUMBER) {
-            fprintf (stderr, "[client:rtmlamp_ohwr]: HALCS number too big! Defaulting to: %u\n",
-                    MAX_HALCS_NUMBER);
-            halcs_number = MAX_HALCS_NUMBER;
-        }
     }
 
     char service[50];
@@ -267,7 +334,72 @@ int main (int argc, char *argv [])
 
         uint32_t arg = 0;
         halcs_get_rtmlamp_ohwr_dac_data_from_wb (halcs_client, service, &arg);
-        printf ("[client:rtmlamp_ohwr]: dac_data_from_wb: 0x%08X\n", arg);
+        printf ("[client:rtmlamp_ohwr]: dac_data_from_wb: 0x%08x\n", arg);
+    }
+
+    if (pi_kp_str != NULL) {
+        uint32_t pi_kp = strtoul (pi_kp_str, NULL, 10);
+        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_kp (halcs_client, service, pi_kp);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_kp failed\n");
+            goto err_halcs_set;
+        }
+
+        uint32_t arg = 0;
+        halcs_get_rtmlamp_ohwr_pi_kp (halcs_client, service, &arg);
+        printf ("[client:rtmlamp_ohwr]: pi_kp: 0x%08x\n", arg);
+    }
+
+    if (pi_ti_str != NULL) {
+        uint32_t pi_ti = strtoul (pi_ti_str, NULL, 10);
+        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ti (halcs_client, service, pi_ti);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ti failed\n");
+            goto err_halcs_set;
+        }
+
+        uint32_t arg = 0;
+        halcs_get_rtmlamp_ohwr_pi_ti (halcs_client, service, &arg);
+        printf ("[client:rtmlamp_ohwr]: pi_ti: 0x%08x\n", arg);
+    }
+
+    if (pi_sp_str != NULL) {
+        uint32_t pi_sp = strtoul (pi_sp_str, NULL, 10);
+        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_sp (halcs_client, service, pi_sp);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp failed\n");
+            goto err_halcs_set;
+        }
+
+        uint32_t arg = 0;
+        halcs_get_rtmlamp_ohwr_pi_sp (halcs_client, service, &arg);
+        printf ("[client:rtmlamp_ohwr]: pi_sp: 0x%08x\n", arg);
+    }
+
+    if (pi_ol_dac_cnt_max_str != NULL) {
+        uint32_t pi_ol_dac_cnt_max = strtoul (pi_ol_dac_cnt_max_str, NULL, 10);
+        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client, service, pi_ol_dac_cnt_max);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ol_dac_cnt_max failed\n");
+            goto err_halcs_set;
+        }
+
+        uint32_t arg = 0;
+        halcs_get_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client, service, &arg);
+        printf ("[client:rtmlamp_ohwr]: pi_ol_dac_cnt_max: 0x%08X\n", arg);
+    }
+
+    if (pi_sp_lim_inf_str != NULL) {
+        uint32_t pi_sp_lim_inf = strtoul (pi_sp_lim_inf_str, NULL, 10);
+        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client, service, pi_sp_lim_inf);
+        if (err != HALCS_CLIENT_SUCCESS){
+            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp_lim_inf failed\n");
+            goto err_halcs_set;
+        }
+
+        uint32_t arg = 0;
+        halcs_get_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client, service, &arg);
+        printf ("[client:rtmlamp_ohwr]: pi_sp_lim_inf: 0x%08X\n", arg);
     }
 
     uint32_t chan;
@@ -326,6 +458,62 @@ int main (int argc, char *argv [])
             printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_amp_en: 0x%08X\n", arg);
         }
 
+        uint32_t pi_ol_triang_enable = 0;
+        if (pi_ol_triang_enable_str != NULL) {
+            pi_ol_triang_enable = strtoul (pi_ol_triang_enable_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ol_triang_enable (halcs_client, service, chan, pi_ol_triang_enable);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ol_triang_enable failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_ol_triang_enable (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ol_triang_enable: 0x%08X\n", arg);
+        }
+
+        uint32_t pi_ol_square_enable = 0;
+        if (pi_ol_square_enable_str != NULL) {
+            pi_ol_square_enable = strtoul (pi_ol_square_enable_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ol_square_enable (halcs_client, service, chan, pi_ol_square_enable);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ol_square_enable failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_ol_square_enable (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ol_square_enable: 0x%08X\n", arg);
+        }
+
+        uint32_t pi_sp_square_enable = 0;
+        if (pi_sp_square_enable_str != NULL) {
+            pi_sp_square_enable = strtoul (pi_sp_square_enable_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_sp_square_enable (halcs_client, service, chan, pi_sp_square_enable);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp_square_enable failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_sp_square_enable (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp_square_enable: 0x%08X\n", arg);
+        }
+
+        uint32_t pi_enable = 0;
+        if (pi_enable_str != NULL) {
+            pi_enable = strtoul (pi_enable_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_enable (halcs_client, service, chan, pi_enable);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_enable failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_enable (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_enable: 0x%08X\n", arg);
+        }
+
         uint32_t dac_data = 0;
         if (dac_data_str != NULL) {
             dac_data = strtoul (dac_data_str, NULL, 10);
@@ -361,8 +549,26 @@ err_halcs_client_new:
     dac_wr_str = NULL;
     free (dac_data_str);
     dac_data_str = NULL;
+    free (pi_sp_lim_inf_str);
+    pi_sp_lim_inf_str = NULL;
+    free (pi_ol_dac_cnt_max_str);
+    pi_ol_dac_cnt_max_str = NULL;
+    free (pi_sp_str);
+    pi_sp_str = NULL;
+    free (pi_ti_str);
+    pi_ti_str = NULL;
+    free (pi_kp_str);
+    pi_kp_str = NULL;
     free (dac_data_from_wb_str);
     dac_data_from_wb_str = NULL;
+    free (pi_enable_str);
+    pi_enable_str = NULL;
+    free (pi_sp_square_enable_str);
+    pi_sp_square_enable_str = NULL;
+    free (pi_ol_square_enable_str);
+    pi_ol_square_enable_str = NULL;
+    free (pi_ol_triang_enable_str);
+    pi_ol_triang_enable_str = NULL;
     free (amp_en_str);
     amp_en_str = NULL;
     free (chan_str);
