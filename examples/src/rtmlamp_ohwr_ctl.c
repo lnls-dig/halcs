@@ -337,45 +337,6 @@ int main (int argc, char *argv [])
         printf ("[client:rtmlamp_ohwr]: dac_data_from_wb: 0x%08x\n", arg);
     }
 
-    if (pi_kp_str != NULL) {
-        uint32_t pi_kp = strtoul (pi_kp_str, NULL, 10);
-        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_kp (halcs_client, service, pi_kp);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_kp failed\n");
-            goto err_halcs_set;
-        }
-
-        uint32_t arg = 0;
-        halcs_get_rtmlamp_ohwr_pi_kp (halcs_client, service, &arg);
-        printf ("[client:rtmlamp_ohwr]: pi_kp: 0x%08x\n", arg);
-    }
-
-    if (pi_ti_str != NULL) {
-        uint32_t pi_ti = strtoul (pi_ti_str, NULL, 10);
-        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ti (halcs_client, service, pi_ti);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ti failed\n");
-            goto err_halcs_set;
-        }
-
-        uint32_t arg = 0;
-        halcs_get_rtmlamp_ohwr_pi_ti (halcs_client, service, &arg);
-        printf ("[client:rtmlamp_ohwr]: pi_ti: 0x%08x\n", arg);
-    }
-
-    if (pi_sp_str != NULL) {
-        uint32_t pi_sp = strtoul (pi_sp_str, NULL, 10);
-        halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_sp (halcs_client, service, pi_sp);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp failed\n");
-            goto err_halcs_set;
-        }
-
-        uint32_t arg = 0;
-        halcs_get_rtmlamp_ohwr_pi_sp (halcs_client, service, &arg);
-        printf ("[client:rtmlamp_ohwr]: pi_sp: 0x%08x\n", arg);
-    }
-
     if (pi_ol_dac_cnt_max_str != NULL) {
         uint32_t pi_ol_dac_cnt_max = strtoul (pi_ol_dac_cnt_max_str, NULL, 10);
         halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client, service, pi_ol_dac_cnt_max);
@@ -513,6 +474,46 @@ int main (int argc, char *argv [])
             halcs_get_rtmlamp_ohwr_pi_enable (halcs_client, service, chan, &arg);
             printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_enable: 0x%08X\n", arg);
         }
+
+        if (pi_kp_str != NULL) {
+            uint32_t pi_kp = strtoul (pi_kp_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_kp (halcs_client, service, chan, pi_kp);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_kp failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_kp (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: pi_kp: 0x%08x\n", arg);
+        }
+
+        if (pi_ti_str != NULL) {
+            uint32_t pi_ti = strtoul (pi_ti_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_ti (halcs_client, service, chan, pi_ti);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_ti failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_ti (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: pi_ti: 0x%08x\n", arg);
+        }
+
+        if (pi_sp_str != NULL) {
+            uint32_t pi_sp = strtoul (pi_sp_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_pi_sp (halcs_client, service, chan, pi_sp);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_pi_sp failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_pi_sp (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: pi_sp: 0x%08x\n", arg);
+        }
+
 
         uint32_t dac_data = 0;
         if (dac_data_str != NULL) {
