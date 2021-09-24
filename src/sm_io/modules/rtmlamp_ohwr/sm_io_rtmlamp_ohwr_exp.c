@@ -39,7 +39,7 @@
 
 /* This must match the FPGA maximum number of channels */
 #define RTMLAMP_OHWR_NUM_CHAN                          12
-#define RTMLAMP_OHWR_CHAN_OFFSET                       0x00c /* 3 32-bit registers */
+#define RTMLAMP_OHWR_CHAN_OFFSET                       0x018 /* 6 32-bit registers */
 
 /*****************************************************************/
 /************ Specific RTMLAMP_OHWR INTERFACE Operations **************/
@@ -144,6 +144,27 @@ RW_PARAM_FUNC(rtmlamp_ohwr, pi_enable) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(rtmlamp_ohwr, pi_kp) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
+            CH_0_PI_KP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(rtmlamp_ohwr, pi_ti) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
+            CH_0_PI_TI, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
+            CH_0_PI_SP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
 #define HALCS_RTMLAMP_OHWR_DAC_DATA_MIN                 0
 #define HALCS_RTMLAMP_OHWR_DAC_DATA_MAX                 RTMLAMP_OHWR_CH_0_DAC_DATA_MASK
 RW_PARAM_FUNC(rtmlamp_ohwr, dac_data) {
@@ -160,24 +181,6 @@ RW_PARAM_FUNC(rtmlamp_ohwr, dac_wr) {
             CH_0_DAC, WR, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_DAC_WR_MIN, HALCS_RTMLAMP_OHWR_DAC_WR_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
-}
-
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_kp) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, PI_KP, DATA,
-            MULT_BIT_PARAM, /* No min check */, /* No max check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_ti) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, PI_TI, DATA,
-            MULT_BIT_PARAM, /* No min check */, /* No max check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, PI_SP, DATA,
-            MULT_BIT_PARAM, /* No min check */, /* No max check */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(rtmlamp_ohwr, pi_ol_dac_cnt_max) {
@@ -205,11 +208,11 @@ const disp_table_func_fp rtmlamp_ohwr_exp_fp [] = {
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ol_square_enable),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp_square_enable),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_enable),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_data),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_wr),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_kp),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ti),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_data),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_wr),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ol_dac_cnt_max),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp_lim_inf),
     NULL

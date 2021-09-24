@@ -21,11 +21,11 @@ extern disp_op_t rtmlamp_ohwr_pi_ol_triang_enable_exp;
 extern disp_op_t rtmlamp_ohwr_pi_ol_square_enable_exp;
 extern disp_op_t rtmlamp_ohwr_pi_sp_square_enable_exp;
 extern disp_op_t rtmlamp_ohwr_pi_enable_exp;
-extern disp_op_t rtmlamp_ohwr_dac_data_exp;
-extern disp_op_t rtmlamp_ohwr_dac_wr_exp;
 extern disp_op_t rtmlamp_ohwr_pi_kp_exp;
 extern disp_op_t rtmlamp_ohwr_pi_ti_exp;
 extern disp_op_t rtmlamp_ohwr_pi_sp_exp;
+extern disp_op_t rtmlamp_ohwr_dac_data_exp;
+extern disp_op_t rtmlamp_ohwr_dac_wr_exp;
 extern disp_op_t rtmlamp_ohwr_pi_ol_dac_cnt_max_exp;
 extern disp_op_t rtmlamp_ohwr_pi_sp_lim_inf_exp;
 

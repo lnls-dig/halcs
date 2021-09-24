@@ -151,6 +151,45 @@ disp_op_t rtmlamp_ohwr_pi_enable_exp = {
     }
 };
 
+disp_op_t rtmlamp_ohwr_pi_kp_exp = {
+    .name = RTMLAMP_OHWR_NAME_PI_KP,
+    .opcode = RTMLAMP_OHWR_OPCODE_PI_KP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rtmlamp_ohwr_pi_ti_exp = {
+    .name = RTMLAMP_OHWR_NAME_PI_TI,
+    .opcode = RTMLAMP_OHWR_OPCODE_PI_TI,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t rtmlamp_ohwr_pi_sp_exp = {
+    .name = RTMLAMP_OHWR_NAME_PI_SP,
+    .opcode = RTMLAMP_OHWR_OPCODE_PI_SP,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t rtmlamp_ohwr_dac_data_exp = {
     .name = RTMLAMP_OHWR_NAME_DAC_DATA,
     .opcode = RTMLAMP_OHWR_OPCODE_DAC_DATA,
@@ -171,42 +210,6 @@ disp_op_t rtmlamp_ohwr_dac_wr_exp = {
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rtmlamp_ohwr_pi_kp_exp = {
-    .name = RTMLAMP_OHWR_NAME_PI_KP,
-    .opcode = RTMLAMP_OHWR_OPCODE_PI_KP,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rtmlamp_ohwr_pi_ti_exp = {
-    .name = RTMLAMP_OHWR_NAME_PI_TI,
-    .opcode = RTMLAMP_OHWR_OPCODE_PI_TI,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_END
-    }
-};
-
-disp_op_t rtmlamp_ohwr_pi_sp_exp = {
-    .name = RTMLAMP_OHWR_NAME_PI_SP,
-    .opcode = RTMLAMP_OHWR_OPCODE_PI_SP,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-    .retval_owner = DISP_OWNER_OTHER,
-    .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
@@ -250,11 +253,11 @@ const disp_op_t *rtmlamp_ohwr_exp_ops [] = {
     &rtmlamp_ohwr_pi_ol_square_enable_exp,
     &rtmlamp_ohwr_pi_sp_square_enable_exp,
     &rtmlamp_ohwr_pi_enable_exp,
-    &rtmlamp_ohwr_dac_data_exp,
-    &rtmlamp_ohwr_dac_wr_exp,
     &rtmlamp_ohwr_pi_kp_exp,
     &rtmlamp_ohwr_pi_ti_exp,
     &rtmlamp_ohwr_pi_sp_exp,
+    &rtmlamp_ohwr_dac_data_exp,
+    &rtmlamp_ohwr_dac_wr_exp,
     &rtmlamp_ohwr_pi_ol_dac_cnt_max_exp,
     &rtmlamp_ohwr_pi_sp_lim_inf_exp,
     NULL
