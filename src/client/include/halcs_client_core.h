@@ -2466,6 +2466,21 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_enable (halcs_client_t *self, char 
 halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_enable (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *pi_enable);
 
+halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_kp (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t pi_kp);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_kp (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *pi_kp);
+
+halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ti (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t pi_ti);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ti (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *pi_ti);
+
+halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t pi_sp);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *pi_sp);
+
 /* RTMLAMP_OHWR Controller DAC function. The function set/get
  * DAC data of a specified amplifier channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
@@ -2487,21 +2502,6 @@ halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_wr (halcs_client_t *self, char *se
 /* RTMLAMP_OHWR Controller PI controller functions. The functions returns
  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
  * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_kp (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_pi_kp);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_kp (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_pi_kp);
-
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ti (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_pi_ti);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ti (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_pi_ti);
-
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_pi_sp);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_pi_sp);
-
 halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client_t *self, char *service,
         uint32_t rtmlamp_ohwr_pi_ol_dac_cnt_max);
 halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client_t *self, char *service,
