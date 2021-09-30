@@ -4035,6 +4035,90 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_en, chan, amp_en)
             chan, amp_en);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_ol_triang_enable, chan, pi_ol_triang_enable)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_TRIANG_ENABLE,
+            chan, pi_ol_triang_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_ol_triang_enable, chan, pi_ol_triang_enable)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_TRIANG_ENABLE,
+            chan, pi_ol_triang_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_ol_square_enable, chan, pi_ol_square_enable)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_SQUARE_ENABLE,
+            chan, pi_ol_square_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_ol_square_enable, chan, pi_ol_square_enable)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_SQUARE_ENABLE,
+            chan, pi_ol_square_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_sp_square_enable, chan, pi_sp_square_enable)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_SQUARE_ENABLE,
+            chan, pi_sp_square_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_sp_square_enable, chan, pi_sp_square_enable)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_SQUARE_ENABLE,
+            chan, pi_sp_square_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_enable, chan, pi_enable)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_ENABLE,
+            chan, pi_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_enable, chan, pi_enable)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_ENABLE,
+            chan, pi_enable);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_kp, chan, pi_kp)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_KP,
+            chan, pi_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_kp, chan, pi_kp)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_KP,
+            chan, pi_kp);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_ti, chan, pi_ti)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_TI,
+            chan, pi_ti);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_ti, chan, pi_ti)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_TI,
+            chan, pi_ti);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_sp, chan, pi_sp)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_SP,
+            chan, pi_sp);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_sp, chan, pi_sp)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP,
+            chan, pi_sp);
+}
+
 PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_dac_data, chan, dac_data)
 {
     return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA,
@@ -4057,4 +4141,24 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_dac_wr, chan, dac_wr)
 {
     return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_WR,
             chan, dac_wr);
+}
+
+PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_pi_ol_dac_cnt_max)
+{
+    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_DAC_CNT_MAX, rtmlamp_ohwr_pi_ol_dac_cnt_max);
+}
+
+PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_ol_dac_cnt_max)
+{
+    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_DAC_CNT_MAX, rtmlamp_ohwr_pi_ol_dac_cnt_max);
+}
+
+PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_pi_sp_lim_inf)
+{
+    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
+}
+
+PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_sp_lim_inf)
+{
+    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
 }

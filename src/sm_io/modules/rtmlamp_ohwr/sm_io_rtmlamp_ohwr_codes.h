@@ -26,11 +26,29 @@
 #define RTMLAMP_OHWR_NAME_AMP_TFLAG_R                      "rtmlamp_ohwr_amp_tflag_r"
 #define RTMLAMP_OHWR_OPCODE_AMP_EN                         104
 #define RTMLAMP_OHWR_NAME_AMP_EN                           "rtmlamp_ohwr_amp_en"
-#define RTMLAMP_OHWR_OPCODE_DAC_DATA                       105
+#define RTMLAMP_OHWR_OPCODE_PI_OL_TRIANG_ENABLE            105
+#define RTMLAMP_OHWR_NAME_PI_OL_TRIANG_ENABLE              "rtmlamp_ohwr_pi_ol_triang_enable"
+#define RTMLAMP_OHWR_OPCODE_PI_OL_SQUARE_ENABLE            106
+#define RTMLAMP_OHWR_NAME_PI_OL_SQUARE_ENABLE              "rtmlamp_ohwr_pi_ol_square_enable"
+#define RTMLAMP_OHWR_OPCODE_PI_SP_SQUARE_ENABLE            107
+#define RTMLAMP_OHWR_NAME_PI_SP_SQUARE_ENABLE              "rtmlamp_ohwr_pi_sp_square_enable"
+#define RTMLAMP_OHWR_OPCODE_PI_ENABLE                      108
+#define RTMLAMP_OHWR_NAME_PI_ENABLE                        "rtmlamp_ohwr_pi_enable"
+#define RTMLAMP_OHWR_OPCODE_PI_KP                          109
+#define RTMLAMP_OHWR_NAME_PI_KP                            "rtmlamp_ohwr_pi_kp"
+#define RTMLAMP_OHWR_OPCODE_PI_TI                          110
+#define RTMLAMP_OHWR_NAME_PI_TI                            "rtmlamp_ohwr_pi_ti"
+#define RTMLAMP_OHWR_OPCODE_PI_SP                          111
+#define RTMLAMP_OHWR_NAME_PI_SP                            "rtmlamp_ohwr_pi_sp"
+#define RTMLAMP_OHWR_OPCODE_DAC_DATA                       112
 #define RTMLAMP_OHWR_NAME_DAC_DATA                         "rtmlamp_ohwr_dac_data"
-#define RTMLAMP_OHWR_OPCODE_DAC_WR                         106
+#define RTMLAMP_OHWR_OPCODE_DAC_WR                         113
 #define RTMLAMP_OHWR_NAME_DAC_WR                           "rtmlamp_ohwr_dac_wr"
-#define RTMLAMP_OHWR_OPCODE_END                            
+#define RTMLAMP_OHWR_OPCODE_PI_OL_DAC_CNT_MAX              114
+#define RTMLAMP_OHWR_NAME_PI_OL_DAC_CNT_MAX                "rtmlamp_ohwr_pi_ol_dac_cnt_max"
+#define RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF                  115
+#define RTMLAMP_OHWR_NAME_PI_SP_LIM_INF                    "rtmlamp_ohwr_pi_sp_lim_inf"
+#define RTMLAMP_OHWR_OPCODE_END                            116
 
 /* Messaging Reply OPCODES */
 #define RTMLAMP_OHWR_REPLY_TYPE                            uint32_t

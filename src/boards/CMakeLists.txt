@@ -83,7 +83,7 @@ subdirlist(subdirs ${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach(subdir ${subdirs})
     add_subdirectory(${subdir})
-    list(APPEND boards_subdir ${subdir}})
+    list(APPEND boards_subdir ${subdir})
     list(APPEND boards_LIBRARIES boards_${subdir})
 endforeach()
 
