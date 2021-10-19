@@ -278,6 +278,7 @@ set(halcsclient_smio_table_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/orbit_intlk/sm_io_orbit_intlk_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_processing/sm_io_fofb_processing_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.c
 )
 
@@ -337,6 +338,7 @@ set(halcsclient_smio_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/orbit_intlk/sm_io_orbit_intlk_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_ctrl/sm_io_fofb_ctrl_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_codes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_processing/sm_io_fofb_processing_codes.h
 )
 
 # Get directory names only
@@ -390,6 +392,7 @@ set(halcsclient_smio_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/orbit_intlk/sm_io_orbit_intlk_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_processing/sm_io_fofb_processing_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.h
 )
 
@@ -764,7 +767,7 @@ if(ENABLE_CPACK)
         set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
         set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
         set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        # Seems broken in CMake and crashes with 
+        # Seems broken in CMake and crashes with
         # CPack: Create package
         # terminate called after throwing an instance of 'std::logic_error'
         #   what():  basic_string::_M_construct null not valid
