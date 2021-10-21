@@ -1,18 +1,18 @@
-#ifndef __CHEBY__WB_FOFB_PROCESSING__H__
-#define __CHEBY__WB_FOFB_PROCESSING__H__
-#define WB_FOFB_PROCESSING_SIZE 12 /* 0xc */
+#ifndef __CHEBY__WB_FOFB_PROCESSING_REGS__H__
+#define __CHEBY__WB_FOFB_PROCESSING_REGS__H__
+#define WB_FOFB_PROCESSING_REGS_SIZE 12 /* 0xc */
 
 /* None */
-#define WB_FOFB_PROCESSING_RAM_COEFF_DAT 0x0UL
+#define WB_FOFB_PROCESSING_REGS_RAM_COEFF_DAT 0x0UL
 
 /* None */
-#define WB_FOFB_PROCESSING_RAM_COEFF_ADDR 0x4UL
+#define WB_FOFB_PROCESSING_REGS_RAM_COEFF_ADDR 0x4UL
 
 /* None */
-#define WB_FOFB_PROCESSING_RAM_WRITE 0x8UL
-#define WB_FOFB_PROCESSING_RAM_WRITE_ENABLE 0x1UL
+#define WB_FOFB_PROCESSING_REGS_RAM_WRITE 0x8UL
+#define WB_FOFB_PROCESSING_REGS_RAM_WRITE_ENABLE 0x1UL
 
-struct wb_fofb_processing {
+struct wb_fofb_processing_regs {
   /* [0x0]: REG (rw) (no description) */
   uint32_t ram_coeff_dat;
 
@@ -23,4 +23,4 @@ struct wb_fofb_processing {
   uint32_t ram_write;
 };
 
-#endif /* __CHEBY__WB_FOFB_PROCESSING__H__ */
+#endif /* __CHEBY__WB_FOFB_PROCESSING_REGS__H__ */
