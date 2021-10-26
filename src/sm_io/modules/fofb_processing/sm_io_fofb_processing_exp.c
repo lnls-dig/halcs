@@ -40,22 +40,20 @@
 /*************  Specific FOFB_PROCESSING Operations *************/
 /************************************************************/
 
-#define FOFB_PROCESSING_CTRL_RAM_EN_MIN                        0
-#define FOFB_PROCESSING_CTRL_RAM_EN_MAX                        1
 RW_PARAM_FUNC(fofb_processing, ram_en) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, CTRL, RAM_EN,
-            SINLE_BIT_PARAM, FOFB_PROCESSING_CTRL_EN_MIN, FOFB_PROCESSING_CTRL_EN_MAX,
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_WRITE, ENABLE,
+            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, CTRL, ram_addr,
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_COEFF, ADDR,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_daat) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, CTRL, ram_data,
+RW_PARAM_FUNC(fofb_processing, ram_data) {
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM, COEFF_DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }

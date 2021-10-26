@@ -47,7 +47,7 @@ disp_op_t fofb_processing_set_get_ram_data_exp = {
 };
 
 /* Exported function description */
-const disp_op_t *orbit_intlk_exp_ops [] = {
+const disp_op_t *fofb_processing_exp_ops [] = {
     &fofb_processing_set_get_ram_en_exp,
     &fofb_processing_set_get_ram_addr_exp,
     &fofb_processing_set_get_ram_data_exp,
