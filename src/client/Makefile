@@ -245,7 +245,7 @@ $(LIBNAME)_SMIO_EXPORTS = \
 	$(SMIO_TABLE_SRC_DIR)/modules/orbit_intlk/sm_io_orbit_intlk_exports.h \
 	$(SMIO_TABLE_SRC_DIR)/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.h \
 	$(SMIO_TABLE_SRC_DIR)/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.h \
-	$(SMIO_TABLE_SRC_DIR)/modules/fofb_processing/sm_io_rfofb_processing_exports.h
+	$(SMIO_TABLE_SRC_DIR)/modules/fofb_processing/sm_io_fofb_processing_exports.h
 
 # Copy non-standard headers
 $(LIBNAME)_SMIO_HEADERS_BASENAME = $(basename $(notdir $($(LIBNAME)_SMIO_CODES) $($(LIBNAME)_SMIO_EXPORTS)))
