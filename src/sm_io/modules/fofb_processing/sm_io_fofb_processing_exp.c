@@ -47,13 +47,19 @@ RW_PARAM_FUNC(fofb_processing, ram_write) {
 }
 
 RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_COEFF, ADDR,
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM, ADDR,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_data) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM, COEFF_DATA,
+RW_PARAM_FUNC(fofb_processing, ram_data_in) {
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_IN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, ram_data_out) {
+    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_OUT, DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -62,7 +68,8 @@ RW_PARAM_FUNC(fofb_processing, ram_data) {
 const disp_table_func_fp fofb_processing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fofb_processing, ram_write),
     RW_PARAM_FUNC_NAME(fofb_processing, ram_addr),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data),
+    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_in),
+    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_out),
     NULL
 };
 

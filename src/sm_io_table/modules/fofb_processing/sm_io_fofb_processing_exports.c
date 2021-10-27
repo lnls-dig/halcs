@@ -34,9 +34,21 @@ disp_op_t fofb_processing_set_get_ram_addr_exp = {
     }
 };
 
-disp_op_t fofb_processing_set_get_ram_data_exp = {
-    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_DATA,
-    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA,
+disp_op_t fofb_processing_set_get_ram_data_in_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_ram_data_out_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT,
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
@@ -50,7 +62,8 @@ disp_op_t fofb_processing_set_get_ram_data_exp = {
 const disp_op_t *fofb_processing_exp_ops [] = {
     &fofb_processing_set_get_ram_write_exp,
     &fofb_processing_set_get_ram_addr_exp,
-    &fofb_processing_set_get_ram_data_exp,
+    &fofb_processing_set_get_ram_data_in_exp,
+    &fofb_processing_set_get_ram_data_out_exp,
     NULL
 };
 

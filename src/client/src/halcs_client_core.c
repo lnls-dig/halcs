@@ -4187,13 +4187,24 @@ PARAM_FUNC_CLIENT_READ(fofb_processing_ram_addr)
     return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
 }
 
-/* FOFB processing ram data */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data)
+/* FOFB processing ram data in */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_in)
 {
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA, fofb_processing_ram_data);
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data)
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_in)
 {
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA, fofb_processing_ram_data);
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
+}
+
+/* FOFB processing ram data out */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_out)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
 }

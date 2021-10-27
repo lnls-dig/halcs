@@ -16,8 +16,10 @@
 #define FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE          "fofb_processing_set_get_ram_write"
 #define FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR         1
 #define FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR           "fofb_processing_set_get_ram_addr"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA         2
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA           "fofb_processing_set_get_ram_data"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN      2
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN        "fofb_processing_set_get_ram_data_in"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT     3
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT       "fofb_processing_set_get_ram_data_out"
 
 /* For compatibility with older API. Don't remove these without changing libclient on clients */
 #define FOFB_PROCESSING_OPCODE_SET_GET_INTLK_BIGGER         FOFB_PROCESSING_OPCODE_SET_GET_INTLK
