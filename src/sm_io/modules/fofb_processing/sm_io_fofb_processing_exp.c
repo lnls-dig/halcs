@@ -40,7 +40,7 @@
 /*************  Specific FOFB_PROCESSING Operations *************/
 /************************************************************/
 
-RW_PARAM_FUNC(fofb_processing, ram_en) {
+RW_PARAM_FUNC(fofb_processing, ram_write) {
     SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_WRITE, ENABLE,
             SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
@@ -60,7 +60,7 @@ RW_PARAM_FUNC(fofb_processing, ram_data) {
 
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_en),
+    RW_PARAM_FUNC_NAME(fofb_processing, ram_write),
     RW_PARAM_FUNC_NAME(fofb_processing, ram_addr),
     RW_PARAM_FUNC_NAME(fofb_processing, ram_data),
     NULL

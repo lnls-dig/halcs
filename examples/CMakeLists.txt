@@ -422,6 +422,12 @@ if(BUILD_EXAMPLE_fofb_ctrl)
     list(APPEND bin_target_outputs "fofb_ctrl")
 endif()
 
+option(BUILD_EXAMPLE_fofb_processing "Wheter or not to build example fofb_processing tool" ON)
+
+if(BUILD_EXAMPLE_fofb_processing)
+    list(APPEND bin_target_outputs "fofb_processing")
+endif()
+
 option(BUILD_EXAMPLE_rtmlamp_ohwr_ctl "Whether or not to build example rtmlamp_ohwr_ctl tool" ON)
 
 if(BUILD_EXAMPLE_rtmlamp_ohwr_ctl)

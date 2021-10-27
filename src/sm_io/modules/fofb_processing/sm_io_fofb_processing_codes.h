@@ -12,8 +12,8 @@
 #define FOFB_PROCESSING_OPCODE_TYPE                     uint32_t
 #define FOFB_PROCESSING_OPCODE_SIZE                     (sizeof (FOFB_PROCESSING_OPCODE_TYPE))
 
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_EN           0
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_EN             "fofb_processing_set_get_ram_en"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE        0
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE          "fofb_processing_set_get_ram_write"
 #define FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR         1
 #define FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR           "fofb_processing_set_get_ram_addr"
 #define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA         2

@@ -10,7 +10,7 @@
 
 #include "disptable.h"
 
-extern disp_op_t fofb_processing_set_get_ram_en_exp;
+extern disp_op_t fofb_processing_set_get_ram_write_exp;
 extern disp_op_t fofb_processing_set_get_ram_addr_exp;
 extern disp_op_t fofb_processing_set_get_ram_data_exp;
 

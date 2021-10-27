@@ -4166,14 +4166,14 @@ PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_sp_lim_inf)
 /**************** FOFB PROCESSING SMIO Functions ****************/
 
 /* FOFB processing ram enable */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_en)
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_write)
 {
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_EN, fofb_processing_ram_en);
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_en)
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_write)
 {
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_EN, fofb_processing_ram_en);
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
 }
 
 /* FOFB processing ram addr */
