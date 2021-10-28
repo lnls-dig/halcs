@@ -104,11 +104,19 @@
 #define ORBIT_INTLK_NAME_SET_GET_ANG_MIN_X              "orbit_intlk_set_get_ang_min_x"
 #define ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y            45
 #define ORBIT_INTLK_NAME_SET_GET_ANG_MIN_Y              "orbit_intlk_set_get_ang_min_y"
-#define ORBIT_INTLK_OPCODE_END                          46
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_X_DIFF         46
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_X_DIFF           "orbit_intlk_set_get_trans_x_diff"
+#define ORBIT_INTLK_OPCODE_SET_GET_TRANS_Y_DIFF         47
+#define ORBIT_INTLK_NAME_SET_GET_TRANS_Y_DIFF           "orbit_intlk_set_get_trans_y_diff"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_X_DIFF           48
+#define ORBIT_INTLK_NAME_SET_GET_ANG_X_DIFF             "orbit_intlk_set_get_ang_x_diff"
+#define ORBIT_INTLK_OPCODE_SET_GET_ANG_Y_DIFF           49
+#define ORBIT_INTLK_NAME_SET_GET_ANG_Y_DIFF             "orbit_intlk_set_get_ang_y_diff"
+#define ORBIT_INTLK_OPCODE_END                          50
 
 /* For compatibility with older API. Don't remove these without changing libclient on clients */
 #define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER         ORBIT_INTLK_OPCODE_SET_GET_INTLK
-#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER           ORBIT_INTLK_NAME_SET_GET_INTLK 
+#define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER           ORBIT_INTLK_NAME_SET_GET_INTLK
 #define ORBIT_INTLK_OPCODE_SET_GET_INTLK_BIGGER_LTC     ORBIT_INTLK_OPCODE_SET_GET_INTLK_LTC
 #define ORBIT_INTLK_NAME_SET_GET_INTLK_BIGGER_LTC       ORBIT_INTLK_NAME_SET_GET_INTLK_LTC
 
