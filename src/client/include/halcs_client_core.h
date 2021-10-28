@@ -2117,6 +2117,30 @@ halcs_client_err_e halcs_set_orbit_intlk_ang_min_y (halcs_client_t *self, char *
 halcs_client_err_e halcs_get_orbit_intlk_ang_min_y (halcs_client_t *self, char *service,
         int32_t *orbit_intlk_ang_min_y);
 
+/* Orbit interlock translation X diff. function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_orbit_intlk_trans_x_diff (halcs_client_t *self, char *service,
+        int32_t *orbit_intlk_trans_x_diff);
+
+/* Orbit interlock translation Y diff. function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_orbit_intlk_trans_y_diff (halcs_client_t *self, char *service,
+        int32_t *orbit_intlk_trans_y_diff);
+
+/* Orbit interlock angular X diff. function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_orbit_intlk_ang_x_diff (halcs_client_t *self, char *service,
+        int32_t *orbit_intlk_ang_x_diff);
+
+/* Orbit interlock angular Y diff. function. The functions returns
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_orbit_intlk_ang_y_diff (halcs_client_t *self, char *service,
+        int32_t *orbit_intlk_ang_y_diff);
+
 /********************** FOFB CTRL Functions ********************/
 
 /* FOFB Controller act_part function. The functions returns

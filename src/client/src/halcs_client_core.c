@@ -3659,6 +3659,26 @@ PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_min_y)
     return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
 }
 
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_x_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_X_DIFF, orbit_intlk_trans_x_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_y_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_Y_DIFF, orbit_intlk_trans_y_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_x_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_X_DIFF, orbit_intlk_ang_x_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_y_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_Y_DIFF, orbit_intlk_ang_y_diff);
+}
+
 /**************** FOFB CTRL SMIO Functions ****************/
 PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_act_part)
 {
