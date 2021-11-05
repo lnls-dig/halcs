@@ -898,10 +898,10 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_tag_desync_cnt),
     _dsp_offset_x,
     _dsp_offset_y,
-    RW_PARAM_FUNC(dsp, amp_gain_ch0_data),
-    RW_PARAM_FUNC(dsp, amp_gain_ch1_data),
-    RW_PARAM_FUNC(dsp, amp_gain_ch2_data),
-    RW_PARAM_FUNC(dsp, amp_gain_ch3_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch0_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch1_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch2_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch3_data),
     NULL
 };
 
