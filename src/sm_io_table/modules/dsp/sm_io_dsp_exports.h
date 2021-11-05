@@ -65,6 +65,10 @@ extern disp_op_t dsp_set_get_monit_tag_desync_cnt_rst_exp;
 extern disp_op_t dsp_set_get_monit_tag_desync_cnt_exp;
 extern disp_op_t dsp_set_get_offset_x_exp;
 extern disp_op_t dsp_set_get_offset_y_exp;
+extern disp_op_t dsp_set_get_amp_gain_ch0_data_exp;
+extern disp_op_t dsp_set_get_amp_gain_ch1_data_exp;
+extern disp_op_t dsp_set_get_amp_gain_ch2_data_exp;
+extern disp_op_t dsp_set_get_amp_gain_ch3_data_exp;
 
 extern const disp_op_t *dsp_exp_ops [];
 
