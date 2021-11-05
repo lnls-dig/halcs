@@ -176,6 +176,15 @@ struct _smio_dsp_monit_data_t {
 #define DSP_NAME_SET_GET_OFFSET_Y           "dsp_set_get_offset_y"
 #define DSP_OPCODE_END                      56
 
+#define DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA     57
+#define DSP_NAME_SET_GET_AMP_GAIN_CH0_DATA       "dsp_set_get_gain_ch0"
+#define DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA     58
+#define DSP_NAME_SET_GET_AMP_GAIN_CH1_DATA       "dsp_set_get_gain_ch1"
+#define DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA     59
+#define DSP_NAME_SET_GET_AMP_GAIN_CH2_DATA       "dsp_set_get_gain_ch2"
+#define DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA     60
+#define DSP_NAME_SET_GET_AMP_GAIN_CH3_DATA       "dsp_set_get_gain_ch3"
+
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t
 #define DSP_REPLY_SIZE                      (sizeof (DSP_REPLY_TYPE))
