@@ -296,7 +296,7 @@ int main (int argc, char *argv [])
     }
 
     /* Set halcs number */
-    uint32_t halcs_number;
+    uint32_t halcs_number=0;
     if (halcs_number_str == NULL) {
         fprintf (stderr, "[client:rtmlamp_ohwr]: No halcs instance specified. Please use --halcsnumber option\n");
         goto err_halcs_set;
@@ -306,7 +306,7 @@ int main (int argc, char *argv [])
     }
 
     char service[50];
-    snprintf (service, sizeof (service), "HALCS%u:DEVIO:RTMLAMP_OHWR0", board_number);
+    snprintf (service, sizeof (service), "HALCS%u:DEVIO:RTMLAMP_OHWR%u", board_number, halcs_number);
 
     halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
     if (halcs_client == NULL) {
