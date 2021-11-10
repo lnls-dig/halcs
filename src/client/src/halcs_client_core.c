@@ -4206,3 +4206,50 @@ PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_sp_lim_inf)
 {
     return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
 }
+
+/**************** FOFB PROCESSING SMIO Functions ****************/
+
+/* FOFB processing ram write enable */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_write_enable)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE_ENABLE, fofb_processing_ram_write_enable);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_write_enable)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE_ENABLE, fofb_processing_ram_write_enable);
+}
+
+/* FOFB processing ram addr */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_addr_val)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR_VAL, fofb_processing_ram_addr_val);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_addr_val)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR_VAL, fofb_processing_ram_addr_val);
+}
+
+/* FOFB processing ram data in */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_in_val)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN_VAL, fofb_processing_ram_data_in_val);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_in_val)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN_VAL, fofb_processing_ram_data_in_val);
+}
+
+/* FOFB processing ram data out */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_out_val)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT_VAL, fofb_processing_ram_data_out_val);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out_val)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT_VAL, fofb_processing_ram_data_out_val);
+}
+

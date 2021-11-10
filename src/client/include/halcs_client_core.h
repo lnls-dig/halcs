@@ -2536,6 +2536,32 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client_t *self, c
 halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client_t *self, char *service,
         uint32_t *rtmlamp_ohwr_pi_sp_lim_inf);
 
+/********************** FOFB PROCESSING Functions ********************/
+
+/* FOFB PROCESSING RAM functions. The functions returns
+ *  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ *   * (see halcs_client_err.h for all possible errors)*/
+
+halcs_client_err_e halcs_set_fofb_processing_ram_write_enable (halcs_client_t *self, char *service,
+        uint32_t fofb_processing_ram_write_enable);
+halcs_client_err_e halcs_get_fofb_processing_ram_write_enable (halcs_client_t *self, char *service,
+        uint32_t *fofb_processing_ram_write_enable);
+
+halcs_client_err_e halcs_set_fofb_processing_ram_addr_val (halcs_client_t *self, char *service,
+        uint32_t fofb_processing_ram_addr_val);
+halcs_client_err_e halcs_get_fofb_processing_ram_addr_val (halcs_client_t *self, char *service,
+        uint32_t *fofb_processing_ram_addr_val);
+
+halcs_client_err_e halcs_set_fofb_processing_ram_data_in_val (halcs_client_t *self, char *service,
+        uint32_t fofb_processing_ram_data_in_val);
+halcs_client_err_e halcs_get_fofb_processing_ram_data_in_val (halcs_client_t *self, char *service,
+        uint32_t *fofb_processing_ram_data_in_val);
+
+halcs_client_err_e halcs_set_fofb_processing_ram_data_out_val (halcs_client_t *self, char *service,
+        uint32_t fofb_processing_ram_data_out_val);
+halcs_client_err_e halcs_get_fofb_processing_ram_data_out_val (halcs_client_t *self, char *service,
+        uint32_t *fofb_processing_ram_data_out_val);
+
 #ifdef __cplusplus
 }
 #endif
