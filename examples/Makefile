@@ -68,10 +68,10 @@ RM = /usr/bin/cmake3 -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/lnls-bpm/halcs_bpm/repo/halcs
+CMAKE_SOURCE_DIR = /home/lnls-bpm/software/halcs-repo/halcs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/lnls-bpm/halcs_bpm/repo/halcs/examples
+CMAKE_BINARY_DIR = /home/lnls-bpm/software/halcs-repo/halcs/examples
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -135,7 +135,7 @@ package/fast: package
 # Special rule for the target package_source
 package_source:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	/usr/bin/cpack3 --config ./CPackSourceConfig.cmake /home/lnls-bpm/halcs_bpm/repo/halcs/examples/CPackSourceConfig.cmake
+	/usr/bin/cpack3 --config ./CPackSourceConfig.cmake /home/lnls-bpm/software/halcs-repo/halcs/examples/CPackSourceConfig.cmake
 .PHONY : package_source
 
 # Special rule for the target package_source
@@ -168,9 +168,9 @@ install/local/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lnls-bpm/halcs_bpm/repo/halcs/examples/CMakeFiles /home/lnls-bpm/halcs_bpm/repo/halcs/examples/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lnls-bpm/software/halcs-repo/halcs/examples/CMakeFiles /home/lnls-bpm/software/halcs-repo/halcs/examples/CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/lnls-bpm/halcs_bpm/repo/halcs/examples/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/lnls-bpm/software/halcs-repo/halcs/examples/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -836,6 +836,19 @@ sm_io_module_fofb_ctrl/fast:
 .PHONY : sm_io_module_fofb_ctrl/fast
 
 #=============================================================================
+# Target rules for targets named sm_io_module_fofb_processing
+
+# Build rule for target.
+sm_io_module_fofb_processing: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 sm_io_module_fofb_processing
+.PHONY : sm_io_module_fofb_processing
+
+# fast build rule for target.
+sm_io_module_fofb_processing/fast:
+	$(MAKE) $(MAKESILENT) -f src/sm_io/modules/fofb_processing/CMakeFiles/sm_io_module_fofb_processing.dir/build.make src/sm_io/modules/fofb_processing/CMakeFiles/sm_io_module_fofb_processing.dir/build
+.PHONY : sm_io_module_fofb_processing/fast
+
+#=============================================================================
 # Target rules for targets named sm_io_module_init
 
 # Build rule for target.
@@ -1016,6 +1029,19 @@ sm_io_table: cmake_check_build_system
 sm_io_table/fast:
 	$(MAKE) $(MAKESILENT) -f src/sm_io_table/CMakeFiles/sm_io_table.dir/build.make src/sm_io_table/CMakeFiles/sm_io_table.dir/build
 .PHONY : sm_io_table/fast
+
+#=============================================================================
+# Target rules for targets named fofb_processing
+
+# Build rule for target.
+fofb_processing: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 fofb_processing
+.PHONY : fofb_processing
+
+# fast build rule for target.
+fofb_processing/fast:
+	$(MAKE) $(MAKESILENT) -f examples/CMakeFiles/fofb_processing.dir/build.make examples/CMakeFiles/fofb_processing.dir/build
+.PHONY : fofb_processing/fast
 
 #=============================================================================
 # Target rules for targets named pos_calc
@@ -1455,6 +1481,7 @@ help:
 	@echo "... fmc250m_4ch_test_mode"
 	@echo "... fmc_active_clk_ad9510_ctl"
 	@echo "... fofb_ctrl"
+	@echo "... fofb_processing"
 	@echo "... fpga_info"
 	@echo "... gensdbfs"
 	@echo "... halcsclient"
@@ -1497,6 +1524,7 @@ help:
 	@echo "... sm_io_module_fmc_adc_common"
 	@echo "... sm_io_module_fmcpico1m_4ch"
 	@echo "... sm_io_module_fofb_ctrl"
+	@echo "... sm_io_module_fofb_processing"
 	@echo "... sm_io_module_init"
 	@echo "... sm_io_module_orbit_intlk"
 	@echo "... sm_io_module_rffe"
