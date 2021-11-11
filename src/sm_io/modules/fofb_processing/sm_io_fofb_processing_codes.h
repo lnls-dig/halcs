@@ -12,14 +12,14 @@
 #define FOFB_PROCESSING_OPCODE_TYPE                     uint32_t
 #define FOFB_PROCESSING_OPCODE_SIZE                     (sizeof (FOFB_PROCESSING_OPCODE_TYPE))
 
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE_ENABLE     0
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE_ENABLE       "fofb_processing_set_get_ram_write_enable"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR_VAL         1
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR_VAL           "fofb_processing_set_get_ram_addr_val"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN_VAL      2
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN_VAL        "fofb_processing_set_get_ram_data_in_val"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT_VAL     3
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT_VAL       "fofb_processing_set_get_ram_data_out_val"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE            0
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE              "fofb_processing_set_get_ram_write"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR             1
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR               "fofb_processing_set_get_ram_addr"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN          2
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN            "fofb_processing_set_get_ram_data_in"
+#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT         3
+#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT           "fofb_processing_set_get_ram_data_out"
 
 /* Messaging Reply OPCODES */
 #define FOFB_PROCESSING_REPLY_TYPE                      uint32_t

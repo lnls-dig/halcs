@@ -59,7 +59,7 @@ typedef struct {
 int main (int argc, char *argv [])
 {
   int ret = 0;
-  int verbose = 0;
+  int verbose = 1;
   char *broker_endp = NULL;
   char *board_number_str = NULL;
   char *halcs_number_str = NULL;
@@ -179,14 +179,6 @@ int main (int argc, char *argv [])
   }
   else {
     ram_data_in = strtoul (ram_data_in_str, NULL, 10);
-
-    /* set ram_data_in */
-    err = halcs_set_fofb_processing_ram_data_in_val(halcs_client, service, ram_data_in);
-    if (err != HALCS_CLIENT_SUCCESS){
-      fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_data_in_val failed\n");
-      ret = 2;
-      goto err_halcs_exit;
-    }
   }
 
   /* ------------------------------------------------------------------------------ RAM addr */
@@ -201,13 +193,18 @@ int main (int argc, char *argv [])
   }
   fprintf (stdout, "[client:fofb_processing]: ram_addr: %u\n", ram_addr);
 
-  /* set ram_addr */
-  err = halcs_set_fofb_processing_ram_addr_val(halcs_client, service, ram_addr);
+  /* get ram_data_out */
+
+  uint32_t ram_data_out_get;
+
+  err = halcs_get_fofb_processing_ram_data_out(halcs_client, service, &ram_data_out_get);
+
   if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_addr_val failed\n");
+    fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out failed\n");
     ret = 2;
     goto err_halcs_exit;
   }
+  fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out: %u\n", ram_data_out_get);
 
 err_halcs_exit:
   /* Try to read up until the point where the error occurs, anyway */
