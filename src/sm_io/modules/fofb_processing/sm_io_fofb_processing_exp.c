@@ -41,25 +41,25 @@
 /************************************************************/
 
 RW_PARAM_FUNC(fofb_processing, ram_write) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_WRITE, ENABLE,
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_WRITE, ,
             SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_ADDR, VAL,
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_ADDR, ,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fofb_processing, ram_data_in) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_DATA_IN, VAL,
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_IN, ,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(fofb_processing, ram_data_out) {
-    SET_GET_PARAM(fofb_processing, 0x0, WB_FOFB_PROCESSING, RAM_DATA_OUT, VAL,
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_OUT, ,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
