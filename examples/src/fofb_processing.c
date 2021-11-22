@@ -172,10 +172,18 @@ int main (int argc, char *argv [])
     ram_write_en = strtoul (ram_write_en_str, NULL, 10);
   }
 
+  /* set ram_write_en */
+  err = halcs_set_fofb_processing_ram_write(halcs_client, service, ram_write_en);
+  if (err != HALCS_CLIENT_SUCCESS){
+    fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_write failed\n");
+    ret = 2;
+    goto err_halcs_exit;
+  }
+
   /* ------------------------------------------------------------------------------ RAM data in */
   uint32_t ram_data_in;
   if (ram_data_in_str == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: ram_data_in >> no value");
+    fprintf (stderr, "[client:fofb_processing]: ram_data_in >> no value \n");
   }
   else {
     ram_data_in = strtoul (ram_data_in_str, NULL, 10);
@@ -209,7 +217,6 @@ int main (int argc, char *argv [])
   else {
     ram_addr = strtoul (ram_addr_str, NULL, 10);
   }
-  fprintf (stdout, "[client:fofb_processing]: ram_addr: %u\n", ram_addr);
 
   /* set ram_addr */
   err = halcs_set_fofb_processing_ram_addr(halcs_client, service, ram_addr);
@@ -228,6 +235,17 @@ int main (int argc, char *argv [])
     goto err_halcs_exit;
   }
   fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_addr: %u\n", ram_addr_get);
+
+  /* ------------------------------------------------------------------------------ RAM data out */
+  /* get ram_data_out */
+  uint32_t ram_data_out_get;
+  err = halcs_get_fofb_processing_ram_data_out(halcs_client, service, &ram_data_out_get);
+  if (err != HALCS_CLIENT_SUCCESS){
+    fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out failed\n");
+    ret = 2;
+    goto err_halcs_exit;
+  }
+  fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out: %u\n", ram_data_out_get);
 
 err_halcs_exit:
   /* Try to read up until the point where the error occurs, anyway */

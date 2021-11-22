@@ -10,7 +10,7 @@
 
 /* Known modules IDs (from SDB records defined in FPGA) */
 #define FOFB_PROCESSING_SDB_DEVID       0x49681ca6
-#define FOFB_PROCESSING_SDB_NAME        "FOFB_PROCESSING_REGS"
+#define FOFB_PROCESSING_SDB_NAME        "FOFB_PROCESSING"
 
 extern const smio_bootstrap_ops_t fofb_processing_bootstrap_ops;
 
