@@ -170,6 +170,17 @@ int main (int argc, char *argv [])
   }
   else {
     ram_write_en = strtoul (ram_write_en_str, NULL, 10);
+    if (ram_write_en == 1) {
+      fprintf(stdout, "[client:fofb_processing]: WRITE mode\n");
+    }
+    else if (ram_write_en == 0) {
+      fprintf(stdout, "[client:fofb_processing]: READ mode\n");
+    }
+    else {
+      fprintf(stdout, "[client:fofb_processing]: ram write enable value must be 0 or 1\n");
+      print_help (argv [0]);
+      exit (1);
+    }
   }
 
   /* set ram_write_en */
