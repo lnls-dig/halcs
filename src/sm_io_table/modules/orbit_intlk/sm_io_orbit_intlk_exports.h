@@ -57,6 +57,10 @@ extern disp_op_t orbit_intlk_set_get_trans_min_x_exp;
 extern disp_op_t orbit_intlk_set_get_trans_min_y_exp;
 extern disp_op_t orbit_intlk_set_get_ang_min_x_exp;
 extern disp_op_t orbit_intlk_set_get_ang_min_y_exp;
+extern disp_op_t orbit_intlk_set_get_trans_x_diff_exp;
+extern disp_op_t orbit_intlk_set_get_trans_y_diff_exp;
+extern disp_op_t orbit_intlk_set_get_ang_x_diff_exp;
+extern disp_op_t orbit_intlk_set_get_ang_y_diff_exp;
 
 extern const disp_op_t *orbit_intlk_exp_ops [];
 

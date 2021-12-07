@@ -2103,6 +2103,50 @@ PARAM_FUNC_CLIENT_READ_SIGNED(offset_y)
      return param_client_read_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_Y, offset_y);
 }
 
+/* Amplitude gain channel 0 data */
+PARAM_FUNC_CLIENT_WRITE(amp_gain_ch0_data)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+}
+
+PARAM_FUNC_CLIENT_READ(amp_gain_ch0_data)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+}
+
+/* Amplitude gain channel 1 data */
+PARAM_FUNC_CLIENT_WRITE(amp_gain_ch1_data)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+}
+
+PARAM_FUNC_CLIENT_READ(amp_gain_ch1_data)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+}
+
+/* Amplitude gain channel 2 data */
+PARAM_FUNC_CLIENT_WRITE(amp_gain_ch2_data)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+}
+
+PARAM_FUNC_CLIENT_READ(amp_gain_ch2_data)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+}
+
+/* Amplitude gain channel 3 data */
+PARAM_FUNC_CLIENT_WRITE(amp_gain_ch3_data)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+}
+
+PARAM_FUNC_CLIENT_READ(amp_gain_ch3_data)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+}
+
 /**************** Swap SMIO Functions ****************/
 
 /* Switching functions */
@@ -3659,6 +3703,26 @@ PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_min_y)
     return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_MIN_Y, orbit_intlk_ang_min_y);
 }
 
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_x_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_X_DIFF, orbit_intlk_trans_x_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_trans_y_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_TRANS_Y_DIFF, orbit_intlk_trans_y_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_x_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_X_DIFF, orbit_intlk_ang_x_diff);
+}
+
+PARAM_FUNC_CLIENT_READ_SIGNED(orbit_intlk_ang_y_diff)
+{
+    return param_client_read_signed (self, service, ORBIT_INTLK_OPCODE_SET_GET_ANG_Y_DIFF, orbit_intlk_ang_y_diff);
+}
+
 /**************** FOFB CTRL SMIO Functions ****************/
 PARAM_FUNC_CLIENT_WRITE(fofb_ctrl_act_part)
 {
@@ -4162,3 +4226,50 @@ PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_sp_lim_inf)
 {
     return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
 }
+
+/**************** FOFB PROCESSING SMIO Functions ****************/
+
+/* FOFB processing ram write enable */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_write)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_write)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
+}
+
+/* FOFB processing ram addr */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_addr)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_addr)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
+}
+
+/* FOFB processing ram data in */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_in)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_in)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
+}
+
+/* FOFB processing ram data out */
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_out)
+{
+    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
+}
+

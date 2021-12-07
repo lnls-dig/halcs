@@ -670,6 +670,54 @@ disp_op_t dsp_set_get_offset_y_exp = {
     }
 };
 
+disp_op_t dsp_set_get_amp_gain_ch0_data_exp = {
+    .name = DSP_NAME_SET_GET_AMP_GAIN_CH0_DATA,
+    .opcode = DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_amp_gain_ch1_data_exp = {
+    .name = DSP_NAME_SET_GET_AMP_GAIN_CH1_DATA,
+    .opcode = DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_amp_gain_ch2_data_exp = {
+    .name = DSP_NAME_SET_GET_AMP_GAIN_CH2_DATA,
+    .opcode = DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t dsp_set_get_amp_gain_ch3_data_exp = {
+    .name = DSP_NAME_SET_GET_AMP_GAIN_CH3_DATA,
+    .opcode = DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_kx_exp,
@@ -727,6 +775,10 @@ const disp_op_t *dsp_exp_ops [] = {
     &dsp_set_get_monit_tag_desync_cnt_exp,
     &dsp_set_get_offset_x_exp,
     &dsp_set_get_offset_y_exp,
+    &dsp_set_get_amp_gain_ch0_data_exp,
+    &dsp_set_get_amp_gain_ch1_data_exp,
+    &dsp_set_get_amp_gain_ch2_data_exp,
+    &dsp_set_get_amp_gain_ch3_data_exp,
     NULL
 };
 

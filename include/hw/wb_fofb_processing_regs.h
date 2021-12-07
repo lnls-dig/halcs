@@ -1,0 +1,60 @@
+#ifndef __WB_FOFB_PROCESSING_REGS_H__
+#define __WB_FOFB_PROCESSING_REGS_H__
+
+#include "__wb_fofb_processing_regs.h"
+
+#ifdef __KERNEL__
+#include <linux/types.h>
+#else
+#include <inttypes.h>
+#endif
+
+#if defined( __GNUC__)
+#define PACKED __attribute__ ((packed))
+#else
+#error "Unsupported compiler?"
+#endif
+
+#ifndef __WBGEN2_MACROS_DEFINED__
+#define __WBGEN2_MACROS_DEFINED__
+#define WBGEN2_GEN_MASK(offset, size) (((1<<(size))-1) << (offset))
+#define WBGEN2_GEN_WRITE(value, offset, size) (((value) & ((1<<(size))-1)) << (offset))
+#define WBGEN2_GEN_READ(reg, offset, size) (((reg) >> (offset)) & ((1<<(size))-1))
+#define WBGEN2_SIGN_EXTEND(value, bits) (((value) & (1<<bits) ? ~((1<<(bits))-1): 0 ) | (value))
+#endif
+
+/* Definitions for RAM WRITE ENABLE */
+
+#define FOFB_PROCESSING_REG_RAM_WRITE             WB_FOFB_PROCESSING_REGS_RAM_WRITE
+#define FOFB_PROCESSING_RAM_WRITE                 WB_FOFB_PROCESSING_REGS_RAM_WRITE_ENABLE
+
+
+/* Definitions for RAM DATA IN */
+
+#define FOFB_PROCESSING_REG_RAM_DATA_IN           WB_FOFB_PROCESSING_REGS_RAM_DATA_IN
+
+#define FOFB_PROCESSING_RAM_DATA_IN_MASK          WB_FOFB_PROCESSING_REGS_RAM_DATA_IN_VAL_MASK
+#define FOFB_PROCESSING_RAM_DATA_IN_SHIFT         WB_FOFB_PROCESSING_REGS_RAM_DATA_IN_VAL_SHIFT
+#define FOFB_PROCESSING_RAM_DATA_IN_R(val)        ((val & FOFB_PROCESSING_RAM_DATA_IN_MASK) >> FOFB_PROCESSING_RAM_DATA_IN_SHIFT)
+#define FOFB_PROCESSING_RAM_DATA_IN_W(reg)        ((reg & FOFB_PROCESSING_RAM_DATA_IN_MASK) << FOFB_PROCESSING_RAM_DATA_IN_SHIFT)
+
+
+/* Definitions for RAM DATA OUT */
+
+#define FOFB_PROCESSING_REG_RAM_DATA_OUT          WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT
+
+#define FOFB_PROCESSING_RAM_DATA_OUT_MASK         WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT_VAL_MASK
+#define FOFB_PROCESSING_RAM_DATA_OUT_SHIFT        WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT_VAL_SHIFT
+#define FOFB_PROCESSING_RAM_DATA_OUT_R(val)       ((val & FOFB_PROCESSING_RAM_DATA_OUT_MASK) >> FOFB_PROCESSING_RAM_DATA_OUT_SHIFT)
+#define FOFB_PROCESSING_RAM_DATA_OUT_W(reg)       ((reg & FOFB_PROCESSING_RAM_DATA_OUT_MASK) << FOFB_PROCESSING_RAM_DATA_OUT_SHIFT)
+
+/* RAM address register */
+
+#define FOFB_PROCESSING_REG_RAM_ADDR              WB_FOFB_PROCESSING_REGS_RAM_ADDR
+
+#define FOFB_PROCESSING_RAM_ADDR_MASK             WB_FOFB_PROCESSING_REGS_RAM_ADDR_VAL_MASK
+#define FOFB_PROCESSING_RAM_ADDR_SHIFT            WB_FOFB_PROCESSING_REGS_RAM_ADDR_VAL_SHIFT
+#define FOFB_PROCESSING_RAM_ADDR_R(val)           ((val & FOFB_PROCESSING_RAM_ADDR_MASK) >> FOFB_PROCESSING_RAM_ADDR_SHIFT)
+#define FOFB_PROCESSING_RAM_ADDR_W(reg)           ((reg & FOFB_PROCESSING_RAM_ADDR_MASK) << FOFB_PROCESSING_RAM_ADDR_SHIFT)
+
+#endif /* __WB_FOFB_PROCESSING_REGS_H__ */

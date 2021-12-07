@@ -712,6 +712,54 @@
 #define POS_CALC_MONIT_DATA_MASK_SAMPLES_END_W(value) WBGEN2_DSP_GEN_WRITE(value, 16, 16)
 #define POS_CALC_MONIT_DATA_MASK_SAMPLES_END_R(reg) WBGEN2_DSP_GEN_READ(reg, 16, 16)
 
+/* definitions for field: DATA in reg: Amplitude gain for channel 0 */
+#define POS_CALC_AMP_GAIN_CH0_DATA_MASK WBGEN2_DSP_GEN_MASK(0, 25)
+#define POS_CALC_AMP_GAIN_CH0_DATA_SHIFT 0
+#define POS_CALC_AMP_GAIN_CH0_DATA_W(value) WBGEN2_DSP_GEN_WRITE(value, 0, 25)
+#define POS_CALC_AMP_GAIN_CH0_DATA_R(reg) WBGEN2_DSP_GEN_READ(reg, 0, 25)
+
+/* definitions for field: RESERVED in reg: Amplitude gain for channel 0 */
+#define POS_CALC_AMP_GAIN_CH0_RESERVED_MASK WBGEN2_DSP_GEN_MASK(25, 7)
+#define POS_CALC_AMP_GAIN_CH0_RESERVED_SHIFT 25
+#define POS_CALC_AMP_GAIN_CH0_RESERVED_W(value) WBGEN2_DSP_GEN_WRITE(value, 25, 7)
+#define POS_CALC_AMP_GAIN_CH0_RESERVED_R(reg) WBGEN2_DSP_GEN_READ(reg, 25, 7)
+
+/* definitions for field: DATA in reg: Amplitude gain for channel 1 */
+#define POS_CALC_AMP_GAIN_CH1_DATA_MASK WBGEN2_DSP_GEN_MASK(0, 25)
+#define POS_CALC_AMP_GAIN_CH1_DATA_SHIFT 0
+#define POS_CALC_AMP_GAIN_CH1_DATA_W(value) WBGEN2_DSP_GEN_WRITE(value, 0, 25)
+#define POS_CALC_AMP_GAIN_CH1_DATA_R(reg) WBGEN2_DSP_GEN_READ(reg, 0, 25)
+
+/* definitions for field: RESERVED in reg: Amplitude gain for channel 1 */
+#define POS_CALC_AMP_GAIN_CH1_RESERVED_MASK WBGEN2_DSP_GEN_MASK(25, 7)
+#define POS_CALC_AMP_GAIN_CH1_RESERVED_SHIFT 25
+#define POS_CALC_AMP_GAIN_CH1_RESERVED_W(value) WBGEN2_DSP_GEN_WRITE(value, 25, 7)
+#define POS_CALC_AMP_GAIN_CH1_RESERVED_R(reg) WBGEN2_DSP_GEN_READ(reg, 25, 7)
+
+/* definitions for field: DATA in reg: Amplitude gain for channel 2 */
+#define POS_CALC_AMP_GAIN_CH2_DATA_MASK WBGEN2_DSP_GEN_MASK(0, 25)
+#define POS_CALC_AMP_GAIN_CH2_DATA_SHIFT 0
+#define POS_CALC_AMP_GAIN_CH2_DATA_W(value) WBGEN2_DSP_GEN_WRITE(value, 0, 25)
+#define POS_CALC_AMP_GAIN_CH2_DATA_R(reg) WBGEN2_DSP_GEN_READ(reg, 0, 25)
+
+/* definitions for field: RESERVED in reg: Amplitude gain for channel 2 */
+#define POS_CALC_AMP_GAIN_CH2_RESERVED_MASK WBGEN2_DSP_GEN_MASK(25, 7)
+#define POS_CALC_AMP_GAIN_CH2_RESERVED_SHIFT 25
+#define POS_CALC_AMP_GAIN_CH2_RESERVED_W(value) WBGEN2_DSP_GEN_WRITE(value, 25, 7)
+#define POS_CALC_AMP_GAIN_CH2_RESERVED_R(reg) WBGEN2_DSP_GEN_READ(reg, 25, 7)
+
+/* definitions for field: DATA in reg: Amplitude gain for channel 3 */
+#define POS_CALC_AMP_GAIN_CH3_DATA_MASK WBGEN2_DSP_GEN_MASK(0, 25)
+#define POS_CALC_AMP_GAIN_CH3_DATA_SHIFT 0
+#define POS_CALC_AMP_GAIN_CH3_DATA_W(value) WBGEN2_DSP_GEN_WRITE(value, 0, 25)
+#define POS_CALC_AMP_GAIN_CH3_DATA_R(reg) WBGEN2_DSP_GEN_READ(reg, 0, 25)
+
+/* definitions for field: RESERVED in reg: Amplitude gain for channel 3 */
+#define POS_CALC_AMP_GAIN_CH3_RESERVED_MASK WBGEN2_DSP_GEN_MASK(25, 7)
+#define POS_CALC_AMP_GAIN_CH3_RESERVED_SHIFT 25
+#define POS_CALC_AMP_GAIN_CH3_RESERVED_W(value) WBGEN2_DSP_GEN_WRITE(value, 25, 7)
+#define POS_CALC_AMP_GAIN_CH3_RESERVED_R(reg) WBGEN2_DSP_GEN_READ(reg, 25, 7)
+
 /* [0x0]: REG Config divisor threshold TBT register */
 #define POS_CALC_REG_DS_TBT_THRES 0x00000000
 /* [0x4]: REG Config divisor threshold FOFB register */
@@ -854,4 +902,12 @@
 #define POS_CALC_REG_OFFSET_X 0x000000114
 /* [0x118]: REG BPM Y position offset parameter register */
 #define POS_CALC_REG_OFFSET_Y 0x00000118
+/* [0x11c]: REG (rw) Amplitude gain for channel 0 */
+#define POS_CALC_REG_AMP_GAIN_CH0 0x0000011c
+/* [0x120]: REG (rw) Amplitude gain for channel 1 */
+#define POS_CALC_REG_AMP_GAIN_CH1 0x00000120
+/* [0x124]: REG (rw) Amplitude gain for channel 2 */
+#define POS_CALC_REG_AMP_GAIN_CH2 0x00000124
+/* [0x128]: REG (rw) Amplitude gain for channel 3 */
+#define POS_CALC_REG_AMP_GAIN_CH3 0x00000128
 #endif

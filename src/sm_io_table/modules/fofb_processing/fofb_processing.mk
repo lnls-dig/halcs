@@ -1,0 +1,3 @@
+sm_io_table_fofb_processing_DIR = $(sm_io_table_modules_DIR)/fofb_processing
+
+sm_io_table_fofb_processing_OBJS = $(sm_io_table_fofb_processing_DIR)/sm_io_fofb_processing_exports.o

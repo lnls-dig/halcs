@@ -562,6 +562,54 @@ disp_op_t orbit_intlk_set_get_ang_min_y_exp = {
     }
 };
 
+disp_op_t orbit_intlk_set_get_trans_x_diff_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_X_DIFF,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_X_DIFF,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_trans_y_diff_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_TRANS_Y_DIFF,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_TRANS_Y_DIFF,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_x_diff_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_X_DIFF,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_X_DIFF,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t orbit_intlk_set_get_ang_y_diff_exp = {
+    .name = ORBIT_INTLK_NAME_SET_GET_ANG_Y_DIFF,
+    .opcode = ORBIT_INTLK_OPCODE_SET_GET_ANG_Y_DIFF,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_INT32, int32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *orbit_intlk_exp_ops [] = {
     &orbit_intlk_set_get_en_exp,
@@ -610,6 +658,10 @@ const disp_op_t *orbit_intlk_exp_ops [] = {
     &orbit_intlk_set_get_trans_min_y_exp,
     &orbit_intlk_set_get_ang_min_x_exp,
     &orbit_intlk_set_get_ang_min_y_exp,
+    &orbit_intlk_set_get_trans_x_diff_exp,
+    &orbit_intlk_set_get_trans_y_diff_exp,
+    &orbit_intlk_set_get_ang_x_diff_exp,
+    &orbit_intlk_set_get_ang_y_diff_exp,
     NULL
 };
 

@@ -625,6 +625,42 @@ err_get_orbit_intlk_handler:
     return err;
 }
 
+#define ORBIT_INTLK_TRANS_X_DIFF_R(val)       (val)
+#define ORBIT_INTLK_TRANS_X_DIFF_W(val)       (val)
+#define ORBIT_INTLK_TRANS_X_DIFF_MASK         ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, trans_x_diff) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_X_DIFF, /* No field */,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_TRANS_Y_DIFF_R(val)       (val)
+#define ORBIT_INTLK_TRANS_Y_DIFF_W(val)       (val)
+#define ORBIT_INTLK_TRANS_Y_DIFF_MASK         ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, trans_y_diff) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, TRANS_Y_DIFF, /* No field */,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_ANG_X_DIFF_R(val)         (val)
+#define ORBIT_INTLK_ANG_X_DIFF_W(val)         (val)
+#define ORBIT_INTLK_ANG_X_DIFF_MASK           ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, ang_x_diff) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_X_DIFF, /* No field */,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define ORBIT_INTLK_ANG_Y_DIFF_R(val)         (val)
+#define ORBIT_INTLK_ANG_Y_DIFF_W(val)         (val)
+#define ORBIT_INTLK_ANG_Y_DIFF_MASK           ((1ULL<<32)-1)
+RW_PARAM_FUNC(orbit_intlk, ang_y_diff) {
+    SET_GET_PARAM(orbit_intlk, 0x0, ORBIT_INTLK, ANG_Y_DIFF, /* No field */,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp orbit_intlk_exp_fp [] = {
     RW_PARAM_FUNC_NAME(orbit_intlk, en),
@@ -673,6 +709,10 @@ const disp_table_func_fp orbit_intlk_exp_fp [] = {
     _orbit_intlk_trans_min_y,
     _orbit_intlk_ang_min_x,
     _orbit_intlk_ang_min_y,
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_x_diff),
+    RW_PARAM_FUNC_NAME(orbit_intlk, trans_y_diff),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_x_diff),
+    RW_PARAM_FUNC_NAME(orbit_intlk, ang_y_diff),
     NULL
 };
 
