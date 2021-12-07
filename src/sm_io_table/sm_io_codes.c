@@ -29,6 +29,7 @@ const disp_op_t **smio_exp_ops [] = {
     orbit_intlk_exp_ops,
     fofb_ctrl_exp_ops,
     rtmlamp_ohwr_exp_ops,
+    fofb_processing_exp_ops,
     NULL
 };
 

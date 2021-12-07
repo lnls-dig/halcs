@@ -814,6 +814,33 @@ err_get_dsp_handler:
     return err;
 }
 
+RW_PARAM_FUNC(dsp, amp_gain_ch0_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH0, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+
+RW_PARAM_FUNC(dsp, amp_gain_ch1_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH1, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+
+RW_PARAM_FUNC(dsp, amp_gain_ch2_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH2, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+
+RW_PARAM_FUNC(dsp, amp_gain_ch3_data) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH3, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, kx),
@@ -871,6 +898,10 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_tag_desync_cnt),
     _dsp_offset_x,
     _dsp_offset_y,
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch0_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch1_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch2_data),
+    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch3_data),
     NULL
 };
 

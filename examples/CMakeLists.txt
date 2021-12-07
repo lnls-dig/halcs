@@ -428,6 +428,18 @@ if(BUILD_EXAMPLE_rtmlamp_ohwr_ctl)
     list(APPEND bin_target_outputs "rtmlamp_ohwr_ctl")
 endif()
 
+option(BUILD_EXAMPLE_pos_calc "Whether or not to build example pos_calc tool" ON)
+
+if(BUILD_EXAMPLE_pos_calc)
+    list(APPEND bin_target_outputs "pos_calc")
+endif()
+
+option(BUILD_EXAMPLE_fofb_processing "Whether or not to build example fofb_processing tool" ON)
+
+if(BUILD_EXAMPLE_fofb_processing)
+    list(APPEND bin_target_outputs "fofb_processing")
+endif()
+
 foreach(bin_target ${bin_target_outputs})
     # add binary tool
     add_executable(${bin_target} src/${bin_target}.c)
