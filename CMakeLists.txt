@@ -310,16 +310,24 @@ if(ENABLE_CPACK)
     # we also depend on malamute >= 1.0, but this has not been packaged into the official
     # repositories yet
     set(CPACK_RPM_PACKAGE_REQUIRE "libsodium-devel >= 1.0.8, zeromq-devel >= 4.2.5, czmq-devel >= 4.0.2")
+
+    # Exclude directories from system packages
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
-        /lib
-        /usr/etc
+        /etc/ld.so.conf.d
         /etc/systemd
-        /lib/systemd
         /etc/systemd/system
-        /lib/systemd/system
         /etc/udev
         /etc/udev/rules.d
+        /lib
+        /lib/systemd
+        /lib/systemd/system
+        /usr/etc
+        /usr/lib64/cmake
+        /usr/lib64/pkgconfig
+        /usr/lib/systemd
+        /usr/lib/systemd/system
     )
+
     set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${halcs_POSTINST_FILE_DIR}/redhat/postinst")
     set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_NAME}-${halcs_VERSION}")
     set(CPACK_RPM_DEBUGINFO_PACKAGE ON)
