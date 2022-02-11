@@ -317,6 +317,7 @@ int main (int argc, char *argv[])
     }
 
     devio_err_e err = DEVIO_SUCCESS;
+    hutils_err_e hu_err = HUTILS_SUCCESS;
     const llio_ops_t *llio_ops = NULL;
     /* Check Dev_type */
     switch (llio_type) {
@@ -485,8 +486,8 @@ int main (int argc, char *argv[])
     /* Get board type name */
     err = DEVIO_SUCCESS;
     char *board_type = NULL;
-    err = hutils_get_board_type (devio_hints, dev_id, &board_type);
-    ASSERT_TEST (err == DEVIO_SUCCESS, "Could not get board_type from config file",
+    hu_err = hutils_get_board_type (devio_hints, dev_id, &board_type);
+    ASSERT_TEST (hu_err == HUTILS_SUCCESS, "Could not get board_type from config file",
             err_exit);
 
     DBE_DEBUG (DBG_DEV_IO | DBG_LVL_INFO, "[halcsd] board_type set to %s.\n",
