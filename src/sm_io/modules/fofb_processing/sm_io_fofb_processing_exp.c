@@ -40,36 +40,39 @@
 /***********  Specific FOFB_PROCESSING Operations ***********/
 /************************************************************/
 
-RW_PARAM_FUNC(fofb_processing, ram_write) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_WRITE, ,
-            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
 
-RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_ADDR, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
+static int _fofb_processing_coeff_ram_bank_write (void *owner, void *args,
+    void *ret)
+{
+    UNUSED(ret);
+    assert (owner);
+    assert (args);
+    int err = FOFB_PROCESSING_OK;
 
-RW_PARAM_FUNC(fofb_processing, ram_data_in) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_IN, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_coeff_ram_bank_write\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
-RW_PARAM_FUNC(fofb_processing, ram_data_out) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_OUT, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+    uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    struct _smio_fofb_processing_data_block_t coeffs =
+        *(struct _smio_fofb_processing_data_block_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_write_block(self,
+        FOFB_PROCESSING_REGS_RAM_BANK_OFFS(chan),
+        FOFB_PROCESSING_REGS_RAM_BANK_SIZE, coeffs.data);
+
+    if(size != FOFB_PROCESSING_REGS_RAM_BANK_SIZE) {
+        err = -FOFB_PROCESSING_ERR;
+    }
+
+    return err;
 }
 
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_write),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_addr),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_in),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_out),
+    _fofb_processing_coeff_ram_bank_write,
     NULL
 };
 

@@ -4203,48 +4203,31 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_sp, chan, eff_sp)
 }
 
 /**************** FOFB PROCESSING SMIO Functions ****************/
+halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
+    halcs_client_t *self, char *service, const uint32_t chan,
+    const smio_fofb_processing_data_block_t coeffs) {
+    assert(self);
+    assert(service);
 
-/* FOFB processing ram write enable */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_write)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
+    uint32_t input[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) + 1] = {0};
+    uint32_t output;
+
+    input[0] = chan;
+    memcpy(&input[1], coeffs.data, FOFB_PROCESSING_REGS_RAM_BANK_SIZE);
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE, service, input, &output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "fofb_processing_coeff_ram_bank_write: Something wrong hapenned",
+         coeff_ram_bank_write, HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_coeff_ram_bank_write] Coefficients"
+        "successfully written\n");
+    
+coeff_ram_bank_write:
+    return err;
 }
-
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_write)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
-}
-
-/* FOFB processing ram addr */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_addr)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_addr)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
-}
-
-/* FOFB processing ram data in */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_in)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_in)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
-}
-
-/* FOFB processing ram data out */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_out)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
-}
-
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
-}
-

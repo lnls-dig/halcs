@@ -8,18 +8,18 @@
 #ifndef _SM_IO_FOFB_PROCESSING_CODES_H_
 #define _SM_IO_FOFB_PROCESSING_CODES_H_
 
+#include "hw/wb_fofb_processing_regs.h" // TODO: Is this include okay to be here?
+
+struct _smio_fofb_processing_data_block_t {
+    uint32_t data[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t)];
+};
+
 /* Messaging OPCODES */
 #define FOFB_PROCESSING_OPCODE_TYPE                     uint32_t
 #define FOFB_PROCESSING_OPCODE_SIZE                     (sizeof (FOFB_PROCESSING_OPCODE_TYPE))
 
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE            0
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE              "fofb_processing_set_get_ram_write"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR             1
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR               "fofb_processing_set_get_ram_addr"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN          2
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN            "fofb_processing_set_get_ram_data_in"
-#define FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT         3
-#define FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT           "fofb_processing_set_get_ram_data_out"
+#define FOFB_PROCESSING_OPCODE_COEFF_RAM_BANK_WRITE     1
+#define FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE       "fofb_processing_coeff_ram_bank_write"
 
 /* Messaging Reply OPCODES */
 #define FOFB_PROCESSING_REPLY_TYPE                      uint32_t
