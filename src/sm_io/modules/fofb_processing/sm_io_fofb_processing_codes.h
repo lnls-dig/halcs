@@ -18,6 +18,8 @@ struct _smio_fofb_processing_data_block_t {
 #define FOFB_PROCESSING_OPCODE_TYPE                     uint32_t
 #define FOFB_PROCESSING_OPCODE_SIZE                     (sizeof (FOFB_PROCESSING_OPCODE_TYPE))
 
+#define FOFB_PROCESSING_OPCODE_COEFF_RAM_BANK_READ      0
+#define FOFB_PROCESSING_NAME_COEFF_RAM_BANK_READ        "fofb_processing_coeff_ram_bank_read"
 #define FOFB_PROCESSING_OPCODE_COEFF_RAM_BANK_WRITE     1
 #define FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE       "fofb_processing_coeff_ram_bank_write"
 

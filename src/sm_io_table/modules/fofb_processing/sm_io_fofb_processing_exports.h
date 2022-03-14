@@ -10,6 +10,7 @@
 
 #include "disptable.h"
 
+extern disp_op_t fofb_processing_coeff_ram_bank_read_exp;
 extern disp_op_t fofb_processing_coeff_ram_bank_write_exp;
 
 extern const disp_op_t *fofb_processing_exp_ops [];

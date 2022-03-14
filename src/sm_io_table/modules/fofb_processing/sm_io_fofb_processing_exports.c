@@ -9,7 +9,17 @@
 #include "sm_io_codes.h"
 
 /* Description SMIO FOFB_PROCESSING functions */
-
+disp_op_t fofb_processing_coeff_ram_bank_read_exp = {
+    .name = FOFB_PROCESSING_NAME_COEFF_RAM_BANK_READ,
+    .opcode = FOFB_PROCESSING_OPCODE_COEFF_RAM_BANK_READ,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+        sizeof(smio_fofb_processing_data_block_t)),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
 
 disp_op_t fofb_processing_coeff_ram_bank_write_exp = {
     .name = FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE,
@@ -26,6 +36,7 @@ disp_op_t fofb_processing_coeff_ram_bank_write_exp = {
 
 /* Exported function description */
 const disp_op_t *fofb_processing_exp_ops [] = {
+    &fofb_processing_coeff_ram_bank_read_exp,
     &fofb_processing_coeff_ram_bank_write_exp,
     NULL
 };

@@ -4203,6 +4203,36 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_sp, chan, eff_sp)
 }
 
 /**************** FOFB PROCESSING SMIO Functions ****************/
+halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_read(
+    halcs_client_t *self, char *service, const uint32_t chan,
+    smio_fofb_processing_data_block_t *const coeffs) {
+    assert(self);
+    assert(service);
+
+    uint32_t input;
+    uint32_t output[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t)];
+
+    input = chan;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_COEFF_RAM_BANK_READ, service, &input, output);
+
+    memcpy(coeffs->data, output, FOFB_PROCESSING_REGS_RAM_BANK_SIZE);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_coeff_ram_bank_read] Something wrong hapenned",
+        coeff_ram_bank_read, HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_coeff_ram_bank_read] Coefficients"
+        "successfully read\n");
+
+coeff_ram_bank_read:
+    return err;
+}
+
 halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
     halcs_client_t *self, char *service, const uint32_t chan,
     const smio_fofb_processing_data_block_t coeffs) {

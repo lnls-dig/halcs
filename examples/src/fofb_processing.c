@@ -20,13 +20,14 @@ static struct option long_opts[] = {
   {"board-slot",    required_argument,  NULL, 'o'},
   {"halcs-number",  required_argument,  NULL, 'n'},
   {"channel",       required_argument,  NULL, 'c'},
+  {"get-coeffs",    no_argument,        NULL, 'g'},
   {"set-coeffs",    required_argument,  NULL, 's'},
   {"broker-endp",   required_argument,  NULL, 'b'},
   {"verbose",       no_argument,        NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static const char *short_opts = "ho:n:c:s:b:v";
+static const char *short_opts = "ho:n:c:gs:b:v";
 
 struct optional_args {
   char *broker_endp;
@@ -34,7 +35,8 @@ struct optional_args {
 };
 
 enum operation {
-  SET_COEFFS
+  SET_COEFFS,
+  GET_COEFFS
 };
 
 enum necessary_args_idx {
@@ -59,18 +61,20 @@ void print_usage(char *program_name) {
     "HALCSD FOFB Processing Client Example\n"
     "Usages:\n"
     "       %s --help\n"
+    "       %s [OPTIONALS] --board-slot <1-12> --halcs-number <0|1> --channel <0-11> --get-coeffs\n"
     "       %s [OPTIONALS] --board-slot <1-12> --halcs-number <0|1> --channel <0-11> --set-coeffs <filename>\n"
     "\n"
     "  -h  --help                                    display this usage info\n"
     "  -o  --board-slot <board slot number = [1-12]> board slot number\n"
     "  -n  --halcs-number <HALCS number = [0|1]>     HALCS number\n"
     "  -c  --channel <channel number = [0-11]>       channel number\n"
+    "  -g  --get-coeffs                              gets coeffs\n"
     "  -s  --set-coeffs <filename>                   sets coeffs\n"
     "\n"
     "OPTIONALS:\n"
     "  -b  --broker-endp <broker endpoint>           broker endpoint (defaults to %s)\n"
     "  -v  --verbose                                 verbose output\n",
-    program_name, program_name, "ipc://"DFLT_BIND_FOLDER);
+    program_name, program_name, program_name, "ipc://"DFLT_BIND_FOLDER);
 }
 
 int main(int argc, char *argv[]) {
@@ -89,7 +93,9 @@ int main(int argc, char *argv[]) {
     nec_args.is_given[i] = false;
   }
 
-  smio_fofb_processing_data_block_t coeffs;
+  smio_fofb_processing_data_block_t coeffs = {
+      .data = {0}
+  };
 
   int opt;
   // Parsing arguments
@@ -120,6 +126,20 @@ int main(int argc, char *argv[]) {
       case 'c':
         nec_args.channel = strtoul(optarg, NULL, 10);
         nec_args.is_given[CHANNEL] = true;
+        break;
+
+      case 'g':
+        if(!nec_args.is_given[OP]) {
+            nec_args.op = GET_COEFFS;
+            nec_args.is_given[OP] = true;
+        } else { 
+          fprintf(stderr, "[client:fofb_processing]: Multiple operations not"
+            " allowed!\n");
+          print_usage(argv[0]);
+
+          ret = 1;
+          goto err_free_mem;
+        }
         break;
 
       case 's':
@@ -238,6 +258,32 @@ int main(int argc, char *argv[]) {
     } else {
       fprintf(stdout, "[client:fofb_processing]: "
         "halcs_fofb_processing_coeff_ram_bank_write succeed\n");
+    }
+  } else if(nec_args.op == GET_COEFFS) {
+    halcs_client_err_e err;
+
+    err = halcs_fofb_processing_coeff_ram_bank_read(client, service,
+      nec_args.channel, &coeffs);
+    if(err != HALCS_CLIENT_SUCCESS) {
+      fprintf(stderr, "[client:fofb_processing]: "
+        "halcs_fofb_processing_coeff_ram_bank_read failed\n");
+
+      ret = 1;
+      goto err_halcs_exit;
+    } else {
+      fprintf(stdout, "[client:fofb_processing]: "
+        "halcs_fofb_processing_coeff_ram_bank_read succeed\n");
+
+      fprintf(stdout, "{");
+      for(int i = 0;
+        i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++) {
+          if(i != (FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) - 1)) {
+            fprintf(stdout, "%d, ", coeffs.data[i]);
+          } else {
+            fprintf(stdout, "%d", coeffs.data[i]);
+          }
+        }
+      fprintf(stdout, "}\n");
     }
   }
 
