@@ -50,21 +50,15 @@ static int _fofb_processing_coeff_ram_bank_read (void *owner, void *args,
         "Calling _fofb_processing_coeff_ram_bank_read\n");
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
-    uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
-
-    struct _smio_fofb_processing_data_block_t coeffs;
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
 
     ssize_t size;
     size = smio_thsafe_client_read_block(self,
         FOFB_PROCESSING_REGS_RAM_BANK_OFFS(chan),
-        FOFB_PROCESSING_REGS_RAM_BANK_SIZE, coeffs.data);
+        FOFB_PROCESSING_REGS_RAM_BANK_SIZE, (uint32_t *)ret);
 
-    if(size != FOFB_PROCESSING_REGS_RAM_BANK_SIZE) {
-        err = -FOFB_PROCESSING_ERR;
-    } else {
-        memcpy(ret, coeffs.data, FOFB_PROCESSING_REGS_RAM_BANK_SIZE);
-        err = size;
-    }
+    err = (size == FOFB_PROCESSING_REGS_RAM_BANK_SIZE)?
+        size : -FOFB_PROCESSING_ERR;
 
     return err;
 }
@@ -75,15 +69,15 @@ static int _fofb_processing_coeff_ram_bank_write (void *owner, void *args,
     UNUSED(ret);
     assert (owner);
     assert (args);
-    int err = FOFB_PROCESSING_OK;
+    int err;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
         "Calling _fofb_processing_coeff_ram_bank_write\n");
     SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
 
-    uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
 
-    struct _smio_fofb_processing_data_block_t coeffs =
+    const struct _smio_fofb_processing_data_block_t coeffs =
         *(struct _smio_fofb_processing_data_block_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
 
     ssize_t size;
@@ -91,9 +85,8 @@ static int _fofb_processing_coeff_ram_bank_write (void *owner, void *args,
         FOFB_PROCESSING_REGS_RAM_BANK_OFFS(chan),
         FOFB_PROCESSING_REGS_RAM_BANK_SIZE, coeffs.data);
 
-    if(size != FOFB_PROCESSING_REGS_RAM_BANK_SIZE) {
-        err = -FOFB_PROCESSING_ERR;
-    }
+    err = (size == FOFB_PROCESSING_REGS_RAM_BANK_SIZE)?
+        FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
 
     return err;
 }

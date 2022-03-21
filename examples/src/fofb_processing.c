@@ -3,6 +3,7 @@
 ** Processing SMIO.
 **/
 
+#include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -13,6 +14,7 @@
 
 #include "hw/wb_fofb_processing_regs.h" // TODO: Is this include okay to be here?
 
+#define UINT32_T_MAX        4294967295  // 2^32 - 1
 #define DFLT_BIND_FOLDER    "/tmp/malamute"
 
 static struct option long_opts[] = {
@@ -43,10 +45,10 @@ enum necessary_args_idx {
   BOARD_SLOT,
   HALCS_NUMBER,
   CHANNEL,
-  OP
+  OP,
+  NUM_OF_NECESSARY_ARGS
 };
 
-#define NUM_OF_NECESSARY_ARGS 4
 struct necessary_args {
   bool is_given[NUM_OF_NECESSARY_ARGS];
 
@@ -77,25 +79,42 @@ void print_usage(char *program_name) {
     program_name, program_name, program_name, "ipc://"DFLT_BIND_FOLDER);
 }
 
+static int _strtou(const char *nptr, uint32_t *const u) {
+  int ret;
+  char *endptr;
+
+  errno = 0;
+  const unsigned long int ul = strtoul(nptr, &endptr, 10);
+
+  if(endptr == nptr) {
+    fprintf(stderr, "[client:fofb_processing]: '%s' is not a decimal number\n",
+      nptr);
+    ret = -1;
+  } else if(ul == 0 && errno != 0) {
+    fprintf(stderr, "[client:fofb_processing]: '%s': %s\n", nptr, strerror(errno));
+    ret = -1;
+  } else if(ul > UINT32_T_MAX) {
+    fprintf(stderr, "[client:fofb_processing]: %ld is greater than "
+      "UINT32_T_MAX\n", ul);
+    ret = -1;
+  } else {
+    *u = (uint32_t)ul;
+    ret = 0;
+  }
+
+  return ret;
+}
+
 int main(int argc, char *argv[]) {
   int ret = 0;
 
   struct optional_args opt_args = {
-    .broker_endp = strdup("ipc://"DFLT_BIND_FOLDER),
+    .broker_endp = "ipc://" DFLT_BIND_FOLDER,
     .verbose = 0
   };
-  struct necessary_args nec_args = {
-    .board_slot = 0,
-    .halcs_number = 0,
-    .channel = 0,
-  };
-  for(int i = 0; i < NUM_OF_NECESSARY_ARGS; i++) {
-    nec_args.is_given[i] = false;
-  }
+  struct necessary_args nec_args = {0};
 
-  smio_fofb_processing_data_block_t coeffs = {
-      .data = {0}
-  };
+  smio_fofb_processing_data_block_t coeffs = {0};
 
   int opt;
   // Parsing arguments
@@ -106,25 +125,34 @@ int main(int argc, char *argv[]) {
         print_usage(argv[0]);
 
         ret = 0;
-        goto err_free_mem;
+        goto err_halcs_client_not_inst;
         break;
 
       case 'b':
-        opt_args.broker_endp = strdup(optarg);
+        opt_args.broker_endp = optarg;
         break;
 
       case 'o':
-        nec_args.board_slot = strtoul(optarg, NULL, 10);
+        if(_strtou(optarg, &nec_args.board_slot) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
         nec_args.is_given[BOARD_SLOT] = true;
         break;
 
       case 'n':
-        nec_args.halcs_number = strtoul(optarg, NULL, 10);
+        if(_strtou(optarg, &nec_args.halcs_number) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
         nec_args.is_given[HALCS_NUMBER] = true;
         break;
 
       case 'c':
-        nec_args.channel = strtoul(optarg, NULL, 10);
+        if(_strtou(optarg, &nec_args.channel) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
         nec_args.is_given[CHANNEL] = true;
         break;
 
@@ -137,36 +165,40 @@ int main(int argc, char *argv[]) {
             " allowed!\n");
           print_usage(argv[0]);
 
-          ret = 1;
-          goto err_free_mem;
+          ret = -1;
+          goto err_halcs_client_not_inst;
         }
         break;
 
       case 's':
+        errno = 0;
         if(!nec_args.is_given[OP]) {
           FILE *fp;
 
           fp = fopen(optarg, "r");
           if(fp == NULL) {
-            fprintf(stderr, "[client:fofb_processing]: Something wrong happened"
-              " while trying to open %s\n", optarg);
+            fprintf(stderr, "[client:fofb_processing]:  %s: %s\n", optarg,
+              strerror(errno));
 
-            ret = 1;
-            goto err_free_mem;
+            ret = -1;
+            goto err_halcs_client_not_inst;
           } else {
             char coeff[20] = {0};
 
             for(int i = 0;
               i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++) {
-                if(fgets(coeff, 20, fp) != NULL) {
-                  coeffs.data[i] = strtoul(coeff, NULL, 10);
+                if(fgets(coeff, sizeof coeff, fp) != NULL) {
+                  if(_strtou(coeff, &coeffs.data[i]) != 0) {
+                    ret = -1;
+                    goto err_halcs_client_not_inst;
+                  }
                 } else {
                   fclose(fp);
-                  fprintf(stderr, "[client:fofb_processing]: Something wrong"
-                    " happened while parsing %s\n", optarg);
+                  fprintf(stderr, "[client:fofb_processing]: %s: %s\n", optarg,
+                    strerror(errno));
 
-                  ret = 1;
-                  goto err_free_mem;
+                  ret = -1;
+                  goto err_halcs_client_not_inst;
                 }
             }
             fclose(fp);
@@ -179,8 +211,8 @@ int main(int argc, char *argv[]) {
             " allowed!\n");
           print_usage(argv[0]);
 
-          ret = 1;
-          goto err_free_mem;
+          ret = -1;
+          goto err_halcs_client_not_inst;
         }
        break;
 
@@ -193,16 +225,16 @@ int main(int argc, char *argv[]) {
           " missing argument\n");
         print_usage(argv[0]);
 
-        ret = 1;
-        goto err_free_mem;
+        ret = -1;
+        goto err_halcs_client_not_inst;
         break;
 
       default:
         fprintf(stderr, "[client:fofb_processing]: Could not parse options\n");
         print_usage(argv[0]);
 
-        ret = 1;
-        goto err_free_mem;
+        ret = -1;
+        goto err_halcs_client_not_inst;
       }
   }
 
@@ -214,8 +246,8 @@ int main(int argc, char *argv[]) {
         " arguments!\n");
       print_usage(argv[0]);
 
-      ret = 1;
-      goto err_free_mem;
+      ret = -1;
+      goto err_halcs_client_not_inst;
     }
   }
 
@@ -227,8 +259,8 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "[client:fofb_processing]: HALCS client could not be"
       " created\n");
 
-    ret = 1;
-    goto err_free_mem;
+    ret = -1;
+    goto err_halcs_client_not_inst;
   } else {
     fprintf(stdout, "[client:fofb_processing]: HALCS client successfully"
       " created\n");
@@ -253,8 +285,8 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "[client:fofb_processing]: "
         "halcs_fofb_processing_coeff_ram_bank_write failed\n");
 
-      ret = 1;
-      goto err_halcs_exit;
+      ret = -1;
+      goto err_halcs_client_inst;
     } else {
       fprintf(stdout, "[client:fofb_processing]: "
         "halcs_fofb_processing_coeff_ram_bank_write succeed\n");
@@ -268,31 +300,25 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "[client:fofb_processing]: "
         "halcs_fofb_processing_coeff_ram_bank_read failed\n");
 
-      ret = 1;
-      goto err_halcs_exit;
+      ret = -1;
+      goto err_halcs_client_inst;
     } else {
       fprintf(stdout, "[client:fofb_processing]: "
         "halcs_fofb_processing_coeff_ram_bank_read succeed\n");
 
+      int i;
       fprintf(stdout, "{");
-      for(int i = 0;
-        i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++) {
-          if(i != (FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) - 1)) {
-            fprintf(stdout, "%d, ", coeffs.data[i]);
-          } else {
-            fprintf(stdout, "%d", coeffs.data[i]);
-          }
+      for(i = 0;
+        i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) - 1; i++) {
+          fprintf(stdout, "%d, ", coeffs.data[i]);
         }
-      fprintf(stdout, "}\n");
+      fprintf(stdout, "%d}\n", coeffs.data[i]);
     }
   }
 
-err_halcs_exit:
+err_halcs_client_inst:
   halcs_client_destroy(&client);
-
-err_free_mem:
-  free(opt_args.broker_endp);
-  opt_args.broker_endp = NULL;
+err_halcs_client_not_inst:
 
   return ret;
 }

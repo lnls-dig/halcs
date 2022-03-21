@@ -13,7 +13,7 @@
 #define PACKED __attribute__ ((packed))
 #else
 #error "Unsupported compiler?"
- #endif
+#endif
 
 #ifndef __WBGEN2_MACROS_DEFINED__
 #define __WBGEN2_MACROS_DEFINED__
