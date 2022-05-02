@@ -165,12 +165,10 @@ RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define HALCS_RTMLAMP_OHWR_DAC_DATA_MIN                 0
-#define HALCS_RTMLAMP_OHWR_DAC_DATA_MAX                 RTMLAMP_OHWR_CH_0_DAC_DATA_MASK
 RW_PARAM_FUNC(rtmlamp_ohwr, dac_data) {
     SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
             CH_0_DAC, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_DAC_DATA_MIN, HALCS_RTMLAMP_OHWR_DAC_DATA_MAX, NO_CHK_FUNC,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
