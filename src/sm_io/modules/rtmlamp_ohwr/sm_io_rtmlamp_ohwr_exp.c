@@ -49,25 +49,25 @@
 #define RTMLAMP_OHWR_STA_W(val)       (val)
 #define RTMLAMP_OHWR_STA_MASK         ((1ULL<<32)-1)
 RW_PARAM_FUNC(rtmlamp_ohwr, sta) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, STA, /* No field */,
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, STA, RESERVED,
             MULT_BIT_PARAM, /* No min check */, /* No max check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-#define RTMLAMP_OHWR_CTL_DAC_DATA_FROM_WB_MIN            0
-#define RTMLAMP_OHWR_CTL_DAC_DATA_FROM_WB_MAX            1
-RW_PARAM_FUNC(rtmlamp_ohwr, dac_data_from_wb) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, CTL, DAC_DATA_FROM_WB,
-            SINGLE_BIT_PARAM, RTMLAMP_OHWR_CTL_DAC_DATA_FROM_WB_MIN,
-            RTMLAMP_OHWR_CTL_DAC_DATA_FROM_WB_MAX,
+#define RTMLAMP_OHWR_MODE_R(val)       (val)
+#define RTMLAMP_OHWR_MODE_W(val)       (val)
+#define RTMLAMP_OHWR_MODE_MASK         ((1ULL<<32)-1)
+RW_PARAM_FUNC(rtmlamp_ohwr, mode) {
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, CH_CTL, MODE,
+            MULT_BIT_PARAM, /* No min check */, /* No max check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 #define HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_L_MIN           0
 #define HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_L_MAX           1
 RW_PARAM_FUNC(rtmlamp_ohwr, amp_iflag_l) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_STA, AMP_IFLAG_L, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_STA, AMP_IFLAG_L, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_L_MIN, HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_L_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -75,8 +75,8 @@ RW_PARAM_FUNC(rtmlamp_ohwr, amp_iflag_l) {
 #define HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_L_MIN           0
 #define HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_L_MAX           1
 RW_PARAM_FUNC(rtmlamp_ohwr, amp_tflag_l) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_STA, AMP_TFLAG_L, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_STA, AMP_TFLAG_L, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_L_MIN, HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_L_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -84,8 +84,8 @@ RW_PARAM_FUNC(rtmlamp_ohwr, amp_tflag_l) {
 #define HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_R_MIN           0
 #define HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_R_MAX           1
 RW_PARAM_FUNC(rtmlamp_ohwr, amp_iflag_r) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_STA, AMP_IFLAG_R, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_STA, AMP_IFLAG_R, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_R_MIN, HALCS_RTMLAMP_OHWR_STA_AMP_IFLAG_R_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -93,8 +93,8 @@ RW_PARAM_FUNC(rtmlamp_ohwr, amp_iflag_r) {
 #define HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_R_MIN           0
 #define HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_R_MAX           1
 RW_PARAM_FUNC(rtmlamp_ohwr, amp_tflag_r) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_STA, AMP_TFLAG_R, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_STA, AMP_TFLAG_R, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_R_MIN, HALCS_RTMLAMP_OHWR_STA_AMP_TFLAG_R_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
@@ -102,117 +102,98 @@ RW_PARAM_FUNC(rtmlamp_ohwr, amp_tflag_r) {
 #define HALCS_RTMLAMP_OHWR_CTL_AMP_EN_MIN                0
 #define HALCS_RTMLAMP_OHWR_CTL_AMP_EN_MAX                1
 RW_PARAM_FUNC(rtmlamp_ohwr, amp_en) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_CTL, AMP_EN, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_CTL, AMP_EN, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
             HALCS_RTMLAMP_OHWR_CTL_AMP_EN_MIN, HALCS_RTMLAMP_OHWR_CTL_AMP_EN_MAX, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define HALCS_RTMLAMP_OHWR_CTL_PI_OL_TRIANG_ENABLE_MIN   0
-#define HALCS_RTMLAMP_OHWR_CTL_PI_OL_TRIANG_ENABLE_MAX   1
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_ol_triang_enable) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_CTL, PI_OL_TRIANG_ENABLE, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_CTL_PI_OL_TRIANG_ENABLE_MIN, HALCS_RTMLAMP_OHWR_CTL_PI_OL_TRIANG_ENABLE_MAX, NO_CHK_FUNC,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define HALCS_RTMLAMP_OHWR_CTL_PI_OL_SQUARE_ENABLE_MIN   0
-#define HALCS_RTMLAMP_OHWR_CTL_PI_OL_SQUARE_ENABLE_MAX   1
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_ol_square_enable) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_CTL, PI_OL_SQUARE_ENABLE, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_CTL_PI_OL_SQUARE_ENABLE_MIN, HALCS_RTMLAMP_OHWR_CTL_PI_OL_SQUARE_ENABLE_MAX, NO_CHK_FUNC,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define HALCS_RTMLAMP_OHWR_CTL_PI_SP_SQUARE_ENABLE_MIN   0
-#define HALCS_RTMLAMP_OHWR_CTL_PI_SP_SQUARE_ENABLE_MAX   1
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp_square_enable) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_CTL, PI_SP_SQUARE_ENABLE, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_CTL_PI_SP_SQUARE_ENABLE_MIN, HALCS_RTMLAMP_OHWR_CTL_PI_SP_SQUARE_ENABLE_MAX, NO_CHK_FUNC,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
-#define HALCS_RTMLAMP_OHWR_CTL_PI_ENABLE_MIN   0
-#define HALCS_RTMLAMP_OHWR_CTL_PI_ENABLE_MAX   1
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_enable) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_CTL, PI_ENABLE, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_CTL_PI_ENABLE_MIN, HALCS_RTMLAMP_OHWR_CTL_PI_ENABLE_MAX, NO_CHK_FUNC,
-            NO_FMT_FUNC, SET_FIELD);
-}
-
 RW_PARAM_FUNC(rtmlamp_ohwr, pi_kp) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_PI_KP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_PI_KP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
             /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(rtmlamp_ohwr, pi_ti) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_PI_TI, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_PI_TI, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
             /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_PI_SP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_PI_SP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
             /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
 RW_PARAM_FUNC(rtmlamp_ohwr, dac_data) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_DAC, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_DAC, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
             /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-#define HALCS_RTMLAMP_OHWR_DAC_WR_MIN                    0
-#define HALCS_RTMLAMP_OHWR_DAC_WR_MAX                    1
-RW_PARAM_FUNC(rtmlamp_ohwr, dac_wr) {
-    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR,
-            CH_0_DAC, WR, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
-            HALCS_RTMLAMP_OHWR_DAC_WR_MIN, HALCS_RTMLAMP_OHWR_DAC_WR_MAX, NO_CHK_FUNC,
+RW_PARAM_FUNC(rtmlamp_ohwr, lim_a) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_LIM, A, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
             NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_ol_dac_cnt_max) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, PI_OL_DAC_CNT_MAX, DATA,
+RW_PARAM_FUNC(rtmlamp_ohwr, lim_b) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_LIM, B, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
+            /* No min check */, /* No max check */, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(rtmlamp_ohwr, cnt) {
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, CH_CNT, DATA,
             MULT_BIT_PARAM, /* No min check */, /* No max check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(rtmlamp_ohwr, pi_sp_lim_inf) {
-    SET_GET_PARAM(rtmlamp_ohwr, 0x0, RTMLAMP_OHWR, PI_SP_LIM_INF, DATA,
+RW_PARAM_FUNC(rtmlamp_ohwr, eff_adc) {
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, CH_ADC_DAC_EFF, ADC,
             MULT_BIT_PARAM, /* No min check */, /* No max check */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
+
+RW_PARAM_FUNC(rtmlamp_ohwr, eff_dac) {
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, CH_ADC_DAC_EFF, DAC,
+            MULT_BIT_PARAM, /* No min check */, /* No max check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(rtmlamp_ohwr, eff_sp) {
+    SET_GET_PARAM(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR, CH_SP_EFF, SP,
+            MULT_BIT_PARAM, /* No min check */, /* No max check */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 
 /* Exported function pointers */
 const disp_table_func_fp rtmlamp_ohwr_exp_fp [] = {
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, sta),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_data_from_wb),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, amp_iflag_l),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, amp_tflag_l),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, amp_iflag_r),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, amp_tflag_r),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, amp_en),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ol_triang_enable),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ol_square_enable),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp_square_enable),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_enable),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, mode),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_kp),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ti),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_data),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, dac_wr),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_ol_dac_cnt_max),
-    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, pi_sp_lim_inf),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, lim_a),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, lim_b),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, cnt),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_adc),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_dac),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_sp),
     NULL
 };
 
