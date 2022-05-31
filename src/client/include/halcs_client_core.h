@@ -2501,6 +2501,15 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *ser
 halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *pi_sp);
 
+/* RTMLAMP_OHWR Controller Dac Data function. The function set/get
+ * dac data of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t dac_data);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *dac_data);
+
 /* RTMLAMP_OHWR Controller Lim function. The function set/get
  * Lim of a specified amplifier channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
