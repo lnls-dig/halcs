@@ -38,9 +38,9 @@ static struct option long_options[] =
     {"lim_a",               required_argument,   NULL, 'g'},
     {"lim_b",               required_argument,   NULL, 'n'},
     {"cnt",                 required_argument,   NULL, 'f'},
-    {"eff_adc",             required_argument,   NULL, 'm'},
-    {"eff_dac",             required_argument,   NULL, 'e'},
-    {"eff_sp",              required_argument,   NULL, 'l'},
+    {"eff_adc",             no_argument,         NULL, 'm'},
+    {"eff_dac",             no_argument,         NULL, 'e'},
+    {"eff_sp",              no_argument,         NULL, 'l'},
     {NULL, 0, NULL, 0}
 };
 
@@ -84,7 +84,7 @@ void print_help (char *program_name)
             "  -f  --lim_b                          PI setpoint inferior limit (for PI test modes)\n"
             "  -m  --eff_adc                        ADC instantaneous measurement\n" 
             "  -e  --eff_dac                        DAC instantaneous effective data\n" 
-            "  -l  --eff_sp                         Set point instantaneous effective data\n",
+            "  -l  --eff_sp                         Setpoint instantaneous effective data\n",
             program_name);
 }
 

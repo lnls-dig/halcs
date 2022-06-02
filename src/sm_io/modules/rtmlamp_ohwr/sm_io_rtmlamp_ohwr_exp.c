@@ -39,7 +39,7 @@
 
 /* This must match the FPGA maximum number of channels */
 #define RTMLAMP_OHWR_NUM_CHAN                          12
-#define RTMLAMP_OHWR_CHAN_OFFSET                       0x018 /* 6 32-bit registers */
+#define RTMLAMP_OHWR_CHAN_OFFSET                       WB_RTMLAMP_OHWR_CH_SIZE
 
 /*****************************************************************/
 /************ Specific RTMLAMP_OHWR INTERFACE Operations **************/
