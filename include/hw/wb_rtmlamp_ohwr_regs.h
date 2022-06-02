@@ -35,8 +35,7 @@
 
 /* General RTM offset */
 #define WB_RTMLAMP_OHWR_REG_CH                       WB_RTMLAMP_OHWR_REGS_CH
-#define WB_RTMLAMP_OHWR_REG_CH_SIZE                  WB_RTMLAMP_OHWR_REGS_CH_SIZE /* 64 */
-#define WB_RTMLAMP_OHWR_CH_SIZE                      0x40 /* convert WB_RTMLAMP_OHWR_REG_CH_SIZE to hex */
+#define WB_RTMLAMP_OHWR_CH_SIZE                      WB_RTMLAMP_OHWR_REGS_CH_SIZE
 
 /* Definitions for Channel status register */
 #define WB_RTMLAMP_OHWR_REG_CH_STA                   WB_RTMLAMP_OHWR_REGS_CH_STA + WB_RTMLAMP_OHWR_REGS_CH
