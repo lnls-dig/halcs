@@ -186,6 +186,7 @@ disp_op_t rtmlamp_ohwr_cnt_exp = {
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
@@ -196,6 +197,7 @@ disp_op_t rtmlamp_ohwr_eff_adc_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
@@ -210,6 +212,7 @@ disp_op_t rtmlamp_ohwr_eff_dac_exp = {
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
@@ -220,6 +223,7 @@ disp_op_t rtmlamp_ohwr_eff_sp_exp = {
     .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
