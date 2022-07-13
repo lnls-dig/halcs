@@ -110,9 +110,9 @@ int main (int argc, char *argv [])
     char *lim_a_str = NULL;
     char *lim_b_str = NULL; 
     char *cnt_str = NULL;
-    char *eff_adc_str = NULL;
-    char *eff_dac_str = NULL;
-    char *eff_sp_str = NULL;
+    int eff_adc = 0;
+    int eff_dac = 0;
+    int eff_sp = 0;
     int opt;
 
     while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -202,15 +202,15 @@ int main (int argc, char *argv [])
                 break;
 
             case 'm':
-                eff_adc_str = strdup (optarg);
+                eff_adc = 1;
                 break;
 
             case 'e':
-                eff_dac_str = strdup (optarg);
+                eff_dac = 1;
                 break;
 
             case 'l':
-                eff_sp_str = strdup (optarg);
+                eff_sp = 1;
                 break;
 
             case '?':
@@ -475,28 +475,33 @@ int main (int argc, char *argv [])
         }
 
         uint32_t arg = 0;
-        halcs_client_err_e err = halcs_get_rtmlamp_ohwr_eff_adc (halcs_client, service, chan, &arg);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_adc failed\n");
-            goto err_halcs_set;
-        }
-        printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_adc: 0x%08X\n", arg);
 
-        arg = 0;
-        err = halcs_get_rtmlamp_ohwr_eff_dac (halcs_client, service, chan, &arg);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_dac failed\n");
-            goto err_halcs_set;
+        if (eff_adc) {
+            halcs_client_err_e err = halcs_get_rtmlamp_ohwr_eff_adc (halcs_client, service, chan, &arg);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_adc failed\n");
+                goto err_halcs_set;
+            }
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_adc: 0x%08X\n", arg);
         }
-        printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_dac: 0x%08X\n", arg);
 
-        arg = 0;
-        err = halcs_get_rtmlamp_ohwr_eff_sp (halcs_client, service, chan, &arg);
-        if (err != HALCS_CLIENT_SUCCESS){
-            fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_sp failed\n");
-            goto err_halcs_set;
+        if (eff_dac) {
+            err = halcs_get_rtmlamp_ohwr_eff_dac (halcs_client, service, chan, &arg);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_dac failed\n");
+                goto err_halcs_set;
+            }
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_dac: 0x%08X\n", arg);
         }
-        printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_sp: 0x%08X\n", arg);
+
+        if (eff_sp) {
+            err = halcs_get_rtmlamp_ohwr_eff_sp (halcs_client, service, chan, &arg);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_sp failed\n");
+                goto err_halcs_set;
+            }
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_eff_sp: 0x%08X\n", arg);
+        }
 
     }
 
