@@ -475,7 +475,6 @@ int main (int argc, char *argv [])
         }
 
         uint32_t arg = 0;
-
         if (eff_adc) {
             halcs_client_err_e err = halcs_get_rtmlamp_ohwr_eff_adc (halcs_client, service, chan, &arg);
             if (err != HALCS_CLIENT_SUCCESS){
@@ -486,7 +485,7 @@ int main (int argc, char *argv [])
         }
 
         if (eff_dac) {
-            err = halcs_get_rtmlamp_ohwr_eff_dac (halcs_client, service, chan, &arg);
+            halcs_client_err_e err = halcs_get_rtmlamp_ohwr_eff_dac (halcs_client, service, chan, &arg);
             if (err != HALCS_CLIENT_SUCCESS){
                 fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_dac failed\n");
                 goto err_halcs_set;
@@ -495,7 +494,7 @@ int main (int argc, char *argv [])
         }
 
         if (eff_sp) {
-            err = halcs_get_rtmlamp_ohwr_eff_sp (halcs_client, service, chan, &arg);
+            halcs_client_err_e err = halcs_get_rtmlamp_ohwr_eff_sp (halcs_client, service, chan, &arg);
             if (err != HALCS_CLIENT_SUCCESS){
                 fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_get_rtmlamp_ohwr_eff_sp failed\n");
                 goto err_halcs_set;
