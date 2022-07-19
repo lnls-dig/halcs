@@ -50,6 +50,7 @@ typedef struct _smio_init_board_type_t smio_init_board_type_t;
 #include "sm_io_fofb_ctrl_codes.h"
 #include "sm_io_rtmlamp_ohwr_codes.h"
 #include "sm_io_fofb_processing_codes.h"
+#include "sm_io_clk_cnt_codes.h"
 
 /* Include all function descriptors */
 #include "sm_io_fmc130m_4ch_exports.h"
@@ -74,6 +75,7 @@ typedef struct _smio_init_board_type_t smio_init_board_type_t;
 #include "sm_io_fofb_ctrl_exports.h"
 #include "sm_io_rtmlamp_ohwr_exports.h"
 #include "sm_io_fofb_processing_exports.h"
+#include "sm_io_clk_cnt_exports.h"
 
 /* Merge all function descriptors in a single structure */
 extern const disp_op_t **smio_exp_ops [];

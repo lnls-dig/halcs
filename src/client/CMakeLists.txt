@@ -279,6 +279,7 @@ set(halcsclient_smio_table_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_processing/sm_io_fofb_processing_exports.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/clk_cnt/sm_io_clk_cnt_exports.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.c
 )
 
@@ -338,7 +339,8 @@ set(halcsclient_smio_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/orbit_intlk/sm_io_orbit_intlk_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_ctrl/sm_io_fofb_ctrl_codes.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_codes.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_processing/sm_io_fofb_processing_codes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/fofb_processing/sm_io_fofb_processing_codes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io/modules/clk_cnt/sm_io_clk_cnt_codes.h
 )
 
 # Get directory names only
@@ -392,7 +394,8 @@ set(halcsclient_smio_table_public_headers
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/orbit_intlk/sm_io_orbit_intlk_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_ctrl/sm_io_fofb_ctrl_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/rtmlamp_ohwr/sm_io_rtmlamp_ohwr_exports.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_processing/sm_io_fofb_processing_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/fofb_processing/sm_io_fofb_processing_exports.h
+	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/modules/clk_cnt/sm_io_clk_cnt_exports.h
 	${CMAKE_CURRENT_SOURCE_DIR}/../sm_io_table/sm_io_codes.h
 )
 
