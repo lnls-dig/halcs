@@ -440,6 +440,12 @@ if(BUILD_EXAMPLE_fofb_processing)
     list(APPEND bin_target_outputs "fofb_processing")
 endif()
 
+option(BUILD_EXAMPLE_clk_cnt "Whether or not to build example clk_cnt tool" ON)
+
+if(BUILD_EXAMPLE_clk_cnt)
+    list(APPEND bin_target_outputs "clk_cnt")
+endif()
+
 foreach(bin_target ${bin_target_outputs})
     # add binary tool
     add_executable(${bin_target} src/${bin_target}.c)
