@@ -2574,6 +2574,7 @@ halcs_client_err_e halcs_get_fofb_processing_ram_data_out (halcs_client_t *self,
 
 /********************** CLK CNT Functions ********************/
 
+halcs_client_err_e halcs_get_clk_cnt_trig_act (halcs_client_t *, char *, uint32_t *);
 halcs_client_err_e halcs_set_clk_cnt_trig_act (halcs_client_t *, char *, uint32_t);
 halcs_client_err_e halcs_get_clk_cnt_cnt_snap (halcs_client_t *, char *, uint32_t *);
 

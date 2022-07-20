@@ -19,7 +19,7 @@ static struct option long_options[] =
   {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "b:s:o:";
+static const char* shortopt = "b:s:o:t:";
 
 /* Our read function */
 typedef halcs_client_err_e (*halcs_func_fp) (halcs_client_t *self, char *service,
@@ -30,6 +30,7 @@ int main (int argc, char *argv [])
   char *broker_endp = NULL;
   char *board_number_str = NULL;
   char *halcs_number_str = NULL;
+  char *trig_act_str = NULL;
 
   int opt;
   while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
@@ -43,6 +44,9 @@ int main (int argc, char *argv [])
         break;
       case 's':
         halcs_number_str = optarg;
+        break;
+      case 't':
+        trig_act_str = optarg;
         break;
       default:
         fprintf (stderr, "[client:clk_cnt] Could not parse options\n");
@@ -89,8 +93,14 @@ int main (int argc, char *argv [])
   char service[50];
   snprintf (service, sizeof (service), "HALCS%u:DEVIO:CLK_CNT%u", board_number, halcs_number);
 
-  halcs_set_clk_cnt_trig_act(halcs_client, service, 1);
+  if (trig_act_str) {
+    uint32_t trig_act = strtoul(trig_act_str, NULL, 10);
+    halcs_set_clk_cnt_trig_act(halcs_client, service, trig_act);
+  }
+
   uint32_t val = 0;
+  halcs_get_clk_cnt_trig_act(halcs_client, service, &val);
+  printf("trig_act: %ju\n", (uintmax_t)val);
   halcs_get_clk_cnt_cnt_snap(halcs_client, service, &val);
   printf("cnt_snap: %ju\n", (uintmax_t)val);
 

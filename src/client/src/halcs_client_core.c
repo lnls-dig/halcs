@@ -4250,6 +4250,11 @@ PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out)
 
 /**************** CLK CNT SMIO Functions ****************/
 
+PARAM_FUNC_CLIENT_READ(clk_cnt_trig_act)
+{
+    return param_client_read (self, service, CLK_CNT_OPCODE_SET_GET_TRIG_ACT, clk_cnt_trig_act);
+}
+
 PARAM_FUNC_CLIENT_WRITE(clk_cnt_trig_act)
 {
     return param_client_write (self, service, CLK_CNT_OPCODE_SET_GET_TRIG_ACT, clk_cnt_trig_act);
