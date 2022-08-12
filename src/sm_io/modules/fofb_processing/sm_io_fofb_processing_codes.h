@@ -22,6 +22,8 @@ struct _smio_fofb_processing_data_block_t {
 #define FOFB_PROCESSING_NAME_COEFF_RAM_BANK_READ        "fofb_processing_coeff_ram_bank_read"
 #define FOFB_PROCESSING_OPCODE_COEFF_RAM_BANK_WRITE     1
 #define FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE       "fofb_processing_coeff_ram_bank_write"
+#define FOFB_PROCESSING_OPCODE_SET_GET_FIXED_POINT_POS  2
+#define FOFB_PROCESSING_NAME_SET_GET_FIXED_POINT_POS    "fofb_processing_set_get_fixed_point_pos"
 
 /* Messaging Reply OPCODES */
 #define FOFB_PROCESSING_REPLY_TYPE                      uint32_t

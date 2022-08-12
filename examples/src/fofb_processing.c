@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>     /* strtof */
 #include <string.h>
 
 #include <czmq.h>
@@ -87,14 +88,14 @@ static int _strtou(const char *nptr, uint32_t *const u) {
   const unsigned long int ul = strtoul(nptr, &endptr, 10);
 
   if(endptr == nptr) {
-    fprintf(stderr, "[client:fofb_processing]: '%s' is not a decimal number\n",
+    fprintf(stderr, "[client:fofb_processing] '%s' is not a decimal number\n",
       nptr);
     ret = -1;
   } else if(ul == 0 && errno != 0) {
-    fprintf(stderr, "[client:fofb_processing]: '%s': %s\n", nptr, strerror(errno));
+    fprintf(stderr, "[client:fofb_processing] '%s': %s\n", nptr, strerror(errno));
     ret = -1;
   } else if(ul > UINT32_T_MAX) {
-    fprintf(stderr, "[client:fofb_processing]: %ld is greater than "
+    fprintf(stderr, "[client:fofb_processing] %ld is greater than "
       "UINT32_T_MAX\n", ul);
     ret = -1;
   } else {
@@ -114,11 +115,13 @@ int main(int argc, char *argv[]) {
   };
   struct necessary_args nec_args = {0};
 
-  smio_fofb_processing_data_block_t coeffs = {0};
+  float float_point_coeffs[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t)]
+    = {0};
+  smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
 
   int opt;
   // Parsing arguments
-  // ########################################################################### 
+  // ###########################################################################
   while((opt = getopt_long(argc, argv, short_opts, long_opts, NULL)) != -1) {
     switch(opt) {
       case 'h':
@@ -160,8 +163,8 @@ int main(int argc, char *argv[]) {
         if(!nec_args.is_given[OP]) {
             nec_args.op = GET_COEFFS;
             nec_args.is_given[OP] = true;
-        } else { 
-          fprintf(stderr, "[client:fofb_processing]: Multiple operations not"
+        } else {
+          fprintf(stderr, "[client:fofb_processing] Multiple operations not"
             " allowed!\n");
           print_usage(argv[0]);
 
@@ -177,7 +180,7 @@ int main(int argc, char *argv[]) {
 
           fp = fopen(optarg, "r");
           if(fp == NULL) {
-            fprintf(stderr, "[client:fofb_processing]:  %s: %s\n", optarg,
+            fprintf(stderr, "[client:fofb_processing]  %s: %s\n", optarg,
               strerror(errno));
 
             ret = -1;
@@ -188,13 +191,10 @@ int main(int argc, char *argv[]) {
             for(int i = 0;
               i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++) {
                 if(fgets(coeff, sizeof coeff, fp) != NULL) {
-                  if(_strtou(coeff, &coeffs.data[i]) != 0) {
-                    ret = -1;
-                    goto err_halcs_client_not_inst;
-                  }
+                  float_point_coeffs[i] = strtof(coeff, NULL);
                 } else {
                   fclose(fp);
-                  fprintf(stderr, "[client:fofb_processing]: %s: %s\n", optarg,
+                  fprintf(stderr, "[client:fofb_processing] %s: %s\n", optarg,
                     strerror(errno));
 
                   ret = -1;
@@ -206,8 +206,8 @@ int main(int argc, char *argv[]) {
             nec_args.op = SET_COEFFS;
             nec_args.is_given[OP] = true;
           }
-        } else { 
-          fprintf(stderr, "[client:fofb_processing]: Multiple operations not"
+        } else {
+          fprintf(stderr, "[client:fofb_processing] Multiple operations not"
             " allowed!\n");
           print_usage(argv[0]);
 
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
         break;
 
       case '?':
-        fprintf(stderr, "[client:fofb_processing]: Option not recognized or"
+        fprintf(stderr, "[client:fofb_processing] Option not recognized or"
           " missing argument\n");
         print_usage(argv[0]);
 
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
         break;
 
       default:
-        fprintf(stderr, "[client:fofb_processing]: Could not parse options\n");
+        fprintf(stderr, "[client:fofb_processing] Could not parse options\n");
         print_usage(argv[0]);
 
         ret = -1;
@@ -239,10 +239,10 @@ int main(int argc, char *argv[]) {
   }
 
   // Checking if necessary arguments were given
-  // ########################################################################### 
+  // ###########################################################################
   for(int i = 0; i < NUM_OF_NECESSARY_ARGS; i++) {
     if(!nec_args.is_given[i]) {
-      fprintf(stderr, "[client:fofb_processing]: Missing one or more necessary"
+      fprintf(stderr, "[client:fofb_processing] Missing one or more necessary"
         " arguments!\n");
       print_usage(argv[0]);
 
@@ -252,67 +252,109 @@ int main(int argc, char *argv[]) {
   }
 
   // Instantiating a HALCS client
-  // ########################################################################### 
+  // ###########################################################################
   halcs_client_t *client =
     halcs_client_new(opt_args.broker_endp, opt_args.verbose, NULL);
   if(client == NULL) {
-    fprintf(stderr, "[client:fofb_processing]: HALCS client could not be"
+    fprintf(stderr, "[client:fofb_processing] HALCS client could not be"
       " created\n");
 
     ret = -1;
     goto err_halcs_client_not_inst;
   } else {
-    fprintf(stdout, "[client:fofb_processing]: HALCS client successfully"
+    fprintf(stdout, "[client:fofb_processing] HALCS client successfully"
       " created\n");
   }
 
   // Setting target service name
-  // ########################################################################### 
+  // ###########################################################################
   char service[50];
   snprintf(service, sizeof(service), "HALCS%u:DEVIO:FOFB_PROCESSING%u",
     nec_args.board_slot, nec_args.halcs_number);
-  fprintf(stdout, "[client:fofb_processing]: Target service name: %s\n",
+  fprintf(stdout, "[client:fofb_processing] Target service name: %s\n",
     service);
 
+  // Getting fixed-point position from hw
+  // ###########################################################################
+  halcs_client_err_e err;
+  uint32_t fixed_point_pos;
+
+  err = halcs_get_fofb_processing_fixed_point_pos(client, service,
+    &fixed_point_pos);
+  if(err != HALCS_CLIENT_SUCCESS) {
+    fprintf(stderr, "[client:fofb_processing] "
+      "halcs_get_fofb_processing_fixed_point_pos failed\n");
+
+    ret = -1;
+    goto err_halcs_client_inst;
+  } else {
+    fprintf(stdout, "[client:fofb_processing] "
+      "Fixed-point position: %u\n", fixed_point_pos);
+  }
+
   // Performing operation
-  // ########################################################################### 
+  // ###########################################################################
   if(nec_args.op == SET_COEFFS) {
-    halcs_client_err_e err;
+    smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
+
+    // floating-point to fixed-point conversion
+    for(int i = 0; i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++)
+    {
+      fixed_point_coeffs.data[i] =
+        (uint32_t)(float_point_coeffs[i]*(1 << fixed_point_pos));
+    }
 
     err = halcs_fofb_processing_coeff_ram_bank_write(client, service,
-      nec_args.channel, coeffs);
+      nec_args.channel, fixed_point_coeffs);
     if(err != HALCS_CLIENT_SUCCESS) {
-      fprintf(stderr, "[client:fofb_processing]: "
+      fprintf(stderr, "[client:fofb_processing] "
         "halcs_fofb_processing_coeff_ram_bank_write failed\n");
 
       ret = -1;
       goto err_halcs_client_inst;
     } else {
-      fprintf(stdout, "[client:fofb_processing]: "
+      fprintf(stdout, "[client:fofb_processing] "
         "halcs_fofb_processing_coeff_ram_bank_write succeed\n");
     }
   } else if(nec_args.op == GET_COEFFS) {
-    halcs_client_err_e err;
-
     err = halcs_fofb_processing_coeff_ram_bank_read(client, service,
-      nec_args.channel, &coeffs);
+      nec_args.channel, &fixed_point_coeffs);
     if(err != HALCS_CLIENT_SUCCESS) {
-      fprintf(stderr, "[client:fofb_processing]: "
+      fprintf(stderr, "[client:fofb_processing] "
         "halcs_fofb_processing_coeff_ram_bank_read failed\n");
 
       ret = -1;
       goto err_halcs_client_inst;
     } else {
-      fprintf(stdout, "[client:fofb_processing]: "
+      fprintf(stdout, "[client:fofb_processing] "
         "halcs_fofb_processing_coeff_ram_bank_read succeed\n");
 
-      int i;
-      fprintf(stdout, "{");
-      for(i = 0;
-        i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) - 1; i++) {
-          fprintf(stdout, "%d, ", coeffs.data[i]);
+      FILE *fp;
+
+      fp = fopen("coeffs.out", "w+");
+      if(fp == NULL) {
+        fprintf(stderr, "[client:fofb_processing]  %s: %s\n", optarg,
+          strerror(errno));
+
+        ret = -1;
+        goto err_halcs_client_inst;
+      } else {
+        // fixed-point to floating-point conversion
+        int i;
+        for(i = 0; i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t);
+          i++) {
+          if(fprintf(fp, "%.6f\n", ((float)((int)fixed_point_coeffs.data[i])/
+            (float)(1 << fixed_point_pos))) < 0) {
+            fprintf(stderr, "[client:fofb_processing] "
+              "Error while writing to coeffs.out");
+            fclose(fp);
+
+            ret = -1;
+            goto err_halcs_client_inst;
+          }
         }
-      fprintf(stdout, "%d}\n", coeffs.data[i]);
+        fclose(fp);
+      }
     }
   }
 

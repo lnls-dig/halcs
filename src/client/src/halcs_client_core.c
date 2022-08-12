@@ -4260,3 +4260,8 @@ halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
 coeff_ram_bank_write:
     return err;
 }
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_fixed_point_pos)
+{
+    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_FIXED_POINT_POS, fofb_processing_fixed_point_pos);
+}

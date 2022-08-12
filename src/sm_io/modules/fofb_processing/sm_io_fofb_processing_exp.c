@@ -91,10 +91,17 @@ static int _fofb_processing_coeff_ram_bank_write (void *owner, void *args,
     return err;
 }
 
+RW_PARAM_FUNC(fofb_processing, fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
     _fofb_processing_coeff_ram_bank_read,
     _fofb_processing_coeff_ram_bank_write,
+    RW_PARAM_FUNC_NAME(fofb_processing, fixed_point_pos),
     NULL
 };
 
