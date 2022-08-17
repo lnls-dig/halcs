@@ -46,7 +46,9 @@
 #define RTMLAMP_OHWR_NAME_EFF_DAC                          "rtmlamp_ohwr_eff_dac"
 #define RTMLAMP_OHWR_OPCODE_EFF_SP                         115
 #define RTMLAMP_OHWR_NAME_EFF_SP                           "rtmlamp_ohwr_eff_sp"
-#define RTMLAMP_OHWR_OPCODE_END                            116
+#define RTMLAMP_OHWR_OPCODE_TRIG_EN                        116
+#define RTMLAMP_OHWR_NAME_TRIG_EN                          "rtmlamp_ohwr_trig_en"
+#define RTMLAMP_OHWR_OPCODE_END                            117
 
 /* Messaging Reply OPCODES */
 #define RTMLAMP_OHWR_REPLY_TYPE                            uint32_t

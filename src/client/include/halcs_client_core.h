@@ -2477,8 +2477,17 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *se
 halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *amp_en);
 
+/* RTMLAMP_OHWR Controller Trigger enable function. The function set/get
+ * the trigger enable of a specified channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_trig_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t trig_en);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_trig_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *trig_en);
+
 /* RTMLAMP_OHWR Controller Mode function. The function set/get
- * amplifier enable of a specified amplifier channel "chan".
+ * mode of a specified channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_rtmlamp_ohwr_mode (halcs_client_t *self, char *service,

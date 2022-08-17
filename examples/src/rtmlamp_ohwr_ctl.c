@@ -41,6 +41,7 @@ static struct option long_options[] =
     {"eff_adc",             no_argument,         NULL, 'm'},
     {"eff_dac",             no_argument,         NULL, 'e'},
     {"eff_sp",              no_argument,         NULL, 'l'},
+    {"trig_en",             required_argument,   NULL, 'i'},
     {NULL, 0, NULL, 0}
 };
 
@@ -72,6 +73,8 @@ void print_help (char *program_name)
             "  -t  --amp_tflag_r                    Amplifier right overtemperature flag \n"
             "  -u  --amp_en <[0 = disable, 1 = enable>\n"
             "                                       Amplifier enable (must set --channnumber)\n"
+            "  -i  --trig_en <[0 = disable, 1 = enable>\n"
+            "                                       Trigger enable (must set --channnumber)\n"
 
             "  -q  --mode <[0 = OL_MANUAL , 1 = OL_TEST_SQR, 2 = CL_MANUAL, 3 = CL_TEST_SQR, 4 = CL_FOFB>\n"
             "                                       Power supply mode (must set --channnumber)\n"
@@ -110,6 +113,7 @@ int main (int argc, char *argv [])
     char *lim_a_str = NULL;
     char *lim_b_str = NULL; 
     char *cnt_str = NULL;
+    char *trig_en_str = NULL;
     int eff_adc = 0;
     int eff_dac = 0;
     int eff_sp = 0;
@@ -167,6 +171,10 @@ int main (int argc, char *argv [])
 
             case 'u':
                 amp_en_str = strdup (optarg);
+                break;
+
+            case 'i':
+                trig_en_str = strdup (optarg);
                 break;
 
             case 'q':
@@ -232,6 +240,7 @@ int main (int argc, char *argv [])
          amp_iflag_r_sel == 1 ||
          amp_iflag_r_sel == 1 ||
          amp_en_str != NULL ||
+         trig_en_str != NULL ||
          dac_data_str != NULL) &&
              chan_sel == 0) {
         fprintf (stderr, "[client:rtmlamp_ohwr]: Channel number not selected (use -c or --channumber option)\n");
@@ -365,6 +374,20 @@ int main (int argc, char *argv [])
             uint32_t arg = 0;
             halcs_get_rtmlamp_ohwr_amp_en (halcs_client, service, chan, &arg);
             printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_amp_en: 0x%08X\n", arg);
+        }
+
+        uint32_t trig_en = 0;
+        if (trig_en_str != NULL) {
+            trig_en = strtoul (trig_en_str, NULL, 10);
+            halcs_client_err_e err = halcs_set_rtmlamp_ohwr_trig_en (halcs_client, service, chan, trig_en);
+            if (err != HALCS_CLIENT_SUCCESS){
+                fprintf (stderr, "[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_trig_en failed\n");
+                goto err_halcs_set;
+            }
+
+            uint32_t arg = 0;
+            halcs_get_rtmlamp_ohwr_trig_en (halcs_client, service, chan, &arg);
+            printf ("[client:rtmlamp_ohwr]: halcs_set_rtmlamp_ohwr_trig_en: 0x%08X\n", arg);
         }
 
         uint32_t mode = 0;
@@ -524,6 +547,8 @@ err_halcs_client_new:
     mode_str = NULL;
     free (amp_en_str);
     amp_en_str = NULL;
+    free (trig_en_str);
+    trig_en_str = NULL;
     free (chan_str);
     chan_str = NULL;
     free (board_number_str);

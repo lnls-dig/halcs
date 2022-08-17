@@ -4089,6 +4089,18 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_en, chan, amp_en)
             chan, amp_en);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_trig_en, chan, trig_en)
+{
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_TRIG_EN,
+            chan, trig_en);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_trig_en, chan, trig_en)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_TRIG_EN,
+            chan, trig_en);
+}
+
 PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_mode, chan, mode)
 {
     return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_MODE,

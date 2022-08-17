@@ -106,6 +106,15 @@ RW_PARAM_FUNC(rtmlamp_ohwr, amp_en) {
             NO_FMT_FUNC, SET_FIELD);
 }
 
+#define HALCS_RTMLAMP_OHWR_CTL_TRIG_EN_MIN                0
+#define HALCS_RTMLAMP_OHWR_CTL_TRIG_EN_MAX                1
+RW_PARAM_FUNC(rtmlamp_ohwr, trig_en) {
+    SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
+            CH_CTL, TRIG_EN, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, SINGLE_BIT_PARAM,
+            HALCS_RTMLAMP_OHWR_CTL_TRIG_EN_MIN, HALCS_RTMLAMP_OHWR_CTL_TRIG_EN_MAX, NO_CHK_FUNC,
+            NO_FMT_FUNC, SET_FIELD);
+}
+
 RW_PARAM_FUNC(rtmlamp_ohwr, pi_kp) {
     SET_GET_PARAM_CHANNEL(rtmlamp_ohwr, 0x0, WB_RTMLAMP_OHWR,
             CH_PI_KP, DATA, RTMLAMP_OHWR_CHAN_OFFSET, RTMLAMP_OHWR_NUM_CHAN, MULT_BIT_PARAM,
@@ -196,6 +205,7 @@ const disp_table_func_fp rtmlamp_ohwr_exp_fp [] = {
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_adc),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_dac),
     RW_PARAM_FUNC_NAME(rtmlamp_ohwr, eff_sp),
+    RW_PARAM_FUNC_NAME(rtmlamp_ohwr, trig_en),
     NULL
 };
 

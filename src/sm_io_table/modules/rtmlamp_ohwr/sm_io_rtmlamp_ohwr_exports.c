@@ -87,6 +87,19 @@ disp_op_t rtmlamp_ohwr_amp_en_exp = {
     }
 };
 
+disp_op_t rtmlamp_ohwr_trig_en_exp = {
+    .name = RTMLAMP_OHWR_NAME_TRIG_EN,
+    .opcode = RTMLAMP_OHWR_OPCODE_TRIG_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 disp_op_t rtmlamp_ohwr_mode_exp = {
     .name = RTMLAMP_OHWR_NAME_MODE,
     .opcode = RTMLAMP_OHWR_OPCODE_MODE,
@@ -249,6 +262,7 @@ const disp_op_t *rtmlamp_ohwr_exp_ops [] = {
     &rtmlamp_ohwr_eff_adc_exp,
     &rtmlamp_ohwr_eff_dac_exp,
     &rtmlamp_ohwr_eff_sp_exp,
+    &rtmlamp_ohwr_trig_en_exp,
     NULL
 };
 

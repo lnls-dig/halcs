@@ -16,6 +16,7 @@ extern disp_op_t rtmlamp_ohwr_amp_tflag_l_exp;
 extern disp_op_t rtmlamp_ohwr_amp_iflag_r_exp;
 extern disp_op_t rtmlamp_ohwr_amp_tflag_r_exp;
 extern disp_op_t rtmlamp_ohwr_amp_en_exp;
+extern disp_op_t rtmlamp_ohwr_trig_en_exp;
 extern disp_op_t rtmlamp_ohwr_mode_exp;
 extern disp_op_t rtmlamp_ohwr_pi_kp_exp;
 extern disp_op_t rtmlamp_ohwr_pi_ti_exp;
