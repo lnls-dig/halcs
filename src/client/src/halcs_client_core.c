@@ -4238,11 +4238,11 @@ halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
     assert(self);
     assert(service);
 
-    uint32_t input[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t) + 1];
+    uint32_t input[FOFB_PROCESSING_MAX_NUM_OF_COEFFS + 1];
     uint32_t output[1]; // not used
 
     input[0] = chan;
-    memcpy(&input[1], coeffs.data, FOFB_PROCESSING_REGS_RAM_BANK_SIZE);
+    memcpy(&input[1], coeffs.data, FOFB_PROCESSING_MAX_NUM_OF_COEFFS*sizeof(uint32_t));
 
     halcs_client_err_e err = halcs_func_trans_exec(self,
         FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE, service, input, output);

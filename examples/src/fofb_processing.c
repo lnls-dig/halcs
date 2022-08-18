@@ -13,8 +13,6 @@
 #include <czmq.h>
 #include <halcs_client.h>
 
-#include "hw/wb_fofb_processing_regs.h" // TODO: Is this include okay to be here?
-
 #define UINT32_T_MAX        4294967295  // 2^32 - 1
 #define DFLT_BIND_FOLDER    "/tmp/malamute"
 
@@ -115,8 +113,7 @@ int main(int argc, char *argv[]) {
   };
   struct necessary_args nec_args = {0};
 
-  float float_point_coeffs[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t)]
-    = {0};
+  float float_point_coeffs[FOFB_PROCESSING_MAX_NUM_OF_COEFFS] = {0};
   smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
 
   int opt;
@@ -188,18 +185,17 @@ int main(int argc, char *argv[]) {
           } else {
             char coeff[20] = {0};
 
-            for(int i = 0;
-              i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++) {
-                if(fgets(coeff, sizeof coeff, fp) != NULL) {
-                  float_point_coeffs[i] = strtof(coeff, NULL);
-                } else {
-                  fclose(fp);
-                  fprintf(stderr, "[client:fofb_processing] %s: %s\n", optarg,
-                    strerror(errno));
+            for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
+              if(fgets(coeff, sizeof coeff, fp) != NULL) {
+                float_point_coeffs[i] = strtof(coeff, NULL);
+              } else {
+                fclose(fp);
+                fprintf(stderr, "[client:fofb_processing] %s: %s\n", optarg,
+                  strerror(errno));
 
-                  ret = -1;
-                  goto err_halcs_client_not_inst;
-                }
+                ret = -1;
+                goto err_halcs_client_not_inst;
+              }
             }
             fclose(fp);
 
@@ -298,7 +294,7 @@ int main(int argc, char *argv[]) {
     smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
 
     // floating-point to fixed-point conversion
-    for(int i = 0; i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t); i++)
+    for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++)
     {
       fixed_point_coeffs.data[i] =
         (uint32_t)(float_point_coeffs[i]*(1 << fixed_point_pos));
@@ -341,8 +337,7 @@ int main(int argc, char *argv[]) {
       } else {
         // fixed-point to floating-point conversion
         int i;
-        for(i = 0; i < FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t);
-          i++) {
+        for(i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
           if(fprintf(fp, "%.6f\n", ((float)((int)fixed_point_coeffs.data[i])/
             (float)(1 << fixed_point_pos))) < 0) {
             fprintf(stderr, "[client:fofb_processing] "

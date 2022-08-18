@@ -8,10 +8,12 @@
 #ifndef _SM_IO_FOFB_PROCESSING_CODES_H_
 #define _SM_IO_FOFB_PROCESSING_CODES_H_
 
-#include "hw/wb_fofb_processing_regs.h" // TODO: Is this include okay to be here?
-
+/* NOTE: This value should be FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t),
+ * 	 where FOFB_PROCESSING_REGS_RAM_BANK_SIZE is defined on hw/wb_fofb_processing_regs.h
+ */
+#define FOFB_PROCESSING_MAX_NUM_OF_COEFFS			          512
 struct _smio_fofb_processing_data_block_t {
-    uint32_t data[FOFB_PROCESSING_REGS_RAM_BANK_SIZE/sizeof(uint32_t)];
+    uint32_t data[FOFB_PROCESSING_MAX_NUM_OF_COEFFS];
 };
 
 /* Messaging OPCODES */
