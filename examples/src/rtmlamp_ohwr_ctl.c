@@ -51,7 +51,7 @@ extern disp_op_t rtmlamp_ohwr_pi_sp_exp;
 extern disp_op_t rtmlamp_ohwr_lim_a_exp;
 extern disp_op_t rtmlamp_ohwr_lim_b_exp;
 
-static const char* shortopt = "hb:vo:s:c:yrpatu:q:k:z:j:d:g:n:f:mel";
+static const char* shortopt = "hb:vo:s:c:yrpatu:q:k:z:j:d:g:n:f:meli:";
 
 void print_help (char *program_name)
 {
