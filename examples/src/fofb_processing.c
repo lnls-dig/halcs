@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
   };
   struct necessary_args nec_args = {0};
 
-  float float_point_coeffs[FOFB_PROCESSING_MAX_NUM_OF_COEFFS] = {0};
+  float float_point_coeffs[FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS] = {0};
   smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
 
   int opt;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
           } else {
             char coeff[20] = {0};
 
-            for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
+            for(int i = 0; i < FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS; i++) {
               if(fgets(coeff, sizeof coeff, fp) != NULL) {
                 float_point_coeffs[i] = strtof(coeff, NULL);
               } else {
@@ -275,11 +275,11 @@ int main(int argc, char *argv[]) {
   halcs_client_err_e err;
   uint32_t fixed_point_pos;
 
-  err = halcs_get_fofb_processing_fixed_point_pos(client, service,
+  err = halcs_get_fofb_processing_coeffs_fixed_point_pos(client, service,
     &fixed_point_pos);
   if(err != HALCS_CLIENT_SUCCESS) {
     fprintf(stderr, "[client:fofb_processing] "
-      "halcs_get_fofb_processing_fixed_point_pos failed\n");
+      "halcs_get_fofb_processing_coeffs_fixed_point_pos failed\n");
 
     ret = -1;
     goto err_halcs_client_inst;
@@ -294,36 +294,36 @@ int main(int argc, char *argv[]) {
     smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
 
     // floating-point to fixed-point conversion
-    for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++)
+    for(int i = 0; i < FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS; i++)
     {
       fixed_point_coeffs.data[i] =
         (uint32_t)(float_point_coeffs[i]*(1 << fixed_point_pos));
     }
 
-    err = halcs_fofb_processing_coeff_ram_bank_write(client, service,
+    err = halcs_fofb_processing_coeffs_ram_bank_write(client, service,
       nec_args.channel, fixed_point_coeffs);
     if(err != HALCS_CLIENT_SUCCESS) {
       fprintf(stderr, "[client:fofb_processing] "
-        "halcs_fofb_processing_coeff_ram_bank_write failed\n");
+        "halcs_fofb_processing_coeffs_ram_bank_write failed\n");
 
       ret = -1;
       goto err_halcs_client_inst;
     } else {
       fprintf(stdout, "[client:fofb_processing] "
-        "halcs_fofb_processing_coeff_ram_bank_write succeed\n");
+        "halcs_fofb_processing_coeffs_ram_bank_write succeed\n");
     }
   } else if(nec_args.op == GET_COEFFS) {
-    err = halcs_fofb_processing_coeff_ram_bank_read(client, service,
+    err = halcs_fofb_processing_coeffs_ram_bank_read(client, service,
       nec_args.channel, &fixed_point_coeffs);
     if(err != HALCS_CLIENT_SUCCESS) {
       fprintf(stderr, "[client:fofb_processing] "
-        "halcs_fofb_processing_coeff_ram_bank_read failed\n");
+        "halcs_fofb_processing_coeffs_ram_bank_read failed\n");
 
       ret = -1;
       goto err_halcs_client_inst;
     } else {
       fprintf(stdout, "[client:fofb_processing] "
-        "halcs_fofb_processing_coeff_ram_bank_read succeed\n");
+        "halcs_fofb_processing_coeffs_ram_bank_read succeed\n");
 
       FILE *fp;
 
@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
       } else {
         // fixed-point to floating-point conversion
         int i;
-        for(i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
+        for(i = 0; i < FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS; i++) {
           if(fprintf(fp, "%.6f\n", ((float)((int)fixed_point_coeffs.data[i])/
             (float)(1 << fixed_point_pos))) < 0) {
             fprintf(stderr, "[client:fofb_processing] "
