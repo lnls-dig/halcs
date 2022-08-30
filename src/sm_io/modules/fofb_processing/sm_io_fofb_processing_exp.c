@@ -39,37 +39,69 @@
 /************************************************************/
 /***********  Specific FOFB_PROCESSING Operations ***********/
 /************************************************************/
+static int _fofb_processing_coeff_ram_bank_read (void *owner, void *args,
+    void *ret)
+{
+    assert(owner);
+    assert(args);
+    int err;
 
-RW_PARAM_FUNC(fofb_processing, ram_write) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_WRITE, ,
-            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_coeff_ram_bank_read\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_read_block(self,
+        FOFB_PROCESSING_REGS_RAM_BANK_OFFS(chan),
+        FOFB_PROCESSING_REGS_RAM_BANK_SIZE, (uint32_t *)ret);
+
+    err = (size == FOFB_PROCESSING_REGS_RAM_BANK_SIZE)?
+        size : -FOFB_PROCESSING_ERR;
+
+    return err;
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_ADDR, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+static int _fofb_processing_coeff_ram_bank_write (void *owner, void *args,
+    void *ret)
+{
+    UNUSED(ret);
+    assert (owner);
+    assert (args);
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_coeff_ram_bank_write\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    const struct _smio_fofb_processing_data_block_t coeffs =
+        *(struct _smio_fofb_processing_data_block_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_write_block(self,
+        FOFB_PROCESSING_REGS_RAM_BANK_OFFS(chan),
+        FOFB_PROCESSING_REGS_RAM_BANK_SIZE, coeffs.data);
+
+    err = (size == FOFB_PROCESSING_REGS_RAM_BANK_SIZE)?
+        FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
+
+    return err;
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_data_in) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_IN, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
-}
-
-RW_PARAM_FUNC(fofb_processing, ram_data_out) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_OUT, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+RW_PARAM_FUNC(fofb_processing, fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_write),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_addr),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_in),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_out),
+    _fofb_processing_coeff_ram_bank_read,
+    _fofb_processing_coeff_ram_bank_write,
+    RW_PARAM_FUNC_NAME(fofb_processing, fixed_point_pos),
     NULL
 };
 

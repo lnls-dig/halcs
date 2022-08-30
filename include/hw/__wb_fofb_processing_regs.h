@@ -1,38 +1,174 @@
 #ifndef __CHEBY__WB_FOFB_PROCESSING_REGS__H__
 #define __CHEBY__WB_FOFB_PROCESSING_REGS__H__
-#define WB_FOFB_PROCESSING_REGS_SIZE 16 /* 0x10 */
+#define WB_FOFB_PROCESSING_REGS_SIZE 26624 /* 0x6800 = 26KB */
 
-/* RAM write register */
-#define WB_FOFB_PROCESSING_REGS_RAM_WRITE              0x00000000
-#define WB_FOFB_PROCESSING_REGS_RAM_WRITE_ENABLE       0x00000001
+/* fixed-point position constant register */
+#define WB_FOFB_PROCESSING_REGS_FIXED_POINT_POS 0x0UL
+#define WB_FOFB_PROCESSING_REGS_FIXED_POINT_POS_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_FIXED_POINT_POS_VAL_SHIFT 0
 
-/* RAM data input register */
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_IN            0x00000004
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_IN_VAL_MASK   0xffffffff
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_IN_VAL_SHIFT  0
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_0 0x800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_0_SIZE 4 /* 0x4 */
 
-/* RAM data output register */
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT           0x00000008
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT_VAL_MASK  0xffffffff
-#define WB_FOFB_PROCESSING_REGS_RAM_DATA_OUT_VAL_SHIFT 0
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_0_DATA 0x0UL
 
-/* RAM address register */
-#define WB_FOFB_PROCESSING_REGS_RAM_ADDR               0x0000000c
-#define WB_FOFB_PROCESSING_REGS_RAM_ADDR_VAL_MASK      0x00000fff
-#define WB_FOFB_PROCESSING_REGS_RAM_ADDR_VAL_SHIFT     0
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_1 0x1000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_1_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_1_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_2 0x1800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_2_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_2_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_3 0x2000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_3_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_3_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_4 0x2800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_4_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_4_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_5 0x3000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_5_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_5_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_6 0x3800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_6_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_6_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_7 0x4000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_7_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_7_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_8 0x4800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_8_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_8_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_9 0x5000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_9_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_9_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_10 0x5800UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_10_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_10_DATA 0x0UL
+
+/* FOFB PROCESSING RAM bank for register map */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_11 0x6000UL
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_11_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_RAM_BANK_11_DATA 0x0UL
 
 struct wb_fofb_processing_regs {
-  /* [0x0]: REG (rw) RAM write register */
-  uint32_t ram_write;
+  /* [0x0]: REG (rw) fixed-point position constant register */
+  uint32_t fixed_point_pos;
 
-  /* [0x4]: REG (rw) RAM data input register */
-  uint32_t ram_data_in;
+  /* padding to: 512 words */
+  uint32_t __padding_0[511];
 
-  /* [0x8]: REG (ro) RAM data output register */
-  uint32_t ram_data_out;
+  /* [0x800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_0 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_0[512];
 
-  /* [0xc]: REG (rw) RAM address register */
-  uint32_t ram_addr;
+  /* [0x1000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_1 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_1[512];
+
+  /* [0x1800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_2 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_2[512];
+
+  /* [0x2000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_3 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_3[512];
+
+  /* [0x2800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_4 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_4[512];
+
+  /* [0x3000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_5 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_5[512];
+
+  /* [0x3800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_6 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_6[512];
+
+  /* [0x4000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_7 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_7[512];
+
+  /* [0x4800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_8 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_8[512];
+
+  /* [0x5000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_9 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_9[512];
+
+  /* [0x5800]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_10 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_10[512];
+
+  /* [0x6000]: MEMORY FOFB PROCESSING RAM bank for register map */
+  struct ram_bank_11 {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } ram_bank_11[512];
 };
 
 #endif /* __CHEBY__WB_FOFB_PROCESSING_REGS__H__ */

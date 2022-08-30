@@ -2558,28 +2558,18 @@ halcs_client_err_e halcs_get_rtmlamp_ohwr_eff_sp (halcs_client_t *self, char *se
 /********************** FOFB PROCESSING Functions ********************/
 
 /* FOFB PROCESSING RAM functions. The functions returns
- *  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- *   * (see halcs_client_err.h for all possible errors)*/
+ * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
+ * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_read(
+        halcs_client_t *self, char *service, const uint32_t chan,
+        smio_fofb_processing_data_block_t *const coeffs);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_write (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_write);
-halcs_client_err_e halcs_get_fofb_processing_ram_write (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_write);
+halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
+        halcs_client_t *self, char *service, const uint32_t chan,
+        const smio_fofb_processing_data_block_t coeffs);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_addr (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_addr);
-halcs_client_err_e halcs_get_fofb_processing_ram_addr (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_addr);
-
-halcs_client_err_e halcs_set_fofb_processing_ram_data_in (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_data_in);
-halcs_client_err_e halcs_get_fofb_processing_ram_data_in (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_data_in);
-
-halcs_client_err_e halcs_set_fofb_processing_ram_data_out (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_data_out);
-halcs_client_err_e halcs_get_fofb_processing_ram_data_out (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_data_out);
+halcs_client_err_e halcs_get_fofb_processing_fixed_point_pos(
+        halcs_client_t *self, char *service, uint32_t *fixed_point_pos);
 
 #ifdef __cplusplus
 }

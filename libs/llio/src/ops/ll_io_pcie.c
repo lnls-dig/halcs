@@ -606,7 +606,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
     for (unsigned int pg = pg_start;
             pg < pg_start + (pg_offs+size)/bar_size + 1;
             ++pg) {
-        SET_WB_PG (dev_pcie->bar0, pg);
+        SET_WB_PG (((volatile uint32_t *)dev_pcie->bar0), pg);
         uint32_t num_bytes_page = (num_bytes_rem > bar_size) ?
             (bar_size-offs) : (num_bytes_rem);
         num_bytes_rem -= num_bytes_page;
@@ -616,7 +616,7 @@ static ssize_t _pcie_rw_bar4_block_raw (llio_t *self, uint32_t pg_start, uint64_
                 "[ll_io_pcie:_pcie_rw_bar4_block_raw] Reading %u bytes from addr: %p\n"
                 "-------------------------------------------------------------------------------------\n",
                 num_bytes_page, dev_pcie->bar4);
-        BAR4_RW_BLOCK(dev_pcie->bar4, offs, num_bytes_page,
+        BAR4_RW_BLOCK(((volatile uint64_t *)dev_pcie->bar4), offs, num_bytes_page,
                 (uint32_t *)((uint8_t *)data + (pg-pg_start)*bar_size), rw);
 
         /* Always 0 after the first page */

@@ -1,272 +1,361 @@
 /*
- *  *  * Example for demonstrating the communication between a
- *   *   * a FOFB Processing module and a client
- *    *    */
+** Example for demonstrating the communication between a HALCS client and FOFB
+** Processing SMIO.
+**/
 
+#include <errno.h>
 #include <getopt.h>
-#include <czmq.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>     /* strtof */
 #include <string.h>
+
+#include <czmq.h>
 #include <halcs_client.h>
 
-#define DFLT_BIND_FOLDER            "/tmp/malamute"
+#define UINT32_T_MAX        4294967295  // 2^32 - 1
+#define DFLT_BIND_FOLDER    "/tmp/malamute"
 
-#define DFLT_HALCS_NUMBER           0
-#define DFLT_BOARD_NUMBER           0
-
-static struct option long_options[] =
-{
-  {"help",                no_argument,         NULL, 'h'},
-  {"brokerendp",          required_argument,   NULL, 'b'},
-  {"verbose",             no_argument,         NULL, 'v'},
-  {"halcsnumber",         required_argument,   NULL, 's'},
-  {"boardslot",           required_argument,   NULL, 'o'},
-  {"ram_write_en",        required_argument,   NULL, 'w'},
-  {"ram_data_in",         required_argument,   NULL, 'd'},
-  {"ram_addr",            required_argument,   NULL, 'a'},
+static struct option long_opts[] = {
+  {"help",          no_argument,        NULL, 'h'},
+  {"board-slot",    required_argument,  NULL, 'o'},
+  {"halcs-number",  required_argument,  NULL, 'n'},
+  {"channel",       required_argument,  NULL, 'c'},
+  {"get-coeffs",    no_argument,        NULL, 'g'},
+  {"set-coeffs",    required_argument,  NULL, 's'},
+  {"broker-endp",   required_argument,  NULL, 'b'},
+  {"verbose",       no_argument,        NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static const char* shortopt = "hb:vo:s:w:d:a:";
+static const char *short_opts = "ho:n:c:gs:b:v";
 
-void print_help (char *program_name)
-{
-  fprintf (stdout, "HALCSD FOFB Controller control utility\n"
-          "Usage: %s [options]\n"
-          "\n"
-          "  -h  --help                                    Display this usage information\n"
-          "  -b  --brokerendp <Broker endpoint>            Broker endpoint\n"
-          "  -v  --verbose                                 Verbose output\n"
-          "  -o  --boardslot <Board slot number = [1-12]>  Board slot number\n"
-          "  -s  --halcsnumber <HALCS number = [0|1]>      HALCS number\n"
-          "  -w  --ram_write_en <[Read = 0 | Write = 1]>   RAM write enable\n"
-          "  -d  --ram_data_in                             RAM data\n"
-          "  -a  --ram_addr                                RAM addr\n",
-          program_name);
+struct optional_args {
+  char *broker_endp;
+  int verbose;
+};
+
+enum operation {
+  SET_COEFFS,
+  GET_COEFFS
+};
+
+enum necessary_args_idx {
+  BOARD_SLOT,
+  HALCS_NUMBER,
+  CHANNEL,
+  OP,
+  NUM_OF_NECESSARY_ARGS
+};
+
+struct necessary_args {
+  bool is_given[NUM_OF_NECESSARY_ARGS];
+
+  uint32_t board_slot;
+  uint32_t halcs_number;
+  uint32_t channel;
+  enum operation op;
+};
+
+void print_usage(char *program_name) {
+  fprintf(stdout,
+    "HALCSD FOFB Processing Client Example\n"
+    "Usages:\n"
+    "       %s --help\n"
+    "       %s [OPTIONALS] --board-slot <1-12> --halcs-number <0|1> --channel <0-11> --get-coeffs\n"
+    "       %s [OPTIONALS] --board-slot <1-12> --halcs-number <0|1> --channel <0-11> --set-coeffs <filename>\n"
+    "\n"
+    "  -h  --help                                    display this usage info\n"
+    "  -o  --board-slot <board slot number = [1-12]> board slot number\n"
+    "  -n  --halcs-number <HALCS number = [0|1]>     HALCS number\n"
+    "  -c  --channel <channel number = [0-11]>       channel number\n"
+    "  -g  --get-coeffs                              gets coeffs\n"
+    "  -s  --set-coeffs <filename>                   sets coeffs\n"
+    "\n"
+    "OPTIONALS:\n"
+    "  -b  --broker-endp <broker endpoint>           broker endpoint (defaults to %s)\n"
+    "  -v  --verbose                                 verbose output\n",
+    program_name, program_name, program_name, "ipc://"DFLT_BIND_FOLDER);
 }
 
-/* Our read function */
-typedef halcs_client_err_e (*halcs_func_fp) (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *value);
+static int _strtou(const char *nptr, uint32_t *const u) {
+  int ret;
+  char *endptr;
 
-typedef struct {
-  halcs_func_fp func;
-  const char *func_name;
-  int call;
-} func_call_t;
+  errno = 0;
+  const unsigned long int ul = strtoul(nptr, &endptr, 10);
 
-int main (int argc, char *argv [])
-{
+  if(endptr == nptr) {
+    fprintf(stderr, "[client:fofb_processing] '%s' is not a decimal number\n",
+      nptr);
+    ret = -1;
+  } else if(ul == 0 && errno != 0) {
+    fprintf(stderr, "[client:fofb_processing] '%s': %s\n", nptr, strerror(errno));
+    ret = -1;
+  } else if(ul > UINT32_T_MAX) {
+    fprintf(stderr, "[client:fofb_processing] %ld is greater than "
+      "UINT32_T_MAX\n", ul);
+    ret = -1;
+  } else {
+    *u = (uint32_t)ul;
+    ret = 0;
+  }
+
+  return ret;
+}
+
+int main(int argc, char *argv[]) {
   int ret = 0;
-  int verbose = 1;
-  char *broker_endp = NULL;
-  char *board_number_str = NULL;
-  char *halcs_number_str = NULL;
-  char *ram_write_en_str = NULL;
-  char *ram_data_in_str = NULL;
-  char *ram_addr_str = NULL;
-  int opt;
 
-  while ((opt = getopt_long (argc, argv, shortopt, long_options, NULL)) != -1) {
-    /* Get the user selected options */
-    switch (opt) {
-      /* Display Help */
+  struct optional_args opt_args = {
+    .broker_endp = "ipc://" DFLT_BIND_FOLDER,
+    .verbose = 0
+  };
+  struct necessary_args nec_args = {0};
+
+  float float_point_coeffs[FOFB_PROCESSING_MAX_NUM_OF_COEFFS] = {0};
+  smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
+
+  int opt;
+  // Parsing arguments
+  // ###########################################################################
+  while((opt = getopt_long(argc, argv, short_opts, long_opts, NULL)) != -1) {
+    switch(opt) {
       case 'h':
-        print_help (argv [0]);
-        exit (1);
+        print_usage(argv[0]);
+
+        ret = 0;
+        goto err_halcs_client_not_inst;
         break;
 
       case 'b':
-        broker_endp = strdup (optarg);
-        break;
-
-      case 'v':
-        verbose = 1;
+        opt_args.broker_endp = optarg;
         break;
 
       case 'o':
-        board_number_str = strdup (optarg);
+        if(_strtou(optarg, &nec_args.board_slot) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
+        nec_args.is_given[BOARD_SLOT] = true;
+        break;
+
+      case 'n':
+        if(_strtou(optarg, &nec_args.halcs_number) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
+        nec_args.is_given[HALCS_NUMBER] = true;
+        break;
+
+      case 'c':
+        if(_strtou(optarg, &nec_args.channel) != 0) {
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
+        nec_args.is_given[CHANNEL] = true;
+        break;
+
+      case 'g':
+        if(!nec_args.is_given[OP]) {
+            nec_args.op = GET_COEFFS;
+            nec_args.is_given[OP] = true;
+        } else {
+          fprintf(stderr, "[client:fofb_processing] Multiple operations not"
+            " allowed!\n");
+          print_usage(argv[0]);
+
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
         break;
 
       case 's':
-        halcs_number_str = strdup (optarg);
-        break;
+        errno = 0;
+        if(!nec_args.is_given[OP]) {
+          FILE *fp;
 
-      case 'w':
-        ram_write_en_str = strdup (optarg);
-        break;
+          fp = fopen(optarg, "r");
+          if(fp == NULL) {
+            fprintf(stderr, "[client:fofb_processing]  %s: %s\n", optarg,
+              strerror(errno));
 
-      case 'd':
-        ram_data_in_str = strdup (optarg);
-        break;
+            ret = -1;
+            goto err_halcs_client_not_inst;
+          } else {
+            char coeff[20] = {0};
 
-      case 'a':
-        ram_addr_str = strdup (optarg);
+            for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
+              if(fgets(coeff, sizeof coeff, fp) != NULL) {
+                float_point_coeffs[i] = strtof(coeff, NULL);
+              } else {
+                fclose(fp);
+                fprintf(stderr, "[client:fofb_processing] %s: %s\n", optarg,
+                  strerror(errno));
+
+                ret = -1;
+                goto err_halcs_client_not_inst;
+              }
+            }
+            fclose(fp);
+
+            nec_args.op = SET_COEFFS;
+            nec_args.is_given[OP] = true;
+          }
+        } else {
+          fprintf(stderr, "[client:fofb_processing] Multiple operations not"
+            " allowed!\n");
+          print_usage(argv[0]);
+
+          ret = -1;
+          goto err_halcs_client_not_inst;
+        }
+       break;
+
+      case 'v':
+        opt_args.verbose = 1;
         break;
 
       case '?':
-        fprintf (stderr, "[client:fofb_processing] Option not recognized or missing argument\n");
-        print_help (argv [0]);
-        exit (1);
+        fprintf(stderr, "[client:fofb_processing] Option not recognized or"
+          " missing argument\n");
+        print_usage(argv[0]);
+
+        ret = -1;
+        goto err_halcs_client_not_inst;
         break;
 
       default:
-        fprintf (stderr, "[client:fofb_processing] Could not parse options\n");
-        print_help (argv [0]);
-        exit (1);
+        fprintf(stderr, "[client:fofb_processing] Could not parse options\n");
+        print_usage(argv[0]);
+
+        ret = -1;
+        goto err_halcs_client_not_inst;
       }
   }
 
-  halcs_client_err_e err;
+  // Checking if necessary arguments were given
+  // ###########################################################################
+  for(int i = 0; i < NUM_OF_NECESSARY_ARGS; i++) {
+    if(!nec_args.is_given[i]) {
+      fprintf(stderr, "[client:fofb_processing] Missing one or more necessary"
+        " arguments!\n");
+      print_usage(argv[0]);
 
-  halcs_client_t *halcs_client = halcs_client_new (broker_endp, verbose, NULL);
-
-  if (halcs_client == NULL) {
-    fprintf (stderr, "[client:DSP]: halcs_client could be created\n");
-    ret = 1;
-    goto err_halcs_client_new;
+      ret = -1;
+      goto err_halcs_client_not_inst;
+    }
   }
 
-  /* Set default broker address */
-  if (broker_endp == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: Setting default broker endpoint: %s\n",
-            "ipc://"DFLT_BIND_FOLDER);
-    broker_endp = strdup ("ipc://"DFLT_BIND_FOLDER);
+  // Instantiating a HALCS client
+  // ###########################################################################
+  halcs_client_t *client =
+    halcs_client_new(opt_args.broker_endp, opt_args.verbose, NULL);
+  if(client == NULL) {
+    fprintf(stderr, "[client:fofb_processing] HALCS client could not be"
+      " created\n");
+
+    ret = -1;
+    goto err_halcs_client_not_inst;
+  } else {
+    fprintf(stdout, "[client:fofb_processing] HALCS client successfully"
+      " created\n");
   }
 
-  /* Set default board number */
-  uint32_t board_number;
-  if (board_number_str == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: Setting default value to BOARD number: %u\n",
-            DFLT_BOARD_NUMBER);
-    board_number = DFLT_BOARD_NUMBER;
-  }
-  else {
-    board_number = strtoul (board_number_str, NULL, 10);
-  }
-
-  /* Set default halcs number */
-  uint32_t halcs_number;
-  if (halcs_number_str == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: Setting default value to HALCS number: %u\n",
-            DFLT_HALCS_NUMBER);
-    halcs_number = DFLT_HALCS_NUMBER;
-  }
-  else {
-    halcs_number = strtoul (halcs_number_str, NULL, 10);
-  }
-
+  // Setting target service name
+  // ###########################################################################
   char service[50];
-  snprintf (service, sizeof (service), "HALCS%u:DEVIO:FOFB_PROCESSING%u", board_number, halcs_number);
+  snprintf(service, sizeof(service), "HALCS%u:DEVIO:FOFB_PROCESSING%u",
+    nec_args.board_slot, nec_args.halcs_number);
+  fprintf(stdout, "[client:fofb_processing] Target service name: %s\n",
+    service);
 
-  /* ------------------------------------------------------------------------------ RAM write enable */
+  // Getting fixed-point position from hw
+  // ###########################################################################
+  halcs_client_err_e err;
+  uint32_t fixed_point_pos;
 
-  uint32_t ram_write_en;
-  if (ram_write_en_str == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: ram_write_en >> option not recognized or missing argument\n");
-            print_help (argv [0]);
-            exit (1);
+  err = halcs_get_fofb_processing_fixed_point_pos(client, service,
+    &fixed_point_pos);
+  if(err != HALCS_CLIENT_SUCCESS) {
+    fprintf(stderr, "[client:fofb_processing] "
+      "halcs_get_fofb_processing_fixed_point_pos failed\n");
+
+    ret = -1;
+    goto err_halcs_client_inst;
+  } else {
+    fprintf(stdout, "[client:fofb_processing] "
+      "Fixed-point position: %u\n", fixed_point_pos);
   }
-  else {
-    ram_write_en = strtoul (ram_write_en_str, NULL, 10);
-    if (ram_write_en == 1) {
-      fprintf(stdout, "[client:fofb_processing]: WRITE mode\n");
+
+  // Performing operation
+  // ###########################################################################
+  if(nec_args.op == SET_COEFFS) {
+    smio_fofb_processing_data_block_t fixed_point_coeffs = {0};
+
+    // floating-point to fixed-point conversion
+    for(int i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++)
+    {
+      fixed_point_coeffs.data[i] =
+        (uint32_t)(float_point_coeffs[i]*(1 << fixed_point_pos));
     }
-    else if (ram_write_en == 0) {
-      fprintf(stdout, "[client:fofb_processing]: READ mode\n");
+
+    err = halcs_fofb_processing_coeff_ram_bank_write(client, service,
+      nec_args.channel, fixed_point_coeffs);
+    if(err != HALCS_CLIENT_SUCCESS) {
+      fprintf(stderr, "[client:fofb_processing] "
+        "halcs_fofb_processing_coeff_ram_bank_write failed\n");
+
+      ret = -1;
+      goto err_halcs_client_inst;
+    } else {
+      fprintf(stdout, "[client:fofb_processing] "
+        "halcs_fofb_processing_coeff_ram_bank_write succeed\n");
     }
-    else {
-      fprintf(stdout, "[client:fofb_processing]: ram write enable value must be 0 or 1\n");
-      print_help (argv [0]);
-      exit (1);
+  } else if(nec_args.op == GET_COEFFS) {
+    err = halcs_fofb_processing_coeff_ram_bank_read(client, service,
+      nec_args.channel, &fixed_point_coeffs);
+    if(err != HALCS_CLIENT_SUCCESS) {
+      fprintf(stderr, "[client:fofb_processing] "
+        "halcs_fofb_processing_coeff_ram_bank_read failed\n");
+
+      ret = -1;
+      goto err_halcs_client_inst;
+    } else {
+      fprintf(stdout, "[client:fofb_processing] "
+        "halcs_fofb_processing_coeff_ram_bank_read succeed\n");
+
+      FILE *fp;
+
+      fp = fopen("coeffs.out", "w+");
+      if(fp == NULL) {
+        fprintf(stderr, "[client:fofb_processing]  %s: %s\n", optarg,
+          strerror(errno));
+
+        ret = -1;
+        goto err_halcs_client_inst;
+      } else {
+        // fixed-point to floating-point conversion
+        int i;
+        for(i = 0; i < FOFB_PROCESSING_MAX_NUM_OF_COEFFS; i++) {
+          if(fprintf(fp, "%.6f\n", ((float)((int)fixed_point_coeffs.data[i])/
+            (float)(1 << fixed_point_pos))) < 0) {
+            fprintf(stderr, "[client:fofb_processing] "
+              "Error while writing to coeffs.out");
+            fclose(fp);
+
+            ret = -1;
+            goto err_halcs_client_inst;
+          }
+        }
+        fclose(fp);
+      }
     }
   }
 
-  /* set ram_write_en */
-  err = halcs_set_fofb_processing_ram_write(halcs_client, service, ram_write_en);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_write failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-
-  /* ------------------------------------------------------------------------------ RAM data in */
-  uint32_t ram_data_in;
-  if (ram_data_in_str == NULL) {
-    fprintf (stderr, "[client:fofb_processing]: ram_data_in >> no value \n");
-  }
-  else {
-    ram_data_in = strtoul (ram_data_in_str, NULL, 10);
-  }
-
-  /* set ram_data_in */
-  err = halcs_set_fofb_processing_ram_data_in(halcs_client, service, ram_data_in);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_data_in failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-
-  /* get ram_data_in */
-  uint32_t ram_data_in_get;
-  err = halcs_get_fofb_processing_ram_data_in(halcs_client, service, &ram_data_in_get);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_in failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-  fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_in: %u\n", ram_data_in_get);
-
-  /* ------------------------------------------------------------------------------ RAM addr */
-  uint32_t ram_addr;
-  if (ram_addr_str == NULL) {
-      fprintf (stderr, "[client:fofb_processing]: ram_addr >> option not recognized or missing argument\n");
-              print_help (argv [0]);
-              exit (1);
-  }
-  else {
-    ram_addr = strtoul (ram_addr_str, NULL, 10);
-  }
-
-  /* set ram_addr */
-  err = halcs_set_fofb_processing_ram_addr(halcs_client, service, ram_addr);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_set_fofb_processing_ram_addr failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-
-  /* get ram_addr */
-  uint32_t ram_addr_get;
-  err = halcs_get_fofb_processing_ram_addr(halcs_client, service, &ram_addr_get);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_addr failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-  fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_addr: %u\n", ram_addr_get);
-
-  /* ------------------------------------------------------------------------------ RAM data out */
-  /* get ram_data_out */
-  uint32_t ram_data_out_get;
-  err = halcs_get_fofb_processing_ram_data_out(halcs_client, service, &ram_data_out_get);
-  if (err != HALCS_CLIENT_SUCCESS){
-    fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out failed\n");
-    ret = 2;
-    goto err_halcs_exit;
-  }
-  fprintf (stderr, "[client:fofb_processing]: halcs_get_fofb_processing_ram_data_out: %u\n", ram_data_out_get);
-
-err_halcs_exit:
-  /* Try to read up until the point where the error occurs, anyway */
-  halcs_client_destroy (&halcs_client);
-
-err_halcs_client_new:
-  free (broker_endp);
-  broker_endp = NULL;
-  free (board_number_str);
-  board_number_str = NULL;
+err_halcs_client_inst:
+  halcs_client_destroy(&client);
+err_halcs_client_not_inst:
 
   return ret;
 }

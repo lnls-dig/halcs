@@ -392,6 +392,8 @@
         else {                                                      \
             for (j = 0; j < size/sizeof (BAR_RW_TYPE); ++j) {       \
                 *((barp) + addr + (j << WB_DWORD_ACC)) = *((datap) + j); \
+                /* Read from memory to flush previous write */      \
+                *((barp) + addr + (j << WB_DWORD_ACC));             \
             }                                                       \
         }                                                           \
         /* RW one last word if size not multiple of sizeof (barp)*/ \
