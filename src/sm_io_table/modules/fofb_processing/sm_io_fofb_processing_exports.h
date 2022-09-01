@@ -13,6 +13,8 @@
 extern disp_op_t fofb_processing_coeffs_ram_bank_read_exp;
 extern disp_op_t fofb_processing_coeffs_ram_bank_write_exp;
 extern disp_op_t fofb_processing_set_get_coeffs_fixed_point_pos_exp;
+extern disp_op_t fofb_processing_setpoints_ram_bank_read_exp;
+extern disp_op_t fofb_processing_setpoints_ram_bank_write_exp;
 
 extern const disp_op_t *fofb_processing_exp_ops [];
 

@@ -1,6 +1,6 @@
 #ifndef __CHEBY__WB_FOFB_PROCESSING_REGS__H__
 #define __CHEBY__WB_FOFB_PROCESSING_REGS__H__
-#define WB_FOFB_PROCESSING_REGS_SIZE 26624 /* 0x6800 = 26KB */
+#define WB_FOFB_PROCESSING_REGS_SIZE 28672 /* 0x7000 = 28KB */
 
 /* fofb processing coefficients fixed-point position constant */
 #define WB_FOFB_PROCESSING_REGS_COEFFS_FIXED_POINT_POS 0x0UL
@@ -91,6 +91,13 @@
 /* None */
 #define WB_FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_11_DATA 0x0UL
 
+/* fofb processing setpoints ram bank */
+#define WB_FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK 0x6800UL
+#define WB_FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE 4 /* 0x4 */
+
+/* None */
+#define WB_FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_DATA 0x0UL
+
 struct wb_fofb_processing_regs {
   /* [0x0]: REG (rw) fofb processing coefficients fixed-point position constant */
   uint32_t coeffs_fixed_point_pos;
@@ -169,6 +176,12 @@ struct wb_fofb_processing_regs {
     /* [0x0]: REG (rw) (no description) */
     uint32_t data;
   } coeffs_ram_bank_11[512];
+
+  /* [0x6800]: MEMORY fofb processing setpoints ram bank */
+  struct setpoints_ram_bank {
+    /* [0x0]: REG (rw) (no description) */
+    uint32_t data;
+  } setpoints_ram_bank[512];
 };
 
 #endif /* __CHEBY__WB_FOFB_PROCESSING_REGS__H__ */

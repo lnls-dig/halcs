@@ -97,11 +97,63 @@ RW_PARAM_FUNC(fofb_processing, coeffs_fixed_point_pos) {
         NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+static int _fofb_processing_setpoints_ram_bank_read(void *owner, void *args,
+    void *ret) {
+    assert(owner);
+    UNUSED(args);
+    assert(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_setpoints_ram_bank_read\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    ssize_t size;
+    size = smio_thsafe_client_read_block(self,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_OFFS,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE, (uint32_t *)ret);
+
+    err = (size == FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE)?
+        size : -FOFB_PROCESSING_ERR;
+
+    return err;
+}
+
+static int _fofb_processing_setpoints_ram_bank_write(void *owner, void *args,
+    void *ret) {
+    assert(owner);
+    assert(args);
+    UNUSED(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_setpoints_ram_bank_write\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const struct _smio_fofb_processing_data_block_t setpoints =
+        *(struct _smio_fofb_processing_data_block_t *)
+        EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_write_block(self,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_OFFS,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE, setpoints.data);
+
+    err = (size == FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE)?
+        FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
+
+    return err;
+}
+
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
     _fofb_processing_coeffs_ram_bank_read,
     _fofb_processing_coeffs_ram_bank_write,
     RW_PARAM_FUNC_NAME(fofb_processing, coeffs_fixed_point_pos),
+    _fofb_processing_setpoints_ram_bank_read,
+    _fofb_processing_setpoints_ram_bank_write,
     NULL
 };
 
