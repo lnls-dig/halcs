@@ -39,11 +39,12 @@
 /************************************************************/
 /***********  Specific FOFB_PROCESSING Operations ***********/
 /************************************************************/
-static int _fofb_processing_coeffs_ram_bank_read (void *owner, void *args,
-    void *ret)
-{
+static int _fofb_processing_coeffs_ram_bank_read(void *owner, void *args,
+    void *ret) {
     assert(owner);
     assert(args);
+    assert(ret);
+
     int err;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
@@ -63,12 +64,12 @@ static int _fofb_processing_coeffs_ram_bank_read (void *owner, void *args,
     return err;
 }
 
-static int _fofb_processing_coeffs_ram_bank_write (void *owner, void *args,
-    void *ret)
-{
-    UNUSED(ret);
+static int _fofb_processing_coeffs_ram_bank_write(void *owner, void *args,
+    void *ret) {
     assert (owner);
     assert (args);
+    UNUSED(ret);
+
     int err;
 
     DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "

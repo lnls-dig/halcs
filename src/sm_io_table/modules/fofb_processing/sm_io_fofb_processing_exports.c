@@ -24,7 +24,7 @@ disp_op_t fofb_processing_coeffs_ram_bank_read_exp = {
 disp_op_t fofb_processing_coeffs_ram_bank_write_exp = {
     .name = FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE,
     .opcode = FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
