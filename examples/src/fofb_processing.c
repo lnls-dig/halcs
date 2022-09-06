@@ -185,7 +185,6 @@ int main(int argc, char *argv[]) {
         break;
 
       case 's':
-        errno = 0;
         if(!nec_args.is_given[OP]) {
           FILE *fp;
 
@@ -244,7 +243,6 @@ int main(int argc, char *argv[]) {
         break;
 
       case 'w':
-        errno = 0;
         if(!nec_args.is_given[OP]) {
           FILE *fp;
 
@@ -472,7 +470,7 @@ int main(int argc, char *argv[]) {
       } else {
         // casting uint32_t to int32_t
         for(int i = 0; i < FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS; i++) {
-          if(fprintf(fp, "%d\n", (int32_t)setpoints.data[i]) < 0) {
+          if(fprintf(fp, "%d\n", (int)(int32_t)setpoints.data[i]) < 0) {
             fprintf(stderr, "[client:fofb_processing] "
               "Error while writing to %s\n", nec_args.filename);
             fclose(fp);
