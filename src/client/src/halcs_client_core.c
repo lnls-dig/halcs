@@ -4284,6 +4284,48 @@ PARAM_FUNC_CLIENT_READ(fofb_processing_coeffs_fixed_point_pos) {
         fofb_processing_coeffs_fixed_point_pos);
 }
 
+PARAM_FUNC_CLIENT_READ(fofb_processing_acc_gains_fixed_point_pos) {
+    return param_client_read(self, service,
+        FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAINS_FIXED_POINT_POS,
+        fofb_processing_acc_gains_fixed_point_pos);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_gain, chan, clear)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN,
+            chan, clear);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_gain, chan, clear)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN,
+            chan, clear);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_ctl_clear, chan, clear)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR,
+            chan, clear);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_ctl_clear, chan, clear)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR,
+            chan, clear);
+}
+
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_ctl_freeze, chan, freeze)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE,
+            chan, freeze);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_ctl_freeze, chan, freeze)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE,
+            chan, freeze);
+}
+
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
     halcs_client_t *self, char *service,
     smio_fofb_processing_data_block_t *const setpoints) {

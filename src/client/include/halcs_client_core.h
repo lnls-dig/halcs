@@ -2571,6 +2571,27 @@ halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_write(
 halcs_client_err_e halcs_get_fofb_processing_coeffs_fixed_point_pos(
         halcs_client_t *self, char *service, uint32_t *fixed_point_pos);
 
+halcs_client_err_e halcs_get_fofb_processing_acc_gains_fixed_point_pos(
+        halcs_client_t *, char *, uint32_t *);
+
+halcs_client_err_e halcs_get_fofb_processing_acc_gain(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_gain(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_acc_ctl_clear(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_ctl_clear(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_acc_ctl_freeze(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_ctl_freeze(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
         halcs_client_t *self, char *service,
         smio_fofb_processing_data_block_t *const setpoints);
