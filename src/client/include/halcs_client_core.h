@@ -2556,20 +2556,28 @@ halcs_client_err_e halcs_get_rtmlamp_ohwr_eff_sp (halcs_client_t *self, char *se
         uint32_t chan, uint32_t *eff_sp);
 
 /********************** FOFB PROCESSING Functions ********************/
+/* FOFB PROCESSING functions. The functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h for all possible
+ * errors) */
 
-/* FOFB PROCESSING RAM functions. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_read(
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_read(
         halcs_client_t *self, char *service, const uint32_t chan,
         smio_fofb_processing_data_block_t *const coeffs);
 
-halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_write(
         halcs_client_t *self, char *service, const uint32_t chan,
         const smio_fofb_processing_data_block_t coeffs);
 
-halcs_client_err_e halcs_get_fofb_processing_fixed_point_pos(
+halcs_client_err_e halcs_get_fofb_processing_coeffs_fixed_point_pos(
         halcs_client_t *self, char *service, uint32_t *fixed_point_pos);
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
+        halcs_client_t *self, char *service,
+        smio_fofb_processing_data_block_t *const setpoints);
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_write(
+        halcs_client_t *self, char *service,
+        const smio_fofb_processing_data_block_t setpoints);
 
 #ifdef __cplusplus
 }

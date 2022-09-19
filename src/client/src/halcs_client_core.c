@@ -4215,7 +4215,8 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_sp, chan, eff_sp)
 }
 
 /**************** FOFB PROCESSING SMIO Functions ****************/
-halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_read(
+
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_read(
     halcs_client_t *self, char *service, const uint32_t chan,
     smio_fofb_processing_data_block_t *const coeffs) {
     assert(self);
@@ -4226,54 +4227,120 @@ halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_read(
 
     input[0] = chan;
     output = coeffs->data;
- 
+
     halcs_client_err_e err = halcs_func_trans_exec(self,
-        FOFB_PROCESSING_NAME_COEFF_RAM_BANK_READ, service, input, output);
+        FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ, service, input, output);
 
     /* Check if any error occurred */
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
-        "[halcs_fofb_processing_coeff_ram_bank_read] Something wrong happened",
-        coeff_ram_bank_read, HALCS_CLIENT_ERR_AGAIN);
+        "[halcs_fofb_processing_coeffs_ram_bank_read] "
+        "Something wrong happened", coeffs_ram_bank_read_err,
+        HALCS_CLIENT_ERR_AGAIN);
 
     /* If we are here, then the request was successfully processed */
     DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
-        "[halcs_fofb_processing_coeff_ram_bank_read] Coefficients"
-        "successfully read\n");
+        "[halcs_fofb_processing_coeffs_ram_bank_read] "
+        "Coefficients successfully read\n");
 
-coeff_ram_bank_read:
+coeffs_ram_bank_read_err:
     return err;
 }
 
-halcs_client_err_e halcs_fofb_processing_coeff_ram_bank_write(
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_write(
     halcs_client_t *self, char *service, const uint32_t chan,
     const smio_fofb_processing_data_block_t coeffs) {
     assert(self);
     assert(service);
 
-    uint32_t input[FOFB_PROCESSING_MAX_NUM_OF_COEFFS + 1];
-    uint32_t output[1]; // not used
+    uint32_t input[FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS + 1];
+    uint32_t *output; // not used
 
     input[0] = chan;
-    memcpy(&input[1], coeffs.data, FOFB_PROCESSING_MAX_NUM_OF_COEFFS*sizeof(uint32_t));
+    memcpy(&input[1], coeffs.data,
+        FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS*sizeof(uint32_t));
+    output = NULL;
 
     halcs_client_err_e err = halcs_func_trans_exec(self,
-        FOFB_PROCESSING_NAME_COEFF_RAM_BANK_WRITE, service, input, output);
+        FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE, service, input, output);
 
     /* Check if any error occurred */
     ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
-        "fofb_processing_coeff_ram_bank_write: Something wrong happened",
-         coeff_ram_bank_write, HALCS_CLIENT_ERR_AGAIN);
+        "[halcs_fofb_processing_coeffs_ram_bank_write] "
+        "Something wrong happened", coeffs_ram_bank_write_err,
+        HALCS_CLIENT_ERR_AGAIN);
 
     /* If we are here, then the request was successfully processed */
     DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
-        "[halcs_fofb_processing_coeff_ram_bank_write] Coefficients"
-        "successfully written\n");
-    
-coeff_ram_bank_write:
+        "[halcs_fofb_processing_coeffs_ram_bank_write] "
+        "Coefficients successfully written\n");
+
+coeffs_ram_bank_write_err:
     return err;
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_fixed_point_pos)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_FIXED_POINT_POS, fofb_processing_fixed_point_pos);
+PARAM_FUNC_CLIENT_READ(fofb_processing_coeffs_fixed_point_pos) {
+    return param_client_read(self, service,
+        FOFB_PROCESSING_OPCODE_SET_GET_COEFFS_FIXED_POINT_POS,
+        fofb_processing_coeffs_fixed_point_pos);
+}
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
+    halcs_client_t *self, char *service,
+    smio_fofb_processing_data_block_t *const setpoints) {
+    assert(self);
+    assert(service);
+
+    uint32_t *input; // not used
+    uint32_t *output;
+
+    input = NULL;
+    output = setpoints->data;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_setpoints_ram_bank_read] "
+        "Something wrong happened", setpoints_ram_bank_read_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_setpoints_ram_bank_read] "
+        "Setpoints successfully read\n");
+
+setpoints_ram_bank_read_err:
+    return err;
+}
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_write(
+    halcs_client_t *self, char *service,
+    const smio_fofb_processing_data_block_t setpoints) {
+    assert(self);
+    assert(service);
+
+    uint32_t input[FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS];
+    uint32_t *output; // not used
+
+    memcpy(input, setpoints.data,
+        FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS*sizeof(uint32_t));
+    output = NULL;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_setpoints_ram_bank_write] "
+        "Something wrong happened", setpoints_ram_bank_write_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_setpoints_ram_bank_write] "
+        "Setpoints successfully written\n");
+
+setpoints_ram_bank_write_err:
+    return err;
 }
