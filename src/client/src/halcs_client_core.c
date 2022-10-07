@@ -4326,6 +4326,28 @@ PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_ctl_freeze, chan, freeze)
             chan, freeze);
 }
 
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_sp_max, chan, sp_max)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+            chan, sp_max);
+}
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_sp_max, chan, sp_max)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+            chan, sp_max);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_sp_min, chan, sp_min)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+            chan, sp_min);
+}
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_sp_min, chan, sp_min)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+            chan, sp_min);
+}
+
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
     halcs_client_t *self, char *service,
     smio_fofb_processing_data_block_t *const setpoints) {

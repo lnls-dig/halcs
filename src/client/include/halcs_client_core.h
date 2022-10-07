@@ -2592,6 +2592,16 @@ halcs_client_err_e halcs_get_fofb_processing_acc_ctl_freeze(
 halcs_client_err_e halcs_set_fofb_processing_acc_ctl_freeze(
         halcs_client_t *, char *, uint32_t, uint32_t);
 
+halcs_client_err_e halcs_get_fofb_processing_sp_max(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_sp_max(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_sp_min(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_sp_min(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
         halcs_client_t *self, char *service,
         smio_fofb_processing_data_block_t *const setpoints);
