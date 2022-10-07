@@ -71,6 +71,31 @@ disp_op_t fofb_processing_set_get_acc_ctl_freeze_exp = {
     }
 };
 
+disp_op_t fofb_processing_set_get_sp_max_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_SP_MAX,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_sp_min_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_SP_MIN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Description SMIO FOFB_PROCESSING functions */
 disp_op_t fofb_processing_coeffs_ram_bank_read_exp = {
     .name = FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ,
@@ -127,6 +152,8 @@ const disp_op_t *fofb_processing_exp_ops [] = {
     &fofb_processing_set_get_acc_gain_exp,
     &fofb_processing_set_get_acc_ctl_clear_exp,
     &fofb_processing_set_get_acc_ctl_freeze_exp,
+    &fofb_processing_set_get_sp_max_exp,
+    &fofb_processing_set_get_sp_min_exp,
     &fofb_processing_coeffs_ram_bank_read_exp,
     &fofb_processing_coeffs_ram_bank_write_exp,
     &fofb_processing_setpoints_ram_bank_read_exp,
