@@ -132,6 +132,126 @@
 #define WB_FOFB_PROCESSING_REGS_ACC_CTL_11_CLEAR 0x1UL
 #define WB_FOFB_PROCESSING_REGS_ACC_CTL_11_FREEZE 0x2UL
 
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_0 0x68UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_0_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_0_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_0 0x6cUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_0_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_0_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_1 0x70UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_1_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_1_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_1 0x74UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_1_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_1_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_2 0x78UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_2_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_2_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_2 0x7cUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_2_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_2_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_3 0x80UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_3_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_3_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_3 0x84UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_3_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_3_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_4 0x88UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_4_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_4_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_4 0x8cUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_4_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_4_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_5 0x90UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_5_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_5_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_5 0x94UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_5_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_5_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_6 0x98UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_6_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_6_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_6 0x9cUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_6_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_6_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_7 0xa0UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_7_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_7_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_7 0xa4UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_7_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_7_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_8 0xa8UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_8_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_8_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_8 0xacUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_8_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_8_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_9 0xb0UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_9_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_9_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_9 0xb4UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_9_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_9_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_10 0xb8UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_10_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_10_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_10 0xbcUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_10_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_10_VAL_SHIFT 0
+
+/* fofb processing maximum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_11 0xc0UL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_11_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MAX_11_VAL_SHIFT 0
+
+/* fofb processing minimum saturation value register (per channel) */
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_11 0xc4UL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_11_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_SP_MIN_11_VAL_SHIFT 0
+
 /* fofb processing coefficients ram bank */
 #define WB_FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_0 0x800UL
 #define WB_FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_0_SIZE 4 /* 0x4 */
@@ -302,8 +422,80 @@ struct wb_fofb_processing_regs {
   /* [0x64]: REG (rw) fofb processing accumulator control register (per channel) */
   uint32_t acc_ctl_11;
 
+  /* [0x68]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_0;
+
+  /* [0x6c]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_0;
+
+  /* [0x70]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_1;
+
+  /* [0x74]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_1;
+
+  /* [0x78]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_2;
+
+  /* [0x7c]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_2;
+
+  /* [0x80]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_3;
+
+  /* [0x84]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_3;
+
+  /* [0x88]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_4;
+
+  /* [0x8c]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_4;
+
+  /* [0x90]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_5;
+
+  /* [0x94]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_5;
+
+  /* [0x98]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_6;
+
+  /* [0x9c]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_6;
+
+  /* [0xa0]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_7;
+
+  /* [0xa4]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_7;
+
+  /* [0xa8]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_8;
+
+  /* [0xac]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_8;
+
+  /* [0xb0]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_9;
+
+  /* [0xb4]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_9;
+
+  /* [0xb8]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_10;
+
+  /* [0xbc]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_10;
+
+  /* [0xc0]: REG (rw) fofb processing maximum saturation value register (per channel) */
+  uint32_t sp_max_11;
+
+  /* [0xc4]: REG (rw) fofb processing minimum saturation value register (per channel) */
+  uint32_t sp_min_11;
+
   /* padding to: 512 words */
-  uint32_t __padding_0[486];
+  uint32_t __padding_0[462];
 
   /* [0x800]: MEMORY fofb processing coefficients ram bank */
   struct coeffs_ram_bank_0 {
