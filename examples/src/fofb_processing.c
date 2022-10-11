@@ -353,6 +353,10 @@ int main(int argc, char *argv[]) {
   fprintf(stdout, "[client:fofb_processing] Target service name: %s\n",
     service);
 
+  /* TODO: implement reading and writing from:
+   * - acc_gain, acc_ctl (freeze and clear)
+   * - sp_max and sp_min */
+
   uint32_t fixed_point_pos;
   if(nec_args.op == SET_COEFFS || nec_args.op == GET_COEFFS) {
     // Getting fixed-point position from hw
