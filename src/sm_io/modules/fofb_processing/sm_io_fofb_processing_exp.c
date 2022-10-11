@@ -39,6 +39,52 @@
 /************************************************************/
 /***********  Specific FOFB_PROCESSING Operations ***********/
 /************************************************************/
+RW_PARAM_FUNC(fofb_processing, coeffs_fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, COEFFS_FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, accs_gains_fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACCS_GAINS_FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, acc_gain) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_GAIN,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, acc_clear) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_CTL,
+        CLEAR, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, acc_freeze) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_CTL,
+        FREEZE, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, sp_max) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, SP_MAX,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_SP_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, sp_min) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, SP_MIN,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_SP_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 static int _fofb_processing_coeffs_ram_bank_read(void *owner, void *args,
     void *ret) {
     assert(owner);
@@ -90,12 +136,6 @@ static int _fofb_processing_coeffs_ram_bank_write(void *owner, void *args,
         FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
 
     return err;
-}
-
-RW_PARAM_FUNC(fofb_processing, coeffs_fixed_point_pos) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, COEFFS_FIXED_POINT_POS,
-        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
-        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
 static int _fofb_processing_setpoints_ram_bank_read(void *owner, void *args,
@@ -150,9 +190,15 @@ static int _fofb_processing_setpoints_ram_bank_write(void *owner, void *args,
 
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
+    RW_PARAM_FUNC_NAME(fofb_processing, coeffs_fixed_point_pos),
+    RW_PARAM_FUNC_NAME(fofb_processing, accs_gains_fixed_point_pos),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_gain),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_clear),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_freeze),
+    RW_PARAM_FUNC_NAME(fofb_processing, sp_max),
+    RW_PARAM_FUNC_NAME(fofb_processing, sp_min),
     _fofb_processing_coeffs_ram_bank_read,
     _fofb_processing_coeffs_ram_bank_write,
-    RW_PARAM_FUNC_NAME(fofb_processing, coeffs_fixed_point_pos),
     _fofb_processing_setpoints_ram_bank_read,
     _fofb_processing_setpoints_ram_bank_write,
     NULL

@@ -20,16 +20,28 @@ struct _smio_fofb_processing_data_block_t {
 #define FOFB_PROCESSING_OPCODE_TYPE                             uint32_t
 #define FOFB_PROCESSING_OPCODE_SIZE                             (sizeof (FOFB_PROCESSING_OPCODE_TYPE))
 
-#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_READ             0
-#define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ               "_fofb_processing_coeffs_ram_bank_read"
-#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE            1
-#define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE              "_fofb_processing_coeffs_ram_bank_write"
-#define FOFB_PROCESSING_OPCODE_SET_GET_COEFFS_FIXED_POINT_POS   2
-#define FOFB_PROCESSING_NAME_SET_GET_COEFFS_FIXED_POINT_POS     "fofb_processing_set_get_coeffs_fixed_point_pos"
-#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_READ          3
-#define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ            "_fofb_processing_setpoints_ram_bank_read"
-#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_WRITE         4
-#define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE           "_fofb_processing_setpoints_ram_bank_write"
+#define FOFB_PROCESSING_OPCODE_SET_GET_COEFFS_FIXED_POINT_POS    0
+#define FOFB_PROCESSING_NAME_SET_GET_COEFFS_FIXED_POINT_POS      "fofb_processing_set_get_coeffs_fixed_point_pos"
+#define FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAINS_FIXED_POINT_POS 1
+#define FOFB_PROCESSING_NAME_SET_GET_ACC_GAINS_FIXED_POINT_POS   "fofb_processing_set_get_acc_gains_fixed_point_pos"
+#define FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN                  2
+#define FOFB_PROCESSING_NAME_SET_GET_ACC_GAIN                    "fofb_processing_set_get_acc_gain"
+#define FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR             3
+#define FOFB_PROCESSING_NAME_SET_GET_ACC_CTL_CLEAR               "fofb_processing_set_get_acc_ctl_clear"
+#define FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE            4
+#define FOFB_PROCESSING_NAME_SET_GET_ACC_CTL_FREEZE              "fofb_processing_set_get_acc_ctl_freeze"
+#define FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX                    5
+#define FOFB_PROCESSING_NAME_SET_GET_SP_MAX                      "_fofb_processing_set_get_sp_max"
+#define FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN                    6
+#define FOFB_PROCESSING_NAME_SET_GET_SP_MIN                      "_fofb_processing_set_get_sp_min"
+#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_READ              7
+#define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ                "_fofb_processing_coeffs_ram_bank_read"
+#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE             8
+#define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE               "_fofb_processing_coeffs_ram_bank_write"
+#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_READ           9
+#define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ             "_fofb_processing_setpoints_ram_bank_read"
+#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_WRITE          10
+#define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE            "_fofb_processing_setpoints_ram_bank_write"
 
 /* Messaging Reply OPCODES */
 #define FOFB_PROCESSING_REPLY_TYPE                              uint32_t
