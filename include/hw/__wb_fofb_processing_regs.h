@@ -252,6 +252,20 @@
 #define WB_FOFB_PROCESSING_REGS_SP_MIN_11_VAL_MASK 0xffffffffUL
 #define WB_FOFB_PROCESSING_REGS_SP_MIN_11_VAL_SHIFT 0
 
+/* fofb processing loop interlock control register */
+#define WB_FOFB_PROCESSING_REGS_LOOP_INTLK_CTL 0xc8UL
+#define WB_FOFB_PROCESSING_REGS_LOOP_INTLK_CTL_EN 0x1UL
+#define WB_FOFB_PROCESSING_REGS_LOOP_INTLK_CTL_CLR 0x2UL
+
+/* fofb processing loop interlock status register */
+#define WB_FOFB_PROCESSING_REGS_LOOP_INTLK_STA 0xccUL
+#define WB_FOFB_PROCESSING_REGS_LOOP_INTLK_STA_ORB_DISTORT 0x1UL
+
+/* fofb processing loop interlock orbit distortion limit absolut value register */
+#define WB_FOFB_PROCESSING_REGS_ORB_DISTORT_LIMIT 0xd0UL
+#define WB_FOFB_PROCESSING_REGS_ORB_DISTORT_LIMIT_VAL_MASK 0xffffffffUL
+#define WB_FOFB_PROCESSING_REGS_ORB_DISTORT_LIMIT_VAL_SHIFT 0
+
 /* fofb processing coefficients ram bank */
 #define WB_FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_0 0x800UL
 #define WB_FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_0_SIZE 4 /* 0x4 */
@@ -494,8 +508,17 @@ struct wb_fofb_processing_regs {
   /* [0xc4]: REG (rw) fofb processing minimum saturation value register (per channel) */
   uint32_t sp_min_11;
 
+  /* [0xc8]: REG (rw) fofb processing loop interlock control register */
+  uint32_t loop_intlk_ctl;
+
+  /* [0xcc]: REG (rw) fofb processing loop interlock status register */
+  uint32_t loop_intlk_sta;
+
+  /* [0xd0]: REG (rw) fofb processing loop interlock orbit distortion limit absolut value register */
+  uint32_t orb_distort_limit;
+
   /* padding to: 512 words */
-  uint32_t __padding_0[462];
+  uint32_t __padding_0[459];
 
   /* [0x800]: MEMORY fofb processing coefficients ram bank */
   struct coeffs_ram_bank_0 {

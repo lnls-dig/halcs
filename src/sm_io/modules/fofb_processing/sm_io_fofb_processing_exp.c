@@ -85,6 +85,27 @@ RW_PARAM_FUNC(fofb_processing, sp_min) {
         NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+RW_PARAM_FUNC(fofb_processing, intlk_en) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_CTL,
+        EN, SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, intlk_clr) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_CTL,
+        CLR, SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, intlk_sta) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_STA,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, loop_orb_distort_limit) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_ORB_DISTORT_LIMIT,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 static int _fofb_processing_coeffs_ram_bank_read(void *owner, void *args,
     void *ret) {
     assert(owner);
@@ -197,6 +218,10 @@ const disp_table_func_fp fofb_processing_exp_fp [] = {
     RW_PARAM_FUNC_NAME(fofb_processing, acc_freeze),
     RW_PARAM_FUNC_NAME(fofb_processing, sp_max),
     RW_PARAM_FUNC_NAME(fofb_processing, sp_min),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_en),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_clr),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_sta),
+    RW_PARAM_FUNC_NAME(fofb_processing, loop_orb_distort_limit),
     _fofb_processing_coeffs_ram_bank_read,
     _fofb_processing_coeffs_ram_bank_write,
     _fofb_processing_setpoints_ram_bank_read,
