@@ -34,21 +34,25 @@ struct _smio_fofb_processing_data_block_t {
 #define FOFB_PROCESSING_NAME_SET_GET_SP_MAX                      "_fofb_processing_set_get_sp_max"
 #define FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN                    6
 #define FOFB_PROCESSING_NAME_SET_GET_SP_MIN                      "_fofb_processing_set_get_sp_min"
-#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_EN         7
-#define FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_CTL_EN           "_fofb_processing_set_get_intlk_en"
-#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR        8
+#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN         7
+#define FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_ORB_EN           "_fofb_processing_set_get_intlk_orb_en"
+#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN      8
+#define FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_PACKET_EN        "_fofb_processing_set_get_intlk_packet_en"
+#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR        9
 #define FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_CTL_CLR          "_fofb_processing_set_get_intlk_clr"
-#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_STA            9
+#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_STA            10
 #define FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_STA              "_fofb_processing_set_get_intlk_sta"
-#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT    10
+#define FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT    11
 #define FOFB_PROCESSING_NAME_SET_GET_LOOP_ORB_DISTORT_LIMIT      "_fofb_processing_set_get_loop_orb_distort_limit"
-#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_READ              11
+#define FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS              12
+#define FOFB_PROCESSING_NAME_SET_GET_MIN_NUM_PKTS                "_fofb_processing_set_get_min_num_pkts"
+#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_READ              13
 #define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ                "_fofb_processing_coeffs_ram_bank_read"
-#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE             12
+#define FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE             14
 #define FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE               "_fofb_processing_coeffs_ram_bank_write"
-#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_READ           13
+#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_READ           15
 #define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ             "_fofb_processing_setpoints_ram_bank_read"
-#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_WRITE          14
+#define FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_WRITE          16
 #define FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE            "_fofb_processing_setpoints_ram_bank_write"
 
 /* Messaging Reply OPCODES */

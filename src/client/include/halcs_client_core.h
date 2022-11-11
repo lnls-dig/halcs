@@ -2602,9 +2602,14 @@ halcs_client_err_e halcs_get_fofb_processing_sp_min(
 halcs_client_err_e halcs_set_fofb_processing_sp_min(
         halcs_client_t *, char *, uint32_t, uint32_t);
 
-halcs_client_err_e halcs_get_fofb_processing_intlk_en(
+halcs_client_err_e halcs_get_fofb_processing_intlk_orb_en(
         halcs_client_t *, char *, uint32_t *);
-halcs_client_err_e halcs_set_fofb_processing_intlk_en(
+halcs_client_err_e halcs_set_fofb_processing_intlk_orb_en(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_intlk_packet_en(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_intlk_packet_en(
         halcs_client_t *, char *, uint32_t);
 
 halcs_client_err_e halcs_get_fofb_processing_intlk_clr(
@@ -2618,6 +2623,11 @@ halcs_client_err_e halcs_get_fofb_processing_intlk_sta(
 halcs_client_err_e halcs_get_fofb_processing_loop_orb_distort_limit(
         halcs_client_t *, char *, uint32_t *);
 halcs_client_err_e halcs_set_fofb_processing_loop_orb_distort_limit(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_min_num_packet(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_min_num_packet(
         halcs_client_t *, char *, uint32_t);
 
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(

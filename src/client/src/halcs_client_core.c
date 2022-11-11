@@ -4348,14 +4348,23 @@ PARAM_FUNC_CLIENT_WRITE2(fofb_processing_sp_min, chan, sp_min)
             chan, sp_min);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_en)
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_orb_en)
 {
-    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_EN, fofb_processing_intlk_en);
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN, fofb_processing_intlk_orb_en);
 }
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_en)
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_orb_en)
 {
-    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_EN, fofb_processing_intlk_en);
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN, fofb_processing_intlk_orb_en);
 }
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_packet_en)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN, fofb_processing_intlk_packet_en);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_packet_en)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN, fofb_processing_intlk_packet_en);
+}
+
 PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_clr)
 {
     return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR, fofb_processing_intlk_clr);
@@ -4368,6 +4377,7 @@ PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_sta)
 {
     return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_STA, fofb_processing_intlk_sta);
 }
+
 PARAM_FUNC_CLIENT_READ(fofb_processing_loop_orb_distort_limit)
 {
     return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT, fofb_processing_loop_orb_distort_limit);
@@ -4375,6 +4385,14 @@ PARAM_FUNC_CLIENT_READ(fofb_processing_loop_orb_distort_limit)
 PARAM_FUNC_CLIENT_WRITE(fofb_processing_loop_orb_distort_limit)
 {
     return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT, fofb_processing_loop_orb_distort_limit);
+}
+PARAM_FUNC_CLIENT_READ(fofb_processing_min_num_packet)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS, fofb_processing_min_num_packet);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_min_num_packet)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS, fofb_processing_min_num_packet);
 }
 
 halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
