@@ -355,7 +355,8 @@ int main(int argc, char *argv[]) {
 
   /* TODO: implement reading and writing from:
    * - acc_gain, acc_ctl (freeze and clear)
-   * - sp_max and sp_min */
+   * - sp_max and sp_min
+   * - intlk_en, intlk_clr, orb_distort_limit */
 
   uint32_t fixed_point_pos;
   if(nec_args.op == SET_COEFFS || nec_args.op == GET_COEFFS) {
