@@ -814,29 +814,83 @@ err_get_dsp_handler:
     return err;
 }
 
-RW_PARAM_FUNC(dsp, amp_gain_ch0_data) {
-    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH0, DATA,
+#define POS_CALC_ADC_GAINS_FIXED_POINT_POS_DATA_R(val) (val)
+#define POS_CALC_ADC_GAINS_FIXED_POINT_POS_DATA_W(val) (val)
+#define POS_CALC_ADC_GAINS_FIXED_POINT_POS_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_gains_fixed_point_pos) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_GAINS_FIXED_POINT_POS, DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-
-RW_PARAM_FUNC(dsp, amp_gain_ch1_data) {
-    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH1, DATA,
+#define POS_CALC_ADC_CH0_SWCLK_0_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH0_SWCLK_0_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH0_SWCLK_0_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch0_swclk_0_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH0_SWCLK_0_GAIN, DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-
-RW_PARAM_FUNC(dsp, amp_gain_ch2_data) {
-    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH2, DATA,
+#define POS_CALC_ADC_CH1_SWCLK_0_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH1_SWCLK_0_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH1_SWCLK_0_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch1_swclk_0_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH1_SWCLK_0_GAIN, DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
+#define POS_CALC_ADC_CH2_SWCLK_0_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH2_SWCLK_0_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH2_SWCLK_0_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch2_swclk_0_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH2_SWCLK_0_GAIN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
 
-RW_PARAM_FUNC(dsp, amp_gain_ch3_data) {
-    SET_GET_PARAM(dsp, 0x0, POS_CALC, AMP_GAIN_CH3, DATA,
+#define POS_CALC_ADC_CH3_SWCLK_0_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH3_SWCLK_0_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH3_SWCLK_0_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch3_swclk_0_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH3_SWCLK_0_GAIN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_ADC_CH0_SWCLK_1_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH0_SWCLK_1_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH0_SWCLK_1_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch0_swclk_1_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH0_SWCLK_1_GAIN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_ADC_CH1_SWCLK_1_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH1_SWCLK_1_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH1_SWCLK_1_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch1_swclk_1_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH1_SWCLK_1_GAIN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_ADC_CH2_SWCLK_1_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH2_SWCLK_1_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH2_SWCLK_1_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch2_swclk_1_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH2_SWCLK_1_GAIN, DATA,
+            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
+            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+#define POS_CALC_ADC_CH3_SWCLK_1_GAIN_DATA_R(val) (val)
+#define POS_CALC_ADC_CH3_SWCLK_1_GAIN_DATA_W(val) (val)
+#define POS_CALC_ADC_CH3_SWCLK_1_GAIN_DATA_MASK UINT32_MAX
+RW_PARAM_FUNC(dsp, adc_ch3_swclk_1_gain) {
+    SET_GET_PARAM(dsp, 0x0, POS_CALC, ADC_CH3_SWCLK_1_GAIN, DATA,
             MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
             NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
@@ -898,10 +952,15 @@ const disp_table_func_fp dsp_exp_fp [] = {
     RW_PARAM_FUNC_NAME(dsp, monit_tag_desync_cnt),
     _dsp_offset_x,
     _dsp_offset_y,
-    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch0_data),
-    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch1_data),
-    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch2_data),
-    RW_PARAM_FUNC_NAME(dsp, amp_gain_ch3_data),
+    RW_PARAM_FUNC_NAME(dsp, adc_gains_fixed_point_pos),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch0_swclk_0_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch1_swclk_0_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch2_swclk_0_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch3_swclk_0_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch0_swclk_1_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch1_swclk_1_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch2_swclk_1_gain),
+    RW_PARAM_FUNC_NAME(dsp, adc_ch3_swclk_1_gain),
     NULL
 };
 

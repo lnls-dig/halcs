@@ -2103,48 +2103,75 @@ PARAM_FUNC_CLIENT_READ_SIGNED(offset_y)
      return param_client_read_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_Y, offset_y);
 }
 
-/* Amplitude gain channel 0 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch0_data)
+PARAM_FUNC_CLIENT_READ(adc_gain_fixed_point_pos)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_GAINS_FIXED_POINT_POS, adc_gain_fixed_point_pos);
 }
 
-PARAM_FUNC_CLIENT_READ(amp_gain_ch0_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch0_swclk_0_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_0_GAIN, adc_ch0_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch0_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_0_GAIN, adc_ch0_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch1_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_0_GAIN, adc_ch1_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch1_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_0_GAIN, adc_ch1_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch2_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_0_GAIN, adc_ch2_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch2_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_0_GAIN, adc_ch2_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch3_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_0_GAIN, adc_ch3_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch3_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_0_GAIN, adc_ch3_swclk_0_gain);
 }
 
-/* Amplitude gain channel 1 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch1_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch0_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_1_GAIN, adc_ch0_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch1_data)
+PARAM_FUNC_CLIENT_READ(adc_ch0_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_1_GAIN, adc_ch0_swclk_1_gain);
 }
-
-/* Amplitude gain channel 2 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch2_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch1_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_1_GAIN, adc_ch1_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch2_data)
+PARAM_FUNC_CLIENT_READ(adc_ch1_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_1_GAIN, adc_ch1_swclk_1_gain);
 }
-
-/* Amplitude gain channel 3 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch3_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch2_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_1_GAIN, adc_ch2_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch3_data)
+PARAM_FUNC_CLIENT_READ(adc_ch2_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_1_GAIN, adc_ch2_swclk_1_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch3_swclk_1_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_1_GAIN, adc_ch3_swclk_1_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch3_swclk_1_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_1_GAIN, adc_ch3_swclk_1_gain);
 }
 
 /**************** Swap SMIO Functions ****************/
