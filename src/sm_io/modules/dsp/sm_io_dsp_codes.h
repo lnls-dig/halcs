@@ -176,14 +176,26 @@ struct _smio_dsp_monit_data_t {
 #define DSP_NAME_SET_GET_OFFSET_Y           "dsp_set_get_offset_y"
 #define DSP_OPCODE_END                      56
 
-#define DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA     57
-#define DSP_NAME_SET_GET_AMP_GAIN_CH0_DATA       "dsp_set_get_gain_ch0"
-#define DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA     58
-#define DSP_NAME_SET_GET_AMP_GAIN_CH1_DATA       "dsp_set_get_gain_ch1"
-#define DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA     59
-#define DSP_NAME_SET_GET_AMP_GAIN_CH2_DATA       "dsp_set_get_gain_ch2"
-#define DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA     60
-#define DSP_NAME_SET_GET_AMP_GAIN_CH3_DATA       "dsp_set_get_gain_ch3"
+#define DSP_OPCODE_SET_GET_ADC_GAINS_FIXED_POINT_POS  57
+#define DSP_NAME_SET_GET_ADC_GAINS_FIXED_POINT_POS    "dsp_set_get_adc_gains_fixed_point_pos"
+
+#define DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_0_GAIN  58
+#define DSP_NAME_SET_GET_ADC_CH0_SWCLK_0_GAIN    "dsp_set_get_adc_ch0_swclk_0_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_0_GAIN  59
+#define DSP_NAME_SET_GET_ADC_CH1_SWCLK_0_GAIN    "dsp_set_get_adc_ch1_swclk_0_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_0_GAIN  60
+#define DSP_NAME_SET_GET_ADC_CH2_SWCLK_0_GAIN    "dsp_set_get_adc_ch2_swclk_0_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_0_GAIN  61
+#define DSP_NAME_SET_GET_ADC_CH3_SWCLK_0_GAIN    "dsp_set_get_adc_ch3_swclk_0_gain"
+
+#define DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_1_GAIN  62
+#define DSP_NAME_SET_GET_ADC_CH0_SWCLK_1_GAIN    "dsp_set_get_adc_ch0_swclk_1_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_1_GAIN  63
+#define DSP_NAME_SET_GET_ADC_CH1_SWCLK_1_GAIN    "dsp_set_get_adc_ch1_swclk_1_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_1_GAIN  64
+#define DSP_NAME_SET_GET_ADC_CH2_SWCLK_1_GAIN    "dsp_set_get_adc_ch2_swclk_1_gain"
+#define DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_1_GAIN  65
+#define DSP_NAME_SET_GET_ADC_CH3_SWCLK_1_GAIN    "dsp_set_get_adc_ch3_swclk_1_gain"
 
 /* Messaging Reply OPCODES */
 #define DSP_REPLY_TYPE                      uint32_t

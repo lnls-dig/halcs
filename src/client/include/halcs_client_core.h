@@ -1098,29 +1098,43 @@ halcs_client_err_e halcs_set_offset_y (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_offset_y (halcs_client_t *self, char *service,
         int32_t *offset_y);
 
-/* Amplitude Gain Channel 0 */
-halcs_client_err_e halcs_set_amp_gain_ch0_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch0_data);
-halcs_client_err_e halcs_get_amp_gain_ch0_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch0_data);
-        
-/* Amplitude Gain Channel 1 */        
-halcs_client_err_e halcs_set_amp_gain_ch1_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch1_data);
-halcs_client_err_e halcs_get_amp_gain_ch1_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch1_data);
+/* Amplitude Gain for Switching Cycles */
+halcs_client_err_e halcs_get_adc_gain_fixed_point_pos (halcs_client_t *self, char *service,
+        uint32_t *);
 
-/* Amplitude Gain Channel 2 */        
-halcs_client_err_e halcs_set_amp_gain_ch2_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch2_data);
-halcs_client_err_e halcs_get_amp_gain_ch2_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch2_data);
+halcs_client_err_e halcs_set_adc_ch0_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch0_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch1_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch1_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch2_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch2_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch3_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch3_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
 
-/* Amplitude Gain Channel 3 */
-halcs_client_err_e halcs_set_amp_gain_ch3_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch3_data);
-halcs_client_err_e halcs_get_amp_gain_ch3_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch3_data);
+halcs_client_err_e halcs_set_adc_ch0_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch0_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch1_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch1_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch2_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch2_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch3_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch3_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
 
 /********************** SWAP Functions ********************/
 
