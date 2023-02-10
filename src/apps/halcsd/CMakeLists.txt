@@ -94,7 +94,7 @@ endif()
 # if we want to install idev rules or not
 option(halcsd_INSTALL_UDEV_RULES
     "Install udev rules for halcsd"
-    ON
+    OFF
 )
 
 # udev directories
