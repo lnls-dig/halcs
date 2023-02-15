@@ -94,7 +94,7 @@ endif()
 # if we want to install idev rules or not
 option(halcsd_INSTALL_UDEV_RULES
     "Install udev rules for halcsd"
-    ON
+    OFF
 )
 
 # udev directories
@@ -475,25 +475,27 @@ foreach(bin_target ${apps_halcsd})
             )
 
             # udev rules
-            install(CODE "set(input_file
-                \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/80-udev_fpga.rules.in\")"
-                COMPONENT Scripts
-            )
-            install(CODE "set(output_file
-                \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules\")"
-                COMPONENT Scripts
-            )
-            install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
-                COMPONENT Scripts
-            )
+            if(halcsd_INSTALL_UDEV_RULES)
+                install(CODE "set(input_file
+                    \"${CMAKE_CURRENT_SOURCE_DIR}/init/systemd/etc/udev/rules.d/80-udev_fpga.rules.in\")"
+                    COMPONENT Scripts
+                )
+                install(CODE "set(output_file
+                    \"${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules\")"
+                    COMPONENT Scripts
+                )
+                install(SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/CMakeConfigureInstall.cmake"
+                    COMPONENT Scripts
+                )
 
-            install(FILES
-                ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules
-                DESTINATION ${UDEV_SYSCONFDIR}
-                COMPONENT Scripts
-                PERMISSIONS
-                OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
-            )
+                install(FILES
+                    ${CMAKE_CURRENT_BINARY_DIR}/init/systemd/80-udev_fpga.rules
+                    DESTINATION ${UDEV_SYSCONFDIR}
+                    COMPONENT Scripts
+                    PERMISSIONS
+                    OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
+                )
+            endif()
         else()
             message(FATAL_ERROR "could not find systemd. Other init systems are not supported")
         endif()
