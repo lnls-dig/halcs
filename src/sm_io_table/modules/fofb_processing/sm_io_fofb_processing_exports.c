@@ -1,68 +1,235 @@
 /*
- *  * Copyright (C) 2020 LNLS (www.lnls.br)
- *   * Author: Melissa Aguiar <melissa.aguiar@cnpem.br>
- *    *
- *     * Released according to the GNU GPL, version 3 or any later version.
- *      */
+** Copyright (C) 2020 LNLS (www.lnls.br)
+** Author: Melissa Aguiar <melissa.aguiar@cnpem.br>
+**
+** Released according to the GNU GPL, version 3 or any later version.
+**/
 
 #include "sm_io_exports_helper.h"
 #include "sm_io_codes.h"
 
+disp_op_t fofb_processing_set_get_coeffs_fixed_point_pos_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_COEFFS_FIXED_POINT_POS,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_COEFFS_FIXED_POINT_POS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_acc_gains_fixed_point_pos_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_ACC_GAINS_FIXED_POINT_POS,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAINS_FIXED_POINT_POS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_acc_gain_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_ACC_GAIN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_acc_ctl_clear_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_ACC_CTL_CLEAR,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_acc_ctl_freeze_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_ACC_CTL_FREEZE,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_sp_max_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_SP_MAX,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_sp_min_exp = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_SP_MIN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
+disp_op_t fofb_processing_set_get_intlk_orb_en = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_ORB_EN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_intlk_packet_en = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_PACKET_EN,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_intlk_clr = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_CTL_CLR,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_intlk_sta = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_LOOP_INTLK_STA,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_STA,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_loop_orb_distort_limit = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_LOOP_ORB_DISTORT_LIMIT,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+disp_op_t fofb_processing_set_get_min_num_packets = {
+    .name = FOFB_PROCESSING_NAME_SET_GET_MIN_NUM_PKTS,
+    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Description SMIO FOFB_PROCESSING functions */
-
-disp_op_t fofb_processing_set_get_ram_write_exp = {
-    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_WRITE,
-    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+disp_op_t fofb_processing_coeffs_ram_bank_read_exp = {
+    .name = FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ,
+    .opcode = FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_READ,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+        sizeof(smio_fofb_processing_data_block_t)),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
 
-disp_op_t fofb_processing_set_get_ram_addr_exp = {
-    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_ADDR,
-    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+disp_op_t fofb_processing_coeffs_ram_bank_write_exp = {
+    .name = FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE,
+    .opcode = FOFB_PROCESSING_OPCODE_COEFFS_RAM_BANK_WRITE,
+    .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
         DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+            sizeof(smio_fofb_processing_data_block_t)),
         DISP_ARG_END
     }
 };
 
-disp_op_t fofb_processing_set_get_ram_data_in_exp = {
-    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_IN,
-    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+disp_op_t fofb_processing_setpoints_ram_bank_read_exp = {
+    .name = FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ,
+    .opcode = FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_READ,
+    .retval = DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+        sizeof(smio_fofb_processing_data_block_t)),
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
         DISP_ARG_END
     }
 };
 
-disp_op_t fofb_processing_set_get_ram_data_out_exp = {
-    .name = FOFB_PROCESSING_NAME_SET_GET_RAM_DATA_OUT,
-    .opcode = FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT,
-    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+disp_op_t fofb_processing_setpoints_ram_bank_write_exp = {
+    .name = FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE,
+    .opcode = FOFB_PROCESSING_OPCODE_SETPOINTS_RAM_BANK_WRITE,
+    .retval = DISP_ARG_END,
     .retval_owner = DISP_OWNER_OTHER,
     .args = {
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
-        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE_RAW(DISP_ATYPE_STRUCT,
+            sizeof(smio_fofb_processing_data_block_t)),
         DISP_ARG_END
     }
 };
 
 /* Exported function description */
 const disp_op_t *fofb_processing_exp_ops [] = {
-    &fofb_processing_set_get_ram_write_exp,
-    &fofb_processing_set_get_ram_addr_exp,
-    &fofb_processing_set_get_ram_data_in_exp,
-    &fofb_processing_set_get_ram_data_out_exp,
+    &fofb_processing_set_get_coeffs_fixed_point_pos_exp,
+    &fofb_processing_set_get_acc_gains_fixed_point_pos_exp,
+    &fofb_processing_set_get_acc_gain_exp,
+    &fofb_processing_set_get_acc_ctl_clear_exp,
+    &fofb_processing_set_get_acc_ctl_freeze_exp,
+    &fofb_processing_set_get_sp_max_exp,
+    &fofb_processing_set_get_sp_min_exp,
+    &fofb_processing_set_get_intlk_orb_en,
+    &fofb_processing_set_get_intlk_packet_en,
+    &fofb_processing_set_get_intlk_clr,
+    &fofb_processing_set_get_intlk_sta,
+    &fofb_processing_set_get_loop_orb_distort_limit,
+    &fofb_processing_set_get_min_num_packets,
+    &fofb_processing_coeffs_ram_bank_read_exp,
+    &fofb_processing_coeffs_ram_bank_write_exp,
+    &fofb_processing_setpoints_ram_bank_read_exp,
+    &fofb_processing_setpoints_ram_bank_write_exp,
     NULL
 };

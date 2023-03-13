@@ -1098,29 +1098,43 @@ halcs_client_err_e halcs_set_offset_y (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_offset_y (halcs_client_t *self, char *service,
         int32_t *offset_y);
 
-/* Amplitude Gain Channel 0 */
-halcs_client_err_e halcs_set_amp_gain_ch0_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch0_data);
-halcs_client_err_e halcs_get_amp_gain_ch0_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch0_data);
-        
-/* Amplitude Gain Channel 1 */        
-halcs_client_err_e halcs_set_amp_gain_ch1_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch1_data);
-halcs_client_err_e halcs_get_amp_gain_ch1_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch1_data);
+/* Amplitude Gain for Switching Cycles */
+halcs_client_err_e halcs_get_adc_gain_fixed_point_pos (halcs_client_t *self, char *service,
+        uint32_t *);
 
-/* Amplitude Gain Channel 2 */        
-halcs_client_err_e halcs_set_amp_gain_ch2_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch2_data);
-halcs_client_err_e halcs_get_amp_gain_ch2_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch2_data);
+halcs_client_err_e halcs_set_adc_ch0_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch0_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch1_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch1_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch2_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch2_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch3_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch3_swclk_0_gain (halcs_client_t *self, char *service,
+        uint32_t *);
 
-/* Amplitude Gain Channel 3 */
-halcs_client_err_e halcs_set_amp_gain_ch3_data (halcs_client_t *self, char *service,
-        uint32_t amp_gain_ch3_data);
-halcs_client_err_e halcs_get_amp_gain_ch3_data (halcs_client_t *self, char *service,
-        uint32_t *amp_gain_ch3_data);
+halcs_client_err_e halcs_set_adc_ch0_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch0_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch1_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch1_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch2_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch2_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
+halcs_client_err_e halcs_set_adc_ch3_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t);
+halcs_client_err_e halcs_get_adc_ch3_swclk_1_gain (halcs_client_t *self, char *service,
+        uint32_t *);
 
 /********************** SWAP Functions ********************/
 
@@ -2447,14 +2461,6 @@ halcs_client_err_e halcs_get_fofb_ctrl_rcb_data (halcs_client_t *self, char *ser
 halcs_client_err_e halcs_get_rtmlamp_ohwr_sta (halcs_client_t *self, char *service,
         uint32_t *rtmlamp_ohwr_sta);
 
-/* RTMLAMP_OHWR Controller dac_data_from_wb function. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_dac_data_from_wb);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data_from_wb (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_dac_data_from_wb);
-
 /* RTMLAMP_OHWR Controller AMP flags functions. The functions returns
  * amplifier flags of a specified amplifier channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
@@ -2485,29 +2491,23 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *se
 halcs_client_err_e halcs_get_rtmlamp_ohwr_amp_en (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *amp_en);
 
-/* RTMLAMP_OHWR Controller PI enable/PI test modes functions. The function set/get
- * amplifier enable of a specified amplifier channel "chan".
+/* RTMLAMP_OHWR Controller Trigger enable function. The function set/get
+ * the trigger enable of a specified channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ol_triang_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t pi_ol_triang_enable);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ol_triang_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *pi_ol_triang_enable);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_trig_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t trig_en);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_trig_en (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *trig_en);
 
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ol_square_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t pi_ol_square_enable);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ol_square_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *pi_ol_square_enable);
-
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp_square_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t pi_sp_square_enable);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp_square_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *pi_sp_square_enable);
-
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t pi_enable);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_enable (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *pi_enable);
+/* RTMLAMP_OHWR Controller Mode function. The function set/get
+ * mode of a specified channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_mode (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t mode);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_mode (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *mode);
 
 halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_kp (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t pi_kp);
@@ -2524,8 +2524,8 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *ser
 halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *pi_sp);
 
-/* RTMLAMP_OHWR Controller DAC function. The function set/get
- * DAC data of a specified amplifier channel "chan".
+/* RTMLAMP_OHWR Controller Dac Data function. The function set/get
+ * dac data of a specified amplifier channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see halcs_client_err.h for all possible errors)*/
 halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
@@ -2533,53 +2533,124 @@ halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *
 halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_data (halcs_client_t *self, char *service,
         uint32_t chan, uint32_t *dac_data);
 
-/* RTMLAMP_OHWR Controller DAC write function. The function set/get
- * DAC data write to external IC of a specified amplifier channel "chan".
+/* RTMLAMP_OHWR Controller Lim function. The function set/get
+ * Lim of a specified amplifier channel "chan".
  * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
  * correctly set or error (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_dac_wr (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t dac_wr);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_dac_wr (halcs_client_t *self, char *service,
-        uint32_t chan, uint32_t *dac_wr);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_lim_a (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t lim_a);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_lim_a (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *lim_a);
 
-/* RTMLAMP_OHWR Controller PI controller functions. The functions returns
- * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- * (see halcs_client_err.h for all possible errors)*/
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_pi_ol_dac_cnt_max);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_ol_dac_cnt_max (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_pi_ol_dac_cnt_max);
+halcs_client_err_e halcs_set_rtmlamp_ohwr_lim_b (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t lim_b);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_lim_b (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *lim_b);
 
-halcs_client_err_e halcs_set_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client_t *self, char *service,
-        uint32_t rtmlamp_ohwr_pi_sp_lim_inf);
-halcs_client_err_e halcs_get_rtmlamp_ohwr_pi_sp_lim_inf (halcs_client_t *self, char *service,
-        uint32_t *rtmlamp_ohwr_pi_sp_lim_inf);
+/* RTMLAMP_OHWR Controller CNT function. The function set/get
+ * CNT of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_set_rtmlamp_ohwr_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t cnt);
+halcs_client_err_e halcs_get_rtmlamp_ohwr_cnt (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *cnt);
+
+/* RTMLAMP_OHWR Controller EFF ADC/DAC/SP function. The function set/get
+ * EFF ADC/DAC/SP of a specified amplifier channel "chan".
+ * All of the functions returns HALCS_CLIENT_SUCCESS if the parameter was
+ * correctly set or error (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_get_rtmlamp_ohwr_eff_adc (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *eff_adc);
+
+halcs_client_err_e halcs_get_rtmlamp_ohwr_eff_dac (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *eff_dac);
+
+halcs_client_err_e halcs_get_rtmlamp_ohwr_eff_sp (halcs_client_t *self, char *service,
+        uint32_t chan, uint32_t *eff_sp);
 
 /********************** FOFB PROCESSING Functions ********************/
+/* FOFB PROCESSING functions. The functions returns HALCS_CLIENT_SUCCESS if the
+ * parameter was correctly set or error (see halcs_client_err.h for all possible
+ * errors) */
 
-/* FOFB PROCESSING RAM functions. The functions returns
- *  * HALCS_CLIENT_SUCCESS if the parameter was correctly set or error
- *   * (see halcs_client_err.h for all possible errors)*/
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_read(
+        halcs_client_t *self, char *service, const uint32_t chan,
+        smio_fofb_processing_data_block_t *const coeffs);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_write (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_write);
-halcs_client_err_e halcs_get_fofb_processing_ram_write (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_write);
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_write(
+        halcs_client_t *self, char *service, const uint32_t chan,
+        const smio_fofb_processing_data_block_t coeffs);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_addr (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_addr);
-halcs_client_err_e halcs_get_fofb_processing_ram_addr (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_addr);
+halcs_client_err_e halcs_get_fofb_processing_coeffs_fixed_point_pos(
+        halcs_client_t *self, char *service, uint32_t *fixed_point_pos);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_data_in (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_data_in);
-halcs_client_err_e halcs_get_fofb_processing_ram_data_in (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_data_in);
+halcs_client_err_e halcs_get_fofb_processing_acc_gains_fixed_point_pos(
+        halcs_client_t *, char *, uint32_t *);
 
-halcs_client_err_e halcs_set_fofb_processing_ram_data_out (halcs_client_t *self, char *service,
-        uint32_t fofb_processing_ram_data_out);
-halcs_client_err_e halcs_get_fofb_processing_ram_data_out (halcs_client_t *self, char *service,
-        uint32_t *fofb_processing_ram_data_out);
+halcs_client_err_e halcs_get_fofb_processing_acc_gain(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_gain(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_acc_ctl_clear(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_ctl_clear(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_acc_ctl_freeze(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+
+halcs_client_err_e halcs_set_fofb_processing_acc_ctl_freeze(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_sp_max(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_sp_max(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_sp_min(
+        halcs_client_t *, char *, uint32_t, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_sp_min(
+        halcs_client_t *, char *, uint32_t, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_intlk_orb_en(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_intlk_orb_en(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_intlk_packet_en(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_intlk_packet_en(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_intlk_clr(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_intlk_clr(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_intlk_sta(
+        halcs_client_t *, char *, uint32_t *);
+
+halcs_client_err_e halcs_get_fofb_processing_loop_orb_distort_limit(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_loop_orb_distort_limit(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_get_fofb_processing_min_num_packet(
+        halcs_client_t *, char *, uint32_t *);
+halcs_client_err_e halcs_set_fofb_processing_min_num_packet(
+        halcs_client_t *, char *, uint32_t);
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
+        halcs_client_t *self, char *service,
+        smio_fofb_processing_data_block_t *const setpoints);
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_write(
+        halcs_client_t *self, char *service,
+        const smio_fofb_processing_data_block_t setpoints);
 
 #ifdef __cplusplus
 }

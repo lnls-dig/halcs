@@ -43,3 +43,4 @@ esac
 chmod 777 /tmp/malamute || :
 ldconfig
 systemctl daemon-reload
+udevadm control -R

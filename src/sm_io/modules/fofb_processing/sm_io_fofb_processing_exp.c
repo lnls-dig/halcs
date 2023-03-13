@@ -39,37 +39,208 @@
 /************************************************************/
 /***********  Specific FOFB_PROCESSING Operations ***********/
 /************************************************************/
-
-RW_PARAM_FUNC(fofb_processing, ram_write) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_WRITE, ,
-            SINLE_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+RW_PARAM_FUNC(fofb_processing, coeffs_fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, COEFFS_FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_addr) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_ADDR, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+RW_PARAM_FUNC(fofb_processing, accs_gains_fixed_point_pos) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACCS_GAINS_FIXED_POINT_POS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_data_in) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_IN, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+RW_PARAM_FUNC(fofb_processing, acc_gain) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_GAIN,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
 }
 
-RW_PARAM_FUNC(fofb_processing, ram_data_out) {
-    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING, RAM_DATA_OUT, ,
-            MULT_BIT_PARAM, /* No minimum value */, /* No maximum value */,
-            NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+RW_PARAM_FUNC(fofb_processing, acc_clear) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_CTL,
+        CLEAR, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, acc_freeze) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, ACC_CTL,
+        FREEZE, FOFB_PROCESSING_REGS_CHANNEL_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, sp_max) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, SP_MAX,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_SP_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, sp_min) {
+    SET_GET_PARAM_CHANNEL(fofb_processing, 0x0, FOFB_PROCESSING_REGS, SP_MIN,
+        VAL, FOFB_PROCESSING_REGS_CHANNEL_SP_DISTANCE, FOFB_PROCESSING_CHANNEL_COUNT,
+        MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, intlk_orb_en) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_SRC_EN_CTL,
+        ORB_DISTORT_EN, SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, intlk_packet_en) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_SRC_EN_CTL,
+        PACKET_LOSS_EN, SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, intlk_clr) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_CTL,
+        CLR, SINGLE_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, intlk_sta) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_INTLK_STA,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+RW_PARAM_FUNC(fofb_processing, loop_orb_distort_limit) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, LOOP_ORB_DISTORT_LIMIT,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+RW_PARAM_FUNC(fofb_processing, min_num_packets) {
+    SET_GET_PARAM(fofb_processing, 0x0, FOFB_PROCESSING_REGS, MIN_NUM_PKTS,
+        /* No field */, MULT_BIT_PARAM, /* No minimum check*/, /* No maximum check */,
+        NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
+static int _fofb_processing_coeffs_ram_bank_read(void *owner, void *args,
+    void *ret) {
+    assert(owner);
+    assert(args);
+    assert(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_coeffs_ram_bank_read\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_read_block(self,
+        FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_OFFS(chan),
+        FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_SIZE, (uint32_t *)ret);
+
+    err = (size == FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_SIZE)?
+        size : -FOFB_PROCESSING_ERR;
+
+    return err;
+}
+
+static int _fofb_processing_coeffs_ram_bank_write(void *owner, void *args,
+    void *ret) {
+    assert (owner);
+    assert (args);
+    UNUSED(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_coeffs_ram_bank_write\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const uint32_t chan = *(uint32_t *) EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    const struct _smio_fofb_processing_data_block_t coeffs =
+        *(struct _smio_fofb_processing_data_block_t *) EXP_MSG_ZMQ_NEXT_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_write_block(self,
+        FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_OFFS(chan),
+        FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_SIZE, coeffs.data);
+
+    err = (size == FOFB_PROCESSING_REGS_COEFFS_RAM_BANK_SIZE)?
+        FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
+
+    return err;
+}
+
+static int _fofb_processing_setpoints_ram_bank_read(void *owner, void *args,
+    void *ret) {
+    assert(owner);
+    UNUSED(args);
+    assert(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_setpoints_ram_bank_read\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    ssize_t size;
+    size = smio_thsafe_client_read_block(self,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_OFFS,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE, (uint32_t *)ret);
+
+    err = (size == FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE)?
+        size : -FOFB_PROCESSING_ERR;
+
+    return err;
+}
+
+static int _fofb_processing_setpoints_ram_bank_write(void *owner, void *args,
+    void *ret) {
+    assert(owner);
+    assert(args);
+    UNUSED(ret);
+
+    int err;
+
+    DBE_DEBUG (DBG_SM_IO | DBG_LVL_TRACE, "[sm_io:fofb_processing] "
+        "Calling _fofb_processing_setpoints_ram_bank_write\n");
+    SMIO_OWNER_TYPE *self = SMIO_EXP_OWNER(owner);
+
+    const struct _smio_fofb_processing_data_block_t setpoints =
+        *(struct _smio_fofb_processing_data_block_t *)
+        EXP_MSG_ZMQ_FIRST_ARG(args);
+
+    ssize_t size;
+    size = smio_thsafe_client_write_block(self,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_OFFS,
+        FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE, setpoints.data);
+
+    err = (size == FOFB_PROCESSING_REGS_SETPOINTS_RAM_BANK_SIZE)?
+        FOFB_PROCESSING_OK : -FOFB_PROCESSING_ERR;
+
+    return err;
 }
 
 /* Exported function pointers */
 const disp_table_func_fp fofb_processing_exp_fp [] = {
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_write),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_addr),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_in),
-    RW_PARAM_FUNC_NAME(fofb_processing, ram_data_out),
+    RW_PARAM_FUNC_NAME(fofb_processing, coeffs_fixed_point_pos),
+    RW_PARAM_FUNC_NAME(fofb_processing, accs_gains_fixed_point_pos),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_gain),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_clear),
+    RW_PARAM_FUNC_NAME(fofb_processing, acc_freeze),
+    RW_PARAM_FUNC_NAME(fofb_processing, sp_max),
+    RW_PARAM_FUNC_NAME(fofb_processing, sp_min),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_orb_en),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_packet_en),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_clr),
+    RW_PARAM_FUNC_NAME(fofb_processing, intlk_sta),
+    RW_PARAM_FUNC_NAME(fofb_processing, loop_orb_distort_limit),
+    RW_PARAM_FUNC_NAME(fofb_processing, min_num_packets),
+    _fofb_processing_coeffs_ram_bank_read,
+    _fofb_processing_coeffs_ram_bank_write,
+    _fofb_processing_setpoints_ram_bank_read,
+    _fofb_processing_setpoints_ram_bank_write,
     NULL
 };
 

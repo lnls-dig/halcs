@@ -2103,48 +2103,75 @@ PARAM_FUNC_CLIENT_READ_SIGNED(offset_y)
      return param_client_read_signed (self, service, DSP_OPCODE_SET_GET_OFFSET_Y, offset_y);
 }
 
-/* Amplitude gain channel 0 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch0_data)
+PARAM_FUNC_CLIENT_READ(adc_gain_fixed_point_pos)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_GAINS_FIXED_POINT_POS, adc_gain_fixed_point_pos);
 }
 
-PARAM_FUNC_CLIENT_READ(amp_gain_ch0_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch0_swclk_0_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH0_DATA, amp_gain_ch0_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_0_GAIN, adc_ch0_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch0_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_0_GAIN, adc_ch0_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch1_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_0_GAIN, adc_ch1_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch1_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_0_GAIN, adc_ch1_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch2_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_0_GAIN, adc_ch2_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch2_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_0_GAIN, adc_ch2_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch3_swclk_0_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_0_GAIN, adc_ch3_swclk_0_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch3_swclk_0_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_0_GAIN, adc_ch3_swclk_0_gain);
 }
 
-/* Amplitude gain channel 1 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch1_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch0_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_1_GAIN, adc_ch0_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch1_data)
+PARAM_FUNC_CLIENT_READ(adc_ch0_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH1_DATA, amp_gain_ch1_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH0_SWCLK_1_GAIN, adc_ch0_swclk_1_gain);
 }
-
-/* Amplitude gain channel 2 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch2_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch1_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_1_GAIN, adc_ch1_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch2_data)
+PARAM_FUNC_CLIENT_READ(adc_ch1_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH2_DATA, amp_gain_ch2_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH1_SWCLK_1_GAIN, adc_ch1_swclk_1_gain);
 }
-
-/* Amplitude gain channel 3 data */
-PARAM_FUNC_CLIENT_WRITE(amp_gain_ch3_data)
+PARAM_FUNC_CLIENT_WRITE(adc_ch2_swclk_1_gain)
 {
-    return param_client_write (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_1_GAIN, adc_ch2_swclk_1_gain);
 }
-
-PARAM_FUNC_CLIENT_READ(amp_gain_ch3_data)
+PARAM_FUNC_CLIENT_READ(adc_ch2_swclk_1_gain)
 {
-    return param_client_read (self, service, DSP_OPCODE_SET_GET_AMP_GAIN_CH3_DATA, amp_gain_ch3_data);
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH2_SWCLK_1_GAIN, adc_ch2_swclk_1_gain);
+}
+PARAM_FUNC_CLIENT_WRITE(adc_ch3_swclk_1_gain)
+{
+    return param_client_write (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_1_GAIN, adc_ch3_swclk_1_gain);
+}
+PARAM_FUNC_CLIENT_READ(adc_ch3_swclk_1_gain)
+{
+    return param_client_read (self, service, DSP_OPCODE_SET_GET_ADC_CH3_SWCLK_1_GAIN, adc_ch3_swclk_1_gain);
 }
 
 /**************** Swap SMIO Functions ****************/
@@ -4029,16 +4056,6 @@ PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_sta)
     return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_STA, rtmlamp_ohwr_sta);
 }
 
-PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_dac_data_from_wb)
-{
-    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA_FROM_WB, rtmlamp_ohwr_dac_data_from_wb);
-}
-
-PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_dac_data_from_wb)
-{
-    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_DATA_FROM_WB, rtmlamp_ohwr_dac_data_from_wb);
-}
-
 PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_amp_iflag_l, chan, amp_iflag_l)
 {
     return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_AMP_IFLAG_L,
@@ -4099,54 +4116,29 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_amp_en, chan, amp_en)
             chan, amp_en);
 }
 
-PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_ol_triang_enable, chan, pi_ol_triang_enable)
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_trig_en, chan, trig_en)
 {
-    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_TRIANG_ENABLE,
-            chan, pi_ol_triang_enable);
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_TRIG_EN,
+            chan, trig_en);
 }
 
-PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_ol_triang_enable, chan, pi_ol_triang_enable)
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_trig_en, chan, trig_en)
 {
-    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_TRIANG_ENABLE,
-            chan, pi_ol_triang_enable);
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_TRIG_EN,
+            chan, trig_en);
 }
 
-PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_ol_square_enable, chan, pi_ol_square_enable)
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_mode, chan, mode)
 {
-    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_SQUARE_ENABLE,
-            chan, pi_ol_square_enable);
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_MODE,
+            chan, mode);
 }
 
-PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_ol_square_enable, chan, pi_ol_square_enable)
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_mode, chan, mode)
 {
-    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_SQUARE_ENABLE,
-            chan, pi_ol_square_enable);
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_MODE,
+            chan, mode);
 }
-
-PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_sp_square_enable, chan, pi_sp_square_enable)
-{
-    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_SQUARE_ENABLE,
-            chan, pi_sp_square_enable);
-}
-
-PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_sp_square_enable, chan, pi_sp_square_enable)
-{
-    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_SQUARE_ENABLE,
-            chan, pi_sp_square_enable);
-}
-
-PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_enable, chan, pi_enable)
-{
-    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_ENABLE,
-            chan, pi_enable);
-}
-
-PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_pi_enable, chan, pi_enable)
-{
-    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_PI_ENABLE,
-            chan, pi_enable);
-}
-
 PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_pi_kp, chan, pi_kp)
 {
     return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_PI_KP,
@@ -4195,81 +4187,298 @@ PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_dac_data, chan, dac_data)
             chan, dac_data);
 }
 
-PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_dac_wr, chan, dac_wr)
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_lim_a, chan, lim_a)
 {
-    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_DAC_WR,
-            chan, dac_wr);
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_LIM_A,
+            chan, lim_a);
 }
 
-PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_dac_wr, chan, dac_wr)
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_lim_a, chan, lim_a)
 {
-    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_DAC_WR,
-            chan, dac_wr);
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_LIM_A,
+            chan, lim_a);
 }
 
-PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_pi_ol_dac_cnt_max)
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_lim_b, chan, lim_b)
 {
-    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_DAC_CNT_MAX, rtmlamp_ohwr_pi_ol_dac_cnt_max);
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_LIM_B,
+            chan, lim_b);
 }
 
-PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_ol_dac_cnt_max)
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_lim_b, chan, lim_b)
 {
-    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_OL_DAC_CNT_MAX, rtmlamp_ohwr_pi_ol_dac_cnt_max);
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_LIM_B,
+            chan, lim_b);
 }
 
-PARAM_FUNC_CLIENT_WRITE(rtmlamp_ohwr_pi_sp_lim_inf)
+PARAM_FUNC_CLIENT_WRITE2(rtmlamp_ohwr_cnt, chan, cnt)
 {
-    return param_client_write (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
+    return param_client_write2 (self, service, RTMLAMP_OHWR_OPCODE_CNT,
+            chan, cnt);
 }
 
-PARAM_FUNC_CLIENT_READ(rtmlamp_ohwr_pi_sp_lim_inf)
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_cnt, chan, cnt)
 {
-    return param_client_read (self, service, RTMLAMP_OHWR_OPCODE_PI_SP_LIM_INF, rtmlamp_ohwr_pi_sp_lim_inf);
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_CNT,
+            chan, cnt);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_adc, chan, eff_adc)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_EFF_ADC,
+            chan, eff_adc);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_dac, chan, eff_dac)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_EFF_DAC,
+            chan, eff_dac);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(rtmlamp_ohwr_eff_sp, chan, eff_sp)
+{
+    return param_client_write_read (self, service, RTMLAMP_OHWR_OPCODE_EFF_SP,
+            chan, eff_sp);
 }
 
 /**************** FOFB PROCESSING SMIO Functions ****************/
 
-/* FOFB processing ram write enable */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_write)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_read(
+    halcs_client_t *self, char *service, const uint32_t chan,
+    smio_fofb_processing_data_block_t *const coeffs) {
+    assert(self);
+    assert(service);
+
+    uint32_t input[1];
+    uint32_t *output;
+
+    input[0] = chan;
+    output = coeffs->data;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_READ, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_coeffs_ram_bank_read] "
+        "Something wrong happened", coeffs_ram_bank_read_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_coeffs_ram_bank_read] "
+        "Coefficients successfully read\n");
+
+coeffs_ram_bank_read_err:
+    return err;
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_write)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_WRITE, fofb_processing_ram_write);
+halcs_client_err_e halcs_fofb_processing_coeffs_ram_bank_write(
+    halcs_client_t *self, char *service, const uint32_t chan,
+    const smio_fofb_processing_data_block_t coeffs) {
+    assert(self);
+    assert(service);
+
+    uint32_t input[FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS + 1];
+    uint32_t *output; // not used
+
+    input[0] = chan;
+    memcpy(&input[1], coeffs.data,
+        FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS*sizeof(uint32_t));
+    output = NULL;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_COEFFS_RAM_BANK_WRITE, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_coeffs_ram_bank_write] "
+        "Something wrong happened", coeffs_ram_bank_write_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_coeffs_ram_bank_write] "
+        "Coefficients successfully written\n");
+
+coeffs_ram_bank_write_err:
+    return err;
 }
 
-/* FOFB processing ram addr */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_addr)
-{
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
+PARAM_FUNC_CLIENT_READ(fofb_processing_coeffs_fixed_point_pos) {
+    return param_client_read(self, service,
+        FOFB_PROCESSING_OPCODE_SET_GET_COEFFS_FIXED_POINT_POS,
+        fofb_processing_coeffs_fixed_point_pos);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_addr)
-{
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_ADDR, fofb_processing_ram_addr);
+PARAM_FUNC_CLIENT_READ(fofb_processing_acc_gains_fixed_point_pos) {
+    return param_client_read(self, service,
+        FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAINS_FIXED_POINT_POS,
+        fofb_processing_acc_gains_fixed_point_pos);
 }
 
-/* FOFB processing ram data in */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_in)
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_gain, chan, clear)
 {
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN,
+            chan, clear);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_in)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_gain, chan, clear)
 {
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_IN, fofb_processing_ram_data_in);
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_GAIN,
+            chan, clear);
 }
 
-/* FOFB processing ram data out */
-PARAM_FUNC_CLIENT_WRITE(fofb_processing_ram_data_out)
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_ctl_clear, chan, clear)
 {
-    return param_client_write (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR,
+            chan, clear);
 }
 
-PARAM_FUNC_CLIENT_READ(fofb_processing_ram_data_out)
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_ctl_clear, chan, clear)
 {
-    return param_client_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_RAM_DATA_OUT, fofb_processing_ram_data_out);
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_CLEAR,
+            chan, clear);
 }
 
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_acc_ctl_freeze, chan, freeze)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE,
+            chan, freeze);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_acc_ctl_freeze, chan, freeze)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_ACC_CTL_FREEZE,
+            chan, freeze);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_sp_max, chan, sp_max)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+            chan, sp_max);
+}
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_sp_max, chan, sp_max)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MAX,
+            chan, sp_max);
+}
+
+PARAM_FUNC_CLIENT_WRITE_READ(fofb_processing_sp_min, chan, sp_min)
+{
+    return param_client_write_read (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+            chan, sp_min);
+}
+PARAM_FUNC_CLIENT_WRITE2(fofb_processing_sp_min, chan, sp_min)
+{
+    return param_client_write2 (self, service, FOFB_PROCESSING_OPCODE_SET_GET_SP_MIN,
+            chan, sp_min);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_orb_en)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN, fofb_processing_intlk_orb_en);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_orb_en)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_ORB_EN, fofb_processing_intlk_orb_en);
+}
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_packet_en)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN, fofb_processing_intlk_packet_en);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_packet_en)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_PACKET_EN, fofb_processing_intlk_packet_en);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_clr)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR, fofb_processing_intlk_clr);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_intlk_clr)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_CTL_CLR, fofb_processing_intlk_clr);
+}
+PARAM_FUNC_CLIENT_READ(fofb_processing_intlk_sta)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_INTLK_STA, fofb_processing_intlk_sta);
+}
+
+PARAM_FUNC_CLIENT_READ(fofb_processing_loop_orb_distort_limit)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT, fofb_processing_loop_orb_distort_limit);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_loop_orb_distort_limit)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_LOOP_ORB_DISTORT_LIMIT, fofb_processing_loop_orb_distort_limit);
+}
+PARAM_FUNC_CLIENT_READ(fofb_processing_min_num_packet)
+{
+    return param_client_read(self, service, FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS, fofb_processing_min_num_packet);
+}
+PARAM_FUNC_CLIENT_WRITE(fofb_processing_min_num_packet)
+{
+    return param_client_write(self, service, FOFB_PROCESSING_OPCODE_SET_GET_MIN_NUM_PKTS, fofb_processing_min_num_packet);
+}
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_read(
+    halcs_client_t *self, char *service,
+    smio_fofb_processing_data_block_t *const setpoints) {
+    assert(self);
+    assert(service);
+
+    uint32_t *input; // not used
+    uint32_t *output;
+
+    input = NULL;
+    output = setpoints->data;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_READ, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_setpoints_ram_bank_read] "
+        "Something wrong happened", setpoints_ram_bank_read_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_setpoints_ram_bank_read] "
+        "Setpoints successfully read\n");
+
+setpoints_ram_bank_read_err:
+    return err;
+}
+
+halcs_client_err_e halcs_fofb_processing_setpoints_ram_bank_write(
+    halcs_client_t *self, char *service,
+    const smio_fofb_processing_data_block_t setpoints) {
+    assert(self);
+    assert(service);
+
+    uint32_t input[FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS];
+    uint32_t *output; // not used
+
+    memcpy(input, setpoints.data,
+        FOFB_PROCESSING_DATA_BLOCK_MAX_PARAMS*sizeof(uint32_t));
+    output = NULL;
+
+    halcs_client_err_e err = halcs_func_trans_exec(self,
+        FOFB_PROCESSING_NAME_SETPOINTS_RAM_BANK_WRITE, service, input, output);
+
+    /* Check if any error occurred */
+    ASSERT_TEST(err == HALCS_CLIENT_SUCCESS,
+        "[halcs_fofb_processing_setpoints_ram_bank_write] "
+        "Something wrong happened", setpoints_ram_bank_write_err,
+        HALCS_CLIENT_ERR_AGAIN);
+
+    /* If we are here, then the request was successfully processed */
+    DBE_DEBUG(DBG_LIB_CLIENT | DBG_LVL_TRACE,
+        "[halcs_fofb_processing_setpoints_ram_bank_write] "
+        "Setpoints successfully written\n");
+
+setpoints_ram_bank_write_err:
+    return err;
+}
