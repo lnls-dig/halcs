@@ -4,5 +4,3 @@ After=network-online.target
 Wants=network-online.target
 After=halcs-be@%i.service
 Wants=halcs-be@%i.service
-After=halcs-fe@%i.service
-Wants=halcs-fe@%i.service
