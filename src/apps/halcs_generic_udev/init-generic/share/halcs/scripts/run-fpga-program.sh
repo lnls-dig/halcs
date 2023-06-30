@@ -15,6 +15,12 @@ FMC_NAMES=($@)
 # Get HALCS instances
 HALCS_IDXS=($(${DIR}/get-halcs-idxs.sh ${DEVICE_NUMBER}))
 
+HOST=$(hostname)
+case "$HOST" in
+  *rabpm-*) CRATE_NUMBER=$(echo "$HOST" | tr -d -c 0-9) ;;
+  *rabpmtl*) CRATE_NUMBER=21
+esac
+
 for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
     prog_inst=$((i-1));
     case "${GATEWARE_NAME}" in
@@ -22,6 +28,9 @@ for i in $(seq 1 "${#HALCS_IDXS[@]}"); do
             case "${FMC_NAMES[$prog_inst]}" in
                 LNLS_FMC250M*)
                     START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"
+                    cd /opt/rffe-epics-ioc
+                    CRATE_NUMBER=$CRATE_NUMBER docker-compose up -d rffe-ioc-${HALCS_IDXS[$prog_inst]}
+                    cd -
                     ;;
                 LNLS_FMC130M*)
                     START_PROGRAM="/usr/bin/systemctl --no-block start halcs-ioc@${HALCS_IDXS[$prog_inst]}.target"

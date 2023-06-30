@@ -4,7 +4,6 @@ After=network-online.target
 Wants=network-online.target
 After=malamute.service
 Requires=malamute.service
-PartOf=halcs@%i.target
 
 [Service]
 Environment=HALCS_LOG_DIR=/var/log/halcs
@@ -12,7 +11,3 @@ ExecStartPre=/bin/mkdir -p ${HALCS_LOG_DIR}
 ExecStart=/usr/local/bin/halcsd -f /usr/local/etc/halcs/halcs.cfg -n fe -t eth -i %i -b ipc:///tmp/malamute -l ${HALCS_LOG_DIR}
 WorkingDirectory=/usr/local/bin
 TimeoutStopSec=2
-
-[Install]
-RequiredBy=halcs-fe-ioc@%i.service
-WantedBy=halcs@%i.target
