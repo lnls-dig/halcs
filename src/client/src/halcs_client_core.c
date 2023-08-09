@@ -2209,6 +2209,17 @@ PARAM_FUNC_CLIENT_READ(sw_dly)
     return param_client_read (self, service, SWAP_OPCODE_SET_GET_SW_DLY, sw_dly);
 }
 
+/* Switching phase synchronization enable */
+PARAM_FUNC_CLIENT_WRITE(div_f_cnt_en)
+{
+    return param_client_write (self, service, SWAP_OPCODE_SET_GET_DIV_F_CNT_EN, div_f_cnt_en);
+}
+
+PARAM_FUNC_CLIENT_READ(div_f_cnt_en)
+{
+    return param_client_read (self, service, SWAP_OPCODE_SET_GET_DIV_F_CNT_EN, div_f_cnt_en);
+}
+
 /**************** RFFE SMIO Functions ****************/
 
 /* RFFE get/set attenuator */

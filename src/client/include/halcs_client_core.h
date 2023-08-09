@@ -1175,6 +1175,9 @@ halcs_client_err_e halcs_set_sw_dly (halcs_client_t *self, char *service,
 halcs_client_err_e halcs_get_sw_dly (halcs_client_t *self, char *service,
         uint32_t *sw_dly);
 
+halcs_client_err_e halcs_set_div_f_cnt_en (halcs_client_t *, char *, uint32_t);
+halcs_client_err_e halcs_get_div_f_cnt_en (halcs_client_t *, char *, uint32_t *);
+
 /********************** RFFE Functions ********************/
 
 /* Attenuator functions */

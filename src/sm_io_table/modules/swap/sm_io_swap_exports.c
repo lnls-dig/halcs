@@ -46,10 +46,23 @@ disp_op_t swap_set_get_sw_dly_exp = {
     }
 };
 
+disp_op_t swap_set_get_div_f_cnt_en = {
+    .name = SWAP_NAME_SET_GET_DIV_F_CNT_EN,
+    .opcode = SWAP_OPCODE_SET_GET_DIV_F_CNT_EN,
+    .retval = DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+    .retval_owner = DISP_OWNER_OTHER,
+    .args = {
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_ENCODE(DISP_ATYPE_UINT32, uint32_t),
+        DISP_ARG_END
+    }
+};
+
 /* Exported function description */
 const disp_op_t *swap_exp_ops [] = {
     &swap_set_get_sw_exp,
     &swap_set_get_div_clk_exp,
     &swap_set_get_sw_dly_exp,
+    &swap_set_get_div_f_cnt_en,
     NULL
 };

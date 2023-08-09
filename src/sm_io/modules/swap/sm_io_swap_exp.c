@@ -68,11 +68,17 @@ RW_PARAM_FUNC(swap, sw_dly) {
             SET_FIELD);
 }
 
+RW_PARAM_FUNC(swap, div_f_cnt_en) {
+    SET_GET_PARAM(swap, 0x0, BPM_SWAP, CTRL, SWAP_DIV_F_CNT_EN, SINGLE_BIT_PARAM,
+            /**/, /**/, NO_CHK_FUNC, NO_FMT_FUNC, SET_FIELD);
+}
+
 /* Exported function pointers */
 const disp_table_func_fp swap_exp_fp [] = {
     RW_PARAM_FUNC_NAME(swap, sw),
     RW_PARAM_FUNC_NAME(swap, div_clk),
     RW_PARAM_FUNC_NAME(swap, sw_dly),
+    RW_PARAM_FUNC_NAME(swap, div_f_cnt_en),
     NULL
 };
 
