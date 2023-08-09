@@ -20,7 +20,9 @@
 #define SWAP_NAME_SET_GET_DIV_CLK           "swap_set_get_div_clk"
 #define SWAP_OPCODE_SET_GET_SW_DLY          2
 #define SWAP_NAME_SET_GET_SW_DLY            "swap_set_get_sw_dly"
-#define SWAP_OPCODE_END                     3
+#define SWAP_OPCODE_SET_GET_DIV_F_CNT_EN    3
+#define SWAP_NAME_SET_GET_DIV_F_CNT_EN      "swap_set_get_div_f_cnt_en"
+#define SWAP_OPCODE_END                     4
 
 #endif
 
